@@ -34,6 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -41,7 +42,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListener;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
@@ -608,7 +608,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         public StaticMovieAction(String name, Icon icon) {
             super(name, icon);
-            LayersModel.getSingletonInstance().addLayersListener(this);
+            Displayer.getLayersModel().addLayersListener(this);
         }
 
         /**

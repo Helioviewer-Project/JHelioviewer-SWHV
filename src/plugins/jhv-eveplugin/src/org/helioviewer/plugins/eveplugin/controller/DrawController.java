@@ -13,7 +13,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
@@ -36,7 +35,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         forAllPlotIdentifiers = new ArrayList<DrawControllerListener>();
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
         Displayer.addTimeListener(this);
     }
 
@@ -198,7 +197,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
 
     @Override
     public void layerRemoved(int oldIdx) {
-        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
+        if (Displayer.getLayersModel().getNumLayers() == 0) {
             fireRedrawRequestMovieFrameChanged(null);
         }
     }

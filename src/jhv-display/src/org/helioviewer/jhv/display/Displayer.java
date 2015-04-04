@@ -22,6 +22,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static final Displayer instance = new Displayer();
     private static final RenderableContainer renderableContainer = new RenderableContainer();
     private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
+    private static final LayersModel layersModel = new LayersModel();
 
     public static Displayer getSingletonInstance() {
         return instance;
@@ -37,7 +38,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private final Timer timer = new Timer(1000 / 20, new MyListener());
 
-    private static final LayersModel layersModel = LayersModel.getSingletonInstance();
     private static final FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
     private Displayer() {
@@ -143,6 +143,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static RenderableContainerPanel getRenderableContainerPanel() {
         return renderableContainerPanel;
+    }
+
+    public static LayersModel getLayersModel() {
+        return layersModel;
     }
 
 }

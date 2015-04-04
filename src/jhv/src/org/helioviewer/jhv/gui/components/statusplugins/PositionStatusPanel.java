@@ -54,7 +54,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
 
         setText("(x, y) = " + "(    0" + PRIME + PRIME + ",    0" + PRIME + PRIME + ")");
 
-        // LayersModel.getSingletonInstance().addLayersListener(this);
+        // Displayer.getLayersModel().addLayersListener(this);
     }
 
     public static PositionStatusPanel getSingletonInstance() {

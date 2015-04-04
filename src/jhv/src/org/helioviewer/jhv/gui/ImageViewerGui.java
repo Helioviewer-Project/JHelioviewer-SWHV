@@ -60,7 +60,6 @@ import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.View;
@@ -109,8 +108,6 @@ public class ImageViewerGui {
     private ComponentView mainComponentView;
 
     private FilterTabPanelManager filterTabPanelManager;
-
-    private LayeredView layeredView;
 
     private GL3DCameraView cameraView;
 
@@ -225,7 +222,6 @@ public class ImageViewerGui {
      */
     public void createViewchains() {
         State newState = StateController.getInstance().getCurrentState();
-        layeredView = new LayeredView();
 
         cameraView = new GL3DCameraView();
         //getCameraView().setView(layeredView);
@@ -457,8 +453,8 @@ public class ImageViewerGui {
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
-                        for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                            View subView = layeredView.getLayer(i);
+                        for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
+                            View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
@@ -510,8 +506,8 @@ public class ImageViewerGui {
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
-                        for (int i = 0; i < layeredView.getNumLayers(); i++) {
-                            View subView = layeredView.getLayer(i);
+                        for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
+                            View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (imageInfoView.equals(subView.getAdapter(ImageInfoView.class))) {
@@ -632,10 +628,6 @@ public class ImageViewerGui {
 
     public GL3DCameraView getCameraView() {
         return cameraView;
-    }
-
-    public LayeredView getLayeredView() {
-        return layeredView;
     }
 
     public ImageDataPanel getObservationImagePane() {

@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -18,7 +18,7 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Action to center the active layer.
- * 
+ *
  * @author Markus Langenberg
  */
 public class CenterImageAction extends AbstractAction {
@@ -38,8 +38,9 @@ public class CenterImageAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
-        View view = LayersModel.getSingletonInstance().getActiveView();
+        View view = Displayer.getLayersModel().getActiveView();
 
         if (view != null) {
             MetaDataView baseView = view.getAdapter(MetaDataView.class);

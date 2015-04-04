@@ -22,7 +22,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.view.AbstractComponentView;
@@ -186,7 +185,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         View v;
         JHVJP2View mv;
 
-        if ((v = LayersModel.getSingletonInstance().getActiveView()) == null || (mv = v.getAdapter(JHVJP2View.class)) == null) {
+        if ((v = Displayer.getLayersModel().getActiveView()) == null || (mv = v.getAdapter(JHVJP2View.class)) == null) {
             stopExport();
             return;
         }
@@ -232,7 +231,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
-        View v = LayersModel.getSingletonInstance().getActiveView();
+        View v = Displayer.getLayersModel().getActiveView();
         if (v instanceof JHVJPXView) {
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
@@ -249,7 +248,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
     }
 
     private void stopExport() {
-        View v = LayersModel.getSingletonInstance().getActiveView();
+        View v = Displayer.getLayersModel().getActiveView();
         JHVJPXView jpxView = (JHVJPXView) v;
 
         exportMode = false;

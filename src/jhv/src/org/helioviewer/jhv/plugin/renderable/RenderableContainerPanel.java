@@ -67,13 +67,13 @@ public class RenderableContainerPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
-            JHVJP2View activeView = LayersModel.getSingletonInstance().getActiveView();
+            JHVJP2View activeView = Displayer.getLayersModel().getActiveView();
 
             if (activeView instanceof JHVJPXView) {
                 JHVJPXView jpxView = (JHVJPXView) activeView;
                 if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
-                    ImmutableDateTime start = LayersModel.getSingletonInstance().getStartDate(activeView);
-                    ImmutableDateTime end = LayersModel.getSingletonInstance().getEndDate(activeView);
+                    ImmutableDateTime start = Displayer.getLayersModel().getStartDate(activeView);
+                    ImmutableDateTime end = Displayer.getLayersModel().getEndDate(activeView);
                     if (start != null && end != null) {
                         try {
                             Date startDate = start.getTime();

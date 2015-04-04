@@ -12,13 +12,11 @@ import java.util.TimerTask;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
@@ -70,7 +68,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
         noImagePostRendererSet = true;
 
         loadingPostRenderer.setContainerSize(getWidth(), getHeight());
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     /**
@@ -125,9 +123,9 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
                 for (MouseMotionListener l : mouseMotionListeners)
                     renderedImageComponent.addMouseMotionListener(l);
 
-            LayeredView layeredView = ImageViewerGui.getSingletonInstance().getLayeredView();
-            if (layeredView != null) {
-                if (layeredView.getNumLayers() > 0 || loadingTasks > 0) {
+            LayersModel layersModel = Displayer.getLayersModel();
+            if (layersModel != null) {
+                if (layersModel.getNumLayers() > 0 || loadingTasks > 0) {
                     // remove
                     if (noImagePostRendererSet) {
                         removePostRenderer(noImagePostRenderer);
@@ -170,7 +168,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
             addPostRenderer(noImagePostRenderer);
             noImagePostRendererSet = true;
         }
-        loadingPostRenderer.useCenterRenderer(LayersModel.getSingletonInstance().getNumLayers() == 0);
+        loadingPostRenderer.useCenterRenderer(Displayer.getLayersModel().getNumLayers() == 0);
     }
 
     @Override
@@ -179,7 +177,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
             removePostRenderer(noImagePostRenderer);
             noImagePostRendererSet = false;
         }
-        loadingPostRenderer.useCenterRenderer(LayersModel.getSingletonInstance().getNumLayers() == 0);
+        loadingPostRenderer.useCenterRenderer(Displayer.getLayersModel().getNumLayers() == 0);
     }
 
     @Override

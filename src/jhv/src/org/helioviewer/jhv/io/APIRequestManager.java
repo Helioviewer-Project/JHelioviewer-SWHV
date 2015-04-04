@@ -20,7 +20,7 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -360,7 +360,7 @@ public class APIRequestManager {
 
             @Override
             public void run() {
-                LayersModel.getSingletonInstance().addLayer(theView);
+                Displayer.getLayersModel().addLayer(theView);
             }
 
             public Runnable init(JHVJP2View theView) {

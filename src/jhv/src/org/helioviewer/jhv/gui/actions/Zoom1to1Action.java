@@ -6,15 +6,15 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.ZoomController;
-import org.helioviewer.jhv.layers.LayersModel;
 
 /**
  * Action to zoom to the native resoltion of the active layer.
- * 
+ *
  * @author Markus Langenberg
  */
 public class Zoom1to1Action extends AbstractAction {
@@ -24,7 +24,7 @@ public class Zoom1to1Action extends AbstractAction {
 
     /**
      * Constructor
-     * 
+     *
      * @param small
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
@@ -39,12 +39,13 @@ public class Zoom1to1Action extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (zoomController == null) {
             zoomController = new ZoomController();
             zoomController.setImagePanel(ImageViewerGui.getSingletonInstance().getMainImagePanel());
         }
-        zoomController.zoom1to1(ImageViewerGui.getSingletonInstance().getMainView(), LayersModel.getSingletonInstance().getActiveView());
+        zoomController.zoom1to1(ImageViewerGui.getSingletonInstance().getMainView(), Displayer.getLayersModel().getActiveView());
     }
 
 }

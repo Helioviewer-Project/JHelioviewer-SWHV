@@ -41,7 +41,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
      * private constructor
      */
     private SWHVHEKData() {
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     /**
@@ -59,8 +59,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     @Override
     public void layerAdded(int idx) {
         boolean request = false;
-        Date first = LayersModel.getSingletonInstance().getFirstDate();
-        Date last = LayersModel.getSingletonInstance().getLastDate();
+        Date first = Displayer.getLayersModel().getFirstDate();
+        Date last = Displayer.getLayersModel().getLastDate();
         if (beginDate == null || first.getTime() < beginDate.getTime()) {
             beginDate = first;
             request = true;

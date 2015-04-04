@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -27,7 +28,6 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
@@ -63,7 +63,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         timePane = new JPanel();
         plotPane = new JPanel();
         initVisualComponents();
-        LayersModel.getSingletonInstance().addLayersListener(SimpleObservationDialogUIPanel.this);
+        Displayer.getLayersModel().addLayersListener(SimpleObservationDialogUIPanel.this);
 
         // initGroups();
     }
@@ -103,7 +103,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        Interval<Date> movieInterval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+        Interval<Date> movieInterval = new Interval<Date>(Displayer.getLayersModel().getFirstDate(), Displayer.getLayersModel().getLastDate());
         if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
             return movieInterval;
         } else {
@@ -241,7 +241,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(int idx) {
-        View view = LayersModel.getSingletonInstance().getLayer(idx);
+        View view = Displayer.getLayersModel().getLayer(idx);
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
             Date start, end;

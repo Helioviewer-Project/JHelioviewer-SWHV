@@ -8,8 +8,8 @@ import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
@@ -47,7 +47,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     private ZoomController() {
         pas = PlotAreaSpace.getSingletonInstance();
         pas.addPlotAreaSpaceListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     /**
@@ -404,7 +404,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
             Thread.dumpStack();
             System.exit(666);
         }
-        final Interval<Date> interval = new Interval<Date>(LayersModel.getSingletonInstance().getFirstDate(), LayersModel.getSingletonInstance().getLastDate());
+        final Interval<Date> interval = new Interval<Date>(Displayer.getLayersModel().getFirstDate(), Displayer.getLayersModel().getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
         } else {
