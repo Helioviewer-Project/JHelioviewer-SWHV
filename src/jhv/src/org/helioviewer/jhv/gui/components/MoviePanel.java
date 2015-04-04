@@ -641,14 +641,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         private void searchCorrespondingMoviePanel(JHVJP2View view) {
             if (view instanceof JHVJPXView) {
                 JHVJPXView movieView = (JHVJPXView) view;
-                if (movieView != null) {
-                    setEnabled(true);
 
-                    for (MoviePanel panel : panelList) {
-                        if (panel.view == movieView) {
-                            activePanel = panel;
-                            return;
-                        }
+                setEnabled(true);
+                for (MoviePanel panel : panelList) {
+                    if (panel.view == movieView) {
+                        activePanel = panel;
+                        return;
                     }
                 }
             }
