@@ -23,14 +23,13 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
-import org.helioviewer.viewmodelplugin.overlay.OverlayPanel;
 
 /**
  * Panel of Pfss-Plugin
  *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssPluginPanel extends OverlayPanel {
+public class PfssPluginPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 

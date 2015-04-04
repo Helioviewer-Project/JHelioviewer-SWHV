@@ -30,7 +30,6 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.pluginsOLD.OverlayPluginDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodelplugin.controller.PluginContainer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -65,8 +64,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
-
-    private final JButton overlayButton = new JButton("Overlays");
 
     private final JButton okButton = new JButton("Ok", IconBank.getIcon(JHVIcon.CHECK));
 
@@ -151,21 +148,10 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         installedPane.add(listContainerPane, BorderLayout.CENTER);
         installedPane.add(installedButtonPane, BorderLayout.PAGE_END);
 
-        // center - sequence arrangement
-        final JPanel managePane = new JPanel();
-        managePane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        managePane.setBorder(BorderFactory.createTitledBorder(" Filter and Overlays "));
-        managePane.add(overlayButton);
-
-        overlayButton.setToolTipText("Opens a dialog where all available overlays can be managed.");
-
-        overlayButton.addActionListener(this);
-
         // center
         final JPanel centerPane = new JPanel();
         centerPane.setLayout(new BorderLayout());
         centerPane.add(installedPane, BorderLayout.CENTER);
-        centerPane.add(managePane, BorderLayout.PAGE_END);
 
         // footer
         final JPanel footer = new JPanel();
@@ -205,8 +191,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
             listLayout.show(listContainerPane, "empty");
         }
-
-        overlayButton.setEnabled(PluginManager.getSingletonInstance().getNumberOfOverlays() > 0);
     }
 
     /**
@@ -345,8 +329,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             importPlugin();
         } else if (e.getSource().equals(downloadButton)) {
             downloadPlugins();
-        } else if (e.getSource().equals(overlayButton)) {
-            new OverlayPluginDialog().showDialog();
         } else if (e.getSource().equals(filterComboBox)) {
             updatePluginList();
         }

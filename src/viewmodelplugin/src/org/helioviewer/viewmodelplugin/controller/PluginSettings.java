@@ -18,7 +18,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.helioviewer.viewmodel.renderer.physical.PhysicalRenderer;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,11 +36,6 @@ public class PluginSettings {
     private static final String NODES_PLUGIN = "Plugin";
     private static final String NODES_PLUGINLOCATION = "PluginLocation";
     private static final String NODES_PLUGINACTIVATED = "PluginActivated";
-    private static final String NODES_OVERLAYS = "Overlays";
-    private static final String NODES_OVERLAY = "Overlay";
-    private static final String NODES_OVERLAYNAME = "OverlayName";
-    private static final String NODES_OVERLAYACTIVATED = "OverlayActivated";
-    private static final String NODES_OVERLAYPOSITION = "OverlayPosition";
 
     private static final String PLUGIN_FILENAME = "PluginProperties.xml";
 
@@ -225,96 +219,6 @@ public class PluginSettings {
     }
 
     /**
-     * Adds or updates the information of a passed overlay to the internal XML
-     * document. This method does not save the XML document to the corresponding
-     * settings file!
-     *
-     * @param pluginLocation
-     *            location of the plug-in where the filter comes from.
-     * @param overlayContainer
-     *            Filter container whose information have to be updated in the
-     *            internal XML document.
-     * @see #savePluginSettings()
-     */
-    public void overlaySettingsToXML(URI pluginLocation, OverlayContainer overlayContainer) {
-        if (pluginLocation == null)
-            return;
-
-        Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return;
-
-        Node overlayNode = findNode(pluginNode, NODES_OVERLAYNAME, overlayContainer.getOverlayClass().getName());
-
-        if (overlayNode == null) {
-            addOverlayToXML(pluginNode, overlayContainer);
-        } else {
-            editOverlayInXML(overlayNode, overlayContainer);
-        }
-    }
-
-    /**
-     * Adds the information of a overlay to the XML document.
-     *
-     * @param pluginNode
-     *            Corresponding plug-in node of the given overlay.
-     * @param overlayContainer
-     *            Overlay container whose information have to be added to the
-     *            internal XML document.
-     */
-    private void addOverlayToXML(Node pluginNode, OverlayContainer overlayContainer) {
-        NodeList overlays = ((Element) pluginNode).getElementsByTagName(NODES_OVERLAYS);
-        Node overlaysNode;
-
-        if (overlays.getLength() == 1) {
-            overlaysNode = overlays.item(0);
-        } else {
-            overlaysNode = xmlDocument.createElement(NODES_OVERLAYS);
-            pluginNode.appendChild(overlaysNode);
-        }
-
-        Node overlayNode = xmlDocument.createElement(NODES_OVERLAY);
-        Node nameNode = xmlDocument.createElement(NODES_OVERLAYNAME);
-        Node activatedNode = xmlDocument.createElement(NODES_OVERLAYACTIVATED);
-        Node positionNode = xmlDocument.createElement(NODES_OVERLAYPOSITION);
-
-        overlaysNode.appendChild(overlayNode);
-        overlayNode.appendChild(nameNode);
-        overlayNode.appendChild(activatedNode);
-        overlayNode.appendChild(positionNode);
-
-        nameNode.appendChild(xmlDocument.createTextNode(overlayContainer.getOverlayClass().getName()));
-        activatedNode.appendChild(xmlDocument.createTextNode(Boolean.toString(overlayContainer.isActive())));
-        positionNode.appendChild(xmlDocument.createTextNode(Integer.toString(overlayContainer.getPosition())));
-    }
-
-    /**
-     * Updates the information of a passed overlay to the internal XML document.
-     *
-     * @param overlayNode
-     *            Corresponding overlay node of the given overlay.
-     * @param overlayContainer
-     *            Overlay container whose information have to be updated in the
-     *            internal XML document.
-     */
-    private void editOverlayInXML(Node overlayNode, OverlayContainer overlayContainer) {
-        NodeList list = ((Element) overlayNode).getElementsByTagName(NODES_OVERLAYACTIVATED);
-
-        if (list.getLength() == 1) {
-            Node textNode = list.item(0).getFirstChild();
-            textNode.setNodeValue(Boolean.toString(overlayContainer.isActive()));
-        }
-
-        list = ((Element) overlayNode).getElementsByTagName(NODES_OVERLAYPOSITION);
-
-        if (list.getLength() == 1) {
-            Node textNode = list.item(0).getFirstChild();
-            textNode.setNodeValue(Integer.toString(overlayContainer.getPosition()));
-        }
-    }
-
-    /**
      * Saves the internal XML document to the settings file.
      */
     public void savePluginSettings() {
@@ -369,76 +273,6 @@ public class PluginSettings {
             return isActivated(pluginNode, NODES_PLUGINACTIVATED);
 
         return true;
-    }
-
-    /**
-     * Checks the activated value of a given overlay in the XML document. If
-     * there is no entry in the XML document the return value is the passed
-     * default value.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @param overlayClass
-     *            Class of the overlay which has to be checked in the XML
-     *            document.
-     * @param defaultValue
-     *            value which has to be returned if there is no entry for the
-     *            given overlay in the XML document.
-     * @return boolean value as it is in the XML document or the passed default
-     *         value if no entry exists.
-     */
-    public boolean isOverlayInPluginActivated(URI pluginLocation, Class<? extends PhysicalRenderer> overlayClass, boolean defaultValue) {
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return defaultValue;
-
-        if (isActivated(pluginNode, NODES_PLUGINACTIVATED)) {
-
-            Node overlayNode = findNode(pluginNode, NODES_OVERLAYNAME, overlayClass.getName());
-            if (overlayNode != null)
-                return isActivated(overlayNode, NODES_OVERLAYACTIVATED);
-        }
-
-        return defaultValue;
-    }
-
-    /**
-     * Reads the saved position of a given overlay from the XML document.
-     *
-     * @param pluginLocation
-     *            location of the file where the plug-in comes from.
-     * @param overlayClass
-     *            Class of the overlay which has to be checked in the XML
-     *            document.
-     * @return The position of the overlay or -1 if there is no entry for the
-     *         given overlay.
-     */
-    public int getOverlayPosition(URI pluginLocation, Class<? extends PhysicalRenderer> overlayClass) {
-        Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-
-        if (pluginNode == null)
-            return -1;
-
-        if (isActivated(pluginNode, NODES_PLUGINACTIVATED)) {
-
-            Node overlayNode = findNode(pluginNode, NODES_OVERLAYNAME, overlayClass.getName());
-            if (overlayNode != null) {
-                NodeList list = ((Element) overlayNode).getElementsByTagName(NODES_OVERLAYPOSITION);
-
-                if (list.getLength() == 1) {
-                    Node child = list.item(0).getFirstChild();
-                    if (child != null && child.getNodeType() == Node.TEXT_NODE) {
-                        try {
-                            return Integer.parseInt(child.getNodeValue());
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-                }
-            }
-        }
-
-        return -1;
     }
 
     /**

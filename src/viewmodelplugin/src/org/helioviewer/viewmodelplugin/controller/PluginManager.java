@@ -23,7 +23,6 @@ import java.util.jar.Manifest;
 import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-import org.helioviewer.viewmodelplugin.overlay.OverlayContainer;
 
 /**
  * This class is responsible to manage all plug-ins for JHV. It loads available
@@ -41,7 +40,6 @@ public class PluginManager {
 
     private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
     private final Map<Plugin, PluginContainer> plugins = new HashMap<Plugin, PluginContainer>();
-    private final AbstractList<OverlayContainer> pluginOverlays = new LinkedList<OverlayContainer>();
 
     // ////////////////////////////////////////////////////////////////
     // Methods
@@ -190,59 +188,6 @@ public class PluginManager {
         for (PluginContainer container : plugins.values()) {
             if (container.isActive() == activated)
                 result.add(container);
-        }
-
-        return result;
-    }
-
-    /**
-     * Adds a container with a overlay to the list of all overlays.
-     *
-     * @param container
-     *            Overlay container to add to the list.
-     */
-    public void addOverlayContainer(OverlayContainer container) {
-        pluginOverlays.add(container);
-    }
-
-    /**
-     * Removes a container with a overlay from the list of all overlays.
-     *
-     * @param container
-     *            Overlay container to remove from the list.
-     */
-    public void removeOverlayContainer(OverlayContainer container) {
-        container.setActive(false);
-        container.changeSettings();
-
-        pluginOverlays.remove(container);
-    }
-
-    /**
-     * Returns the number of all available overlays.
-     *
-     * @return Number of available overlays.
-     * */
-    public int getNumberOfOverlays() {
-        return pluginOverlays.size();
-    }
-
-    /**
-     * Returns a list with all overlays which have the passed active status. If
-     * the active status is true all activated overlays will be returned
-     * otherwise all available and not activated overlays will be returned.
-     *
-     * @param activated
-     *            Indicates if all available (false) or all activated (true)
-     *            overlays have to be returned.
-     * @return list with all overlays which have the passed active status.
-     */
-    public AbstractList<OverlayContainer> getOverlayContainers(boolean activated) {
-        AbstractList<OverlayContainer> result = new LinkedList<OverlayContainer>();
-
-        for (OverlayContainer oc : pluginOverlays) {
-            if (oc.isActive() == activated)
-                result.add(oc);
         }
 
         return result;
