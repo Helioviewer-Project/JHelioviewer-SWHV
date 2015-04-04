@@ -19,7 +19,6 @@ import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -77,7 +76,7 @@ public class LayersModel {
      *            - index of the layer to be set as active Layer
      */
     public void setActiveLayer(int idx) {
-        View view = getLayer(idx);
+        JHVJP2View view = getLayer(idx);
         if (view == null && idx != -1) {
             return;
         }
@@ -428,7 +427,7 @@ public class LayersModel {
         }
     }
 
-    private void fireActiveLayerChanged(View view) {
+    private void fireActiveLayerChanged(JHVJP2View view) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(view);
         }

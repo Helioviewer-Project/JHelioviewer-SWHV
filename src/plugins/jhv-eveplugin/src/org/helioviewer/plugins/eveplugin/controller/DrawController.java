@@ -21,7 +21,7 @@ import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class DrawController implements ZoomControllerListener, LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener {
 
@@ -203,7 +203,7 @@ public class DrawController implements ZoomControllerListener, LineDataSelectorM
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
     }
 
 }

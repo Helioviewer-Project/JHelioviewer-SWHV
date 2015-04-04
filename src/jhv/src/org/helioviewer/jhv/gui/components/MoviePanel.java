@@ -47,11 +47,11 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -154,8 +154,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private final JPanel speedPanel;
 
     // References
-    private MovieView view;
-    private TimedMovieView timedView = null;
+    private JHVJPXView view;
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -169,7 +168,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel(MovieView movieView) {
+    public MoviePanel(JHVJPXView movieView) {
         this();
 
         if (movieView == null) {
@@ -177,15 +176,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         view = movieView;
-        if (view instanceof TimedMovieView) {
-            timedView = (TimedMovieView) movieView;
-        }
 
         timeSlider.setMaximum(movieView.getMaximumFrameNumber());
         timeSlider.setValue(movieView.getCurrentFrameNumber());
 
         SpeedUnit[] units;
-        if (view.getAdapter(MetaDataView.class) != null && view.getAdapter(MetaDataView.class).getMetaData() instanceof ObserverMetaData) {
+        if (view.getMetaData() instanceof ObserverMetaData) {
             SpeedUnit[] newunits = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
             units = newunits;
 
@@ -308,7 +304,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void setEnabled(boolean enabled) {
-        if (timedView == null) {
+        if (view == null) {
             enabled = false;
         }
 
@@ -404,7 +400,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             view.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
         } else {
-            timedView.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+            view.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
         }
     }
 
@@ -629,7 +625,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(View view) {
+        public void activeLayerChanged(JHVJP2View view) {
             this.searchCorrespondingMoviePanel(view);
         }
 
@@ -642,9 +638,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param view
          *            View to search panel for
          */
-        private void searchCorrespondingMoviePanel(View view) {
-            if (view != null) {
-                MovieView movieView = view.getAdapter(MovieView.class);
+        private void searchCorrespondingMoviePanel(JHVJP2View view) {
+            if (view instanceof JHVJPXView) {
+                JHVJPXView movieView = (JHVJPXView) view;
                 if (movieView != null) {
                     setEnabled(true);
 
@@ -694,7 +690,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(View view) {
+        public void activeLayerChanged(JHVJP2View view) {
             super.activeLayerChanged(view);
             if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
                 putValue(NAME, activePanel.playPauseButton.getToolTipText());
@@ -783,11 +779,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to add
          */
         public void linkMoviePanel(MoviePanel newPanel) {
-            if (newPanel.timedView == null) {
+            if (newPanel.view == null) {
                 return;
             }
 
-            newPanel.timedView.linkMovie();
+            newPanel.view.linkMovie();
 
             if (!linkedMovies.isEmpty()) {
                 // Copy Settings
@@ -799,11 +795,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 newPanel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
 
                 // move frame
-                ImmutableDateTime maxAvailableDateTime = newPanel.timedView.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
-                if (maxAvailableDateTime.getMillis() >= copyFrom.timedView.getCurrentFrameDateTime().getMillis()) {
-                    newPanel.timedView.setCurrentFrame(copyFrom.timedView.getCurrentFrameDateTime());
+                ImmutableDateTime maxAvailableDateTime = newPanel.view.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
+                if (maxAvailableDateTime.getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis()) {
+                    newPanel.view.setCurrentFrame(copyFrom.view.getCurrentFrameDateTime());
                 } else {
-                    newPanel.timedView.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber());
+                    newPanel.view.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber());
                 }
             }
 
@@ -820,7 +816,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to remove
          */
         public void unlinkMoviePanel(MoviePanel panel) {
-            panel.timedView.unlinkMovie();
+            panel.view.unlinkMovie();
             linkedMovies.remove(panel);
         }
 

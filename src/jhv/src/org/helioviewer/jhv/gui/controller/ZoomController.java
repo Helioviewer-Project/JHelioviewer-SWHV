@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.controller;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -12,9 +11,7 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
@@ -50,7 +47,7 @@ public class ZoomController {
      * Zooms in one step. A step mean scaling the current region of interest by
      * the square root of two
      */
-    public void zoomIn(View topmostView) {
+    public void zoomIn(JHVJP2View topmostView) {
         zoom(topmostView, zoomFactorStep);
     }
 
@@ -58,7 +55,7 @@ public class ZoomController {
      * Zooms out one step. A step mean scaling the current region of interest by
      * the square root of two
      */
-    public void zoomOut(View topmostView) {
+    public void zoomOut(JHVJP2View topmostView) {
         zoom(topmostView, 1.0 / zoomFactorStep);
     }
 
@@ -70,7 +67,7 @@ public class ZoomController {
      * @param steps
      *            Number of steps to zoom, the sign defines the direction.
      */
-    public void zoomSteps(View topmostView, int steps) {
+    public void zoomSteps(JHVJP2View topmostView, int steps) {
         zoom(topmostView, Math.pow(zoomFactorStep, steps));
     }
 
@@ -81,13 +78,9 @@ public class ZoomController {
      * @param zoomFactor
      *            zoom factor to scale the current region with
      */
-    public void zoom(View topmostView, double zoomFactor) {
+    public void zoom(JHVJP2View topmostView, double zoomFactor) {
 
-        RegionView regionView = topmostView.getAdapter(RegionView.class);
-        MetaDataView metaDataView = topmostView.getAdapter(MetaDataView.class);
-        ViewportView viewportView = topmostView.getAdapter(ViewportView.class);
-
-        if (regionView != null && metaDataView != null && metaDataView.getMetaData() != null) {
+        if (topmostView.getMetaData() != null) {
 
             // if zooming out, make sure that we do not get off too far
             if (zoomFactor < 1) {
@@ -98,7 +91,7 @@ public class ZoomController {
                 // too small
                 boolean tooSmall = true;
                 for (int i = 0; i < layersModel.getNumLayers(); ++i) {
-                    View view = layersModel.getLayer(i);
+                    JHVJP2View view = layersModel.getLayer(i);
                     if (getZoom(view) * zoomFactor > 0.005) {
                         tooSmall = false;
                         break;
@@ -108,17 +101,17 @@ public class ZoomController {
                     return;
                 }
             }
-            Region oldRegion = regionView.getRegion();
+            Region oldRegion = topmostView.getRegion();
             if (oldRegion == null) {
                 return;
             }
             Vector2dDouble newSizeVector = Vector2dDouble.scale(oldRegion.getSize(), 1.0 / zoomFactor);
 
             Vector2dDouble newCorner = null;
-            if (panel != null && viewportView != null) {
+            if (panel != null) {
                 Vector2dInt mousePosition = panel.getInputController().getMousePosition();
                 if (mousePosition != null) {
-                    Viewport v = viewportView.getViewport();
+                    Viewport v = topmostView.getViewport();
                     ViewportImageSize vis = ViewHelper.calculateViewportImageSize(v, oldRegion);
                     Vector2dInt visOffset = v.getSize().subtract(vis.getSizeVector()).scale(0.5);
                     Vector2dInt fixPointViewport = mousePosition.subtract(visOffset);
@@ -135,35 +128,26 @@ public class ZoomController {
             if (newCorner == null) {
                 newCorner = Vector2dDouble.add(oldRegion.getLowerLeftCorner(), Vector2dDouble.scale(Vector2dDouble.subtract(oldRegion.getSize(), newSizeVector), 0.5));
             }
-            Region zoomedRegion = ViewHelper.cropRegionToImage(StaticRegion.createAdaptedRegion(newCorner, newSizeVector), metaDataView.getMetaData());
+            Region zoomedRegion = ViewHelper.cropRegionToImage(StaticRegion.createAdaptedRegion(newCorner, newSizeVector), topmostView.getMetaData());
 
-            regionView.setRegion(zoomedRegion, new ChangeEvent());
+            topmostView.setRegion(zoomedRegion, new ChangeEvent());
         }
     }
 
-    public static double getZoom(View view, Region outerRegion, Viewport viewport) {
-        RegionView regionView = view.getAdapter(RegionView.class);
-        MetaDataView metaDataView = view.getAdapter(MetaDataView.class);
-        if (regionView != null && metaDataView != null) {
-            Region region = regionView.getRegion();
+    public static double getZoom(JHVJP2View view, Region outerRegion, Viewport viewport) {
+        if (view != null) {
+            Region region = view.getRegion();
             if (outerRegion == null) {
                 outerRegion = region;
             }
 
-            // JHVJP2View's getRegion method will only return the latest region
-            // that
-            // has been fully downloaded. This workaround get's the newest
-            // region
-            // which might not yet fully been downloaded yet
-            if (regionView instanceof JHVJP2View) {
-                region = ((JHVJP2View) regionView).getNewestRegion();
-            }
+            region = view.getNewestRegion();
 
             if (region == null || viewport == null) {
                 return 1.0;
             }
 
-            double unitsPerPixel = ((ImageSizeMetaData) metaDataView.getMetaData()).getUnitsPerPixel();
+            double unitsPerPixel = ((ImageSizeMetaData) view.getMetaData()).getUnitsPerPixel();
             ViewportImageSize vis = ViewHelper.calculateViewportImageSize(viewport, outerRegion);
             Viewport layerViewport = ViewHelper.calculateInnerViewport(region, outerRegion, vis);
             Vector2dInt actualSize = layerViewport.getSize();
@@ -173,14 +157,13 @@ public class ZoomController {
         return 1.0;
     }
 
-    public static double getZoom(View view, Viewport viewport) {
+    public static double getZoom(JHVJP2View view, Viewport viewport) {
         return getZoom(view, null, viewport);
     }
 
-    public static double getZoom(View view) {
-        ViewportView viewportView = view.getAdapter(ViewportView.class);
-        if (viewportView != null) {
-            Viewport viewport = viewportView.getViewport();
+    public static double getZoom(JHVJP2View view) {
+        if (view != null) {
+            Viewport viewport = view.getViewport();
             return getZoom(view, viewport);
         }
         return 1.0;
@@ -190,16 +173,16 @@ public class ZoomController {
      * Zooms the image in such a way, that the active layer is displayed in its
      * native resolution.
      */
-    public void zoom1to1(View topmostView, View activeView) {
+    public void zoom1to1(JHVJP2View topmostView, JHVJP2View activeView) {
         // View view = Displayer.getLayersModel().getActiveView();
         if (activeView != null && topmostView != null) {
             zoom(topmostView, 1.0 / getZoom(activeView));
         }
     }
 
-    public void zoom1to1(View topmostView, View activeView, Viewport viewport) {
+    public void zoom1to1(JHVJP2View topmostView, JHVJP2View activeView, Viewport viewport) {
         if (activeView != null && topmostView != null && viewport != null) {
-            zoom(topmostView, 1.0 / getZoom(activeView, topmostView.getAdapter(RegionView.class).getRegion(), viewport));
+            zoom(topmostView, 1.0 / getZoom(activeView, topmostView.getRegion(), viewport));
         }
     }
 
@@ -228,7 +211,7 @@ public class ZoomController {
      * main viewport.
      */
     public void zoomFit() {
-        zoomFit(Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
+        zoomFit(Displayer.getLayersModel().getActiveView(), Displayer.getLayersModel().getActiveView());
     }
 
 }

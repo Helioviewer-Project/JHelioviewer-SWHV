@@ -461,7 +461,7 @@ public class ImageViewerGui {
                                 // Set the correct image scale
                                 ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) subView.getMetaData();
                                 ZoomController zoomController = new ZoomController();
-                                zoomController.zoom(ImageViewerGui.getSingletonInstance().getMainView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
+                                zoomController.zoom(Displayer.getLayersModel().getActiveView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
 
                                 // Lock movie
                                 if (jhvRequest.linked) {

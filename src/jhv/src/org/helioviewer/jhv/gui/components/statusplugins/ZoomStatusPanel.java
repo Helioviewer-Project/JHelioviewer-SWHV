@@ -6,7 +6,7 @@ import javax.swing.BorderFactory;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.controller.ZoomController;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Status panel for displaying the current zoom.
@@ -40,7 +40,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
     /**
      * Updates the displayed zoom.
      */
-    private void updateZoomLevel(View view) {
+    private void updateZoomLevel(JHVJP2View view) {
         if (view != null) {
             long zoom = Math.round(ZoomController.getZoom(view) * 100);
             if (zoom != 0.0) {
@@ -59,7 +59,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
     }
 
     @Override
-    public void activeLayerChanged(View view) {
+    public void activeLayerChanged(JHVJP2View view) {
         updateZoomLevel(view);
     }
 

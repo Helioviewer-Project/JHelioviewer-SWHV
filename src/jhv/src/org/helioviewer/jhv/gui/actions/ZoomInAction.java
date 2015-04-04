@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -44,7 +45,7 @@ public class ZoomInAction extends AbstractAction {
             zoomController = new ZoomController();
             zoomController.setImagePanel(ImageViewerGui.getSingletonInstance().getMainImagePanel());
         }
-        zoomController.zoomSteps(ImageViewerGui.getSingletonInstance().getMainView(), 2);
+        zoomController.zoomSteps(Displayer.getLayersModel().getActiveView(), 2);
     }
 
 }

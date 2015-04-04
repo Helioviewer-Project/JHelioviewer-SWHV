@@ -9,10 +9,7 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.ZoomController;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
 
 /**
  * Action to zoom, such that the active layer fits completely in the viewport.
@@ -46,7 +43,7 @@ public class ZoomFitAction extends AbstractAction {
         if (zoomController == null) {
             zoomController = new ZoomController();
         }
-        zoomController.zoomFit(Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
+        zoomController.zoomFit(Displayer.getLayersModel().getActiveView(), Displayer.getLayersModel().getActiveView());
     }
 
 }
