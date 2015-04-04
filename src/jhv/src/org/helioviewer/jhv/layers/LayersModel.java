@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,12 +10,14 @@ import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LayeredView;
+import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -46,21 +47,7 @@ public class LayersModel {
 
     private static final LayeredView layeredView = new LayeredView();
 
-    /**
-     * Method returns the sole instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
-    public static LayersModel getSingletonInstance() {
-        if (!EventQueue.isDispatchThread()) {
-            System.out.println(">>> You have been naughty: " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(1);
-        }
-        return layersModel;
-    }
-
-    private LayersModel() {
+    public LayersModel() {
     }
 
     public LayeredView getLayeredView() {
@@ -84,19 +71,6 @@ public class LayersModel {
     }
 
     /**
-     * @param idx
-     *            - Index of the layer to be retrieved
-     * @return View associated with the given index
-     */
-    public JHVJP2View getLayer(int idx) {
-        idx = invertIndex(idx);
-        if (idx >= 0 && idx < getNumLayers()) {
-            return layeredView.getLayer(idx);
-        }
-        return null;
-    }
-
-    /**
      * Set the activeLayer to the Layer associated with the given index
      *
      * @param idx
@@ -107,7 +81,6 @@ public class LayersModel {
         if (view == null && idx != -1) {
             return;
         }
-
         activeLayer = idx;
         fireActiveLayerChanged(view);
     }
@@ -235,66 +208,9 @@ public class LayersModel {
     public int findView(JHVJP2View view) {
         int idx = -1;
         if (view != null) {
-            idx = layeredView.getLayerLevel(view);
-        }
-        return invertIndex(idx);
-    }
-
-    /**
-     * Important internal method to convert between LayersModel indexing and
-     * LayeredView indexing. Calling it twice should form the identity
-     * operation.
-     *
-     * LayersModel indices go from 0 .. (LayerCount - 1), with 0 being the
-     * uppermost layer
-     *
-     * whereas
-     *
-     * LayeredView indies go from (LayerCount - 1) .. 0, with 0 being the layer
-     * at the bottom.
-     *
-     * @param idx
-     *            to be converted from LayersModel to LayeredView or the other
-     *            direction.
-     * @return the inverted index
-     */
-    private int invertIndex(int idx) {
-        int num = this.getNumLayers();
-        // invert indices
-        if (idx >= 0 && num > 0) {
-            idx = num - 1 - idx;
+            idx = this.getLayerLevel(view);
         }
         return idx;
-    }
-
-    /**
-     * Important internal method to convert between LayersModel indexing and
-     * LayeredView indexing.
-     *
-     * Since this index transformation involves the number of layers, this
-     * transformation has to pay respect to situation where the number of layers
-     * has changed.
-     *
-     * @param idx
-     *            to be converted from LayersModel to LayeredView or the other
-     *            direction after a layer has been deleted
-     * @return inverted index
-     */
-    private int invertIndexDeleted(int idx) {
-        int num = this.getNumLayers();
-        if (idx >= 0) {
-            idx = num - idx;
-        }
-        return idx;
-    }
-
-    /**
-     * Return the number of layers currently available
-     *
-     * @return number of layers
-     */
-    public int getNumLayers() {
-        return layeredView.getNumLayers();
     }
 
     /**
@@ -400,25 +316,19 @@ public class LayersModel {
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
     public void showMetaInfo(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
-
         MetaDataDialog dialog = new MetaDataDialog();
         dialog.setMetaData(view);
         dialog.showDialog();
     }
 
     public void addLayer(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
+        movieManager.pauseLinkedMovies();
 
-        int newIndex = invertIndex(layeredView.addLayer(view));
-        // wtf
+        GL3DImageLayer imageLayer = new GL3DImageLayer("", view, true, true, true);
+        view.setImageLayer(imageLayer);
+        layers.add(view);
 
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        // If MoviewView, add MoviePanel
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = new MoviePanel((JHVJPXView) view);
             setLink(view, true);
@@ -428,7 +338,7 @@ public class LayersModel {
             MoviePanel moviePanel = new MoviePanel(null);
             ivg.getMoviePanelContainer().addLayer(view, moviePanel);
         }
-
+        int newIndex = layers.size() - 1;
         fireLayerAdded(newIndex);
         setActiveLayer(newIndex);
     }
@@ -440,9 +350,6 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public void removeLayer(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
 
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
@@ -450,11 +357,21 @@ public class LayersModel {
                 moviePanel.remove();
             }
         }
+        int index = layers.indexOf(view);
 
-        int oldIndex = invertIndexDeleted(layeredView.removeLayer(view));
-        fireLayerRemoved(oldIndex);
+        movieManager.pauseLinkedMovies();
 
-        int newIndex = determineNewActiveLayer(oldIndex);
+        layers.remove(view);
+
+        JHVJP2View jp2 = view.getAdapter(JHVJP2View.class);
+        if (jp2 != null) {
+            jp2.abolish();
+            jp2.removeRenderListener();
+        }
+
+        fireLayerRemoved(index);
+
+        int newIndex = determineNewActiveLayer(index);
         setActiveLayer(newIndex);
     }
 
@@ -527,6 +444,50 @@ public class LayersModel {
 
     public LinkedList<TimedMovieView> getLayers() {
         return null;
+    }
+
+    private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
+
+    private final ArrayList<JHVJP2View> layers = new ArrayList<JHVJP2View>();
+
+    /**
+     * Returns the view at a given position within the stack of layers.
+     *
+     * @param index
+     *            Position within the stack of layers
+     * @return View at given position
+     */
+    public JHVJP2View getLayer(int index) {
+        try {
+            return layers.get(index);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns number of layers currently connected to the LayeredView.
+     *
+     * @return Number of layers
+     * @see #getNumberOfVisibleLayer
+     */
+    public int getNumLayers() {
+        return layers.size();
+    }
+
+    /**
+     * Returns the position of the view within the stack of layers.
+     *
+     * Zero indicates the most bottom view. If the given view is not a direct
+     * child of the LayeredView, the function returns -1.
+     *
+     * @param view
+     *            View to search for within the stack of layers
+     * @return Position of the view within stack
+     * @see #moveView
+     */
+    public int getLayerLevel(JHVJP2View view) {
+        return layers.indexOf(view);
     }
 
 }

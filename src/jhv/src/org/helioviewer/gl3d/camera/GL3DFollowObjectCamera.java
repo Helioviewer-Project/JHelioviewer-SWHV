@@ -10,7 +10,6 @@ import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -30,7 +29,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         super();
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     @Override
@@ -64,8 +63,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void timeChanged(Date date) {
         if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
             //Layer times
-            long t1 = LayersModel.getSingletonInstance().getFirstDate().getTime();
-            long t2 = LayersModel.getSingletonInstance().getLastDate().getTime();
+            long t1 = Displayer.getLayersModel().getFirstDate().getTime();
+            long t2 = Displayer.getLayersModel().getLastDate().getTime();
             //Camera times
             long t3 = this.positionLoading.getBeginDate().getTime();
             long t4 = this.positionLoading.getEndDate().getTime();

@@ -38,7 +38,7 @@ public class PfssRenderable implements Renderable, LayersListener {
         this.pfssCache = pfssCache;
         Displayer.getRenderablecontainer().addRenderable(this);
         this.optionsPanel = new PfssPluginPanel();
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     @Override
@@ -105,8 +105,8 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void layerAdded(int idx) {
-        Date start = LayersModel.getSingletonInstance().getFirstDate();
-        Date end = LayersModel.getSingletonInstance().getLastDate();
+        Date start = Displayer.getLayersModel().getFirstDate();
+        Date end = Displayer.getLayersModel().getLastDate();
         Thread t = new Thread(new PfssNewDataLoader(start, end, pfssCache), "PFFSLoader");
         pfssNewLoadPool.submit(t);
     }

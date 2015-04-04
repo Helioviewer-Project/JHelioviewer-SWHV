@@ -15,11 +15,10 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.AbstractFilterPanel;
-import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
@@ -213,7 +212,7 @@ public class FilterTabPanelManager {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                LayersModel.getSingletonInstance().downloadLayer(jp2view);
+                Displayer.getLayersModel().downloadLayer(jp2view);
             }
         };
         downloadLayerButton.setAction(downloadLayerAction);
@@ -226,7 +225,7 @@ public class FilterTabPanelManager {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                LayersModel.getSingletonInstance().showMetaInfo(jp2view);
+                Displayer.getLayersModel().showMetaInfo(jp2view);
             }
         };
         showMetaButton.setAction(showMetaAction);

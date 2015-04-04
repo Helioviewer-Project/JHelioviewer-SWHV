@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.controller;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -9,7 +10,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
@@ -21,7 +21,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Collection of several zooming functions.
- * 
+ *
  * <p>
  * This class provides several zooming functions. The controller is used by
  * several classes, such as {@link org.helioviewer.jhv.gui.actions.ZoomInAction}, {@link org.helioviewer.jhv.gui.actions.ZoomOutAction},
@@ -38,7 +38,7 @@ public class ZoomController {
     /**
      * Sets the panel on which the zoom controller should operate. Can be used
      * to zoom to the current mouse position within the specified panel.
-     * 
+     *
      * @param panel
      *            An ImagePanel
      */
@@ -66,7 +66,7 @@ public class ZoomController {
      * Zooms in or out the desired number of steps. A step mean scaling the
      * current region of interest by the square root of two. To zoom in, steps
      * has to be greater than zero, to zoom out it has to be lesser than zero.
-     * 
+     *
      * @param steps
      *            Number of steps to zoom, the sign defines the direction.
      */
@@ -77,7 +77,7 @@ public class ZoomController {
     /**
      * Zooms by scaling the current region by the given zoom factor. Uses a
      * heuristic to avoid zooming out TOO much!
-     * 
+     *
      * @param zoomFactor
      *            zoom factor to scale the current region with
      */
@@ -92,13 +92,13 @@ public class ZoomController {
             // if zooming out, make sure that we do not get off too far
             if (zoomFactor < 1) {
 
-                LayeredView layeredView = regionView.getAdapter(LayeredView.class);
+                LayersModel layersModel = Displayer.getLayersModel();
 
                 // loop over all layers to check if all layers would be getting
                 // too small
                 boolean tooSmall = true;
-                for (int i = 0; i < layeredView.getNumLayers(); ++i) {
-                    View view = layeredView.getLayer(i);
+                for (int i = 0; i < layersModel.getNumLayers(); ++i) {
+                    View view = layersModel.getLayer(i);
                     if (getZoom(view) * zoomFactor > 0.005) {
                         tooSmall = false;
                         break;
@@ -191,7 +191,7 @@ public class ZoomController {
      * native resolution.
      */
     public void zoom1to1(View topmostView, View activeView) {
-        // View view = LayersModel.getSingletonInstance().getActiveView();
+        // View view = Displayer.getLayersModel().getActiveView();
         if (activeView != null && topmostView != null) {
             zoom(topmostView, 1.0 / getZoom(activeView));
         }
@@ -206,7 +206,7 @@ public class ZoomController {
     /**
      * Zooms the image in such a way, that the whole region given by the
      * metaData fits exactly into the viewport.
-     * 
+     *
      * @param metaDataView
      *            MetaDataView of the layer which should be fit into the
      *            viewport
@@ -228,7 +228,7 @@ public class ZoomController {
      * main viewport.
      */
     public void zoomFit() {
-        zoomFit(LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
+        zoomFit(Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
     }
 
 }

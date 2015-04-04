@@ -19,7 +19,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;
@@ -282,7 +281,7 @@ public class GL3DImageLayer implements Renderable {
         disableIndexVBO(state);
         deletePositionVBO(state);
         deleteIndexVBO(state);
-        LayersModel.getSingletonInstance().removeLayer(getMainLayerView());
+        Displayer.getLayersModel().removeLayer(getMainLayerView());
     }
 
     private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {

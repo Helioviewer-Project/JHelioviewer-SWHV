@@ -26,7 +26,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.JHVUncaughtExceptionHandler;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -77,7 +77,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         *
+         * 
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -103,7 +103,7 @@ public class MovieExport {
         args.add("-s");
         args.add("" + width + "x" + height);
         args.add("-r");
-        MovieView movieView = LayersModel.getSingletonInstance().getActiveView().getAdapter(MovieView.class);
+        MovieView movieView = Displayer.getLayersModel().getActiveView().getAdapter(MovieView.class);
         if (movieView != null) {
             framerate = movieView.getDesiredRelativeSpeed();
         }
@@ -129,7 +129,7 @@ public class MovieExport {
         String exportPath = exportdir.getPath();
         int i = 0;
 
-        JHVJPXView jpx = LayersModel.getSingletonInstance().getActiveView().getAdapter(JHVJPXView.class);
+        JHVJPXView jpx = Displayer.getLayersModel().getActiveView().getAdapter(JHVJPXView.class);
         String path;
         if (jpx != null) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");

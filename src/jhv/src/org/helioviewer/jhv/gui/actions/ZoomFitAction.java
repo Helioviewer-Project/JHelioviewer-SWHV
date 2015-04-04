@@ -6,17 +6,17 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.ZoomController;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 
 /**
  * Action to zoom, such that the active layer fits completely in the viewport.
- * 
+ *
  * @author Markus Langenberg
  */
 public class ZoomFitAction extends AbstractAction {
@@ -26,7 +26,7 @@ public class ZoomFitAction extends AbstractAction {
 
     /**
      * Constructor
-     * 
+     *
      * @param small
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
@@ -41,11 +41,12 @@ public class ZoomFitAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         if (zoomController == null) {
             zoomController = new ZoomController();
         }
-        zoomController.zoomFit(LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
+        zoomController.zoomFit(Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class), ImageViewerGui.getSingletonInstance().getMainView().getAdapter(RegionView.class));
     }
 
 }

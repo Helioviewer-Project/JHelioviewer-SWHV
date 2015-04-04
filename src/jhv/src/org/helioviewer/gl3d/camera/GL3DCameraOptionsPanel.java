@@ -18,7 +18,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.View;
 
 public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener, LayersListener {
@@ -30,7 +29,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     private JTabbedPane tab;
 
     public GL3DCameraOptionsPanel() {
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setModel();
         addCameraTabs();
@@ -120,7 +119,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     @Override
     public void fireInit() {
         this.initCamera(cameraSelectorModel.getObserverCamera());
-        if (LayersModel.getSingletonInstance().getNumLayers() > 0) {
+        if (Displayer.getLayersModel().getNumLayers() > 0) {
             visactivate();
         } else {
             visdeactivate();
@@ -160,14 +159,14 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
     @Override
     public void layerAdded(int idx) {
-        if (LayersModel.getSingletonInstance().getNumLayers() > 0) {
+        if (Displayer.getLayersModel().getNumLayers() > 0) {
             this.visactivate();
         }
     }
 
     @Override
     public void layerRemoved(int oldIdx) {
-        if (LayersModel.getSingletonInstance().getNumLayers() == 0) {
+        if (Displayer.getLayersModel().getNumLayers() == 0) {
             this.visdeactivate();
         }
     }

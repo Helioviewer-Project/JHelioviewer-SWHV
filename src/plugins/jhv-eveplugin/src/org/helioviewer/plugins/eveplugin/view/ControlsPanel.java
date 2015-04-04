@@ -21,11 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.helioviewer.base.math.Interval;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
@@ -71,7 +71,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private ControlsPanel() {
         initVisualComponents();
         ZoomController.getSingletonInstance().addZoomControllerListener(this);
-        LayersModel.getSingletonInstance().addLayersListener(this);
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     private void initVisualComponents() {
@@ -173,7 +173,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void setDateRange() {
-        View activeView = LayersModel.getSingletonInstance().getActiveView();
+        View activeView = Displayer.getLayersModel().getActiveView();
         JHVJPXView jpxView = activeView.getAdapter(JHVJPXView.class);
         if (jpxView != null) {
             Date start, end;
@@ -187,8 +187,8 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void setEnabledStateOfPeriodMovieButton() {
-        Date start = LayersModel.getSingletonInstance().getFirstDate();
-        Date end = LayersModel.getSingletonInstance().getLastDate();
+        Date start = Displayer.getLayersModel().getFirstDate();
+        Date end = Displayer.getLayersModel().getLastDate();
 
         periodFromLayersButton.setEnabled(start != null && end != null);
     }

@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.View;
@@ -40,7 +39,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         int x = e.getPoint().x - this.lastMousePoint.x;
         int y = e.getPoint().y - this.lastMousePoint.y;
 
-        View view = LayersModel.getSingletonInstance().getActiveView();
+        View view = Displayer.getLayersModel().getActiveView();
 
         Region region;
         RegionView regionView = view.getAdapter(RegionView.class);

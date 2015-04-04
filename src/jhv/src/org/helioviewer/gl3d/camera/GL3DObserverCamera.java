@@ -10,7 +10,6 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.MetaDataView;
@@ -63,7 +62,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         double addl0 = 0.;
         double addb0 = 0.;
 
-        MetaDataView mdv = LayersModel.getSingletonInstance().getActiveView().getAdapter(MetaDataView.class);
+        MetaDataView mdv = Displayer.getLayersModel().getActiveView().getAdapter(MetaDataView.class);
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
             if (metadata instanceof HelioviewerPositionedMetaData) {
