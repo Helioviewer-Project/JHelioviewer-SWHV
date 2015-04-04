@@ -101,11 +101,9 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
 
     private static void displayBody(GL2 gl, View v, int width, int height) {
         GL3DState state = GL3DState.get();
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         GL3DCamera camera = ImageViewerGui.getSingletonInstance().getCameraView().getCurrentCamera();
-        if (camera != null) {
-            state.setActiveChamera(camera);
-        }
+        state.setActiveChamera(camera);
+
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
 
@@ -113,12 +111,11 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glEnable(GL2.GL_DEPTH_TEST);
 
         state.pushMV();
-        state.getActiveCamera().applyPerspective(state);
-        state.getActiveCamera().applyCamera(state);
+        camera.applyPerspective(state);
+        camera.applyCamera(state);
         Displayer.getRenderablecontainer().render(state);
-        state.getActiveCamera().drawCamera(state);
-        state.getActiveCamera().resumePerspective(state);
-
+        camera.drawCamera(state);
+        camera.resumePerspective(state);
         state.popMV();
 
         gl.glEnable(GL2.GL_BLEND);
@@ -131,11 +128,7 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         int height = canvas.getHeight();
 
         GL3DState.setUpdated(gl, width, height);
-
-        if (backGroundColorChanged) {
-            gl.glClearColor(backgroundColor.getRed() / 255.0f, backgroundColor.getGreen() / 255.0f, backgroundColor.getBlue() / 255.0f, backgroundColor.getAlpha() / 255.0f);
-            backGroundColorChanged = false;
-        }
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         gl.glPushMatrix();
         displayBody(gl, view, width, height);

@@ -20,7 +20,6 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.LayeredView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
@@ -127,7 +126,7 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
                 for (MouseMotionListener l : mouseMotionListeners)
                     renderedImageComponent.addMouseMotionListener(l);
 
-            LayeredView layeredView = ViewHelper.getViewAdapter(newView, LayeredView.class);
+            LayeredView layeredView = ImageViewerGui.getSingletonInstance().getLayeredView();
             if (layeredView != null) {
                 if (layeredView.getNumLayers() > 0 || loadingTasks > 0) {
                     // remove
