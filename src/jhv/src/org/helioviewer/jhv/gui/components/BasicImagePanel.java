@@ -9,6 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -72,8 +73,10 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void addMouseListener(MouseListener l) {
-        if (renderedImageComponent != null)
+
+        if (renderedImageComponent != null && !Arrays.asList(renderedImageComponent.getMouseListeners()).contains(l)) {
             renderedImageComponent.addMouseListener(l);
+        }
     }
 
     /**
