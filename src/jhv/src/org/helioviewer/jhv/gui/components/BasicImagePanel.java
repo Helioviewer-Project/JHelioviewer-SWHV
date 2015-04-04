@@ -42,7 +42,6 @@ public class BasicImagePanel extends JPanel {
 
     protected Image backgroundImage;
 
-
     /**
      * Default constructor.
      * */

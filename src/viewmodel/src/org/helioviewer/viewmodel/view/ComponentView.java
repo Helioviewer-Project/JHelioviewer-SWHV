@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
+import java.io.IOException;
 import java.util.AbstractList;
 
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
@@ -27,7 +28,7 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
  * @author Markus Langenberg
  *
  */
-public interface ComponentView extends ModifiableInnerViewView, ViewListener {
+public interface ComponentView extends ViewListener {
 
     /**
      * Deactivate the Component View can be used to clean up the component view

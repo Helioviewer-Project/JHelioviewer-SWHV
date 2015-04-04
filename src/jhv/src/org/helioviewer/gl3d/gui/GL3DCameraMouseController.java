@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.AbstractImagePanelMouseController;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 
 /**
@@ -36,7 +36,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     private GL3DCameraView cameraView;
 
     @Override
-    public void setView(View newView) {
+    public void setView(ComponentView newView) {
         cameraView = ImageViewerGui.getSingletonInstance().getCameraView();
         super.setView(newView);
     }
