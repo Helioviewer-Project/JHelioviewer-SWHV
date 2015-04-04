@@ -348,6 +348,13 @@ public class APIRequestManager {
     }
 
     private static void addToViewchain(JHVJP2View view) {
+        while (view.getSubimageData() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         EventQueue.invokeLater(new Runnable() {
             private JHVJP2View theView;
 
