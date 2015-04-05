@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -176,9 +175,6 @@ public class JHVSimpleImageView extends AbstractView implements ViewportView, Re
      */
     @Override
     public boolean setRegion(Region r, ChangeEvent event) {
-
-        event.addReason(new RegionUpdatedReason(this, r));
-
         // check if region has changed
         if ((region == r) || (region != null && r != null && region.getCornerX() == r.getCornerX() && region.getCornerY() == r.getCornerY() && region.getWidth() == r.getWidth() && region.getHeight() == r.getHeight()))
             return false;

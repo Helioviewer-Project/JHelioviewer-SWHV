@@ -9,7 +9,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.RegionChangedReason;
-import org.helioviewer.viewmodel.changeevent.RegionUpdatedReason;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -86,7 +85,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
      *            Specifies the location of the FITS file.
      * */
     public JHVFITSView(FITSImage fits, URI uri, Interval<Date> range) {
-
         this.uri = uri;
         this.fits = fits;
         this.range = range;
@@ -99,11 +97,9 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
      * Initializes global variables.
      */
     private void initFITSImageView() {
-
         m = MetaDataConstructor.getMetaData(fits);
 
         BufferedImage bi = fits.getImage(0, 0, fits.getPixelHeight(), fits.getPixelWidth());
-
         if (bi.getColorModel().getPixelSize() <= 8) {
             subImageData = new SingleChannelByte8ImageData(bi, new ColorMask());
         } else if (bi.getColorModel().getPixelSize() <= 16) {
@@ -125,7 +121,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
      * */
     private void updateImageData(ChangeEvent event) {
         Region r = region;
-
         m = getMetaData();
 
         double imageMeterPerPixel = m.getPhysicalImageWidth() / fits.getPixelWidth();
@@ -135,12 +130,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
         Vector2dInt imagePostion = ViewHelper.calculateInnerViewportOffset(r, m.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(fits.getPixelWidth(), fits.getPixelHeight())));
 
         BufferedImage bi = fits.getImage(imagePostion.getX(), imagePostion.getY(), (int) imageHeight, (int) imageWidth);
-
-        /*
-         * mageData.getSubimage(imagePostion.getX(), imagePostion.getY(), (int)
-         * imageWidth, (int) imageHeight);
-         */
-
         if (bi.getColorModel().getPixelSize() <= 8) {
             subImageData = new SingleChannelByte8ImageData(bi, new ColorMask());
         } else if (bi.getColorModel().getPixelSize() <= 16) {
@@ -166,7 +155,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
      * */
     @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
-
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
             return false;
@@ -192,9 +180,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
      * */
     @Override
     public boolean setRegion(Region r, ChangeEvent event) {
-
-        event.addReason(new RegionUpdatedReason(this, r));
-
         // check if region has changed
         if ((region == r) || (region != null && r != null && region.getCornerX() == r.getCornerX() && region.getCornerY() == r.getCornerY() && region.getWidth() == r.getWidth() && region.getHeight() == r.getHeight()))
             return false;
