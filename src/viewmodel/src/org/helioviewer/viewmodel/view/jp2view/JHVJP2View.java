@@ -84,8 +84,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
     protected Region region, lastRegion;
     protected ImageData imageData;
 
-    protected CircularSubImageBuffer subImageBuffer = new CircularSubImageBuffer();
-
     // Member related to JP2
     protected boolean isMainView;
     protected boolean isPersistent;
@@ -585,8 +583,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
 
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
-        subImageBuffer.putSubImage(subImage, r);
-
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
     }
 
@@ -743,8 +739,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
 
         this.imageData = newImageData;
 
-        subImageBuffer.setLastRegion(roi);
-
         fireFrameChanged(this, dtc);
     }
 
@@ -793,63 +787,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
      */
     void updateParameter() {
         setImageViewParams(calculateParameter());
-    }
-
-    /**
-     * Private class for remembering the
-     * {@link org.helioviewer.viewmodel.region.Region} corresponding to
-     * {@link org.helioviewer.viewmodel.view.jp2view.image.SubImage}.
-     *
-     * <p>
-     * To ensure, that the size of the buffer does not grow into infinity, this
-     * buffer is organized in circle.
-     */
-    private class CircularSubImageBuffer {
-
-        private static final int bufferSize = 16;
-        private final SubImageRegion[] buffer = new SubImageRegion[bufferSize];
-        private int nextPos = 0;
-
-        /**
-         * Puts a new pair of Region and SubImage into the buffer.
-         *
-         * @param subImage
-         * @param subImageRegion
-         */
-        public void putSubImage(SubImage subImage, Region subImageRegion) {
-            SubImageRegion newEntry = new SubImageRegion();
-            newEntry.subImage = subImage;
-            newEntry.region = subImageRegion;
-
-            buffer[(++nextPos) & (bufferSize - 1)] = newEntry;
-        }
-
-        /**
-         * Sets the parents Region to the one corresponding to subImage.
-         *
-         * @param subImage
-         *            Search Region for this SubImage
-         */
-        public void setLastRegion(SubImage subImage) {
-            int searchPos = nextPos;
-            SubImageRegion searchEntry;
-
-            for (int i = 0; i < bufferSize; i++) {
-                searchEntry = buffer[(--searchPos) & (bufferSize - 1)];
-                if (searchEntry != null && searchEntry.subImage == subImage) {
-                    lastRegion = searchEntry.region;
-                    return;
-                }
-            }
-        }
-
-        /**
-         * Pair of SubImage and Region.
-         */
-        private class SubImageRegion {
-            public SubImage subImage;
-            public Region region;
-        }
     }
 
     @Override
