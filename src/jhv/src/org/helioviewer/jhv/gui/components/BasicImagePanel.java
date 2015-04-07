@@ -19,6 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
  * This class represents a basic image component that is used to display the
@@ -37,7 +38,7 @@ public class BasicImagePanel extends JPanel {
 
     protected AbstractList<ImagePanelPlugin> plugins;
 
-    protected Component renderedImageComponent; // don't touch this
+    protected final Component renderedImageComponent; // don't touch this
 
     protected AbstractList<ScreenRenderer> postRenderers;
 
@@ -48,6 +49,8 @@ public class BasicImagePanel extends JPanel {
      * */
     public BasicImagePanel() {
         super(new BorderLayout(0, 0));
+        renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
+
         setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         // initialize list of plugins

@@ -18,7 +18,6 @@ import org.helioviewer.viewmodel.renderer.screen.ScreenRenderGraphics;
 import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
  * This class represents an image component that is used to display the image of
@@ -59,7 +58,6 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
         super();
 
         // the one GLCanvas
-        renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
         add(renderedImageComponent);
 
         // add post render that no image is loaded
