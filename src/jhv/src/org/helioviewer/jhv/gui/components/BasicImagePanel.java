@@ -77,7 +77,7 @@ public class BasicImagePanel extends JPanel {
     @Override
     public void addMouseListener(MouseListener l) {
 
-        if (renderedImageComponent != null && !Arrays.asList(renderedImageComponent.getMouseListeners()).contains(l)) {
+        if (!Arrays.asList(renderedImageComponent.getMouseListeners()).contains(l)) {
             renderedImageComponent.addMouseListener(l);
         }
     }
@@ -87,8 +87,7 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void addMouseMotionListener(MouseMotionListener l) {
-        if (renderedImageComponent != null)
-            renderedImageComponent.addMouseMotionListener(l);
+        renderedImageComponent.addMouseMotionListener(l);
     }
 
     /**
@@ -96,8 +95,7 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void addMouseWheelListener(MouseWheelListener l) {
-        if (renderedImageComponent != null)
-            renderedImageComponent.addMouseWheelListener(l);
+        renderedImageComponent.addMouseWheelListener(l);
     }
 
     /**
@@ -114,8 +112,7 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void removeMouseMotionListener(MouseMotionListener l) {
-        if (renderedImageComponent != null)
-            renderedImageComponent.removeMouseMotionListener(l);
+        renderedImageComponent.removeMouseMotionListener(l);
     }
 
     /**
@@ -145,11 +142,9 @@ public class BasicImagePanel extends JPanel {
      *            new component view.
      */
     public void setView(ComponentView newView) {
-        if (renderedImageComponent != null) {
-            renderedImageComponent.removeMouseListener(inputController);
-            renderedImageComponent.removeMouseMotionListener(inputController);
-            renderedImageComponent.removeMouseWheelListener(inputController);
-        }
+        renderedImageComponent.removeMouseListener(inputController);
+        renderedImageComponent.removeMouseMotionListener(inputController);
+        renderedImageComponent.removeMouseWheelListener(inputController);
 
         componentView = newView;
 
@@ -234,27 +229,25 @@ public class BasicImagePanel extends JPanel {
     public void setInputController(ImagePanelInputController newInputController) {
         addPlugin(newInputController);
 
-        if (renderedImageComponent != null) {
-            if (inputController != null) {
-                renderedImageComponent.removeMouseListener(inputController);
-                renderedImageComponent.removeMouseMotionListener(inputController);
-                renderedImageComponent.removeMouseWheelListener(inputController);
+        if (inputController != null) {
+            renderedImageComponent.removeMouseListener(inputController);
+            renderedImageComponent.removeMouseMotionListener(inputController);
+            renderedImageComponent.removeMouseWheelListener(inputController);
 
-                if (KeyListener.class.isAssignableFrom(inputController.getClass())) {
-                    renderedImageComponent.removeKeyListener((KeyListener) inputController);
-                }
-
+            if (KeyListener.class.isAssignableFrom(inputController.getClass())) {
+                renderedImageComponent.removeKeyListener((KeyListener) inputController);
             }
-            removePlugin(inputController);
 
-            if (newInputController != null) {
-                renderedImageComponent.addMouseListener(newInputController);
-                renderedImageComponent.addMouseMotionListener(newInputController);
-                renderedImageComponent.addMouseWheelListener(newInputController);
+        }
+        removePlugin(inputController);
 
-                if (KeyListener.class.isAssignableFrom(newInputController.getClass())) {
-                    renderedImageComponent.addKeyListener((KeyListener) newInputController);
-                }
+        if (newInputController != null) {
+            renderedImageComponent.addMouseListener(newInputController);
+            renderedImageComponent.addMouseMotionListener(newInputController);
+            renderedImageComponent.addMouseWheelListener(newInputController);
+
+            if (KeyListener.class.isAssignableFrom(newInputController.getClass())) {
+                renderedImageComponent.addKeyListener((KeyListener) newInputController);
             }
         }
 
