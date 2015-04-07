@@ -83,6 +83,9 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     private void removeRenderables(GL3DState state) {
         for (Renderable renderable : removedRenderables) {
+            if (renderable instanceof GL3DImageLayer) {
+                countImagelayers--;
+            }
             renderable.remove(state);
         }
         removedRenderables.clear();
