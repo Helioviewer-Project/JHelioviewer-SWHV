@@ -21,7 +21,6 @@ import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -287,13 +286,11 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
             // sub image data will change because resolution level changed
             // -> memorize change event till sub image data has changed
             event.copyFrom(aEvent);
-            event.addReason(new ViewportChangedReason(this, v));
             fireChangeEvent(event);
 
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
             event.copyFrom(aEvent);
-            event.addReason(new ViewportChangedReason(this, v));
             fireChangeEvent(event);
 
             renderRequestedSignal.signal(RenderReasons.OTHER);

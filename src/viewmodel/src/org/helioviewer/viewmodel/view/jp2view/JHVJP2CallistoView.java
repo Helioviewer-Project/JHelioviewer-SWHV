@@ -5,7 +5,6 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.ViewportChangedReason;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -45,14 +44,12 @@ public class JHVJP2CallistoView extends JHVJP2View {
                 // sub image data will change because resolution level changed
                 // -> memorize change event till sub image data has changed
                 event.copyFrom(aEvent);
-                event.addReason(new ViewportChangedReason(this, v));
                 fireChangeEvent(event);
 
                 return true;
 
             } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
                 event.copyFrom(aEvent);
-                event.addReason(new ViewportChangedReason(this, v));
                 fireChangeEvent(event);
 
                 renderRequestedSignal.signal(RenderReasons.OTHER);
