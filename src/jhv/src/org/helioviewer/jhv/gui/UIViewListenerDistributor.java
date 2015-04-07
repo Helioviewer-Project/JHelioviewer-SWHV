@@ -74,10 +74,12 @@ public class UIViewListenerDistributor {
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
 
-        for (UIViewListener listener : listeners) {
-            listener.UIviewChanged(sender, aEvent);
+        if (!aEvent.hasReasons()) {
+        } else {
+            for (UIViewListener listener : listeners) {
+                listener.UIviewChanged(sender, aEvent);
+            }
         }
-
     }
 
 }
