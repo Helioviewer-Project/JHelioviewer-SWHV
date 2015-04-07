@@ -120,7 +120,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         if (view == null) {
             return null;
         }
-        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(lview.getViewport(), lview.getRegion());
+        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(lview.getRegion());
         Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-lview.getRegion().getUpperLeftCorner().getX(), lview.getRegion().getUpperLeftCorner().getY(), lview.getRegion(), viewportImageSize);
 
         return ViewHelper.convertImageToScreenDisplacement(x, y, lview.getRegion(), viewportImageSize).add(offset);

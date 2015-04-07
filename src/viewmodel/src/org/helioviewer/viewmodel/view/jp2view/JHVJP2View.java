@@ -38,7 +38,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
@@ -70,7 +69,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  * application.
  *
  */
-public class JHVJP2View extends AbstractView implements JP2View, ViewportView, RegionView, MetaDataView, SubimageDataView, ImageInfoView, RenderListener {
+public class JHVJP2View extends AbstractView implements JP2View, RegionView, MetaDataView, SubimageDataView, ImageInfoView, RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
@@ -280,15 +279,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Viewport getViewport() {
-        return viewport;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean setViewport(Viewport v, ChangeEvent aEvent) {
         ChangeEvent event = new ChangeEvent();
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
@@ -556,7 +547,7 @@ public class JHVJP2View extends AbstractView implements JP2View, ViewportView, R
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
-        ViewportImageSize imageViewportDimension = ViewHelper.calculateViewportImageSize(v, r);
+        ViewportImageSize imageViewportDimension = ViewHelper.calculateViewportImageSize(r);
         MetaData metaData = jp2Image.metaDataList[frameNumber];
 
         // calculate total resolution of the image necessary to

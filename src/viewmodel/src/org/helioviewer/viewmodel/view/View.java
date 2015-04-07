@@ -8,14 +8,13 @@ import java.util.AbstractList;
  * <p>
  * A view represents an knot within the view chain. The view chain is a tree of
  * multiple views, usually with a {@link ComponentView} as a root and several
- * {@link ImageInfoView}s as leafs. The
- * different views communicate via {@link ViewListener}s.
+ * {@link ImageInfoView}s as leafs. The different views communicate via
+ * {@link ViewListener}s.
  *
  * <p>
  * The design of the view chain is very loose and allows many variations, but
  * there exist one requirement has to hold: After finishing the construction of
- * any view chain, no call to getAdapter for {@link RegionView},
- * {@link ViewportView} or {@link MetaDataView} is allowed to return null, thus
+ * any view chain, no call to getAdapter for is allowed to return null, thus
  * every path of the view chain must contain all three views.
  *
  * <p>

@@ -17,7 +17,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
@@ -73,19 +72,14 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private void updatePosition(Point position) {
         if (jp2View == null || position == lastPosition)
             return;
-
-        // check region and viewport
         Region r = jp2View.getRegion();
-        Viewport v = jp2View.getViewport();
         MetaData m = jp2View.getMetaData();
-
-        if (r == null || v == null || m == null) {
+        if (r == null || m == null) {
             setText("(x, y) = " + "(" + position.x + "," + position.y + ")");
             return;
         }
-
         // get viewport image size
-        ViewportImageSize vis = ViewHelper.calculateViewportImageSize(v, r);
+        ViewportImageSize vis = ViewHelper.calculateViewportImageSize(r);
 
         // Helioviewer images have there physical lower left corner in a
         // negative area; real pixel based image at 0
