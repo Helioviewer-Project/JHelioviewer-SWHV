@@ -60,7 +60,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
 
     @Override
     public void activeLayerChanged(JHVJP2View view) {
-        updateZoomLevel(view);
+        //updateZoomLevel(view);
     }
 
 }
