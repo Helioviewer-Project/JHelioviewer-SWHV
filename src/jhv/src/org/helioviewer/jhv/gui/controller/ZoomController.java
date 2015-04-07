@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.controller;
 
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -111,9 +112,9 @@ public class ZoomController {
             if (panel != null) {
                 Vector2dInt mousePosition = panel.getInputController().getMousePosition();
                 if (mousePosition != null) {
-                    Viewport v = topmostView.getViewport();
-                    ViewportImageSize vis = ViewHelper.calculateViewportImageSize(v, oldRegion);
-                    Vector2dInt visOffset = v.getSize().subtract(vis.getSizeVector()).scale(0.5);
+                    ViewportImageSize vis = ViewHelper.calculateViewportImageSize(oldRegion);
+                    Vector2dInt vp = new Vector2dInt(GL3DState.get().getViewportWidth(), GL3DState.get().getViewportHeight());
+                    Vector2dInt visOffset = vp.subtract(vis.getSizeVector()).scale(0.5);
                     Vector2dInt fixPointViewport = mousePosition.subtract(visOffset);
                     if (fixPointViewport.getX() >= 0 && fixPointViewport.getY() >= 0) {
                         Vector2dDouble fixPointOffset = ViewHelper.convertScreenToImageDisplacement(fixPointViewport.subtract(new Vector2dInt(0, vis.getHeight())), oldRegion, vis);
@@ -134,7 +135,7 @@ public class ZoomController {
         }
     }
 
-    public static double getZoom(JHVJP2View view, Region outerRegion, Viewport viewport) {
+    public static double getZoom(JHVJP2View view, Region outerRegion) {
         if (view != null) {
             Region region = view.getRegion();
             if (outerRegion == null) {
@@ -143,12 +144,12 @@ public class ZoomController {
 
             region = view.getNewestRegion();
 
-            if (region == null || viewport == null) {
+            if (region == null) {
                 return 1.0;
             }
 
             double unitsPerPixel = ((ImageSizeMetaData) view.getMetaData()).getUnitsPerPixel();
-            ViewportImageSize vis = ViewHelper.calculateViewportImageSize(viewport, outerRegion);
+            ViewportImageSize vis = ViewHelper.calculateViewportImageSize(outerRegion);
             Viewport layerViewport = ViewHelper.calculateInnerViewport(region, outerRegion, vis);
             Vector2dInt actualSize = layerViewport.getSize();
             double zoom = actualSize.getX() * unitsPerPixel / region.getSize().getX();
@@ -157,32 +158,16 @@ public class ZoomController {
         return 1.0;
     }
 
-    public static double getZoom(JHVJP2View view, Viewport viewport) {
-        return getZoom(view, null, viewport);
-    }
-
     public static double getZoom(JHVJP2View view) {
         if (view != null) {
-            Viewport viewport = view.getViewport();
-            return getZoom(view, viewport);
+            return getZoom(view, null);
         }
         return 1.0;
     }
 
-    /**
-     * Zooms the image in such a way, that the active layer is displayed in its
-     * native resolution.
-     */
     public void zoom1to1(JHVJP2View topmostView, JHVJP2View activeView) {
-        // View view = Displayer.getLayersModel().getActiveView();
         if (activeView != null && topmostView != null) {
-            zoom(topmostView, 1.0 / getZoom(activeView));
-        }
-    }
-
-    public void zoom1to1(JHVJP2View topmostView, JHVJP2View activeView, Viewport viewport) {
-        if (activeView != null && topmostView != null && viewport != null) {
-            zoom(topmostView, 1.0 / getZoom(activeView, topmostView.getRegion(), viewport));
+            zoom(topmostView, 1.0 / getZoom(activeView, topmostView.getRegion()));
         }
     }
 

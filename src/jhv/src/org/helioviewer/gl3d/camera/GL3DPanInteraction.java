@@ -41,9 +41,9 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
         Region region;
         Viewport viewport;
-        if (jp2view != null && (region = jp2view.getRegion()) != null && (viewport = jp2view.getViewport()) != null) {
+        if (jp2view != null && (region = jp2view.getRegion()) != null) {
 
-            ViewportImageSize vis = ViewHelper.calculateViewportImageSize(viewport, region);
+            ViewportImageSize vis = ViewHelper.calculateViewportImageSize(region);
             Vector2dDouble imageDisplacement = ViewHelper.convertScreenToImageDisplacement(x, y, region, vis);
             camera.translation.x += imageDisplacement.getX();
             camera.translation.y += imageDisplacement.getY();

@@ -8,6 +8,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -122,51 +123,27 @@ public final class ViewHelper {
      *            visible region of the image
      * @return resulting image size of the region within the viewport
      */
-    public static ViewportImageSize calculateViewportImageSize(Viewport v, Region r) {
-        if (v == null || r == null) {
+    public static ViewportImageSize calculateViewportImageSize(Region r) {
+        if (r == null || GL3DState.get() == null) {
             return null;
         }
+        int viewportwidth = GL3DState.get().getViewportWidth();
+        int viewportheight = GL3DState.get().getViewportHeight();
 
         double screenMeterPerPixel;
         double screenSubImageWidth;
         double screenSubImageHeight;
         // fit region of interest into viewport
-        if ((double) v.getWidth() / (double) v.getHeight() < r.getWidth() / r.getHeight()) {
-            screenMeterPerPixel = r.getHeight() / v.getHeight();
-            screenSubImageHeight = v.getHeight();
+        if (viewportwidth / (double) viewportheight < r.getWidth() / r.getHeight()) {
+            screenMeterPerPixel = r.getHeight() / viewportheight;
+            screenSubImageHeight = viewportheight;
             screenSubImageWidth = r.getWidth() / screenMeterPerPixel;
         } else {
-            screenMeterPerPixel = r.getWidth() / v.getWidth();
-            screenSubImageWidth = v.getWidth();
+            screenMeterPerPixel = r.getWidth() / viewportwidth;
+            screenSubImageWidth = viewportwidth;
             screenSubImageHeight = r.getHeight() / screenMeterPerPixel;
         }
         return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
-    }
-
-    /**
-     * Calculates the final size of a given region within the viewport.
-     *
-     * <p>
-     * The resulting size is smaller or equal to the size of the viewport. It is
-     * equal if and only if the aspect ratio of the region is equal to the
-     * aspect ratio of the viewport. Otherwise, the image size is cropped to
-     * keep the regions aspect ratio and not deform the image.
-     *
-     * <p>
-     * Basically, this function fetches the region and viewport of the given
-     * view and calls {@link #calculateViewportImageSize(Viewport, Region)}.
-     *
-     * @param v
-     *            View containing the image.
-     * @return resulting image size of the region within the viewport
-     */
-    public static ViewportImageSize calculateViewportImageSize(View v) {
-        RegionView regionView = (RegionView) v;
-        ViewportView viewportView = (ViewportView) v;
-        if (regionView == null || viewportView == null) {
-            return null;
-        }
-        return calculateViewportImageSize(viewportView.getViewport(), regionView.getRegion());
     }
 
     /**

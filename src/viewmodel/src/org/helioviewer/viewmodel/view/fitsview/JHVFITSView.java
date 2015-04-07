@@ -27,7 +27,6 @@ import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
 import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.ViewportView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
@@ -42,7 +41,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  *
  * @author Andreas Hoelzl
  * */
-public class JHVFITSView extends AbstractView implements ViewportView, RegionView, SubimageDataView, ImageInfoView, MetaDataView {
+public class JHVFITSView extends AbstractView implements RegionView, SubimageDataView, ImageInfoView, MetaDataView {
 
     protected Viewport viewport;
     protected Region region;
@@ -145,15 +144,6 @@ public class JHVFITSView extends AbstractView implements ViewportView, RegionVie
     /**
      * {@inheritDoc}
      * */
-    @Override
-    public Viewport getViewport() {
-        return viewport;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
     public boolean setViewport(Viewport v, ChangeEvent event) {
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
