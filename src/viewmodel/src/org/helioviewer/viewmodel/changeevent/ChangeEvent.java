@@ -8,11 +8,11 @@ import org.helioviewer.viewmodel.view.View;
 
 /**
  * Container for change events.
- * 
+ *
  * A change event acts as a message in the view chain that something has
  * changed. Therefore it can hold different kinds of {@link ChangedReason} which
  * give more details about it.
- * 
+ *
  * @author Stephan Pagel
  * @see ChangedReason
  * */
@@ -44,10 +44,10 @@ public class ChangeEvent {
     /**
      * Constructor which creates a new change event container and adds a passed
      * changed reason.
-     * 
+     *
      * If a null value is passed the change event container will be created but
      * adding a change reason will be ignored.
-     * 
+     *
      * @param aReason
      *            A change reason which should be added to the change event
      *            container.
@@ -73,10 +73,10 @@ public class ChangeEvent {
 
     /**
      * Creates a new unique change event id.
-     * 
+     *
      * The unique change event id is the next (increased by 1) integral number
      * of the last change event.
-     * 
+     *
      * @return New unique change event id.
      * */
     private static long getNextID() {
@@ -85,16 +85,17 @@ public class ChangeEvent {
 
     /**
      * Compares this object to the specified object.
-     * 
+     *
      * The result is true if and only if the argument is not null and is an
      * ChangeEvent object that contains the same change event id as this object.
-     * 
+     *
      * @param obj
      *            the object to compare with.
      * @return true if the objects are the same; false otherwise.
      * @see #hashCode()
      */
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -108,21 +109,22 @@ public class ChangeEvent {
 
     /**
      * Returns a hash code for this ChangeEvent
-     * 
+     *
      * @return a hash code value for this object, computed from the change event
      *         id for this ChangeEvent object.
      * @see #equals(Object)
      * */
 
+    @Override
     public int hashCode() {
         return (int) (changeEventID ^ (changeEventID >>> 32));
     }
 
     /**
      * Adds a change reason to the change event container.
-     * 
+     *
      * If a null value is passed this method will do nothing.
-     * 
+     *
      * @param aReason
      *            A change reason which should be added to the change event
      *            container.
@@ -138,7 +140,7 @@ public class ChangeEvent {
 
     /**
      * Returns the latest added change reason of the change event container.
-     * 
+     *
      * @return the latest added change reason or null if no change reason is
      *         available.
      * */
@@ -149,13 +151,13 @@ public class ChangeEvent {
     /**
      * Checks if an instance of an object of the passed change reason class was
      * added to the change event container.
-     * 
+     *
      * @param aReasonClass
      *            Class for which an instance should be searched for.
-     * 
+     *
      * @return true if an instance of an object of the passed change reason
      *         class was found in the change event container; false otherwise.
-     * 
+     *
      *         Checks if the ChangeReason class (type) exists in the change
      *         event and returns a boolean value.
      * */
@@ -166,7 +168,7 @@ public class ChangeEvent {
     /**
      * Returns the latest changed reason object of the given type, which was
      * added to the change event container.
-     * 
+     *
      * @param aReasonClass
      *            Class for which an instance should be searched for.
      * @return the latest changed reason object of the passed type. If no
@@ -184,10 +186,15 @@ public class ChangeEvent {
         return null;
     }
 
+    public boolean hasReasons() {
+        return history.size() != 0;
+
+    }
+
     /**
      * Returns the latest changed reason object of the given type and view,
      * which was added to the change event container.
-     * 
+     *
      * @param aReasonClass
      *            Class for which an instance should be searched for.
      * @param view
@@ -210,9 +217,9 @@ public class ChangeEvent {
     /**
      * Returns all changed reasons objects of the given type, which were added
      * to the change event container.
-     * 
+     *
      * The list s sorted from old to new.
-     * 
+     *
      * @param aReasonClass
      *            Type to search for
      * @return List of all change reasons of the given type. The list might be
@@ -240,6 +247,7 @@ public class ChangeEvent {
         return history.isEmpty() && availableChangeReasons.isEmpty();
     }
 
+    @Override
     public ChangeEvent clone() {
         ChangeEvent res = new ChangeEvent();
         res.history.addAll(history);
@@ -248,6 +256,7 @@ public class ChangeEvent {
         return res;
     }
 
+    @Override
     public String toString() {
         return availableChangeReasons.toString();
     }
