@@ -38,7 +38,7 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     protected ImageCacheStatus imageCacheStatus;
     protected int lastRenderedCompositionLayer = -1;
 
-    private LinkedMovieManager linkedMovieManager = LinkedMovieManager.getSingletonInstance();
+    private final LinkedMovieManager linkedMovieManager = LinkedMovieManager.getSingletonInstance();
 
     /**
      * Default constructor.
@@ -112,13 +112,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
         frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
 
         if (forceSignal) {
-            while (getMaximumAccessibleFrameNumber() < imageViewParams.compositionLayer) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
         } else {
             boolean changed = setCurrentFrameNumber(frameNumber, forceSignal);
@@ -361,13 +354,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovi
     public boolean setCurrentFrameNumber(int frameNumber, boolean forceSignal) {
         if (frameNumber != imageViewParams.compositionLayer || forceSignal) {
             imageViewParams.compositionLayer = frameNumber;
-            while (getMaximumAccessibleFrameNumber() < imageViewParams.compositionLayer) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
