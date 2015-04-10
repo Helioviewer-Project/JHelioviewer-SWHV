@@ -167,23 +167,9 @@ public class LinkedMovieManager {
 
         long minimalInterval = Long.MAX_VALUE;
         TimedMovieView minimalIntervalView = null;
-        int lastAvailableFrame = 0;
 
         for (TimedMovieView movie : linkedMovies) {
-            lastAvailableFrame = 0;
-            do {
-                lastAvailableFrame = movie.getMaximumFrameNumber();
-                if (lastAvailableFrame > 0) {
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } while (true);
-
+            int lastAvailableFrame = movie.getMaximumFrameNumber();
             long interval = movie.getFrameDateTime(lastAvailableFrame).getMillis() - movie.getFrameDateTime(0).getMillis();
             interval /= (lastAvailableFrame + 1);
 
