@@ -52,7 +52,9 @@ public abstract class GL3DCamera {
     private boolean trackingMode;
 
     public GL3DMat4d orthoMatrix = GL3DMat4d.identity();
-    public double cameraWidth = 1.;
+    public GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
+
+    private double cameraWidth = 1.;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -165,14 +167,13 @@ public abstract class GL3DCamera {
         gl.glLoadIdentity();
 
         cameraWidth = -translation.z * Math.tan(fov / 2.);
-        if (cameraWidth == 0.)
+        if (getCameraWidth() == 0.)
             cameraWidth = 1.;
 
-        double waspect = cameraWidth * aspect;
-        gl.glOrtho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-        orthoMatrix.setIdentity();
-        orthoMatrix.multiply(GL3DMat4d.ortho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar));
-
+        double waspect = getCameraWidth() * aspect;
+        gl.glOrtho(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
+        orthoMatrix = GL3DMat4d.ortho(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
+        orthoMatrixInverse = GL3DMat4d.orthoInverse(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
@@ -193,9 +194,8 @@ public abstract class GL3DCamera {
         GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 1., 1.);
 
         GL3DMat4d roti = this.getRotation().toMatrix().inverse();
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
-        GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
+        GL3DVec4d up1 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates1));
+        GL3DVec4d up2 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates2));
         GL3DVec4d linevec = GL3DVec4d.subtract(up2, up1);
         GL3DVec4d normal = this.getLocalRotation().toMatrix().inverse().multiply(new GL3DVec4d(0., 0., 1., 1.));
         double fact = -GL3DVec4d.dot3d(up1, normal) / GL3DVec4d.dot3d(linevec, normal);
@@ -320,6 +320,10 @@ public abstract class GL3DCamera {
 
     public void setDefaultFOV() {
         this.fov = INITFOV;
+    }
+
+    public double getCameraWidth() {
+        return cameraWidth;
     }
 
 }
