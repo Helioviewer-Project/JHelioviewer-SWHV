@@ -225,9 +225,10 @@ public class GL3DImageLayer implements Renderable {
                 GL3DMat4d vpmi = camera.orthoMatrix.inverse();
 
                 GL3DMat4d mult = roti.multiply(vpmi);
-                GLSLShader.bindMatrix(gl, mult.getFloatArray(), "cameraTransformationInverse");
+                GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
                 //float[] layerLocalRotation = camera.getLocalRotation().toMatrix().getFloatArray();
                 GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
+                GLSLShader.bindMatrix(gl, camera.getCurrentDragRotation().toMatrix().getFloatArray(), "currentDragRotation");
 
                 GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
@@ -249,7 +250,7 @@ public class GL3DImageLayer implements Renderable {
                         //gl.glDepthRange(0.f, 1.f);
                     }
                     if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
-                        //gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                     }
 
                 }
