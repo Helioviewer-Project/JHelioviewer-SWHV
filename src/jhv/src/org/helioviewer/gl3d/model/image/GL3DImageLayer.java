@@ -114,6 +114,8 @@ public class GL3DImageLayer implements Renderable {
         state.getActiveCamera().updateCameraTransformation();
     }
 
+    //public static ArrayList<GL3DVec3d> hp = new ArrayList<GL3DVec3d>();
+
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
@@ -128,7 +130,7 @@ public class GL3DImageLayer implements Renderable {
         double phi = hvmd.getPhi();
         double theta = hvmd.getTheta();
 
-        GL3DQuatd rth = GL3DQuatd.createRotation(theta * 0, GL3DVec3d.XAxis);
+        GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
         GL3DMat4d rt = rth.toMatrix();
 
@@ -138,27 +140,26 @@ public class GL3DImageLayer implements Renderable {
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
-
+        //if (hp.size() == 0) {
         for (int i = 0; i < pointlist.length; i++) {
-            for (final boolean on : new boolean[] { false, true }) {
-                GL3DVec3d hitPoint;
-                if (on) {
-                    hitPoint = activeCamera.getVectorFromSphere(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
-                } else {
-                    hitPoint = activeCamera.getVectorFromPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
-                }
-                if (hitPoint != null) {
-                    hitPoint = rt.multiply(hitPoint);
-                    minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                    minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                    maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                    maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-                }
+            GL3DVec3d hitPoint;
+            hitPoint = activeCamera.getVectorFromSphere(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
+            if (hitPoint == null) {
+                hitPoint = activeCamera.getVectorFromPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
+            }
+            if (hitPoint != null) {
+                //hp.add(hitPoint);
+                hitPoint = rt.multiply(hitPoint);
+
+                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.0);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.0);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
@@ -182,7 +183,7 @@ public class GL3DImageLayer implements Renderable {
         double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
         if (regionWidth > 0 && regionHeight > 0) {
-            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, -(minPhysicalY + regionHeight), regionWidth, regionHeight);
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
@@ -190,6 +191,7 @@ public class GL3DImageLayer implements Renderable {
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.getMainLayerView().setViewport(layerViewport, null);
+        //}
     }
 
     @Override
@@ -261,6 +263,10 @@ public class GL3DImageLayer implements Renderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_BLEND);
         updateROI(state);
+        /*
+         * gl.glBegin(GL2.GL_POINTS); gl.glColor3d(1., 0., 1.); for (GL3DVec3d
+         * pt : hp) { gl.glVertex3d(pt.x, pt.y, pt.z); } gl.glEnd();
+         */
     }
 
     private int generate(GL3DState state) {
