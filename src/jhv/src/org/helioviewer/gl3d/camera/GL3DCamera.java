@@ -102,10 +102,6 @@ public abstract class GL3DCamera {
         this.translation.z = this.ratio * this.translationz;
     }
 
-    protected void addPanning(double x, double y) {
-        setPanning(this.translation.x + x, this.translation.y + y);
-    }
-
     public void setPanning(double x, double y) {
         this.translation.x = x;
         this.translation.y = y;
@@ -173,11 +169,9 @@ public abstract class GL3DCamera {
             w = 1.;
 
         double waspect = w / aspect;
-
         gl.glOrtho(-w, w, -waspect, waspect, clipNear, clipFar);
-
-        orthoMatrix = GL3DMat4d.ortho(-w, w, -waspect, waspect, clipNear, clipFar);
-        orthoMatrix.translate(translation.x, translation.y, 0.);
+        orthoMatrix.setIdentity();
+        orthoMatrix.multiply(GL3DMat4d.ortho(-w, w, -waspect, waspect, clipNear, clipFar));
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }

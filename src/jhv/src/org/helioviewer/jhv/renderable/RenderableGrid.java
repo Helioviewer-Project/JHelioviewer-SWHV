@@ -63,27 +63,32 @@ public class RenderableGrid implements Renderable {
         if (!isVisible)
             return;
         GL2 gl = state.gl;
-        gl.glColor3d(1., 1., 0.);
+        gl.glPushMatrix();
+        gl.glMultMatrixd(state.getActiveCamera().getLocalRotation().toMatrix().transpose().m, 0);
+        {
+            gl.glColor3d(1., 1., 0.);
 
-        float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
-        if (relhi != oldrelhi) {
-            oldrelhi = relhi;
+            float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
+            if (relhi != oldrelhi) {
+                oldrelhi = relhi;
 
-            float cfontsize = this.fontsize * relhi;
-            cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
-            font = font.deriveFont(cfontsize);
+                float cfontsize = this.fontsize * relhi;
+                cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
+                font = font.deriveFont(cfontsize);
 
-            renderer = new TextRenderer(font, true, false);
-            renderer.setUseVertexArrays(true);
-            //renderer.setSmoothing(true);
-            renderer.setColor(Color.WHITE);
+                renderer = new TextRenderer(font, true, false);
+                renderer.setUseVertexArrays(true);
+                //renderer.setSmoothing(true);
+                renderer.setColor(Color.WHITE);
+            }
+
+            if (!followCamera) {
+                drawText(gl);
+            }
+
+            drawCircles(gl);
         }
-
-        if (!followCamera) {
-            drawText(gl);
-        }
-
-        drawCircles(gl);
+        gl.glPopMatrix();
     }
 
     private void drawCircles(GL2 gl) {
