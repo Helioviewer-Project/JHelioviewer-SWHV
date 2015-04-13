@@ -52,6 +52,7 @@ public abstract class GL3DCamera {
     private boolean trackingMode;
 
     public GL3DMat4d orthoMatrix = GL3DMat4d.identity();
+    public double w = 1.;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -164,28 +165,26 @@ public abstract class GL3DCamera {
         gl.glPushMatrix();
         gl.glLoadIdentity();
 
-        double w = -translation.z * Math.tan(fov / 2.);
+        w = -translation.z * Math.tan(fov / 2.);
         if (w == 0.)
             w = 1.;
 
-        double waspect = w / aspect;
-        gl.glOrtho(-w, w, -waspect, waspect, clipNear, clipFar);
+        double waspect = w * aspect;
+        gl.glOrtho(-waspect, waspect, -w, w, clipNear, clipFar);
         orthoMatrix.setIdentity();
-        orthoMatrix.multiply(GL3DMat4d.ortho(-w, w, -waspect, waspect, clipNear, clipFar));
+        orthoMatrix.multiply(GL3DMat4d.ortho(-waspect, waspect, -w, w, clipNear, clipFar));
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
-
         return hp;
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
         return this.getLocalRotation().toMatrix().multiply(hp);
-
     }
 
     public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
