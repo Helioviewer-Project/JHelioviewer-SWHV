@@ -31,13 +31,12 @@ public class RayTracer {
         GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
         GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
         GL3DVec4d linevec = GL3DVec4d.subtract(up1, up2);
-        linevec.normalize();
 
         GL3DVec3d direction = new GL3DVec3d(linevec.x, linevec.y, linevec.z);
-        GL3DVec3d origin = new GL3DVec3d(up1.x, up1.y, up1.z);
-        Ray ray = new Ray(origin, direction);
         direction.normalize();
         direction.negate();
+        GL3DVec3d origin = new GL3DVec3d(up1.x, up1.y, up1.z);
+        Ray ray = new Ray(origin, direction);
 
         return intersect(ray);
     }

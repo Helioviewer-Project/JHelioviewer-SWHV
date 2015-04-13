@@ -27,6 +27,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -215,10 +216,25 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.filter(gl);
                 GLSLShader.bind(gl);
                 GLSLShader.bindVars(gl);
+                GL3DCamera camera = state.getActiveCamera();
+                GL3DMat4d roti = camera.getCameraTransformation().inverse();
+                System.out.println("roti" + roti);
+                GL3DMat4d vpmi = camera.orthoMatrix.inverse();
+                System.out.println("vpmi" + vpmi);
+
+                GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
+                //float[] layerLocalRotation = camera.getLocalRotation().toMatrix().getFloatArray();
+                GLSLShader.bindMatrix(gl, roti.getFloatArray(), "layerLocalRotation");
+                GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
                 enablePositionVBO(state);
                 enableIndexVBO(state);
                 {
+                    /*
+                     * gl.glBegin(GL2.GL_QUADS); float r = 1.0f;
+                     * gl.glVertex2f(-r, r); gl.glVertex2f(r, r);
+                     * gl.glVertex2f(r, -r); gl.glVertex2f(-r, -r); gl.glEnd();
+                     */
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                     if (this.showCorona) {
                         gl.glDepthRange(1.f, 1.f);
@@ -226,8 +242,9 @@ public class GL3DImageLayer implements Renderable {
                         gl.glDepthRange(0.f, 1.f);
                     }
                     if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
-                        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                        //gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                     }
+
                 }
                 disableIndexVBO(state);
                 disablePositionVBO(state);
