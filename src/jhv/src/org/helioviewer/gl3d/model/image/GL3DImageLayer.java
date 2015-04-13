@@ -226,8 +226,12 @@ public class GL3DImageLayer implements Renderable {
 
                 GL3DMat4d mult = roti.multiply(vpmi);
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
-                //float[] layerLocalRotation = camera.getLocalRotation().toMatrix().getFloatArray();
-                GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
+                HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
+                double phi = md.getPhi();
+                double theta = md.getTheta();
+                GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0., 1., 0.));
+                layerLocalRotation.rotate(GL3DQuatd.createRotation(theta, new GL3DVec3d(0., 0., 1.)));
+                GLSLShader.bindMatrix(gl, layerLocalRotation.toMatrix().getFloatArray(), "layerLocalRotation");
                 GLSLShader.bindMatrix(gl, camera.getCurrentDragRotation().toMatrix().getFloatArray(), "currentDragRotation");
 
                 GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
@@ -238,11 +242,6 @@ public class GL3DImageLayer implements Renderable {
                 enablePositionVBO(state);
                 enableIndexVBO(state);
                 {
-                    /*
-                     * gl.glBegin(GL2.GL_QUADS); float r = 1.0f;
-                     * gl.glVertex2f(-r, r); gl.glVertex2f(r, r);
-                     * gl.glVertex2f(r, -r); gl.glVertex2f(-r, -r); gl.glEnd();
-                     */
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                     if (this.showCorona) {
                         gl.glDepthRange(1.f, 1.f);
@@ -456,5 +455,4 @@ public class GL3DImageLayer implements Renderable {
     public JHVJP2View getMainLayerView() {
         return mainLayerView;
     }
-
 }
