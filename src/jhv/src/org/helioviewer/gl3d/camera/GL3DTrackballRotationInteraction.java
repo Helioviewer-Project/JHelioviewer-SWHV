@@ -53,10 +53,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
-        // The start point of the rotation remains the same during a drag,
-        // because the
-        // mouse should always point to the same Point on the Surface of the
-        // sphere.
         this.currentRotationStartPoint = camera.getVectorFromSphereAlt(e.getPoint());
     }
 

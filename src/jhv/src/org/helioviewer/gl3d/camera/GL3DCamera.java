@@ -31,7 +31,7 @@ public abstract class GL3DCamera {
     private final double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
     private double aspect = 0.0;
-
+    private final RayTracer rayTracer;
     private GL3DMat4d cameraTransformation;
 
     protected GL3DQuatd rotation;
@@ -51,7 +51,7 @@ public abstract class GL3DCamera {
 
     private boolean trackingMode;
 
-    private GL3DMat4d orthoMatrix = GL3DMat4d.identity();
+    public GL3DMat4d orthoMatrix = GL3DMat4d.identity();
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -59,7 +59,7 @@ public abstract class GL3DCamera {
         this.currentDragRotation = new GL3DQuatd();
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
-
+        rayTracer = new RayTracer(this);
     }
 
     public void reset() {
@@ -183,48 +183,15 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        GL3DState state = GL3DState.get();
-        // workaround for null state on startup
-        if (state == null)
-            return null;
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
+        GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
 
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
-        solarCoordinates.w = 0.;
-
-        double len2 = solarCoordinates.length2();
-        if (len2 > 1.)
-            return null;
-        solarCoordinates.z = Math.sqrt(1 - len2);
-
-        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
-        GL3DVec4d notRotated = roti.multiply(solarCoordinates);
-
-        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
+        return hp;
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
-        GL3DState state = GL3DState.get();
-        // workaround for null state on startup
-        if (state == null)
-            return null;
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
+        GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
+        return this.getLocalRotation().toMatrix().multiply(hp);
 
-        GL3DMat4d vpmi = this.orthoMatrix.inverse();
-        GL3DVec4d solarCoordinates = vpmi.multiply(centeredViewportCoordinates);
-        solarCoordinates.w = 0.;
-
-        double len2 = solarCoordinates.length2();
-        if (len2 > 1.)
-            solarCoordinates.z = 0;
-        else
-            solarCoordinates.z = Math.sqrt(1 - len2);
-
-        GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
-        GL3DVec4d notRotated = roti.multiply(solarCoordinates);
-
-        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
 
     public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
@@ -262,6 +229,10 @@ public abstract class GL3DCamera {
         cameraTransformation = this.rotation.toMatrix().translate(this.translation);
     }
 
+    public GL3DMat4d getRotationMatrix() {
+        return this.getRotation().toMatrix();
+    }
+
     public void applyCamera(GL3DState state) {
         state.multiplyMV(cameraTransformation);
     }
@@ -288,6 +259,11 @@ public abstract class GL3DCamera {
 
     public double getCameraFOV() {
         return this.fov;
+    }
+
+    public double getWidth() {
+        double width = -translation.z * Math.tan(fov / 2.);
+        return width;
     }
 
     public double setCameraFOV(double fov) {
