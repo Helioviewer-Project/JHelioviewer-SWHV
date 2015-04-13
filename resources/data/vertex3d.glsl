@@ -1,9 +1,7 @@
 #version 110
+uniform mat4 layerLocalRotation;
 void main(void)
 {
-    vec4 v = vec4(gl_Vertex);
-    v.z = 0.;
-    v.w = 1.;
-    gl_Position = v;//gl_ModelViewProjectionMatrix * v;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+    vec4 v = gl_ModelViewProjectionMatrix * (vec4(gl_Vertex)*layerLocalRotation);
+    gl_Position = v ;
 }

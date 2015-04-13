@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.Pair;
+import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
@@ -199,7 +200,6 @@ public class GL3DImageLayer implements Renderable {
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
         GLSLShader.bind(gl);
         {
 
@@ -217,16 +217,23 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.bind(gl);
                 GLSLShader.bindVars(gl);
                 GL3DCamera camera = state.getActiveCamera();
+                GL3DVec3d tr = camera.getTranslation().copy();
+                tr.negate();
+                GL3DMat4d translate = GL3DMat4d.translation(tr);
                 GL3DMat4d roti = camera.getCameraTransformation().inverse();
-                System.out.println("roti" + roti);
+                //roti = roti.multiply(translate);
                 GL3DMat4d vpmi = camera.orthoMatrix.inverse();
-                System.out.println("vpmi" + vpmi);
 
-                GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
+                GL3DMat4d mult = roti.multiply(vpmi);
+                GLSLShader.bindMatrix(gl, mult.getFloatArray(), "cameraTransformationInverse");
                 //float[] layerLocalRotation = camera.getLocalRotation().toMatrix().getFloatArray();
-                GLSLShader.bindMatrix(gl, roti.getFloatArray(), "layerLocalRotation");
+                GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
+
                 GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
+                Vector2dDouble ll = jp2view.getMetaData().getPhysicalLowerLeft();
+                ll.getX();
+                ll.getY();
                 enablePositionVBO(state);
                 enableIndexVBO(state);
                 {
@@ -237,9 +244,9 @@ public class GL3DImageLayer implements Renderable {
                      */
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                     if (this.showCorona) {
-                        gl.glDepthRange(1.f, 1.f);
+                        //gl.glDepthRange(1.f, 1.f);
                         gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                        gl.glDepthRange(0.f, 1.f);
+                        //gl.glDepthRange(0.f, 1.f);
                     }
                     if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
                         //gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
@@ -322,20 +329,20 @@ public class GL3DImageLayer implements Renderable {
             subdivide(f[0], f[1], f[2], vertices, faceIndices, level);
         }
         int beginPositionNumberCorona = vertices.size() / 3;
-        vertices.add(-40f);
-        vertices.add(40f);
+        vertices.add(-2f);
+        vertices.add(2f);
         vertices.add(0f);
 
-        vertices.add(40f);
-        vertices.add(40f);
+        vertices.add(2f);
+        vertices.add(2f);
         vertices.add(0f);
 
-        vertices.add(40f);
-        vertices.add(-40f);
+        vertices.add(2f);
+        vertices.add(-2f);
         vertices.add(0f);
 
-        vertices.add(-40f);
-        vertices.add(-40f);
+        vertices.add(-2f);
+        vertices.add(-2f);
         vertices.add(0f);
 
         faceIndices.add(beginPositionNumberCorona + 0);
