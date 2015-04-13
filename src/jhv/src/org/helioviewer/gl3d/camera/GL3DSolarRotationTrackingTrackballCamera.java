@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 /**
@@ -42,11 +41,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     }
 
     @Override
-    public double getDistanceToSunSurface() {
-        return -this.getCameraTransformation().translation().z;
-    }
-
-    @Override
     public GL3DInteraction getPanInteraction() {
         return this.panInteraction;
     }
@@ -69,12 +63,6 @@ public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
     @Override
     public GL3DInteraction getZoomInteraction() {
         return this.zoomBoxInteraction;
-    }
-
-    @Override
-    public GL3DMat4d getVM() {
-        GL3DMat4d c = this.getCameraTransformation().copy();
-        return c;
     }
 
     @Override

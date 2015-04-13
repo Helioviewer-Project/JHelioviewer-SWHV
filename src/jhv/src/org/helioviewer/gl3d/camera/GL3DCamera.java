@@ -237,10 +237,6 @@ public abstract class GL3DCamera {
         state.multiplyMV(cameraTransformation);
     }
 
-    public abstract GL3DMat4d getVM();
-
-    public abstract double getDistanceToSunSurface();
-
     public abstract GL3DInteraction getPanInteraction();
 
     public abstract GL3DInteraction getRotateInteraction();
@@ -292,9 +288,6 @@ public abstract class GL3DCamera {
     @Override
     public String toString() {
         return getName();
-    }
-
-    public void updateRotation(long dateMillis) {
     }
 
     public void setTimeDelay(long timeDelay) {
