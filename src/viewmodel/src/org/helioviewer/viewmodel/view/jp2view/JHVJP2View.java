@@ -547,24 +547,11 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
 
         // calculate total resolution of the image necessary to
         // have the requested resolution in the subimage
-        double rWidth, rHeight;
-        if (r == null) {
-            rWidth = metaData.getPhysicalImageWidth();
-            rHeight = metaData.getPhysicalImageHeight();
-            r = StaticRegion.createAdaptedRegion(0, 0, rWidth, rHeight);
-        } else {
-            rWidth = r.getWidth();
-            rHeight = r.getHeight();
-        }
 
-        double iWidth, iHeight;
-        if (imageViewportDimension == null) {
-            iWidth = rWidth;
-            iHeight = rHeight;
-        } else {
-            iWidth = imageViewportDimension.getWidth();
-            iHeight = imageViewportDimension.getHeight();
-        }
+        double rWidth = r.getWidth();
+        double rHeight = r.getHeight();
+        double iWidth = imageViewportDimension.getWidth();
+        double iHeight = imageViewportDimension.getHeight();
 
         int totalWidth = (int) Math.round(iWidth * metaData.getPhysicalImageWidth() / rWidth);
         int totalHeight = (int) Math.round(iHeight * metaData.getPhysicalImageHeight() / rHeight);

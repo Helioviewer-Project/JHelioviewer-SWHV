@@ -54,11 +54,12 @@ void main(void)
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec3 direction = (up1 - up2).xyz;
     vec3 newdirection = normalize(-direction);
-    vec3 origin = up1.xyz;    
+    vec3 origin = up1.xyz; 
     
   
     vec4 color;
     vec2 texcoord; 
+    vec2 difftexcoord; 
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
     vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * currentDragRotation;
     if(dot(up1.xy, up1.xy)<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.){
@@ -74,18 +75,18 @@ void main(void)
     if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.){
         discard;
     }
-/*
+
+    color = texture2D(image, texcoord);
     if(isdifference>0.24 && isdifference<0.27){
-        color.r = color.r - texture2D(differenceImage, gl_TexCoord[4].xy).r;
+        color.r = color.r - texture2D(differenceImage, texcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
     } else if(isdifference>0.98 && isdifference<1.01){
-        color.r = color.r - texture2D(differenceImage, gl_TexCoord[4].xy).r;
+        color.r = color.r - texture2D(differenceImage, texcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
     }
-*/
-    color = texture2D(image, texcoord);
+
     for(int i=0; i<3; i++)
     {
         for(int j=0; j<3; j++)

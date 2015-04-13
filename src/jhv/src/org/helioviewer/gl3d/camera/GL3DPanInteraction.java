@@ -31,8 +31,8 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         int x = e.getPoint().x - this.lastMousePoint.x;
         int y = e.getPoint().y - this.lastMousePoint.y;
         GL3DState state = GL3DState.get();
-        camera.translation.x += x * 2. * camera.w / state.getViewportHeight();
-        camera.translation.y -= y * 2. * camera.w / state.getViewportHeight();
+        camera.translation.x += x * 2. * camera.cameraWidth / state.getViewportHeight();
+        camera.translation.y -= y * 2. * camera.cameraWidth / state.getViewportHeight();
 
         this.lastMousePoint = e.getPoint();
         camera.updateCameraTransformation();

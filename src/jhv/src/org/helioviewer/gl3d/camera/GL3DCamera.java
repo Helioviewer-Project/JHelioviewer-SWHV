@@ -52,7 +52,7 @@ public abstract class GL3DCamera {
     private boolean trackingMode;
 
     public GL3DMat4d orthoMatrix = GL3DMat4d.identity();
-    public double w = 1.;
+    public double cameraWidth = 1.;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -84,7 +84,6 @@ public abstract class GL3DCamera {
             this.translation = precedingCamera.translation.copy();
             this.updateCameraTransformation();
 
-            // Also set the correct interaction
             if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getRotateInteraction())) {
                 this.setCurrentInteraction(this.getRotateInteraction());
             } else if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getPanInteraction())) {
@@ -165,14 +164,14 @@ public abstract class GL3DCamera {
         gl.glPushMatrix();
         gl.glLoadIdentity();
 
-        w = -translation.z * Math.tan(fov / 2.);
-        if (w == 0.)
-            w = 1.;
+        cameraWidth = -translation.z * Math.tan(fov / 2.);
+        if (cameraWidth == 0.)
+            cameraWidth = 1.;
 
-        double waspect = w * aspect;
-        gl.glOrtho(-waspect, waspect, -w, w, clipNear, clipFar);
+        double waspect = cameraWidth * aspect;
+        gl.glOrtho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrix.setIdentity();
-        orthoMatrix.multiply(GL3DMat4d.ortho(-waspect, waspect, -w, w, clipNear, clipFar));
+        orthoMatrix.multiply(GL3DMat4d.ortho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar));
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
