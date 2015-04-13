@@ -64,7 +64,7 @@ public class RenderableGrid implements Renderable {
             return;
         GL2 gl = state.gl;
         gl.glPushMatrix();
-        gl.glMultMatrixd(state.getActiveCamera().getLocalRotation().toMatrix().transpose().m, 0);
+        //gl.glMultMatrixd(state.getActiveCamera().getLocalRotation().toMatrix().transpose().m, 0);
         {
             gl.glColor3d(1., 1., 0.);
 

@@ -217,14 +217,9 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.bind(gl);
                 GLSLShader.bindVars(gl);
                 GL3DCamera camera = state.getActiveCamera();
-                GL3DVec3d tr = camera.getTranslation().copy();
-                tr.negate();
-                GL3DMat4d translate = GL3DMat4d.translation(tr);
-                GL3DMat4d roti = camera.getCameraTransformation().inverse();
-                //roti = roti.multiply(translate);
-                GL3DMat4d vpmi = camera.orthoMatrix.inverse();
 
-                GL3DMat4d mult = roti.multiply(vpmi);
+                GL3DMat4d vpmi = camera.orthoMatrix.inverse();
+                vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
                 HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
                 double phi = md.getPhi();
