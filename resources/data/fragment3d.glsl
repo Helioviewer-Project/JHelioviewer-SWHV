@@ -23,36 +23,6 @@ uniform vec2 sunOffset;
 uniform vec2 viewport;
 uniform float vpheight;
 
-struct Sphere{
-    float radius;
-    vec3 center;
-};
-
-struct Ray{
-    vec3 direction;
-    vec3 origin;
-};
-
-struct Plane{
-    vec3 normal;
-};
-
-Sphere sphere = Sphere(1., vec3(0.,0.,0.));
-Plane plane = Plane(vec3(0., 0., 1.));
-float intersectSphere(in Ray ray, in Sphere sphere)
-{
-    float t = -1.;
-    vec3 L =  sphere.center - ray.origin; 
-    float tca = dot(L, ray.direction);
-    float dsq = dot(L, L) - tca * tca;
-    float diff = sphere.radius*sphere.radius - dsq;
-    if (diff <= 0.0||tca<0.) {
-        return t;
-    }
-    t = tca + sqrt(diff);
-    return t;      
-}
-
 float intersectPlane(vec4 vecin)
 {   
     vec3 altnormal = (currentDragRotation * vec4(0., 0., 1., 1.)).xyz;
@@ -61,6 +31,18 @@ float intersectPlane(vec4 vecin)
 
 void main(void)
 {  
+    float unsharpMaskingKernel[9];
+    unsharpMaskingKernel[0] = 1.;
+    unsharpMaskingKernel[1] = 2.;
+    unsharpMaskingKernel[2] = 1.;
+    unsharpMaskingKernel[3] = 2.;
+    unsharpMaskingKernel[4] = 4.;
+    unsharpMaskingKernel[5] = 2.;
+    unsharpMaskingKernel[6] = 1.;
+    unsharpMaskingKernel[7] = 2.;
+    unsharpMaskingKernel[8] = 1.;
+
+    float tmpConvolutionSum = 0.;
     vec2 normalizedScreenpos = 2.*((gl_FragCoord.xy/viewport)-0.5);
 
     normalizedScreenpos.y = normalizedScreenpos.y;
@@ -71,30 +53,47 @@ void main(void)
     vec3 newdirection = normalize(-direction);
     vec3 origin = up1.xyz;    
     
-    Ray ray = Ray(newdirection, origin);
-
-    //float tSphere = intersectSphere(ray, sphere);
-    //float tPlane = intersectPlane(ray, plane);
   
-    vec4 imageColor;
+    vec4 color;
+    vec2 texcoord; 
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
     vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * currentDragRotation;
     if(dot(up1.xy, up1.xy)<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.){
-        vec4 lutg = texture1D(lut, 0.);
-        vec2 texcoord = vec2((rotatedHitPoint.x*rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w)); 
-        imageColor = texture2D(differenceImage, texcoord);
-        imageColor = texture2D(image, texcoord);
+        texcoord = vec2((rotatedHitPoint.x*rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
+        //imageColor = texture2D(image, texcoord);
     }
     else{
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) *currentDragRotation;
-        vec4 lutg = texture1D(lut, 0.);
-        vec2 texcoord = vec2((rotatedHitPoint.x * rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w)); 
-        imageColor = texture2D(differenceImage, texcoord);
-        imageColor = texture2D(image, texcoord);
-        //imageColor = vec4(0., 1., 0., 1.);
+        texcoord = vec2((rotatedHitPoint.x * rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
+        //imageColor = texture2D(image, texcoord);
     } 
-
-    gl_FragColor = imageColor;
-    
+    if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.){
+        discard;
+    }
+/*
+    if(isdifference>0.24 && isdifference<0.27){
+        color.r = color.r - texture2D(differenceImage, gl_TexCoord[4].xy).r;
+        color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
+        color.r = (color.r + 1.0)/2.0;
+    } else if(isdifference>0.98 && isdifference<1.01){
+        color.r = color.r - texture2D(differenceImage, gl_TexCoord[4].xy).r;
+        color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
+        color.r = (color.r + 1.0)/2.0;
+    }
+*/
+    color = texture2D(image, texcoord);
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            tmpConvolutionSum += texture2D(image, texcoord.xy + vec2(i-1, j-1)*pixelSizeWeighting.x).r * unsharpMaskingKernel[3*i+j];
+        }
+    }
+    color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
+    color.r = pow(color.r, gamma);
+    color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
+    color.rgb = texture1D(lut, color.r).rgb;
+    color.a = 1.;
+    gl_FragColor = color;
 }
