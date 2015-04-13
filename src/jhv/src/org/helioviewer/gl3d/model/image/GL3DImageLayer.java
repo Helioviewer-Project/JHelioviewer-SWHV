@@ -128,7 +128,7 @@ public class GL3DImageLayer implements Renderable {
         double phi = hvmd.getPhi();
         double theta = hvmd.getTheta();
 
-        GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
+        GL3DQuatd rth = GL3DQuatd.createRotation(theta * 0, GL3DVec3d.XAxis);
         rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
         GL3DMat4d rt = rth.toMatrix();
 
@@ -224,10 +224,11 @@ public class GL3DImageLayer implements Renderable {
                 HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
                 double phi = md.getPhi();
                 double theta = md.getTheta();
-                GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(phi, new GL3DVec3d(0., 1., 0.));
-                layerLocalRotation.rotate(GL3DQuatd.createRotation(theta, new GL3DVec3d(0., 0., 1.)));
-                GLSLShader.bindMatrix(gl, layerLocalRotation.toMatrix().getFloatArray(), "layerLocalRotation");
-                GLSLShader.bindMatrix(gl, camera.getCurrentDragRotation().toMatrix().getFloatArray(), "currentDragRotation");
+                GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
+                layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
+                GL3DMat4d difmat = camera.getCurrentDragRotation().toMatrix().multiply(camera.getLocalRotation().toMatrix()).multiply(layerLocalRotation.toMatrix().transpose());
+                GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
+                GLSLShader.bindMatrix(gl, difmat.getFloatArray(), "currentDragRotation");
 
                 GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
