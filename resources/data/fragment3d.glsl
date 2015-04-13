@@ -26,6 +26,9 @@ uniform float vpheight;
 float intersectPlane(vec4 vecin)
 {   
     vec3 altnormal = (currentDragRotation * vec4(0., 0., 1., 1.)).xyz;
+    if(altnormal.z <0.){
+        discard;
+    }
     return -dot(altnormal.xy,vecin.xy)/altnormal.z;
 }
 
