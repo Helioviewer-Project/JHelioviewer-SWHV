@@ -106,6 +106,14 @@ public class GLSLShader {
         GLSLShader.setUniform(gl, GLSLShader.thetaRef, GLSLShader.thetaParamFloat, 1);
     }
 
+    public static void bindMatrix(GL2 gl, float[] matrix, String name) {
+        gl.glUniformMatrix4fv(gl.glGetUniformLocation(progID, name), 1, false, matrix, 0);
+    }
+
+    public static void bindViewport(GL2 gl, int viewportWidth, int viewportHeight) {
+        gl.glUniform2f(gl.glGetUniformLocation(progID, "viewport"), viewportWidth, viewportHeight);
+    }
+
     public static void unbind(GL2 gl) {
         gl.glUseProgram(0);
     }
