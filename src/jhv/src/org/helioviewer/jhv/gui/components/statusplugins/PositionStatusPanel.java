@@ -7,17 +7,13 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
 
-import org.helioviewer.base.math.Vector2dDouble;
-import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Status panel for displaying the current mouse position.
@@ -50,9 +46,8 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         setBorder(BorderFactory.createEtchedBorder());
         setPreferredSize(new Dimension(170, 20));
 
-        setText("(x, y) = " + "(    0" + PRIME + PRIME + ",    0" + PRIME + PRIME + ")");
+        setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
 
-        // Displayer.getLayersModel().addLayersListener(this);
     }
 
     public static PositionStatusPanel getSingletonInstance() {
@@ -70,39 +65,19 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
 
     private void updatePosition(Point position) {
-        if (jp2View == null || position == lastPosition)
-            return;
-        Region r = jp2View.getRegion();
-        MetaData m = jp2View.getMetaData();
-        if (r == null || m == null) {
-            setText("(x, y) = " + "(" + position.x + "," + position.y + ")");
-            return;
-        }
-        // get viewport image size
-        ViewportImageSize vis = ViewHelper.calculateViewportImageSize(r);
+        GL3DCamera camera = GL3DState.get().getActiveCamera();
 
-        // Helioviewer images have there physical lower left corner in a
-        // negative area; real pixel based image at 0
-        if (m.getPhysicalLowerLeft().getX() < 0) {
-            Vector2dInt solarcenter = ViewHelper.convertImageToScreenDisplacement(r.getUpperLeftCorner().negateX(), r, vis);
-            Vector2dDouble scaling = new Vector2dDouble(Constants.SunRadius, Constants.SunRadius);
-            Vector2dDouble solarRadius = new Vector2dDouble(ViewHelper.convertImageToScreenDisplacement(scaling, r, vis));
-            Vector2dDouble pos = new Vector2dDouble(position.x - solarcenter.getX(), -position.y + solarcenter.getY()).invertedScale(solarRadius).scale(959.705);
-
-            String text = String.format("(x, y) = (% 5d\u2032\u2032, % 5d\u2032\u2032)", (int) Math.round(pos.getX()), (int) Math.round(pos.getY()));
-            setText(text);
+        if (position == lastPosition)
+            return;
+        GL3DVec3d computedposition = camera.getVectorFromSphereAlt(position);
+        double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
+        double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
+        if (computedposition.x * computedposition.x + computedposition.y * computedposition.y > 1.) {
+            //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");
+            setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
         } else {
-            // computes pixel position for simple images (e.g. jpg and png)
-            // where cursor points at
-
-            // compute coordinates in image
-            int x = (int) (r.getWidth() * (position.getX() / vis.getWidth()) + r.getCornerX());
-            int y = (int) (m.getPhysicalImageHeight() - (r.getCornerY() + r.getHeight()) + position.getY() / vis.getHeight() * r.getHeight() + 0.5);
-
-            // show coordinates
-            setText("(x, y) = " + "(" + x + "," + y + ")");
+            setText("(\u03B8, \u03C6) = " + "(" + String.format("%.2f\u00B0", theta) + "," + String.format("%.2f\u00B0", phi) + ")");
         }
-
         lastPosition = position;
     }
 
@@ -156,19 +131,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     @Override
     public void mouseMoved(MouseEvent e) {
         updatePosition(e.getPoint());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void activeLayerChanged(JHVJP2View view) {
-        if (view != null) {
-            jp2View = view;
-            setVisible(true);
-        } else {
-            setVisible(false);
-        }
     }
 
     public void updatePosition() {

@@ -30,7 +30,6 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
         setBorder(BorderFactory.createEtchedBorder());
         setPreferredSize(new Dimension(100, 20));
         setText("Zoom:");
-        Displayer.getLayersModel().addLayersListener(this);
     }
 
     public static ZoomStatusPanel getSingletonInstance() {
@@ -56,11 +55,6 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
 
     public void updateZoomLevel() {
         updateZoomLevel(Displayer.getLayersModel().getActiveView());
-    }
-
-    @Override
-    public void activeLayerChanged(JHVJP2View view) {
-        //updateZoomLevel(view);
     }
 
 }
