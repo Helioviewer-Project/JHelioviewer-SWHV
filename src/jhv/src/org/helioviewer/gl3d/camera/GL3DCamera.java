@@ -130,6 +130,11 @@ public abstract class GL3DCamera {
         return this.rotation;
     }
 
+    public GL3DQuatd getRotationInverse() {
+        this.updateCameraTransformation();
+        return this.rotation;
+    }
+
     public void resetCurrentDragRotation() {
         this.currentDragRotation.clear();
     }
@@ -193,11 +198,11 @@ public abstract class GL3DCamera {
         GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), -1., 1.);
         GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 1., 1.);
 
-        GL3DMat4d roti = this.getRotation().toMatrix().inverse();
+        GL3DMat4d roti = this.getRotation().toMatrix().transpose();
         GL3DVec4d up1 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates1));
         GL3DVec4d up2 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates2));
         GL3DVec4d linevec = GL3DVec4d.subtract(up2, up1);
-        GL3DVec4d normal = this.getLocalRotation().toMatrix().inverse().multiply(new GL3DVec4d(0., 0., 1., 1.));
+        GL3DVec4d normal = this.getLocalRotation().toMatrix().transpose().multiply(new GL3DVec4d(0., 0., 1., 1.));
         double fact = -GL3DVec4d.dot3d(up1, normal) / GL3DVec4d.dot3d(linevec, normal);
         GL3DVec4d notRotated = GL3DVec4d.add(up1, GL3DVec4d.multiply(linevec, fact));
 
@@ -247,11 +252,6 @@ public abstract class GL3DCamera {
 
     public double getCameraFOV() {
         return this.fov;
-    }
-
-    public double getWidth() {
-        double width = -translation.z * Math.tan(fov / 2.);
-        return width;
     }
 
     public double setCameraFOV(double fov) {

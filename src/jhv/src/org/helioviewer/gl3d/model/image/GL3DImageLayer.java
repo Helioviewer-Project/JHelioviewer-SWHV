@@ -97,7 +97,7 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public void init(GL3DState state) {
-        Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(3);
+        Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(1);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
@@ -113,8 +113,6 @@ public class GL3DImageLayer implements Renderable {
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         state.getActiveCamera().updateCameraTransformation();
     }
-
-    //public static ArrayList<GL3DVec3d> hp = new ArrayList<GL3DVec3d>();
 
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
@@ -144,7 +142,7 @@ public class GL3DImageLayer implements Renderable {
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
             hitPoint = activeCamera.getVectorFromSphere(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
-            if (hitPoint == null) {
+            if (hitPoint == null || hitPoint.z == 0.) {
                 hitPoint = activeCamera.getVectorFromPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
             }
             if (hitPoint != null) {
@@ -263,10 +261,6 @@ public class GL3DImageLayer implements Renderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_BLEND);
         updateROI(state);
-        /*
-         * gl.glBegin(GL2.GL_POINTS); gl.glColor3d(1., 0., 1.); for (GL3DVec3d
-         * pt : hp) { gl.glVertex3d(pt.x, pt.y, pt.z); } gl.glEnd();
-         */
     }
 
     private int generate(GL3DState state) {
@@ -331,16 +325,16 @@ public class GL3DImageLayer implements Renderable {
             subdivide(f[0], f[1], f[2], vertices, faceIndices, level);
         }
         int beginPositionNumberCorona = vertices.size() / 3;
-        vertices.add(-2f);
-        vertices.add(2f);
+        vertices.add(-40f);
+        vertices.add(40f);
         vertices.add(0f);
 
-        vertices.add(2f);
-        vertices.add(2f);
+        vertices.add(40f);
+        vertices.add(40f);
         vertices.add(0f);
 
-        vertices.add(2f);
-        vertices.add(-2f);
+        vertices.add(40f);
+        vertices.add(-40f);
         vertices.add(0f);
 
         vertices.add(-2f);
