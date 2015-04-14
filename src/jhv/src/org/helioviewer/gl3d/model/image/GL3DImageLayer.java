@@ -325,8 +325,8 @@ public class GL3DImageLayer implements Renderable {
         vertices.add(-40f);
         vertices.add(0f);
 
-        vertices.add(-2f);
-        vertices.add(-2f);
+        vertices.add(-40f);
+        vertices.add(-40f);
         vertices.add(0f);
 
         faceIndices.add(beginPositionNumberCorona + 0);
