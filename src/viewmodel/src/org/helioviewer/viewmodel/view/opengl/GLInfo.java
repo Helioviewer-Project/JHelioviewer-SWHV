@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
@@ -20,9 +21,9 @@ public class GLInfo {
 
     /*
      * TBD
-     * 
+     *
      * - pixel scale at startup
-     * 
+     *
      * if (!GLInfo.glIsUsable()) { Message.err("Could not initialize OpenGL",
      * "OpenGL could not be initialized properly during startup. JHelioviewer
      * will start in Software Mode. For detailed information please read the log
@@ -71,4 +72,46 @@ public class GLInfo {
         }
     }
 
+    public boolean checkGLErrors(String message, GL2 gl) {
+        if (gl == null) {
+            Log.warn("OpenGL not yet Initialised!");
+            return true;
+        }
+        /*
+         * To allow for distributed implementations, there may be several error
+         * flags. If any single error flag has recorded an error, the value of
+         * that flag is returned and that flag is reset to GL_NO_ERROR when
+         * glGetError is called. If more than one flag has recorded an error,
+         * glGetError returns and clears an arbitrary error flag value. Thus,
+         * glGetError should always be called in a loop, until it returns
+         * GL_NO_ERROR, if all error flags are to be reset.
+         */
+        int glErrorCode = gl.glGetError();
+
+        if (glErrorCode != GL2.GL_NO_ERROR) {
+            GLU glu = new GLU();
+            Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkGLErrors(GL2 gl) {
+        if (gl == null) {
+            Log.warn("OpenGL not yet Initialised!");
+            return true;
+        }
+        int glErrorCode = gl.glGetError();
+
+        if (glErrorCode != GL2.GL_NO_ERROR) {
+            GLU glu = new GLU();
+            Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode));
+
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
