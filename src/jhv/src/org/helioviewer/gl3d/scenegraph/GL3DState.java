@@ -1,14 +1,12 @@
 package org.helioviewer.gl3d.scenegraph;
 
 import java.util.Date;
-import java.util.Stack;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.math.GL3DMat3d;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
@@ -27,13 +25,6 @@ public class GL3DState {
     private static GL3DState instance;
 
     public GL2 gl;
-
-    public GL3DMat4d mv;
-    private final Stack<GL3DMat4d> matrixStack;
-
-    protected GL3DMat4d mvInverse;
-
-    protected GL3DMat3d normalMatrix;
 
     protected GL3DCamera activeCamera;
 
@@ -60,41 +51,14 @@ public class GL3DState {
 
     private GL3DState(GL2 gl) {
         this.gl = gl;
-        this.mv = GL3DMat4d.identity();
-        this.matrixStack = new Stack<GL3DMat4d>();
-    }
-
-    public void pushMV() {
-        gl.glPushMatrix();
-        this.matrixStack.push(new GL3DMat4d(this.mv));
-        // Log.debug("GL3DState.pushMV: "+this.matrixStack.size());
-    }
-
-    public void popMV() {
-        gl.glPopMatrix();
-        this.mv = this.matrixStack.pop();
-        // Log.debug("GL3DState.popMV: "+this.matrixStack.size());
     }
 
     public void loadIdentity() {
-        this.mv = GL3DMat4d.identity();
-        this.mvInverse = GL3DMat4d.identity();
-        this.matrixStack.push(new GL3DMat4d(this.mv));
         this.gl.glLoadIdentity();
     }
 
-    public GL3DMat4d multiplyMV(GL3DMat4d m) {
-        this.mv.multiply(m);
+    public void multiplyMV(GL3DMat4d m) {
         gl.glMultMatrixd(m.m, 0);
-        return mv;
-    }
-
-    public GL3DMat4d getMVInverse() {
-        return new GL3DMat4d(this.mvInverse);
-    }
-
-    public GL3DMat4d getMV() {
-        return new GL3DMat4d(this.mv);
     }
 
     public boolean checkGLErrors(String message) {
