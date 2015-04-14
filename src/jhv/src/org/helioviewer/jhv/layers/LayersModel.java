@@ -358,8 +358,6 @@ public class LayersModel {
 
         int index = layers.indexOf(view);
 
-        movieManager.pauseLinkedMovies();
-
         layers.remove(view);
         view.abolish();
         view.removeRenderListener();
