@@ -16,8 +16,8 @@ uniform float gamma;
 uniform float contrast;
 uniform sampler1D lut;
 uniform float alpha;
-uniform vec4 cutOffRadius;
-uniform vec4 outerCutOffRadius;
+uniform float cutOffRadius;
+uniform float outerCutOffRadius;
 uniform float phi;
 uniform float theta;
 uniform mat4 cameraTransformationInverse;
@@ -66,7 +66,7 @@ void main(void)
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
     vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * cameraDifferenceRotation;
     float radius2 = dot(up1.xy, up1.xy);
-    if(radius2 > outerCutOffRadius.x * outerCutOffRadius.x || radius2 < cutOffRadius.x * cutOffRadius.x) {
+    if(radius2 > outerCutOffRadius * outerCutOffRadius || radius2 < cutOffRadius * cutOffRadius) {
         discard;
     }
     if(radius2<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {

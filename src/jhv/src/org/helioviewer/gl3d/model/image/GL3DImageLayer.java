@@ -210,9 +210,9 @@ public class GL3DImageLayer implements Renderable {
                 if (jp2view != null) {
                     jp2view.applyFilters(gl);
                 }
+                GLSLShader.setViewport(GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
+
                 GLSLShader.filter(gl);
-                GLSLShader.bind(gl);
-                GLSLShader.bindVars(gl);
                 GL3DCamera camera = state.getActiveCamera();
                 GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
                 vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
@@ -224,8 +224,6 @@ public class GL3DImageLayer implements Renderable {
                 } else {
                     GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getPreviousImageData()).getFloatArray(), "diffcameraDifferenceRotation");
                 }
-
-                GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
                 Vector2dDouble ll = jp2view.getMetaData().getPhysicalLowerLeft();
                 ll.getX();
