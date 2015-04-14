@@ -109,13 +109,15 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         gl.glDisable(GL2.GL_BLEND);
         gl.glEnable(GL2.GL_DEPTH_TEST);
 
-        state.pushMV();
-        camera.applyPerspective(state);
-        camera.applyCamera(state);
-        Displayer.getRenderablecontainer().render(state);
-        camera.drawCamera(state);
-        camera.resumePerspective(state);
-        state.popMV();
+        gl.glPushMatrix();
+        {
+            camera.applyPerspective(state);
+            camera.applyCamera(state);
+            Displayer.getRenderablecontainer().render(state);
+            camera.drawCamera(state);
+            camera.resumePerspective(state);
+        }
+        gl.glPopMatrix();
 
         gl.glEnable(GL2.GL_BLEND);
     }
