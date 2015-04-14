@@ -23,16 +23,15 @@ public class RayTracer {
 
     public Ray cast(double x, double y) {
         GL3DState state = GL3DState.get();
-        GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (x / state.getViewportWidth() - 0.5), -2. * (y / state.getViewportHeight() - 0.5), 1., 1.);
-        GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (x / state.getViewportWidth() - 0.5), -2. * (y / state.getViewportHeight() - 0.5), -1., 1.);
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (x / state.getViewportWidth() - 0.5), -2. * (y / state.getViewportHeight() - 0.5), 1., 1.);
 
         GL3DMat4d roti = camera.getCameraTransformation().inverse();
         GL3DMat4d vpmi = camera.orthoMatrixInverse;
-        GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
-        GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
-        GL3DVec3d direction = new GL3DVec3d(up1.x - up2.x, up1.y - up2.y, up1.z - up2.z);
+        GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates));
+        centeredViewportCoordinates.z = -1;
+        GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates));
+        GL3DVec3d direction = new GL3DVec3d(up2.x - up1.x, up2.y - up1.y, up2.z - up1.z);
         direction.normalize();
-        direction.negate();
         GL3DVec3d origin = new GL3DVec3d(up1.x, up1.y, up1.z);
         Ray ray = new Ray(origin, direction);
 
