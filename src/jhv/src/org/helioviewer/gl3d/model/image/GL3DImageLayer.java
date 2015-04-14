@@ -95,7 +95,7 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public void init(GL3DState state) {
-        Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(1);
+        Pair<FloatBuffer, IntBuffer> bufferPair = this.makeIcosphere(3);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
