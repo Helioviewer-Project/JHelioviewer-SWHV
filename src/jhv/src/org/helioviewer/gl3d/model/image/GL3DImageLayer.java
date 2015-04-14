@@ -218,7 +218,7 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getImageData()).getFloatArray(), "cameraDifferenceRotation");
                 if (this.mainLayerView.getBaseDifferenceMode()) {
                     GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getBaseDifferenceImageData()).getFloatArray(), "diffcameraDifferenceRotation");
-                } else {
+                } else if (this.mainLayerView.getDifferenceMode()) {
                     GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getPreviousImageData()).getFloatArray(), "diffcameraDifferenceRotation");
                 }
 
