@@ -1,9 +1,9 @@
 package org.helioviewer.gl3d.math;
 
 public class GL3DMat3d {
-    private double[] m = new double[9];/*
-                                        * / 0 3 6 \ | 1 4 7 | \ 2 5 8 /
-                                        */
+    private final double[] m = new double[9];/*
+                                              * / 0 3 6 \ | 1 4 7 | \ 2 5 8 /
+                                              */
 
     public GL3DMat3d() {
         this.identity();
@@ -41,9 +41,9 @@ public class GL3DMat3d {
 
     public GL3DMat3d multiply(GL3DMat3d A) {
         set(m[0] * A.m[0] + m[3] * A.m[1] + m[6] * A.m[2], // ROW 1
-            m[0] * A.m[3] + m[3] * A.m[4] + m[6] * A.m[5], m[0] * A.m[6] + m[3] * A.m[7] + m[6] * A.m[8], m[1] * A.m[0] + m[4] * A.m[1] + m[7] * A.m[2], // ROW2
-            m[1] * A.m[3] + m[4] * A.m[4] + m[7] * A.m[5], m[1] * A.m[6] + m[4] * A.m[7] + m[7] * A.m[8], m[2] * A.m[0] + m[5] * A.m[1] + m[8] * A.m[2], // ROW3
-            m[2] * A.m[3] + m[5] * A.m[4] + m[8] * A.m[5], m[2] * A.m[6] + m[5] * A.m[7] + m[8] * A.m[8]);
+                m[0] * A.m[3] + m[3] * A.m[4] + m[6] * A.m[5], m[0] * A.m[6] + m[3] * A.m[7] + m[6] * A.m[8], m[1] * A.m[0] + m[4] * A.m[1] + m[7] * A.m[2], // ROW2
+                m[1] * A.m[3] + m[4] * A.m[4] + m[7] * A.m[5], m[1] * A.m[6] + m[4] * A.m[7] + m[7] * A.m[8], m[2] * A.m[0] + m[5] * A.m[1] + m[8] * A.m[2], // ROW3
+                m[2] * A.m[3] + m[5] * A.m[4] + m[8] * A.m[5], m[2] * A.m[6] + m[5] * A.m[7] + m[8] * A.m[8]);
         return this;
     }
 
@@ -204,10 +204,7 @@ public class GL3DMat3d {
         return this.scale(vs.x, vs.y, vs.z);
     }
 
-    public double trace() {
-        return m[0] + m[4] + m[8];
-    }
-
+    @Override
     public String toString() {
         return m[0] + "\t" + m[3] + "\t" + m[6] + "\n" + m[1] + "\t" + m[4] + "\t" + m[7] + "\n" + m[2] + "\t" + m[5] + "\t" + m[8];
     }
