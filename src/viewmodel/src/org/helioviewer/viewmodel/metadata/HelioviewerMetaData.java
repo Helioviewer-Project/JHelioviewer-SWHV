@@ -365,7 +365,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public double getPhi() {
-        System.out.println(phi + " " + this);
         return this.phi;
     }
 
