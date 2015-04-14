@@ -30,9 +30,7 @@ public class RayTracer {
         GL3DMat4d vpmi = camera.orthoMatrixInverse;
         GL3DVec4d up2 = roti.multiply(vpmi.multiply(centeredViewportCoordinates1));
         GL3DVec4d up1 = roti.multiply(vpmi.multiply(centeredViewportCoordinates2));
-        GL3DVec4d linevec = GL3DVec4d.subtract(up1, up2);
-
-        GL3DVec3d direction = new GL3DVec3d(linevec.x, linevec.y, linevec.z);
+        GL3DVec3d direction = new GL3DVec3d(up1.x - up2.x, up1.y - up2.y, up1.z - up2.z);
         direction.normalize();
         direction.negate();
         GL3DVec3d origin = new GL3DVec3d(up1.x, up1.y, up1.z);
