@@ -13,8 +13,8 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -56,7 +56,7 @@ public class GL3DImageLayer implements Renderable {
     public double maxZ = Constants.SunRadius;
 
     private final int resolution = 3;
-    private final GL3DVec4d[] pointlist = new GL3DVec4d[(resolution + 1) * 2 * 2];
+    private final GL3DVec2d[] pointlist = new GL3DVec2d[(resolution + 1) * 2 * 2];
     private final boolean showSphere;
     private boolean showCorona;
     private int positionBufferID;
@@ -76,13 +76,13 @@ public class GL3DImageLayer implements Renderable {
         int count = 0;
         for (int i = 0; i <= this.resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                this.pointlist[count] = new GL3DVec4d(2. * (1. * i / this.resolution - 0.5), -2. * (j - 0.5), 0., 0.);
+                this.pointlist[count] = new GL3DVec2d(2. * (1. * i / this.resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= this.resolution; j++) {
-                this.pointlist[count] = new GL3DVec4d(2. * (i / 1. - 0.5), -2. * (1. * j / this.resolution - 0.5), 0., 0.);
+                this.pointlist[count] = new GL3DVec2d(2. * (i / 1. - 0.5), -2. * (1. * j / this.resolution - 0.5));
                 count++;
             }
         }

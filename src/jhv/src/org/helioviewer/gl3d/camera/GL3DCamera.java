@@ -9,8 +9,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.math.GL3DVec3d;
-import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 
@@ -58,6 +58,8 @@ public abstract class GL3DCamera {
 
     private double cameraWidth = 1.;
     private double previousCameraWidth = -1;
+
+    private double cameraWidthTimesAspect;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -173,17 +175,17 @@ public abstract class GL3DCamera {
         if (cameraWidth == 0.)
             cameraWidth = 1.;
 
-        double waspect = getCameraWidth() * aspect;
+        cameraWidthTimesAspect = cameraWidth * aspect;
         gl.glLoadIdentity();
-        gl.glOrtho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
             return;
         }
         previousCameraWidth = cameraWidth;
         previousAspect = aspect;
-        //orthoMatrix = GL3DMat4d.ortho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-        orthoMatrixInverse = GL3DMat4d.orthoInverse(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
     public void resumePerspective(GL3DState state) {
@@ -193,19 +195,22 @@ public abstract class GL3DCamera {
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
-    public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec4d normalizedScreenpos, GL3DMat4d cameraDifferenceRotation) {
-        GL3DVec4d up1 = this.orthoMatrixInverse.multiply(normalizedScreenpos);
+    public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec2d normalizedScreenpos, GL3DMat4d cameraDifferenceRotation) {
+        //GL3DVec4d up1 = this.orthoMatrixInverse.multiply(normalizedScreenpos);
+        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect;
+        double up1y = normalizedScreenpos.y * cameraWidth;
+
         GL3DVec3d hitPoint;
         GL3DVec3d rotatedHitPoint;
-        double radius2 = up1.x * up1.x + up1.y * up1.y;
-        hitPoint = new GL3DVec3d(up1.x, up1.y, Math.sqrt(1. - radius2));
+        double radius2 = up1x * up1x + up1y * up1y;
+        hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
         rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
         if (radius2 <= 1 && rotatedHitPoint.z > 0.) {
             return rotatedHitPoint;
         } else {
             GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
-            double zvalue = -(altnormal.x * up1.x + altnormal.y * up1.y) / altnormal.z;
-            hitPoint = new GL3DVec3d(up1.x, up1.y, zvalue);
+            double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
+            hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
             rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
             return rotatedHitPoint;
         }
