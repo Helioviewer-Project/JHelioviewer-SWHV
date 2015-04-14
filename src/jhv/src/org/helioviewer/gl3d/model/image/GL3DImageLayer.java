@@ -1,7 +1,6 @@
 package org.helioviewer.gl3d.model.image;
 
 import java.awt.Component;
-import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
 import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -56,7 +56,7 @@ public class GL3DImageLayer implements Renderable {
     public double maxZ = Constants.SunRadius;
 
     private final int resolution = 3;
-    private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
+    private final GL3DVec4d[] pointlist = new GL3DVec4d[(resolution + 1) * 2 * 2];
     private final boolean showSphere;
     private boolean showCorona;
     private int positionBufferID;
@@ -76,15 +76,13 @@ public class GL3DImageLayer implements Renderable {
         int count = 0;
         for (int i = 0; i <= this.resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                this.pointlist[count][0] = 1. * i / this.resolution;
-                this.pointlist[count][1] = j;
+                this.pointlist[count] = new GL3DVec4d(2. * (1. * i / this.resolution - 0.5), -2. * (j - 0.5), 0., 0.);
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= this.resolution; j++) {
-                this.pointlist[count][0] = i / 1.;
-                this.pointlist[count][1] = 1. * j / this.resolution;
+                this.pointlist[count] = new GL3DVec4d(2. * (i / 1. - 0.5), -2. * (1. * j / this.resolution - 0.5), 0., 0.);
                 count++;
             }
         }
@@ -121,8 +119,6 @@ public class GL3DImageLayer implements Renderable {
             return;
         }
 
-        int width = state.getViewportWidth();
-        int height = state.getViewportHeight();
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
@@ -130,7 +126,7 @@ public class GL3DImageLayer implements Renderable {
         GL3DMat4d camdiff = this.getCameraDifferenceRotation(activeCamera, this.getMainLayerView().getImageData());
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
-            hitPoint = activeCamera.getVectorFromSphereOrPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)), camdiff);
+            hitPoint = activeCamera.getVectorFromSphereOrPlane(pointlist[i], camdiff);
             if (hitPoint != null) {
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);

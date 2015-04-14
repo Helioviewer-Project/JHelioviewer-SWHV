@@ -193,9 +193,8 @@ public abstract class GL3DCamera {
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
-    public GL3DVec3d getVectorFromSphereOrPlane(Point viewportCoordinates, GL3DMat4d cameraDifferenceRotation) {
+    public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec4d normalizedScreenpos, GL3DMat4d cameraDifferenceRotation) {
         GL3DState state = GL3DState.get();
-        GL3DVec4d normalizedScreenpos = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
         GL3DMat4d cameraDifferenceRotationInverse = cameraDifferenceRotation.copy().transpose();
         GL3DVec4d up1 = this.orthoMatrixInverse.multiply(normalizedScreenpos);
         GL3DVec3d hitPoint;
