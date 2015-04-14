@@ -112,8 +112,6 @@ public class GL3DImageLayer implements Renderable {
         state.getActiveCamera().updateCameraTransformation();
     }
 
-    public static ArrayList<GL3DVec3d> hp = new ArrayList<GL3DVec3d>();
-
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
@@ -125,13 +123,6 @@ public class GL3DImageLayer implements Renderable {
             return;
         }
 
-        double phi = hvmd.getPhi();
-        double theta = hvmd.getTheta();
-
-        GL3DQuatd rth = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
-        rth.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
-        GL3DMat4d rt = rth.toMatrix();
-
         int width = state.getViewportWidth();
         int height = state.getViewportHeight();
         double minPhysicalX = Double.MAX_VALUE;
@@ -139,15 +130,10 @@ public class GL3DImageLayer implements Renderable {
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
         GL3DMat4d camdiff = this.getCameraDifferenceRotation(activeCamera);
-        //if (hp.size() == 0) {
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
             hitPoint = activeCamera.getVectorFromSphereOrPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)), camdiff);
-
             if (hitPoint != null) {
-                //hp.add(hitPoint);
-                //hitPoint = rt.multiply(hitPoint);
-
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
                 maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -188,8 +174,7 @@ public class GL3DImageLayer implements Renderable {
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.getMainLayerView().setViewport(layerViewport, null);
-        //}
-}
+    }
 
     public GL3DMat4d getCameraDifferenceRotation(GL3DCamera camera) {
         HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
@@ -262,13 +247,6 @@ public class GL3DImageLayer implements Renderable {
         GLSLShader.unbind(gl);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_BLEND);
-
-        gl.glBegin(GL2.GL_POINTS);
-        gl.glColor3d(1., 0., 1.);
-        for (GL3DVec3d pt : hp) {
-            gl.glVertex3d(pt.x, pt.y, pt.z);
-        }
-        gl.glEnd();
 
         updateROI(state);
     }
