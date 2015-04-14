@@ -23,9 +23,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
- * This class is a (redundant) representation of the ViewChain
- * state, and, in addition to this, introduces the concept of an "activeLayer",
- * which is the Layer that is currently operated on by the user/GUI.
+ * This class is a (redundant) representation of the ViewChain state, and, in
+ * addition to this, introduces the concept of an "activeLayer", which is the
+ * Layer that is currently operated on by the user/GUI.
  *
  * This class is mainly used by the LayerTable(Model) as an abstraction to the
  * ViewChain.
@@ -65,6 +65,15 @@ public class LayersModel {
      */
     public void setActiveLayer(int idx) {
         JHVJP2View view = getLayer(idx);
+        if (view == null && idx != -1) {
+            return;
+        }
+        activeLayer = idx;
+        fireActiveLayerChanged(view);
+    }
+
+    public void setActiveLayer(JHVJP2View view) {
+        int idx = findView(view);
         if (view == null && idx != -1) {
             return;
         }
