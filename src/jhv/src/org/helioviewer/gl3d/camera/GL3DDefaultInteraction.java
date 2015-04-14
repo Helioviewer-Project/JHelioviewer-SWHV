@@ -3,8 +3,6 @@ package org.helioviewer.gl3d.camera;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.jhv.display.Displayer;
-
 /**
  * Default {@link GL3DInteraction} class . Default behavior includes camera
  * reset on double click.
@@ -37,12 +35,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e, GL3DCamera camera) {
         int wr = e.getWheelRotation();
-        double previousFOV = camera.getCameraFOV();
-
-        camera.setCameraFOV(camera.getCameraFOV() + ZOOM_WHEEL_FACTOR * wr);
-        if (previousFOV != camera.getCameraFOV()) {
-            Displayer.display();
-        }
+        camera.zoomIn(wr);
     }
 
 }

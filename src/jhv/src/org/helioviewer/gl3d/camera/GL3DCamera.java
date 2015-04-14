@@ -12,6 +12,7 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.math.GL3DVec4d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 
 /**
  *
@@ -328,6 +329,15 @@ public abstract class GL3DCamera {
 
     public double getCameraWidth() {
         return cameraWidth;
+    }
+
+    public void zoomIn(int wr) {
+        double currentWidth = this.getCameraWidth();
+        double newWidth = currentWidth + wr * 0.1;
+        double fov = 2. * Math.atan(-newWidth / this.getTranslation().z);
+
+        this.setCameraFOV(fov);
+        Displayer.display();
     }
 
 }
