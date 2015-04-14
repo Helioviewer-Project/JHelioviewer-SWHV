@@ -948,15 +948,15 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
         if (this.baseDifferenceMode || this.differenceMode) {
             if (this.baseDifferenceMode) {
                 if (this.baseDifferenceNoRot) {
-                    GLSLShader.setIsDifference(0.26f);
+                    GLSLShader.setIsDifference(GLSLShader.BASEDIFFERENCE_NO_ROT);
                 } else {
-                    GLSLShader.setIsDifference(0.99f);
+                    GLSLShader.setIsDifference(GLSLShader.BASEDIFFERENCE_ROT);
                 }
             } else {
                 if (this.runningDifferenceNoRot) {
-                    GLSLShader.setIsDifference(0.25f);
+                    GLSLShader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_NO_ROT);
                 } else {
-                    GLSLShader.setIsDifference(1.0f);
+                    GLSLShader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_ROT);
                 }
             }
 
@@ -973,7 +973,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
-            GLSLShader.setIsDifference(0.0f);
+            GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);
         }
     }
 
@@ -1050,7 +1050,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
         }
 
         GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
-        GLSLShader.changeAngles(theta, phi);
 
         boolean diffMode = false;
         Region diffRegion = null;
@@ -1072,11 +1071,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
             double diffXScale = 1. / diffRegion.getWidth();
             double diffYScale = 1. / diffRegion.getHeight();
 
-            double diffTheta = -Astronomy.getB0InRadians(diffDate);
-            double diffPhi = Astronomy.getL0Radians(diffDate);
-
             GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
-            GLSLShader.changeDifferenceAngles(diffTheta, diffPhi);
         }
 
         double innerCutOff = 0;
