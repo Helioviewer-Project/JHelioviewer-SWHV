@@ -23,21 +23,10 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * @author Andre Dau
  *
  */
-public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData, ObserverMetaData, ImageSizeMetaData {
-    private double heeqX;
-    private double heeqY;
-    private double heeqZ;
-    private boolean heeqAvailable = false;
+public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData, ImageSizeMetaData {
 
-    private double heeX;
-    private double heeY;
-    private double heeZ;
-    private boolean heeAvailable = false;
-
-    private double crlt;
-    private double crln;
     private double dobs;
-    private boolean carringtonAvailable = false;
+    private final boolean carringtonAvailable = false;
 
     private double stonyhurstLongitude;
     private double stonyhurstLatitude;
@@ -54,7 +43,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     private String observatory = " ";
     private String fullName = "";
     private Vector2dInt pixelImageSize = new Vector2dInt();
-    private double solarPixelRadius = -1;
     private Vector2dDouble sunPixelPosition = new Vector2dDouble();
 
     private double meterPerPixel;
@@ -73,117 +61,63 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     public HelioviewerMetaData(MetaDataContainer metaDataContainer) {
 
         m = metaDataContainer;
-
-        if (m.get("INSTRUME") == null)
+        instrument = m.get("INSTRUME");
+        if (instrument == null)
             return;
+        instrument = instrument.split("_")[0];
 
         detector = m.get("DETECTOR");
-        instrument = m.get("INSTRUME");
 
         if (detector == null) {
             detector = " ";
         }
-        if (instrument == null) {
-            instrument = " ";
-        }
+
         updateDateTime();
         updatePixelParameters();
 
         setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
         setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
-
-        if (instrument.contains("AIA")) {
-            instrument = "AIA";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "AIA " + measurement;
-        } else if (instrument.contains("SWAP")) {
-            instrument = "SWAP";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "SWAP " + measurement;
-        } else if (instrument.contains("VSM")) {
-            instrument = "VSM";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "NSO-SOLIS " + measurement;
-        } else if (instrument.contains("GONG")) {
-            instrument = "GONG";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "GONG " + measurement;
-        } else if (instrument.contains("H-alpha")) {
-            instrument = "H-alpha";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "H-alpha " + measurement;
-        } else if (instrument.contains("HMI")) {
-            instrument = "HMI";
-            measurement = m.get("CONTENT");
-            observatory = m.get("TELESCOP");
-            fullName = "HMI " + measurement.substring(0, 1) + measurement.substring(1, 3).toLowerCase();
-        } else if (instrument.contains("NRH")) {
-            instrument = "NRH";
-            measurement = m.get("WAVELNTH");
-            observatory = m.get("TELESCOP");
-            fullName = "NRH " + measurement;
-        } else if (instrument.equals("EIT")) {
-            measurement = m.get("WAVELNTH");
-            if (measurement == null) {
-                measurement = "" + m.tryGetInt("WAVELNTH");
-            }
-            observatory = m.get("TELESCOP");
-            fullName = "EIT " + measurement;
+        measurement = m.get("WAVELNTH");
+        if (measurement == null) {
+            measurement = "" + m.tryGetInt("WAVELNTH");
         }
+        if (measurement == null) {
+            measurement = "" + m.tryGetDouble("WAVELNTH");
+        }
+        observatory = m.get("TELESCOP");
 
-        else if (detector.equals("C2") || detector.equals("C3")) {
+        if (instrument.contains("VSM")) {
+            fullName = "NSO-SOLIS " + measurement;
+        } else if (instrument.contains("HMI")) {
+            measurement = m.get("CONTENT");
+            fullName = "HMI " + measurement.substring(0, 1) + measurement.substring(1, 3).toLowerCase();
+        } else if (detector.equals("C2") || detector.equals("C3")) {
             String measurement1 = m.get("FILTER");
             String measurement2 = m.get("POLAR");
             measurement = measurement1 + " " + measurement2;
-
-            observatory = m.get("TELESCOP");
             fullName = "LASCO " + detector;
-        }
-
-        else if (instrument.equals("MDI")) {
-            observatory = m.get("TELESCOP");
+        } else if (instrument.equals("MDI")) {
             measurement = m.get("DPC_OBSR");
             fullName = "MDI " + measurement.substring(3, 6);
-        }
-
-        else if (detector.equals("COR1") || detector.equals("COR2")) {
+        } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
-            measurement = m.get("WAVELNTH");
-            if (measurement == null) {
-                measurement = "" + m.tryGetDouble("WAVELNTH");
-            }
             fullName = instrument + " " + detector;
         } else if (detector.equals("EUVI")) {
             observatory = m.get("OBSRVTRY");
-            measurement = m.get("WAVELNTH");
             if (measurement == null) {
                 measurement = "" + m.tryGetDouble("WAVELNTH");
             }
             fullName = instrument + " " + detector + " " + measurement;
+        } else {
+            fullName = instrument + " " + measurement;
         }
     }
 
-    /**
-     * Reads the non-constant pixel parameters of the meta data.
-     *
-     * This includes the resolution as well as position and size of the sun. The
-     * function also checks, whether these values have changed and returns true
-     * if so.
-     *
-     * @return true, if the pixel parameters have changed, false otherwise
-     */
-    protected boolean updatePixelParameters() {
+    private void updatePixelParameters() {
         updatePosition();
-        boolean changed = false;
 
         if (pixelImageSize.getX() != m.getPixelWidth() || pixelImageSize.getY() != m.getPixelHeight()) {
             pixelImageSize = new Vector2dInt(m.getPixelWidth(), m.getPixelHeight());
-            changed = true;
         }
 
         int pixelImageWidth = pixelImageSize.getX();
@@ -250,12 +184,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
             newSolarPixelRadius = solarRadiusPixel;
         }
 
-        if (newSolarPixelRadius > 0) {
-            if (Math.abs(solarPixelRadius - newSolarPixelRadius) > solarPixelRadius * allowedRelativeDifference) {
-                changed = true;
-            }
-        }
-
         double allowedCenterPixelDistance = 1.;
         double sunX = m.tryGetDouble("CRPIX1") - 1;
         double sunY = m.tryGetDouble("CRPIX2") - 1;
@@ -263,19 +191,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         double dY = sunPixelPosition.getY() - sunY;
 
         if (dX * dX + dY * dY > allowedCenterPixelDistance * allowedCenterPixelDistance) {
-            changed = true;
             sunPixelPosition = new Vector2dDouble(sunX, sunY);
             sunPixelPositionImage = new Vector2dDouble(sunX, pixelImageHeight - 1 - sunY);
         }
 
-        if (changed) {
-            solarPixelRadius = newSolarPixelRadius;
-            meterPerPixel = Constants.SunRadius / solarPixelRadius;
-            setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
-            setPhysicalImageSize(new Vector2dDouble(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
-        }
-
-        return changed;
+        meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
+        setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
+        setPhysicalImageSize(new Vector2dDouble(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
@@ -286,7 +208,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
         String observedDate = m.get("DATE-OBS");
         if (observedDate == null) {
             observedDate = m.get("DATE_OBS");
-
             if (observedDate != null && instrument.equals("LASCO")) {
                 observedDate += "T" + m.get("TIME_OBS");
             }
@@ -336,22 +257,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
      * {@inheritDoc}
      */
     @Override
-    public double getSunPixelRadius() {
-        return solarPixelRadius;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Vector2dDouble getSunPixelPosition() {
-        return sunPixelPosition;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Vector2dInt getResolution() {
         return pixelImageSize;
     }
@@ -374,20 +279,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
     private void updatePosition() {
 
-        this.heeqX = m.tryGetDouble("HEQX_OBS");
-        this.heeqY = m.tryGetDouble("HEQY_OBS");
-        this.heeqZ = m.tryGetDouble("HEQZ_OBS");
-        this.heeqAvailable = this.heeqX != 0.0 || this.heeqY != 0.0 || this.heeqZ != 0.0;
-
-        this.heeX = m.tryGetDouble("HEEX_OBS");
-        this.heeY = m.tryGetDouble("HEEY_OBS");
-        this.heeZ = m.tryGetDouble("HEEZ_OBS");
-        this.heeAvailable = this.heeX != 0.0 || this.heeY != 0.0 || this.heeZ != 0.0;
-
-        this.crlt = m.tryGetDouble("CRLT_OBS");
-        this.crln = m.tryGetDouble("CRLN_OBS");
+        double crlt = m.tryGetDouble("CRLT_OBS");
+        double crln = m.tryGetDouble("CRLN_OBS");
         this.dobs = m.tryGetDouble("DSUN_OBS");
-        this.carringtonAvailable = this.crlt != 0.0 || this.crln != 0.0;
+        boolean carringtonAvailable = crlt != 0.0 || crln != 0.0;
 
         this.refb0 = m.tryGetDouble("REF_B0");
         this.refl0 = m.tryGetDouble("REF_L0");
@@ -395,7 +290,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         this.stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (this.stonyhurstLatitude == 0) {
-            this.stonyhurstLatitude = this.crlt;
+            this.stonyhurstLatitude = crlt;
             if (this.stonyhurstLatitude == 0) {
                 this.stonyhurstLatitude = this.refb0;
             }
@@ -413,37 +308,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
 
         this.theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
         this.phi = Astronomy.getL0Radians(this.getDateTime().getTime());
-        //this.phi -= getStonyhurstLongitude() / MathUtils.radeg;
-        System.out.println("here" + this + " " + phi);
+        this.phi -= getStonyhurstLongitude() / MathUtils.radeg;
         this.theta = getStonyhurstLatitude() / MathUtils.radeg;
-    }
-
-    public double getHEEX() {
-        return heeX;
-    }
-
-    public double getHEEY() {
-        return heeqY;
-    }
-
-    public double getHEEZ() {
-        return heeZ;
-    }
-
-    public boolean isHEEProvided() {
-        return heeAvailable;
-    }
-
-    public boolean isHEEQProvided() {
-        return this.heeqAvailable;
-    }
-
-    public double getCrln() {
-        return crln;
-    }
-
-    public double getCrlt() {
-        return crlt;
     }
 
     public double getDobs() {

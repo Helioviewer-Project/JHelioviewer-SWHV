@@ -26,21 +26,11 @@ public class MetaDataConstructor {
      */
     public static MetaData getMetaData(MetaDataContainer mdc) {
 
-        HelioviewerMetaData hvPosMetaData = new HelioviewerMetaData(mdc);
-        if (hvPosMetaData.isHEEQProvided() || hvPosMetaData.isHEEProvided() || hvPosMetaData.isCarringtonProvided() || hvPosMetaData.isStonyhurstProvided()) {
-            return hvPosMetaData;
-        }
-
         // Try helioviewer meta data
         HelioviewerMetaData hvMetaData = new HelioviewerMetaData(mdc);
 
-        // If the sun radius is -1, there wasn't any
-        // supported meta data available
-        if (hvMetaData.getSunPixelRadius() == -1) {
-            return new PixelBasedMetaData(mdc.getPixelWidth(), mdc.getPixelHeight());
-        } else {
-            return hvMetaData;
-        }
+        return hvMetaData;
+
     }
 
 }
