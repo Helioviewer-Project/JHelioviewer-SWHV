@@ -802,7 +802,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
     }
 
     public void removeRenderListener() {
-        Displayer.getSingletonInstance().removeRenderListener(this);
+        Displayer.removeRenderListener(this);
     }
 
     private float contrast = 0f;
