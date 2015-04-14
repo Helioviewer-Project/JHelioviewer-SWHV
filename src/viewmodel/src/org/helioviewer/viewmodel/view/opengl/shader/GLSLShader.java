@@ -8,6 +8,11 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 
 public class GLSLShader {
+    public static final int NODIFFERENCE = 0;
+    public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
+    public static final int RUNNINGDIFFERENCE_ROT = 2;
+    public static final int BASEDIFFERENCE_NO_ROT = 3;
+    public static final int BASEDIFFERENCE_ROT = 4;
 
     private static int vertexID;
     private static int fragmentID;
@@ -21,27 +26,22 @@ public class GLSLShader {
     public static int alphaParamRef;
     public static int cutOffRadiusRef;
     public static int outerCutOffRadiusRef;
+    public static int rectRef;
+    public static int differenceRectRef;
+    public static int viewportRef;
 
     public static final int[] isDifferenceValue = new int[1];
 
-    public static final float[] truncationValueFloat = new float[4];
-    public static final float[] sharpenParamFloat = new float[4];
-    public static final float[] gammaParamFloat = new float[4];
-    public static final float[] contrastParamFloat = new float[4];
-    public static final float[] alphaParamFloat = new float[4];
-    public static final float[] cutOffRadiusFloat = new float[4];
-    public static final float[] outerCutOffRadiusFloat = new float[4];
-
-    /* Vertex */
-    public static int rectRef;
-    public static int differenceRectRef;
+    public static final float[] sharpenParamFloat = new float[3];
+    public static final float[] truncationValueFloat = new float[1];
+    public static final float[] gammaParamFloat = new float[1];
+    public static final float[] contrastParamFloat = new float[1];
+    public static final float[] alphaParamFloat = new float[1];
+    public static final float[] cutOffRadiusFloat = new float[1];
+    public static final float[] outerCutOffRadiusFloat = new float[1];
     public static final float[] rectVertex = new float[4];
     public static final float[] differencerect = new float[4];
-    public static final int NODIFFERENCE = 0;
-    public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
-    public static final int RUNNINGDIFFERENCE_ROT = 2;
-    public static final int BASEDIFFERENCE_NO_ROT = 3;
-    public static final int BASEDIFFERENCE_ROT = 4;
+    public static final float[] viewport = new float[2];
 
     public static ColorMask colorMask = new ColorMask();
     public static boolean init = false;
@@ -70,6 +70,8 @@ public class GLSLShader {
 
             rectRef = gl.glGetUniformLocation(progID, "rect");
             differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
+            viewportRef = gl.glGetUniformLocation(progID, "viewport");
+
             bind(gl);
             setTextureUnit(gl, "image", 0);
             setTextureUnit(gl, "lut", 1);
@@ -91,19 +93,8 @@ public class GLSLShader {
         gl.glUseProgram(progID);
     }
 
-    public static void bindVars(GL2 gl) {
-        GLSLShader.setUniform(gl, GLSLShader.rectRef, GLSLShader.rectVertex, 4);
-        GLSLShader.setUniform(gl, GLSLShader.differenceRectRef, GLSLShader.differencerect, 4);
-        GLSLShader.setUniform(gl, GLSLShader.cutOffRadiusRef, GLSLShader.cutOffRadiusFloat, 4);
-        GLSLShader.setUniform(gl, GLSLShader.outerCutOffRadiusRef, GLSLShader.outerCutOffRadiusFloat, 4);
-    }
-
     public static void bindMatrix(GL2 gl, float[] matrix, String name) {
         gl.glUniformMatrix4fv(gl.glGetUniformLocation(progID, name), 1, false, matrix, 0);
-    }
-
-    public static void bindViewport(GL2 gl, int viewportWidth, int viewportHeight) {
-        gl.glUniform2f(gl.glGetUniformLocation(progID, "viewport"), viewportWidth, viewportHeight);
     }
 
     public static void unbind(GL2 gl) {
@@ -267,21 +258,18 @@ public class GLSLShader {
     }
 
     public static void filter(GL2 gl) {
-        //contrast
-        GLSLShader.setUniform(gl, GLSLShader.contrastParamRef, GLSLShader.contrastParamFloat, 1);
-        //channelmixer
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-        //difference
-        GLSLShader.setUniform(gl, GLSLShader.truncationValueRef, GLSLShader.truncationValueFloat, 1);
-
+        gl.glUniform1fv(GLSLShader.contrastParamRef, 1, GLSLShader.contrastParamFloat, 0);
+        gl.glUniform1fv(GLSLShader.truncationValueRef, 1, GLSLShader.truncationValueFloat, 0);
         gl.glUniform1iv(GLSLShader.isDifferenceValueRef, 1, GLSLShader.isDifferenceValue, 0);
-        //gamma
-        GLSLShader.setUniform(gl, GLSLShader.gammaParamRef, GLSLShader.gammaParamFloat, 1);
-        //opacity
-        GLSLShader.setUniform(gl, GLSLShader.alphaParamRef, GLSLShader.alphaParamFloat, 1);
-        //sharpen
-        GLSLShader.setUniform(gl, GLSLShader.pixelSizeWeightingRef, GLSLShader.sharpenParamFloat, 4);
-
+        gl.glUniform1fv(GLSLShader.gammaParamRef, 1, GLSLShader.gammaParamFloat, 0);
+        gl.glUniform1fv(GLSLShader.alphaParamRef, 1, GLSLShader.alphaParamFloat, 0);
+        gl.glUniform3fv(GLSLShader.pixelSizeWeightingRef, 1, GLSLShader.sharpenParamFloat, 0);
+        gl.glUniform4fv(GLSLShader.rectRef, 1, GLSLShader.rectVertex, 0);
+        gl.glUniform4fv(GLSLShader.differenceRectRef, 1, GLSLShader.differencerect, 0);
+        gl.glUniform1fv(GLSLShader.cutOffRadiusRef, 1, GLSLShader.cutOffRadiusFloat, 0);
+        gl.glUniform1fv(GLSLShader.outerCutOffRadiusRef, 1, GLSLShader.outerCutOffRadiusFloat, 0);
+        gl.glUniform2fv(GLSLShader.viewportRef, 1, GLSLShader.viewport, 0);
     }
 
     public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
@@ -315,4 +303,8 @@ public class GLSLShader {
         truncationValueFloat[0] = truncationValue;
     }
 
+    public static void setViewport(float width, float height) {
+        viewport[0] = width;
+        viewport[1] = height;
+    }
 }
