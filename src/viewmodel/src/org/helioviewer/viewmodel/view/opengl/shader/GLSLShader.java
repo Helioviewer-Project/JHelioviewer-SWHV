@@ -21,29 +21,28 @@ public class GLSLShader {
     public static int alphaParamRef;
     public static int cutOffRadiusRef;
     public static int outerCutOffRadiusRef;
-    public static int phiRef;
-    public static int thetaRef;
+
+    public static final int[] isDifferenceValue = new int[1];
 
     public static final float[] truncationValueFloat = new float[4];
-    public static final float[] isDifferenceValueFloat = new float[4];
     public static final float[] sharpenParamFloat = new float[4];
     public static final float[] gammaParamFloat = new float[4];
     public static final float[] contrastParamFloat = new float[4];
     public static final float[] alphaParamFloat = new float[4];
-    public static final float[] phiParamFloat = new float[4];
-    public static final float[] thetaParamFloat = new float[4];
     public static final float[] cutOffRadiusFloat = new float[4];
     public static final float[] outerCutOffRadiusFloat = new float[4];
 
     /* Vertex */
     public static int rectRef;
-    public static int differenceThetaRef;
-    public static int differencePhiRef;
     public static int differenceRectRef;
     public static final float[] rectVertex = new float[4];
-    public static final float[] differenceThetaVertex = new float[4];
-    public static final float[] differencePhiVertex = new float[4];
-    public static final float[] differenceRectVertex = new float[4];
+    public static final float[] differencerect = new float[4];
+    public static final int NODIFFERENCE = 0;
+    public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
+    public static final int RUNNINGDIFFERENCE_ROT = 2;
+    public static final int BASEDIFFERENCE_NO_ROT = 3;
+    public static final int BASEDIFFERENCE_ROT = 4;
+
     public static ColorMask colorMask = new ColorMask();
     public static boolean init = false;
 
@@ -68,12 +67,9 @@ public class GLSLShader {
             alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
             cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
             outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
-            phiRef = gl.glGetUniformLocation(progID, "phi");
-            thetaRef = gl.glGetUniformLocation(progID, "theta");
-            differencePhiRef = gl.glGetUniformLocation(progID, "differencephi");
-            differenceThetaRef = gl.glGetUniformLocation(progID, "differencetheta");
+
             rectRef = gl.glGetUniformLocation(progID, "rect");
-            differenceRectRef = gl.glGetUniformLocation(progID, "differenceRect");
+            differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
             bind(gl);
             setTextureUnit(gl, "image", 0);
             setTextureUnit(gl, "lut", 1);
@@ -97,13 +93,9 @@ public class GLSLShader {
 
     public static void bindVars(GL2 gl) {
         GLSLShader.setUniform(gl, GLSLShader.rectRef, GLSLShader.rectVertex, 4);
-        GLSLShader.setUniform(gl, GLSLShader.differenceRectRef, GLSLShader.differenceRectVertex, 4);
-        GLSLShader.setUniform(gl, GLSLShader.differenceThetaRef, GLSLShader.differenceThetaVertex, 1);
-        GLSLShader.setUniform(gl, GLSLShader.differencePhiRef, GLSLShader.differencePhiVertex, 1);
+        GLSLShader.setUniform(gl, GLSLShader.differenceRectRef, GLSLShader.differencerect, 4);
         GLSLShader.setUniform(gl, GLSLShader.cutOffRadiusRef, GLSLShader.cutOffRadiusFloat, 4);
         GLSLShader.setUniform(gl, GLSLShader.outerCutOffRadiusRef, GLSLShader.outerCutOffRadiusFloat, 4);
-        GLSLShader.setUniform(gl, GLSLShader.phiRef, GLSLShader.phiParamFloat, 1);
-        GLSLShader.setUniform(gl, GLSLShader.thetaRef, GLSLShader.thetaParamFloat, 1);
     }
 
     public static void bindMatrix(GL2 gl, float[] matrix, String name) {
@@ -268,10 +260,10 @@ public class GLSLShader {
     }
 
     public static void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
-        differenceRectVertex[0] = (float) differenceXOffset;
-        differenceRectVertex[1] = (float) differenceYOffset;
-        differenceRectVertex[2] = (float) differenceXScale;
-        differenceRectVertex[3] = (float) differenceYScale;
+        differencerect[0] = (float) differenceXOffset;
+        differencerect[1] = (float) differenceYOffset;
+        differencerect[2] = (float) differenceXScale;
+        differencerect[3] = (float) differenceYScale;
     }
 
     public static void filter(GL2 gl) {
@@ -281,7 +273,9 @@ public class GLSLShader {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
         //difference
         GLSLShader.setUniform(gl, GLSLShader.truncationValueRef, GLSLShader.truncationValueFloat, 1);
-        GLSLShader.setUniform(gl, GLSLShader.isDifferenceValueRef, GLSLShader.isDifferenceValueFloat, 1);
+
+        gl.glUniform1iv(GLSLShader.isDifferenceValueRef, 1, GLSLShader.isDifferenceValue, 0);
+        System.out.println(GLSLShader.isDifferenceValue[0]);
         //gamma
         GLSLShader.setUniform(gl, GLSLShader.gammaParamRef, GLSLShader.gammaParamFloat, 1);
         //opacity
@@ -294,16 +288,6 @@ public class GLSLShader {
     public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
         cutOffRadiusFloat[0] = (float) cutOffRadius;
         outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
-    }
-
-    public static void changeAngles(double theta, double phi) {
-        thetaParamFloat[0] = (float) (0 * theta);
-        phiParamFloat[0] = (float) -phi;
-    }
-
-    public static void changeDifferenceAngles(double theta, double phi) {
-        differenceThetaVertex[0] = (float) (0 * theta);
-        differencePhiVertex[0] = (float) -phi;
     }
 
     public static void setAlpha(float alpha) {
@@ -324,8 +308,8 @@ public class GLSLShader {
         sharpenParamFloat[2] = weighting;
     }
 
-    public static void setIsDifference(float isDifference) {
-        isDifferenceValueFloat[0] = isDifference;
+    public static void setIsDifference(int isDifference) {
+        isDifferenceValue[0] = isDifference;
     }
 
     public static void setTruncationValue(float truncationValue) {
