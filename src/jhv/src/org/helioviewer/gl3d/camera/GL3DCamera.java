@@ -196,9 +196,6 @@ public abstract class GL3DCamera {
             return rotatedHitPoint;
         } else {
             GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
-            if (altnormal.z < 0.) {
-                return null;
-            }
             double zvalue = -(altnormal.x * up1.x + altnormal.y * up1.y) / altnormal.z;
             hitPoint = new GL3DVec3d(up1.x, up1.y, zvalue);
             rotatedHitPoint = cameraDifferenceRotationInverse.multiply(hitPoint);
@@ -206,19 +203,6 @@ public abstract class GL3DCamera {
         }
     }
 
-    /*
-     * public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-     * GL3DState state = GL3DState.get(); GL3DVec4d normalizedScreenpos = new
-     * GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() -
-     * 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() -
-     * 0.5), 0., 0.); GL3DVec4d up1 =
-     * this.orthoMatrixInverse.multiply(normalizedScreenpos); GL3DVec3d
-     * hitPoint; GL3DVec3d rotatedHitPoint; double radius2 = up1.x * up1.x +
-     * up1.y * up1.y; if (radius2 <= 1.) { hitPoint = new GL3DVec3d(up1.x,
-     * up1.y, Math.sqrt(1. - radius2)); rotatedHitPoint =
-     * getRotation().toMatrix().transpose().multiply(hitPoint); return
-     * rotatedHitPoint; } return null; }
-     */
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
         return hp;
