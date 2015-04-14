@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL2;
 
@@ -16,13 +17,14 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid implements Renderable {
+    private static final int SUBDIVISIONS = 120;
 
-    private double lonstepDegrees = 13.2;
-    private double latstepDegrees = 20.;
-    private final int lineres = 120;
+    private float lonstepDegrees = 13.2f;
+    private float latstepDegrees = 20.f;
     private final float scale = 0.8f;
     private Font font;
     private TextRenderer renderer;
@@ -30,8 +32,6 @@ public class RenderableGrid implements Renderable {
     private final boolean followCamera;
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
-    private final Color thirdColor = Color.YELLOW;
-    private final float lineWidth = 1.2f;
     private final RenderableType renderableType;
     private final Component optionsPanel;
     private final String name = "Grid";
@@ -57,6 +57,8 @@ public class RenderableGrid implements Renderable {
     }
 
     private float oldrelhi = -1;
+    private int positionBufferID;
+    private int colorBufferID;
 
     @Override
     public void render(GL3DState state) {
@@ -86,115 +88,87 @@ public class RenderableGrid implements Renderable {
                 drawText(gl);
             }
 
-            drawCircles(gl);
+            drawCircles(state);
         }
         gl.glPopMatrix();
     }
 
-    private void drawCircles(GL2 gl) {
-        //latitude positive
-        gl.glLineWidth(lineWidth);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
+    private void drawCircles(GL3DState state) {
+        GL2 gl = state.gl;
 
-        double phi = Math.PI / 2.;
-        double latstep = getLatstepDegrees() / 180. * Math.PI;
-        for (; phi < Math.PI; phi = phi + latstep) {
-            gl.glBegin(GL2.GL_LINE_LOOP);
-            for (int i = 0; i <= lineres; i++) {
-                if (i % 2 == 0) {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
-                    }
+        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
-                } else {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
-                    }
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+        {
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+            gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
+            gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);
+
+            gl.glRotatef(90f, 0f, 1f, 0f);
+            gl.glPushMatrix();
+            {
+                float rotation = 0f;
+                while (rotation <= 90f) {
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                    gl.glRotatef(lonstepDegrees, 0f, 1f, 0f);
+                    rotation += lonstepDegrees;
                 }
-                double theta = 2 * i * Math.PI / lineres;
-                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
             }
-            gl.glEnd();
-        }
-        //latitude negative
-        phi = Math.PI / 2. - latstep;
-        for (; phi > 0.; phi = phi - latstep) {
-            //+ j * Math.PI / this.xticks;
-            gl.glBegin(GL2.GL_LINE_LOOP);
-            for (int i = 0; i <= lineres; i++) {
-                if (i % 2 == 0) {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
-                    }
-                } else {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
-                    }
-                }
-                double theta = 2 * i * Math.PI / lineres;
-                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
-            }
-            gl.glEnd();
-        }
+            gl.glPopMatrix();
+            gl.glPushMatrix();
+            {
+                float rotation = 0f;
+                rotation -= lonstepDegrees;
+                gl.glRotatef(-lonstepDegrees, 0f, 1f, 0f);
 
-        //longitude positive
-        double theta = 0.;
-        double lonstep = getLonstepDegrees() / 180. * Math.PI;
-        for (; theta <= Math.PI; theta = theta + lonstep) {
-            gl.glBegin(GL2.GL_LINE_STRIP);
-            for (int i = 0; i <= lineres; i++) {
-                if (i % 2 == 0) {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
-                    }
-
-                } else {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
-                    }
+                while (rotation >= -90f) {
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                    gl.glRotatef(-lonstepDegrees, 0f, 1f, 0f);
+                    rotation -= lonstepDegrees;
                 }
-                phi = i * Math.PI / lineres;
-                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
             }
-            gl.glEnd();
-        }
+            gl.glPopMatrix();
+            gl.glPushMatrix();
+            {
+                float rotation = 0f;
+                gl.glRotatef(90.f, 1f, 0f, 0f);
 
-        //longitude negative
-        theta = -lonstep;
-        for (; theta >= -Math.PI; theta = theta - lonstep) {
-            gl.glBegin(GL2.GL_LINE_STRIP);
-            for (int i = 0; i <= lineres; i++) {
-                if (i % 2 == 0) {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (secondColor.getRed() / 255.), (float) (secondColor.getGreen() / 255.), (float) (secondColor.getBlue() / 255.));
+                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                while (rotation < 90.) {
+                    gl.glPushMatrix();
+                    {
+                        gl.glTranslatef(0f, 0f, (float) Math.sin(Math.PI / 180. * rotation));
+                        float scale = (float) Math.cos(Math.PI / 180. * rotation);
+                        gl.glScalef(scale, scale, scale);
+                        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
                     }
-                } else {
-                    if (followCamera) {
-                        gl.glColor3f((float) (thirdColor.getRed() / 255.), (float) (thirdColor.getGreen() / 255.), (float) (thirdColor.getBlue() / 255.));
-                    } else {
-                        gl.glColor3f((float) (firstColor.getRed() / 255.), (float) (firstColor.getGreen() / 255.), (float) (firstColor.getBlue() / 255.));
-                    }
+                    gl.glPopMatrix();
+                    rotation += latstepDegrees;
                 }
-                phi = i * Math.PI / lineres;
-                gl.glVertex3d(Math.sin(theta) * Math.sin(phi), Math.cos(phi), Math.cos(theta) * Math.sin(phi));
+
+                rotation = latstepDegrees;
+                while (rotation < 90.) {
+                    gl.glPushMatrix();
+                    {
+                        gl.glTranslatef(0f, 0f, -(float) Math.sin(Math.PI / 180. * rotation));
+                        float scale = (float) Math.cos(Math.PI / 180. * rotation);
+                        gl.glScalef(scale, scale, scale);
+                        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                    }
+                    gl.glPopMatrix();
+                    rotation += latstepDegrees;
+                }
+                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+
             }
-            gl.glEnd();
+            gl.glPopMatrix();
         }
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+
     }
 
     private void drawText(GL2 gl) {
@@ -261,10 +235,48 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void init(GL3DState state) {
+        FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
+        FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
+
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
+            positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
+            positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
+            if (i % 2 == 0) {
+                colorBuffer.put(this.firstColor.getRed() / 255f);
+                colorBuffer.put(this.firstColor.getGreen() / 255f);
+                colorBuffer.put(this.firstColor.getBlue() / 255f);
+            } else {
+                colorBuffer.put(this.secondColor.getRed() / 255f);
+                colorBuffer.put(this.secondColor.getGreen() / 255f);
+                colorBuffer.put(this.secondColor.getBlue() / 255f);
+            }
+
+        }
+        positionBuffer.flip();
+        colorBuffer.flip();
+        int positionBufferSize = positionBuffer.capacity();
+        int colorBufferSize = colorBuffer.capacity();
+
+        positionBufferID = generate(state);
+        colorBufferID = generate(state);
+
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
+        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBufferSize * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
+
+    }
+
+    private int generate(GL3DState state) {
+        int[] tmpId = new int[1];
+        state.gl.glGenBuffers(1, tmpId, 0);
+        return tmpId[0];
     }
 
     @Override
     public void remove(GL3DState state) {
+        state.gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
+        state.gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
     }
 
     @Override
@@ -297,7 +309,7 @@ public class RenderableGrid implements Renderable {
     }
 
     public void setLonstepDegrees(double lonstepDegrees) {
-        this.lonstepDegrees = lonstepDegrees;
+        this.lonstepDegrees = (float) lonstepDegrees;
     }
 
     public double getLatstepDegrees() {
@@ -305,7 +317,7 @@ public class RenderableGrid implements Renderable {
     }
 
     public void setLatstepDegrees(double latstepDegrees) {
-        this.latstepDegrees = latstepDegrees;
+        this.latstepDegrees = (float) latstepDegrees;
     }
 
     @Override
