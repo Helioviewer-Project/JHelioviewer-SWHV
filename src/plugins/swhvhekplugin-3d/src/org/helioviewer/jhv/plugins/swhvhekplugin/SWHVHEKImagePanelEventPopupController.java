@@ -24,13 +24,10 @@ import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
@@ -253,11 +250,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
 
-        boolean state3D = false;
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View3D) {
-            state3D = true;
-            hitpoint = this.getHitPoint(e);
-        }
+        hitpoint = this.getHitPoint(e);
 
         if (currentDate != null) {
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
@@ -269,24 +262,13 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
                     JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
 
                     if (pt != null) {
-                        if (state3D) {
-                            if (hitpoint != null) {
-                                double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
-                                double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
-                                double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
-                                if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                                    mouseOverJHVEvent = evt;
-                                    mouseOverPosition = new Point(e.getX(), e.getY());
-                                }
-                            }
-                        } else {
-                            Vector2dInt screenPos = convertPhysicalToScreen(pt.getCoordinate1(), pt.getCoordinate2());
-                            double x = e.getX() * GLInfo.pixelScale[0];
-                            double y = e.getY() * GLInfo.pixelScale[1];
-
-                            if (screenPos != null && x >= screenPos.getX() - 8 && x <= screenPos.getX() + 8 && y >= screenPos.getY() - 8 && y <= screenPos.getY() + 8) {
+                        if (hitpoint != null) {
+                            double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
+                            double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
+                            double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
+                            if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
                                 mouseOverJHVEvent = evt;
-                                mouseOverPosition = new Point(screenPos.getX(), screenPos.getY());
+                                mouseOverPosition = new Point(e.getX(), e.getY());
                             }
                         }
                     }
