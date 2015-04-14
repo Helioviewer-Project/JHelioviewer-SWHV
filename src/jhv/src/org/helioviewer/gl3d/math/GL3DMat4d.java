@@ -25,7 +25,7 @@ public class GL3DMat4d {
         m[15] = M15;
     }
 
-    public GL3DMat4d() {
+    private GL3DMat4d() {
     }
 
     public GL3DMat4d(GL3DMat4d mat) {
