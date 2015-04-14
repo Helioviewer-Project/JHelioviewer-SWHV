@@ -55,7 +55,7 @@ public class GL3DImageLayer implements Renderable {
     public double minZ = -Constants.SunRadius;
     public double maxZ = Constants.SunRadius;
 
-    private final int resolution = 6;
+    private final int resolution = 3;
     private final double[][] pointlist = new double[(resolution + 1) * 2 * 2][2];
     private final boolean showSphere;
     private boolean showCorona;
@@ -139,8 +139,8 @@ public class GL3DImageLayer implements Renderable {
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.0);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.0);
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;

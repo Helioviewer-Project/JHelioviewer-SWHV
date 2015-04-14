@@ -32,6 +32,8 @@ public abstract class GL3DCamera {
     private final double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
     private double aspect = 0.0;
+    private double previousAspect = -1.0;
+
     private final RayTracer rayTracer;
     private GL3DMat4d cameraTransformation;
 
@@ -52,10 +54,10 @@ public abstract class GL3DCamera {
 
     private boolean trackingMode;
 
-    public GL3DMat4d orthoMatrix = GL3DMat4d.identity();
     public GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
 
     private double cameraWidth = 1.;
+    private double previousCameraWidth = -1;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -164,22 +166,30 @@ public abstract class GL3DCamera {
 
     public void applyPerspective(GL3DState state) {
         GL2 gl = state.gl;
-
-        this.aspect = state.getViewportWidth() / (double) state.getViewportHeight();
-
         gl.glMatrixMode(GL2.GL_PROJECTION);
-
         gl.glPushMatrix();
-        gl.glLoadIdentity();
-
+        this.aspect = state.getViewportWidth() / (double) state.getViewportHeight();
         cameraWidth = -translation.z * Math.tan(fov / 2.);
-        if (getCameraWidth() == 0.)
+        if (cameraWidth == 0.)
             cameraWidth = 1.;
 
         double waspect = getCameraWidth() * aspect;
-        gl.glOrtho(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
-        orthoMatrix = GL3DMat4d.ortho(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
-        orthoMatrixInverse = GL3DMat4d.orthoInverse(-waspect, waspect, -getCameraWidth(), getCameraWidth(), clipNear, clipFar);
+        gl.glLoadIdentity();
+        gl.glOrtho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
+            return;
+        }
+        previousCameraWidth = cameraWidth;
+        previousAspect = aspect;
+        //orthoMatrix = GL3DMat4d.ortho(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        orthoMatrixInverse = GL3DMat4d.orthoInverse(-waspect, waspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+    }
+
+    public void resumePerspective(GL3DState state) {
+        GL2 gl = state.gl;
+        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glPopMatrix();
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
@@ -212,13 +222,6 @@ public abstract class GL3DCamera {
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
         return this.getLocalRotation().toMatrix().multiply(hp);
-    }
-
-    public void resumePerspective(GL3DState state) {
-        GL2 gl = state.gl;
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glPopMatrix();
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
     /**
@@ -335,7 +338,6 @@ public abstract class GL3DCamera {
         double currentWidth = this.getCameraWidth();
         double newWidth = currentWidth + wr * 0.1;
         double fov = 2. * Math.atan(-newWidth / this.getTranslation().z);
-
         this.setCameraFOV(fov);
         Displayer.display();
     }
