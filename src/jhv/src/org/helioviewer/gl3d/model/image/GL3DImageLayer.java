@@ -18,8 +18,6 @@ import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;
@@ -244,7 +242,7 @@ public class GL3DImageLayer implements Renderable {
                         gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
                         gl.glDepthRange(0.f, 1.f);
                     }
-                    if (this.showSphere && StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState()) {
+                    if (this.showSphere) {
                         gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                     }
 

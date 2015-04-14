@@ -5,8 +5,6 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -342,15 +340,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements SunMetaData
     }
 
     public double getPhi() {
-        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
-            return this.phi;
-        return 0.;
+        return this.phi;
     }
 
     public double getTheta() {
-        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
-            return this.theta;
-        return 0.;
+        return this.theta;
     }
 
 }
