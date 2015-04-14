@@ -236,7 +236,7 @@ public abstract class GL3DCamera {
     }
 
     public void applyCamera(GL3DState state) {
-        state.multiplyMV(cameraTransformation);
+        state.gl.glMultMatrixd(cameraTransformation.m, 0);
     }
 
     public abstract GL3DInteraction getPanInteraction();
