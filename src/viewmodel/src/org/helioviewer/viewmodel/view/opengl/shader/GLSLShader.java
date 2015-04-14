@@ -275,7 +275,6 @@ public class GLSLShader {
         GLSLShader.setUniform(gl, GLSLShader.truncationValueRef, GLSLShader.truncationValueFloat, 1);
 
         gl.glUniform1iv(GLSLShader.isDifferenceValueRef, 1, GLSLShader.isDifferenceValue, 0);
-        System.out.println(GLSLShader.isDifferenceValue[0]);
         //gamma
         GLSLShader.setUniform(gl, GLSLShader.gammaParamRef, GLSLShader.gammaParamFloat, 1);
         //opacity
