@@ -295,7 +295,7 @@ public class GL3DImageLayer implements Renderable {
         Displayer.getLayersModel().removeLayer(getMainLayerView());
     }
 
-    private Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
+    private static Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
         float t = (float) ((Math.sqrt(5) - 1) / 2);
         float[][] icosahedronVertexList = new float[][] { new float[] { -1, -t, 0 }, new float[] { 0, 1, t }, new float[] { 0, 1, -t }, new float[] { 1, t, 0 }, new float[] { 1, -t, 0 }, new float[] { 0, -1, -t }, new float[] { 0, -1, t }, new float[] { t, 0, 1 }, new float[] { -t, 0, 1 }, new float[] { t, 0, -1 }, new float[] { -t, 0, -1 }, new float[] { -1, t, 0 }, };
         for (float[] v : icosahedronVertexList) {
@@ -354,7 +354,7 @@ public class GL3DImageLayer implements Renderable {
         return new Pair<FloatBuffer, IntBuffer>(positionBuffer, indexBuffer);
     }
 
-    private void subdivide(int vx, int vy, int vz, ArrayList<Float> vertexList, ArrayList<Integer> faceList, int level) {
+    private static void subdivide(int vx, int vy, int vz, ArrayList<Float> vertexList, ArrayList<Integer> faceList, int level) {
         if (level != 0) {
             float x1 = (vertexList.get(3 * vx) + vertexList.get(3 * vy));
             float y1 = (vertexList.get(3 * vx + 1) + vertexList.get(3 * vy + 1));
