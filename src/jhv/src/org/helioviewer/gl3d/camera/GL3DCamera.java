@@ -203,17 +203,18 @@ public abstract class GL3DCamera {
         GL3DVec3d hitPoint;
         GL3DVec3d rotatedHitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
-        rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
-        if (radius2 <= 1 && rotatedHitPoint.z > 0.) {
-            return rotatedHitPoint;
-        } else {
-            GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
-            double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-            hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
+        if (radius2 <= 1) {
+            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
             rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
-            return rotatedHitPoint;
+            if (rotatedHitPoint.z > 0.) {
+                return rotatedHitPoint;
+            }
         }
+        GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
+        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
+        hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
+        rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
+        return rotatedHitPoint;
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
