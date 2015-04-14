@@ -123,6 +123,11 @@ public class GL3DMat4d {
         return new GL3DVec3d((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
     }
 
+    public final GL3DVec3d multiplyTranspose(GL3DVec3d v) {
+        double W = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
+        return new GL3DVec3d((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
+    }
+
     public final GL3DVec4d multiply(GL3DVec4d v) {
         return new GL3DVec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
