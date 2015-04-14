@@ -182,6 +182,43 @@ public abstract class GL3DCamera {
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
+    public GL3DVec3d getVectorFromSphereOrPlane(Point viewportCoordinates, GL3DMat4d cameraDifferenceRotation) {
+        GL3DState state = GL3DState.get();
+        GL3DVec4d normalizedScreenpos = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 0., 0.);
+        GL3DMat4d cameraDifferenceRotationInverse = cameraDifferenceRotation.copy().transpose();
+        GL3DVec4d up1 = this.orthoMatrixInverse.multiply(normalizedScreenpos);
+        GL3DVec3d hitPoint;
+        GL3DVec3d rotatedHitPoint;
+        double radius2 = up1.x * up1.x + up1.y * up1.y;
+        hitPoint = new GL3DVec3d(up1.x, up1.y, Math.sqrt(1. - radius2));
+        rotatedHitPoint = cameraDifferenceRotationInverse.multiply(hitPoint);
+        if (radius2 <= 1 && rotatedHitPoint.z > 0.) {
+            return rotatedHitPoint;
+        } else {
+            GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
+            if (altnormal.z < 0.) {
+                return null;
+            }
+            double zvalue = -(altnormal.x * up1.x + altnormal.y * up1.y) / altnormal.z;
+            hitPoint = new GL3DVec3d(up1.x, up1.y, zvalue);
+            rotatedHitPoint = cameraDifferenceRotationInverse.multiply(hitPoint);
+            return rotatedHitPoint;
+        }
+    }
+
+    /*
+     * public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
+     * GL3DState state = GL3DState.get(); GL3DVec4d normalizedScreenpos = new
+     * GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() -
+     * 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() -
+     * 0.5), 0., 0.); GL3DVec4d up1 =
+     * this.orthoMatrixInverse.multiply(normalizedScreenpos); GL3DVec3d
+     * hitPoint; GL3DVec3d rotatedHitPoint; double radius2 = up1.x * up1.x +
+     * up1.y * up1.y; if (radius2 <= 1.) { hitPoint = new GL3DVec3d(up1.x,
+     * up1.y, Math.sqrt(1. - radius2)); rotatedHitPoint =
+     * getRotation().toMatrix().transpose().multiply(hitPoint); return
+     * rotatedHitPoint; } return null; }
+     */
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
         return hp;
@@ -190,23 +227,6 @@ public abstract class GL3DCamera {
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
         return this.getLocalRotation().toMatrix().multiply(hp);
-    }
-
-    public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
-        GL3DState state = GL3DState.get();
-
-        GL3DVec4d centeredViewportCoordinates1 = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), -1., 1.);
-        GL3DVec4d centeredViewportCoordinates2 = new GL3DVec4d(2. * (viewportCoordinates.getX() / state.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / state.getViewportHeight() - 0.5), 1., 1.);
-
-        GL3DMat4d roti = this.getRotation().toMatrix().transpose();
-        GL3DVec4d up1 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates1));
-        GL3DVec4d up2 = roti.multiply(orthoMatrixInverse.multiply(centeredViewportCoordinates2));
-        GL3DVec4d linevec = GL3DVec4d.subtract(up2, up1);
-        GL3DVec4d normal = this.getLocalRotation().toMatrix().transpose().multiply(new GL3DVec4d(0., 0., 1., 1.));
-        double fact = -GL3DVec4d.dot3d(up1, normal) / GL3DVec4d.dot3d(linevec, normal);
-        GL3DVec4d notRotated = GL3DVec4d.add(up1, GL3DVec4d.multiply(linevec, fact));
-
-        return new GL3DVec3d(notRotated.x, notRotated.y, notRotated.z);
     }
 
     public void resumePerspective(GL3DState state) {

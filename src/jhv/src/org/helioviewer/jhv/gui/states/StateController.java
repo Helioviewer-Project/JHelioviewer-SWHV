@@ -3,6 +3,9 @@ package org.helioviewer.jhv.gui.states;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
+
 /**
  * Singleton that controls the current state, i.e. 2D or 3D.
  * {@link StateChangeListener}s can be added for notifications about the current
@@ -28,6 +31,8 @@ public class StateController {
 
     public void set2DState() {
         setState(ViewStateEnum.View2D.getState());
+        GL3DState.get().getActiveCamera().reset();
+        Displayer.display();
     }
 
     public void set3DState() {

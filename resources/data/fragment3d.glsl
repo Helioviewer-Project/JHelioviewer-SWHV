@@ -16,8 +16,7 @@ uniform float phi;
 uniform float theta;
 varying vec4 outPosition;
 uniform mat4 cameraTransformationInverse;
-uniform mat4 layerLocalRotation;
-uniform mat4 currentDragRotation;
+uniform mat4 cameraDifferenceRotation;
 uniform float physicalImageWidth;
 uniform vec2 sunOffset;
 uniform vec2 viewport;
@@ -25,7 +24,7 @@ uniform float vpheight;
 
 float intersectPlane(vec4 vecin)
 {   
-    vec3 altnormal = (currentDragRotation * vec4(0., 0., 1., 1.)).xyz;
+    vec3 altnormal = (cameraDifferenceRotation * vec4(0., 0., 1., 1.)).xyz;
     if(altnormal.z <0.){
         discard;
     }
@@ -50,27 +49,24 @@ void main(void)
 
     normalizedScreenpos.y = normalizedScreenpos.y;
 
-    vec4 up2 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, 1., 1.);
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec3 direction = (up1 - up2).xyz;
-    vec3 newdirection = normalize(-direction);
-    vec3 origin = up1.xyz; 
-    
   
     vec4 color;
     vec2 texcoord; 
     vec2 difftexcoord; 
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
-    vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * currentDragRotation;
-    if(dot(up1.xy, up1.xy)<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.){
+    vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * cameraDifferenceRotation;
+    float radius2 = dot(up1.xy, up1.xy);
+    if(radius2 > outerCutOffRadius.x * outerCutOffRadius.x || radius2 < cutOffRadius.x * cutOffRadius.x){
+        discard;
+    }
+    if(radius2<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.){
         texcoord = vec2((rotatedHitPoint.x*rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
-        //imageColor = texture2D(image, texcoord);
     }
     else{
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
-        rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) *currentDragRotation;
+        rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) *cameraDifferenceRotation;
         texcoord = vec2((rotatedHitPoint.x * rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
-        //imageColor = texture2D(image, texcoord);
     } 
     if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.){
         discard;
