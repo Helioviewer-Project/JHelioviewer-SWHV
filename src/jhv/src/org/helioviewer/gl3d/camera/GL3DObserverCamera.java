@@ -10,7 +10,7 @@ import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.MetaDataView;
 
@@ -65,8 +65,8 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         MetaDataView mdv = Displayer.getLayersModel().getActiveView();
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
-            if (metadata instanceof HelioviewerPositionedMetaData) {
-                HelioviewerPositionedMetaData hvMetadata = (HelioviewerPositionedMetaData) metadata;
+            if (metadata instanceof HelioviewerMetaData) {
+                HelioviewerMetaData hvMetadata = (HelioviewerMetaData) metadata;
                 if (!hvMetadata.isStonyhurstProvided()) {
                     addb0 = Astronomy.getB0InRadians(date);
                 } else {

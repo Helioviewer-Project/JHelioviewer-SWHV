@@ -24,8 +24,6 @@ import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.HelioviewerOcculterMetaData;
-import org.helioviewer.viewmodel.metadata.HelioviewerPositionedMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
@@ -1045,8 +1043,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
         double phi = Astronomy.getL0Radians(dt);
 
         MetaData metadata = image.getMETADATA();
-        if (metadata instanceof HelioviewerPositionedMetaData) {
-            HelioviewerPositionedMetaData md = (HelioviewerPositionedMetaData) metadata;
+        if (metadata instanceof HelioviewerMetaData) {
+            HelioviewerMetaData md = (HelioviewerMetaData) metadata;
             phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
             theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
         }
@@ -1083,8 +1081,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
 
         double innerCutOff = 0;
         double outerCutOff = 40;
-        if (metadata instanceof HelioviewerOcculterMetaData) {
-            HelioviewerOcculterMetaData md = (HelioviewerOcculterMetaData) metadata;
+        if (metadata instanceof HelioviewerMetaData) {
+            HelioviewerMetaData md = (HelioviewerMetaData) metadata;
             innerCutOff = md.getInnerPhysicalOcculterRadius();
             outerCutOff = md.getOuterPhysicalOcculterRadius();
         }

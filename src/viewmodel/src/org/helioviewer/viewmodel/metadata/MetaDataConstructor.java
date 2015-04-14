@@ -26,15 +26,7 @@ public class MetaDataConstructor {
      */
     public static MetaData getMetaData(MetaDataContainer mdc) {
 
-        // Try occulter meta data
-        HelioviewerOcculterMetaData occulterMetaData = new HelioviewerOcculterMetaData(mdc);
-
-        // If the inner radius is 0, then there wasn't any
-        // supported meta data available
-        if (occulterMetaData.getInnerPhysicalOcculterRadius() != 0.0)
-            return occulterMetaData;
-
-        HelioviewerPositionedMetaData hvPosMetaData = new HelioviewerPositionedMetaData(mdc);
+        HelioviewerMetaData hvPosMetaData = new HelioviewerMetaData(mdc);
         if (hvPosMetaData.isHEEQProvided() || hvPosMetaData.isHEEProvided() || hvPosMetaData.isCarringtonProvided() || hvPosMetaData.isStonyhurstProvided()) {
             return hvPosMetaData;
         }
