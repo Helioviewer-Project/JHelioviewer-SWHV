@@ -323,50 +323,6 @@ public class GL3DMat4d {
         return this;
     }
 
-    public final void readLookAt(GL3DVec3d eye, GL3DVec3d at, GL3DVec3d up, GL3DVec3d right) {
-        GL3DMat4d invRot = new GL3DMat4d(this);
-        invRot.setTranslation(0, 0, 0); // remove the translation
-        invRot.transpose(); // transpose it to get inverse rot.
-        GL3DVec3d translation = this.translation();
-        translation.negate();
-        eye.set(invRot.multiply(translation)); // setMatrix eye
-        right.set(m[0], m[4], m[8]); // normalized look right vector
-        up.set(m[1], m[5], m[9]); // normalized look up vector
-        at.set(-m[2], -m[6], -m[10]); // normalized look at vector
-    }
-
-    public final void posAtUp(GL3DVec3d pos) {
-        this.posAtUp(pos, new GL3DVec3d(), new GL3DVec3d());
-    }
-
-    public final void posAtUp(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
-        lightAt(pos, dirAt, dirUp);
-    }
-
-    public final void lightAt(GL3DVec3d pos, GL3DVec3d dirAt, GL3DVec3d dirUp) {
-        GL3DVec3d VX = new GL3DVec3d();
-        GL3DVec3d VY = new GL3DVec3d();
-        GL3DVec3d VZ;
-        // GL3DVec3d VT = new GL3DVec3d();
-
-        GL3DMat3d xz = new GL3DMat3d(0, 0, 1, 0, 0, 0, -1, 0, 0);
-
-        VZ = GL3DVec3d.subtract(pos, dirAt);
-        if (dirUp.isApproxEqual(GL3DVec3d.ZERO, 0)) {
-            VX = xz.multiply(VZ);
-            VX.normalize();
-            VY = GL3DVec3d.cross(VZ, VX);
-            VY.normalize();
-        } else {
-            VX = GL3DVec3d.cross(dirUp, VZ);
-            VX.normalize();
-            VY = GL3DVec3d.cross(VZ, VX);
-            VY.normalize();
-        }
-
-        set(VX.x, VY.x, VZ.x, pos.x, VX.y, VY.y, VZ.y, pos.y, VX.z, VY.z, VZ.z, pos.z, 0, 0, 0, 1);
-    }
-
     private final static GL3DMat4d rotation(GL3DQuatd q) {
         return GL3DMat4d.rotation(q.getAngle(), q.getRotationAxis());
     }
