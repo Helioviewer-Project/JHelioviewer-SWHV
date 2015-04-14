@@ -112,6 +112,8 @@ public class GL3DImageLayer implements Renderable {
         state.getActiveCamera().updateCameraTransformation();
     }
 
+    public static ArrayList<GL3DVec3d> hp = new ArrayList<GL3DVec3d>();
+
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
@@ -136,16 +138,15 @@ public class GL3DImageLayer implements Renderable {
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
+        GL3DMat4d camdiff = this.getCameraDifferenceRotation(activeCamera);
         //if (hp.size() == 0) {
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
-            hitPoint = activeCamera.getVectorFromSphere(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
-            if (hitPoint == null || hitPoint.z == 0.) {
-                hitPoint = activeCamera.getVectorFromPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)));
-            }
+            hitPoint = activeCamera.getVectorFromSphereOrPlane(new Point((int) (pointlist[i][0] * width), (int) (pointlist[i][1] * height)), camdiff);
+
             if (hitPoint != null) {
                 //hp.add(hitPoint);
-                hitPoint = rt.multiply(hitPoint);
+                //hitPoint = rt.multiply(hitPoint);
 
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -188,6 +189,16 @@ public class GL3DImageLayer implements Renderable {
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.getMainLayerView().setViewport(layerViewport, null);
         //}
+}
+
+    public GL3DMat4d getCameraDifferenceRotation(GL3DCamera camera) {
+        HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
+        double phi = md.getPhi();
+        double theta = md.getTheta();
+        GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
+        layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
+        GL3DMat4d cameraDifferenceRotation = camera.getCurrentDragRotation().toMatrix().multiply(camera.getLocalRotation().toMatrix()).multiply(layerLocalRotation.toMatrix().transpose());
+        return cameraDifferenceRotation;
     }
 
     @Override
@@ -215,18 +226,11 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.bind(gl);
                 GLSLShader.bindVars(gl);
                 GL3DCamera camera = state.getActiveCamera();
-
                 GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
                 vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
-                HelioviewerMetaData md = (HelioviewerMetaData) (this.mainLayerView.getMetaData());
-                double phi = md.getPhi();
-                double theta = md.getTheta();
-                GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
-                layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
-                GL3DMat4d difmat = camera.getCurrentDragRotation().toMatrix().multiply(camera.getLocalRotation().toMatrix()).multiply(layerLocalRotation.toMatrix().transpose());
                 GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
-                GLSLShader.bindMatrix(gl, difmat.getFloatArray(), "currentDragRotation");
+                GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera).getFloatArray(), "cameraDifferenceRotation");
 
                 GLSLShader.bindViewport(gl, GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
@@ -258,6 +262,14 @@ public class GL3DImageLayer implements Renderable {
         GLSLShader.unbind(gl);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_BLEND);
+
+        gl.glBegin(GL2.GL_POINTS);
+        gl.glColor3d(1., 0., 1.);
+        for (GL3DVec3d pt : hp) {
+            gl.glVertex3d(pt.x, pt.y, pt.z);
+        }
+        gl.glEnd();
+
         updateROI(state);
     }
 
