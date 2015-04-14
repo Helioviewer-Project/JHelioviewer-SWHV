@@ -116,10 +116,7 @@ public class GL3DImageLayer implements Renderable {
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
         GL3DCamera activeCamera = state.getActiveCamera();
-        HelioviewerMetaData hvmd = null;
-        if (metaData instanceof HelioviewerMetaData) {
-            hvmd = (HelioviewerMetaData) metaData;
-        }
+
         if (metaData == null || activeCamera == null) {
             return;
         }
