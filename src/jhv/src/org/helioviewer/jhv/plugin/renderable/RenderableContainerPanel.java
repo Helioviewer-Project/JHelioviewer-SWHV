@@ -27,13 +27,13 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -189,6 +189,11 @@ public class RenderableContainerPanel extends JPanel {
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
                     Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
+                    if (renderable instanceof GL3DImageLayer) {
+                        GL3DImageLayer imageLayer = (GL3DImageLayer) renderable;
+                        Displayer.getLayersModel().setActiveLayer(imageLayer.getMainLayerView());
+                    }
+
                     setOptionsPanel(renderable);
                 }
                 if (col == REMOVEROW) {
