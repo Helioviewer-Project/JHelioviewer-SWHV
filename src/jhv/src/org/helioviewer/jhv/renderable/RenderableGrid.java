@@ -13,6 +13,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
@@ -70,7 +71,7 @@ public class RenderableGrid implements Renderable {
         {
             gl.glColor3d(1., 1., 0.);
 
-            float relhi = (float) (state.getActiveCamera().INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
+            float relhi = (float) (GL3DCamera.INITFOV / (state.getActiveCamera().getCameraFOV())) * scale;
             if (relhi != oldrelhi) {
                 oldrelhi = relhi;
 
