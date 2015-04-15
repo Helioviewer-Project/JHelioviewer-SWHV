@@ -48,8 +48,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private Vector2dDouble sunPixelPosition = new Vector2dDouble();
 
     private double meterPerPixel;
-    protected double theta;
-    protected double phi;
     private GL3DQuatd localRotation;
     private Vector2dDouble sunPixelPositionImage = new Vector2dDouble();
 
@@ -276,14 +274,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return this.localRotation;
     }
 
-    public double getPhi() {
-        return this.phi;
-    }
-
-    public double getTheta() {
-        return this.theta;
-    }
-
     private void updatePosition() {
 
         double crlt = m.tryGetDouble("CRLT_OBS");
@@ -313,10 +303,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
 
-        this.theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
-        this.phi = Astronomy.getL0Radians(this.getDateTime().getTime());
-        this.phi -= getStonyhurstLongitude() / MathUtils.radeg;
-        this.theta = getStonyhurstLatitude() / MathUtils.radeg;
+        double theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
+        double phi = Astronomy.getL0Radians(this.getDateTime().getTime());
+        phi -= getStonyhurstLongitude() / MathUtils.radeg;
+        theta = getStonyhurstLatitude() / MathUtils.radeg;
 
         localRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         localRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
