@@ -171,29 +171,13 @@ public class GL3DImageLayer implements Renderable {
         this.getMainLayerView().setViewport(layerViewport, null);
     }
 
-    public GL3DMat4d getCameraDifferenceRotation(GL3DCamera camera, ImageData imageData) {
-        if (imageData == null)
-            return GL3DMat4d.identity();
-        HelioviewerMetaData md = (HelioviewerMetaData) (imageData.getMETADATA());
-        double phi = md.getPhi();
-        double theta = md.getTheta();
-        GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
-        layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
-        GL3DMat4d cameraDifferenceRotation = camera.getCurrentDragRotation().toMatrix().multiply(camera.getLocalRotation().toMatrix()).multiply(layerLocalRotation.toMatrix().transpose());
-        return cameraDifferenceRotation;
-    }
-
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
         if (imageData == null)
             return new GL3DQuatd();
         HelioviewerMetaData md = (HelioviewerMetaData) (imageData.getMETADATA());
-        double phi = md.getPhi();
-        double theta = md.getTheta();
-        GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
-        layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
-        layerLocalRotation.conjugate();
+
         GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
-        cameraDifferenceRotation.rotate(layerLocalRotation);
+        cameraDifferenceRotation.rotateWithConjugate(md.getLocalRotation());
 
         return cameraDifferenceRotation;
     }
