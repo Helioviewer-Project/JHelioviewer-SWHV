@@ -116,6 +116,17 @@ public class GL3DQuatd {
         this.normalize();
     }
 
+    public void rotateWithConjugate(GL3DQuatd q2) {
+        GL3DQuatd q1 = this.copy();
+
+        this.a = q1.a * q2.a + q1.u.x * q2.u.x + q1.u.y * q2.u.y + q1.u.z * q2.u.z;
+        this.u.x = -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y;
+        this.u.y = -q1.a * q2.u.y + q1.u.y * q2.a - q1.u.z * q2.u.x + q1.u.x * q2.u.z;
+        this.u.z = -q1.a * q2.u.z + q1.u.z * q2.a - q1.u.x * q2.u.y + q1.u.y * q2.u.x;
+
+        this.normalize();
+    }
+
     public GL3DQuatd slerp(GL3DQuatd r, double t) {
         double cosAngle = dot(r);
 
@@ -215,7 +226,6 @@ public class GL3DQuatd {
     }
 
     public float[] getFloatArray() {
-        // TODO Auto-generated method stub
         return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
     }
 }
