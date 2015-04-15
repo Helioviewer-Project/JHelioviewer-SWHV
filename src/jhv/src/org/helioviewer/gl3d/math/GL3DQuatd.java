@@ -27,7 +27,7 @@ public class GL3DQuatd {
     }
 
     public GL3DQuatd() {
-        this(1, new GL3DVec3d());
+        this(0., new GL3DVec3d(1., 0., 0.));
     }
 
     public void clear() {
@@ -61,17 +61,14 @@ public class GL3DQuatd {
         double y = u.y, y2 = y * y;
         double z = u.z, z2 = z * z;
 
-        return new GL3DMat4d(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0,
-        2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0,
-        2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0,
-        0, 0, 0, w2 + x2 + y2 + z2);
+        return new GL3DMat4d(w2 + x2 - y2 - z2, 2 * x * y - 2 * w * z, 2 * x * z + 2 * w * y, 0, 2 * x * y + 2 * w * z, w2 - x2 + y2 - z2, 2 * y * z - 2 * w * x, 0, 2 * x * z - 2 * w * y, 2 * y * z + 2 * w * x, w2 - x2 - y2 + z2, 0, 0, 0, 0, w2 + x2 + y2 + z2);
         /*
          * return new GL3DMat4d( w2+x2-y2-z2, 2*x*y+2*w*z, 2*x*z-2*w*y, 0,
-         * 
+         *
          * 2*x*y-2*w*z, w2-x2+y2-z2, 2*y*z+2*w*x, 0,
-         * 
+         *
          * 2*x*z+2*w*y, 2*y*z-2*w*x, w2-x2-y2+z2, 0,
-         * 
+         *
          * 0, 0, 0, 1 );
          */
     }
@@ -184,8 +181,41 @@ public class GL3DQuatd {
         return new GL3DQuatd(this.a, this.u.copy());
     }
 
+    @Override
     public String toString() {
         return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
     }
 
+    public GL3DVec3d rotateVector(GL3DVec3d vec) {
+        //q'vq = vec + 2.0 * cross(q.xyz,cross(  q.xyz, vec ) + q.w * vec)
+        double vx = vec.z * u.y - vec.y * u.z + a * vec.x;
+        double vy = vec.x * u.z - vec.z * u.x + a * vec.y;
+        double vz = vec.y * u.x - vec.x * u.y + a * vec.z;
+        double vvx = (vz * u.y - vy * u.z) * 2. + vec.x;
+        double vvy = (vx * u.z - vz * u.x) * 2. + vec.y;
+        double vvz = (vy * u.x - vx * u.y) * 2. + vec.z;
+        return new GL3DVec3d(vvx, vvy, vvz);
+        //18 mul + 12 add
+    }
+
+    public GL3DVec3d rotateInverseVector(GL3DVec3d vec) {
+        double vx = -vec.z * u.y + vec.y * u.z + a * vec.x;
+        double vy = -vec.x * u.z + vec.z * u.x + a * vec.y;
+        double vz = -vec.y * u.x + vec.x * u.y + a * vec.z;
+        double vvx = (-vz * u.y + vy * u.z) * 2. + vec.x;
+        double vvy = (-vx * u.z + vz * u.x) * 2. + vec.y;
+        double vvz = (-vy * u.x + vx * u.y) * 2. + vec.z;
+        return new GL3DVec3d(vvx, vvy, vvz);
+    }
+
+    public void conjugate() {
+        u.x = -u.x;
+        u.y = -u.y;
+        u.z = -u.z;
+    }
+
+    public float[] getFloatArray() {
+        // TODO Auto-generated method stub
+        return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
+    }
 }

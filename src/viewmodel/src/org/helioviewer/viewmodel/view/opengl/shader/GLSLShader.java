@@ -5,6 +5,7 @@ import java.io.InputStream;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.FileUtils;
+import org.helioviewer.gl3d.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 
 public class GLSLShader {
@@ -95,6 +96,11 @@ public class GLSLShader {
 
     public static void bindMatrix(GL2 gl, float[] matrix, String name) {
         gl.glUniformMatrix4fv(gl.glGetUniformLocation(progID, name), 1, false, matrix, 0);
+    }
+
+    public static void bindQuat(GL2 gl, GL3DQuatd quat, String name) {
+
+        gl.glUniform4fv(gl.glGetUniformLocation(progID, name), 1, quat.getFloatArray(), 0);
     }
 
     public static void unbind(GL2 gl) {
