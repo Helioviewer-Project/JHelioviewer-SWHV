@@ -196,7 +196,6 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec2d normalizedScreenpos, GL3DMat4d cameraDifferenceRotation) {
-        //GL3DVec4d up1 = this.orthoMatrixInverse.multiply(normalizedScreenpos);
         double up1x = normalizedScreenpos.x * cameraWidthTimesAspect;
         double up1y = normalizedScreenpos.y * cameraWidth;
 
