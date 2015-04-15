@@ -123,7 +123,8 @@ public class GL3DImageLayer implements Renderable {
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = -Double.MAX_VALUE;
         double maxPhysicalY = -Double.MAX_VALUE;
-        GL3DMat4d camdiff = this.getCameraDifferenceRotation(activeCamera, this.getMainLayerView().getImageData());
+        GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, this.getMainLayerView().getImageData());
+
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
             hitPoint = activeCamera.getVectorFromSphereOrPlane(pointlist[i], camdiff);
@@ -182,6 +183,21 @@ public class GL3DImageLayer implements Renderable {
         return cameraDifferenceRotation;
     }
 
+    public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
+        if (imageData == null)
+            return new GL3DQuatd();
+        HelioviewerMetaData md = (HelioviewerMetaData) (imageData.getMETADATA());
+        double phi = md.getPhi();
+        double theta = md.getTheta();
+        GL3DQuatd layerLocalRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
+        layerLocalRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
+        layerLocalRotation.conjugate();
+        GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
+        cameraDifferenceRotation.rotate(layerLocalRotation);
+
+        return cameraDifferenceRotation;
+    }
+
     @Override
     public void render(GL3DState state) {
         if (!this.isVisible)
@@ -211,11 +227,13 @@ public class GL3DImageLayer implements Renderable {
                 vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
                 GLSLShader.bindMatrix(gl, camera.getLocalRotation().toMatrix().getFloatArray(), "layerLocalRotation");
-                GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getImageData()).getFloatArray(), "cameraDifferenceRotation");
+                GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getImageData()), "cameraDifferenceRotationQuat");
+
                 if (this.mainLayerView.getBaseDifferenceMode()) {
-                    GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getBaseDifferenceImageData()).getFloatArray(), "diffcameraDifferenceRotation");
+                    GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getBaseDifferenceImageData()), "diffcameraDifferenceRotationQuat");
+
                 } else if (this.mainLayerView.getDifferenceMode()) {
-                    GLSLShader.bindMatrix(gl, getCameraDifferenceRotation(camera, this.mainLayerView.getPreviousImageData()).getFloatArray(), "diffcameraDifferenceRotation");
+                    GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()), "diffcameraDifferenceRotationQuat");
                 }
 
                 Vector2dDouble ll = jp2view.getMetaData().getPhysicalLowerLeft();

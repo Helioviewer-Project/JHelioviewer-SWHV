@@ -21,14 +21,23 @@ uniform float outerCutOffRadius;
 uniform float phi;
 uniform float theta;
 uniform mat4 cameraTransformationInverse;
-uniform mat4 cameraDifferenceRotation;
-uniform mat4 diffcameraDifferenceRotation;
+uniform vec4 cameraDifferenceRotationQuat;
+uniform vec4 diffcameraDifferenceRotationQuat;
 uniform float physicalImageWidth;
 uniform vec2 viewport;
 
+vec3 rotate_vector_inverse( vec4 quat, vec3 vec )
+{
+    return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
+}
+vec3 rotate_vector( vec4 quat, vec3 vec )
+{
+    return vec + 2.0 * cross( quat.xyz, cross( quat.xyz, vec ) + quat.w * vec );
+}
+
 float intersectPlane(vec4 vecin)
 {   
-    vec3 altnormal = (cameraDifferenceRotation * vec4(0., 0., 1., 1.)).xyz;
+    vec3 altnormal = rotate_vector(cameraDifferenceRotationQuat, vec3(0., 0., 1.));
     if(altnormal.z <0.){
         discard;
     }
@@ -36,7 +45,7 @@ float intersectPlane(vec4 vecin)
 }
 float intersectPlanediff(vec4 vecin)
 {   
-    vec3 altnormal = (diffcameraDifferenceRotation * vec4(0., 0., 1., 1.)).xyz;
+    vec3 altnormal = rotate_vector(diffcameraDifferenceRotationQuat, vec3(0., 0., 1.));
     if(altnormal.z <0.){
         discard;
     }
@@ -64,7 +73,7 @@ void main(void)
     vec2 texcoord; 
     vec2 difftexcoord; 
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
-    vec4 rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * cameraDifferenceRotation;
+    vec3 rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     float radius2 = dot(up1.xy, up1.xy);
     if(radius2 > outerCutOffRadius * outerCutOffRadius || radius2 < cutOffRadius * cutOffRadius) {
         discard;
@@ -74,7 +83,7 @@ void main(void)
     }
     else{
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
-        rotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) *cameraDifferenceRotation;
+        rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
         texcoord = vec2((rotatedHitPoint.x * rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
     } 
     if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.) {
@@ -88,13 +97,13 @@ void main(void)
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
     } else if(isdifference == BASEDIFFERENCE_ROT || isdifference == RUNNINGDIFFERENCE_ROT) {
-        vec4 diffrotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) * diffcameraDifferenceRotation;
+        vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         if(radius2<1. && dot(diffrotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {
             difftexcoord = vec2((diffrotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (diffrotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         }
         else{
             hitPoint = vec3(up1.x, up1.y, intersectPlanediff(up1));
-            diffrotatedHitPoint = vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.) *diffcameraDifferenceRotation;
+            diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
             difftexcoord = vec2((diffrotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (diffrotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         } 
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
