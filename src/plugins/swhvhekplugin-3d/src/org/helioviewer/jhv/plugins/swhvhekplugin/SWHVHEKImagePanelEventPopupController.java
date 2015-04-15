@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -25,10 +24,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.BasicImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
@@ -101,26 +97,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     @Override
     public BasicImagePanel getImagePanel() {
         return imagePanel;
-    }
-
-    /**
-     * Converts physical coordinate to screen coordinates
-     *
-     * @param x
-     *            Physical x-coordinate
-     * @param y
-     *            Physical y-coordinate
-     * @return Corresponding screen coordinate
-     */
-    private Vector2dInt convertPhysicalToScreen(double x, double y) {
-        JHVJP2View lview = Displayer.getLayersModel().getActiveView();
-        if (view == null) {
-            return null;
-        }
-        ViewportImageSize viewportImageSize = ViewHelper.calculateViewportImageSize(lview.getRegion());
-        Vector2dInt offset = ViewHelper.convertImageToScreenDisplacement(-lview.getRegion().getUpperLeftCorner().getX(), lview.getRegion().getUpperLeftCorner().getY(), lview.getRegion(), viewportImageSize);
-
-        return ViewHelper.convertImageToScreenDisplacement(x, y, lview.getRegion(), viewportImageSize).add(offset);
     }
 
     private Point calcWindowPosition(Point p) {
