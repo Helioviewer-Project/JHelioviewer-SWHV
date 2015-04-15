@@ -210,7 +210,7 @@ public abstract class GL3DCamera {
                 return rotatedHitPoint;
             }
         }
-        GL3DVec3d altnormal = cameraDifferenceRotation.multiply(new GL3DVec3d(0., 0., 1.));
+        GL3DVec3d altnormal = cameraDifferenceRotation.multiply(GL3DVec3d.ZAxis);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
         hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
         rotatedHitPoint = cameraDifferenceRotation.multiplyTranspose(hitPoint);
