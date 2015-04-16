@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.lines.model;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -75,7 +76,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private void addToMap(final Band band) {
         Interval<Date> interval = drawController.getSelectedInterval();
-        DownloadedData data = retrieveData(band, interval);
+        Rectangle plotArea = drawController.getPlotArea();
+        DownloadedData data = retrieveData(band, interval, plotArea);
         if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
             dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
         }
@@ -103,7 +105,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private void updateBand(final Band band, boolean keepFullValueRange) {
         Interval<Date> interval = drawController.getSelectedInterval();
-        DownloadedData data = retrieveData(band, interval);
+        Rectangle plotArea = drawController.getPlotArea();
+        DownloadedData data = retrieveData(band, interval, plotArea);
         boolean isLog = band.getBandType().isLogScale();
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
             availableRangeMap.put(band.getUnitLabel(), new Range());
@@ -263,8 +266,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    private final DownloadedData retrieveData(final Band band, final Interval<Date> interval) {
-        return band.getBandType().getDataDownloader().downloadData(band, interval);
+    private final DownloadedData retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
+        return band.getBandType().getDataDownloader().downloadData(band, interval, plotArea);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -307,6 +310,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     @Override
     public void bandGroupChanged() {
         Interval<Date> interval = drawController.getSelectedInterval();
+        Rectangle plotArea = drawController.getPlotArea();
         dataMapPerUnitLabel.clear();
 
         final Band[] activeBands = BandController.getSingletonInstance().getBands();
@@ -315,7 +319,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
                 dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
             }
-            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval));
+            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval, plotArea));
         }
 
         fireRedrawRequest(true);

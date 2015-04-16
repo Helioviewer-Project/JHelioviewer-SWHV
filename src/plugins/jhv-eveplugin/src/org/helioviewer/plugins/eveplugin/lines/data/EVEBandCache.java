@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.Rectangle;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,7 +35,7 @@ public class EVEBandCache {
         cache.add(values, dates);
     }
 
-    public EVEValues getValuesInInterval(final Band band, final Interval<Date> interval) {
+    public EVEValues getValuesInInterval(final Band band, final Interval<Date> interval, Rectangle plotArea) {
         EVECache cache = cacheMap.get(band);
         if (cache == null) {
             return new EVEValues();
