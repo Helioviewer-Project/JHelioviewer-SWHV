@@ -29,7 +29,7 @@ public class EVEValues {
         dates = new long[numOfBins];
         minValues = new double[numOfBins];
         maxValues = new double[numOfBins];
-        fillDates();
+        fillArrays();
     }
 
     public EVEValues() {
@@ -52,7 +52,6 @@ public class EVEValues {
                 if (index >= 0 && index < numOfBins) {
                     maxValues[index] = Math.max(maxValues[index], value);
                     minValues[index] = Math.min(minValues[index], value);
-                    dates[index] = indates[i];
                     minValue = value < minValue ? value : minValue;
                     maxValue = value > maxValue ? value : maxValue;
                 } else {
@@ -80,7 +79,7 @@ public class EVEValues {
         return maxValue;
     }
 
-    private void fillDates() {
+    private void fillArrays() {
         if (numOfBins > 0) {
             dates[0] = intervalStart;
             maxValues[0] = Double.MIN_VALUE;
