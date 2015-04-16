@@ -10,8 +10,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
@@ -23,12 +22,11 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, ZoomControllerListener, EVECacheControllerListener, PlotAreaSpaceListener {
+public class EVEDrawController implements BandControllerListener, TimingListener, EVECacheControllerListener, PlotAreaSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -37,7 +35,6 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
     private final Map<String, Map<Band, DownloadedData>> dataMapPerUnitLabel = new HashMap<String, Map<Band, DownloadedData>>();
 
-    private Interval<Date> interval = new Interval<Date>(null, null);
     private final Map<String, Range> selectedRangeMap = new HashMap<String, Range>();
     private final Map<String, Range> availableRangeMap = new HashMap<String, Range>();
     private final DrawController drawController;
@@ -54,7 +51,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     public EVEDrawController() {
 
         BandController.getSingletonInstance().addBandControllerListener(this);
-        ZoomController.getSingletonInstance().addZoomControllerListener(this);
+        DrawController.getSingletonInstance().addTimingListener(this);
         EVECacheController.getSingletonInstance().addControllerListener(this);
 
         drawController = DrawController.getSingletonInstance();
@@ -77,6 +74,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void addToMap(final Band band) {
+        Interval<Date> interval = drawController.getSelectedInterval();
         DownloadedData data = retrieveData(band, interval);
         if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
             dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
@@ -104,6 +102,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void updateBand(final Band band, boolean keepFullValueRange) {
+        Interval<Date> interval = drawController.getSelectedInterval();
         DownloadedData data = retrieveData(band, interval);
         boolean isLog = band.getBandType().isLogScale();
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
@@ -150,6 +149,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     }
 
     private void fireRedrawRequest(final boolean maxRange) {
+        Interval<Date> interval = drawController.getSelectedInterval();
         for (String unit : dataMapPerUnitLabel.keySet()) {
             final Band[] bands = dataMapPerUnitLabel.get(unit).keySet().toArray(new Band[0]);
             final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
@@ -271,19 +271,14 @@ public class EVEDrawController implements BandControllerListener, ZoomController
     // Zoom Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
     @Override
-    public void availableIntervalChanged(final Interval<Date> newInterval) {
+    public void availableIntervalChanged() {
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueRange) {
-        interval = newInterval;
+    public void selectedIntervalChanged() {
 
-        updateBands(keepFullValueRange);
+        updateBands(drawController.keepfullValueRange());
         fireRedrawRequest(false);
-    }
-
-    @Override
-    public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution) {
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -311,6 +306,7 @@ public class EVEDrawController implements BandControllerListener, ZoomController
 
     @Override
     public void bandGroupChanged() {
+        Interval<Date> interval = drawController.getSelectedInterval();
         dataMapPerUnitLabel.clear();
 
         final Band[] activeBands = BandController.getSingletonInstance().getBands();

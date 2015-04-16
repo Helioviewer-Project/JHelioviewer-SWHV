@@ -22,7 +22,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
@@ -137,7 +136,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * Checks if the selected start date is before selected or equal to end
      * date. The methods checks the entered times when the dates are equal. If
      * the start time is greater than the end time the method will return false.
-     * 
+     *
      * @return boolean value if selected start date is before selected end date.
      */
     /*
@@ -160,10 +159,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * return start <= end; }
      */
 
-    private void updateZoomController() {
+    private void updateDrawController() {
         Interval<Date> interval = defineInterval(getDate());
-        ZoomController.getSingletonInstance().setAvailableInterval(interval);
-        ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+        DrawController.getSingletonInstance().setAvailableInterval(interval);
+        DrawController.getSingletonInstance().setSelectedInterval(interval, true);
     }
 
     private boolean updateBandController() {
@@ -202,7 +201,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     @Override
     public void dialogOpened() {
-        final Interval<Date> interval = ZoomController.getSingletonInstance().getAvailableInterval();
+        final Interval<Date> interval = DrawController.getSingletonInstance().getAvailableInterval();
 
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(interval.getEnd());
@@ -223,7 +222,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
         if (updateBandController()) {
-            updateZoomController();
+            updateDrawController();
         }
         return true;
     }

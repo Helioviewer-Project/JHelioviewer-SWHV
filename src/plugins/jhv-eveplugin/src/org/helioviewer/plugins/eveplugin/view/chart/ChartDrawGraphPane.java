@@ -227,7 +227,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         long start = System.currentTimeMillis();
         Set<YAxisElement> yAxisElements = drawController.getYAxisElements();
         List<YAxisElement> orderedList = orderYAxes(yAxisElements);
-        Interval<Date> interval = drawController.getInterval();
+        Interval<Date> interval = drawController.getSelectedInterval();
         if (!drawController.getIntervalAvailable()) {
             return;
         }
@@ -466,7 +466,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateRatios() {
-        Interval<Date> interval = drawController.getInterval();
+        Interval<Date> interval = drawController.getSelectedInterval();
         ratioX = !drawController.getIntervalAvailable() ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
@@ -488,7 +488,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private boolean updateMovieLineInformation() {
         int newMovieLine = -1;
-        Interval<Date> interval = drawController.getInterval();
+        Interval<Date> interval = drawController.getSelectedInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             newMovieLine = -1;
         } else {
@@ -505,7 +505,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void setMovieFrameManually(final Point point) {
-        Interval<Date> interval = drawController.getInterval();
+        Interval<Date> interval = drawController.getSelectedInterval();
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             return;
         }
@@ -824,11 +824,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }

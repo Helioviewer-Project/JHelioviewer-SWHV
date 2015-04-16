@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
@@ -34,9 +34,9 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public void installPlugin() {
         EventRequester eventRequester = EventRequester.getSingletonInstance();
-        ZoomController.getSingletonInstance().addZoomControllerListener(eventRequester);
+        DrawController.getSingletonInstance().addTimingListener(eventRequester);
         eventRequester.addListener(EventModel.getSingletonInstance());
-        ZoomController.getSingletonInstance().addZoomControllerListener(EventModel.getSingletonInstance());
+        DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
         // Create an instance of eveDrawController and leave it here.
         EVEDrawController eveDrawController = new EVEDrawController();
         if (mainPanel == null) {

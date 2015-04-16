@@ -4,26 +4,15 @@ import java.awt.EventQueue;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.settings.BandType;
-//import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  *
  * @author Stephan Pagel
  * */
-public class ZoomController implements PlotAreaSpaceListener, LayersListener {
+public class ZoomController {
 
     /** the sole instance of this class */
     private static final ZoomController singletonInstance = new ZoomController();
@@ -32,22 +21,13 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
         CUSTOM, All, Year, Month, Day, Hour, Carrington
     };
 
-    private final LinkedList<ZoomControllerListener> listeners = new LinkedList<ZoomControllerListener>();
-
-    private Interval<Date> availableInterval = new Interval<Date>(null, null);
-    private Interval<Date> selectedInterval = new Interval<Date>(null, null);
-
-    private API_RESOLUTION_AVERAGES selectedResolution = API_RESOLUTION_AVERAGES.MINUTE_1;
-
-    private final PlotAreaSpace pas;
+    private final DrawController drawController;
 
     /**
      * The private constructor to support the singleton pattern.
      * */
     private ZoomController() {
-        pas = PlotAreaSpace.getSingletonInstance();
-        pas.addPlotAreaSpaceListener(this);
-        Displayer.getLayersModel().addLayersListener(this);
+        drawController = DrawController.getSingletonInstance();
     }
 
     /**
@@ -59,139 +39,6 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
         return singletonInstance;
     }
 
-    public boolean addZoomControllerListener(final ZoomControllerListener listener) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        return listeners.add(listener);
-    }
-
-    public boolean removeControllerListener(final ZoomControllerListener listener) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        return listeners.remove(listener);
-    }
-
-    public void setAvailableInterval(final Interval<Date> interval) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        availableInterval = makeCompleteDay(interval);
-        // Log.debug("New available interval : " + availableInterval);
-        fireAvailableIntervalChanged(availableInterval);
-
-        // request data if needed
-        final Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(availableInterval.getEnd());
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-
-        final Interval<Date> downloadInterval = new Interval<Date>(availableInterval.getStart(), calendar.getTime());
-        final BandType[] bandTypes = BandController.getSingletonInstance().getAllAvailableBandTypes();
-
-        DownloadController.getSingletonInstance().updateBands(bandTypes, downloadInterval, selectedInterval);
-
-        // check if selected interval is in available interval and correct it if
-        // needed
-        setSelectedInterval(selectedInterval, false);
-        // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
-        // interval.getEnd());
-    }
-
-    private Interval<Date> makeCompleteDay(final Interval<Date> interval) {
-        return makeCompleteDay(interval.getStart(), interval.getEnd());
-    }
-
-    private Interval<Date> makeCompleteDay(final Date start, final Date end) {
-        final Interval<Date> interval = new Interval<Date>(null, null);
-        Date endDate = end;
-
-        if (start == null || end == null) {
-            return interval;
-        }
-
-        if (end.getTime() > System.currentTimeMillis()) {
-            endDate = new Date();
-        }
-
-        final Calendar calendar = new GregorianCalendar();
-        calendar.clear();
-        calendar.setTime(start);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        interval.setStart(calendar.getTime());
-
-        calendar.clear();
-        calendar.setTime(endDate);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-
-        interval.setEnd(calendar.getTime());
-
-        return interval;
-    }
-
-    public final Interval<Date> getAvailableInterval() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        return availableInterval;
-    }
-
-    private void fireAvailableIntervalChanged(final Interval<Date> newInterval) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.availableIntervalChanged(newInterval);
-        }
-
-    }
-
-    public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
-            selectedInterval = new Interval<Date>(null, null);
-        } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
-            selectedInterval = availableInterval;
-        } else if (availableInterval.containsInclusive(newSelectedInterval)) {
-            selectedInterval = newSelectedInterval;
-        } else {
-            Date start = newSelectedInterval.getStart();
-            Date end = newSelectedInterval.getEnd();
-
-            start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
-            end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
-
-            if (start.equals(end)) {
-                selectedInterval = availableInterval;
-            } else {
-                selectedInterval = new Interval<Date>(start, end);
-            }
-        }
-
-        updatePlotAreaSpace(selectedInterval);
-        fireSelectedIntervalChanged(selectedInterval, useFullValueSpace);
-
-        return selectedInterval;
-    }
-
     public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
         if (!EventQueue.isDispatchThread()) {
             Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
@@ -199,6 +46,8 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
             System.exit(666);
         }
         Interval<Date> newInterval = new Interval<Date>(null, null);
+        Interval<Date> selectedInterval = drawController.getSelectedInterval();
+        Interval<Date> availableInterval = drawController.getAvailableInterval();
         switch (zoom) {
         case CUSTOM:
             newInterval = selectedInterval;
@@ -221,7 +70,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
         case Carrington:
             newInterval = computeCarringtonInterval(selectedInterval, value);
         }
-        return setSelectedInterval(newInterval, true);
+        return drawController.setSelectedInterval(newInterval, true);
     }
 
     private Interval<Date> computeCarringtonInterval(Interval<Date> interval, int value) {
@@ -231,6 +80,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
     private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
         Date middle = new Date(interval.getStart().getTime() + (interval.getEnd().getTime() - interval.getStart().getTime()) / 2);
         Date startDate = interval.getStart();
+        Interval<Date> availableInterval = drawController.getAvailableInterval();
         // Date endDate = interval.getEnd();
         GregorianCalendar gce = new GregorianCalendar();
         gce.clear();
@@ -270,7 +120,7 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
         Date availableS = sInAvailable ? availableInterval.getStart() : startDate;
         Date availableE = eInAvailable ? availableInterval.getEnd() : endDate;
 
-        setAvailableInterval(new Interval<Date>(availableS, availableE));
+        drawController.setAvailableInterval(new Interval<Date>(availableS, availableE));
 
         return new Interval<Date>(startDate, endDate);
 
@@ -304,128 +154,4 @@ public class ZoomController implements PlotAreaSpaceListener, LayersListener {
             return null;
         }
     }
-
-    public Interval<Date> getSelectedInterval() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        return selectedInterval;
-    }
-
-    private void fireSelectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.selectedIntervalChanged(newInterval, keepFullValueSpace);
-        }
-    }
-
-    public void setSelectedResolution(final API_RESOLUTION_AVERAGES resolution) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        selectedResolution = resolution;
-        fireSelectedResolutionChanged(selectedResolution);
-    }
-
-    public API_RESOLUTION_AVERAGES getSelectedResolution() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        return selectedResolution;
-    }
-
-    private void fireSelectedResolutionChanged(final API_RESOLUTION_AVERAGES reolution) {
-        for (ZoomControllerListener listener : listeners) {
-            listener.selectedResolutionChanged(reolution);
-        }
-    }
-
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-            double scaleDiff = scaledMaxTime - scaledMinTime;
-            double selectedMin = (scaledSelectedMinTime - scaledMinTime) / scaleDiff;
-            double selectedMax = (scaledSelectedMaxTime - scaledMinTime) / scaleDiff;
-            Date newSelectedStartTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMin));
-            Date newSelectedEndTime = new Date(availableInterval.getStart().getTime() + Math.round(diffTime * selectedMax));
-            // Log.info("plotareachanged starttime: " + newSelectedStartTime
-            // + " endtime: " + newSelectedEndTime);
-            if (forced || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval.getStart()))) {
-                selectedInterval = new Interval<Date>(newSelectedStartTime, newSelectedEndTime);
-                fireSelectedIntervalChanged(selectedInterval, false);
-            }
-        }
-    }
-
-    private void updatePlotAreaSpace(Interval<Date> selectedInterval) {
-        if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
-            double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
-            double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-            double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
-            pas.setScaledSelectedTimeAndValue(scaledSelectedStart, scaledSelectedEnd, pas.getScaledMinValue(), pas.getScaledMaxValue());
-        }
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
-            double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
-            double startDifference = oldMinTime - newMinTime;
-            double endDifference = newMaxTime - oldMaxTime;
-
-            Date tempStartDate = new Date(availableInterval.getStart().getTime() - Math.round(startDifference * timeRatio));
-            Date tempEndDate = new Date(availableInterval.getEnd().getTime() + Math.round(endDifference * timeRatio));
-
-            setAvailableInterval(new Interval<Date>(tempStartDate, tempEndDate));
-        }
-    }
-
-    @Override
-    public void layerAdded(int idx) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        final Interval<Date> interval = new Interval<Date>(Displayer.getLayersModel().getFirstDate(), Displayer.getLayersModel().getLastDate());
-        if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
-            availableInterval = interval;
-        } else {
-            Date start = availableInterval.getStart();
-            if (interval.getStart().before(availableInterval.getStart())) {
-                start = interval.getStart();
-            }
-            Date end = availableInterval.getEnd();
-            if (interval.getEnd().after(availableInterval.getEnd())) {
-                end = interval.getEnd();
-            }
-            this.setAvailableInterval(new Interval<Date>(start, end));
-        }
-    }
-
-    @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
-    public void activeLayerChanged(JHVJP2View view) {
-    }
-
 }

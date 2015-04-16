@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * */
@@ -44,7 +44,7 @@ public class BandController {
 
     /**
      * Method returns the sole instance of this class.
-     * 
+     *
      * @return the only instance of this class.
      * */
     public static BandController getSingletonInstance() {
@@ -52,7 +52,7 @@ public class BandController {
     }
 
     /**
-     * 
+     *
      * */
     public void addBand(final BandType bandType) {
         if (bandType == null) {
@@ -70,12 +70,12 @@ public class BandController {
                 listener.bandAdded(band);
             }
             selectorModel.addLineData(band);
-            DownloadController.getSingletonInstance().updateBand(band, ZoomController.getSingletonInstance().getAvailableInterval(), ZoomController.getSingletonInstance().getSelectedInterval());
+            DownloadController.getSingletonInstance().updateBand(band, DrawController.getSingletonInstance().getAvailableInterval(), DrawController.getSingletonInstance().getSelectedInterval());
         }
     }
 
     /**
-     * 
+     *
      * */
     public void removeBand(final Band band) {
         if (band == null) {
@@ -208,14 +208,14 @@ public class BandController {
     }
 
     /**
-     * 
+     *
      * */
     public void addBandControllerListener(BandControllerListener listener) {
         bandControllerListeners.add(listener);
     }
 
     /**
-     * 
+     *
      * */
     public void removeBandControllerListener(BandControllerListener listener) {
         bandControllerListeners.remove(listener);
@@ -312,7 +312,7 @@ public class BandController {
             // set current group visible = false
             /*
              * final LinkedList<Band> bands = getBands();
-             * 
+             *
              * for (final Band band : bands) { band.setVisible(false); }
              */
 
