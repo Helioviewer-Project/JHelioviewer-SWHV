@@ -3,11 +3,9 @@ package org.helioviewer.plugins.eveplugin.lines.data;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 
-public class EVEValues implements DownloadedData {
+public class EVEValues {
 
     private int index = 0;
     private final int MINUTES_PER_DAY = 1440;
@@ -41,12 +39,10 @@ public class EVEValues implements DownloadedData {
         return index;
     }
 
-    @Override
     public double getMinimumValue() {
         return minValue;
     }
 
-    @Override
     public double getMaximumValue() {
         return maxValue;
     }

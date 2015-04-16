@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.download.DataDownloader;
 
 public class BandType {
     private String baseUrl;
@@ -24,15 +23,12 @@ public class BandType {
     private boolean isLog = false;
 
     // private double multiplier = 1.0;
-    private DataDownloader dataDownloader;
 
     public URL buildUrl(Interval<Date> interval) {
         final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
         URL url = null;
         try {
-            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&"
-                    + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE
-                    + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
+            url = new URL(baseUrl + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + this.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         } catch (MalformedURLException e) {
             Log.error("Something is wrong with the EVEAPI url", e);
         }
@@ -114,14 +110,6 @@ public class BandType {
 
     public void setMax(double max) {
         this.max = max;
-    }
-
-    public DataDownloader getDataDownloader() {
-        return dataDownloader;
-    }
-
-    public void setDataDownloader(DataDownloader dataDownloader) {
-        this.dataDownloader = dataDownloader;
     }
 
     public void setName(String name) {

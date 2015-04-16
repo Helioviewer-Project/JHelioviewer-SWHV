@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
@@ -143,19 +142,19 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * private boolean isStartDateBeforeOrEqualEndDate() { final
      * GregorianCalendar calendar = new GregorianCalendar();
      * calendar.setTime(getStartDate());
-     * 
+     *
      * final GregorianCalendar calendar2 = new
      * GregorianCalendar(calendar.get(Calendar.YEAR),
      * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
      * long start = calendar2.getTimeInMillis();
-     * 
+     *
      * calendar.clear(); calendar2.clear();
-     * 
+     *
      * calendar.setTime(getEndDate());
      * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
      * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
      * calendar2.getTimeInMillis();
-     * 
+     *
      * return start <= end; }
      */
 
@@ -170,7 +169,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
-        bandType.setDataDownloader(EVECacheController.getSingletonInstance());
 
         Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         if (yAxisElements.size() >= 2) {
