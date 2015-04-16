@@ -29,7 +29,6 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
@@ -97,10 +96,10 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         return calendarStartDate.getDate();
     }
 
-    private void updateZoomController() {
+    private void updateDrawController() {
         Interval<Date> interval = defineInterval(getDate());
-        ZoomController.getSingletonInstance().setAvailableInterval(interval);
-        ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+        DrawController.getSingletonInstance().setAvailableInterval(interval);
+        DrawController.getSingletonInstance().setSelectedInterval(interval, true);
     }
 
     protected Interval<Date> defineInterval(Date date) {
@@ -144,7 +143,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     private void startRadioDownload() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Interval<Date> selectedInterval = ZoomController.getSingletonInstance().getSelectedInterval();
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         String isoStart = df.format(selectedInterval.getStart());
         Calendar end = Calendar.getInstance();
         end.setTime(selectedInterval.getEnd());
@@ -157,7 +156,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void dialogOpened() {
-        final Interval<Date> interval = ZoomController.getSingletonInstance().getAvailableInterval();
+        final Interval<Date> interval = DrawController.getSingletonInstance().getAvailableInterval();
 
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(interval.getEnd());
@@ -200,7 +199,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
             downloadOK = true;
         }
         if (downloadOK) {
-            updateZoomController();
+            updateDrawController();
             startRadioDownload();
         } else {
             JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), "No more than two y-axes can be used. Remove some of the lines before adding a new line.", "Too much y-axes", JOptionPane.WARNING_MESSAGE);

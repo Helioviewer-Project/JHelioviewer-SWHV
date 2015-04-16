@@ -30,10 +30,9 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.EVEState;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
@@ -41,7 +40,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  *
  * @author Stephan Pagel
  * */
-public class ChartDrawIntervalPane extends JComponent implements ZoomControllerListener, MouseInputListener, LayersListener {
+public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -49,8 +48,6 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     private static final long serialVersionUID = 1L;
 
-    private Interval<Date> availableInterval = null;
-    private Interval<Date> selectedInterval = null;
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
 
     private boolean mouseOverComponent = false;
@@ -77,8 +74,8 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
         addMouseListener(this);
         addMouseMotionListener(this);
-        ZoomController.getSingletonInstance().addZoomControllerListener(this);
         Displayer.getLayersModel().addLayersListener(this);
+        DrawController.getSingletonInstance().addTimingListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
     }
@@ -93,20 +90,21 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         super.paintComponent(g);
 
         drawBackground(g);
-
+        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (availableInterval != null && selectedInterval != null) {
-            computeIntervalBorderPositions();
+            computeIntervalBorderPositions(availableInterval, selectedInterval);
 
             drawInterval(g);
-            drawMovieInterval(g);
-            drawLabels(g);
+            drawMovieInterval(g, availableInterval);
+            drawLabels(g, availableInterval, selectedInterval);
             drawBorders(g);
             drawIntervalGraspPoints(g);
             // drawGraspPointLabels(g);
         }
     }
 
-    private void computeIntervalBorderPositions() {
+    private void computeIntervalBorderPositions(Interval<Date> availableInterval, Interval<Date> selectedInterval) {
         final double diffMin = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / 60000.0;
 
         long start = selectedInterval.getStart().getTime() - availableInterval.getStart().getTime();
@@ -137,7 +135,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         g2.fillRect(leftIntervalBorderPosition, 5, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
     }
 
-    private void drawMovieInterval(Graphics g) {
+    private void drawMovieInterval(Graphics g, Interval<Date> availableInterval) {
         if (availableInterval == null || movieInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
             return;
         }
@@ -207,7 +205,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
     }
 
-    private void drawGraspPointLabels(Graphics g) {
+    private void drawGraspPointLabels(Graphics g, Interval<Date> selectedInterval) {
         if (mousePressed != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             final String leftLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getStart());
             final Rectangle2D leftLabelTextRectangle = g.getFontMetrics().getStringBounds(leftLabelText, g);
@@ -246,7 +244,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         g.drawString(text, rectangle.x, rectangle.y - 2 + rectangle.height);
     }
 
-    private void drawLabels(Graphics g) {
+    private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
@@ -262,7 +260,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.YEAR, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            drawLabelsYear(g, maxTicks, availableIntervalWidth, ratioX);
+            drawLabelsYear(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
@@ -270,7 +268,7 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.MONTH, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            drawLabelsMonth(g, maxTicks, availableIntervalWidth, ratioX);
+            drawLabelsMonth(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
@@ -278,15 +276,15 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
         calendar.setTime(availableInterval.getStart());
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         if (availableInterval.containsPointInclusive(calendar.getTime())) {
-            drawLabelsDay(g, maxTicks, availableIntervalWidth, ratioX);
+            drawLabelsDay(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
             return;
         }
 
-        drawLabelsTime(g, maxTicks, availableIntervalWidth, ratioX);
+        drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
 
     }
 
-    private void drawLabelsTime(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsTime(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final long timeDiff = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -303,11 +301,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
                 tickText = ChartConstants.HOUR_TIME_FORMAT_NO_SEC.format(tickValue);
             }
 
-            drawLabel(g, tickText, availableIntervalWidth, tickValue, ratioX);
+            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, tickValue, ratioX);
         }
     }
 
-    private void drawLabelsDay(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsDay(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
 
         final Calendar calendar = new GregorianCalendar();
 
@@ -340,11 +338,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
             final String tickText = ChartConstants.DAY_MONTH_YEAR_TIME_FORMAT.format(calendar.getTime());
 
-            drawLabel(g, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
+            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
         }
     }
 
-    private void drawLabelsMonth(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsMonth(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -382,11 +380,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
             final String tickText = ChartConstants.MONTH_YEAR_TIME_FORMAT.format(calendar.getTime());
 
-            drawLabel(g, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
+            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
         }
     }
 
-    private void drawLabelsYear(Graphics g, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsYear(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -413,11 +411,11 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
 
             final String tickText = ChartConstants.YEAR_ONLY_TIME_FORMAT.format(calendar.getTime());
 
-            drawLabel(g, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
+            drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
         }
     }
 
-    private void drawLabel(Graphics g, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
+    private void drawLabel(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         final int x = ChartConstants.getGraphLeftSpace() + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
 
@@ -515,29 +513,12 @@ public class ChartDrawIntervalPane extends JComponent implements ZoomControllerL
     // //////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void availableIntervalChanged(final Interval<Date> newInterval) {
-        if (newInterval.getStart() == null || newInterval.getEnd() == null) {
-            availableInterval = null;
-        } else {
-            availableInterval = newInterval;
-        }
+    public void availableIntervalChanged() {
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
-        // Log.debug("selected interval" + newInterval);
-        // Thread.dumpStack();
-        if (newInterval.getStart() == null || newInterval.getEnd() == null) {
-            selectedInterval = null;
-        } else {
-            selectedInterval = newInterval;
-        }
-
+    public void selectedIntervalChanged() {
         repaint();
-    }
-
-    @Override
-    public void selectedResolutionChanged(final API_RESOLUTION_AVERAGES newResolution) {
     }
 
     // //////////////////////////////////////////////////////////////////////////////

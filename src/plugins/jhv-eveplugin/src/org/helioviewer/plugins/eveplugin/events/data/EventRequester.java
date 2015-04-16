@@ -12,18 +12,17 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 
 /**
  * Requests events from the JHVEventContainer if the selected interval or
  * available interval changes.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-public class EventRequester implements ZoomControllerListener, JHVEventHandler {
+public class EventRequester implements TimingListener, JHVEventHandler {
 
     /** Singleton instance of the event requester */
     private static EventRequester singletonInstance;
@@ -31,30 +30,22 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     /** Instance of the event container */
     private final JHVEventContainer eventContainer;
 
-    /** the selected interval */
-    private Interval<Date> selectedInterval;
-
-    /** the available interval */
-    private final Interval<Date> availableInterval;
-
     /** The listeners */
     private final List<EventRequesterListener> listeners;
 
     /**
      * Private default constructor.
-     * 
+     *
      */
     private EventRequester() {
         eventContainer = JHVEventContainer.getSingletonInstance();
-        ZoomController.getSingletonInstance().addZoomControllerListener(this);
-        availableInterval = new Interval<Date>(new Date(), new Date());
-        selectedInterval = new Interval<Date>(new Date(), new Date());
+        DrawController.getSingletonInstance().addTimingListener(this);
         listeners = new ArrayList<EventRequesterListener>();
     }
 
     /**
      * Gets the singleton instance of the EventRequester.
-     * 
+     *
      * @return The singleton instance
      */
     public static EventRequester getSingletonInstance() {
@@ -66,7 +57,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     /**
      * Adds a new IncomingEventHandlerListener.
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -76,7 +67,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
 
     /**
      * Removes an IncomingEventHandlerListener.
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -85,29 +76,20 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
     }
 
     @Override
-    public void availableIntervalChanged(final Interval<Date> newInterval) {
+    public void availableIntervalChanged() {
+        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        eventContainer.requestForInterval(availableInterval.getStart(), availableInterval.getEnd(), EventRequester.this);
+    }
+
+    @Override
+    public void selectedIntervalChanged() {
         if (!EventQueue.isDispatchThread()) {
             Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
             Thread.dumpStack();
             System.exit(666);
         }
-        eventContainer.requestForInterval(newInterval.getStart(), newInterval.getEnd(), EventRequester.this);
-    }
-
-    @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
-        selectedInterval = newInterval;
-        JHVEventContainer.getSingletonInstance().requestForInterval(newInterval.getStart(), newInterval.getEnd(), this);
-    }
-
-    @Override
-    public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
-
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        JHVEventContainer.getSingletonInstance().requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 
     @Override
@@ -127,6 +109,7 @@ public class EventRequester implements ZoomControllerListener, JHVEventHandler {
             Thread.dumpStack();
             System.exit(666);
         }
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 

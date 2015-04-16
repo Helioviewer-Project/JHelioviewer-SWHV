@@ -10,16 +10,14 @@ import java.util.Map;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 
-public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListener {
+public class ZoomManager implements TimingListener, PlotAreaSpaceListener {
     private static ZoomManager instance;
-    private final ZoomController zoomController;
-    private Interval<Date> currentInterval;
+    private final DrawController drawController;
     private final PlotAreaSpace plotAreaSpace;
     private final Object intervalLock;
     private final YValueModel yValueModel;
@@ -31,8 +29,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
 
     private ZoomManager() {
         // currentInterval = new Interval<Date>(new Date(), new Date());
-        zoomController = ZoomController.getSingletonInstance();
-        zoomController.addZoomControllerListener(this);
+        drawController = DrawController.getSingletonInstance();
+        drawController.addTimingListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         intervalLock = new Object();
         yValueModel = YValueModel.getSingletonInstance();
@@ -76,6 +74,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     public void addZoomDataConfig(Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID) {
+        Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval == null) {
             currentInterval = interval;
         }
@@ -120,7 +119,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * have the coordinates (0,0,0,0) and are meaningless, the destination
      * coordinates are corresponding with the time interval and the taking the
      * complete height of the plot area.
-     * 
+     *
      * @param startDate
      *            The start date of the interval
      * @param endDate
@@ -145,8 +144,8 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      * interval and frequency interval. The frequency gets the complete height,
      * the time gets the portion of the width of the screen corresponding with
      * the portion of the complete time interval it takes.
-     * 
-     * 
+     *
+     *
      * @param startDate
      *            The start date of the requested time interval
      * @param endDate
@@ -166,6 +165,7 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
      */
     public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId) {
         YValueModel yValueModel = YValueModel.getSingletonInstance();
+        Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax()) && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
             int height = displaySize.height;
             double ratio = 1.0 * displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
@@ -195,18 +195,17 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     @Override
-    public void availableIntervalChanged(Interval<Date> newInterval) {
-        currentInterval = newInterval;
+    public void availableIntervalChanged() {
     }
 
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
+    public void selectedIntervalChanged() {
         if (!EventQueue.isDispatchThread()) {
             Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
             Thread.dumpStack();
             System.exit(433);
         }
-        currentInterval = newInterval;
+        Interval<Date> newInterval = drawController.getSelectedInterval();
 
         for (ZoomDataConfig zdc : zoomDataConfigMap.values()) {
             zdc.setMinX(newInterval.getStart());
@@ -217,16 +216,12 @@ public class ZoomManager implements ZoomControllerListener, PlotAreaSpaceListene
     }
 
     @Override
-    public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
-    }
-
-    @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
     }
 
     /**
      * Remove the zoom manager data from the zoom manager.
-     * 
+     *
      * @param downloadID
      *            The download identifier to remove from the zoom manager
      * @param plotIdentifier

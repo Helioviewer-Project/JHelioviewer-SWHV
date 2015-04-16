@@ -18,29 +18,22 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.plugins.eveplugin.events.gui.EventsSelectorElement;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-public class EventModel implements ZoomControllerListener, EventRequesterListener {
+public class EventModel implements TimingListener, EventRequesterListener {
 
     /** Singleton instance of the Event model */
     private static EventModel instance;
-
-    /** the current selected interval */
-    private Interval<Date> selectedInterval;
-
-    /** the current available interval */
-    private Interval<Date> availableInterval;
 
     /** event plot configurations */
     private EventTypePlotConfiguration eventPlotConfiguration;
@@ -81,7 +74,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     /**
      * Gets the singleton instance of the EventModel.
-     * 
+     *
      * @return the singleton instance of the event model
      */
     public static EventModel getSingletonInstance() {
@@ -93,7 +86,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
 
     /**
      * Adds an event model listener to the event model.
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -102,25 +95,21 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
     }
 
     @Override
-    public void availableIntervalChanged(Interval<Date> newInterval) {
-        availableInterval = newInterval;
+    public void availableIntervalChanged() {
     }
 
     @Override
-    public void selectedIntervalChanged(final Interval<Date> newInterval, boolean keepFullValueSpace) {
-        selectedInterval = newInterval;
+    public void selectedIntervalChanged() {
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
             createEventPlotConfiguration();
         }
     }
 
     @Override
-    public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
-    }
-
-    @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         this.events = events;
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         if (selectedInterval != null && availableInterval != null) {
             createEventPlotConfiguration();
         }
@@ -184,6 +173,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         if (currentSwingWorker != null) {
             currentSwingWorker.cancel(true);
         }
+        final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
 
         currentSwingWorker = new SwingWorker<EventTypePlotConfiguration, Void>() {
 
@@ -243,8 +233,8 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
                                         minimalEndDate = endDates.get(minimalDateLine);
                                         maximumDateLine = defineMaximumDateLine(endDates);
                                         maximumEndDate = endDates.get(maximumDateLine);
-                                        double scaledX0 = defineScaledValue(event.getStartDate());
-                                        double scaledX1 = defineScaledValue(event.getEndDate());
+                                        double scaledX0 = defineScaledValue(event.getStartDate(), selectedInterval);
+                                        double scaledX1 = defineScaledValue(event.getEndDate(), selectedInterval);
                                         if (nrLines > maxEventLines) {
                                             maxEventLines = nrLines;
                                         }
@@ -343,7 +333,7 @@ public class EventModel implements ZoomControllerListener, EventRequesterListene
         return minLine;
     }
 
-    private double defineScaledValue(Date date) {
+    private double defineScaledValue(Date date, Interval<Date> selectedInterval) {
         double selectedDuration = 1.0 * (selectedInterval.getEnd().getTime() - selectedInterval.getStart().getTime());
         double position = 1.0 * (date.getTime() - selectedInterval.getStart().getTime());
         return position / selectedDuration;

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.helioviewer.plugins.eveplugin.model;
 
@@ -10,34 +10,24 @@ import java.util.Map;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 
 /**
  * Adapts the plot area space of the plots in case the interval is locked.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
- * 
+ *
  */
-public class TimeIntervalLockModel implements ZoomControllerListener, DrawControllerListener, PlotAreaSpaceListener {
-    /** Instance of the zoom controller */
-    private final ZoomController zoomController;
+public class TimeIntervalLockModel implements TimingListener, DrawControllerListener, PlotAreaSpaceListener {
 
     /** Instance of the draw controller */
     private final DrawController drawController;
 
-    /** Instance of the plot area space manager */
-    private final PlotAreaSpace plotAreaSpace;
-
     /** Is the time interval locked */
     private boolean isLocked;
 
-    /** The current available time interval */
-    private Interval<Date> currentAvailableInterval;
-
     /** The current selected widths of the plot area space */
-    private final Map<PlotAreaSpace, Double> selectedSpaceWidth;
+    private double selectedSpaceWidth;
 
     /** Singleton instance of the time interval lock model */
     private static TimeIntervalLockModel instance;
@@ -45,27 +35,28 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     /** Holds the previous movie time */
     private Date previousMovieTime;
 
+    private final PlotAreaSpace plotAreaSpace;
+
     private Date latestMovieTime;
 
     /**
      * Private constructor
      */
     private TimeIntervalLockModel() {
-        zoomController = ZoomController.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         isLocked = false;
         // currentAvailableInterval = new Interval<Date>(null, null);
-        zoomController.addZoomControllerListener(this);
+        drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
-        selectedSpaceWidth = new HashMap<PlotAreaSpace, Double>();
+        selectedSpaceWidth = 0;
         previousMovieTime = new Date();
+        plotAreaSpace = drawController.getPlotAreaSpace();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
     /**
      * Gives acces to the singleton instance of the time interval lock model.
-     * 
+     *
      * @return The singleton instance of the time interval lock model
      */
     public static TimeIntervalLockModel getInstance() {
@@ -77,7 +68,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
 
     /**
      * Is the time interval locked
-     * 
+     *
      * @return true if the interval is locked, false if the interval is not
      *         locked
      */
@@ -87,7 +78,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
 
     /**
      * Sets the locked state of the time interval.
-     * 
+     *
      * @param isLocked
      *            true if the interval is locked, false if the interval is not
      *            locked
@@ -95,7 +86,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
     public void setLocked(boolean isLocked) {
         this.isLocked = isLocked;
         if (isLocked) {
-            selectedSpaceWidth.put(plotAreaSpace, plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
+            selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
             if (latestMovieTime != null) {
                 drawMovieLineRequest(latestMovieTime);
             }
@@ -107,7 +98,7 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawRequest()
      */
@@ -117,13 +108,14 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawMovieLineRequest(java.util.Date)
      */
     @Override
     public void drawMovieLineRequest(Date time) {
         latestMovieTime = time;
+        Interval<Date> currentAvailableInterval = drawController.getAvailableInterval();
         if (time != null && currentAvailableInterval != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
             // Log.debug("Execute drawMovieline : " + time);
             // Log.trace("previousTimeInterval : " + previousMovieTime +
@@ -131,7 +123,6 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
             previousMovieTime = time;
             Map<PlotAreaSpace, Double> selectedStartTimes = new HashMap<PlotAreaSpace, Double>();
             Map<PlotAreaSpace, Double> selectedEndTimes = new HashMap<PlotAreaSpace, Double>();
-            double selectedIntervalWidth = selectedSpaceWidth.get(plotAreaSpace);
             // Log.debug("Selected interval width: " +
             // selectedIntervalWidth);
 
@@ -147,11 +138,11 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
             // double newSelectedScaledStart =
             // Math.max(space.getScaledMinTime(), scaledMoviePosition -
             // (selectedIntervalWidth / 2));
-            double newSelectedScaledStart = scaledMoviePosition - (selectedIntervalWidth / 2);
+            double newSelectedScaledStart = scaledMoviePosition - (selectedSpaceWidth / 2);
             // double newSelectedScaledEnd =
             // Math.min(space.getScaledMaxTime(), scaledMoviePosition +
             // (selectedIntervalWidth / 2));
-            double newSelectedScaledEnd = scaledMoviePosition + (selectedIntervalWidth / 2);
+            double newSelectedScaledEnd = scaledMoviePosition + (selectedSpaceWidth / 2);
             // Log.debug("Old selected width, new selected width: " +
             // selectedIntervalWidth + ", " + (newSelectedScaledEnd -
             // newSelectedScaledStart));
@@ -167,14 +158,13 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * availableIntervalChanged(org.helioviewer.base.math.Interval)
      */
     @Override
-    public void availableIntervalChanged(Interval<Date> newInterval) {
+    public void availableIntervalChanged() {
         // Log.debug("Current interval changed : " + newInterval);
-        currentAvailableInterval = newInterval;
         if (latestMovieTime != null) {
             drawMovieLineRequest(latestMovieTime);
         }
@@ -182,29 +172,17 @@ public class TimeIntervalLockModel implements ZoomControllerListener, DrawContro
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
-     * selectedResolutionChanged
-     * (org.helioviewer.plugins.eveplugin.settings.EVEAPI
-     * .API_RESOLUTION_AVERAGES)
-     */
-    @Override
-    public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
+    public void selectedIntervalChanged() {
     }
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        selectedSpaceWidth.put(plotAreaSpace, scaledSelectedMaxTime - scaledSelectedMinTime);
+        selectedSpaceWidth = scaledSelectedMaxTime - scaledSelectedMinTime;
     }
 
     @Override

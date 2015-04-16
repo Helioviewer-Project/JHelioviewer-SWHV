@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -26,13 +25,13 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController;
 import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
-import org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.events.model.EventModelListener;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
-import org.helioviewer.plugins.eveplugin.settings.EVEAPI.API_RESOLUTION_AVERAGES;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -47,7 +46,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, ZoomControllerListener, LineDataSelectorModelListener {
+public class ControlsPanel extends JPanel implements ActionListener, LayersListener, EventModelListener, TimingListener, LineDataSelectorModelListener {
 
     private static final long serialVersionUID = 3639870635351984819L;
 
@@ -70,8 +69,8 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private ControlsPanel() {
         initVisualComponents();
-        ZoomController.getSingletonInstance().addZoomControllerListener(this);
         Displayer.getLayersModel().addLayersListener(this);
+        DrawController.getSingletonInstance().addTimingListener(this);
     }
 
     private void initVisualComponents() {
@@ -181,7 +180,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
                 // Log.debug("start " + start + " end " + end);
                 final Interval<Date> interval = new Interval<Date>(start, end);
-                ZoomController.getSingletonInstance().setSelectedInterval(interval, true);
+                DrawController.getSingletonInstance().setSelectedInterval(interval, true);
             }
         }
     }
@@ -216,7 +215,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                     final Interval<Date> interval = new Interval<Date>(start, end);
                     // ZoomController.getSingletonInstance().setAvailableInterval(interval);
                     if (TimeIntervalLockModel.getInstance().isLocked()) {
-                        ZoomController.getSingletonInstance().setSelectedInterval(interval, false);
+                        DrawController.getSingletonInstance().setSelectedInterval(interval, false);
                     }
                 }
             }
@@ -307,17 +306,12 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     @Override
-    public void availableIntervalChanged(Interval<Date> newInterval) {
-        if (newInterval.getStart() != null || newInterval.getEnd() != null) {
-            final Calendar calendar = new GregorianCalendar();
-            calendar.clear();
-            calendar.setTime(newInterval.getEnd());
-            calendar.add(Calendar.DATE, -1);
-        }
+    public void availableIntervalChanged() {
     }
 
     @Override
-    public void selectedIntervalChanged(Interval<Date> newInterval, boolean keepFullValueSpace) {
+    public void selectedIntervalChanged() {
+        Interval<Date> newInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (selectedIntervalByZoombox != null && newInterval != null) {
             if (!selectedIntervalByZoombox.equals(newInterval)) {
                 try {
@@ -327,10 +321,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
                 }
             }
         }
-    }
-
-    @Override
-    public void selectedResolutionChanged(API_RESOLUTION_AVERAGES newResolution) {
     }
 
     @Override
