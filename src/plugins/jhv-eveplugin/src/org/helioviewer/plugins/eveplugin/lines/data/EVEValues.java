@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
-import org.helioviewer.base.logging.Log;
 
 public class EVEValues {
 
@@ -20,7 +19,6 @@ public class EVEValues {
     private final int numOfBins;
 
     public EVEValues(long binStart, long binEnd, long intervalStart, int numOfBins, long timePerBin) {
-        Log.debug("numOfBins : " + numOfBins + " timePerBin : " + timePerBin);
         this.intervalStart = intervalStart;
         this.binStart = binStart;
         this.binEnd = binEnd;
@@ -44,7 +42,6 @@ public class EVEValues {
     }
 
     public void addValues(final long[] indates, final double[] invalues) {
-        Log.debug("indates : " + indates.length);
         for (int i = 0; i < indates.length; i++) {
             double value = invalues[i];
             if (!Double.isNaN(value)) {
