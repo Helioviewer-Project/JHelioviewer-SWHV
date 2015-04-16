@@ -1,52 +1,69 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
-import java.awt.Rectangle;
-import java.util.Arrays;
-import java.util.Date;
-
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.logging.Log;
 
 public class EVEValues {
 
-    private int index = 0;
-    private final int MINUTES_PER_DAY = 1440;
+    private final int index = 0;
 
-    public long[] dates = new long[MINUTES_PER_DAY];
-    public double[] values = new double[MINUTES_PER_DAY];
+    public final long[] dates;
+    public final double[] minValues;
+    public final double[] maxValues;
 
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
 
-    private final Interval<Date> interval;
-    private final Rectangle space;
+    private final long intervalStart;
+    private final long binStart;
+    private final long binEnd;
+    private final long timePerBin;
+    private final int numOfBins;
 
-    public EVEValues(Interval<Date> interval, Rectangle space) {
-        this.interval = interval;
-        this.space = space;
+    public EVEValues(long binStart, long binEnd, long intervalStart, int numOfBins, long timePerBin) {
+        this.intervalStart = intervalStart;
+        this.binStart = binStart;
+        this.binEnd = binEnd;
+        this.timePerBin = timePerBin;
+        this.numOfBins = numOfBins;
+        dates = new long[numOfBins];
+        minValues = new double[numOfBins];
+        maxValues = new double[numOfBins];
+        fillDates();
+    }
 
+    public EVEValues() {
+        intervalStart = -1;
+        binStart = 0;
+        binEnd = 0;
+        numOfBins = 0;
+        timePerBin = 0;
+        dates = new long[numOfBins];
+        minValues = new double[numOfBins];
+        maxValues = new double[numOfBins];
     }
 
     public void addValues(final long[] indates, final double[] invalues) {
-        if (index + indates.length >= dates.length) {
-            dates = Arrays.copyOf(dates, index + indates.length + MINUTES_PER_DAY);
-            values = Arrays.copyOf(values, index + indates.length + MINUTES_PER_DAY);
-        }
-
         for (int i = 0; i < indates.length; i++) {
             double value = invalues[i];
             if (!Double.isNaN(value)) {
-                values[index] = value;
-                dates[index] = indates[i];
-                index++;
+                int index = (int) ((indates[i] - binStart) / timePerBin);
+                if (index >= 0 && index < numOfBins) {
+                    maxValues[index] = Math.max(maxValues[index], value);
+                    minValues[index] = Math.min(minValues[index], value);
+                    dates[index] = indates[i];
+                    minValue = value < minValue ? value : minValue;
+                    maxValue = value > maxValue ? value : maxValue;
+                } else {
+                    Log.debug("index out of bound avoided");
+                    Log.debug("indates : " + indates[i] + " | binStart : " + binStart + " | binEnd : " + binEnd + " | indates[i] - binStart : " + (indates[i] - binStart) + " | timePerBin : " + timePerBin + " | index : " + index + " | numOfBins : " + numOfBins);
+                }
 
-                minValue = value < minValue ? value : minValue;
-                maxValue = value > maxValue ? value : maxValue;
             }
         }
     }
 
     public int getNumberOfValues() {
-        return index;
+        return numOfBins;
     }
 
     public double getMinimumValue() {
@@ -57,11 +74,16 @@ public class EVEValues {
         return maxValue;
     }
 
-    public Interval<Date> getInterval() {
-        if (index == 0) {
-            return new Interval<Date>(null, null);
+    private void fillDates() {
+        if (numOfBins > 0) {
+            dates[0] = intervalStart;
+            maxValues[0] = Double.MIN_VALUE;
+            minValues[0] = Double.MAX_VALUE;
+            for (int i = 1; i < numOfBins; i++) {
+                dates[i] = dates[i - 1] + timePerBin;
+                maxValues[i] = Double.MIN_VALUE;
+                minValues[i] = Double.MAX_VALUE;
+            }
         }
-        return new Interval<Date>(new Date(dates[0]), new Date(dates[index - 1]));
     }
-
 }
