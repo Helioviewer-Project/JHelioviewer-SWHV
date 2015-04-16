@@ -328,7 +328,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             updatePlotAreaSpace(selectedInterval);
         }
         fireSelectedIntervalChanged();
-        Log.debug("Set selected interval : redraw request" + selectedInterval);
         fireRedrawRequest();
         return selectedInterval;
     }
@@ -371,7 +370,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             Thread.dumpStack();
             System.exit(666);
         }
-        Log.debug("Plot area space changed");
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
             double scaleDiff = scaledMaxTime - scaledMinTime;
