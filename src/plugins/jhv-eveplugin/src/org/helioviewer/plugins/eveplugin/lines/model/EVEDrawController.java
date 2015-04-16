@@ -208,6 +208,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             }
             yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel, selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog, yAxisElement.getActivationTime());
             yAxisElementMap.put(unitLabel, yAxisElement);
+            // eveDrawableElementMap.get(unitLabel).set(interval, bands,
+            // values.toArray(new EVEValues[0]), yAxisElement);
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel));
             } else {
