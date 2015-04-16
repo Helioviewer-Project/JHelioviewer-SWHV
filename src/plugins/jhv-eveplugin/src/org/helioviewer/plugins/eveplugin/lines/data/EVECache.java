@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.Rectangle;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -28,7 +29,7 @@ public class EVECache {
     // //////////////////////////////////////////////////////////////////////////////
 
     public void add(final double[] values, final long[] dates) {
-       GregorianCalendar calendar = new GregorianCalendar();
+        GregorianCalendar calendar = new GregorianCalendar();
 
         for (int i = 0; i < values.length; i++) {
             calendar.setTimeInMillis(dates[i]);
@@ -46,8 +47,8 @@ public class EVECache {
 
     // public EVEValues getValuesInInterval(final Interval<Date> interval,
     // double multiplier) {
-    public EVEValues getValuesInInterval(final Interval<Date> interval) {
-        final EVEValues result = new EVEValues();
+    public EVEValues getValuesInInterval(final Interval<Date> interval, Rectangle space) {
+        final EVEValues result = new EVEValues(interval, space);
 
         GregorianCalendar calendar = new GregorianCalendar();
 
