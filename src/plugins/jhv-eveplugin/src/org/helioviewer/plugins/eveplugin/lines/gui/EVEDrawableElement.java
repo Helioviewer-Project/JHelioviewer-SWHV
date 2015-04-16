@@ -29,7 +29,7 @@ public class EVEDrawableElement implements DrawableElement {
     private boolean intervalAvailable = false;
     private Band[] bands = new Band[0];
     // private EVEValues[] values = null;
-    private final Interval<Date> interval;
+    private Interval<Date> interval;
     private YAxisElement yAxisElement;
     private long lastMilliWithData;
 
@@ -81,7 +81,7 @@ public class EVEDrawableElement implements DrawableElement {
             for (int i = 0; i < bands.length; ++i) {
                 if (bands[i].isVisible()) {
 
-                    EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i]);
+                    EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], interval, graphArea);
                     int num = values.getNumberOfValues();
 
                     final ArrayList<Point> pointList = new ArrayList<Point>();
@@ -106,7 +106,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     int counter = 0;
                     for (int j = 0; j < num; j++) {
-                        double value = values.values[j];
+                        double value = values.maxValues[j];
 
                         if (yAxisElement.isLogScale() && value < 10e-50) {
                             if (counter > 1) {
@@ -254,6 +254,13 @@ public class EVEDrawableElement implements DrawableElement {
                 counter++;
             }
         }
+    }
+
+    public void set(Interval<Date> interval, Band[] bands, YAxisElement yAxisElement) {
+        this.interval = interval;
+        this.bands = bands;
+        this.yAxisElement = yAxisElement;
+        intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
     }
 
     @Override
