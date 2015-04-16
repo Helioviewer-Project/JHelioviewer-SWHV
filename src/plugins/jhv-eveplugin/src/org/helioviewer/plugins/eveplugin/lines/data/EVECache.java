@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
@@ -84,8 +83,10 @@ public class EVECache {
                 cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             }
 
-            final Pair<long[], double[]> pair = cache.getValuesInInterval(interval);
-            result.addValues(pair.a, pair.b);
+            // final Pair<long[], double[]> pair =
+            // cache.getValuesInInterval(interval);
+            // result.addValues(pair.a, pair.b);
+            cache.fillResult(result);
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
