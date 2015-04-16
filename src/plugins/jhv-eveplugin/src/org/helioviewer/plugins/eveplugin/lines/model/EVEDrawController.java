@@ -208,8 +208,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             }
             yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel, selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog, yAxisElement.getActivationTime());
             yAxisElementMap.put(unitLabel, yAxisElement);
-            // eveDrawableElementMap.get(unitLabel).set(interval, bands,
-            // values.toArray(new EVEValues[0]), yAxisElement);
+            eveDrawableElementMap.get(unitLabel).set(interval, bands, yAxisElement);
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel));
             } else {
@@ -289,7 +288,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void selectedIntervalChanged() {
 
         updateBands(drawController.keepfullValueRange());
-        // fireRedrawRequest(false);
+        fireRedrawRequest(false);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -369,8 +368,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         // TODO Auto-generated method stub
     }
 
-    public EVEValues getValues(Band band) {
-        return EVECacheController.getSingletonInstance().downloadData(band, drawController.getSelectedInterval(), drawController.getGraphArea());
+    public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {
+        return EVECacheController.getSingletonInstance().downloadData(band, interval, graphArea);
     }
 
 }
