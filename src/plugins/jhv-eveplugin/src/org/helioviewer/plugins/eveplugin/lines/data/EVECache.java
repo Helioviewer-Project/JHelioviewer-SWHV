@@ -56,16 +56,17 @@ public class EVECache {
         long intervalEnd = interval.getEnd().getTime();
         int numberOfBins;
         long timePerBin;
-        if (space.width < intervalWidth) {
+        if (space.width < (intervalWidth / 60000)) {
             binStart = intervalStart - (intervalWidth / spaceWidth / 2);
             binEnd = intervalEnd + (intervalWidth / spaceWidth / 2);
             numberOfBins = spaceWidth + 1;
             timePerBin = intervalWidth / spaceWidth;
         } else {
-            binStart = intervalStart;
-            binEnd = intervalEnd;
-            numberOfBins = (int) intervalWidth;
-            timePerBin = 1;
+            numberOfBins = (int) intervalWidth / 60000 + 1;
+            timePerBin = intervalWidth / numberOfBins;
+            binStart = intervalStart - timePerBin / 2;
+            binEnd = intervalEnd + timePerBin / 2;
+
         }
 
         final EVEValues result = new EVEValues(binStart, binEnd, intervalStart, numberOfBins, timePerBin);
