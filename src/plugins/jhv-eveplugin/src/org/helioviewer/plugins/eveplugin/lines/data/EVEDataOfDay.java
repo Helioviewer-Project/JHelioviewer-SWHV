@@ -183,4 +183,8 @@ public class EVEDataOfDay {
         return range;
     }
 
+    public void fillResult(EVEValues result) {
+        result.addValues(dates, values);
+    }
+
 }
