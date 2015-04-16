@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.controller;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private final PlotAreaSpace pas;
 
-    private Dimension chartDimension;
     private final List<TimingListener> tListeners;
     private boolean keepFullValueRange;
     private Rectangle graphArea;
