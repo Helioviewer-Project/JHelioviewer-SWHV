@@ -21,21 +21,22 @@ import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 
 public class EVEDrawableElement implements DrawableElement {
 
     private final List<GraphPolyline> graphPolylines = new LinkedList<EVEDrawableElement.GraphPolyline>();
     private boolean intervalAvailable = false;
     private Band[] bands = new Band[0];
-    private EVEValues[] values = null;
-    private Interval<Date> interval;
+    // private EVEValues[] values = null;
+    private final Interval<Date> interval;
     private YAxisElement yAxisElement;
     private long lastMilliWithData;
 
     public EVEDrawableElement(Interval<Date> interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
         this.interval = interval;
         this.bands = bands;
-        this.values = values;
+        // this.values = values;
         this.yAxisElement = yAxisElement;
         intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
         lastMilliWithData = 0;
@@ -44,7 +45,7 @@ public class EVEDrawableElement implements DrawableElement {
     public EVEDrawableElement() {
         interval = new Interval<Date>(Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
         bands = new Band[0];
-        values = new EVEValues[0];
+        // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
     }
 
@@ -80,7 +81,8 @@ public class EVEDrawableElement implements DrawableElement {
             for (int i = 0; i < bands.length; ++i) {
                 if (bands[i].isVisible()) {
 
-                    int num = values[i].getNumberOfValues();
+                    EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i]);
+                    int num = values.getNumberOfValues();
 
                     final ArrayList<Point> pointList = new ArrayList<Point>();
                     final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
@@ -104,7 +106,7 @@ public class EVEDrawableElement implements DrawableElement {
 
                     int counter = 0;
                     for (int j = 0; j < num; j++) {
-                        double value = values[i].values[j];
+                        double value = values.values[j];
 
                         if (yAxisElement.isLogScale() && value < 10e-50) {
                             if (counter > 1) {
@@ -117,7 +119,7 @@ public class EVEDrawableElement implements DrawableElement {
                             continue;
                         }
 
-                        long date = values[i].dates[j];
+                        long date = values.dates[j];
                         int x = (int) ((date - intervalStartTime) * ratioX) + graphArea.x;
 
                         int y = dY;
@@ -267,14 +269,6 @@ public class EVEDrawableElement implements DrawableElement {
     @Override
     public boolean hasElementsToDraw() {
         return bands.length > 0;
-    }
-
-    public void set(Interval<Date> interval, Band[] bands, EVEValues[] values, YAxisElement yAxisElement) {
-        this.interval = interval;
-        this.bands = bands;
-        this.values = values;
-        this.yAxisElement = yAxisElement;
-        intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
     }
 
     @Override

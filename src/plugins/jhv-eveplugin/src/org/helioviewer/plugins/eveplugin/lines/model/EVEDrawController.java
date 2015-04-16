@@ -12,7 +12,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.TimingListener;
-import org.helioviewer.plugins.eveplugin.download.DownloadedData;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
@@ -34,7 +33,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // //////////////////////////////////////////////////////////////////////////////
 
     private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
-    private final Map<String, Map<Band, DownloadedData>> dataMapPerUnitLabel = new HashMap<String, Map<Band, DownloadedData>>();
+    private final Map<String, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<String, Map<Band, EVEValues>>();
 
     private final Map<String, Range> selectedRangeMap = new HashMap<String, Range>();
     private final Map<String, Range> availableRangeMap = new HashMap<String, Range>();
@@ -44,12 +43,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private final Map<String, YAxisElement> yAxisElementMap;
 
     private final PlotAreaSpace plotAreaSpace;
+    private static EVEDrawController instance;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public EVEDrawController() {
+    private EVEDrawController() {
 
         BandController.getSingletonInstance().addBandControllerListener(this);
         DrawController.getSingletonInstance().addTimingListener(this);
@@ -66,6 +66,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
+    public static EVEDrawController getSingletonInstance() {
+        if (instance == null) {
+            instance = new EVEDrawController();
+        }
+        return instance;
+    }
+
     public void addDrawControllerListener(final EVEDrawControllerListener listener) {
         listeners.add(listener);
     }
@@ -77,9 +84,9 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private void addToMap(final Band band) {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        DownloadedData data = retrieveData(band, interval, plotArea);
+        EVEValues data = retrieveData(band, interval, plotArea);
         if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
+            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
         }
         if (data != null) {
             dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
@@ -106,15 +113,15 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private void updateBand(final Band band, boolean keepFullValueRange) {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        DownloadedData data = retrieveData(band, interval, plotArea);
+        EVEValues data = retrieveData(band, interval, plotArea);
         boolean isLog = band.getBandType().isLogScale();
         if (!availableRangeMap.containsKey(band.getUnitLabel())) {
             availableRangeMap.put(band.getUnitLabel(), new Range());
             selectedRangeMap.put(band.getUnitLabel(), new Range());
-            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
+            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
         }
         Range oldAvailableRange = new Range(availableRangeMap.get(band.getUnitLabel()));
-        for (DownloadedData v : dataMapPerUnitLabel.get(band.getUnitLabel()).values()) {
+        for (EVEValues v : dataMapPerUnitLabel.get(band.getUnitLabel()).values()) {
             if (v != null) {
                 availableRangeMap.get(band.getUnitLabel()).setMin(v.getMinimumValue());
                 availableRangeMap.get(band.getUnitLabel()).setMax(v.getMaximumValue());
@@ -155,7 +162,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         Interval<Date> interval = drawController.getSelectedInterval();
         for (String unit : dataMapPerUnitLabel.keySet()) {
             final Band[] bands = dataMapPerUnitLabel.get(unit).keySet().toArray(new Band[0]);
-            final LinkedList<DownloadedData> values = new LinkedList<DownloadedData>();
+            final LinkedList<EVEValues> values = new LinkedList<EVEValues>();
 
             String unitLabel = "";
             boolean isLog = false;
@@ -172,7 +179,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
             Range oldAvailableRange = new Range(availableRangeMap.get(unitLabel));
 
-            for (DownloadedData v : dataMapPerUnitLabel.get(unit).values()) {
+            for (EVEValues v : dataMapPerUnitLabel.get(unit).values()) {
                 if (v != null) {
                     availableRangeMap.get(unitLabel).setMin(v.getMinimumValue());
                     availableRangeMap.get(unitLabel).setMax(v.getMaximumValue());
@@ -201,7 +208,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             }
             yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel, selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog, yAxisElement.getActivationTime());
             yAxisElementMap.put(unitLabel, yAxisElement);
-            eveDrawableElementMap.get(unitLabel).set(interval, bands, values.toArray(new EVEValues[0]), yAxisElement);
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel));
             } else {
@@ -266,8 +272,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    private final DownloadedData retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
-        return band.getBandType().getDataDownloader().downloadData(band, interval, plotArea);
+    private final EVEValues retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
+        return EVECacheController.getSingletonInstance().downloadData(band, interval, plotArea);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -317,7 +323,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
         for (final Band band : activeBands) {
             if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-                dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, DownloadedData>());
+                dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
             }
             dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval, plotArea));
         }
@@ -359,6 +365,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
+    }
+
+    public EVEValues getValues(Band band) {
+        return EVECacheController.getSingletonInstance().downloadData(band, drawController.getSelectedInterval(), drawController.getGraphArea());
     }
 
 }

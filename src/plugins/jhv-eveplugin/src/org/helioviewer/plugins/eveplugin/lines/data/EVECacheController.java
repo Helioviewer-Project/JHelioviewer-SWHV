@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.Rectangle;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -8,15 +9,14 @@ import java.util.List;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.download.DataDownloader;
-import org.helioviewer.plugins.eveplugin.download.DownloadedData;
+import org.helioviewer.plugins.eveplugin.controller.DrawController;
 
 /**
  *
  *
  * @author Stephan Pagel
  * */
-public class EVECacheController implements DataDownloader {
+public class EVECacheController {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -70,7 +70,7 @@ public class EVECacheController implements DataDownloader {
             return null;
         }
 
-        return cache.getValuesInInterval(band, interval);
+        return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
     }
 
     public Range getMinMaxInInterval(final Band band, final Interval<Date> interval) {
@@ -99,13 +99,12 @@ public class EVECacheController implements DataDownloader {
         }
     }
 
-    @Override
-    public DownloadedData downloadData(Band band, Interval<Date> interval) {
+    public EVEValues downloadData(Band band, Interval<Date> interval, Rectangle plotArea) {
         if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
             return null;
         }
 
-        return cache.getValuesInInterval(band, interval);
+        return cache.getValuesInInterval(band, interval, plotArea);
     }
 
 }
