@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElementType;
@@ -84,7 +83,6 @@ public class EVEDrawableElement implements DrawableElement {
 
                     EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], interval, graphArea);
                     int num = values.getNumberOfValues();
-                    Log.debug("num of values: " + num);
                     final ArrayList<Point> pointList = new ArrayList<Point>();
                     final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
                     final LinkedList<String> warnLabels = new LinkedList<String>();
@@ -113,7 +111,6 @@ public class EVEDrawableElement implements DrawableElement {
                             if (counter > 1) {
                                 graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                             }
-                            Log.debug("pointlist size : " + pointList.size());
                             pointList.clear();
                             counter = 0;
 
@@ -138,7 +135,6 @@ public class EVEDrawableElement implements DrawableElement {
                         pointList.add(point);
                         counter++;
                     }
-                    Log.debug("pointlist size : " + pointList.size());
                     if (counter > 0) {
                         graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                     }
