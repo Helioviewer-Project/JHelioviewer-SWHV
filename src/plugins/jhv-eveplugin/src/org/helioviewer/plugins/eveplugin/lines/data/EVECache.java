@@ -48,13 +48,33 @@ public class EVECache {
     // public EVEValues getValuesInInterval(final Interval<Date> interval,
     // double multiplier) {
     public EVEValues getValuesInInterval(final Interval<Date> interval, Rectangle space) {
-        final EVEValues result = new EVEValues(interval, space);
+        long intervalWidth = interval.getEnd().getTime() - interval.getStart().getTime();
+        int spaceWidth = space.width;
+        long binStart;
+        long binEnd;
+        long intervalStart = interval.getStart().getTime();
+        long intervalEnd = interval.getEnd().getTime();
+        int numberOfBins;
+        long timePerBin;
+        if (space.width < intervalWidth) {
+            binStart = intervalStart - (intervalWidth / spaceWidth / 2);
+            binEnd = intervalEnd + (intervalWidth / spaceWidth / 2);
+            numberOfBins = spaceWidth + 1;
+            timePerBin = intervalWidth / spaceWidth;
+        } else {
+            binStart = intervalStart;
+            binEnd = intervalEnd;
+            numberOfBins = (int) intervalWidth;
+            timePerBin = 1;
+        }
+
+        final EVEValues result = new EVEValues(binStart, binEnd, intervalStart, numberOfBins, timePerBin);
 
         GregorianCalendar calendar = new GregorianCalendar();
 
-        calendar.setTime(interval.getEnd());
+        calendar.setTimeInMillis(binEnd);
         Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
-        calendar.setTime(interval.getStart());
+        calendar.setTimeInMillis(binStart);
         Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
 
         while (key <= keyEnd) {
