@@ -289,7 +289,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void selectedIntervalChanged() {
 
         updateBands(drawController.keepfullValueRange());
-        fireRedrawRequest(false);
+        // fireRedrawRequest(false);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
