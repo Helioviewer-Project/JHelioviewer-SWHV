@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
+import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -15,6 +16,15 @@ public class EVEValues {
 
     private double minValue = Double.MAX_VALUE;
     private double maxValue = Double.MIN_VALUE;
+
+    private final Interval<Date> interval;
+    private final Rectangle space;
+
+    public EVEValues(Interval<Date> interval, Rectangle space) {
+        this.interval = interval;
+        this.space = space;
+
+    }
 
     public void addValues(final long[] indates, final double[] invalues) {
         if (index + indates.length >= dates.length) {
