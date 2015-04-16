@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 
@@ -85,47 +84,6 @@ public class EVEDataOfDay {
                 posMax = i;
             }
         }
-    }
-
-    /**
-     * Returns all values within the given interval.
-     *
-     * @param interval
-     *            Only values of corresponding time stamps within the given
-     *            interval will be considered.
-     *
-     * @return Values within the given interval.
-     * */
-    public Pair<long[], double[]> getValuesInInterval(final Interval<Date> interval) {
-        Date dateFirst = new Date(dates[0]);
-        Date dateLast = new Date(dates[MINUTES_PER_DAY - 1]);
-
-        if (dateLast.compareTo(interval.getStart()) < 0) {
-            return new Pair(Arrays.copyOfRange(dates, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1), Arrays.copyOfRange(values, MINUTES_PER_DAY - 3, MINUTES_PER_DAY - 1));
-        }
-
-        if (dateFirst.compareTo(interval.getEnd()) > 0) {
-            return new Pair(Arrays.copyOfRange(dates, 0, 2), Arrays.copyOfRange(values, 0, 2));
-        }
-
-        int indexFrom = 0;
-        int indexTo = MINUTES_PER_DAY - 1;
-        GregorianCalendar calendar = new GregorianCalendar();
-        final Interval<Date> available = new Interval<Date>(dateFirst, dateLast);
-
-        if (available.containsPointInclusive(interval.getStart())) {
-            calendar.setTime(interval.getStart());
-            indexFrom = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-            indexFrom = Math.max(0, indexFrom - 3);
-        }
-
-        if (available.containsPointInclusive(interval.getEnd())) {
-            calendar.setTime(interval.getEnd());
-            indexTo = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-            indexTo = Math.min(indexTo + 3, MINUTES_PER_DAY - 1);
-        }
-
-        return new Pair(Arrays.copyOfRange(dates, indexFrom, indexTo), Arrays.copyOfRange(values, indexFrom, indexTo));
     }
 
     /**

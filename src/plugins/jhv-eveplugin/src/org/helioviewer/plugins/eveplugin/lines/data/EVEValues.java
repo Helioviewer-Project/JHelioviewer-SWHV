@@ -1,9 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
-
 public class EVEValues {
-
-    private final int index = 0;
 
     public final long[] dates;
     public final double[] minValues;
@@ -14,14 +11,12 @@ public class EVEValues {
 
     private final long intervalStart;
     private final long binStart;
-    private final long binEnd;
     private final long timePerBin;
     private final int numOfBins;
 
     public EVEValues(long binStart, long binEnd, long intervalStart, int numOfBins, long timePerBin) {
         this.intervalStart = intervalStart;
         this.binStart = binStart;
-        this.binEnd = binEnd;
         this.timePerBin = timePerBin;
         this.numOfBins = numOfBins;
         dates = new long[numOfBins];
@@ -33,7 +28,6 @@ public class EVEValues {
     public EVEValues() {
         intervalStart = -1;
         binStart = 0;
-        binEnd = 0;
         numOfBins = 0;
         timePerBin = 0;
         dates = new long[numOfBins];
