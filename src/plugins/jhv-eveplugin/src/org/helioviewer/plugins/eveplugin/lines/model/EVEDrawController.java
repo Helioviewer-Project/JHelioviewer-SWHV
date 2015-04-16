@@ -369,6 +369,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {
+        Log.debug("Interval : " + interval);
         return EVECacheController.getSingletonInstance().downloadData(band, interval, graphArea);
     }
 

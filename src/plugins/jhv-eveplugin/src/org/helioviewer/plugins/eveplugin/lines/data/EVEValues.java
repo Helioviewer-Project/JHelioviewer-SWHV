@@ -20,6 +20,7 @@ public class EVEValues {
     private final int numOfBins;
 
     public EVEValues(long binStart, long binEnd, long intervalStart, int numOfBins, long timePerBin) {
+        Log.debug("numOfBins : " + numOfBins + " timePerBin : " + timePerBin);
         this.intervalStart = intervalStart;
         this.binStart = binStart;
         this.binEnd = binEnd;
@@ -43,6 +44,7 @@ public class EVEValues {
     }
 
     public void addValues(final long[] indates, final double[] invalues) {
+        Log.debug("indates : " + indates.length);
         for (int i = 0; i < indates.length; i++) {
             double value = invalues[i];
             if (!Double.isNaN(value)) {
@@ -54,8 +56,12 @@ public class EVEValues {
                     minValue = value < minValue ? value : minValue;
                     maxValue = value > maxValue ? value : maxValue;
                 } else {
-                    Log.debug("index out of bound avoided");
-                    Log.debug("indates : " + indates[i] + " | binStart : " + binStart + " | binEnd : " + binEnd + " | indates[i] - binStart : " + (indates[i] - binStart) + " | timePerBin : " + timePerBin + " | index : " + index + " | numOfBins : " + numOfBins);
+                    // Log.debug("index out of bound avoided");
+                    // Log.debug("indates : " + indates[i] + " | binStart : " +
+                    // binStart + " | binEnd : " + binEnd +
+                    // " | indates[i] - binStart : " + (indates[i] - binStart) +
+                    // " | timePerBin : " + timePerBin + " | index : " + index +
+                    // " | numOfBins : " + numOfBins);
                 }
 
             }
