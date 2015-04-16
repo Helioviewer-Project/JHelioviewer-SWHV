@@ -43,7 +43,7 @@ public class EVEBandCache {
 
         // return cache.getValuesInInterval(interval,
         // band.getBandType().getMultiplier());
-        return cache.getValuesInInterval(interval);
+        return cache.getValuesInInterval(interval, plotArea);
 
     }
 
