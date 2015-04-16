@@ -11,11 +11,12 @@ import java.util.Map;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.controller.GraphDimensionListener;
 import org.helioviewer.plugins.eveplugin.controller.TimingListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
-public class ZoomManager implements TimingListener, PlotAreaSpaceListener {
+public class ZoomManager implements TimingListener, PlotAreaSpaceListener, GraphDimensionListener {
     private static ZoomManager instance;
     private final DrawController drawController;
     private final PlotAreaSpace plotAreaSpace;
@@ -31,6 +32,7 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener {
         // currentInterval = new Interval<Date>(new Date(), new Date());
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
+        drawController.addGraphDimensionListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         intervalLock = new Object();
         yValueModel = YValueModel.getSingletonInstance();
@@ -47,18 +49,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener {
             instance = new ZoomManager();
         }
         return instance;
-    }
-
-    public void setDisplaySize(Rectangle newDisplaySize) {
-        if (!displaySize.equals(newDisplaySize)) {
-            displaySize = newDisplaySize;
-            for (ZoomDataConfig zsc : zoomDataConfigMap.values()) {
-                zsc.setDisplaySize(newDisplaySize);
-            }
-            isAreaInitialized = true;
-            fireDisplaySizeChanged();
-        }
-
     }
 
     public void calculateZoomXDirection() {
@@ -244,5 +234,18 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener {
 
     public void removeZoomManagerListener(ZoomManagerListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public void graphDimensionChanged() {
+        Rectangle newDisplaySize = drawController.getPlotArea();
+        if (!displaySize.equals(newDisplaySize)) {
+            displaySize = newDisplaySize;
+            for (ZoomDataConfig zsc : zoomDataConfigMap.values()) {
+                zsc.setDisplaySize(newDisplaySize);
+            }
+            isAreaInitialized = true;
+            fireDisplaySizeChanged();
+        }
     }
 }

@@ -115,6 +115,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         timer = new Timer("ChartDrawGraphPane redraw timer");
         timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
         // timer.schedule(new RedrawTimerTask(), 0, (long) (3000.0));
+        setChartInformation();
     }
 
     private void initVisualComponents() {
@@ -452,17 +453,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void updateGraphArea() {
-        if (drawController.getYAxisElements().size() >= 2) {
-            twoYAxis = 1;
-        } else {
-            twoYAxis = 0;
-        }
-        final int graphWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight());
-        final int graphHeight = getHeight() - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
-        graphArea = new Rectangle(ChartConstants.getGraphLeftSpace(), ChartConstants.getGraphTopSpace(), graphWidth, graphHeight);
-        plotArea = new Rectangle(0, 0, graphWidth, graphHeight);
-        leftAxisArea = new Rectangle(0, ChartConstants.getGraphTopSpace(), ChartConstants.getGraphLeftSpace(), graphHeight - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
-        zoomManager.setDisplaySize(plotArea);
+        graphArea = drawController.getGraphArea();
+        plotArea = drawController.getPlotArea();
+        leftAxisArea = drawController.getLeftAxisArea();
     }
 
     private void updateRatios() {
@@ -686,12 +679,26 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void componentResized(ComponentEvent e) {
-        updateGraph();
+        setChartInformation();
     }
 
     @Override
     public void componentShown(ComponentEvent e) {
-        updateGraph();
+        setChartInformation();
+    }
+
+    private void setChartInformation() {
+        if (drawController.getYAxisElements().size() >= 2) {
+            twoYAxis = 1;
+        } else {
+            twoYAxis = 0;
+        }
+        final int graphWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight());
+        final int graphHeight = getHeight() - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
+        Rectangle graphArea = new Rectangle(ChartConstants.getGraphLeftSpace(), ChartConstants.getGraphTopSpace(), graphWidth, graphHeight);
+        Rectangle plotArea = new Rectangle(0, 0, graphWidth, graphHeight);
+        Rectangle leftAxisArea = new Rectangle(0, ChartConstants.getGraphTopSpace(), ChartConstants.getGraphLeftSpace(), graphHeight - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
+        drawController.setGraphInformation(graphArea, plotArea, leftAxisArea);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -824,11 +831,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
