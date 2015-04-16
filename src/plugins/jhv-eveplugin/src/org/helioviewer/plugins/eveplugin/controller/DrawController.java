@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.controller;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -45,6 +46,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Dimension chartDimension;
     private final List<TimingListener> tListeners;
     private boolean keepFullValueRange;
+    private Rectangle graphArea;
+    private Rectangle plotArea;
+    private Rectangle leftAxisArea;
+    private final List<GraphDimensionListener> gdListeners;
 
     private DrawController() {
         drawControllerData = new DrawControllerData();
@@ -55,6 +60,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         keepFullValueRange = false;
         pas = PlotAreaSpace.getSingletonInstance();
         pas.addPlotAreaSpaceListener(this);
+        gdListeners = new ArrayList<GraphDimensionListener>();
     }
 
     public static DrawController getSingletonInstance() {
@@ -67,6 +73,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
         drawControllerData.removeDrawControllerListener(listener);
+    }
+
+    public void addGraphDimensionListener(GraphDimensionListener l) {
+        gdListeners.add(l);
     }
 
     public void addTimingListener(TimingListener listener) {
@@ -410,5 +420,31 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public PlotAreaSpace getPlotAreaSpace() {
         return pas;
+    }
+
+    public void setGraphInformation(Rectangle graphArea, Rectangle plotArea, Rectangle leftAxisArea) {
+        this.graphArea = graphArea;
+        this.plotArea = plotArea;
+        this.leftAxisArea = leftAxisArea;
+        fireGraphDimensionsChanged();
+        fireRedrawRequest();
+    }
+
+    private void fireGraphDimensionsChanged() {
+        for (GraphDimensionListener l : gdListeners) {
+            l.graphDimensionChanged();
+        }
+    }
+
+    public Rectangle getPlotArea() {
+        return plotArea;
+    }
+
+    public Rectangle getGraphArea() {
+        return graphArea;
+    }
+
+    public Rectangle getLeftAxisArea() {
+        return leftAxisArea;
     }
 }
