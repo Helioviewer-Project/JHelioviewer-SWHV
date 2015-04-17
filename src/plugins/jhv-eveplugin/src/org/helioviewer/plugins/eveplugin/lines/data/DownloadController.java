@@ -98,32 +98,14 @@ public class DownloadController {
             return;
         }
         // Interval<Date> realQueryInterval =
-        // extendQueryInterval(queryInterval);
+        Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
 
         // get all intervals within query interval where data is missing
-        LinkedList<Interval<Date>> intervals = getIntervals(band, queryInterval);
+        LinkedList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
 
         if (intervals == null) {
             // there is no interval where data is missing
             return;
-        }
-
-        if (intervals == null) {
-            // there is no interval where data is missing
-            return;
-        }
-
-        // check if intervals are in download queues already
-        synchronized (lock) {
-            final LinkedList<Interval<Date>> list = downloadMap.get(band);
-
-            if (list != null) {
-                for (int i = intervals.size() - 1; i >= 0; --i) {
-                    if (list.contains(intervals.get(i))) {
-                        intervals.remove(i);
-                    }
-                }
-            }
         }
 
         if (intervals.size() == 0) {
@@ -150,8 +132,13 @@ public class DownloadController {
     }
 
     private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
-        // TODO Auto-generated method stub
-        return null;
+        GregorianCalendar cs = new GregorianCalendar();
+        cs.setTime(queryInterval.getStart());
+        cs.add(Calendar.DAY_OF_MONTH, -7);
+        GregorianCalendar ce = new GregorianCalendar();
+        ce.setTime(queryInterval.getEnd());
+        ce.add(Calendar.DAY_OF_MONTH, +7);
+        return new Interval<Date>(cs.getTime(), ce.getTime());
     }
 
     private LinkedList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
