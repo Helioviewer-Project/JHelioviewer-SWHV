@@ -39,7 +39,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.MetaDataView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -180,11 +180,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            Source to read
      * @see #addDataItem(String)
      */
-    public void setMetaData(MetaDataView metaDataView) {
-        if (metaDataView == null)
+    public void setMetaData(View v) {
+        if (v == null)
             return;
 
-        MetaData metaData = metaDataView.getMetaData();
+        MetaData metaData = v.getMetaData();
 
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
@@ -205,15 +205,15 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("Time        : " + m.getDateTime().getFormattedTime());
 
             String xmlText = null;
-            if (metaDataView instanceof JHVJP2View) {
-                JP2Image img = ((JHVJP2View) metaDataView).getJP2Image();
+            if (v instanceof JHVJP2View) {
+                JP2Image img = ((JHVJP2View) v).getJP2Image();
 
                 int boxNumber = 1;
-                if (metaDataView instanceof JHVJPXView) {
-                    if (((JHVJPXView) metaDataView).getMaximumAccessibleFrameNumber() < 0) {
+                if (v instanceof JHVJPXView) {
+                    if (((JHVJPXView) v).getMaximumAccessibleFrameNumber() < 0) {
                         return;
                     }
-                    boxNumber = ((JHVJPXView) metaDataView).getCurrentFrameNumber() + 1;
+                    boxNumber = ((JHVJPXView) v).getCurrentFrameNumber() + 1;
                 }
 
                 try {
@@ -221,8 +221,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
                 } catch (JHV_KduException e) {
                     e.printStackTrace();
                 }
-            } else if (metaDataView instanceof JHVFITSView) {
-                xmlText = ((JHVFITSView) metaDataView).getHeaderAsXML();
+            } else if (v instanceof JHVFITSView) {
+                xmlText = ((JHVFITSView) v).getHeaderAsXML();
             }
 
             if (xmlText != null) {

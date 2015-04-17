@@ -43,7 +43,7 @@ public class ZoomFitAction extends AbstractAction {
         if (zoomController == null) {
             zoomController = new ZoomController();
         }
-        zoomController.zoomFit(Displayer.getLayersModel().getActiveView(), Displayer.getLayersModel().getActiveView());
+        zoomController.zoomFit(Displayer.getLayersModel().getActiveView());
     }
 
 }

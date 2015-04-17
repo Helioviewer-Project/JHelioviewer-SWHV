@@ -9,8 +9,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -173,29 +172,15 @@ public class ZoomController {
     /**
      * Zooms the image in such a way, that the whole region given by the
      * metaData fits exactly into the viewport.
-     *
-     * @param metaDataView
-     *            MetaDataView of the layer which should be fit into the
-     *            viewport
-     * @param regionView
-     *            RegionView which is used to set the new region
      */
-    public void zoomFit(MetaDataView metaDataView, RegionView regionView) {
-        if (metaDataView != null && regionView != null) {
-            Region region = metaDataView.getMetaData().getPhysicalRegion();
+    public void zoomFit(View v) {
+        if (v != null) {
+            Region region = v.getMetaData().getPhysicalRegion();
             GL3DVec2d size = region.getSize();
             GL3DVec2d lowerLeft = region.getLowerLeftCorner();
             region = StaticRegion.createAdaptedRegion(lowerLeft, size);
-            regionView.setRegion(region);
+            v.setRegion(region);
         }
-    }
-
-    /**
-     * Convenience method. Fits the active layer of the main view chain into the
-     * main viewport.
-     */
-    public void zoomFit() {
-        zoomFit(Displayer.getLayersModel().getActiveView(), Displayer.getLayersModel().getActiveView());
     }
 
 }
