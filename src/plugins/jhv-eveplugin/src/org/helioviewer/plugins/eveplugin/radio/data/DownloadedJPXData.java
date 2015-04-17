@@ -6,7 +6,6 @@ import java.util.Date;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -14,10 +13,9 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewListener;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 
-public class DownloadedJPXData implements ViewListener {
+public class DownloadedJPXData {
     private ImageInfoView view;
     private Long imageID;
     private Date startDate;
@@ -35,7 +33,6 @@ public class DownloadedJPXData implements ViewListener {
         this.endDate = endDate;
         radioDataManager = RadioDataManager.getSingletonInstance();
         this.downloadID = downloadID;
-        view.addViewListener(this);
         workernumber = 0;
     }
 
@@ -71,8 +68,7 @@ public class DownloadedJPXData implements ViewListener {
         this.endDate = endDate;
     }
 
-    @Override
-    public void viewChanged(final View sender, final ChangeEvent aEvent) {
+    public void viewChanged(final View sender) {
         DownloadedJPXDataWorkerResult result = getJPXData(sender);
         if (result != null) {
             radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
@@ -126,7 +122,6 @@ public class DownloadedJPXData implements ViewListener {
             worker = null;
         }
         if (view != null) {
-            view.removeViewListener(this);
             ((JHVJP2CallistoView) view).abolish();
         }
         view = null;
