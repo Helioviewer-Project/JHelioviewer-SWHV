@@ -269,7 +269,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                } finally {
                 }
             }
         }, "LoadNewImage");

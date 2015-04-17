@@ -306,7 +306,6 @@ public class JavaHelioViewerLauncher {
             }
         }, "JavaHelioviewerstdout");
         Thread threadStderr = new Thread(new Runnable() {
-            // @Override
             @Override
             public void run() {
                 try {
