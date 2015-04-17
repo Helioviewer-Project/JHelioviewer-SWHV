@@ -8,8 +8,8 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_region_compositor;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;

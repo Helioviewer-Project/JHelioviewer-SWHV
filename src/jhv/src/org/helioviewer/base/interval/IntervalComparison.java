@@ -1,4 +1,4 @@
-package org.helioviewer.base.math;
+package org.helioviewer.base.interval;
 
 /**
  * This Interface defines methods needed for camparison of intervals.

@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.gui.controller;
 
+import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainImagePanel;

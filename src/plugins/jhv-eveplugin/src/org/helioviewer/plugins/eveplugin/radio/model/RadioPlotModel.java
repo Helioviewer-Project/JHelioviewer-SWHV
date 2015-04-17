@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;

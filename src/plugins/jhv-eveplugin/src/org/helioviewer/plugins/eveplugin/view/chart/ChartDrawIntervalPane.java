@@ -23,8 +23,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;

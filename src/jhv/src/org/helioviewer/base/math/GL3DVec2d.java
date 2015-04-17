@@ -1,7 +1,6 @@
-package org.helioviewer.gl3d.math;
+package org.helioviewer.base.math;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Vector2dInt;
 
 public class GL3DVec2d {
     /**

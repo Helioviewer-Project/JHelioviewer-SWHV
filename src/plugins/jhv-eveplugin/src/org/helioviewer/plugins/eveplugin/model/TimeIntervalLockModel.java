@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
 import org.helioviewer.plugins.eveplugin.controller.TimingListener;

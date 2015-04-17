@@ -5,7 +5,7 @@ import java.util.Date;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 

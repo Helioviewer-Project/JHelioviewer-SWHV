@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;

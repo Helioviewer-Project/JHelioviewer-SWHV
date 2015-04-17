@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek.request;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 /**
  * Interface needs to be implemented by every class interested in requests for

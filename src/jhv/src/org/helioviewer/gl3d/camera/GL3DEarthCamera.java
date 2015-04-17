@@ -2,10 +2,10 @@ package org.helioviewer.gl3d.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.math.GL3DQuatd;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
-import org.helioviewer.gl3d.math.GL3DQuatd;
-import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 

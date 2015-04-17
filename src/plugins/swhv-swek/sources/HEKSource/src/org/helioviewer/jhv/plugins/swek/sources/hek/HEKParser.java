@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -824,8 +825,8 @@ public class HEKParser implements SWEKParser {
     }
 
     public JHVPoint convertHGSJHV2D(JHVPoint el, HEKEvent evt) {
-        double theta = el.getCoordinate2() / 180. * Math.PI;
-        double phi = el.getCoordinate1() / 180. * Math.PI;
+        double theta = el.getCoordinate2() / MathUtils.radeg;
+        double phi = el.getCoordinate1() / MathUtils.radeg;
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
@@ -833,8 +834,8 @@ public class HEKParser implements SWEKParser {
     }
 
     public JHVPoint convertHGSJHV(JHVPoint el, HEKEvent evt) {
-        double theta = el.getCoordinate2() / 180. * Math.PI;
-        double phi = el.getCoordinate1() / 180. * Math.PI - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        double theta = el.getCoordinate2() / MathUtils.radeg;
+        double phi = el.getCoordinate1() / MathUtils.radeg - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);

@@ -15,7 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.plugins.eveplugin.view.periodpicker.PeriodPickerDialog.PeriodPickerDialogResult;

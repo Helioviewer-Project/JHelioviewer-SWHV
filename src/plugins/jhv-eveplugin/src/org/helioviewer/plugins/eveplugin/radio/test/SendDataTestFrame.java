@@ -18,8 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDataManagerListener;

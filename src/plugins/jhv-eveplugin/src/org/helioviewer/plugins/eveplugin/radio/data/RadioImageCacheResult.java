@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 public class RadioImageCacheResult {
     private List<DownloadedJPXData> availableData;

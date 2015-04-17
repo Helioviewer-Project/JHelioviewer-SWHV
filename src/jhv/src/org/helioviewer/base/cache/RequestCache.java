@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 public class RequestCache {
     private final Map<Date, Interval<Date>> requestCache;

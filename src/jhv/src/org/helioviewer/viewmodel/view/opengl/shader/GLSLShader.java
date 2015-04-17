@@ -5,7 +5,7 @@ import java.io.InputStream;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.FileUtils;
-import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 
 public class GLSLShader {

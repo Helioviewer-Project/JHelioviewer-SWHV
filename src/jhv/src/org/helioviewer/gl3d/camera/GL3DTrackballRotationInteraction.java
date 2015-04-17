@@ -2,8 +2,8 @@ package org.helioviewer.gl3d.camera;
 
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.gl3d.math.GL3DQuatd;
-import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.base.math.GL3DQuatd;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 
 /**

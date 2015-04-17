@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;

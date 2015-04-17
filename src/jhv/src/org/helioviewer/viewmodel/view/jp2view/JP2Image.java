@@ -21,8 +21,8 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_tile;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.MetaData;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 public class JHVEventCacheResult {

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 /**
  * Contains the configuration of an interval with no data used in the

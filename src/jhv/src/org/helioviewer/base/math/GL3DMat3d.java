@@ -1,9 +1,9 @@
-package org.helioviewer.gl3d.math;
+package org.helioviewer.base.math;
 
 public class GL3DMat3d {
     private final double[] m = new double[9];/*
-                                              * / 0 3 6 \ | 1 4 7 | \ 2 5 8 /
-                                              */
+     * / 0 3 6 \ | 1 4 7 | \ 2 5 8 /
+     */
 
     public GL3DMat3d() {
         this.identity();
@@ -77,7 +77,7 @@ public class GL3DMat3d {
     }
 
     public GL3DMat3d rotation(double degAng, double axisx, double axisy, double axisz) {
-        double radAng = degAng * Math.PI / 180.;
+        double radAng = degAng / MathUtils.radeg;
 
         double ca = Math.cos(radAng);
         double sa = Math.sin(radAng);

@@ -13,10 +13,10 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;

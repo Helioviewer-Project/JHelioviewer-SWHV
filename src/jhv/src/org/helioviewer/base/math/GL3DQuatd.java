@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.math;
+package org.helioviewer.base.math;
 
 public class GL3DQuatd {
     public static final double EPSILON = 0.000001;

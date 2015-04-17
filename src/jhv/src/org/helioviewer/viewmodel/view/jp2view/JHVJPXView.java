@@ -2,7 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
