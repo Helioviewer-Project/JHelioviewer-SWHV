@@ -39,69 +39,53 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
-
-        ChangeEvent changeEvent = null;
         lock.lock();
         try {
-            if (imageStatus[compositionLayer] == newStatus)
+            if (imageStatus[compositionLayer] == newStatus) {
                 return;
+            }
 
             // PARTIAL
             if (compositionLayer >= imagePartialUntil && newStatus == CacheStatus.PARTIAL && imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
-
                 imageStatus[compositionLayer] = CacheStatus.PARTIAL;
 
                 int tempImagePartialUntil = 0;
                 while (tempImagePartialUntil <= parent.getMaximumFrameNumber() && (imageStatus[tempImagePartialUntil] == CacheStatus.PARTIAL || imageStatus[tempImagePartialUntil] == CacheStatus.COMPLETE)) {
-
                     tempImagePartialUntil++;
                 }
                 tempImagePartialUntil--;
 
                 if (tempImagePartialUntil > imagePartialUntil) {
-
                     imagePartialUntil = tempImagePartialUntil;
 
-                    changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
+                    ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
                     UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
-
                 }
-
-                // COMPLETE
+            // COMPLETE
             } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
-
                 imageStatus[compositionLayer] = CacheStatus.COMPLETE;
 
                 int tempImageCompleteUntil = 0;
                 while (tempImageCompleteUntil <= parent.getMaximumFrameNumber() && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
-
                     tempImageCompleteUntil++;
                 }
                 tempImageCompleteUntil--;
 
                 if (tempImageCompleteUntil > imageCompleteUntil) {
-
                     imageCompleteUntil = tempImageCompleteUntil;
-
                     if (imagePartialUntil < imageCompleteUntil) {
                         imagePartialUntil = imageCompleteUntil;
                     }
 
-                    changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
+                    ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
                     UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
-
                 }
-
-                // HEADER
+            // HEADER
             } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
-
                 imageStatus[compositionLayer] = CacheStatus.HEADER;
             }
         } finally {
             lock.unlock();
-        }
-        if (changeEvent != null) {
-            parent.fireChangeEvent(changeEvent);
         }
     }
 
@@ -110,7 +94,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public void downgradeImageStatus(int compositionLayer) {
-        ChangeEvent changeEvent = null;
         lock.lock();
         try {
             if (imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
@@ -121,7 +104,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
             int tempImageCompleteUntil = 0;
             while (tempImageCompleteUntil <= parent.getMaximumFrameNumber() && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
-
                 tempImageCompleteUntil++;
             }
 
@@ -130,17 +112,13 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
             }
 
             if (tempImageCompleteUntil < imageCompleteUntil) {
-
                 imageCompleteUntil = tempImageCompleteUntil;
 
-                changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
+                ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
                 UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
             }
         } finally {
             lock.unlock();
-        }
-        if (changeEvent != null) {
-            parent.fireChangeEvent(changeEvent);
         }
     }
 
@@ -149,13 +127,10 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public CacheStatus getImageStatus(int compositionLayer) {
-        CacheStatus res = null;
         lock.lock();
-        try {
-            res = imageStatus[compositionLayer];
-        } finally {
-            lock.unlock();
-        }
+        CacheStatus res = imageStatus[compositionLayer];
+        lock.unlock();
+
         return res;
     }
 
@@ -174,4 +149,5 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     public int getImageCachedCompletelyUntil() {
         return imageCompleteUntil;
     }
+
 }
