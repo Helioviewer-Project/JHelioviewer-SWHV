@@ -15,7 +15,9 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
@@ -47,7 +49,6 @@ import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
@@ -526,31 +527,27 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
-        ViewportImageSize imageViewportDimension = ViewHelper.calculateViewportImageSize(r);
         MetaData metaData = jp2Image.metaDataList[frameNumber];
+        int h = 512;
+        int w = 512;
+        if (GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
+            GL3DCamera cam = GL3DState.get().getActiveCamera();
+            h = (int) (r.getHeight() / (cam.getCameraWidth() * 2.) * GL3DState.get().getViewportHeight() * 2);
+            w = (int) (r.getWidth() / (cam.getCameraWidth() * 2.) * GL3DState.get().getViewportHeight() * 2);
+        }
 
-        // calculate total resolution of the image necessary to
-        // have the requested resolution in the subimage
-
-        double rWidth = r.getWidth();
-        double rHeight = r.getHeight();
-        double iWidth = imageViewportDimension.getWidth();
-        double iHeight = imageViewportDimension.getHeight();
-
-        int totalWidth = (int) Math.round(iWidth * metaData.getPhysicalImageWidth() / rWidth);
-        int totalHeight = (int) Math.round(iHeight * metaData.getPhysicalImageHeight() / rHeight);
-
-        // get corresponding resolution level
+        int totalHeight = (int) (h * metaData.getPhysicalImageWidth() / r.getWidth());
+        int totalWidth = (int) (w * metaData.getPhysicalImageWidth() / r.getWidth());
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
         double imageMeterPerPixel = metaData.getPhysicalImageWidth() / res.getResolutionBounds().getWidth();
-        int imageWidth = (int) Math.round(rWidth / imageMeterPerPixel);
-        int imageHeight = (int) Math.round(rHeight / imageMeterPerPixel);
+
+        int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
+        int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
 
         Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
 
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
-
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
     }
 
