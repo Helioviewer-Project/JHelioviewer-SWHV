@@ -395,9 +395,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                         dispose();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } finally {
                     }
-
                 }
 
             }, "OpenRemoteFile1");
@@ -469,9 +467,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
                         }
                     } catch (IOException e) {
-
                         JOptionPane.showMessageDialog(buttonShow, e.getMessage(), "File not found on streaming server!", JOptionPane.ERROR_MESSAGE);
-
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } finally {
@@ -504,4 +500,5 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     @Override
     public void init() {
     }
+
 }

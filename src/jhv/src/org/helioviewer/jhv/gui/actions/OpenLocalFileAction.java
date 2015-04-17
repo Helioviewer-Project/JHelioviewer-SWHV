@@ -65,27 +65,24 @@ public class OpenLocalFileAction extends AbstractAction {
             File selectedFile = fileChooser.getSelectedFile();
 
             if (selectedFile.exists() && selectedFile.isFile()) {
-
                 // remember the current directory for future
                 Settings.getSingletonInstance().setProperty("default.local.path", fileChooser.getSelectedFile().getParent());
                 Settings.getSingletonInstance().save();
 
                 // Load image in new thread
                 Thread thread = new Thread(new Runnable() {
-
                     @Override
                     public void run() {
                         try {
                             APIRequestManager.newLoad(fileChooser.getSelectedFile().toURI(), true, null);
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
-                        } finally {
                         }
                     }
                 }, "OpenLocalFile");
-
                 thread.start();
             }
         }
     }
+
 }
