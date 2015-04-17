@@ -76,7 +76,6 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void addMouseListener(MouseListener l) {
-
         if (!Arrays.asList(renderedImageComponent.getMouseListeners()).contains(l)) {
             renderedImageComponent.addMouseListener(l);
         }
@@ -103,8 +102,7 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void removeMouseListener(MouseListener l) {
-        if (renderedImageComponent != null)
-            renderedImageComponent.removeMouseListener(l);
+        renderedImageComponent.removeMouseListener(l);
     }
 
     /**
@@ -120,8 +118,7 @@ public class BasicImagePanel extends JPanel {
      */
     @Override
     public void removeMouseWheelListener(MouseWheelListener l) {
-        if (renderedImageComponent != null)
-            renderedImageComponent.removeMouseWheelListener(l);
+        renderedImageComponent.removeMouseWheelListener(l);
     }
 
     /**
