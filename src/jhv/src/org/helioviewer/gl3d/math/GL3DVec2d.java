@@ -1,12 +1,15 @@
 package org.helioviewer.gl3d.math;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.math.Vector2dInt;
 
 public class GL3DVec2d {
     /**
      * Predefined Vectors
      */
     public static final GL3DVec2d ZERO = new GL3DVec2d(0.0, 0.0);
+    public static final GL3DVec2d NEGATIVE_INFINITY_VECTOR = new GL3DVec2d(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+    public static final GL3DVec2d POSITIVE_INFINITY_VECTOR = new GL3DVec2d(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
     /**
      * Coordinates
@@ -36,6 +39,10 @@ public class GL3DVec2d {
         }
         this.x = coordinates[0];
         this.y = coordinates[1];
+    }
+
+    public GL3DVec2d(Vector2dInt newLowerLeftCorner) {
+        this(newLowerLeftCorner.getX(), newLowerLeftCorner.getY());
     }
 
     public void add(GL3DVec2d vec) {
@@ -194,12 +201,14 @@ public class GL3DVec2d {
         return new double[] { x, y };
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof GL3DVec2d)
             return isApproxEqual((GL3DVec2d) o, 0.0);
         return false;
     }
 
+    @Override
     public Object clone() {
         return new GL3DVec2d(this);
     }
@@ -214,8 +223,41 @@ public class GL3DVec2d {
         return arr;
     }
 
+    @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
 
+    public static GL3DVec2d scale(GL3DVec2d vec, double scale) {
+        return new GL3DVec2d(vec.x * scale, vec.y * scale);
+    }
+
+    public static GL3DVec2d scale(GL3DVec2d vec, GL3DVec2d scale) {
+        return new GL3DVec2d(vec.x * scale.x, vec.y * scale.y);
+    }
+
+    public static GL3DVec2d invertedScale(GL3DVec2d vec, GL3DVec2d scale) {
+        return new GL3DVec2d(vec.x / scale.x, vec.y / scale.y);
+
+    }
+
+    public GL3DVec2d getYVector() {
+        return new GL3DVec2d(0., this.y);
+    }
+
+    public GL3DVec2d getXVector() {
+        return new GL3DVec2d(this.x, 0.);
+    }
+
+    public static GL3DVec2d crop(GL3DVec2d v, GL3DVec2d min, GL3DVec2d max) {
+        return new GL3DVec2d(Math.min(max.x, Math.max(min.x, v.x)), Math.min(max.x, Math.max(min.x, v.y)));
+    }
+
+    public static GL3DVec2d componentMin(final GL3DVec2d v1, final GL3DVec2d v2) {
+        return new GL3DVec2d(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y));
+    }
+
+    public static GL3DVec2d componentMax(final GL3DVec2d v1, final GL3DVec2d v2) {
+        return new GL3DVec2d(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
+    }
 }

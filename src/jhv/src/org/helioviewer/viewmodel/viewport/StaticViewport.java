@@ -27,7 +27,7 @@ public class StaticViewport implements BasicViewport {
      * Constructor where to pass the viewport information as a vector.
      * 
      * @param newSizeVector
-     *            Vector2dDouble object which describes the size of the
+     *            GL3DVec2d object which describes the size of the
      *            viewport.
      * */
     public StaticViewport(final Vector2dInt newSizeVector) {
@@ -52,7 +52,7 @@ public class StaticViewport implements BasicViewport {
      * information.
      * 
      * @param newSizeVector
-     *            Vector2dDouble object which describes the size of the
+     *            GL3DVec2d object which describes the size of the
      *            viewport.
      * */
     public static Viewport createAdaptedViewport(final Vector2dInt newSizeVector) {

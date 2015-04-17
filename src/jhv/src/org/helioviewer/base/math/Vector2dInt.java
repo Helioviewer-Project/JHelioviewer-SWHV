@@ -2,6 +2,8 @@ package org.helioviewer.base.math;
 
 import java.awt.Point;
 
+import org.helioviewer.gl3d.math.GL3DVec2d;
+
 /**
  * A class for two dimensional vectors with integer coordinates. Instances of
  * Vector2dInt are immutable.
@@ -39,9 +41,9 @@ public final class Vector2dInt {
         y = v.y;
     }
 
-    public Vector2dInt(final Vector2dDouble v) {
-        x = (int) Math.round(v.getX());
-        y = (int) Math.round(v.getY());
+    public Vector2dInt(final GL3DVec2d v) {
+        x = (int) Math.round(v.x);
+        y = (int) Math.round(v.y);
     }
 
     public int getX() {

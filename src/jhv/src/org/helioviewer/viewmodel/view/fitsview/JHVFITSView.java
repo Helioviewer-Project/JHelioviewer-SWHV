@@ -104,7 +104,7 @@ public class JHVFITSView implements RegionView, SubimageDataView, ImageInfoView,
         }
         subImageData.setMETADATA(m);
 
-        region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().getX(), m.getPhysicalLowerLeft().getY(), m.getPhysicalImageSize().getX(), m.getPhysicalImageSize().getY());
+        region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalImageSize().x, m.getPhysicalImageSize().y);
         viewport = StaticViewport.createAdaptedViewport(100, 100);
     }
 

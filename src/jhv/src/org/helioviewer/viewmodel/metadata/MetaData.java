@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.math.RectangleDouble;
-import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -27,7 +27,7 @@ public interface MetaData {
      *
      * @return Physical image size
      */
-    public Vector2dDouble getPhysicalImageSize();
+    public GL3DVec2d getPhysicalImageSize();
 
     /**
      * Returns the physical position of the lower left corner of the
@@ -35,7 +35,7 @@ public interface MetaData {
      *
      * @return Physical position of the lower left corner
      */
-    public Vector2dDouble getPhysicalLowerLeft();
+    public GL3DVec2d getPhysicalLowerLeft();
 
     /**
      * Returns the physical image width of the corresponding image.
@@ -57,7 +57,7 @@ public interface MetaData {
      *
      * @return Physical position of the upper left corner
      */
-    public Vector2dDouble getPhysicalUpperLeft();
+    public GL3DVec2d getPhysicalUpperLeft();
 
     /**
      * Returns the physical position of the lower right corner of the
@@ -65,7 +65,7 @@ public interface MetaData {
      *
      * @return Physical position of the lower right corner
      */
-    public Vector2dDouble getPhysicalLowerRight();
+    public GL3DVec2d getPhysicalLowerRight();
 
     /**
      * Returns the physical position of the upper right corner of the
@@ -73,7 +73,7 @@ public interface MetaData {
      *
      * @return Physical position of the upper right corner
      */
-    public Vector2dDouble getPhysicalUpperRight();
+    public GL3DVec2d getPhysicalUpperRight();
 
     /**
      * Returns the complete physical rectangle of the corresponding image.
