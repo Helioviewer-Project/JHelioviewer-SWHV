@@ -1,14 +1,10 @@
 package org.helioviewer.base.math;
 
 import java.awt.Point;
-import java.util.Locale;
 
 /**
  * A class for two dimensional vectors with integer coordinates. Instances of
  * Vector2dInt are immutable.
- *
- * The restriction to integer coordinates might lead to overflows in some
- * calculations. Consider using Vector2dDouble or Vector2dLong instead.
  *
  * @author Ludwig Schmidt
  *
@@ -192,6 +188,7 @@ public final class Vector2dInt {
 
     @Override
     public String toString() {
-        return String.format(Locale.ENGLISH, "(%d,%d)", x, y);
+        return String.format("(%d,%d)", x, y);
     }
+
 }
