@@ -21,6 +21,9 @@ public class UIViewListenerDistributor {
     private final static UIViewListenerDistributor singletonObject = new UIViewListenerDistributor();
     private final ArrayList<UIViewListener> listeners = new ArrayList<UIViewListener>();
 
+    private UIViewListenerDistributor() {
+    }
+
     /**
      * Returns the only instance of this class.
      *
@@ -73,9 +76,7 @@ public class UIViewListenerDistributor {
      *            event which contains the associated reasons.
      */
     public void viewChanged(View sender, ChangeEvent aEvent) {
-
-        if (!aEvent.hasReasons()) {
-        } else {
+        if (aEvent.hasReasons()) {
             for (UIViewListener listener : listeners) {
                 listener.UIviewChanged(sender, aEvent);
             }
