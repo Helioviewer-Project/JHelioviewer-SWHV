@@ -139,7 +139,7 @@ public final class ViewHelper {
         screenMeterPerPixel = r.getHeight() / viewportheight;
         screenSubImageHeight = viewportheight;
         screenSubImageWidth = r.getWidth() / screenMeterPerPixel;
-
+        System.out.println("SIW" + screenSubImageWidth + " " + screenSubImageHeight);
         return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
     }
 

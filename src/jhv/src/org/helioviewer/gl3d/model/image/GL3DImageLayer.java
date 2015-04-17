@@ -94,7 +94,7 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public void init(GL3DState state) {
-        Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(1);
+        Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
@@ -136,8 +136,8 @@ public class GL3DImageLayer implements Renderable {
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.1);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.1);
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.0);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.0);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
@@ -187,7 +187,6 @@ public class GL3DImageLayer implements Renderable {
         if (!this.isVisible)
             return;
         GL2 gl = state.gl;
-
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         GLSLShader.bind(gl);
@@ -230,6 +229,7 @@ public class GL3DImageLayer implements Renderable {
                     if (this.showCorona) {
                         gl.glDepthRange(1.f, 1.f);
                         gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+
                         gl.glDepthRange(0.f, 1.f);
                     }
                     if (this.showSphere) {
@@ -339,7 +339,10 @@ public class GL3DImageLayer implements Renderable {
         faceIndices.add(beginPositionNumberCorona + 3);
         FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.size());
         for (Float vert : vertices) {
+            if (vert == 0f)
+                vert = Math.nextAfter(vert, vert + 1.0f);
             positionBuffer.put(vert);
+
         }
         positionBuffer.flip();
         IntBuffer indexBuffer = IntBuffer.allocate(faceIndices.size());

@@ -264,7 +264,7 @@ public class ImageViewerGui {
         minSize.width = Math.min(minSize.width, maxSize.width);
         minSize.height = Math.min(minSize.height, maxSize.height);
         frame.setMinimumSize(minSize);
-        frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
+        frame.setPreferredSize(new Dimension(1024, 1024));
         enableFullScreen(frame);
         frame.setFont(new Font("SansSerif", Font.BOLD, 12));
         return frame;
