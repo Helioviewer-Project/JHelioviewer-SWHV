@@ -28,7 +28,7 @@ public class StaticViewportImageSize implements BasicViewportImageSize {
      * Constructor where to pass the viewport information as a vector.
      * 
      * @param newSizeVector
-     *            Vector2dDouble object which describes the size of the image
+     *            GL3DVec2d object which describes the size of the image
      *            inside the viewport.
      * */
     public StaticViewportImageSize(final Vector2dInt newSizeVector) {
@@ -60,7 +60,7 @@ public class StaticViewportImageSize implements BasicViewportImageSize {
      * information.
      * 
      * @param newSizeVector
-     *            Vector2dDouble object which describes the size of the image
+     *            GL3DVec2d object which describes the size of the image
      *            inside the viewport.
      * */
     public static ViewportImageSize createAdaptedViewportImageSize(final Vector2dInt newSizeVector) {

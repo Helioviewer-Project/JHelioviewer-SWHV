@@ -992,8 +992,8 @@ public class JHVJP2View implements JP2View, RegionView, MetaDataView, SubimageDa
         ImageData image = this.getSubimageData();
         Region region = image.getRegion();
 
-        double xOffset = region.getLowerLeftCorner().getX();
-        double yOffset = region.getLowerLeftCorner().getY();
+        double xOffset = region.getLowerLeftCorner().x;
+        double yOffset = region.getLowerLeftCorner().y;
         double xScale = 1. / region.getWidth();
         double yScale = 1. / region.getHeight();
         Date dt = new Date(image.getDateMillis());
@@ -1025,8 +1025,8 @@ public class JHVJP2View implements JP2View, RegionView, MetaDataView, SubimageDa
         }
 
         if (diffMode) {
-            double diffXOffset = diffRegion.getLowerLeftCorner().getX();
-            double diffYOffset = diffRegion.getLowerLeftCorner().getY();
+            double diffXOffset = diffRegion.getLowerLeftCorner().x;
+            double diffYOffset = diffRegion.getLowerLeftCorner().y;
             double diffXScale = 1. / diffRegion.getWidth();
             double diffYScale = 1. / diffRegion.getHeight();
 

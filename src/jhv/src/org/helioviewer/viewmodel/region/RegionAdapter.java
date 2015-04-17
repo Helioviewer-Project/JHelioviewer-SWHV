@@ -1,11 +1,11 @@
 package org.helioviewer.viewmodel.region;
 
 import org.helioviewer.base.math.RectangleDouble;
-import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 
 /**
  * Implementation of {@link Region}.
- * 
+ *
  * @author Ludwig Schmidt
  * */
 public class RegionAdapter implements Region {
@@ -14,7 +14,7 @@ public class RegionAdapter implements Region {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param newRegion
      *            BasicRegion object which holds the minimal region description.
      * */
@@ -25,48 +25,55 @@ public class RegionAdapter implements Region {
     /**
      * {@inheritDoc}
      * */
+    @Override
     public double getCornerX() {
-        return region.getLowerLeftCorner().getX();
+        return region.getLowerLeftCorner().x;
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public double getCornerY() {
-        return region.getLowerLeftCorner().getY();
+        return region.getLowerLeftCorner().y;
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public double getHeight() {
-        return region.getSize().getY();
+        return region.getSize().y;
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public double getWidth() {
-        return region.getSize().getX();
+        return region.getSize().x;
     }
 
     /**
      * {@inheritDoc}
      * */
-    public Vector2dDouble getLowerLeftCorner() {
+    @Override
+    public GL3DVec2d getLowerLeftCorner() {
         return region.getLowerLeftCorner();
     }
 
     /**
      * {@inheritDoc}
      * */
-    public Vector2dDouble getSize() {
+    @Override
+    public GL3DVec2d getSize() {
         return region.getSize();
     }
 
     /**
      * {@inheritDoc}
      * */
+    @Override
     public RectangleDouble getRectangle() {
         return new RectangleDouble(region.getLowerLeftCorner(), region.getSize());
     }
@@ -74,27 +81,31 @@ public class RegionAdapter implements Region {
     /**
      * {@inheritDoc}
      * */
-    public Vector2dDouble getLowerRightCorner() {
-        return region.getLowerLeftCorner().add(region.getSize().getXVector());
+    @Override
+    public GL3DVec2d getLowerRightCorner() {
+        return GL3DVec2d.add(region.getLowerLeftCorner(), region.getSize().getXVector());
     }
 
     /**
      * {@inheritDoc}
      * */
-    public Vector2dDouble getUpperLeftCorner() {
-        return region.getLowerLeftCorner().add(region.getSize().getYVector());
+    @Override
+    public GL3DVec2d getUpperLeftCorner() {
+        return GL3DVec2d.add(region.getLowerLeftCorner(), region.getSize().getYVector());
     }
 
     /**
      * {@inheritDoc}
      * */
-    public Vector2dDouble getUpperRightCorner() {
-        return region.getLowerLeftCorner().add(region.getSize());
+    @Override
+    public GL3DVec2d getUpperRightCorner() {
+        return GL3DVec2d.add(region.getLowerLeftCorner(), region.getSize());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Region)) {
             return false;
@@ -109,6 +120,7 @@ public class RegionAdapter implements Region {
      * {@inheritDoc}
      */
 
+    @Override
     public String toString() {
         return "[RegionAdapter: Rectangle " + this.getRectangle() + "]";
     }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.Pair;
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DMat4d;
@@ -143,10 +142,10 @@ public class GL3DImageLayer implements Renderable {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        double metLLX = metaData.getPhysicalLowerLeft().getX();
-        double metLLY = metaData.getPhysicalLowerLeft().getY();
-        double metURX = metaData.getPhysicalUpperRight().getX();
-        double metURY = metaData.getPhysicalUpperRight().getY();
+        double metLLX = metaData.getPhysicalLowerLeft().x;
+        double metLLY = metaData.getPhysicalLowerLeft().y;
+        double metURX = metaData.getPhysicalUpperRight().x;
+        double metURY = metaData.getPhysicalUpperRight().y;
 
         if (minPhysicalX < metLLX)
             minPhysicalX = metLLX;
@@ -219,9 +218,6 @@ public class GL3DImageLayer implements Renderable {
                     GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()), "diffcameraDifferenceRotationQuat");
                 }
 
-                Vector2dDouble ll = jp2view.getMetaData().getPhysicalLowerLeft();
-                ll.getX();
-                ll.getY();
                 enablePositionVBO(state);
                 enableIndexVBO(state);
                 {

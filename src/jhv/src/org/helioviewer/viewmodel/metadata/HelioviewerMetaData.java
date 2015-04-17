@@ -2,11 +2,11 @@ package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.math.GL3DQuatd;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -46,11 +46,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String fullName = "";
 
     private Vector2dInt pixelImageSize = new Vector2dInt();
-    private Vector2dDouble sunPixelPosition = new Vector2dDouble();
+    private GL3DVec2d sunPixelPosition = new GL3DVec2d();
 
     private double meterPerPixel;
     private GL3DQuatd localRotation;
-    private Vector2dDouble sunPixelPositionImage = new Vector2dDouble();
+    private GL3DVec2d sunPixelPositionImage = new GL3DVec2d();
 
     /**
      * Default constructor.
@@ -76,8 +76,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         updatePosition(m);
         updatePixelParameters(m);
 
-        setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
-        setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
+        setPhysicalLowerLeftCorner(GL3DVec2d.scale(sunPixelPosition, -meterPerPixel));
+        setPhysicalImageSize(new GL3DVec2d(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
         measurement = m.get("WAVELNTH");
         if (measurement == null) {
             measurement = "" + m.tryGetInt("WAVELNTH");
@@ -186,21 +186,21 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         double allowedCenterPixelDistance = 1.;
         double sunX = m.tryGetDouble("CRPIX1") - 1;
         double sunY = m.tryGetDouble("CRPIX2") - 1;
-        double dX = sunPixelPosition.getX() - sunX;
-        double dY = sunPixelPosition.getY() - sunY;
+        double dX = sunPixelPosition.x - sunX;
+        double dY = sunPixelPosition.y - sunY;
 
         if (dX * dX + dY * dY > allowedCenterPixelDistance * allowedCenterPixelDistance) {
-            sunPixelPosition = new Vector2dDouble(sunX, sunY);
-            sunPixelPositionImage = new Vector2dDouble(sunX, pixelImageHeight - 1 - sunY);
+            sunPixelPosition = new GL3DVec2d(sunX, sunY);
+            sunPixelPositionImage = new GL3DVec2d(sunX, pixelImageHeight - 1 - sunY);
         }
 
         meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
-        setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
-        setPhysicalImageSize(new Vector2dDouble(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
+        setPhysicalLowerLeftCorner(GL3DVec2d.scale(sunPixelPosition, -meterPerPixel));
+        setPhysicalImageSize(new GL3DVec2d(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
+        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.x) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.y) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
     }
 
     private void updateDateTime(MetaDataContainer m) {

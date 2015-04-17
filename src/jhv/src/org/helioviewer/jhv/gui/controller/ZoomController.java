@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.gui.controller;
 
-import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
@@ -105,9 +105,9 @@ public class ZoomController {
             if (oldRegion == null) {
                 return;
             }
-            Vector2dDouble newSizeVector = Vector2dDouble.scale(oldRegion.getSize(), 1.0 / zoomFactor);
+            GL3DVec2d newSizeVector = GL3DVec2d.scale(oldRegion.getSize(), 1.0 / zoomFactor);
 
-            Vector2dDouble newCorner = null;
+            GL3DVec2d newCorner = null;
             if (panel != null) {
                 Vector2dInt mousePosition = panel.getInputController().getMousePosition();
                 if (mousePosition != null) {
@@ -116,17 +116,17 @@ public class ZoomController {
                     Vector2dInt visOffset = vp.subtract(vis.getSizeVector()).scale(0.5);
                     Vector2dInt fixPointViewport = mousePosition.subtract(visOffset);
                     if (fixPointViewport.getX() >= 0 && fixPointViewport.getY() >= 0) {
-                        Vector2dDouble fixPointOffset = ViewHelper.convertScreenToImageDisplacement(fixPointViewport.subtract(new Vector2dInt(0, vis.getHeight())), oldRegion, vis);
-                        Vector2dDouble fixPoint = fixPointOffset.add(oldRegion.getLowerLeftCorner());
-                        Vector2dDouble relativeFixPointOffset = fixPointOffset.invertedScale(oldRegion.getSize());
-                        Vector2dDouble newFixPointOffset = newSizeVector.scale(relativeFixPointOffset);
-                        newCorner = fixPoint.subtract(newFixPointOffset);
+                        GL3DVec2d fixPointOffset = ViewHelper.convertScreenToImageDisplacement(fixPointViewport.subtract(new Vector2dInt(0, vis.getHeight())), oldRegion, vis);
+                        GL3DVec2d fixPoint = GL3DVec2d.add(fixPointOffset, oldRegion.getLowerLeftCorner());
+                        GL3DVec2d relativeFixPointOffset = GL3DVec2d.invertedScale(fixPointOffset, oldRegion.getSize());
+                        GL3DVec2d newFixPointOffset = GL3DVec2d.scale(newSizeVector, relativeFixPointOffset);
+                        newCorner = GL3DVec2d.subtract(fixPoint, newFixPointOffset);
                     }
                 }
             }
 
             if (newCorner == null) {
-                newCorner = Vector2dDouble.add(oldRegion.getLowerLeftCorner(), Vector2dDouble.scale(Vector2dDouble.subtract(oldRegion.getSize(), newSizeVector), 0.5));
+                newCorner = GL3DVec2d.add(oldRegion.getLowerLeftCorner(), GL3DVec2d.scale(GL3DVec2d.subtract(oldRegion.getSize(), newSizeVector), 0.5));
             }
 
             Region zoomedRegion = ViewHelper.cropRegionToImage(StaticRegion.createAdaptedRegion(newCorner, newSizeVector), topmostView.getMetaData());
@@ -151,7 +151,7 @@ public class ZoomController {
             ViewportImageSize vis = ViewHelper.calculateViewportImageSize(outerRegion);
             Viewport layerViewport = ViewHelper.calculateInnerViewport(region, outerRegion, vis);
             Vector2dInt actualSize = layerViewport.getSize();
-            double zoom = actualSize.getX() * unitsPerPixel / region.getSize().getX();
+            double zoom = actualSize.getX() * unitsPerPixel / region.getSize().x;
             return zoom;
         }
         return 1.0;
@@ -183,8 +183,8 @@ public class ZoomController {
     public void zoomFit(MetaDataView metaDataView, RegionView regionView) {
         if (metaDataView != null && regionView != null) {
             Region region = metaDataView.getMetaData().getPhysicalRegion();
-            Vector2dDouble size = region.getSize();
-            Vector2dDouble lowerLeft = region.getLowerLeftCorner();
+            GL3DVec2d size = region.getSize();
+            GL3DVec2d lowerLeft = region.getLowerLeftCorner();
             region = StaticRegion.createAdaptedRegion(lowerLeft, size);
             regionView.setRegion(region);
         }

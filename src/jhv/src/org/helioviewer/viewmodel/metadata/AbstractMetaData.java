@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.math.RectangleDouble;
-import org.helioviewer.base.math.Vector2dDouble;
+import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
@@ -19,8 +19,8 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  */
 public abstract class AbstractMetaData implements MetaData {
 
-    private Vector2dDouble lowerLeftCorner;
-    private Vector2dDouble sizeVector;
+    private GL3DVec2d lowerLeftCorner;
+    private GL3DVec2d sizeVector;
     protected ImmutableDateTime dateTime = null;
 
     /**
@@ -39,7 +39,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newSizeVector
      *            Physical size of the corresponding image
      */
-    public AbstractMetaData(Vector2dDouble newLowerLeftCorner, Vector2dDouble newSizeVector) {
+    public AbstractMetaData(GL3DVec2d newLowerLeftCorner, GL3DVec2d newSizeVector) {
         lowerLeftCorner = newLowerLeftCorner;
         sizeVector = newSizeVector;
     }
@@ -57,8 +57,8 @@ public abstract class AbstractMetaData implements MetaData {
      *            Physical height of the corresponding image
      */
     public AbstractMetaData(double newLowerLeftCornerX, double newLowerLeftCornerY, double newWidth, double newHeight) {
-        lowerLeftCorner = new Vector2dDouble(newLowerLeftCornerX, newLowerLeftCornerY);
-        sizeVector = new Vector2dDouble(newWidth, newHeight);
+        lowerLeftCorner = new GL3DVec2d(newLowerLeftCornerX, newLowerLeftCornerY);
+        sizeVector = new GL3DVec2d(newWidth, newHeight);
     }
 
     /**
@@ -71,9 +71,9 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newHeight
      *            Physical height of the corresponding image
      */
-    public AbstractMetaData(Vector2dDouble newLowerLeftCorner, double newWidth, double newHeight) {
+    public AbstractMetaData(GL3DVec2d newLowerLeftCorner, double newWidth, double newHeight) {
         lowerLeftCorner = newLowerLeftCorner;
-        sizeVector = new Vector2dDouble(newWidth, newHeight);
+        sizeVector = new GL3DVec2d(newWidth, newHeight);
     }
 
     /**
@@ -86,8 +86,8 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newSizeVector
      *            Physical size of the corresponding image
      */
-    public AbstractMetaData(double newLowerLeftCornerX, double newLowerLeftCornerY, Vector2dDouble newSizeVector) {
-        lowerLeftCorner = new Vector2dDouble(newLowerLeftCornerX, newLowerLeftCornerY);
+    public AbstractMetaData(double newLowerLeftCornerX, double newLowerLeftCornerY, GL3DVec2d newSizeVector) {
+        lowerLeftCorner = new GL3DVec2d(newLowerLeftCornerX, newLowerLeftCornerY);
         sizeVector = newSizeVector;
     }
 
@@ -109,15 +109,15 @@ public abstract class AbstractMetaData implements MetaData {
      *            Object to copy
      */
     public AbstractMetaData(AbstractMetaData original) {
-        lowerLeftCorner = new Vector2dDouble(original.lowerLeftCorner);
-        sizeVector = new Vector2dDouble(original.sizeVector);
+        lowerLeftCorner = new GL3DVec2d(original.lowerLeftCorner);
+        sizeVector = new GL3DVec2d(original.sizeVector);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vector2dDouble getPhysicalImageSize() {
+    public GL3DVec2d getPhysicalImageSize() {
         return sizeVector;
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public Vector2dDouble getPhysicalLowerLeft() {
+    public GL3DVec2d getPhysicalLowerLeft() {
         return lowerLeftCorner;
     }
 
@@ -134,7 +134,7 @@ public abstract class AbstractMetaData implements MetaData {
      */
     @Override
     public double getPhysicalImageHeight() {
-        return sizeVector.getY();
+        return sizeVector.y;
     }
 
     /**
@@ -142,31 +142,31 @@ public abstract class AbstractMetaData implements MetaData {
      */
     @Override
     public double getPhysicalImageWidth() {
-        return sizeVector.getX();
+        return sizeVector.x;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vector2dDouble getPhysicalLowerRight() {
-        return lowerLeftCorner.add(sizeVector.getXVector());
+    public GL3DVec2d getPhysicalLowerRight() {
+        return GL3DVec2d.add(lowerLeftCorner, sizeVector.getXVector());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vector2dDouble getPhysicalUpperLeft() {
-        return lowerLeftCorner.add(sizeVector.getYVector());
+    public GL3DVec2d getPhysicalUpperLeft() {
+        return GL3DVec2d.add(lowerLeftCorner, sizeVector.getYVector());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Vector2dDouble getPhysicalUpperRight() {
-        return lowerLeftCorner.add(sizeVector);
+    public GL3DVec2d getPhysicalUpperRight() {
+        return GL3DVec2d.add(lowerLeftCorner, sizeVector);
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newImageSize
      *            Physical size of the corresponding image
      */
-    protected void setPhysicalImageSize(Vector2dDouble newImageSize) {
+    protected void setPhysicalImageSize(GL3DVec2d newImageSize) {
         sizeVector = newImageSize;
     }
 
@@ -201,7 +201,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newlLowerLeftCorner
      *            Physical lower left corner the corresponding image
      */
-    protected void setPhysicalLowerLeftCorner(Vector2dDouble newlLowerLeftCorner) {
+    protected void setPhysicalLowerLeftCorner(GL3DVec2d newlLowerLeftCorner) {
         lowerLeftCorner = newlLowerLeftCorner;
     }
 
