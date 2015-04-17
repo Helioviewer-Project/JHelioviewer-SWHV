@@ -7,8 +7,6 @@ import java.net.SocketException;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -284,7 +282,7 @@ class J2KReader implements Runnable {
                         } catch (IOException ioe) {
                             Log.error(">> J2KReader.run() > Error closing socket.", ioe);
                         }
-                        parentViewRef.fireChangeEvent(new ChangeEvent(new SubImageDataChangedReason(parentViewRef)));
+                        // Displayer.display();
                         // Send signal to try again
                         parentViewRef.readerSignal.signal();
                     }/* catch (JHV_KduException e) {
@@ -534,7 +532,7 @@ class J2KReader implements Runnable {
                                 }
                             }
                         }
-                        parentViewRef.fireChangeEvent(new ChangeEvent(new SubImageDataChangedReason(parentViewRef)));
+                        // Displayer.display();
                         // Send signal to try again
                         parentViewRef.readerSignal.signal();
                     } catch (JHV_KduException e) {
