@@ -60,7 +60,6 @@ import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
@@ -445,8 +444,8 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    ImageInfoView imageInfoView = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
-                    if (imageInfoView != null && getMainView() != null) {
+                    JHVJP2View view = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    if (view != null && getMainView() != null) {
                         // get the layered view
 
                         // go through all sub view chains of the layered
@@ -456,8 +455,7 @@ public class ImageViewerGui {
                             JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
-                            if (imageInfoView.equals(subView)) {
-
+                            if (view.equals(subView)) {
                                 // Set the correct image scale
                                 ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) subView.getMetaData();
                                 ZoomController zoomController = new ZoomController();
@@ -498,8 +496,8 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    ImageInfoView imageInfoView = APIRequestManager.newLoad(jpxUrl, true, null);
-                    if (imageInfoView != null && getMainView() != null) {
+                    JHVJP2View view = APIRequestManager.newLoad(jpxUrl, true, null);
+                    if (view != null && getMainView() != null) {
 
                         // go through all sub view chains of the layered
                         // view and try to find the
@@ -508,7 +506,7 @@ public class ImageViewerGui {
                             JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
-                            if (imageInfoView.equals(subView) && subView instanceof JHVJPXView) {
+                            if (view.equals(subView) && subView instanceof JHVJPXView) {
                                 JHVJPXView movieView = (JHVJPXView) subView;
                                 MoviePanel moviePanel = MoviePanel.getMoviePanel(movieView);
                                 if (moviePanel == null) {

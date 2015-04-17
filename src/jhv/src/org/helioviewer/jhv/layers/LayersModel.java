@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -253,19 +252,18 @@ public class LayersModel {
         }
 
         Thread downloadThread = new Thread(new Runnable() {
-            private ImageInfoView theInfoView;
+            private JHVJP2View theView;
 
             @Override
             public void run() {
-                downloadFromJPIP(theInfoView);
+                downloadFromJPIP(theView);
             }
 
-            public Runnable init(ImageInfoView theInfoView) {
-                this.theInfoView = theInfoView;
+            public Runnable init(JHVJP2View theView) {
+                this.theView = theView;
                 return this;
             }
         }.init(view), "DownloadFromJPIPThread");
-
         downloadThread.start();
     }
 
@@ -275,10 +273,10 @@ public class LayersModel {
      * Changes the source of the ImageInfoView afterwards, since a local file is
      * always faster.
      */
-    private void downloadFromJPIP(ImageInfoView infoView) {
+    private void downloadFromJPIP(JHVJP2View v) {
         FileDownloader fileDownloader = new FileDownloader();
-        URI downloadUri = infoView.getDownloadURI();
-        URI uri = infoView.getUri();
+        URI downloadUri = v.getDownloadURI();
+        URI uri = v.getUri();
 
         // the http server to download the file from is unknown
         if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {
@@ -293,7 +291,7 @@ public class LayersModel {
 
         File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
         try {
-            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + infoView.getName())) {
+            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName())) {
                 return;
             }
         } catch (IOException e) {
