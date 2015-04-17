@@ -30,7 +30,6 @@ public class MainImagePanel extends BasicImagePanel {
 
         // the one GLCanvas
         add(renderedImageComponent);
-
     }
 
     /**

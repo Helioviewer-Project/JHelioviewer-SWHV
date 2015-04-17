@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -39,8 +37,6 @@ public class BasicImagePanel extends JPanel {
 
     protected final Component renderedImageComponent; // don't touch this
 
-    protected Image backgroundImage;
-
     /**
      * Default constructor.
      * */
@@ -52,17 +48,6 @@ public class BasicImagePanel extends JPanel {
 
         // initialize list of plugins
         plugins = new LinkedList<ImagePanelPlugin>();
-    }
-
-    public void setBackgroundImage(Image img) {
-        backgroundImage = img;
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundImage != null)
-            g.drawImage(backgroundImage, 0, 0, null);
     }
 
     /**
