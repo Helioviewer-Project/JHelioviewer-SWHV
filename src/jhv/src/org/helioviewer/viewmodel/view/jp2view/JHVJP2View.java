@@ -366,14 +366,10 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
      * {@inheritDoc}
      */
     @Override
-    public boolean setRegion(Region r, ChangeEvent aEvent) {
+    public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
         changed |= setImageViewParams(calculateParameter());
-
-        ChangeEvent event = new ChangeEvent();
-        event.copyFrom(aEvent);
-        fireChangeEvent(event);
 
         return changed;
     }

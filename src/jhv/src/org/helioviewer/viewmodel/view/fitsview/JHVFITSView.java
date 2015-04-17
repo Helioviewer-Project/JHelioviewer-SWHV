@@ -116,7 +116,7 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
      * @param event
      *            Event that belongs to the request.
      * */
-    private void updateImageData(ChangeEvent event) {
+    private void updateImageData() {
         Region r = region;
         m = getMetaData();
 
@@ -135,7 +135,7 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
             subImageData = new ARGBInt32ImageData(bi, new ColorMask());
         }
 
-        event.addReason(new SubImageDataChangedReason(this));
+        ChangeEvent event = new ChangeEvent(new SubImageDataChangedReason(this));
         notifyViewListeners(event);
     }
 
@@ -158,7 +158,6 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
      * */
     @Override
     public Region getRegion() {
-
         return region;
     }
 
@@ -166,13 +165,13 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
      * {@inheritDoc}
      * */
     @Override
-    public boolean setRegion(Region r, ChangeEvent event) {
+    public boolean setRegion(Region r) {
         // check if region has changed
         if ((region == r) || (region != null && r != null && region.getCornerX() == r.getCornerX() && region.getCornerY() == r.getCornerY() && region.getWidth() == r.getWidth() && region.getHeight() == r.getHeight()))
             return false;
 
         region = r;
-        updateImageData(event);
+        updateImageData();
 
         return true;
     }

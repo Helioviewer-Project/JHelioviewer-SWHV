@@ -555,7 +555,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     if (jp2View != null) {
                         jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
                         Rectangle roi = ri.getROI();
-                        if (!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))), new ChangeEvent())) {
+                        if (!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))))) {
                             if (ri.getLastDataSize() != null) {
                                 fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
                             }
@@ -730,7 +730,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jp2CallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))), new ChangeEvent());
+                        jp2CallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
@@ -793,7 +793,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jpxCallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))), new ChangeEvent());
+                        jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");

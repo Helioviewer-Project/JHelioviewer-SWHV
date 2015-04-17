@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.region.Region;
 
 /**
@@ -37,12 +36,10 @@ public interface RegionView extends View {
      * 
      * @param r
      *            The new region
-     * @param event
-     *            ChangeEvent to append all changes following
      * @return True, if the region has changed, false otherwise
      * @see #getRegion
      */
-    public boolean setRegion(Region r, ChangeEvent event);
+    public boolean setRegion(Region r);
 
     /**
      * Returns the current region.
@@ -51,4 +48,5 @@ public interface RegionView extends View {
      * @see #setRegion
      */
     public Region getRegion();
+
 }
