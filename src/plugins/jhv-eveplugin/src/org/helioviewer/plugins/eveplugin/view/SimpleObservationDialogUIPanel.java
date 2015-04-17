@@ -244,12 +244,10 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         View view = Displayer.getLayersModel().getLayer(idx);
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
-            Date start, end;
-            Interval<Date> range = jpxView.getDateRange();
-            if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
-                calendarStartDate.setDate(start);
-                ObservationDialogDateModel.getInstance().setStartDate(start, false);
-            }
+            Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
+
+            calendarStartDate.setDate(start);
+            ObservationDialogDateModel.getInstance().setStartDate(start, false);
         }
     }
 

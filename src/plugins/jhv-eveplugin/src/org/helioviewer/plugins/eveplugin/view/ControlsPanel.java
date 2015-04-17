@@ -175,13 +175,11 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         JHVJP2View activeView = Displayer.getLayersModel().getActiveView();
         if (activeView instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) activeView;
-            Date start, end;
-            Interval<Date> range = jpxView.getDateRange();
-            if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
-                // Log.debug("start " + start + " end " + end);
-                final Interval<Date> interval = new Interval<Date>(start, end);
-                DrawController.getSingletonInstance().setSelectedInterval(interval, true);
-            }
+            Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
+            Date end = Displayer.getLayersModel().getEndDate(jpxView).getTime();
+
+            Interval<Date> interval = new Interval<Date>(start, end);
+            DrawController.getSingletonInstance().setSelectedInterval(interval, true);
         }
     }
 
@@ -208,15 +206,13 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
             setDefaultPeriod = false;
             if (view instanceof JHVJPXView) {
                 JHVJPXView jpxView = (JHVJPXView) view;
-                Date start, end;
-                Interval<Date> range = jpxView.getDateRange();
-                if (range != null && (start = range.getStart()) != null && (end = range.getEnd()) != null) {
-                    // Log.debug("start " + start + " end " + end);
-                    final Interval<Date> interval = new Interval<Date>(start, end);
-                    // ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                    if (TimeIntervalLockModel.getInstance().isLocked()) {
-                        DrawController.getSingletonInstance().setSelectedInterval(interval, false);
-                    }
+                Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
+                Date end = Displayer.getLayersModel().getEndDate(jpxView).getTime();
+
+                Interval<Date> interval = new Interval<Date>(start, end);
+                // ZoomController.getSingletonInstance().setAvailableInterval(interval);
+                if (TimeIntervalLockModel.getInstance().isLocked()) {
+                    DrawController.getSingletonInstance().setSelectedInterval(interval, false);
                 }
             }
         }

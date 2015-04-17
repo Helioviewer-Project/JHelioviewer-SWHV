@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
@@ -122,7 +121,7 @@ public class APIRequestManager {
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), null, message);
+            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
                 Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
@@ -180,7 +179,6 @@ public class APIRequestManager {
         } catch (ParseException e1) {
         }
 
-        Interval<Date> range = new Interval<Date>(startDate, endDate);
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
         }
@@ -192,7 +190,7 @@ public class APIRequestManager {
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), range, message);
+            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
                 Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
@@ -232,7 +230,7 @@ public class APIRequestManager {
      * @return The ImageInfoView corresponding to the file whose location was
      *         returned by the server
      */
-    public static JHVJP2View requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, Interval<Date> range, boolean errorMessage) throws IOException {
+    public static JHVJP2View requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
@@ -263,7 +261,7 @@ public class APIRequestManager {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
-                return newLoad(response.getURI(), downloadUri, addToViewChain, range);
+                return newLoad(response.getURI(), downloadUri, addToViewChain);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -300,14 +298,14 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static JHVJP2View newLoad(URI uri, boolean addToViewChain, Interval<Date> range) throws IOException {
+    public static JHVJP2View newLoad(URI uri, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        JHVJP2View view = ViewHelper.loadView(uri, range);
+        JHVJP2View view = ViewHelper.loadView(uri);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -330,18 +328,17 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static JHVJP2View newLoad(URI uri, URI downloadURI, boolean addToViewChain, Interval<Date> range) throws IOException {
+    public static JHVJP2View newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
-
-        JHVJP2View view = ViewHelper.loadView(uri, downloadURI, range);
-
+        JHVJP2View view = ViewHelper.loadView(uri, downloadURI);
         if (addToViewChain) {
             addToViewchain(view);
         }
+
         return view;
     }
 

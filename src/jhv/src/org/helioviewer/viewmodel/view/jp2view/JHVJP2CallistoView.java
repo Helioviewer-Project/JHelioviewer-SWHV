@@ -1,9 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
-import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -20,8 +18,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
     private boolean viewportSet;
     private boolean regionSet;
 
-    public JHVJP2CallistoView(boolean isMainView, Interval<Date> range) {
-        super(isMainView, range);
+    public JHVJP2CallistoView(boolean isMainView) {
+        super(isMainView);
         region = new RegionAdapter(new StaticRegion(0, 0, 86400, 380));
         viewport = new ViewportAdapter(new StaticViewport(2700, 12));
         viewportSet = false;

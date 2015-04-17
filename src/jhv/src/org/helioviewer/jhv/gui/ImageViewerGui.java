@@ -496,7 +496,7 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    JHVJP2View view = APIRequestManager.newLoad(jpxUrl, true, null);
+                    JHVJP2View view = APIRequestManager.newLoad(jpxUrl, true);
                     if (view != null && getMainView() != null) {
 
                         // go through all sub view chains of the layered
@@ -531,7 +531,7 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
-                    APIRequestManager.newLoad(jpipUri, true, null);
+                    APIRequestManager.newLoad(jpipUri, true);
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -547,7 +547,7 @@ public class ImageViewerGui {
                     FileDownloader fileDownloader = new FileDownloader();
                     File downloadFile = fileDownloader.getDefaultDownloadLocation(downloadAddress);
                     fileDownloader.get(downloadAddress, downloadFile);
-                    APIRequestManager.newLoad(downloadFile.toURI(), true, null);
+                    APIRequestManager.newLoad(downloadFile.toURI(), true);
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }

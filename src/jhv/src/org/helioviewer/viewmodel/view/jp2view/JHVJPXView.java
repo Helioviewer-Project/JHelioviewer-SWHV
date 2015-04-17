@@ -1,8 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
-import java.util.Date;
-
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -52,12 +49,12 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
      * @param isMainView
      *            Whether the view is a main view or not
      */
-    public JHVJPXView(boolean isMainView, Interval<Date> range, boolean blockingMode) {
-        super(isMainView, range);
+    public JHVJPXView(boolean isMainView, boolean blockingMode) {
+        super(isMainView);
     }
 
-    public JHVJPXView(boolean isMainView, Interval<Date> range) {
-        super(isMainView, range);
+    public JHVJPXView(boolean isMainView) {
+        super(isMainView);
     }
 
     /**
