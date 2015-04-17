@@ -385,7 +385,7 @@ public final class ViewHelper {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
 
                 if (jp2Image.isMultiFrame()) {
-                    JHVJPXView jpxView = new JHVJPXView(isMainView, true);
+                    JHVJPXView jpxView = new JHVJPXView(isMainView);
                     jpxView.setJP2Image(jp2Image);
                     return jpxView;
                 } else {
