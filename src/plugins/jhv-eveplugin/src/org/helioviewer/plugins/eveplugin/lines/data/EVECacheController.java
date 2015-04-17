@@ -4,9 +4,12 @@ import java.awt.Rectangle;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
@@ -30,6 +33,8 @@ public class EVECacheController {
 
     /***/
     private final EVEBandCache cache = new EVEBandCache();
+
+    private final Map<Band, RequestCache> requestCache = new HashMap<Band, RequestCache>();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -63,6 +68,14 @@ public class EVECacheController {
     public void addToCache(Band band, double[] values, long[] dates) {
         cache.add(band, values, dates);
         fireDataAdded(band);
+    }
+
+    public List<Interval<Date>> addRequest(Band band, Interval<Date> interval) {
+        RequestCache rc = requestCache.get(band);
+        if (rc == null) {
+            requestCache.put(band, new RequestCache());
+        }
+        return requestCache.get(band).adaptRequestCache(interval.getStart(), interval.getEnd());
     }
 
     public EVEValues getDataInInterval(final Band band, final Interval<Date> interval) {
