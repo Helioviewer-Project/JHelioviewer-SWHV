@@ -381,17 +381,14 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             img = "/" + img;
 
         setVisible(false);
-        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
 
         try {
             final URI uri = new URI(srv + img);
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
                     FileDownloader filedownloader = new FileDownloader();
                     URI newUri = filedownloader.downloadFromHTTP(uri, true);
-                    ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
 
                     try {
                         APIRequestManager.newLoad(newUri, uri, true, null);
@@ -399,7 +396,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
-                        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                     }
 
                 }
@@ -459,8 +455,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             httpPath = srv + img;
         }
 
-        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
-
         try {
             final URI uri = new URI(srv + img);
             final OpenRemoteFileDialog parent = this;
@@ -478,11 +472,9 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
                         JOptionPane.showMessageDialog(buttonShow, e.getMessage(), "File not found on streaming server!", JOptionPane.ERROR_MESSAGE);
 
-                        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } finally {
-                        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                         parent.dispose();
                     }
                 }
@@ -492,7 +484,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         } catch (URISyntaxException e) {
             e.printStackTrace();
             setVisible(true);
-            ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
         }
     }
 

@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractList;
-
-import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 
 /**
  * View to draw the final image to a Component, thus should be the topmost view
@@ -80,40 +77,5 @@ public interface ComponentView extends ViewListener {
      *            new background color
      */
     public void setBackgroundColor(Color background);
-
-    /**
-     * Adds a post renderer, which can draw simple geometric forms on a drawn
-     * image and background.
-     *
-     * The post renderer will be called after every redraw of the actual image.
-     *
-     * @param postRenderer
-     *            new post renderer
-     * @see #removePostRenderer(ScreenRenderer)
-     * @see #getAllPostRenderer()
-     */
-    public void addPostRenderer(ScreenRenderer postRenderer);
-
-    /**
-     * Removes a post renderer.
-     *
-     * @param postRenderer
-     *            post renderer which should be removed
-     * @see #addPostRenderer(ScreenRenderer)
-     * @see #getAllPostRenderer()
-     */
-    public void removePostRenderer(ScreenRenderer postRenderer);
-
-    /**
-     * Returns the list of all post renderer.
-     *
-     * This function can be used to move the set of post renderers from one
-     * ComponentView to another.
-     *
-     * @return list of all post renderer
-     * @see #addPostRenderer(ScreenRenderer)
-     * @see #removePostRenderer(ScreenRenderer)
-     */
-    public AbstractList<ScreenRenderer> getAllPostRenderer();
 
 }
