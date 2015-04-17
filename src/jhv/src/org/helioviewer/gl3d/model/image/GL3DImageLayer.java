@@ -168,7 +168,7 @@ public class GL3DImageLayer implements Renderable {
         this.getMainLayerView().setRegion(newRegion);
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
-        this.getMainLayerView().setViewport(layerViewport, null);
+        this.getMainLayerView().setViewport(layerViewport);
     }
 
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {

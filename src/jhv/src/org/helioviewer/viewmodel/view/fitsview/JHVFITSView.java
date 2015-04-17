@@ -142,14 +142,12 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
     /**
      * {@inheritDoc}
      * */
-    public boolean setViewport(Viewport v, ChangeEvent event) {
+    public boolean setViewport(Viewport v) {
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
             return false;
 
         viewport = v;
-        notifyViewListeners(event);
-
         return true;
     }
 
@@ -172,7 +170,6 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
 
         region = r;
         updateImageData();
-
         return true;
     }
 

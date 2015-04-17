@@ -24,7 +24,6 @@ import org.helioviewer.plugins.eveplugin.radio.model.YValueModel;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.View;
@@ -553,7 +552,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                     JHVJP2View jp2View = (JHVJP2View) jpxData.getView();
                     if (jp2View != null) {
-                        jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))), new ChangeEvent());
+                        jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))));
                         Rectangle roi = ri.getROI();
                         if (!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))))) {
                             if (ri.getLastDataSize() != null) {
@@ -726,7 +725,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                                 lastUsedResolutionSetting = rst;
                             }
                         }
-                        jp2CallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
+                        jp2CallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())));
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
@@ -790,7 +789,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         }
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         ResolutionSetting lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
-                        jpxCallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())), new ChangeEvent());
+                        jpxCallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())));
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
                         jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))));
