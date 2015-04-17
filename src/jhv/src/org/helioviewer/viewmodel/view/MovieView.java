@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
+import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
+
 /**
  * View to interact with image series.
  *
@@ -8,8 +10,7 @@ package org.helioviewer.viewmodel.view;
  * It provides basic functions to navigate within the image series.
  *
  * <p>
- * Additional features are provides by {@link TimedMovieView} and
- * {@link CachedMovieView}.
+ * Additional features are provides by {@link TimedMovieView}.
  *
  * @author Markus Langenberg
  */
@@ -184,5 +185,12 @@ public interface MovieView extends View {
     public long getCurrentDateMillis();
 
     public int getDesiredRelativeSpeed();
+
+   /**
+     * Returns the image cache status.
+     *
+     * @return image cache status
+     */
+    public ImageCacheStatus getImageCacheStatus();
 
 }

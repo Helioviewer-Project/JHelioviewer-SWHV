@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.region.Region;
  * @author Ludwig Schmidt
  * 
  */
-public interface RegionView extends View {
+public interface RegionView {
 
     /**
      * Sets the current region.

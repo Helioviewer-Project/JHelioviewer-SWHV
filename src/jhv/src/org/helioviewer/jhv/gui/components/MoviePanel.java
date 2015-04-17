@@ -45,7 +45,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
@@ -201,10 +200,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         speedUnitComboBox.addActionListener(this);
 
-        if (view instanceof CachedMovieView) {
-            timeSlider.setPartialCachedUntil(((CachedMovieView) view).getImageCacheStatus().getImageCachedPartiallyUntil());
-            timeSlider.setCompleteCachedUntil(((CachedMovieView) view).getImageCacheStatus().getImageCachedCompletelyUntil());
-        }
+        timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
+        timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
 
         UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
         this.setEnabled(true);
@@ -359,9 +356,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     public void jumpToFrameNumber(int frame) {
-        if (view instanceof CachedMovieView) {
-            frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
-        }
+        frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
         view.setCurrentFrame(frame);
     }

@@ -8,7 +8,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
@@ -335,7 +334,7 @@ class J2KReader implements Runnable {
 
                             if (!parentViewRef.isMainView || !parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (!((MovieView) parentViewRef).isMoviePlaying() && ((CachedMovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (!((MovieView) parentViewRef).isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
                             } else if (parentViewRef.getMetaData() instanceof HelioviewerMetaData && parentViewRef instanceof MovieView && ((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
@@ -422,8 +421,8 @@ class J2KReader implements Runnable {
                                     flowControl();
 
                                     // Downgrade, if necessary
-                                    if (downgradeNecessary && res.getResponseSize() > 0 && parentViewRef.isMainView() && parentViewRef instanceof CachedMovieView) {
-                                        ImageCacheStatus cacheStatus = ((CachedMovieView) parentViewRef).getImageCacheStatus();
+                                    if (downgradeNecessary && res.getResponseSize() > 0 && parentViewRef.isMainView() && parentViewRef instanceof MovieView) {
+                                        ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
 
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
@@ -455,8 +454,8 @@ class J2KReader implements Runnable {
                                         stepQuerys[current_step] = null;
 
                                         // tell the cache status
-                                        if (parentViewRef.isMainView() && parentViewRef instanceof CachedMovieView) {
-                                            ImageCacheStatus cacheStatus = ((CachedMovieView) parentViewRef).getImageCacheStatus();
+                                        if (parentViewRef.isMainView() && parentViewRef instanceof MovieView) {
+                                            ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
 
                                             switch (strategy) {
                                             case CURRENTFRAMEONLY:
