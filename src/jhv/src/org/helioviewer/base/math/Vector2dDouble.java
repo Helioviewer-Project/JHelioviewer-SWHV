@@ -6,9 +6,9 @@ import java.util.Locale;
 /**
  * A class for two dimensional vectors with double coordinates. Instances of
  * Vector2dDouble are immutable.
- * 
+ *
  * @author Ludwig Schmidt
- * 
+ *
  */
 
 public final class Vector2dDouble {
@@ -32,8 +32,8 @@ public final class Vector2dDouble {
     }
 
     public Vector2dDouble(final Point p) {
-        x = (double) p.x;
-        y = (double) p.y;
+        x = p.x;
+        y = p.y;
     }
 
     public Vector2dDouble(final Vector2dDouble v) {
@@ -42,13 +42,8 @@ public final class Vector2dDouble {
     }
 
     public Vector2dDouble(final Vector2dInt v) {
-        x = (double) v.getX();
-        y = (double) v.getY();
-    }
-
-    public Vector2dDouble(final Vector2dLong v) {
-        x = (double) v.getX();
-        y = (double) v.getY();
+        x = v.getX();
+        y = v.getY();
     }
 
     public double getX() {
@@ -185,6 +180,7 @@ public final class Vector2dDouble {
         return new Vector2dDouble(Math.abs(v.x), Math.abs(v.y));
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Vector2dDouble)) {
             return false;
@@ -214,12 +210,14 @@ public final class Vector2dDouble {
      */
     private static final int HASH_CODE_INT_BITS = 32;
 
+    @Override
     public int hashCode() {
         long xBits = Double.doubleToLongBits(x);
         long yBits = Double.doubleToLongBits(y);
         return HASH_CODE_INITIAL_VALUE * HASH_CODE_MULTIPLIER * HASH_CODE_MULTIPLIER + HASH_CODE_MULTIPLIER * (int) (xBits ^ (xBits >>> HASH_CODE_INT_BITS)) + (int) (yBits ^ (yBits >>> HASH_CODE_INT_BITS));
     }
 
+    @Override
     public String toString() {
         return String.format(Locale.ENGLISH, "(%f,%f)", x, y);
     }
