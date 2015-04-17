@@ -4,10 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="resources"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/viewmodel"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl.jar"/>

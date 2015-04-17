@@ -2,15 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="build/|doc/|downloaders/bin/org/helioviewer/jhv/plugins/swek/downloader/|downloaders/src/org/helioviewer/jhv/plugins/swek/downloader/|lib/|resources/|resources/|sources/|src/|temp/" kind="src" path=""/>
-	<classpathentry kind="src" path="/viewmodelplugin"/>
-	<classpathentry kind="src" path="/viewmodel"/>
 	<classpathentry kind="src" path="/jhv"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-data"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HEKSource"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ComesepSource"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jhv-display"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

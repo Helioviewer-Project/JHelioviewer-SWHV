@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/swhv-swek"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/viewmodelplugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/swhvhekplugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EVEPlugin"/>
 	<classpathentry kind="output" path="bin"/>
