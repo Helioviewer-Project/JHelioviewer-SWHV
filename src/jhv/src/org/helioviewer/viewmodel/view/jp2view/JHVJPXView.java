@@ -49,10 +49,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
      * @param isMainView
      *            Whether the view is a main view or not
      */
-    public JHVJPXView(boolean isMainView, boolean blockingMode) {
-        super(isMainView);
-    }
-
     public JHVJPXView(boolean isMainView) {
         super(isMainView);
     }
