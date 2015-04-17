@@ -25,7 +25,7 @@ import java.io.IOException;
  * @author Markus Langenberg
  *
  */
-public interface ComponentView extends ViewListener {
+public interface ComponentView {
 
     /**
      * Deactivate the Component View can be used to clean up the component view
