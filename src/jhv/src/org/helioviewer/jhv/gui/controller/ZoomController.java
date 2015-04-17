@@ -6,7 +6,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -129,9 +128,9 @@ public class ZoomController {
             if (newCorner == null) {
                 newCorner = Vector2dDouble.add(oldRegion.getLowerLeftCorner(), Vector2dDouble.scale(Vector2dDouble.subtract(oldRegion.getSize(), newSizeVector), 0.5));
             }
-            Region zoomedRegion = ViewHelper.cropRegionToImage(StaticRegion.createAdaptedRegion(newCorner, newSizeVector), topmostView.getMetaData());
 
-            topmostView.setRegion(zoomedRegion, new ChangeEvent());
+            Region zoomedRegion = ViewHelper.cropRegionToImage(StaticRegion.createAdaptedRegion(newCorner, newSizeVector), topmostView.getMetaData());
+            topmostView.setRegion(zoomedRegion);
         }
     }
 
@@ -187,7 +186,7 @@ public class ZoomController {
             Vector2dDouble size = region.getSize();
             Vector2dDouble lowerLeft = region.getLowerLeftCorner();
             region = StaticRegion.createAdaptedRegion(lowerLeft, size);
-            regionView.setRegion(region, new ChangeEvent());
+            regionView.setRegion(region);
         }
     }
 

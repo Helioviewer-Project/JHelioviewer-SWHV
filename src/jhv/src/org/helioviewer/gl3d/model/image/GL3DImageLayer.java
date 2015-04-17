@@ -165,7 +165,7 @@ public class GL3DImageLayer implements Renderable {
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        this.getMainLayerView().setRegion(newRegion, null);
+        this.getMainLayerView().setRegion(newRegion);
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
         this.getMainLayerView().setViewport(layerViewport, null);

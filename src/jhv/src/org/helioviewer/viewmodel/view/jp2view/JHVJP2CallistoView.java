@@ -62,7 +62,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    public boolean setRegion(Region r, ChangeEvent aEvent) {
+    public boolean setRegion(Region r) {
         // Log.debug("Set region : " + r);
         // Thread.dumpStack();
         boolean changed = region == null ? r == null : !region.equals(r);
@@ -71,10 +71,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
         if (viewportSet) {
             changed |= setImageViewParams(calculateParameter());
         }
-
-        ChangeEvent event = new ChangeEvent();
-        event.copyFrom(aEvent);
-        fireChangeEvent(event);
 
         return changed;
     }
