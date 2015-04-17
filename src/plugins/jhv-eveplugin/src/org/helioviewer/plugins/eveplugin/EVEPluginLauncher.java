@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin;
 
-import org.helioviewer.base.JavaCompatibility;
+import java.util.Arrays;
+
 import org.helioviewer.jhv.JavaHelioViewer;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
@@ -19,7 +20,7 @@ public class EVEPluginLauncher {
      * @param args
      */
     public static void main(String[] args) {
-        String args2[] = JavaCompatibility.copyArray(args, args.length + 2);
+        String args2[] = Arrays.copyOf(args, args.length + 2);
 
         args2[args2.length - 2] = "--deactivate-plugin";
         args2[args2.length - 1] = "EVEPlugin.jar";
@@ -27,4 +28,5 @@ public class EVEPluginLauncher {
         JavaHelioViewer.main(args2);
         PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
     }
+
 }

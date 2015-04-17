@@ -1,9 +1,7 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek;
 
-import org.helioviewer.base.JavaCompatibility;
+import java.util.Arrays;
+
 import org.helioviewer.jhv.JavaHelioViewer;
 
 /**
@@ -20,7 +18,7 @@ public class SWEKPluginLauncher {
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
         System.out.println("================================================================\n\n");
 
-        String[] args2 = JavaCompatibility.copyArrayString(args, args.length + 4);
+        String[] args2 = Arrays.copyOf(args, args.length + 4);
 
         args2[args2.length - 2] = "--deactivate-plugin";
         args2[args2.length - 1] = "SWEKPlugin.jar";
