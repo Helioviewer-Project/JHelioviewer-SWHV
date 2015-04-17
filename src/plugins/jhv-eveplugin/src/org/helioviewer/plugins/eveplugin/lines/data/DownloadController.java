@@ -97,6 +97,8 @@ public class DownloadController {
         if (band == null || queryInterval == null || queryInterval.getStart() == null || queryInterval.getEnd() == null) {
             return;
         }
+        // Interval<Date> realQueryInterval =
+        // extendQueryInterval(queryInterval);
 
         // get all intervals within query interval where data is missing
         LinkedList<Interval<Date>> intervals = getIntervals(band, queryInterval);
@@ -105,12 +107,6 @@ public class DownloadController {
             // there is no interval where data is missing
             return;
         }
-
-        // try to find data in local database. If data is available in local
-        // database it will be transfered to cache
-
-        // get all intervals within query interval where data is missing again
-        intervals = getIntervals(band, queryInterval);
 
         if (intervals == null) {
             // there is no interval where data is missing
@@ -153,9 +149,14 @@ public class DownloadController {
         fireDownloadStarted(band, queryInterval);
     }
 
+    private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     private LinkedList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
         // get missing data intervals within given interval
-        final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
+        final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
 
         if (missingIntervals.size() == 0) {
             return null;
