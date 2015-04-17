@@ -38,12 +38,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private boolean refAvailable;
     private final double innerRadius = 0.;
     private final double outerRadius = 40.;
-    protected MetaDataContainer m;
+
     private String instrument = "";
     private String detector = "";
     private String measurement = " ";
     private String observatory = " ";
     private String fullName = "";
+
     private Vector2dInt pixelImageSize = new Vector2dInt();
     private Vector2dDouble sunPixelPosition = new Vector2dDouble();
 
@@ -59,22 +60,21 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
      * @param m
      *            Meta data container serving as a base for the construction
      */
-    public HelioviewerMetaData(MetaDataContainer metaDataContainer) {
+    public HelioviewerMetaData(MetaDataContainer m) {
 
-        m = metaDataContainer;
         instrument = m.get("INSTRUME");
         if (instrument == null)
             return;
         instrument = instrument.split("_")[0];
 
         detector = m.get("DETECTOR");
-
         if (detector == null) {
             detector = " ";
         }
 
-        updateDateTime();
-        updatePixelParameters();
+        updateDateTime(m);
+        updatePosition(m);
+        updatePixelParameters(m);
 
         setPhysicalLowerLeftCorner(sunPixelPosition.scale(-meterPerPixel));
         setPhysicalImageSize(new Vector2dDouble(pixelImageSize.getX() * meterPerPixel, pixelImageSize.getY() * meterPerPixel));
@@ -114,9 +114,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
     }
 
-    private void updatePixelParameters() {
-        updatePosition();
-
+    private void updatePixelParameters(MetaDataContainer m) {
         if (pixelImageSize.getX() != m.getPixelWidth() || pixelImageSize.getY() != m.getPixelHeight()) {
             pixelImageSize = new Vector2dInt(m.getPixelWidth(), m.getPixelHeight());
         }
@@ -205,7 +203,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.getX()) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.getY()) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
     }
 
-    private void updateDateTime() {
+    private void updateDateTime(MetaDataContainer m) {
         String observedDate = m.get("DATE-OBS");
         if (observedDate == null) {
             observedDate = m.get("DATE_OBS");
@@ -274,11 +272,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return this.localRotation;
     }
 
-    private void updatePosition() {
+    private void updatePosition(MetaDataContainer m) {
+        this.dobs = m.tryGetDouble("DSUN_OBS");
 
         double crlt = m.tryGetDouble("CRLT_OBS");
         double crln = m.tryGetDouble("CRLN_OBS");
-        this.dobs = m.tryGetDouble("DSUN_OBS");
         boolean carringtonAvailable = crlt != 0.0 || crln != 0.0;
 
         this.refb0 = m.tryGetDouble("REF_B0");
@@ -345,4 +343,5 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     public double getOuterPhysicalOcculterRadius() {
         return outerRadius;
     }
+
 }
