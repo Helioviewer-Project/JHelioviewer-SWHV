@@ -6,6 +6,7 @@
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar">
+	<classpathentry kind="lib" path="../lib/fits.jar"/>
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
 		</attributes>
@@ -17,6 +18,5 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/lib/fits.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
