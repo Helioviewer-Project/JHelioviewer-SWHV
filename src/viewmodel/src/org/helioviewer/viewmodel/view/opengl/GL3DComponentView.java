@@ -24,7 +24,7 @@ import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
-import org.helioviewer.viewmodel.view.AbstractComponentView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -42,7 +42,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DComponentView extends AbstractComponentView implements GLEventListener, ComponentView, DisplayListener {
+public class GL3DComponentView extends AbstractView implements GLEventListener, ComponentView, DisplayListener {
 
     private GLCanvas canvas;
 
@@ -135,28 +135,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         displayBody(gl, width, height);
         gl.glPopMatrix();
 
-        if (!postRenderers.isEmpty()) {
-            gl.glPushMatrix();
-
-            gl.glMatrixMode(GL2.GL_PROJECTION);
-            gl.glLoadIdentity();
-
-            gl.glOrtho(0, width, 0, height, -1, 1);
-
-            gl.glMatrixMode(GL2.GL_MODELVIEW);
-            gl.glLoadIdentity();
-            gl.glTranslatef(0.0f, height, 0.0f);
-            gl.glScalef(1.0f, -1.0f, 1.0f);
-            gl.glColor4f(1, 1, 1, 0);
-            gl.glEnable(GL2.GL_TEXTURE_2D);
-
-            //GLScreenRenderGraphics glRenderer = new GLScreenRenderGraphics(gl);
-            //for (ScreenRenderer r : postRenderers) {
-            //    r.render(glRenderer);
-            //}
-            gl.glPopMatrix();
-        }
-
         if (exportMode || screenshotMode) {
             exportFrame();
         }
@@ -227,7 +205,6 @@ public class GL3DComponentView extends AbstractComponentView implements GLEventL
         }
     }
 
-    @Override
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);

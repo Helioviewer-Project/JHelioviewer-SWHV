@@ -22,12 +22,12 @@ import org.helioviewer.jhv.io.APIRequestManager;
 
 /**
  * Action to open a local file.
- * 
+ *
  * <p>
  * Opens a file chooser dialog, opens the selected file. Currently supports the
  * following file extensions: "jpg", "jpeg", "png", "fts", "fits", "jp2" and
  * "jpx"
- * 
+ *
  * @author Markus Langenberg
  */
 public class OpenLocalFileAction extends AbstractAction {
@@ -46,6 +46,7 @@ public class OpenLocalFileAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         final JFileChooser fileChooser = new JFileChooser(Settings.getSingletonInstance().getProperty("default.local.path"));
@@ -69,18 +70,16 @@ public class OpenLocalFileAction extends AbstractAction {
                 Settings.getSingletonInstance().setProperty("default.local.path", fileChooser.getSelectedFile().getParent());
                 Settings.getSingletonInstance().save();
 
-                ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
-
                 // Load image in new thread
                 Thread thread = new Thread(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             APIRequestManager.newLoad(fileChooser.getSelectedFile().toURI(), true, null);
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         } finally {
-                            ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                         }
                     }
                 }, "OpenLocalFile");

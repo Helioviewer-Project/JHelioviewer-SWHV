@@ -258,8 +258,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * GUI which represents the image.
      * */
     private void loadImage() {
-        // show loading animation
-        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
 
         // download and open the requested image in a separated thread and hide
         // loading animation when finished
@@ -272,7 +270,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 } finally {
-                    ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                 }
             }
         }, "LoadNewImage");
@@ -286,7 +283,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private void loadMovie() {
         // show loading animation
         ImageViewerGui.getSingletonInstance().getTopToolBar().disableStateButton();
-        ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(true);
 
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
@@ -299,7 +295,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 } finally {
-                    ImageViewerGui.getSingletonInstance().getMainImagePanel().setLoading(false);
                     ImageViewerGui.getSingletonInstance().getTopToolBar().enableStateButton();
                 }
             }

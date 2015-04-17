@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.viewmodel.renderer.screen.ScreenRenderer;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
@@ -40,8 +39,6 @@ public class BasicImagePanel extends JPanel {
 
     protected final Component renderedImageComponent; // don't touch this
 
-    protected AbstractList<ScreenRenderer> postRenderers;
-
     protected Image backgroundImage;
 
     /**
@@ -55,9 +52,6 @@ public class BasicImagePanel extends JPanel {
 
         // initialize list of plugins
         plugins = new LinkedList<ImagePanelPlugin>();
-
-        // initialize container for post renderer
-        postRenderers = new LinkedList<ScreenRenderer>();
     }
 
     public void setBackgroundImage(Image img) {
@@ -148,22 +142,11 @@ public class BasicImagePanel extends JPanel {
         if (componentView != null) {
             componentView.setComponent(renderedImageComponent);
             setInputController(inputController);
-            setPostRenderers();
         }
 
         for (ImagePanelPlugin p : plugins) {
             p.setImagePanel(this);
             p.setView(componentView);
-        }
-    }
-
-    /**
-     * Sets the existing post renderer to the (new) component view.
-     */
-    private void setPostRenderers() {
-        if (componentView != null) {
-            for (ScreenRenderer r : postRenderers)
-                componentView.addPostRenderer(r);
         }
     }
 
@@ -249,36 +232,6 @@ public class BasicImagePanel extends JPanel {
         }
 
         inputController = newInputController;
-    }
-
-    /**
-     * Adds the passed post renderer to the image component.
-     *
-     * @param postRenderer
-     *            new post renderer for the image component.
-     */
-    public void addPostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            postRenderers.add(postRenderer);
-
-            if (componentView != null)
-                componentView.addPostRenderer(postRenderer);
-        }
-    }
-
-    /**
-     * Adds the passed post renderer from the image component.
-     *
-     * @param postRenderer
-     *            post renderer which has to be removed from image component.
-     */
-    public void removePostRenderer(ScreenRenderer postRenderer) {
-        if (postRenderer != null) {
-            postRenderers.remove(postRenderer);
-
-            if (componentView != null)
-                componentView.removePostRenderer(postRenderer);
-        }
     }
 
 }
