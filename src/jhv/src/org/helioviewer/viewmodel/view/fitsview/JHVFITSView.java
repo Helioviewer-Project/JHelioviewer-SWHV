@@ -7,8 +7,7 @@ import java.util.Date;
 
 import org.helioviewer.base.math.Interval;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
-import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -135,8 +134,7 @@ public class JHVFITSView extends AbstractView implements RegionView, SubimageDat
             subImageData = new ARGBInt32ImageData(bi, new ColorMask());
         }
 
-        ChangeEvent event = new ChangeEvent(new SubImageDataChangedReason(this));
-        notifyViewListeners(event);
+        Displayer.display();
     }
 
     /**
