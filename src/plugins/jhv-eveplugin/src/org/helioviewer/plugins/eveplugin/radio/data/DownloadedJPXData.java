@@ -11,12 +11,12 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class DownloadedJPXData {
-    private ImageInfoView view;
+    private JHVJP2View view;
     private Long imageID;
     private Date startDate;
     private Date endDate;
@@ -25,7 +25,7 @@ public class DownloadedJPXData {
     private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
     private final int workernumber;
 
-    public DownloadedJPXData(ImageInfoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
+    public DownloadedJPXData(JHVJP2View view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
         this.view = view;
         this.imageID = imageID;
@@ -36,11 +36,11 @@ public class DownloadedJPXData {
         workernumber = 0;
     }
 
-    public ImageInfoView getView() {
+    public JHVJP2View getView() {
         return view;
     }
 
-    public void setView(ImageInfoView view) {
+    public void setView(JHVJP2View view) {
         this.view = view;
     }
 

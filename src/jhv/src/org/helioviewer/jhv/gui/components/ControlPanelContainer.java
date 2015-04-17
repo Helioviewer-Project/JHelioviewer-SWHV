@@ -8,39 +8,36 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
     private static final long serialVersionUID = 5760418851530682634L;
-    HashMap<ImageInfoView, Component> controlMap = new HashMap<ImageInfoView, Component>();
+    HashMap<View, Component> controlMap = new HashMap<View, Component>();
 
     public ControlPanelContainer() {
         this.setLayout(new CardLayout());
         Displayer.getLayersModel().addLayersListener(this);
     }
 
-    public void addLayer(ImageInfoView view, Component controlPanel) {
-        controlMap.put(view, controlPanel);
-        this.add(controlPanel, view.toString());
+    public void addLayer(View v, Component controlPanel) {
+        controlMap.put(v, controlPanel);
+        this.add(controlPanel, v.toString());
     }
 
-    public void removeLayer(ImageInfoView view) {
-        Component toRemove = controlMap.get(view);
+    public void removeLayer(View v) {
+        Component toRemove = controlMap.get(v);
         this.getLayout().removeLayoutComponent(toRemove);
     }
 
-    public Component getViewComponent(ImageInfoView view) {
-        return controlMap.get(view);
+    public Component getViewComponent(View v) {
+        return controlMap.get(v);
     }
 
-    private void updateActiveView(View view) {
-        ImageInfoView infoView = view instanceof ImageInfoView ? (ImageInfoView) view : null;
-
+    private void updateActiveView(View v) {
         CardLayout cl = (CardLayout) this.getLayout();
-        cl.show(this, infoView == null ? "null" : infoView.toString());
+        cl.show(this, v == null ? "null" : v.toString());
         ensureSize();
     }
 

@@ -18,7 +18,6 @@ import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -35,7 +34,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  *
  * @author Andreas Hoelzl
  * */
-public class JHVFITSView implements View, ImageInfoView {
+public class JHVFITSView implements View {
 
     protected Viewport viewport;
     protected Region region;

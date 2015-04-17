@@ -30,7 +30,6 @@ import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
@@ -62,7 +61,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  * application.
  *
  */
-public class JHVJP2View implements JP2View, ImageInfoView, RenderListener {
+public class JHVJP2View implements JP2View, RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
