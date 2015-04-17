@@ -21,7 +21,6 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
@@ -147,10 +146,6 @@ public class GL3DComponentView extends AbstractView implements GLEventListener, 
     @Override
     public void display() {
         canvas.repaint();
-    }
-
-    @Override
-    public void viewChanged(View sender, ChangeEvent aEvent) {
     }
 
     private void exportFrame() {

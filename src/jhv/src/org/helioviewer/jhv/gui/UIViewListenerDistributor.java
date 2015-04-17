@@ -41,7 +41,7 @@ public class UIViewListenerDistributor {
      *
      * @param l
      *            the listener to add
-     * @see #removeViewListener(ViewListener)
+     * @see #removeViewListener(UIViewListener)
      */
     public void addViewListener(UIViewListener l) {
         listeners.add(l);
@@ -55,7 +55,7 @@ public class UIViewListenerDistributor {
      *
      * @param l
      *            the listener to remove
-     * @see #addViewListener(ViewListener)
+     * @see #addViewListener(UIViewListener)
      */
     public void removeViewListener(UIViewListener l) {
         listeners.remove(l);
