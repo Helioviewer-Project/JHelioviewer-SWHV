@@ -6,12 +6,12 @@ import java.util.Locale;
 /**
  * A class for two dimensional vectors with integer coordinates. Instances of
  * Vector2dInt are immutable.
- * 
+ *
  * The restriction to integer coordinates might lead to overflows in some
  * calculations. Consider using Vector2dDouble or Vector2dLong instead.
- * 
+ *
  * @author Ludwig Schmidt
- * 
+ *
  */
 public final class Vector2dInt {
 
@@ -41,11 +41,6 @@ public final class Vector2dInt {
     public Vector2dInt(final Vector2dInt v) {
         x = v.x;
         y = v.y;
-    }
-
-    public Vector2dInt(final Vector2dLong v) {
-        x = (int) v.getX();
-        y = (int) v.getY();
     }
 
     public Vector2dInt(final Vector2dDouble v) {
@@ -171,6 +166,7 @@ public final class Vector2dInt {
         return new Vector2dInt(Math.abs(v.x), Math.abs(v.y));
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Vector2dInt)) {
             return false;
@@ -189,10 +185,12 @@ public final class Vector2dInt {
      */
     private static final int HASH_CODE_INITIAL_VALUE = 17;
 
+    @Override
     public int hashCode() {
         return HASH_CODE_INITIAL_VALUE * HASH_CODE_MULTIPLIER * HASH_CODE_MULTIPLIER + HASH_CODE_MULTIPLIER * x + y;
     }
 
+    @Override
     public String toString() {
         return String.format(Locale.ENGLISH, "(%d,%d)", x, y);
     }
