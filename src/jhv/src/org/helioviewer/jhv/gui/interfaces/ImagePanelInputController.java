@@ -15,7 +15,7 @@ import org.helioviewer.base.math.Vector2dInt;
  * 
  * <p>
  * For further informations, see {@link ImagePanelPlugin}
- * {@link org.helioviewer.jhv.gui.components.BasicImagePanel}.
+ * {@link org.helioviewer.jhv.gui.components.MainImagePanel}.
  * 
  */
 public interface ImagePanelInputController extends MouseInputListener, MouseWheelListener, ImagePanelPlugin {

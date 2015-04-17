@@ -21,7 +21,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.BasicImagePanel;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
@@ -51,7 +51,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
 
     private GL3DComponentView view;
 
-    private BasicImagePanel imagePanel;
+    private MainImagePanel imagePanel;
 
     private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
@@ -85,7 +85,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * {@inheritDoc}
      */
     @Override
-    public void setImagePanel(BasicImagePanel newImagePanel) {
+    public void setImagePanel(MainImagePanel newImagePanel) {
         imagePanel = newImagePanel;
         imagePanel.addMouseListener(this);
         imagePanel.addMouseMotionListener(this);
@@ -95,7 +95,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      * {@inheritDoc}
      */
     @Override
-    public BasicImagePanel getImagePanel() {
+    public MainImagePanel getImagePanel() {
         return imagePanel;
     }
 
