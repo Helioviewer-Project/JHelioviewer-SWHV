@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
@@ -85,16 +84,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         description += "<p>The plugin uses <a href=\"http://db.apache.org/derby/\">Apache Derby, an Apache DB subproject</a>,<br>" + '\u00A9' + " 2011, Apache Software Foundation, <a href=\"http://www.apache.org/licenses/\">Apache License, Version 2.0</a><br>";
 
         return description;
-    }
-
-    /**
-     * Used for testing the plugin
-     *
-     * @see org.helioviewer.plugins.eveplugin.EVEPluginLauncher#main(String[])
-     * @param args
-     */
-    public static void main(String[] args) {
-        JavaHelioViewerLauncher.start(EVEPluginLauncher.class, args);
     }
 
     @Override
