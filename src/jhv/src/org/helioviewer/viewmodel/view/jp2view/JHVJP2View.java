@@ -11,7 +11,6 @@ import javax.media.opengl.GL2;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
@@ -67,8 +66,6 @@ public class JHVJP2View implements JP2View, RenderListener {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     };
 
-    private final Interval<Date> range;
-
     public GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
 
     // Member related to the view chain
@@ -112,13 +109,12 @@ public class JHVJP2View implements JP2View, RenderListener {
      * @param isMainView
      *            Whether the view is a main view or not
      */
-    public JHVJP2View(boolean isMainView, Interval<Date> range) {
+    public JHVJP2View(boolean isMainView) {
         this.isMainView = isMainView;
         if (isMainView) {
             Displayer.addRenderListener(this);
         }
         isPersistent = isMainView;
-        this.range = range;
     }
 
     public void setImageLayer(GL3DImageLayer imageLayer) {
@@ -724,11 +720,6 @@ public class JHVJP2View implements JP2View, RenderListener {
      */
     void updateParameter() {
         setImageViewParams(calculateParameter());
-    }
-
-    @Override
-    public Interval<Date> getDateRange() {
-        return this.range;
     }
 
     public ImageData getImageData() {

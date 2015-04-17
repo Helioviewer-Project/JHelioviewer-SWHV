@@ -384,6 +384,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
         try {
             final URI uri = new URI(srv + img);
+
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -391,17 +392,14 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     URI newUri = filedownloader.downloadFromHTTP(uri, true);
 
                     try {
-                        APIRequestManager.newLoad(newUri, uri, true, null);
+                        APIRequestManager.newLoad(newUri, uri, true);
                         dispose();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-
             }, "OpenRemoteFile1");
-
             thread.start();
-
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
@@ -456,12 +454,12 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         try {
             final URI uri = new URI(srv + img);
             final OpenRemoteFileDialog parent = this;
-            Thread thread = new Thread(new Runnable() {
 
+            Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        APIRequestManager.newLoad(uri, new URI(httpPath), true, null);
+                        APIRequestManager.newLoad(uri, new URI(httpPath), true);
 
                         if (advancedOptions == false) {
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
@@ -475,7 +473,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     }
                 }
             }, "OpenRemoteFile2");
-
             thread.start();
         } catch (URISyntaxException e) {
             e.printStackTrace();

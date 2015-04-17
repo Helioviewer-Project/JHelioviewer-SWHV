@@ -3,9 +3,7 @@ package org.helioviewer.viewmodel.view.fitsview;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -42,7 +40,6 @@ public class JHVFITSView implements View {
     protected ImageData subImageData;
     protected MetaData m;
     private final URI uri;
-    private final Interval<Date> range;
 
     /**
      * Constructor which loads a fits image from a given URI.
@@ -52,10 +49,8 @@ public class JHVFITSView implements View {
      * @throws IOException
      *             when an error occurred during reading the fits file.
      * */
-    public JHVFITSView(URI uri, Interval<Date> range) throws IOException {
-
+    public JHVFITSView(URI uri) throws IOException {
         this.uri = uri;
-        this.range = range;
         if (!uri.getScheme().equalsIgnoreCase("file"))
             throw new IOException("FITS does not support the " + uri.getScheme() + " protocol");
 
@@ -76,12 +71,9 @@ public class JHVFITSView implements View {
      * @param uri
      *            Specifies the location of the FITS file.
      * */
-    public JHVFITSView(FITSImage fits, URI uri, Interval<Date> range) {
+    public JHVFITSView(FITSImage fits, URI uri) {
         this.uri = uri;
         this.fits = fits;
-        this.range = range;
-        initFITSImageView();
-
         initFITSImageView();
     }
 
@@ -234,11 +226,6 @@ public class JHVFITSView implements View {
     @Override
     public URI getDownloadURI() {
         return uri;
-    }
-
-    @Override
-    public Interval<Date> getDateRange() {
-        return this.range;
     }
 
 }

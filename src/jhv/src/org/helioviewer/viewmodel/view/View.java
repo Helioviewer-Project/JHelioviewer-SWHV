@@ -1,9 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
 import java.net.URI;
-import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -75,7 +73,5 @@ public interface View {
      * @return download uri
      */
     public URI getDownloadURI();
-
-    public Interval<Date> getDateRange();
 
 }

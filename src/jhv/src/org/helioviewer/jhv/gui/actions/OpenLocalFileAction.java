@@ -74,7 +74,7 @@ public class OpenLocalFileAction extends AbstractAction {
                     @Override
                     public void run() {
                         try {
-                            APIRequestManager.newLoad(fileChooser.getSelectedFile().toURI(), true, null);
+                            APIRequestManager.newLoad(fileChooser.getSelectedFile().toURI(), true);
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         }

@@ -2,9 +2,7 @@ package org.helioviewer.viewmodel.view;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
@@ -298,8 +296,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, Interval<Date> range) throws IOException {
-        return loadView(uri, true, range);
+    public static JHVJP2View loadView(URI uri) throws IOException {
+        return loadView(uri, true);
     }
 
     /**
@@ -319,8 +317,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, boolean isMainView, Interval<Date> range) throws IOException {
-        return loadView(uri, uri, isMainView, range);
+    public static JHVJP2View loadView(URI uri, boolean isMainView) throws IOException {
+        return loadView(uri, uri, isMainView);
     }
 
     /**
@@ -341,8 +339,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, URI downloadURI, Interval<Date> range) throws IOException {
-        return loadView(uri, downloadURI, true, range);
+    public static JHVJP2View loadView(URI uri, URI downloadURI) throws IOException {
+        return loadView(uri, downloadURI, true);
     }
 
     /**
@@ -364,9 +362,9 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, URI downloadURI, boolean isMainView, Interval<Date> range) throws IOException {
+    public static JHVJP2View loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
-            throw new IOException("Invalid URI.");
+            throw new IOException("Invalid URI");
         }
 
         String[] parts = uri.toString().split("\\.");
@@ -374,7 +372,7 @@ public final class ViewHelper {
         if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView, range);
+                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView);
 
                 jp2CallistoView.setJP2Image(jp2Image);
                 return jp2CallistoView;
@@ -387,11 +385,11 @@ public final class ViewHelper {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
 
                 if (jp2Image.isMultiFrame()) {
-                    JHVJPXView jpxView = new JHVJPXView(isMainView, range, true);
+                    JHVJPXView jpxView = new JHVJPXView(isMainView, true);
                     jpxView.setJP2Image(jp2Image);
                     return jpxView;
                 } else {
-                    JHVJP2View jp2View = new JHVJP2View(isMainView, range);
+                    JHVJP2View jp2View = new JHVJP2View(isMainView);
                     jp2View.setJP2Image(jp2Image);
                     return jp2View;
                 }
