@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui.controller;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.jhv.gui.components.BasicImagePanel;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
 import org.helioviewer.viewmodel.view.ComponentView;
 
@@ -25,7 +25,7 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
     // ///////////////////////////////////////////////////////////////////////////
 
     protected ComponentView view;
-    protected BasicImagePanel imagePanel;
+    protected MainImagePanel imagePanel;
     protected Vector2dInt mousePosition = null;
 
     // ///////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
      * @return Reference to the assigned image panel.
      * */
     @Override
-    public BasicImagePanel getImagePanel() {
+    public MainImagePanel getImagePanel() {
         return imagePanel;
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractImagePanelMouseController implements ImagePanelInp
      *            Image panel
      * */
     @Override
-    public void setImagePanel(BasicImagePanel newImagePanel) {
+    public void setImagePanel(MainImagePanel newImagePanel) {
         imagePanel = newImagePanel;
     }
 

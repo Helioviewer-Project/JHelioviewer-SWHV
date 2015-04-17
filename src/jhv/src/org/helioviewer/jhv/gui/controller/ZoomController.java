@@ -4,7 +4,7 @@ import org.helioviewer.base.math.Vector2dDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.BasicImagePanel;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
@@ -29,7 +29,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
  */
 public class ZoomController {
 
-    private BasicImagePanel panel = null;
+    private MainImagePanel panel = null;
 
     public static final double zoomFactorStep = Math.pow(2, 1.0 / (4.0));
 
@@ -40,7 +40,7 @@ public class ZoomController {
      * @param panel
      *            An ImagePanel
      */
-    public void setImagePanel(BasicImagePanel panel) {
+    public void setImagePanel(MainImagePanel panel) {
         this.panel = panel;
     }
 

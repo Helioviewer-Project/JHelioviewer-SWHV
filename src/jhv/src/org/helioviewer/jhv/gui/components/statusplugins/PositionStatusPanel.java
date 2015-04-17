@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
-import org.helioviewer.jhv.gui.components.BasicImagePanel;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -37,7 +37,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private ComponentView view;
     private JHVJP2View jp2View;
 
-    private BasicImagePanel imagePanel;
+    private MainImagePanel imagePanel;
     private Point lastPosition;
 
     private final char PRIME = '\u2032';
@@ -104,7 +104,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public BasicImagePanel getImagePanel() {
+    public MainImagePanel getImagePanel() {
         return imagePanel;
     }
 
@@ -112,7 +112,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      * {@inheritDoc}
      */
     @Override
-    public void setImagePanel(BasicImagePanel newImagePanel) {
+    public void setImagePanel(MainImagePanel newImagePanel) {
         if (imagePanel != null) {
             imagePanel.removeMouseMotionListener(this);
         }
