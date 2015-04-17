@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.cache;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
@@ -62,6 +63,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                     imagePartialUntil = tempImagePartialUntil;
 
                     changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
+                    UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
 
                 }
 
@@ -86,6 +88,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                     }
 
                     changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
+                    UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
 
                 }
 
@@ -131,7 +134,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                 imageCompleteUntil = tempImageCompleteUntil;
 
                 changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
-
+                UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
             }
         } finally {
             lock.unlock();
