@@ -2,7 +2,6 @@ package org.helioviewer.gl3d.gui;
 
 import java.awt.event.ActionEvent;
 
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 
@@ -23,8 +22,7 @@ public class GL3DZoomOutAction extends ZoomOutAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera camera = GL3DState.get().getActiveCamera();
-        camera.zoomIn(-1);
+        GL3DState.get().getActiveCamera().zoomIn(+1);
     }
 
 }
