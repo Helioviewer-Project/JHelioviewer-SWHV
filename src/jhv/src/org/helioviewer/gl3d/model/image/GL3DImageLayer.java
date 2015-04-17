@@ -314,20 +314,20 @@ public class GL3DImageLayer implements Renderable {
             subdivide(f[0], f[1], f[2], vertices, faceIndices, level);
         }
         int beginPositionNumberCorona = vertices.size() / 3;
-        vertices.add(-40f);
-        vertices.add(40f);
+        vertices.add(-1f);
+        vertices.add(1f);
         vertices.add(0f);
 
-        vertices.add(40f);
-        vertices.add(40f);
+        vertices.add(1f);
+        vertices.add(1f);
         vertices.add(0f);
 
-        vertices.add(40f);
-        vertices.add(-40f);
+        vertices.add(1f);
+        vertices.add(-1f);
         vertices.add(0f);
 
-        vertices.add(-40f);
-        vertices.add(-40f);
+        vertices.add(-1f);
+        vertices.add(-1f);
         vertices.add(0f);
 
         faceIndices.add(beginPositionNumberCorona + 0);
