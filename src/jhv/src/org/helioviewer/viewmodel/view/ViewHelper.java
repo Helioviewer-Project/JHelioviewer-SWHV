@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXCallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -390,16 +389,10 @@ public final class ViewHelper {
         if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
+                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView, range);
 
-                if (jp2Image.isMultiFrame()) {
-                    JHVJPXCallistoView jpxCallistoView = new JHVJPXCallistoView(isMainView, range, true);
-                    jpxCallistoView.setJP2Image(jp2Image);
-                    return jpxCallistoView;
-                } else {
-                    JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView, range);
-                    jp2CallistoView.setJP2Image(jp2Image);
-                    return jp2CallistoView;
-                }
+                jp2CallistoView.setJP2Image(jp2Image);
+                return jp2CallistoView;
             } catch (Exception e) {
                 Log.debug("ViewerHelper::loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
                 throw new IOException(e.getMessage());
