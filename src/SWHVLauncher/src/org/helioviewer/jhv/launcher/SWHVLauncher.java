@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.launcher;
 
 import java.awt.EventQueue;
+import java.util.Arrays;
 
-import org.helioviewer.base.JavaCompatibility;
 import org.helioviewer.jhv.JavaHelioViewer;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
@@ -18,6 +18,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  *
  */
 public class SWHVLauncher {
+
     public static void main(String[] args) {
         System.out.println("================================================================");
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
@@ -25,7 +26,7 @@ public class SWHVLauncher {
 
         JavaHelioViewerLauncher.loadLibs();
 
-        String[] args2 = JavaCompatibility.copyArrayString(args, args.length + 4);
+        String[] args2 = Arrays.copyOf(args, args.length + 4);
 
         args2[args2.length - 2] = "--deactivate-plugin";
         args2[args2.length - 1] = "SWEKPlugin.jar";
@@ -35,14 +36,11 @@ public class SWHVLauncher {
         JavaHelioViewer.main(args2, new SWEKPlugin(false));
 
         EventQueue.invokeLater(new Runnable() {
-
             @Override
             public void run() {
-                // TODO Auto-generated method stub
                 PluginManager.getSingletonInstance().addPlugin(EVEPluginLauncher.class.getClassLoader(), new EVEPlugin(), null);
                 PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
             }
-
         });
     }
 
