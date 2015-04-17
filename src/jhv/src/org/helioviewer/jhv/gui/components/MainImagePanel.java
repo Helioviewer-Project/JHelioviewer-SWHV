@@ -3,10 +3,7 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This class represents an image component that is used to display the image of
@@ -18,21 +15,11 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Stephan Pagel
  * @author Markus Langenberg
  */
-public class MainImagePanel extends BasicImagePanel implements LayersListener {
+public class MainImagePanel extends BasicImagePanel {
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////////////////
-
-    // default serialVersionUID
     private static final long serialVersionUID = 1L;
-    private final int loadingTasks = 0;
 
     private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
-
-    // ///////////////////////////////////////////////////////////////////////////
-    // Methods
-    // ///////////////////////////////////////////////////////////////////////////
 
     /**
      * The public constructor
@@ -44,7 +31,6 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
         // the one GLCanvas
         add(renderedImageComponent);
 
-        Displayer.getLayersModel().addLayersListener(this);
     }
 
     /**
@@ -84,20 +70,6 @@ public class MainImagePanel extends BasicImagePanel implements LayersListener {
     public void removeMouseMotionListener(MouseMotionListener l) {
         if (l != null)
             mouseMotionListeners.remove(l);
-    }
-
-    @Override
-    public void layerAdded(int idx) {
-
-    }
-
-    @Override
-    public void layerRemoved(int oldIdx) {
-
-    }
-
-    @Override
-    public void activeLayerChanged(JHVJP2View view) {
     }
 
 }
