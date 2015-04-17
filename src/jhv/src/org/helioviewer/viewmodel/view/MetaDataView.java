@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  * @author Ludwig Schmidt
  * 
  */
-public interface MetaDataView extends View {
+public interface MetaDataView {
 
     /**
      * Returns the meta data the image.

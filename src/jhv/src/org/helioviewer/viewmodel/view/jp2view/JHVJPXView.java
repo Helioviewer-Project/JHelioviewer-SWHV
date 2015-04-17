@@ -6,7 +6,6 @@ import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.view.CachedMovieView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -32,7 +31,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  *
  * @author Markus Langenberg
  */
-public class JHVJPXView extends JHVJP2View implements TimedMovieView, CachedMovieView {
+public class JHVJPXView extends JHVJP2View implements TimedMovieView {
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;

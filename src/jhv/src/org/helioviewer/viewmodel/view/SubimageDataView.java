@@ -16,7 +16,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
  * 
  * @author Ludwig Schmidt
  */
-public interface SubimageDataView extends View {
+public interface SubimageDataView {
 
     /**
      * Returns the image data produced by the view

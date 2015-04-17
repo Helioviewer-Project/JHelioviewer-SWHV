@@ -20,7 +20,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  *
  * @author Ludwig Schmidt
  */
-public interface ImageInfoView extends View {
+public interface ImageInfoView {
 
     /**
      * Returns the URI representing the location of the image.
