@@ -20,7 +20,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.changeevent.SubImageDataChangedReason;
@@ -157,8 +156,6 @@ public class GL3DComponentView extends AbstractView implements GLEventListener, 
         if (sidReason != null) {
             Displayer.display();
         }
-
-        UIViewListenerDistributor.getSingletonInstance().viewChanged(sender, aEvent);
     }
 
     private void exportFrame() {
