@@ -22,7 +22,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -31,7 +30,6 @@ import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.MetaDataView;
 import org.helioviewer.viewmodel.view.RegionView;
@@ -67,7 +65,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  * application.
  *
  */
-public class JHVJP2View extends AbstractView implements JP2View, RegionView, MetaDataView, SubimageDataView, ImageInfoView, RenderListener {
+public class JHVJP2View implements JP2View, RegionView, MetaDataView, SubimageDataView, ImageInfoView, RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
@@ -419,28 +417,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
             return reader.isConnected();
 
         return false;
-    }
-
-    /**
-     * Fires a ChangeEvent into the view chain.
-     *
-     * @param aEvent
-     *            ChangeEvent to fire
-     */
-    public void fireChangeEvent(ChangeEvent aEvent) {
-        EventQueue.invokeLater(new Runnable() {
-            private ChangeEvent theEvent;
-
-            @Override
-            public void run() {
-                notifyViewListeners(theEvent);
-            }
-
-            public Runnable init(ChangeEvent theEvent) {
-                this.theEvent = theEvent;
-                return this;
-            }
-        }.init(aEvent));
     }
 
     /**

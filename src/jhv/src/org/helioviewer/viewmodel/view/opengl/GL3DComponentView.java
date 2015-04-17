@@ -21,7 +21,6 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -39,7 +38,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DComponentView extends AbstractView implements GLEventListener, ComponentView, DisplayListener {
+public class GL3DComponentView implements GLEventListener, ComponentView, DisplayListener {
 
     private GLCanvas canvas;
 

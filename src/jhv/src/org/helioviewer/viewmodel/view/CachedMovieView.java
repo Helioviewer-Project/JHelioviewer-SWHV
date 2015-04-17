@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 /**
@@ -13,14 +12,6 @@ import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
  *
  */
 public interface CachedMovieView extends MovieView {
-
-    /**
-     * Fires a ChangeEvent into the view chain.
-     *
-     * @param aEvent
-     *            ChangeEvent to fire
-     */
-    public void fireChangeEvent(ChangeEvent aEvent);
 
     /**
      * Returns the image cache status.
