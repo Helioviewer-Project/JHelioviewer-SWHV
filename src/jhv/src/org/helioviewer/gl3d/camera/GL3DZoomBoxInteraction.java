@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.math.GL3DVec3d;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 

@@ -2,7 +2,7 @@ package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 public class RadioData {
     private byte[][] data;

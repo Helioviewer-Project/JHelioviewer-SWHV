@@ -1,4 +1,4 @@
-package org.helioviewer.base.math;
+package org.helioviewer.base.interval;
 
 import java.util.HashMap;
 import java.util.Iterator;

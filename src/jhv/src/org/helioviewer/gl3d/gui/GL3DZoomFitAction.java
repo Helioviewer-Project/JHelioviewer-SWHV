@@ -2,8 +2,8 @@ package org.helioviewer.gl3d.gui;
 
 import java.awt.event.ActionEvent;
 
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.viewmodel.region.Region;
@@ -32,9 +32,9 @@ public class GL3DZoomFitAction extends ZoomFitAction {
         if (view != null) {
             Region region = view.getMetaData().getPhysicalRegion();
             if (region != null) {
-                double halfWidth = region.getWidth() / 2;
-                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.0);
-                double distance = halfWidth * Math.sin(Math.PI / 2 - halfFOVRad) / Math.sin(halfFOVRad);
+                double halfWidth = region.getWidth() / 2.;
+                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.);
+                double distance = halfWidth * Math.sin(Math.PI / 2. - halfFOVRad) / Math.sin(halfFOVRad);
                 distance = -distance - camera.getZTranslation();
                 GL3DVec3d cameraTranslation = camera.getTranslation().copy();
                 cameraTranslation.negate();

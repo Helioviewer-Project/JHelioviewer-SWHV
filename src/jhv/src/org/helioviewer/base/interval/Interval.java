@@ -1,4 +1,4 @@
-package org.helioviewer.base.math;
+package org.helioviewer.base.interval;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -88,28 +88,28 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#contains
+     * @see org.helioviewer.base.interval.IntervalComparison#contains
      */
     public boolean contains(Interval<TimeFormat> other) {
         return this.containsPoint(other.start) && this.containsPoint(other.end);
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#containsFully
+     * @see org.helioviewer.base.interval.IntervalComparison#containsFully
      */
     public boolean containsFully(Interval<TimeFormat> other) {
         return this.containsPointFully(other.start) && this.containsPointFully(other.end);
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#containsInclusive
+     * @see org.helioviewer.base.interval.IntervalComparison#containsInclusive
      */
     public boolean containsInclusive(Interval<TimeFormat> other) {
         return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#containsPoint
+     * @see org.helioviewer.base.interval.IntervalComparison#containsPoint
      */
     public boolean containsPoint(TimeFormat time) {
         // start inclusive, end exclusive!
@@ -119,7 +119,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#containsPointFully
+     * @see org.helioviewer.base.interval.IntervalComparison#containsPointFully
      */
     public boolean containsPointFully(TimeFormat time) {
         assert start.compareTo(end) <= 0;
@@ -127,7 +127,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#containsPointInclusive
+     * @see org.helioviewer.base.interval.IntervalComparison#containsPointInclusive
      */
     public boolean containsPointInclusive(TimeFormat time) {
         assert start.compareTo(end) <= 0;
@@ -135,14 +135,14 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#overlaps
+     * @see org.helioviewer.base.interval.IntervalComparison#overlaps
      */
     public boolean overlaps(Interval<TimeFormat> other) {
         return (this.containsPoint(other.start) || this.containsPoint(other.end)) || (other.containsPoint(this.start) || other.containsPoint(this.end));
     }
 
     /**
-     * @see org.helioviewer.base.math.IntervalComparison#overlapsInclusive
+     * @see org.helioviewer.base.interval.IntervalComparison#overlapsInclusive
      */
     public boolean overlapsInclusive(Interval<TimeFormat> other) {
         return (this.containsPointInclusive(other.start) || this.containsPointInclusive(other.end)) || (other.containsPointInclusive(this.start) || other.containsPointInclusive(this.end));
@@ -364,7 +364,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * <code> intervalA.equals(intervalB) </code>
      * <p>
      * 
-     * @see org.helioviewer.base.math.Interval#equals
+     * @see org.helioviewer.base.interval.Interval#equals
      */
 
     public int hashCode() {

@@ -1,6 +1,5 @@
 package org.helioviewer.base.math;
 
-import org.helioviewer.gl3d.math.GL3DVec2d;
 
 public final class RectangleDouble {
 

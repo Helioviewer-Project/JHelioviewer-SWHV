@@ -3,7 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.net.URI;
 import java.util.Date;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 /**

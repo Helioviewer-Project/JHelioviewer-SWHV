@@ -2,7 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view.image;
 
 import java.awt.Rectangle;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 /**
  * A very simple region of interest class. Basically just an immutable (for

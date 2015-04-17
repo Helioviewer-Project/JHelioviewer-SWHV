@@ -1,5 +1,7 @@
 package org.helioviewer.base.math;
 
+import org.helioviewer.base.interval.Interval;
+
 /**
  * A collection of useful static methods.
  * 

@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.Interval;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.EVEAPI;

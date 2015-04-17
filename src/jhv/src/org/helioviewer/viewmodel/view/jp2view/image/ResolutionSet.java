@@ -3,7 +3,7 @@ package org.helioviewer.viewmodel.view.jp2view.image;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 
 /**
  * A class describing the available resolution levels for a given image. It

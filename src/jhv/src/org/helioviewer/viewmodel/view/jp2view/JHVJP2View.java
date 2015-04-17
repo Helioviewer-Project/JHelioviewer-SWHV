@@ -11,7 +11,7 @@ import javax.media.opengl.GL2;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;

@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.RectangleDouble;
-import org.helioviewer.gl3d.math.GL3DVec2d;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;

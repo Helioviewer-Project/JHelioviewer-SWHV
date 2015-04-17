@@ -7,8 +7,8 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
 
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.math.GL3DVec3d;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;

@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.math.Interval;
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.IconBank;
