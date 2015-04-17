@@ -30,31 +30,25 @@ import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
  * @author Markus Langenberg
  */
 public class MainImagePanel extends JPanel {
+
     private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
 
-    private static final long serialVersionUID = 1L;
-
     protected ComponentView componentView;
-
     protected ImagePanelInputController inputController;
-
     protected AbstractList<ImagePanelPlugin> plugins;
 
-    private final Component renderedImageComponent;
+    private final Component renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
 
     /**
      * Default constructor.
      * */
     public MainImagePanel() {
         super(new BorderLayout(0, 0));
-        renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
-
         setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         // initialize list of plugins
         plugins = new LinkedList<ImagePanelPlugin>();
         add(renderedImageComponent);
-
     }
 
     /**
@@ -99,16 +93,15 @@ public class MainImagePanel extends JPanel {
      *            new component view.
      */
     public void setView(ComponentView newView) {
-        if (renderedImageComponent != null)
-            for (MouseMotionListener l : mouseMotionListeners)
-                renderedImageComponent.removeMouseMotionListener(l);
+        for (MouseMotionListener l : mouseMotionListeners) {
+            renderedImageComponent.removeMouseMotionListener(l);
+        }
 
         renderedImageComponent.removeMouseListener(inputController);
         renderedImageComponent.removeMouseMotionListener(inputController);
         renderedImageComponent.removeMouseWheelListener(inputController);
 
         componentView = newView;
-
         if (componentView != null) {
             componentView.setComponent(renderedImageComponent);
             setInputController(inputController);
@@ -120,9 +113,9 @@ public class MainImagePanel extends JPanel {
         }
 
         if (newView != null) {
-            if (renderedImageComponent != null)
-                for (MouseMotionListener l : mouseMotionListeners)
-                    renderedImageComponent.addMouseMotionListener(l);
+            for (MouseMotionListener l : mouseMotionListeners) {
+                renderedImageComponent.addMouseMotionListener(l);
+            }
         }
     }
 
@@ -193,7 +186,6 @@ public class MainImagePanel extends JPanel {
             if (KeyListener.class.isAssignableFrom(inputController.getClass())) {
                 renderedImageComponent.removeKeyListener((KeyListener) inputController);
             }
-
         }
         removePlugin(inputController);
 
@@ -206,14 +198,14 @@ public class MainImagePanel extends JPanel {
                 renderedImageComponent.addKeyListener((KeyListener) newInputController);
             }
         }
-
         inputController = newInputController;
     }
 
     @Override
     public void addMouseMotionListener(MouseMotionListener l) {
-        if (l != null)
+        if (l != null) {
             mouseMotionListeners.add(l);
+        }
     }
 
     /**
@@ -222,8 +214,9 @@ public class MainImagePanel extends JPanel {
 
     @Override
     public void removeMouseMotionListener(MouseMotionListener l) {
-        if (l != null)
+        if (l != null) {
             mouseMotionListeners.remove(l);
+        }
     }
 
 }
