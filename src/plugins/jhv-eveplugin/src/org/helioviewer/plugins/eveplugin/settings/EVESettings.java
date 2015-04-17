@@ -3,8 +3,8 @@ package org.helioviewer.plugins.eveplugin.settings;
 import org.helioviewer.jhv.JHVDirectory;
 
 /**
- * 
- * 
+ *
+ *
  * @author Stephan Pagel
  * */
 public class EVESettings {
@@ -19,7 +19,7 @@ public class EVESettings {
      * than the given number of days, the interval will be split up into sub
      * intervals. For each sub interval a single request will be send.
      * */
-    public static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 7;
+    public static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     public static final String RADIO_OBSERVATION_UI_NAME = "Radio data";
 
