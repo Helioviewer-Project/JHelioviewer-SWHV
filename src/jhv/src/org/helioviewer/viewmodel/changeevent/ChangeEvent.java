@@ -188,7 +188,6 @@ public class ChangeEvent {
 
     public boolean hasReasons() {
         return history.size() != 0;
-
     }
 
     /**
