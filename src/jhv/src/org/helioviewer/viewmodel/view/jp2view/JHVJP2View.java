@@ -275,24 +275,14 @@ public class JHVJP2View extends AbstractView implements JP2View, RegionView, Met
      * {@inheritDoc}
      */
 
-    public boolean setViewport(Viewport v, ChangeEvent aEvent) {
-        ChangeEvent event = new ChangeEvent();
+    public boolean setViewport(Viewport v) {
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
 
         if (setImageViewParams(calculateParameter())) {
-            // sub image data will change because resolution level changed
-            // -> memorize change event till sub image data has changed
-            event.copyFrom(aEvent);
-            fireChangeEvent(event);
-
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-            event.copyFrom(aEvent);
-            fireChangeEvent(event);
-
             renderRequestedSignal.signal(RenderReasons.OTHER);
-
             return true;
         }
 
