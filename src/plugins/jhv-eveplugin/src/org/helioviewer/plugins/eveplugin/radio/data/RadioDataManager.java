@@ -553,6 +553,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                     JHVJP2View jp2View = (JHVJP2View) jpxData.getView();
                     if (jp2View != null) {
                         jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))));
+                        jpxData.viewChanged(jp2View);
+
                         Rectangle roi = ri.getROI();
                         if (!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))))) {
                             if (ri.getLastDataSize() != null) {
@@ -725,7 +727,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                                 lastUsedResolutionSetting = rst;
                             }
                         }
+
                         jp2CallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())));
+                        djd.viewChanged(jp2CallistoView);
+
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
@@ -789,7 +794,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                         }
                         RadioImage tempRs = new RadioImage(djd, downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         ResolutionSetting lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
+
                         jpxCallistoView.setViewport(new ViewportAdapter(new StaticViewport(lastUsedResolutionSetting.getVec2dIntRepresentation())));
+                        djd.viewChanged(jpxCallistoView);
+
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
                         jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new Vector2dDouble(roi.getWidth(), roi.getHeight()))));
