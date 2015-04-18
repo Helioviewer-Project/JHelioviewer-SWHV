@@ -102,12 +102,15 @@ public class GL3DImageLayer implements Renderable {
 
         state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
         indexBufferID = generate(state);
         indexBufferSize = indexBuffer.capacity();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         state.getActiveCamera().updateCameraTransformation();
+        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+
     }
 
     private void updateROI(GL3DState state) {
@@ -310,20 +313,21 @@ public class GL3DImageLayer implements Renderable {
             subdivide(f[0], f[1], f[2], vertices, faceIndices, level);
         }
         int beginPositionNumberCorona = vertices.size() / 3;
-        vertices.add(-1f);
-        vertices.add(1f);
+        float r = 40.f;
+        vertices.add(-r);
+        vertices.add(r);
         vertices.add(0f);
 
-        vertices.add(1f);
-        vertices.add(1f);
+        vertices.add(r);
+        vertices.add(r);
         vertices.add(0f);
 
-        vertices.add(1f);
-        vertices.add(-1f);
+        vertices.add(r);
+        vertices.add(-r);
         vertices.add(0f);
 
-        vertices.add(-1f);
-        vertices.add(-1f);
+        vertices.add(-r);
+        vertices.add(-r);
         vertices.add(0f);
 
         faceIndices.add(beginPositionNumberCorona + 0);
