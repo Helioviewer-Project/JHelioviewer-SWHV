@@ -28,7 +28,9 @@ public abstract class AbstractImageInfoView implements ImageInfoView {
     private float gamma = 1f;
     private float opacity = 1f;
     private float sharpenWeighting = 0f;
-    protected LUT lut;
+    protected static final LUT gray = LUT.getStandardList().get("Gray");
+
+    protected LUT lut = gray;
     private LUT lastLut;
 
     private boolean invertLUT = false;
@@ -36,7 +38,6 @@ public abstract class AbstractImageInfoView implements ImageInfoView {
     private IntBuffer lutBuffer;
 
     private boolean lutChanged = true;
-    protected static final LUT gray = LUT.getStandardList().get("Gray");
 
     private ColorMask colorMask = new ColorMask(true, true, true);
     private final GLTextureHelper.GLTexture lutTex = new GLTextureHelper.GLTexture();
@@ -237,6 +238,8 @@ public abstract class AbstractImageInfoView implements ImageInfoView {
     private void copyScreenToTexture(GL2 gl) {
         ImageData image = this.getSubimageData();
         Region region = image.getRegion();
+        System.out.println(region);
+        System.out.println(image);
 
         double xOffset = region.getLowerLeftCorner().x;
         double yOffset = region.getLowerLeftCorner().y;

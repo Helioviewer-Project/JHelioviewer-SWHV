@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.helioviewer.base.math.Vector2dInt;
+import javax.media.opengl.GL2;
+
+import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -18,10 +21,13 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewHelper;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.ImageInfoView;
+import org.helioviewer.viewmodel.view.MetaDataView;
+import org.helioviewer.viewmodel.view.RegionView;
+import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
  * Implementation of ImageInfoView for FITS images.
@@ -32,12 +38,11 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  *
  * @author Andreas Hoelzl
  * */
-public class JHVFITSView implements View {
+public class JHVFITSView extends AbstractImageInfoView implements RegionView, SubimageDataView, ImageInfoView, MetaDataView {
 
     protected Viewport viewport;
     protected Region region;
     protected FITSImage fits;
-    protected ImageData subImageData;
     protected MetaData m;
     private final URI uri;
 
@@ -85,15 +90,17 @@ public class JHVFITSView implements View {
 
         BufferedImage bi = fits.getImage(0, 0, fits.getPixelHeight(), fits.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
-            subImageData = new SingleChannelByte8ImageData(bi, new ColorMask());
+            imageData = new SingleChannelByte8ImageData(bi, new ColorMask());
         } else if (bi.getColorModel().getPixelSize() <= 16) {
-            subImageData = new SingleChannelShortImageData(bi.getColorModel().getPixelSize(), bi, new ColorMask());
+            imageData = new SingleChannelShortImageData(bi.getColorModel().getPixelSize(), bi, new ColorMask());
         } else {
-            subImageData = new ARGBInt32ImageData(bi, new ColorMask());
+            imageData = new ARGBInt32ImageData(bi, new ColorMask());
         }
-        subImageData.setMETADATA(m);
+        imageData.setMETADATA(m);
 
         region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalImageSize().x, m.getPhysicalImageSize().y);
+        imageData.setRegion(region);
+        imageData.setMETADATA(this.m);
         viewport = StaticViewport.createAdaptedViewport(100, 100);
     }
 
@@ -104,23 +111,6 @@ public class JHVFITSView implements View {
      *            Event that belongs to the request.
      * */
     private void updateImageData() {
-        Region r = region;
-        m = getMetaData();
-
-        double imageMeterPerPixel = m.getPhysicalImageWidth() / fits.getPixelWidth();
-        long imageWidth = Math.round(r.getWidth() / imageMeterPerPixel);
-        long imageHeight = Math.round(r.getHeight() / imageMeterPerPixel);
-
-        Vector2dInt imagePostion = ViewHelper.calculateInnerViewportOffset(r, m.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(fits.getPixelWidth(), fits.getPixelHeight())));
-
-        BufferedImage bi = fits.getImage(imagePostion.getX(), imagePostion.getY(), (int) imageHeight, (int) imageWidth);
-        if (bi.getColorModel().getPixelSize() <= 8) {
-            subImageData = new SingleChannelByte8ImageData(bi, new ColorMask());
-        } else if (bi.getColorModel().getPixelSize() <= 16) {
-            subImageData = new SingleChannelShortImageData(bi.getColorModel().getPixelSize(), bi, new ColorMask());
-        } else {
-            subImageData = new ARGBInt32ImageData(bi, new ColorMask());
-        }
 
         Displayer.display();
     }
@@ -182,7 +172,7 @@ public class JHVFITSView implements View {
      * */
     @Override
     public ImageData getSubimageData() {
-        return subImageData;
+        return imageData;
     }
 
     /**
@@ -246,17 +236,21 @@ public class JHVFITSView implements View {
 
     @Override
     public ImageData getBaseDifferenceImageData() {
-        return subImageData;
+        return imageData;
     }
 
     @Override
     public ImageData getPreviousImageData() {
-        return subImageData;
+        return imageData;
     }
 
     @Override
     public ImageData getImageData() {
-        return subImageData;
+        return imageData;
     }
 
+    @Override
+    public void applyFilters(GL2 gl) {
+        super.applyFilters(gl);
+    }
 }
