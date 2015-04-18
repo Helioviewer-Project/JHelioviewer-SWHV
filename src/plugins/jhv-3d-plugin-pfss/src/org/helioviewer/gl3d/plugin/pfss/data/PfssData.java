@@ -164,13 +164,13 @@ public class PfssData {
 
                             if (r < 1.5 && ro < 1.5) {
                                 type = 0;
-                                counter = this.addColor(this.LOOPCOLOR, counter);
+                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
                             } else if (bright < 0) {
                                 type = 1;
-                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
                                 type = 2;
-                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
 
                         }
@@ -180,11 +180,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(this.LOOPCOLOR, counter);
+                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
                         }
                         counter = this.addVertex((float) x, (float) z, (float) -y, counter);
@@ -196,11 +196,11 @@ public class PfssData {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
                             if (type == 0) {
-                                counter = this.addColor(this.LOOPCOLOR, counter);
+                                counter = this.addColor(PfssData.LOOPCOLOR, counter);
                             } else if (type == 1) {
-                                counter = this.addColor(this.INSIDEFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.INSIDEFIELDCOLOR, counter);
                             } else {
-                                counter = this.addColor(this.OPENFIELDCOLOR, counter);
+                                counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
                         }
                     }
