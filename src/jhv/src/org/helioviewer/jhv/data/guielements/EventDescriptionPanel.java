@@ -15,9 +15,9 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
  * This is a panel describing an event in short.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventDescriptionPanel extends JPanel {
     /** UID */
@@ -35,11 +35,6 @@ public class EventDescriptionPanel extends JPanel {
     private JTextArea textType = new JTextArea("N/A");
 
     /**
-     * Label showing the event type in the summary of the event
-     */
-    private final JTextArea textDescription = new JTextArea("N/A");
-
-    /**
      * Label showing the event date in the summary of the event
      */
     private JTextArea textStartTime = new JTextArea("N/A");
@@ -55,8 +50,8 @@ public class EventDescriptionPanel extends JPanel {
     private final JLabel colorLabel = new JLabel();
 
     /**
-     * 
-     * 
+     *
+     *
      * @param event
      */
     public EventDescriptionPanel(JHVEvent event) {
@@ -119,7 +114,7 @@ public class EventDescriptionPanel extends JPanel {
 
     /**
      * Initialize the short description.
-     * 
+     *
      */
     private void initDescriptionText() {
 
@@ -149,7 +144,7 @@ public class EventDescriptionPanel extends JPanel {
 
     /**
      * Add component to the summary panel.
-     * 
+     *
      * @param panel
      *            the panel to add to
      * @param y

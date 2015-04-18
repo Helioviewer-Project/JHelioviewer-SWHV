@@ -70,7 +70,6 @@ public class GL3DPositionLoading {
 
         worker = new SwingWorker<Integer, Integer>() {
             private String report = null;
-            public boolean affect = true;
 
             @Override
             protected Integer doInBackground() throws Exception {

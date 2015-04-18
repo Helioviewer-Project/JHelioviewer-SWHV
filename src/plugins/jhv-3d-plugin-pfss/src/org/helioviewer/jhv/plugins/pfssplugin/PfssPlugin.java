@@ -48,7 +48,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        Displayer.getSingletonInstance().getRenderablecontainer().removeRenderable(renderable);
+        Displayer.getRenderablecontainer().removeRenderable(renderable);
         pfssCache = null;
     }
 

@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.opengl;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -40,9 +39,6 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 public class GL3DComponentView implements GLEventListener, ComponentView, DisplayListener {
 
     private GLCanvas canvas;
-
-    private Color backgroundColor = Color.BLACK;
-    private boolean backGroundColorChanged = false;
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -133,12 +129,6 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
         if (exportMode || screenshotMode) {
             exportFrame();
         }
-    }
-
-    @Override
-    public void setBackgroundColor(Color background) {
-        backgroundColor = background;
-        backGroundColorChanged = true;
     }
 
     @Override

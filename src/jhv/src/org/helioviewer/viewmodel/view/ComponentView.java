@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
@@ -66,16 +65,5 @@ public interface ComponentView {
      *             is thrown, if the given output file is not valid
      */
     public boolean saveScreenshot(String imageFormat, File outputFile);
-
-    /**
-     * Sets the background color.
-     *
-     * This color will be displayed in areas with no image, where images are
-     * transparent or when there is no image present at all.
-     *
-     * @param background
-     *            new background color
-     */
-    public void setBackgroundColor(Color background);
 
 }

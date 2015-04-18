@@ -12,8 +12,6 @@ import java.awt.event.MouseWheelEvent;
  */
 public abstract class GL3DDefaultInteraction extends GL3DInteraction {
 
-    private static final double ZOOM_WHEEL_FACTOR = 0.002;
-
     protected GL3DDefaultInteraction(GL3DCamera camera) {
         super(camera);
     }

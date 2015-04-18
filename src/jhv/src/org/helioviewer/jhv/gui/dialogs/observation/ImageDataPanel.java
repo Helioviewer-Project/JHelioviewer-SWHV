@@ -827,7 +827,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private final String[] serverList;
         private final JComboBox comboServer;
         private final JLabel labelServer = new JLabel("Server");
-        private ImageDataPanel imageDataPanel;
 
         private boolean setFromOutside;
 
@@ -840,7 +839,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
             // Setup grid
             setFromOutside = false;
-            this.imageDataPanel = imageDataPanel;
             serverList = DataSourceServers.getSingletonInstance().getServerList();
             DataSourceServers.getSingletonInstance().addListener(this);
             comboServer = new JComboBox(serverList);
