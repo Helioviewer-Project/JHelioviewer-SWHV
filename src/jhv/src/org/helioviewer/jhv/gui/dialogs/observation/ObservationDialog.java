@@ -53,7 +53,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private ObservationDialogPanel selectedPane = null;
 
     private JButton availabilityButton;
-    private final static Object lock = new Object();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods

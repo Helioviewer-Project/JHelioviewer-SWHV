@@ -9,11 +9,8 @@ public class GL3DEarthCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final GL3DEarthCamera camera;
-
     public GL3DEarthCameraOptionPanel(GL3DEarthCamera camera) {
         super();
-        this.camera = camera;
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(0, 200));

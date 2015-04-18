@@ -20,7 +20,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener, Graph
     private static ZoomManager instance;
     private final DrawController drawController;
     private final PlotAreaSpace plotAreaSpace;
-    private final Object intervalLock;
     private final YValueModel yValueModel;
 
     private final Map<Long, ZoomDataConfig> zoomDataConfigMap;
@@ -34,7 +33,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener, Graph
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        intervalLock = new Object();
         yValueModel = YValueModel.getSingletonInstance();
 
         zoomDataConfigMap = new HashMap<Long, ZoomDataConfig>();

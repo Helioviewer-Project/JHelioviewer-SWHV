@@ -216,7 +216,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private void drawLabels(final Graphics2D g) {
         // Log.debug("Draw Labels");
         // Thread.dumpStack();
-        long start = System.currentTimeMillis();
         Set<YAxisElement> yAxisElements = drawController.getYAxisElements();
         List<YAxisElement> orderedList = orderYAxes(yAxisElements);
         Interval<Date> interval = drawController.getSelectedInterval();
@@ -299,7 +298,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.drawString(text, x, y);
 
         }
-        long timeTaken = System.currentTimeMillis() - start;
         // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
         // start) + " total time: " + drawLabelsOperarionTime +
         // " total time over running time : " + timeOverTotalTime);

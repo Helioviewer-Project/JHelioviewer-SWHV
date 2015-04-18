@@ -13,7 +13,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * Status panel for displaying the current mouse position.
@@ -35,12 +34,9 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
     private ComponentView view;
-    private JHVJP2View jp2View;
 
     private MainImagePanel imagePanel;
     private Point lastPosition;
-
-    private final char PRIME = '\u2032';
 
     private PositionStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());

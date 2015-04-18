@@ -24,8 +24,6 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
     /** Maximum value spinner */
     private JSpinner maximumValueSpinner;
 
-    private JLabel units;
-
     public DoubleMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
         // TODO Auto-generated constructor stub

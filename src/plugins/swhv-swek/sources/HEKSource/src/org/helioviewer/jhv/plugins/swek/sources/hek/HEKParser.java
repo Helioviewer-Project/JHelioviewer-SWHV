@@ -410,30 +410,30 @@ public class HEKParser implements SWEKParser {
             if (keyString.toLowerCase().equals("event_starttime")) {
                 currentEvent.setStartTime(parseDate(value));
             } else
-                // Event end time
-                if (keyString.toLowerCase().equals("event_endtime")) {
-                    currentEvent.setEndTime(parseDate(value));
-                } else
-                    // event unique ID
-                    if (keyString.toLowerCase().equals("kb_archivid")) {
-                        currentEvent.setUniqueID(value);
-                    } else
-                        // event positions (Standard position)
-                        if (keyString.toLowerCase().equals("event_coordsys")) {
-                            coordinateSystemString = value;
-                        } else if (keyString.toLowerCase().equals("event_coord1")) {
-                            if (value != null) {
-                                coordinate1 = Double.parseDouble(value);
-                            }
-                        } else if (keyString.toLowerCase().equals("event_coord2")) {
-                            if (value != null) {
-                                coordinate2 = Double.parseDouble(value);
-                            }
-                        } else if (keyString.toLowerCase().equals("event_coord3")) {
-                            if (value != null) {
-                                coordinate3 = Double.parseDouble(value);
-                            }
-                        }
+            // Event end time
+            if (keyString.toLowerCase().equals("event_endtime")) {
+                currentEvent.setEndTime(parseDate(value));
+            } else
+            // event unique ID
+            if (keyString.toLowerCase().equals("kb_archivid")) {
+                currentEvent.setUniqueID(value);
+            } else
+            // event positions (Standard position)
+            if (keyString.toLowerCase().equals("event_coordsys")) {
+                coordinateSystemString = value;
+            } else if (keyString.toLowerCase().equals("event_coord1")) {
+                if (value != null) {
+                    coordinate1 = Double.parseDouble(value);
+                }
+            } else if (keyString.toLowerCase().equals("event_coord2")) {
+                if (value != null) {
+                    coordinate2 = Double.parseDouble(value);
+                }
+            } else if (keyString.toLowerCase().equals("event_coord3")) {
+                if (value != null) {
+                    coordinate3 = Double.parseDouble(value);
+                }
+            }
             // event positions (Not standard)
             if (keyString.toLowerCase().equals("hgc_bbox")) {
                 hgcBoundedBox = parsePolygon(value);
