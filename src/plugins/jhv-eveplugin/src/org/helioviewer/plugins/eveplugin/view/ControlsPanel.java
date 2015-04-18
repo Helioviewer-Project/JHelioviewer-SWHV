@@ -37,7 +37,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorE
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorPanel;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -172,7 +172,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     private void setDateRange() {
-        AbstractImageInfoView activeView = Displayer.getLayersModel().getActiveView();
+        AbstractView activeView = Displayer.getLayersModel().getActiveView();
         if (activeView instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) activeView;
             Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
@@ -200,7 +200,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     }
 
     @Override
-    public void activeLayerChanged(AbstractImageInfoView view) {
+    public void activeLayerChanged(AbstractView view) {
         setEnabledStateOfPeriodMovieButton();
         if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
             setDefaultPeriod = false;

@@ -72,7 +72,7 @@ public class RadioDownloader {
                             // case there were not more than three days
 
                             while (startDate.before(endDate) || startDate.equals(endDate)) {
-                                JHVJP2View v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                                JHVJP2View v = (JHVJP2View) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                                 if (v != null) {
                                     long imageID = getNextID();
                                     DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, downloadID);
@@ -106,14 +106,14 @@ public class RadioDownloader {
                         if (result.isIntervalTooBig()) {
                             fireIntervalTooBig(result.getRequestInterval().getStart(), result.getRequestInterval().getEnd(), result.getDownloadID());
                         } else {
-                            if (!result.getImageInfoViews().isEmpty()) {
-                                for (DownloadedJPXData dJPXD : result.getImageInfoViews()) {
+                            if (!result.getViews().isEmpty()) {
+                                for (DownloadedJPXData dJPXD : result.getViews()) {
                                     cache.add(dJPXD);
                                 }
-                                fireNewJPXDataAvailable(result.getImageInfoViews(), result.getRequestInterval().getStart(), result.getRequestInterval().getEnd(), result.getDownloadID());
+                                fireNewJPXDataAvailable(result.getViews(), result.getRequestInterval().getStart(), result.getRequestInterval().getEnd(), result.getDownloadID());
                             }
                             if (!result.getNoDataIntervals().isEmpty()) {
-                                if (!result.isIntervalTooBig() && result.getImageInfoViews().isEmpty()) {
+                                if (!result.isIntervalTooBig() && result.getViews().isEmpty()) {
                                     fireNoDataInDownloadInterval(result.getRequestInterval(), result.getDownloadID());
                                 }
                                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
@@ -203,7 +203,7 @@ public class RadioDownloader {
                 for (Date date : datesToDownload) {
                     JHVJP2View v = null;
                     try {
-                        v = APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                        v = (JHVJP2View) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                     }
@@ -223,8 +223,8 @@ public class RadioDownloader {
                 try {
                     ImageDownloadWorkerResult result = get();
                     if (result != null) {
-                        if (!result.getImageInfoViews().isEmpty()) {
-                            for (DownloadedJPXData jpxData : result.getImageInfoViews()) {
+                        if (!result.getViews().isEmpty()) {
+                            for (DownloadedJPXData jpxData : result.getViews()) {
                                 cache.add(jpxData);
                                 ArrayList<DownloadedJPXData> temp = new ArrayList<DownloadedJPXData>();
                                 temp.add(jpxData);

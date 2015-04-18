@@ -18,7 +18,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
-public abstract class AbstractImageInfoView implements ImageInfoView {
+public abstract class AbstractView implements View {
     private GL3DImageLayer imageLayer;
 
     protected ImageData imageData;
@@ -238,8 +238,6 @@ public abstract class AbstractImageInfoView implements ImageInfoView {
     private void copyScreenToTexture(GL2 gl) {
         ImageData image = this.getSubimageData();
         Region region = image.getRegion();
-        System.out.println(region);
-        System.out.println(image);
 
         double xOffset = region.getLowerLeftCorner().x;
         double yOffset = region.getLowerLeftCorner().y;

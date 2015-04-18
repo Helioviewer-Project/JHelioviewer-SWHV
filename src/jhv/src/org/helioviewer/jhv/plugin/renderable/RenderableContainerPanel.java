@@ -34,7 +34,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -67,7 +67,7 @@ public class RenderableContainerPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
-            AbstractImageInfoView activeView = Displayer.getLayersModel().getActiveView();
+            AbstractView activeView = Displayer.getLayersModel().getActiveView();
 
             if (activeView instanceof JHVJPXView) {
                 JHVJPXView jpxView = (JHVJPXView) activeView;

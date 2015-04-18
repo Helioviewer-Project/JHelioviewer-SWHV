@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Interface for GUI objects to react to changes of layers The events come on
@@ -31,6 +31,6 @@ public interface LayersListener {
      * @param view
      *            - view of the new active layer, null if none
      */
-    public void activeLayerChanged(AbstractImageInfoView view);
+    public void activeLayerChanged(AbstractView view);
 
 }

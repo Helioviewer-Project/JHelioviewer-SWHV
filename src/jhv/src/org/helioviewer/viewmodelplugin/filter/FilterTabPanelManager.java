@@ -19,7 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.AbstractFilterPanel;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
@@ -199,7 +199,7 @@ public class FilterTabPanelManager {
     private final JButton downloadLayerButton = new JButton();
     private final JButton showMetaButton = new JButton();
 
-    public void setActivejp2(final AbstractImageInfoView jp2view) {
+    public void setActivejp2(final AbstractView jp2view) {
         for (AbstractFilterPanel c : this.abstractFilterPanels) {
             c.setEnabled(true);
             c.setJP2View(jp2view);

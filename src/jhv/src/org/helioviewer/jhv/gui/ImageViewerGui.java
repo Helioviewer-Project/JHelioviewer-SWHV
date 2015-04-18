@@ -59,10 +59,8 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
@@ -446,7 +444,7 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    JHVJP2View view = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
                     if (view != null && getMainView() != null) {
                         // get the layered view
 
@@ -454,7 +452,7 @@ public class ImageViewerGui {
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            AbstractImageInfoView subView = Displayer.getLayersModel().getLayer(i);
+                            AbstractView subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView)) {
@@ -498,14 +496,14 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    JHVJP2View view = APIRequestManager.newLoad(jpxUrl, true);
+                    AbstractView view = APIRequestManager.newLoad(jpxUrl, true);
                     if (view != null && getMainView() != null) {
 
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            AbstractImageInfoView subView = Displayer.getLayersModel().getLayer(i);
+                            AbstractView subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView) && subView instanceof JHVJPXView) {

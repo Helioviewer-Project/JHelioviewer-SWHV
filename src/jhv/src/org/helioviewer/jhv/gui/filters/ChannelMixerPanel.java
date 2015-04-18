@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
 import org.helioviewer.viewmodelplugin.filter.FilterPanel;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
@@ -117,7 +117,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     }
 
     @Override
-    public void setJP2View(AbstractImageInfoView jp2view) {
+    public void setJP2View(AbstractView jp2view) {
         super.setJP2View(jp2view);
         setValue(jp2view.getColorMask());
     }

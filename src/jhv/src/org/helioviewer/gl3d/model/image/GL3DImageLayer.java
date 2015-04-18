@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -63,11 +63,11 @@ public class GL3DImageLayer implements Renderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final AbstractImageInfoView mainLayerView;
+    private final AbstractView mainLayerView;
     private final RenderableType type;
     private boolean isVisible = true;
 
-    public GL3DImageLayer(String name, AbstractImageInfoView view, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+    public GL3DImageLayer(String name, AbstractView view, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
         this.type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         this.mainLayerView = view;
@@ -196,7 +196,7 @@ public class GL3DImageLayer implements Renderable {
                 gl.glCullFace(GL2.GL_BACK);
 
                 gl.glEnable(GL2.GL_BLEND);
-                AbstractImageInfoView jp2view = this.getMainLayerView();
+                AbstractView jp2view = this.getMainLayerView();
 
                 if (jp2view != null) {
                     jp2view.applyFilters(gl);
@@ -438,7 +438,7 @@ public class GL3DImageLayer implements Renderable {
         return getMainLayerView().getMetaData().getDateTime().getCachedDate();
     }
 
-    public AbstractImageInfoView getMainLayerView() {
+    public AbstractView getMainLayerView() {
         return mainLayerView;
     }
 }

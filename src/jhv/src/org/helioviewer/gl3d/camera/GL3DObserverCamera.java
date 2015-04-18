@@ -13,7 +13,7 @@ import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
@@ -63,7 +63,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         double addl0 = 0.;
         double addb0 = 0.;
 
-        AbstractImageInfoView mdv = Displayer.getLayersModel().getActiveView();
+        AbstractView mdv = Displayer.getLayersModel().getActiveView();
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
             if (metadata instanceof HelioviewerMetaData) {

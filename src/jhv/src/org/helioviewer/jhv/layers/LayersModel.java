@@ -15,8 +15,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
-import org.helioviewer.viewmodel.view.ImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -47,7 +47,7 @@ public class LayersModel {
      *
      * @return View associated with the active Layer
      */
-    public AbstractImageInfoView getActiveView() {
+    public AbstractView getActiveView() {
         return getLayer(activeLayer);
     }
 
@@ -65,7 +65,7 @@ public class LayersModel {
      *            - index of the layer to be set as active Layer
      */
     public void setActiveLayer(int idx) {
-        AbstractImageInfoView view = getLayer(idx);
+        AbstractView view = getLayer(idx);
         if (view == null && idx != -1) {
             return;
         }
@@ -73,7 +73,7 @@ public class LayersModel {
         fireActiveLayerChanged(view);
     }
 
-    public void setActiveLayer(AbstractImageInfoView view) {
+    public void setActiveLayer(AbstractView view) {
         int idx = findView(view);
         if (view == null && idx != -1) {
             return;
@@ -91,7 +91,7 @@ public class LayersModel {
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getStartDate(AbstractImageInfoView view) {
+    public ImmutableDateTime getStartDate(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
@@ -147,7 +147,7 @@ public class LayersModel {
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getEndDate(AbstractImageInfoView view) {
+    public ImmutableDateTime getEndDate(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
@@ -202,7 +202,7 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
      */
-    public int findView(AbstractImageInfoView view) {
+    public int findView(AbstractView view) {
         int idx = -1;
         if (view != null) {
             idx = this.getLayerLevel(view);
@@ -272,7 +272,7 @@ public class LayersModel {
     /**
      * Downloads the complete image from the JPIP server.
      *
-     * Changes the source of the ImageInfoView afterwards, since a local file is
+     * Changes the source of the View afterwards, since a local file is
      * always faster.
      */
     private void downloadFromJPIP(JHVJP2View v) {
@@ -317,7 +317,7 @@ public class LayersModel {
         dialog.showDialog();
     }
 
-    public void addLayer(AbstractImageInfoView view) {
+    public void addLayer(AbstractView view) {
         movieManager.pauseLinkedMovies();
 
         GL3DImageLayer imageLayer = new GL3DImageLayer("", view, true, true, true);
@@ -345,7 +345,7 @@ public class LayersModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void removeLayer(ImageInfoView view) {
+    public void removeLayer(View view) {
         if (view == null)
             return;
 
@@ -381,7 +381,7 @@ public class LayersModel {
      * @param link
      *            - true if the layer in question should be linked
      */
-    private void setLink(AbstractImageInfoView view, boolean link) {
+    private void setLink(AbstractView view, boolean link) {
         if (view == null) {
             return;
         }
@@ -422,7 +422,7 @@ public class LayersModel {
         }
     }
 
-    private void fireActiveLayerChanged(AbstractImageInfoView view) {
+    private void fireActiveLayerChanged(AbstractView view) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(view);
         }
@@ -442,7 +442,7 @@ public class LayersModel {
 
     private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
-    private final ArrayList<AbstractImageInfoView> layers = new ArrayList<AbstractImageInfoView>();
+    private final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -451,7 +451,7 @@ public class LayersModel {
      *            Position within the stack of layers
      * @return View at given position
      */
-    public AbstractImageInfoView getLayer(int index) {
+    public AbstractView getLayer(int index) {
         try {
             return layers.get(index);
         } catch (Exception e) {
@@ -480,7 +480,7 @@ public class LayersModel {
      * @return Position of the view within stack
      * @see #moveView
      */
-    public int getLayerLevel(AbstractImageInfoView view) {
+    public int getLayerLevel(AbstractView view) {
         return layers.indexOf(view);
     }
 

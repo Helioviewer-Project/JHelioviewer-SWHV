@@ -3,12 +3,10 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.net.URI;
-import java.util.Date;
 
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -23,10 +21,7 @@ import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
@@ -41,7 +36,7 @@ import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
 import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
- * Implementation of ImageInfoView for JPG2000 images.
+ * Implementation of View for JPG2000 images.
  *
  * <p>
  * This class represents the gateway to the heart of the helioviewer project. It
@@ -56,7 +51,7 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
  * application.
  *
  */
-public class JHVJP2View extends AbstractImageInfoView implements JP2View, RegionView, MetaDataView, SubimageDataView, RenderListener {
+public class JHVJP2View extends AbstractView implements JP2View, RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
@@ -707,6 +702,7 @@ public class JHVJP2View extends AbstractImageInfoView implements JP2View, Region
         setImageViewParams(calculateParameter());
     }
 
+    @Override
     public ImageData getImageData() {
         return this.imageData;
     }
