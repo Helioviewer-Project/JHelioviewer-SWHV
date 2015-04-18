@@ -9,7 +9,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.viewport.Viewport;
@@ -66,7 +66,7 @@ public class ZoomController {
      * @param steps
      *            Number of steps to zoom, the sign defines the direction.
      */
-    public void zoomSteps(JHVJP2View topmostView, int steps) {
+    public void zoomSteps(AbstractImageInfoView topmostView, int steps) {
         zoom(topmostView, Math.pow(zoomFactorStep, steps));
     }
 
@@ -77,7 +77,7 @@ public class ZoomController {
      * @param zoomFactor
      *            zoom factor to scale the current region with
      */
-    public void zoom(JHVJP2View topmostView, double zoomFactor) {
+    public void zoom(AbstractImageInfoView topmostView, double zoomFactor) {
 
         if (topmostView.getMetaData() != null) {
 
@@ -90,7 +90,7 @@ public class ZoomController {
                 // too small
                 boolean tooSmall = true;
                 for (int i = 0; i < layersModel.getNumLayers(); ++i) {
-                    JHVJP2View view = layersModel.getLayer(i);
+                    AbstractImageInfoView view = layersModel.getLayer(i);
                     if (getZoom(view) * zoomFactor > 0.005) {
                         tooSmall = false;
                         break;
@@ -133,14 +133,14 @@ public class ZoomController {
         }
     }
 
-    public static double getZoom(JHVJP2View view, Region outerRegion) {
+    public static double getZoom(AbstractImageInfoView view, Region outerRegion) {
         if (view != null) {
             Region region = view.getRegion();
             if (outerRegion == null) {
                 outerRegion = region;
             }
 
-            region = view.getNewestRegion();
+            region = view.getRegion();
 
             if (region == null) {
                 return 1.0;
@@ -156,14 +156,14 @@ public class ZoomController {
         return 1.0;
     }
 
-    public static double getZoom(JHVJP2View view) {
+    public static double getZoom(AbstractImageInfoView view) {
         if (view != null) {
             return getZoom(view, null);
         }
         return 1.0;
     }
 
-    public void zoom1to1(JHVJP2View topmostView, JHVJP2View activeView) {
+    public void zoom1to1(AbstractImageInfoView topmostView, AbstractImageInfoView activeView) {
         if (activeView != null && topmostView != null) {
             zoom(topmostView, 1.0 / getZoom(activeView, topmostView.getRegion()));
         }
@@ -173,7 +173,7 @@ public class ZoomController {
      * Zooms the image in such a way, that the whole region given by the
      * metaData fits exactly into the viewport.
      */
-    public void zoomFit(View v) {
+    public void zoomFit(AbstractImageInfoView v) {
         if (v != null) {
             Region region = v.getMetaData().getPhysicalRegion();
             GL3DVec2d size = region.getSize();

@@ -30,7 +30,7 @@ import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
@@ -260,7 +260,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void activeLayerChanged(JHVJP2View view) {
+    public void activeLayerChanged(AbstractImageInfoView view) {
     }
 
     private Interval<Date> makeCompleteDay(final Interval<Date> interval) {

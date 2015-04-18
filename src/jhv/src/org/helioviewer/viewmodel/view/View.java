@@ -39,6 +39,29 @@ public interface View {
      * @return Meta data of the image
      */
     public MetaData getMetaData();
+=======
+import org.helioviewer.base.interval.Interval;
+import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.viewport.Viewport;
+
+/**
+ * View to manage an image data source.
+ *
+ * <p>
+ * This view represents undermost view within the view chain. It should not be
+ * possible to use another view as an input for this view.
+ *
+ * <p>
+ * Usually, it is expected to have at least one {@link RegionView} per path
+ * within the view chain, so it might be a good idea to always implement them
+ * together with the ImageInfoView, since every path starts at an ImageInfoView.
+ *
+ * @author Ludwig Schmidt
+ */
+public interface ImageInfoView {
+>>>>>>> create abstraction:jhv-3d-wcs/src/jhv/src/org/helioviewer/viewmodel/view/ImageInfoView.java
 
     /**
      * Returns the URI representing the location of the image.
@@ -73,5 +96,27 @@ public interface View {
      * @return download uri
      */
     public URI getDownloadURI();
+
+    public Interval<Date> getDateRange();
+
+    public boolean getBaseDifferenceMode();
+
+    public boolean getDifferenceMode();
+
+    public ImageData getBaseDifferenceImageData();
+
+    public ImageData getPreviousImageData();
+
+    public ImageData getImageData();
+
+    public ImageData getSubimageData();
+
+    public MetaData getMetaData();
+
+    public boolean setRegion(Region r);
+
+    public Region getRegion();
+
+    public boolean setViewport(Viewport r);
 
 }

@@ -24,6 +24,8 @@ import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -298,14 +300,14 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static JHVJP2View newLoad(URI uri, boolean addToViewChain) throws IOException {
+    public static AbstractImageInfoView newLoad(URI uri, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        JHVJP2View view = ViewHelper.loadView(uri);
+        AbstractImageInfoView view = ViewHelper.loadView(uri);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -342,7 +344,7 @@ public class APIRequestManager {
         return view;
     }
 
-    private static void addToViewchain(JHVJP2View view) {
+    private static void addToViewchain(AbstractImageInfoView view) {
         while (view.getSubimageData() == null) {
             try {
                 Thread.sleep(100);
@@ -351,14 +353,14 @@ public class APIRequestManager {
             }
         }
         EventQueue.invokeLater(new Runnable() {
-            private JHVJP2View theView;
+            private AbstractImageInfoView theView;
 
             @Override
             public void run() {
                 Displayer.getLayersModel().addLayer(theView);
             }
 
-            public Runnable init(JHVJP2View theView) {
+            public Runnable init(AbstractImageInfoView theView) {
                 this.theView = theView;
                 return this;
             }

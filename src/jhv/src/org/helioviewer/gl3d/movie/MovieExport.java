@@ -29,7 +29,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class MovieExport {
@@ -77,7 +77,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         *
+         * 
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -104,7 +104,7 @@ public class MovieExport {
         args.add("" + width + "x" + height);
         args.add("-r");
 
-        JHVJP2View activeView = Displayer.getLayersModel().getActiveView();
+        AbstractImageInfoView activeView = Displayer.getLayersModel().getActiveView();
         if (activeView instanceof JHVJPXView) {
             framerate = ((JHVJPXView) activeView).getDesiredRelativeSpeed();
         }

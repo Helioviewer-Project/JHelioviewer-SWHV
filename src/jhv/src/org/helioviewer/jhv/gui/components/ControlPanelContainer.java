@@ -10,6 +10,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.ImageInfoView;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
@@ -35,7 +37,9 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
         return controlMap.get(v);
     }
 
-    private void updateActiveView(View v) {
+    private void updateActiveView(AbstractImageInfoView view) {
+        ImageInfoView infoView = view;
+
         CardLayout cl = (CardLayout) this.getLayout();
         cl.show(this, v == null ? "null" : v.toString());
         ensureSize();
@@ -59,7 +63,7 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
      * {@inheritDoc}
      */
     @Override
-    public void activeLayerChanged(JHVJP2View view) {
+    public void activeLayerChanged(AbstractImageInfoView view) {
         updateActiveView(view);
     }
 

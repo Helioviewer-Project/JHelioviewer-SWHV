@@ -59,8 +59,10 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.ImageInfoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
@@ -452,7 +454,7 @@ public class ImageViewerGui {
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
+                            AbstractImageInfoView subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView)) {
@@ -503,7 +505,7 @@ public class ImageViewerGui {
                         // view and try to find the
                         // view chain of the corresponding image info view
                         for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            JHVJP2View subView = Displayer.getLayersModel().getLayer(i);
+                            AbstractImageInfoView subView = Displayer.getLayersModel().getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView) && subView instanceof JHVJPXView) {
