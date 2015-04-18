@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 
@@ -117,6 +117,6 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void activeLayerChanged(AbstractImageInfoView view) {
+    public void activeLayerChanged(AbstractView view) {
     }
 }

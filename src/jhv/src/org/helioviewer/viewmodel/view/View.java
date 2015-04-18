@@ -5,45 +5,6 @@ import java.net.URI;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-
-public interface View {
-
-    /**
-     * Returns the image data produced by the view
-     *
-     * @return produced image data
-     */
-    public ImageData getSubimageData();
-
-    /**
-     * Sets the current region.
-     *
-     * @param r
-     *            The new region
-     * @return True, if the region has changed, false otherwise
-     * @see #getRegion
-     */
-    public boolean setRegion(Region r);
-
-    /**
-     * Returns the current region.
-     *
-     * @return Current region
-     * @see #setRegion
-     */
-    public Region getRegion();
-
-    /**
-     * Returns the meta data the image.
-     *
-     * @return Meta data of the image
-     */
-    public MetaData getMetaData();
-=======
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
@@ -56,12 +17,11 @@ import org.helioviewer.viewmodel.viewport.Viewport;
  * <p>
  * Usually, it is expected to have at least one {@link RegionView} per path
  * within the view chain, so it might be a good idea to always implement them
- * together with the ImageInfoView, since every path starts at an ImageInfoView.
+ * together with the View, since every path starts at an View.
  *
  * @author Ludwig Schmidt
  */
-public interface ImageInfoView {
->>>>>>> create abstraction:jhv-3d-wcs/src/jhv/src/org/helioviewer/viewmodel/view/ImageInfoView.java
+public interface View {
 
     /**
      * Returns the URI representing the location of the image.
@@ -96,8 +56,6 @@ public interface ImageInfoView {
      * @return download uri
      */
     public URI getDownloadURI();
-
-    public Interval<Date> getDateRange();
 
     public boolean getBaseDifferenceMode();
 

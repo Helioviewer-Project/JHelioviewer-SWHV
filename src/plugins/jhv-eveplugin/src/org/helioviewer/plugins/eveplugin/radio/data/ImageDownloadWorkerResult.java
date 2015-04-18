@@ -56,7 +56,7 @@ public class ImageDownloadWorkerResult {
      * 
      * @return the list of image info views
      */
-    public List<DownloadedJPXData> getImageInfoViews() {
+    public List<DownloadedJPXData> getViews() {
         return imageInfoViews;
     }
 

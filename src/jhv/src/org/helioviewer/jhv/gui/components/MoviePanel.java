@@ -45,7 +45,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
@@ -620,7 +620,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(AbstractImageInfoView view) {
+        public void activeLayerChanged(AbstractView view) {
             this.searchCorrespondingMoviePanel(view);
         }
 
@@ -633,7 +633,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param view
          *            View to search panel for
          */
-        private void searchCorrespondingMoviePanel(AbstractImageInfoView view) {
+        private void searchCorrespondingMoviePanel(AbstractView view) {
             if (view instanceof JHVJPXView) {
                 JHVJPXView movieView = (JHVJPXView) view;
 
@@ -683,7 +683,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(AbstractImageInfoView view) {
+        public void activeLayerChanged(AbstractView view) {
             super.activeLayerChanged(view);
             if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
                 putValue(NAME, activePanel.playPauseButton.getToolTipText());

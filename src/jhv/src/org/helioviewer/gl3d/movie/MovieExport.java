@@ -29,7 +29,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class MovieExport {
@@ -104,7 +104,7 @@ public class MovieExport {
         args.add("" + width + "x" + height);
         args.add("-r");
 
-        AbstractImageInfoView activeView = Displayer.getLayersModel().getActiveView();
+        AbstractView activeView = Displayer.getLayersModel().getActiveView();
         if (activeView instanceof JHVJPXView) {
             framerate = ((JHVJPXView) activeView).getDesiredRelativeSpeed();
         }

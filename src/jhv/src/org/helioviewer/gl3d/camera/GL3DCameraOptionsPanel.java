@@ -18,7 +18,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener, LayersListener {
 
@@ -172,7 +172,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     @Override
-    public void activeLayerChanged(AbstractImageInfoView view) {
+    public void activeLayerChanged(AbstractView view) {
     }
 
 }

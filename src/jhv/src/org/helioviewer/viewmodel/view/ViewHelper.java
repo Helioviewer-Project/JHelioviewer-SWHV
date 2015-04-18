@@ -284,7 +284,7 @@ public final class ViewHelper {
      *
      * <p>
      * Depending on the file type, a different implementation of the
-     * ImageInfoView is chosen. If there is no implementation available for the
+     * View is chosen. If there is no implementation available for the
      * given type, an exception is thrown.
      *
      * <p>
@@ -292,13 +292,13 @@ public final class ViewHelper {
      *
      * @param uri
      *            URI representing the location of the image
-     * @return ImageInfoView containing the image
+     * @return View containing the image
      * @throws IOException
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractImageInfoView loadView(URI uri) throws IOException {
-        return loadView(uri, true, range);
+    public static AbstractView loadView(URI uri) throws IOException {
+        return loadView(uri, true);
     }
 
     /**
@@ -306,20 +306,20 @@ public final class ViewHelper {
      *
      * <p>
      * Depending on the file type, a different implementation of the
-     * ImageInfoView is chosen. If there is no implementation available for the
+     * View is chosen. If there is no implementation available for the
      * given type, an exception is thrown.
      *
      * @param uri
      *            URI representing the location of the image
      * @param isMainView
      *            Whether the view is used as a main view or not
-     * @return ImageInfoView containing the image
+     * @return View containing the image
      * @throws IOException
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractImageInfoView loadView(URI uri, boolean isMainView) throws IOException {
-        return loadView(uri, uri, isMainView, range);
+    public static AbstractView loadView(URI uri, boolean isMainView) throws IOException {
+        return loadView(uri, uri, isMainView);
     }
 
     /**
@@ -327,7 +327,7 @@ public final class ViewHelper {
      *
      * <p>
      * Depending on the file type, a different implementation of the
-     * ImageInfoView is chosen. If there is no implementation available for the
+     * View is chosen. If there is no implementation available for the
      * given type, an exception is thrown.
      *
      * @param uri
@@ -335,13 +335,13 @@ public final class ViewHelper {
      * @param downloadURI
      *            URI from which the whole file can be downloaded
      *
-     * @return ImageInfoView containing the image
+     * @return View containing the image
      * @throws IOException
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractImageInfoView loadView(URI uri, URI downloadURI) throws IOException {
-        return loadView(uri, downloadURI, true, range);
+    public static AbstractView loadView(URI uri, URI downloadURI) throws IOException {
+        return loadView(uri, downloadURI, true);
     }
 
     /**
@@ -349,7 +349,7 @@ public final class ViewHelper {
      *
      * <p>
      * Depending on the file type, a different implementation of the
-     * ImageInfoView is chosen. If there is no implementation available for the
+     * View is chosen. If there is no implementation available for the
      * given type, an exception is thrown.
      *
      * @param uri
@@ -358,12 +358,12 @@ public final class ViewHelper {
      *            URI from which the whole file can be downloaded
      * @param isMainView
      *            Whether the view is used as a main view or not
-     * @return ImageInfoView containing the image
+     * @return View containing the image
      * @throws IOException
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractImageInfoView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
+    public static AbstractView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI");
         }
@@ -372,7 +372,7 @@ public final class ViewHelper {
         String ending = parts[parts.length - 1];
         if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
             try {
-                JHVFITSView fitsView = new JHVFITSView(uri, range);
+                JHVFITSView fitsView = new JHVFITSView(uri);
 
                 return fitsView;
             } catch (Exception e) {

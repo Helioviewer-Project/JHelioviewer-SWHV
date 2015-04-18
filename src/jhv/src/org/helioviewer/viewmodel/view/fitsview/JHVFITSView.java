@@ -4,10 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 
-import org.helioviewer.base.math.Vector2dInt;
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -19,26 +17,21 @@ import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewHelper;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
-import org.helioviewer.viewmodel.view.ImageInfoView;
-import org.helioviewer.viewmodel.view.MetaDataView;
-import org.helioviewer.viewmodel.view.RegionView;
-import org.helioviewer.viewmodel.view.SubimageDataView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
- * Implementation of ImageInfoView for FITS images.
+ * Implementation of View for FITS images.
  *
  * <p>
  * For further informations about the behavior of this view,
- * {@link ImageInfoView} is a good start to get into the concept.
+ * {@link View} is a good start to get into the concept.
  *
  * @author Andreas Hoelzl
  * */
-public class JHVFITSView extends AbstractImageInfoView implements RegionView, SubimageDataView, ImageInfoView, MetaDataView {
+public class JHVFITSView extends AbstractView {
 
     protected Viewport viewport;
     protected Region region;
@@ -217,11 +210,6 @@ public class JHVFITSView extends AbstractImageInfoView implements RegionView, Su
     @Override
     public URI getDownloadURI() {
         return uri;
-    }
-
-    @Override
-    public Interval<Date> getDateRange() {
-        return this.range;
     }
 
     @Override

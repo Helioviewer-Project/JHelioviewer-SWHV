@@ -24,8 +24,7 @@ import org.helioviewer.viewmodel.io.APIResponse;
 import org.helioviewer.viewmodel.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.AbstractImageInfoView;
-import org.helioviewer.viewmodel.view.ImageInfoView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -62,7 +61,7 @@ public class APIRequestManager {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
-        AbstractImageInfoView view = null;
+        AbstractView view = null;
 
         try {
             view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
@@ -99,7 +98,7 @@ public class APIRequestManager {
      * located on the server. The address of the file will be returned.
      *
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @param observatory
      *            observatory of the requested image.
@@ -117,7 +116,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static AbstractImageInfoView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    public static AbstractView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -143,7 +142,7 @@ public class APIRequestManager {
      * located on the server. The address of the file will be returned.
      *
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @param observatory
      *            observatory of the requested image series.
@@ -161,12 +160,11 @@ public class APIRequestManager {
      *            cadence between to images of the image series.
      * @param message
      *            display error message.
-     * @return view of the file which represents the image series on
-     *         the server.
+     * @return view of the file which represents the image series on the server.
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static JHVJP2View loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
+    private static AbstractView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date startDate = new Date();
@@ -218,10 +216,10 @@ public class APIRequestManager {
      * {@link #newLoad(URI, URI, boolean)}. It will display and log any further
      * message from the server.
      * <p>
-     * Returns the corresponding ImageInfoView for the file.
+     * Returns the corresponding View for the file.
      *
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @param jpipRequest
      *            The http request url which is sent to the server
@@ -229,10 +227,10 @@ public class APIRequestManager {
      *            the http uri from which the whole file can be downloaded
      * @param errorMessage
      *            display error message
-     * @return The ImageInfoView corresponding to the file whose location was
+     * @return The View corresponding to the file whose location was
      *         returned by the server
      */
-public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+    public static AbstractView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
@@ -294,20 +292,20 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
      * @param uri
      *            specifies the location of the file.
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @return associated image info view of the given image or image series
      *         file.
      * @throws IOException
      */
-    public static AbstractImageInfoView newLoad(URI uri, boolean addToViewChain) throws IOException {
+    public static AbstractView newLoad(URI uri, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        AbstractImageInfoView view = ViewHelper.loadView(uri);
+        AbstractView view = ViewHelper.loadView(uri);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -324,20 +322,20 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
      * @param downloadURI
      *            the http uri from which the whole file can be downloaded
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @return associated image info view of the given image or image series
      *         file.
      * @throws IOException
      */
-    public static AbstractImageInfoView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
+    public static AbstractView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
 
-        AbstractImageInfoView view = ViewHelper.loadView(uri, downloadURI, range);
+        AbstractView view = ViewHelper.loadView(uri, downloadURI);
 
         if (addToViewChain) {
             addToViewchain(view);
@@ -346,7 +344,7 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
         return view;
     }
 
-    private static void addToViewchain(AbstractImageInfoView view) {
+    private static void addToViewchain(AbstractView view) {
         while (view.getSubimageData() == null) {
             try {
                 Thread.sleep(100);
@@ -355,14 +353,14 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
             }
         }
         EventQueue.invokeLater(new Runnable() {
-            private AbstractImageInfoView theView;
+            private AbstractView theView;
 
             @Override
             public void run() {
                 Displayer.getLayersModel().addLayer(theView);
             }
 
-            public Runnable init(AbstractImageInfoView theView) {
+            public Runnable init(AbstractView theView) {
                 this.theView = theView;
                 return this;
             }
@@ -374,7 +372,7 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
      *
      * @param addToViewChain
-     *            specifies whether the generated ImageInfoView should be added
+     *            specifies whether the generated View should be added
      *            to the view chain of the main image
      * @param cadence
      *            cadence between two frames (null for single images).
@@ -395,7 +393,7 @@ public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpip
      * @return new view
      * @throws IOException
      */
-    public static JHVJP2View requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static AbstractView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
         if (endTime.equals("")) {
             return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
         } else {
