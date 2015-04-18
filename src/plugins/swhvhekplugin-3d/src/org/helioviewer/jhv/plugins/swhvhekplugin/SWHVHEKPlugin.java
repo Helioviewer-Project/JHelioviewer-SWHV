@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;

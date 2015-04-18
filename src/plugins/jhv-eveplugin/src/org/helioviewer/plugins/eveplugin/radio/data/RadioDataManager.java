@@ -549,7 +549,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
 
-                    JHVJP2View jp2View = (JHVJP2View) jpxData.getView();
+                    JHVJP2View jp2View = jpxData.getView();
                     if (jp2View != null) {
                         jp2View.setViewport(new ViewportAdapter(new StaticViewport(new Vector2dInt(viewport.width, viewport.height))));
                         jpxData.viewChanged(jp2View);
@@ -641,7 +641,6 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     private static String getValueFromXML(NodeList nodeList, String _keyword, String _box) throws JHV_KduException {
         try {
-            NodeList nodes = ((Element) nodeList.item(0)).getElementsByTagName(_box);
             NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
             Element line = (Element) value.item(0);
 
