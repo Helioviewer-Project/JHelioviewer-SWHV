@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**

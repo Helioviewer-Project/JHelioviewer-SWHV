@@ -10,7 +10,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 

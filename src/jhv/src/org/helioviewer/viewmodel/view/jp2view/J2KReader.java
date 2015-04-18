@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
  * This class has two different purposes. The first is to connect to and

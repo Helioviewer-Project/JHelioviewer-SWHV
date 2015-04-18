@@ -2,6 +2,7 @@ package org.helioviewer.gl3d.gui;
 
 import java.awt.event.ActionEvent;
 
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 

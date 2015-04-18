@@ -12,7 +12,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**

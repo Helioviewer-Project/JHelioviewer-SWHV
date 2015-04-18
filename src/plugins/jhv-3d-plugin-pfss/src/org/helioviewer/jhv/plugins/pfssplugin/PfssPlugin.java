@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;

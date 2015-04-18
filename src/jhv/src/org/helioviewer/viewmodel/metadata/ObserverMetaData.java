@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.metadata;
 
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Meta data providing informations about the instrument used to take the
