@@ -62,7 +62,7 @@ public class APIRequestManager {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
-        JHVJP2View view = null;
+        AbstractImageInfoView view = null;
 
         try {
             view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
@@ -76,7 +76,7 @@ public class APIRequestManager {
                     Log.error(">> APIRequestManager.getLatestImageDate() > Could not find Helioviewer meta data in latest image. Use current date as initial end date.", new Exception());
                 }
                 if (view instanceof JHVJP2View) {
-                    view.abolish();
+                    ((JHVJP2View) view).abolish();
                 }
             } else {
                 Log.error(">> APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
@@ -117,7 +117,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static JHVJP2View loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    public static AbstractImageInfoView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -232,7 +232,7 @@ public class APIRequestManager {
      * @return The ImageInfoView corresponding to the file whose location was
      *         returned by the server
      */
-    public static JHVJP2View requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+public static AbstractImageInfoView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
@@ -330,13 +330,15 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static JHVJP2View newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
+    public static AbstractImageInfoView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
         if (uri == null) {
             return null;
         }
 
         // Load new view and assign it to view chain of Main Image
-        JHVJP2View view = ViewHelper.loadView(uri, downloadURI);
+
+        AbstractImageInfoView view = ViewHelper.loadView(uri, downloadURI, range);
+
         if (addToViewChain) {
             addToViewchain(view);
         }

@@ -26,7 +26,6 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractImageInfoView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -413,9 +412,9 @@ public class GL3DImageLayer implements Renderable {
     @Override
     public Component getOptionsPanel() {
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        if (mainLayerView instanceof JHVJPXView) {
-            ivg.getFilterTabPanelManager().setActivejp2((JHVJPXView) mainLayerView);
-        }
+        //if (mainLayerView instanceof JHVJPXView) {
+        ivg.getFilterTabPanelManager().setActivejp2(mainLayerView);
+        //}
         return ivg.getFilterPanelContainer();
     }
 

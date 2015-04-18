@@ -10,6 +10,7 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
+import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -296,8 +297,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri) throws IOException {
-        return loadView(uri, true);
+    public static AbstractImageInfoView loadView(URI uri) throws IOException {
+        return loadView(uri, true, range);
     }
 
     /**
@@ -317,8 +318,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, boolean isMainView) throws IOException {
-        return loadView(uri, uri, isMainView);
+    public static AbstractImageInfoView loadView(URI uri, boolean isMainView) throws IOException {
+        return loadView(uri, uri, isMainView, range);
     }
 
     /**
@@ -339,8 +340,8 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, URI downloadURI) throws IOException {
-        return loadView(uri, downloadURI, true);
+    public static AbstractImageInfoView loadView(URI uri, URI downloadURI) throws IOException {
+        return loadView(uri, downloadURI, true, range);
     }
 
     /**
@@ -362,14 +363,23 @@ public final class ViewHelper {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static JHVJP2View loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
+    public static AbstractImageInfoView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI");
         }
 
         String[] parts = uri.toString().split("\\.");
         String ending = parts[parts.length - 1];
-        if (downloadURI.toString().toLowerCase().contains("callisto")) {
+        if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
+            try {
+                JHVFITSView fitsView = new JHVFITSView(uri, range);
+
+                return fitsView;
+            } catch (Exception e) {
+                Log.debug("ViewerHelper::loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
                 JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView);
