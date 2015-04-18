@@ -35,7 +35,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private boolean stonyhurstAvailable = false;
     private double refb0;
     private double refl0;
-    private boolean refAvailable;
     private final double innerRadius = 0.;
     private final double outerRadius = 40.;
 
@@ -278,7 +277,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         this.refb0 = m.tryGetDouble("REF_B0");
         this.refl0 = m.tryGetDouble("REF_L0");
-        this.refAvailable = this.refb0 != 0.0 || this.refl0 != 0.0;
 
         this.stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (this.stonyhurstLatitude == 0) {
