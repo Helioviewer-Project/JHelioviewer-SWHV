@@ -29,13 +29,10 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.SetPanSelectionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxSelectionAction;
-import org.helioviewer.jhv.gui.actions.View2DAction;
-import org.helioviewer.jhv.gui.actions.View3DAction;
 import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
-import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
@@ -69,8 +66,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton trackSolarRotationButton3D;
     private JToggleButton coronaVisibilityButton;
     private JButton resetCamera;
-    protected JToggleButton view2d;
-    protected JToggleButton view3d;
+
     protected CopyOnWriteArrayList<JToggleButton> pluginList = new CopyOnWriteArrayList<JToggleButton>();
 
     /**
@@ -237,24 +233,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        ButtonGroup stateGroup = new ButtonGroup();
-        view2d = new JToggleButton(new View2DAction());
-        view2d.setIcon(IconBank.getIcon(JHVIcon.MODE_2D));
-        view2d.setSelectedIcon(IconBank.getIcon(JHVIcon.MODE_2D_SELECTED));
-        view2d.setText("2D");
-        view2d.setSelected(true);
-        stateGroup.add(view2d);
-
-        view3d = new JToggleButton(new View3DAction());
-        view3d.setIcon(IconBank.getIcon(JHVIcon.MODE_3D));
-        view3d.setSelectedIcon(IconBank.getIcon(JHVIcon.MODE_3D_SELECTED));
-        view3d.setText("3D");
-        stateGroup.add(view3d);
-
-        addButton(view2d);
-        addButton(view3d);
-        addSeparator();
-
         for (JToggleButton button : this.pluginList) {
             if (displayMode == DisplayMode.ICONANDTEXT)
                 this.add(button);
@@ -269,23 +247,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
     }
 
     public void updateStateButtons() {
-        this.updateStateButtons(StateController.getInstance().getCurrentState());
         this.coronaVisibilityButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.rotateButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
         this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
         this.repaint();
-    }
-
-    public void updateStateButtons(State currentState) {
-        if (currentState.getType() == ViewStateEnum.View2D) {
-            view2d.setSelected(true);
-            view3d.setSelected(false);
-            Log.debug("TopToolBar: Setting 2D as selected");
-        } else if (currentState.getType() == ViewStateEnum.View3D) {
-            view3d.setSelected(true);
-            view2d.setSelected(false);
-            Log.debug("TopToolBar: Setting 3D as selected");
-        }
     }
 
     /**
@@ -356,16 +321,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public void removeToolbarPlugin(AbstractButton button) {
         this.pluginList.remove(button);
-    }
-
-    public void disableStateButton() {
-        this.view2d.setEnabled(false);
-        this.view3d.setEnabled(false);
-    }
-
-    public void enableStateButton() {
-        this.view2d.setEnabled(true);
-        this.view3d.setEnabled(true);
     }
 
     /**
