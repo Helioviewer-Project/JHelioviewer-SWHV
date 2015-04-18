@@ -184,8 +184,6 @@ public class EVEDrawableElement implements DrawableElement {
 
         public final Color color;
 
-        private final double ratioX;
-
         // //////////////////////////////////////////////////////////////////////////
         // Methods
         // //////////////////////////////////////////////////////////////////////////
@@ -200,7 +198,6 @@ public class EVEDrawableElement implements DrawableElement {
             this.color = color;
             this.warnLevels = new int[numberOfWarnLevels];
             this.warnLabels = new String[numberOfWarnLevels];
-            this.ratioX = ratioX;
             int counter = -1;
             double localGraphWidth = graphWidth > 0 ? graphWidth : 10000;
             Integer previousX = null;

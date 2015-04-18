@@ -33,8 +33,7 @@ public class AssociationsPrinter {
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter("/Users/bramb/ass.txt", true));
-            writer.write("    node [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue())
-                    / 255 + "\"];\n");
+            writer.write("    node [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue()) / 255 + "\"];\n");
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -48,8 +47,7 @@ public class AssociationsPrinter {
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter("/Users/bramb/ass.txt", true));
-            writer.write("    edge [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue())
-                    / 255 + "\"];\n");
+            writer.write("    edge [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue()) / 255 + "\"];\n");
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -86,20 +84,9 @@ public class AssociationsPrinter {
 
     }
 
-    private static void printEdgeColor(Color c, BufferedWriter writer) {
-        try {
-            writer.write("    edge [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue())
-                    / 255 + "\"];\n");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     private static void printNodeColor(Color c, BufferedWriter writer) {
         try {
-            writer.write("    node [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue())
-                    / 255 + "\"];\n");
+            writer.write("    node [ color=\"" + ((1.0 * c.getRed()) / 255) + " " + (1.0 * c.getGreen()) / 255 + " " + (1.0 * c.getBlue()) / 255 + "\"];\n");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

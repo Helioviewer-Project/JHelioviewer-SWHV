@@ -123,7 +123,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         int pixelImageHeight = pixelImageSize.getY();
 
         double newSolarPixelRadius = -1.0;
-        double allowedRelativeDifference = 0.005;
 
         if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
@@ -158,7 +157,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         } else if (detector.equals("C2") || detector.equals("C3")) {
             newSolarPixelRadius = m.tryGetDouble("RSUN");
-            allowedRelativeDifference = 0.05;
 
             if (newSolarPixelRadius == 0) {
                 if (detector.equals("C2")) {
@@ -277,7 +275,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         double crlt = m.tryGetDouble("CRLT_OBS");
         double crln = m.tryGetDouble("CRLN_OBS");
-        boolean carringtonAvailable = crlt != 0.0 || crln != 0.0;
 
         this.refb0 = m.tryGetDouble("REF_B0");
         this.refl0 = m.tryGetDouble("REF_L0");

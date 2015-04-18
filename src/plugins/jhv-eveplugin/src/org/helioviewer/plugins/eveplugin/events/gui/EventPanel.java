@@ -22,10 +22,8 @@ import org.helioviewer.plugins.eveplugin.events.model.EventTypePlotConfiguration
 
 public class EventPanel implements DrawableElement {
 
-    private final YAxisElement yAxisElement;
-
     public EventPanel() {
-        yAxisElement = new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK, false, System.currentTimeMillis());
+        new YAxisElement(new Range(0, 0), new Range(0, 0), "", 0, 0, Color.BLACK, false, System.currentTimeMillis());
     }
 
     @Override

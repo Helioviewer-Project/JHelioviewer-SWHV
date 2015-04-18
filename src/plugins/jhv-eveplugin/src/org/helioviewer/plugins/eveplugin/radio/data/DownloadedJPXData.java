@@ -23,7 +23,6 @@ public class DownloadedJPXData {
     private final RadioDataManager radioDataManager;
     private final Long downloadID;
     private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
-    private final int workernumber;
 
     public DownloadedJPXData(JHVJP2View view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
@@ -33,7 +32,6 @@ public class DownloadedJPXData {
         this.endDate = endDate;
         radioDataManager = RadioDataManager.getSingletonInstance();
         this.downloadID = downloadID;
-        workernumber = 0;
     }
 
     public JHVJP2View getView() {

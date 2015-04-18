@@ -54,7 +54,7 @@ public class PfssDataLoader implements Runnable {
             buffer.flush();
 
             byte[] gzipFitsFile = buffer.toByteArray();
-            final PfssData pfssData = new PfssData(gzipFitsFile, url, time);
+            final PfssData pfssData = new PfssData(gzipFitsFile, time);
 
             EventQueue.invokeLater(new Runnable() {
                 @Override

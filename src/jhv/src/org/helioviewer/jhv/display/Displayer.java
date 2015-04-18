@@ -134,7 +134,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     @Override
     public void eventHightChanged(JHVEvent event) {
-        this.display();
+        Displayer.display();
     }
 
     public static RenderableContainer getRenderablecontainer() {
