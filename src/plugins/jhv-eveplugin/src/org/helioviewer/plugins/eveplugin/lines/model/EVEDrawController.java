@@ -239,23 +239,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    private void adjustAvailableRangeBorders(final Range availableRange) {
-        final double minLog10 = Math.log10(availableRange.min);
-        final double maxLog10 = Math.log10(availableRange.max);
-
-        if (minLog10 < 0) {
-            availableRange.min = Math.pow(10, ((int) (minLog10 * 100 - 1)) / 100.0);
-        } else {
-            availableRange.min = Math.pow(10, ((int) (minLog10 * 100)) / 100.0);
-        }
-
-        if (maxLog10 < 0) {
-            availableRange.max = Math.pow(10, ((int) (maxLog10 * 100)) / 100.0);
-        } else {
-            availableRange.max = Math.pow(10, ((int) (maxLog10 * 100 + 1)) / 100.0);
-        }
-    }
-
     private void checkSelectedRange(final Range availableRange, final Range selectedRange) {
         if (selectedRange.min > availableRange.max || selectedRange.max < availableRange.min) {
             selectedRange.min = availableRange.min;

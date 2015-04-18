@@ -36,8 +36,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     }
 
     private void updateActiveView(AbstractView v) {
-        View infoView = v;
-
         CardLayout cl = (CardLayout) this.getLayout();
         cl.show(this, v == null ? "null" : v.toString());
         ensureSize();

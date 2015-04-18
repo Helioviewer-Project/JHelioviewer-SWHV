@@ -283,9 +283,9 @@ public final class ViewHelper {
      * Loads a new image located at the given URI.
      *
      * <p>
-     * Depending on the file type, a different implementation of the
-     * View is chosen. If there is no implementation available for the
-     * given type, an exception is thrown.
+     * Depending on the file type, a different implementation of the View is
+     * chosen. If there is no implementation available for the given type, an
+     * exception is thrown.
      *
      * <p>
      * Calls {@link #loadView(URI, boolean)} with the boolean set to true.
@@ -305,9 +305,9 @@ public final class ViewHelper {
      * Loads a new image located at the given URI.
      *
      * <p>
-     * Depending on the file type, a different implementation of the
-     * View is chosen. If there is no implementation available for the
-     * given type, an exception is thrown.
+     * Depending on the file type, a different implementation of the View is
+     * chosen. If there is no implementation available for the given type, an
+     * exception is thrown.
      *
      * @param uri
      *            URI representing the location of the image
@@ -326,9 +326,9 @@ public final class ViewHelper {
      * Loads a new image located at the given URI.
      *
      * <p>
-     * Depending on the file type, a different implementation of the
-     * View is chosen. If there is no implementation available for the
-     * given type, an exception is thrown.
+     * Depending on the file type, a different implementation of the View is
+     * chosen. If there is no implementation available for the given type, an
+     * exception is thrown.
      *
      * @param uri
      *            URI representing the location of the image
@@ -348,9 +348,9 @@ public final class ViewHelper {
      * Loads a new image located at the given URI.
      *
      * <p>
-     * Depending on the file type, a different implementation of the
-     * View is chosen. If there is no implementation available for the
-     * given type, an exception is thrown.
+     * Depending on the file type, a different implementation of the View is
+     * chosen. If there is no implementation available for the given type, an
+     * exception is thrown.
      *
      * @param uri
      *            URI representing the location of the image
@@ -368,8 +368,6 @@ public final class ViewHelper {
             throw new IOException("Invalid URI");
         }
 
-        String[] parts = uri.toString().split("\\.");
-        String ending = parts[parts.length - 1];
         if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
             try {
                 JHVFITSView fitsView = new JHVFITSView(uri);

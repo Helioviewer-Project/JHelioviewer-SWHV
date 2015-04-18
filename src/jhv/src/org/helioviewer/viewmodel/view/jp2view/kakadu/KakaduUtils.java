@@ -448,7 +448,6 @@ public class KakaduUtils {
 
         private String getValueFromXML(String _keyword, String _box) throws JHV_KduException {
             try {
-                NodeList nodes = ((Element) this.nodeList.item(0)).getElementsByTagName(_box);
                 NodeList value = ((Element) this.nodeList.item(0)).getElementsByTagName(_keyword);
                 Element line = (Element) value.item(0);
 
@@ -478,7 +477,8 @@ public class KakaduUtils {
                 if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
                     try {
                         Thread.sleep(500);
-                    } catch (InterruptedException e1) {}
+                    } catch (InterruptedException e1) {
+                    }
 
                     get(key);
                 } else if (e.getMessage() != "No XML data present") {

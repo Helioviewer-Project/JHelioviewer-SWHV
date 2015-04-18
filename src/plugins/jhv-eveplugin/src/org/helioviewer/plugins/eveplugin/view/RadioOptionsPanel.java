@@ -56,13 +56,12 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        LUT newMap = lutMap.get(lut.getSelectedItem());
         ColorLookupModel.getInstance().setLUT(LUT.getStandardList().get((lut.getSelectedItem())));
     }
 
     /**
      * Adds a color table to the available list and set it active
-     * 
+     *
      * @param lut
      *            Color table to add
      */

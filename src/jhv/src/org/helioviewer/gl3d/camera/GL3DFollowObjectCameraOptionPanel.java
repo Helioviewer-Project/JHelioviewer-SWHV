@@ -19,7 +19,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.Displayer;
@@ -52,16 +51,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
-    private JPanel fovPanel;
-    private JSpinner fovSpinner;
 
     private JPanel buttonPanel;
 
     private final JCheckBox exactDateCheckBox;
 
     protected boolean firstComboChanged = false;
-
-    private JButton visibleFovButton;
 
     protected boolean fovVisible = true;
 

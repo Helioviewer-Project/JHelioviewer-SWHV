@@ -58,8 +58,6 @@ public class Astronomy {
     }
 
     public static double getL0Degree(int year, int month, int day, double et) {
-        double pi = Math.PI;
-
         double jd = ymd2jd(year, month, day) + et / 24.;
         double t = (jd - 2451545.) / 36525.;
         double mnl = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
