@@ -312,7 +312,7 @@ public class BandController {
             // set current group visible = false
             /*
              * final LinkedList<Band> bands = getBands();
-             *
+             * 
              * for (final Band band : bands) { band.setVisible(false); }
              */
 
@@ -324,10 +324,6 @@ public class BandController {
             for (final Band band : newBands) {
                 band.setVisible(true);
             }
-        }
-
-        public BandGroup getSelectedGroup() {
-            return selectedBandGroup;
         }
     }
 

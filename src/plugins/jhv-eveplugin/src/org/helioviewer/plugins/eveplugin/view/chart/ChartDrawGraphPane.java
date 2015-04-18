@@ -82,8 +82,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean mouseOverEvent;
     private int lastWidth;
     private int lastHeight;
-    private final long created;
-    private long drawLabelsOperarionTime;
     private boolean updateRequestReceived;
     private final Timer timer;
 
@@ -93,8 +91,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     public ChartDrawGraphPane() {
         updateRequestReceived = false;
-        created = System.currentTimeMillis();
-        drawLabelsOperarionTime = 0;
         drawController = DrawController.getSingletonInstance();
         initVisualComponents();
         addMouseListener(this);
@@ -304,8 +300,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         }
         long timeTaken = System.currentTimeMillis() - start;
-        drawLabelsOperarionTime += timeTaken;
-        double timeOverTotalTime = 1.0 * drawLabelsOperarionTime / (System.currentTimeMillis() - created);
         // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
         // start) + " total time: " + drawLabelsOperarionTime +
         // " total time over running time : " + timeOverTotalTime);
@@ -826,11 +820,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }

@@ -6,11 +6,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,7 +48,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
 
-    private boolean mouseOverComponent = false;
     private boolean mouseOverInterval = true;
     private boolean mouseOverLeftGraspPoint = false;
     private boolean mouseOverRightGraspPoint = false;
@@ -203,45 +200,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 2,
         // 0, 2, 12, 5, 5));
 
-    }
-
-    private void drawGraspPointLabels(Graphics g, Interval<Date> selectedInterval) {
-        if (mousePressed != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
-            final String leftLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getStart());
-            final Rectangle2D leftLabelTextRectangle = g.getFontMetrics().getStringBounds(leftLabelText, g);
-            final Rectangle leftRectangle = new Rectangle(leftIntervalBorderPosition - 10 - (int) leftLabelTextRectangle.getWidth(), (getHeight() / 2) - ((int) leftLabelTextRectangle.getHeight() / 2), (int) leftLabelTextRectangle.getWidth(), (int) leftLabelTextRectangle.getHeight());
-
-            if (leftRectangle.x <= 5) {
-                leftRectangle.x = leftIntervalBorderPosition + 10;
-            }
-
-            final String rightLabelText = ChartConstants.FULL_DATE_TIME_FORMAT.format(selectedInterval.getEnd());
-            final Rectangle2D rightLabelTextRectangle = g.getFontMetrics().getStringBounds(rightLabelText, g);
-            final Rectangle rightRectangle = new Rectangle(rightIntervalBorderPosition + 10, (getHeight() / 2) - ((int) rightLabelTextRectangle.getHeight() / 2), (int) rightLabelTextRectangle.getWidth(), (int) rightLabelTextRectangle.getHeight());
-
-            if (rightRectangle.x + rightRectangle.width >= getWidth() - 5) {
-                rightRectangle.x = rightIntervalBorderPosition - 10 - (int) rightLabelTextRectangle.getWidth();
-            }
-
-            if (leftRectangle.intersects(rightRectangle)) {
-                leftRectangle.y = (getHeight() / 2) - leftRectangle.y - 2;
-                rightRectangle.y = (getHeight() / 2) + 2;
-            }
-
-            drawGraspPointLabel(g, leftRectangle, leftLabelText);
-            drawGraspPointLabel(g, rightRectangle, rightLabelText);
-        }
-    }
-
-    private void drawGraspPointLabel(Graphics g, final Rectangle rectangle, final String text) {
-        g.setColor(Color.GRAY);
-        g.fillRect(rectangle.x - 2, rectangle.y - 1, rectangle.width + 4, rectangle.height);
-
-        g.setColor(ChartConstants.BORDER_COLOR);
-        g.drawRect(rectangle.x - 2, rectangle.y - 1, rectangle.width + 4, rectangle.height);
-
-        g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.drawString(text, rectangle.x, rectangle.y - 2 + rectangle.height);
     }
 
     private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
@@ -578,7 +536,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        mouseOverComponent = true;
         if (e.getPoint().x >= ChartConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - ChartConstants.getGraphRightSpace()) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         } else {
@@ -598,7 +555,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             }
         }
         mousePressed = null;
-        mouseOverComponent = false;
         mouseOverInterval = false;
         mouseOverLeftGraspPoint = false;
         mouseOverRightGraspPoint = false;

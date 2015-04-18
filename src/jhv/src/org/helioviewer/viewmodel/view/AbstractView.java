@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
 import java.nio.IntBuffer;
-import java.util.Date;
 
 import javax.media.opengl.GL2;
 
@@ -241,7 +240,6 @@ public abstract class AbstractView implements View {
         double yOffset = region.getLowerLeftCorner().y;
         double xScale = 1. / region.getWidth();
         double yScale = 1. / region.getHeight();
-        Date dt = new Date(image.getDateMillis());
 
         MetaData metadata = image.getMETADATA();
 

@@ -1007,25 +1007,11 @@ public class HEKParser implements SWEKParser {
         }
 
         /**
-         * @return the id1
-         */
-        public String getId1() {
-            return id1;
-        }
-
-        /**
          * @param id1
          *            the id1 to set
          */
         public void setId1(String id1) {
             this.id1 = id1;
-        }
-
-        /**
-         * @return the id2
-         */
-        public String getId2() {
-            return id2;
         }
 
         /**
@@ -1037,25 +1023,11 @@ public class HEKParser implements SWEKParser {
         }
 
         /**
-         * @return the eventType1
-         */
-        public String getEventType1() {
-            return eventType1;
-        }
-
-        /**
          * @param eventType1
          *            the eventType1 to set
          */
         public void setEventType1(String eventType1) {
             this.eventType1 = eventType1;
-        }
-
-        /**
-         * @return the eventType2
-         */
-        public String getEventType2() {
-            return eventType2;
         }
 
         /**
