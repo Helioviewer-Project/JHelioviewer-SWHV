@@ -44,7 +44,6 @@ public class PfssData {
     private boolean lastFixedColor;
 
     private String dateString;
-    private final String url;
     private final long time;
 
     /**
@@ -53,9 +52,8 @@ public class PfssData {
      * @param time
      * @param url
      */
-    public PfssData(byte[] gzipFitsFile, String url, long time) {
+    public PfssData(byte[] gzipFitsFile, long time) {
         this.gzipFitsFile = gzipFitsFile;
-        this.url = url;
         this.time = time;
     }
 

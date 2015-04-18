@@ -89,10 +89,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
         Displayer.display();
     }
 
-    private boolean isCompletelyOnSphere() {
-        return true;
-    }
-
     private boolean isValidZoomBox() {
         return this.zoomBoxEndPoint != null && this.zoomBoxStartPoint != null;
     }

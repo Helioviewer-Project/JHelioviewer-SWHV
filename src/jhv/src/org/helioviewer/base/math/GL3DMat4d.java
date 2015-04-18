@@ -328,7 +328,7 @@ public class GL3DMat4d {
         return this;
     }
 
-    private final static GL3DMat4d rotation(GL3DQuatd q) {
+    public final static GL3DMat4d rotation(GL3DQuatd q) {
         return GL3DMat4d.rotation(q.getAngle(), q.getRotationAxis());
     }
 

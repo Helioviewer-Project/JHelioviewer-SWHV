@@ -29,7 +29,6 @@ public class ComesepParser implements SWEKParser {
     private SWEKEventType eventType;
     private SWEKSource eventSource;
     private SWEKSupplier eventSupplier;
-    private List<SWEKRelatedEvents> eventRelationRules;
     private final ComesepEventStream eventStream;
     private boolean parserStopped;
     private final HashMap<String, List<Association>> associationsMap;
@@ -40,12 +39,12 @@ public class ComesepParser implements SWEKParser {
 
     /**
      * Creates a parser for the given event type and event source.
-     * 
+     *
      * @param eventType
      *            the type of the event
      * @param source
      *            the source of the event
-     * 
+     *
      */
     public ComesepParser() {
         parserStopped = false;
@@ -65,7 +64,6 @@ public class ComesepParser implements SWEKParser {
         this.eventType = eventType;
         eventSource = swekSource;
         eventSupplier = swekSupplier;
-        eventRelationRules = relatedEvents;
         try {
             StringBuilder sb = new StringBuilder();
             if (downloadInputStream != null) {
@@ -241,8 +239,8 @@ public class ComesepParser implements SWEKParser {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param eventJSON
      * @throws JSONException
      */
@@ -268,8 +266,8 @@ public class ComesepParser implements SWEKParser {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param jsonObject
      * @return
      * @throws JSONException
@@ -279,8 +277,8 @@ public class ComesepParser implements SWEKParser {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param jsonObject
      * @return
      * @throws JSONException

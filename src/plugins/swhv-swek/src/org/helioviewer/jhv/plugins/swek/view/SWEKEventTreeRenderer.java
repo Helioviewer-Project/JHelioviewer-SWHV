@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -83,18 +82,4 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         return panel;
     }
 
-    /**
-     * Resizes an icon to the correct size.
-     *
-     * @param icon
-     *            the icon to resize
-     * @return the resized icon
-     */
-    private ImageIcon resizeIcon(ImageIcon icon) {
-        Image im = icon.getImage();
-        BufferedImage bi = new BufferedImage(25, 25, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.createGraphics();
-        g.drawImage(im, 0, 0, 25, 25, null);
-        return new ImageIcon(bi);
-    }
 }

@@ -164,7 +164,8 @@ public class Settings {
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
             try {
                 UIManager.setLookAndFeel(lookAndFeel);
-                SwingUtilities.updateComponentTreeUI(ImageViewerGui.getSingletonInstance().getMainFrame());
+                ImageViewerGui.getSingletonInstance();
+                SwingUtilities.updateComponentTreeUI(ImageViewerGui.getMainFrame());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
