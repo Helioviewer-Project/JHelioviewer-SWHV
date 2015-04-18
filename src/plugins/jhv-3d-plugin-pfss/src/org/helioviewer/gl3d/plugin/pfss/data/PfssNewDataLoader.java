@@ -59,8 +59,6 @@ public class PfssNewDataLoader implements Runnable {
                     String inputLine;
                     String[] splitted = null;
                     String url;
-                    String[] date;
-                    String[] time;
                     while ((inputLine = in.readLine()) != null) {
                         splitted = inputLine.split(" ");
                         url = splitted[1];

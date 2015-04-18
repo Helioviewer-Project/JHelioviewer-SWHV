@@ -5,8 +5,6 @@ import java.util.Date;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -245,30 +243,19 @@ public abstract class AbstractView implements View {
         double yScale = 1. / region.getHeight();
         Date dt = new Date(image.getDateMillis());
 
-        double theta = -Astronomy.getB0InRadians(dt);
-        double phi = Astronomy.getL0Radians(dt);
-
         MetaData metadata = image.getMETADATA();
-        if (metadata instanceof HelioviewerMetaData) {
-            HelioviewerMetaData md = (HelioviewerMetaData) metadata;
-            phi -= md.getStonyhurstLongitude() / MathUtils.radeg;
-            theta = -md.getStonyhurstLatitude() / MathUtils.radeg;
-        }
 
         GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
 
         boolean diffMode = false;
         Region diffRegion = null;
-        Date diffDate = null;
 
         if (!this.getBaseDifferenceMode() && this.getPreviousImageData() != null) {
             diffMode = true;
             diffRegion = this.getPreviousImageData().getRegion();
-            diffDate = new Date(this.getPreviousImageData().getDateMillis());
         } else if (this.getBaseDifferenceMode() && this.getBaseDifferenceImageData() != null) {
             diffMode = true;
             diffRegion = this.getBaseDifferenceImageData().getRegion();
-            diffDate = new Date(this.getBaseDifferenceImageData().getDateMillis());
         }
 
         if (diffMode) {

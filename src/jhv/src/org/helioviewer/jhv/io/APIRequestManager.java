@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -98,8 +97,8 @@ public class APIRequestManager {
      * located on the server. The address of the file will be returned.
      *
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @param observatory
      *            observatory of the requested image.
      * @param instrument
@@ -142,8 +141,8 @@ public class APIRequestManager {
      * located on the server. The address of the file will be returned.
      *
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @param observatory
      *            observatory of the requested image series.
      * @param instrument
@@ -167,17 +166,6 @@ public class APIRequestManager {
     private static AbstractView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        Date startDate = new Date();
-        try {
-            startDate = format.parse(startTime);
-        } catch (ParseException e1) {
-        }
-
-        Date endDate = new Date();
-        try {
-            endDate = format.parse(endTime);
-        } catch (ParseException e1) {
-        }
 
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
@@ -219,16 +207,16 @@ public class APIRequestManager {
      * Returns the corresponding View for the file.
      *
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @param jpipRequest
      *            The http request url which is sent to the server
      * @param downloadUri
      *            the http uri from which the whole file can be downloaded
      * @param errorMessage
      *            display error message
-     * @return The View corresponding to the file whose location was
-     *         returned by the server
+     * @return The View corresponding to the file whose location was returned by
+     *         the server
      */
     public static AbstractView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
@@ -292,8 +280,8 @@ public class APIRequestManager {
      * @param uri
      *            specifies the location of the file.
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @return associated image info view of the given image or image series
      *         file.
      * @throws IOException
@@ -322,8 +310,8 @@ public class APIRequestManager {
      * @param downloadURI
      *            the http uri from which the whole file can be downloaded
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @return associated image info view of the given image or image series
      *         file.
      * @throws IOException
@@ -372,8 +360,8 @@ public class APIRequestManager {
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
      *
      * @param addToViewChain
-     *            specifies whether the generated View should be added
-     *            to the view chain of the main image
+     *            specifies whether the generated View should be added to the
+     *            view chain of the main image
      * @param cadence
      *            cadence between two frames (null for single images).
      * @param startTime

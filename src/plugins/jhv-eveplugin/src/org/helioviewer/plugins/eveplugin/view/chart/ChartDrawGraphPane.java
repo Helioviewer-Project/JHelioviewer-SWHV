@@ -30,7 +30,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JComponent;
-import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.interval.Interval;
@@ -46,7 +45,6 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
-import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -72,13 +70,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle plotArea = new Rectangle();
     private double ratioX = 0;
     private BufferedImage screenImage = null;
-    private final ZoomManager zoomManager;
     private int twoYAxis = 0;
     private final PlotAreaSpace plotAreaSpace;
     private final EventModel eventModel;
     private Rectangle leftAxisArea;
 
-    private SwingWorker<Integer, Integer> currentSwingWorker;
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
     private boolean reschedule = false;
@@ -106,7 +102,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseWheelListener(this);
         addComponentListener(this);
         // addKeyListener(this);
-        zoomManager = ZoomManager.getSingletonInstance();
         yRatios = new HashMap<YAxisElement, Double>();
         drawController.addDrawControllerListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
