@@ -45,11 +45,11 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -620,7 +620,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(JHVJP2View view) {
+        public void activeLayerChanged(AbstractImageInfoView view) {
             this.searchCorrespondingMoviePanel(view);
         }
 
@@ -633,7 +633,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param view
          *            View to search panel for
          */
-        private void searchCorrespondingMoviePanel(JHVJP2View view) {
+        private void searchCorrespondingMoviePanel(AbstractImageInfoView view) {
             if (view instanceof JHVJPXView) {
                 JHVJPXView movieView = (JHVJPXView) view;
 
@@ -683,7 +683,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void activeLayerChanged(JHVJP2View view) {
+        public void activeLayerChanged(AbstractImageInfoView view) {
             super.activeLayerChanged(view);
             if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
                 putValue(NAME, activePanel.playPauseButton.getToolTipText());

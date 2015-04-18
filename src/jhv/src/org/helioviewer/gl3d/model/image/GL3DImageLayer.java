@@ -25,7 +25,8 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -63,14 +64,14 @@ public class GL3DImageLayer implements Renderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final JHVJP2View mainLayerView;
+    private final AbstractImageInfoView mainLayerView;
     private final RenderableType type;
     private boolean isVisible = true;
 
-    public GL3DImageLayer(String name, JHVJP2View mainLayerView, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
-        this.type = new RenderableImageType(mainLayerView.getName());
+    public GL3DImageLayer(String name, AbstractImageInfoView view, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+        this.type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
-        this.mainLayerView = mainLayerView;
+        this.mainLayerView = view;
 
         int count = 0;
         for (int i = 0; i <= this.resolution; i++) {
@@ -196,7 +197,7 @@ public class GL3DImageLayer implements Renderable {
                 gl.glCullFace(GL2.GL_BACK);
 
                 gl.glEnable(GL2.GL_BLEND);
-                JHVJP2View jp2view = this.getMainLayerView();
+                AbstractImageInfoView jp2view = this.getMainLayerView();
 
                 if (jp2view != null) {
                     jp2view.applyFilters(gl);
@@ -412,7 +413,9 @@ public class GL3DImageLayer implements Renderable {
     @Override
     public Component getOptionsPanel() {
         ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        ivg.getFilterTabPanelManager().setActivejp2(getMainLayerView());
+        if (mainLayerView instanceof JHVJPXView) {
+            ivg.getFilterTabPanelManager().setActivejp2((JHVJPXView) mainLayerView);
+        }
         return ivg.getFilterPanelContainer();
     }
 
@@ -436,7 +439,7 @@ public class GL3DImageLayer implements Renderable {
         return getMainLayerView().getMetaData().getDateTime().getCachedDate();
     }
 
-    public JHVJP2View getMainLayerView() {
+    public AbstractImageInfoView getMainLayerView() {
         return mainLayerView;
     }
 }

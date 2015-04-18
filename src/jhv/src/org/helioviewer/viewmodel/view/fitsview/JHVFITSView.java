@@ -128,6 +128,7 @@ public class JHVFITSView implements View {
     /**
      * {@inheritDoc}
      * */
+    @Override
     public boolean setViewport(Viewport v) {
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
@@ -226,6 +227,36 @@ public class JHVFITSView implements View {
     @Override
     public URI getDownloadURI() {
         return uri;
+    }
+
+    @Override
+    public Interval<Date> getDateRange() {
+        return this.range;
+    }
+
+    @Override
+    public boolean getBaseDifferenceMode() {
+        return false;
+    }
+
+    @Override
+    public boolean getDifferenceMode() {
+        return false;
+    }
+
+    @Override
+    public ImageData getBaseDifferenceImageData() {
+        return subImageData;
+    }
+
+    @Override
+    public ImageData getPreviousImageData() {
+        return subImageData;
+    }
+
+    @Override
+    public ImageData getImageData() {
+        return subImageData;
     }
 
 }

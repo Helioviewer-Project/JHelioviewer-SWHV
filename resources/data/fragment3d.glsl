@@ -68,7 +68,6 @@ void main(void)
     float tmpConvolutionSum = 0.;
     vec2 normalizedScreenpos = 2.*((gl_FragCoord.xy/viewport)-0.5);
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-  
     vec4 color;
     vec2 texcoord; 
     vec2 difftexcoord; 

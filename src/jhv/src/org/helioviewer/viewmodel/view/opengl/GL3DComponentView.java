@@ -21,9 +21,8 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
@@ -148,7 +147,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
     }
 
     private void exportFrame() {
-        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
+        AbstractImageInfoView mv = Displayer.getLayersModel().getActiveView();
         if (mv == null) {
             stopExport();
             return;
@@ -195,7 +194,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
 
-        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
+        AbstractImageInfoView mv = Displayer.getLayersModel().getActiveView();
         if (mv instanceof JHVJPXView) {
             export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
@@ -212,7 +211,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
     }
 
     private void stopExport() {
-        JHVJP2View mv = Displayer.getLayersModel().getActiveView();
+        AbstractImageInfoView mv = Displayer.getLayersModel().getActiveView();
 
         exportMode = false;
         previousScreenshot = -1;

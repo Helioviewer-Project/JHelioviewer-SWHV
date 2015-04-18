@@ -32,8 +32,7 @@ import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractImageInfoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
@@ -241,7 +240,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(int idx) {
-        View view = Displayer.getLayersModel().getLayer(idx);
+        AbstractImageInfoView view = Displayer.getLayersModel().getLayer(idx);
         if (view instanceof JHVJPXView) {
             JHVJPXView jpxView = (JHVJPXView) view;
             Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
@@ -256,7 +255,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void activeLayerChanged(JHVJP2View view) {
+    public void activeLayerChanged(AbstractImageInfoView view) {
     }
 
     @Override
