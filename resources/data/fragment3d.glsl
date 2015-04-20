@@ -77,10 +77,7 @@ void main(void)
     if(radius2 > outerCutOffRadius * outerCutOffRadius || radius2 < cutOffRadius * cutOffRadius) {
         discard;
     }
-    if(radius2<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {
-        texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (rotatedHitPoint.y - rect.y) * rect.w);
-    }
-    else{
+    if(radius2>=1. || dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))<=0.) {
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     } 
@@ -97,9 +94,7 @@ void main(void)
         color.r = (color.r + 1.0)/2.0;
     } else if(isdifference == BASEDIFFERENCE_ROT || isdifference == RUNNINGDIFFERENCE_ROT) {
         vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
-        if(radius2<1. && dot(diffrotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {
-        }
-        else{
+        if(radius2>=1. && dot(diffrotatedHitPoint.xyz, vec3(0.,0.,1.))<=0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlanediff(up1));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         } 
