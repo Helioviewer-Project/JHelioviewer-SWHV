@@ -1,6 +1,9 @@
 package org.helioviewer.viewmodel.view;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import javax.media.opengl.GL2;
 
@@ -8,10 +11,15 @@ import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.imageformat.ImageFormat;
+import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
+import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
+import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
@@ -73,7 +81,9 @@ public abstract class AbstractView implements View {
 
     public void applyFilters(GL2 gl) {
         copyScreenToTexture(gl);
-        applyRunningDifferenceGL(gl);
+        if (this.differenceMode) {
+            applyRunningDifferenceGL(gl);
+        }
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
         GLSLShader.setGamma(gamma);
@@ -84,8 +94,51 @@ public abstract class AbstractView implements View {
         applyGLLUT(gl);
         if (imageData != null) {
             GLTextureHelper.renderImageDataToScreen(gl, imageData, this.tex);
+            int width = imageData.getWidth();
+            int height = imageData.getHeight();
+            if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
+                int bitsPerPixel = imageData.getImageTransport().getNumBitsPerPixel();
+                Buffer buffer;
+
+                switch (bitsPerPixel) {
+                case 8:
+                    buffer = ByteBuffer.wrap(((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData());
+                    break;
+                case 16:
+                    buffer = ShortBuffer.wrap(((Short16ImageTransport) imageData.getImageTransport()).getShort16PixelData());
+                    break;
+                case 32:
+                    buffer = IntBuffer.wrap(((Int32ImageTransport) imageData.getImageTransport()).getInt32PixelData());
+                    break;
+                default:
+                    buffer = null;
+                }
+
+                gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+                gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+                gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageData.getWidth());
+                gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
+
+                ImageFormat imageFormat = imageData.getImageFormat();
+                gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
+
+                if (width != previousWidth || height != previousHeight) {
+                    gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat), width, height, 0, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), null);
+                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
+                    previousWidth = width;
+                    previousHeight = height;
+                }
+                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat), width, height, 0, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+
+            }
         }
     }
+
+    private int previousWidth = -1;
+    private int previousHeight = -1;
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
         colorMask = new ColorMask(redColormask, greenColormask, blueColormask);

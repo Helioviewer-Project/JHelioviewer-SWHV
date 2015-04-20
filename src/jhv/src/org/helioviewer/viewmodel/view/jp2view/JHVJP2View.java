@@ -147,7 +147,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
             jp2Image.setParentView(this);
         }
         jp2Image.addReference();
-
         try {
             reader = new J2KReader(this);
             render = new J2KRender(this);
