@@ -10,6 +10,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
@@ -36,6 +37,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         eventRequester.addListener(EventModel.getSingletonInstance());
         DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
         // Create an instance of eveDrawController and leave it here.
+        EVEDrawController.getSingletonInstance();
         if (mainPanel == null) {
             mainPanel = new MainPanel();
         }
