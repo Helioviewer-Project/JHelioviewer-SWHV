@@ -101,7 +101,7 @@ public class EVECacheController {
         if (rc == null) {
             requestCache.put(band, new RequestCache());
         }
-        return rc;
+        return requestCache.get(band);
     }
 
     private Date getDay(final Date date) {
