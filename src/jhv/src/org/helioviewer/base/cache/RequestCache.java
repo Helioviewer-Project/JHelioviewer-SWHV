@@ -17,120 +17,15 @@ public class RequestCache {
     }
 
     public List<Interval<Date>> adaptRequestCache(Date startDate, Date endDate) {
-        ArrayList<Interval<Date>> missingIntervals = new ArrayList<Interval<Date>>();
-        Date currentStartDate = startDate;
-        boolean endDateUsed = false;
+
         if (requestCache.isEmpty()) {
-            missingIntervals.add(new Interval<Date>(startDate, endDate));
             requestCache.put(startDate, new Interval<Date>(startDate, endDate));
+            return getMissingIntervals(new Interval<Date>(startDate, endDate));
         } else {
-            Interval<Date> previousInterval = null;
-            for (Date iStartDate : requestCache.keySet()) {
-                if (currentStartDate.before(iStartDate)) {
-                    if (previousInterval == null) {
-                        // No previous interval check if endate is also before
-                        // startdate
-                        if (endDate.before(iStartDate)) {
-                            // complete new interval
-                            missingIntervals.add(new Interval<Date>(startDate, endDate));
-                            previousInterval = requestCache.get(iStartDate);
-                            break;
-                        } else {
-                            // overlapping interval => missing interval =
-                            // {startDate, iStartDate}
-                            // continue with interval = {iStartDate, endDate}
-                            currentStartDate = iStartDate;
-                            missingIntervals.add(new Interval<Date>(startDate, iStartDate));
-                            previousInterval = requestCache.get(iStartDate);
-                            continue;
-                        }
-                    } else {
-                        // 1) start time before or equal previous end time
-                        // 2) start time after previous end time
-                        if (previousInterval.containsPointInclusive(currentStartDate)) {
-                            // 1)
-                            // look at end time
-                            // 1) end time before or equal previous end time:
-                            // internal interval => do nothing break.
-                            // 2) end time after previous end time : partial
-                            // overlapping internal continue with interval
-                            // {previousendtime, endtime}
-
-                            if (previousInterval.containsPointInclusive(endDate)) {
-                                // 1))
-                                break;
-                            } else {
-                                if (endDate.before(iStartDate)) {
-                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
-                                    endDateUsed = true;
-                                    break;
-                                } else {
-                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), iStartDate));
-                                    currentStartDate = iStartDate;
-                                }
-                                previousInterval = requestCache.get(iStartDate);
-                                continue;
-                            }
-
-                        } else {
-                            // 2)
-                            // look at end time
-                            // 1) endDate before or equal current start time:
-                            // missing interval: {previousendtime, enddate}
-                            // 2) endDate after current start time : missing
-                            // interval: {previous end date, current start
-                            // date}, continue with interval: {current start
-                            // time, end time}
-                            if (!previousInterval.containsPointInclusive(endDate)) {
-                                if (endDate.before(iStartDate) || endDate.equals(iStartDate)) {
-                                    // 1)
-                                    if (currentStartDate.after(previousInterval.getEnd())) {
-                                        missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
-                                    } else {
-                                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
-                                    }
-                                    endDateUsed = true;
-                                    break;
-                                } else {
-                                    // 2)
-                                    missingIntervals.add(new Interval<Date>(currentStartDate, iStartDate));
-                                    previousInterval = requestCache.get(iStartDate);
-                                    currentStartDate = iStartDate;
-                                    continue;
-                                }
-                            } else {
-                                endDateUsed = true;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    previousInterval = requestCache.get(iStartDate);
-                }
-            }
-            // check if current start date is after or equal previous (last
-            // interval) start date
-            if (!endDateUsed && (currentStartDate.after(previousInterval.getStart()) || currentStartDate.equals(previousInterval.getStart()))) {
-                // Check if start date is after end date of previous (last)
-                // interval
-                // 1) true: missing interval : {currentStartDate, endDate}
-                // 2) false: check end date
-                if (currentStartDate.after(previousInterval.getEnd()) || currentStartDate.equals(previousInterval.getEnd())) {
-                    // 1)
-                    missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
-                } else {
-                    // 2)
-                    // 1) endDate after previous end date: missing interval =
-                    // {previousenddate, endDate}
-                    // 2) internal interval do nothing
-                    if (endDate.after(previousInterval.getEnd())) {
-                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
-                    }
-                }
-            }
+            List<Interval<Date>> missingIntervals = getMissingIntervals(new Interval<Date>(startDate, endDate));
             updateRequestCache(startDate, endDate);
+            return missingIntervals;
         }
-        return missingIntervals;
     }
 
     private void updateRequestCache(Date startDate, Date endDate) {
@@ -274,5 +169,123 @@ public class RequestCache {
 
     public Collection<Interval<Date>> getAllRequestIntervals() {
         return requestCache.values();
+    }
+
+    public ArrayList<Interval<Date>> getMissingIntervals(Interval<Date> interval) {
+        ArrayList<Interval<Date>> missingIntervals = new ArrayList<Interval<Date>>();
+        Date startDate = interval.getStart();
+        Date endDate = interval.getEnd();
+        Date currentStartDate = interval.getStart();
+        boolean endDateUsed = false;
+        if (requestCache.isEmpty()) {
+            missingIntervals.add(new Interval<Date>(startDate, endDate));
+        } else {
+            Interval<Date> previousInterval = null;
+            for (Date iStartDate : requestCache.keySet()) {
+                if (currentStartDate.before(iStartDate)) {
+                    if (previousInterval == null) {
+                        // No previous interval check if endate is also before
+                        // startdate
+                        if (endDate.before(iStartDate)) {
+                            // complete new interval
+                            missingIntervals.add(new Interval<Date>(startDate, endDate));
+                            previousInterval = requestCache.get(iStartDate);
+                            break;
+                        } else {
+                            // overlapping interval => missing interval =
+                            // {startDate, iStartDate}
+                            // continue with interval = {iStartDate, endDate}
+                            currentStartDate = iStartDate;
+                            missingIntervals.add(new Interval<Date>(startDate, iStartDate));
+                            previousInterval = requestCache.get(iStartDate);
+                            continue;
+                        }
+                    } else {
+                        // 1) start time before or equal previous end time
+                        // 2) start time after previous end time
+                        if (previousInterval.containsPointInclusive(currentStartDate)) {
+                            // 1)
+                            // look at end time
+                            // 1) end time before or equal previous end time:
+                            // internal interval => do nothing break.
+                            // 2) end time after previous end time : partial
+                            // overlapping internal continue with interval
+                            // {previousendtime, endtime}
+
+                            if (previousInterval.containsPointInclusive(endDate)) {
+                                // 1))
+                                break;
+                            } else {
+                                if (endDate.before(iStartDate)) {
+                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                                    endDateUsed = true;
+                                    break;
+                                } else {
+                                    missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), iStartDate));
+                                    currentStartDate = iStartDate;
+                                }
+                                previousInterval = requestCache.get(iStartDate);
+                                continue;
+                            }
+
+                        } else {
+                            // 2)
+                            // look at end time
+                            // 1) endDate before or equal current start time:
+                            // missing interval: {previousendtime, enddate}
+                            // 2) endDate after current start time : missing
+                            // interval: {previous end date, current start
+                            // date}, continue with interval: {current start
+                            // time, end time}
+                            if (!previousInterval.containsPointInclusive(endDate)) {
+                                if (endDate.before(iStartDate) || endDate.equals(iStartDate)) {
+                                    // 1)
+                                    if (currentStartDate.after(previousInterval.getEnd())) {
+                                        missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
+                                    } else {
+                                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                                    }
+                                    endDateUsed = true;
+                                    break;
+                                } else {
+                                    // 2)
+                                    missingIntervals.add(new Interval<Date>(currentStartDate, iStartDate));
+                                    previousInterval = requestCache.get(iStartDate);
+                                    currentStartDate = iStartDate;
+                                    continue;
+                                }
+                            } else {
+                                endDateUsed = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    previousInterval = requestCache.get(iStartDate);
+                }
+            }
+            // check if current start date is after or equal previous (last
+            // interval) start date
+            if (!endDateUsed && (currentStartDate.after(previousInterval.getStart()) || currentStartDate.equals(previousInterval.getStart()))) {
+                // Check if start date is after end date of previous (last)
+                // interval
+                // 1) true: missing interval : {currentStartDate, endDate}
+                // 2) false: check end date
+                if (currentStartDate.after(previousInterval.getEnd()) || currentStartDate.equals(previousInterval.getEnd())) {
+                    // 1)
+                    missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
+                } else {
+                    // 2)
+                    // 1) endDate after previous end date: missing interval =
+                    // {previousenddate, endDate}
+                    // 2) internal interval do nothing
+                    if (endDate.after(previousInterval.getEnd())) {
+                        missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), endDate));
+                    }
+                }
+            }
+        }
+        return missingIntervals;
+
     }
 }
