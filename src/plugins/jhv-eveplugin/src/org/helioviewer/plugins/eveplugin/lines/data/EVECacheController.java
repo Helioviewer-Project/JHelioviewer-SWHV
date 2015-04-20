@@ -71,11 +71,8 @@ public class EVECacheController {
     }
 
     public List<Interval<Date>> addRequest(Band band, Interval<Date> interval) {
-        RequestCache rc = requestCache.get(band);
-        if (rc == null) {
-            requestCache.put(band, new RequestCache());
-        }
-        return requestCache.get(band).adaptRequestCache(interval.getStart(), interval.getEnd());
+        RequestCache rc = getRequestCache(band);
+        return rc.adaptRequestCache(interval.getStart(), interval.getEnd());
     }
 
     public EVEValues getDataInInterval(final Band band, final Interval<Date> interval) {
@@ -95,7 +92,16 @@ public class EVECacheController {
     }
 
     public List<Interval<Date>> getMissingDaysInInterval(final Band band, final Interval<Date> interval) {
-        return cache.getMissingDatesInInterval(band, new Interval<Date>(getDay(interval.getStart()), getDay(interval.getEnd())));
+        RequestCache rc = getRequestCache(band);
+        return rc.getMissingIntervals(interval);
+    }
+
+    private RequestCache getRequestCache(Band band) {
+        RequestCache rc = requestCache.get(band);
+        if (rc == null) {
+            requestCache.put(band, new RequestCache());
+        }
+        return rc;
     }
 
     private Date getDay(final Date date) {
