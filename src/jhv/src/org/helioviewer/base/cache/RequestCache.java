@@ -17,15 +17,15 @@ public class RequestCache {
     }
 
     public List<Interval<Date>> adaptRequestCache(Date startDate, Date endDate) {
-
+        ArrayList<Interval<Date>> missingIntervals = new ArrayList<Interval<Date>>();
         if (requestCache.isEmpty()) {
+            missingIntervals.add(new Interval<Date>(startDate, endDate));
             requestCache.put(startDate, new Interval<Date>(startDate, endDate));
-            return getMissingIntervals(new Interval<Date>(startDate, endDate));
         } else {
-            List<Interval<Date>> missingIntervals = getMissingIntervals(new Interval<Date>(startDate, endDate));
+            missingIntervals = getMissingIntervals(new Interval<Date>(startDate, endDate));
             updateRequestCache(startDate, endDate);
-            return missingIntervals;
         }
+        return missingIntervals;
     }
 
     private void updateRequestCache(Date startDate, Date endDate) {
