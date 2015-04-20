@@ -97,38 +97,42 @@ public class DownloadController {
         if (band == null || queryInterval == null || queryInterval.getStart() == null || queryInterval.getEnd() == null) {
             return;
         }
-        // Interval<Date> realQueryInterval =
-        Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
 
-        // get all intervals within query interval where data is missing
-        LinkedList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
+        List<Interval<Date>> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
+        if (!missingIntervalsNoExtend.isEmpty()) {
+            // Interval<Date> realQueryInterval =
+            Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
 
-        if (intervals == null) {
-            // there is no interval where data is missing
-            return;
-        }
+            // get all intervals within query interval where data is missing
+            LinkedList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
 
-        if (intervals.size() == 0) {
+            if (intervals == null) {
+                // there is no interval where data is missing
+                return;
+            }
+
+            if (intervals.size() == 0) {
+                fireDownloadStarted(band, queryInterval);
+                return;
+            }
+
+            // create download jobs and allocate priorities
+            final DownloadJob[] jobs = new DownloadJob[intervals.size()];
+            final DownloadPriority[] priorities = new DownloadPriority[intervals.size()];
+
+            int i = 0;
+            for (final Interval<Date> interval : intervals) {
+                jobs[i] = new DownloadJob(band, interval);
+                priorities[i] = getPriority(interval, priorityInterval);
+                ++i;
+            }
+
+            // add download jobs
+            addDownloads(jobs, priorities);
+
+            // inform listeners
             fireDownloadStarted(band, queryInterval);
-            return;
         }
-
-        // create download jobs and allocate priorities
-        final DownloadJob[] jobs = new DownloadJob[intervals.size()];
-        final DownloadPriority[] priorities = new DownloadPriority[intervals.size()];
-
-        int i = 0;
-        for (final Interval<Date> interval : intervals) {
-            jobs[i] = new DownloadJob(band, interval);
-            priorities[i] = getPriority(interval, priorityInterval);
-            ++i;
-        }
-
-        // add download jobs
-        addDownloads(jobs, priorities);
-
-        // inform listeners
-        fireDownloadStarted(band, queryInterval);
     }
 
     private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
