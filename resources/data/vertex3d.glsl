@@ -1,5 +1,4 @@
 #version 110
-uniform mat4 layerLocalRotation;
 uniform int isdisc;
 
 void main(void)
