@@ -78,13 +78,13 @@ void main(void)
         discard;
     }
     if(radius2<1. && dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {
-        texcoord = vec2((rotatedHitPoint.x*rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
+        texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (rotatedHitPoint.y - rect.y) * rect.w);
     }
     else{
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
-        texcoord = vec2((rotatedHitPoint.x * rect.z - rect.x*rect.z), (rotatedHitPoint.y*rect.w*1.0-rect.y*rect.w));
     } 
+    texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.) {
         discard;
     }
@@ -98,13 +98,12 @@ void main(void)
     } else if(isdifference == BASEDIFFERENCE_ROT || isdifference == RUNNINGDIFFERENCE_ROT) {
         vec3 diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         if(radius2<1. && dot(diffrotatedHitPoint.xyz, vec3(0.,0.,1.))>0.) {
-            difftexcoord = vec2((diffrotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (diffrotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         }
         else{
             hitPoint = vec3(up1.x, up1.y, intersectPlanediff(up1));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
-            difftexcoord = vec2((diffrotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (diffrotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         } 
+        difftexcoord = vec2((diffrotatedHitPoint.x - differencerect.x) * differencerect.z, (diffrotatedHitPoint.y - differencerect.y ) * differencerect.w);
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
