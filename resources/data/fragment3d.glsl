@@ -98,7 +98,7 @@ void main(void)
             hitPoint = vec3(up1.x, up1.y, intersectPlanediff(up1));
             diffrotatedHitPoint = rotate_vector_inverse(diffcameraDifferenceRotationQuat, hitPoint);
         } 
-        difftexcoord = vec2((diffrotatedHitPoint.x - differencerect.x) * differencerect.z, (diffrotatedHitPoint.y - differencerect.y ) * differencerect.w);
+        difftexcoord = vec2((diffrotatedHitPoint.x - differencerect.x) * differencerect.z, (-diffrotatedHitPoint.y - differencerect.y ) * differencerect.w);
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
