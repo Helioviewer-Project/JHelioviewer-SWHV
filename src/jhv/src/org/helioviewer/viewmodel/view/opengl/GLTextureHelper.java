@@ -38,7 +38,6 @@ public class GLTextureHelper {
 
     private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
-
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
 
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
@@ -185,7 +184,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL memory image format
      */
-    private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
+    public static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return formatMap[((SingleChannelImageFormat) imageFormat).getBitDepth() - 1];
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -202,7 +201,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL input image format
      */
-    private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
+    public static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return GL2.GL_LUMINANCE;
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -251,7 +250,7 @@ public class GLTextureHelper {
      *            Bits per pixel of the input data
      * @return OpenGL type to use
      */
-    private static int mapBitsPerPixelToGLType(int bitsPerPixel) {
+    public static int mapBitsPerPixelToGLType(int bitsPerPixel) {
         switch (bitsPerPixel) {
         case 8:
             return GL2.GL_UNSIGNED_BYTE;
