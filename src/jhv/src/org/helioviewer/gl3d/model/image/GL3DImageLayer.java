@@ -226,12 +226,16 @@ public class GL3DImageLayer implements Renderable {
                 {
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                     if (this.showCorona) {
+                        GLSLShader.bindIsDisc(gl, 0);
+
                         gl.glDepthRange(1.f, 1.f);
                         gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
 
                         gl.glDepthRange(0.f, 1.f);
                     }
                     if (this.showSphere) {
+                        GLSLShader.bindIsDisc(gl, 1);
+
                         gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                     }
 

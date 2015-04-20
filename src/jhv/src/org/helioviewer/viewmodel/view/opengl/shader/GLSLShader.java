@@ -21,6 +21,8 @@ public class GLSLShader {
 
     public static int truncationValueRef;
     public static int isDifferenceValueRef;
+    public static int isDiscRef;
+
     public static int pixelSizeWeightingRef;
     public static int gammaParamRef;
     public static int contrastParamRef;
@@ -32,6 +34,7 @@ public class GLSLShader {
     public static int viewportRef;
 
     public static final int[] isDifferenceValue = new int[1];
+    public static final int[] isDiscValue = new int[1];
 
     public static final float[] sharpenParamFloat = new float[3];
     public static final float[] truncationValueFloat = new float[1];
@@ -62,6 +65,8 @@ public class GLSLShader {
             initializeProgram(gl, true);
             truncationValueRef = gl.glGetUniformLocation(progID, "truncationValue");
             isDifferenceValueRef = gl.glGetUniformLocation(progID, "isdifference");
+            isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
+
             pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
             gammaParamRef = gl.glGetUniformLocation(progID, "gamma");
             contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
@@ -278,6 +283,12 @@ public class GLSLShader {
         gl.glUniform2fv(GLSLShader.viewportRef, 1, GLSLShader.viewport, 0);
     }
 
+    public static void bindIsDisc(GL2 gl, int isDisc) {
+        isDiscValue[0] = isDisc;
+        gl.glUniform1iv(GLSLShader.isDiscRef, 1, GLSLShader.isDiscValue, 0);
+
+    }
+
     public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
         cutOffRadiusFloat[0] = (float) cutOffRadius;
         outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
@@ -313,4 +324,5 @@ public class GLSLShader {
         viewport[0] = width;
         viewport[1] = height;
     }
+
 }
