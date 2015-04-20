@@ -9,7 +9,7 @@ uniform sampler2D image;
 uniform float truncationValue;
 uniform int isdifference;
 uniform sampler2D differenceImage;
-uniform vec4 pixelSizeWeighting;
+uniform vec3 pixelSizeWeighting;
 uniform vec4 rect;
 uniform vec4 differencerect;
 uniform float gamma;
