@@ -1,6 +1,7 @@
 *.class
 *.snap
 *.index
+*.swp
 .location
 jhv-3d-wcs/.metadata
 .recommenders
