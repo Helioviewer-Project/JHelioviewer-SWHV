@@ -7,6 +7,7 @@ import org.helioviewer.jhv.JavaHelioViewer;
 import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
+import org.helioviewer.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
@@ -36,6 +37,7 @@ public class SWHVLauncher {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
                 PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
             }
         });
