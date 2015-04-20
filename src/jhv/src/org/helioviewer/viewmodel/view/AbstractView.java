@@ -93,7 +93,6 @@ public abstract class AbstractView implements View {
         GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 2f);
         applyGLLUT(gl);
         if (imageData != null) {
-            GLTextureHelper.renderImageDataToScreen(gl, imageData, this.tex);
             int width = imageData.getWidth();
             int height = imageData.getHeight();
             if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
@@ -131,7 +130,7 @@ public abstract class AbstractView implements View {
                     previousWidth = width;
                     previousHeight = height;
                 }
-                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat), width, height, 0, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), buffer);
 
             }
         }
