@@ -163,7 +163,7 @@ public class GL3DImageLayer implements Renderable {
         double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
         if (regionWidth > 0 && regionHeight > 0) {
-            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, -(minPhysicalY + regionHeight), regionWidth, regionHeight);
+            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
