@@ -64,7 +64,6 @@ import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
@@ -105,7 +104,7 @@ public class ImageViewerGui {
 
     private final GL3DTopToolBar topToolBar;
 
-    private final ComponentView mainComponentView = new GL3DComponentView();;
+    private final ComponentView mainComponentView = new ComponentView();;
 
     private FilterTabPanelManager filterTabPanelManager;
 

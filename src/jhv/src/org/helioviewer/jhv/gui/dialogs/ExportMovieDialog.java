@@ -16,7 +16,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
+import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * Dialog o export movies to standard video formats.
@@ -68,7 +68,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
 
-        final GL3DComponentView component = (GL3DComponentView) ImageViewerGui.getSingletonInstance().getMainView();
+        final ComponentView component = (ComponentView) ImageViewerGui.getSingletonInstance().getMainView();
         final ExportMovieDialog exportMovieDialog = this;
 
         exportButton.addActionListener(new ActionListener() {

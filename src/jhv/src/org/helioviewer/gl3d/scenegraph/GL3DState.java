@@ -6,11 +6,10 @@ import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * The {@link GL3DState} is recreated every render pass by the
- * {@link GL3DComponentView}. It provides the reference to the {@link GL2}
+ * {@link ComponentView}. It provides the reference to the {@link GL2}
  * object and stores some globally relevant information such as width and height
  * of the viewport, etc. Also it allows for the stacking of the view
  * transformations.
@@ -72,4 +71,5 @@ public class GL3DState {
     public static GL3DCamera getActiveCamera() {
         return activeCamera;
     }
+
 }
