@@ -23,9 +23,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
-import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
+import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
@@ -104,7 +106,7 @@ public class ImageViewerGui {
 
     private final GL3DTopToolBar topToolBar;
 
-    private ComponentView mainComponentView;
+    private final ComponentView mainComponentView = new GL3DComponentView();;
 
     private FilterTabPanelManager filterTabPanelManager;
 
@@ -225,9 +227,6 @@ public class ImageViewerGui {
         cameraView = new GL3DCameraView();
 
         //ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-        mainComponentView = new GL3DComponentView();
-
-        GL3DCameraSelectorModel.getInstance().activate();
 
         // prepare gui again
         updateComponentPanels();
@@ -344,7 +343,9 @@ public class ImageViewerGui {
             leftPane.add("Layers", Displayer.getRenderableContainerPanel(), true);
 
             JTabbedPane cameraTab = new JTabbedPane();
-            cameraOptionsPanel = new GL3DCameraOptionsPanel();
+            GL3DCamera camera = new GL3DObserverCamera();
+            GL3DState.setActiveCamera(camera);
+            cameraOptionsPanel = new GL3DCameraOptionsPanel(camera);
             cameraTab.addTab("Camera Adjustments", cameraOptionsPanel);
             cameraTab.setEnabled(false);
             // leftPane.add("Camera Options", cameraOptionsPanel, false);

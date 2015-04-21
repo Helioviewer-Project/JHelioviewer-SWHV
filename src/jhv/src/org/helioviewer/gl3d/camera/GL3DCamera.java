@@ -46,9 +46,7 @@ public abstract class GL3DCamera {
 
     private long timeDelay;
 
-    private double translationz;
-
-    private double ratio = 1.0;
+    private final double ratio = 1.0;
 
     private long time;
 
@@ -68,6 +66,7 @@ public abstract class GL3DCamera {
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
         rayTracer = new RayTracer(this);
+        this.resetFOV();
     }
 
     public void reset() {
@@ -105,8 +104,8 @@ public abstract class GL3DCamera {
     }
 
     protected void setZTranslation(double z) {
-        this.translationz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
-        this.translation.z = this.ratio * this.translationz;
+        double truncatedz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
+        this.translation.z = this.ratio * truncatedz;
     }
 
     public void setPanning(double x, double y) {
@@ -296,11 +295,6 @@ public abstract class GL3DCamera {
 
     public GL3DQuatd getCurrentDragRotation() {
         return this.currentDragRotation;
-    }
-
-    public void setRatio(double ratio) {
-        this.ratio = ratio;
-        this.translation.z = this.translationz * this.ratio;
     }
 
     public void setTime(long time) {

@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
@@ -19,20 +20,20 @@ import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
  */
 public class GL3DState {
 
-    private static GL3DState instance;
+    private static GL3DState instance = new GL3DState(null);
 
     public GL2 gl;
 
-    protected GL3DCamera activeCamera;
+    private static GL3DCamera activeCamera;
 
-    protected int viewportWidth;
-    protected int viewportHeight;
+    private int viewportWidth;
+    private int viewportHeight;
 
     private Date currentObservationDate;
 
-    public static GL3DState create(GL2 gl) {
-        instance = new GL3DState(gl);
-        return instance;
+    private GL3DState(GL2 gl) {
+        this.gl = gl;
+        activeCamera = new GL3DObserverCamera();
     }
 
     public static GL3DState get() {
@@ -44,18 +45,6 @@ public class GL3DState {
         instance.viewportWidth = width;
         instance.viewportHeight = height;
         return instance;
-    }
-
-    private GL3DState(GL2 gl) {
-        this.gl = gl;
-    }
-
-    public void setActiveChamera(GL3DCamera camera) {
-        this.activeCamera = camera;
-    }
-
-    public GL3DCamera getActiveCamera() {
-        return activeCamera;
     }
 
     public int getViewportHeight() {
@@ -74,4 +63,13 @@ public class GL3DState {
         this.currentObservationDate = currentObservationDate;
     }
 
+    public static void setActiveCamera(GL3DCamera camera) {
+        camera.activate(activeCamera);
+        activeCamera.deactivate();
+        activeCamera = camera;
+    }
+
+    public static GL3DCamera getActiveCamera() {
+        return activeCamera;
+    }
 }

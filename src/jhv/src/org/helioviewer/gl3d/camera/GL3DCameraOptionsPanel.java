@@ -12,32 +12,27 @@ import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.gl3d.gui.GL3DCameraSelectionModelListener;
-import org.helioviewer.gl3d.gui.GL3DCameraSelectorModel;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectionModelListener, LayersListener {
+public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private static final long serialVersionUID = 3942154069677445408L;
-    private GL3DCameraSelectorModel cameraSelectorModel;
     private JPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
     private JTabbedPane tab;
+    private GL3DCamera previousCamera;
 
-    public GL3DCameraOptionsPanel() {
+    public GL3DCameraOptionsPanel(GL3DCamera newCamera) {
         Displayer.getLayersModel().addLayersListener(this);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setModel();
         addCameraTabs();
-    }
-
-    protected void setModel() {
-        cameraSelectorModel = GL3DCameraSelectorModel.getInstance();
-        cameraSelectorModel.addListener(this);
+        previousCamera = newCamera;
+        changeCamera(newCamera);
     }
 
     private void addCameraTabs() {
@@ -53,13 +48,13 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
             public void stateChanged(ChangeEvent e) {
                 int index = tab.getSelectedIndex();
                 if (index == 0) {
-                    changeCamera(cameraSelectorModel.getObserverCamera());
+                    changeCamera(new GL3DObserverCamera());
                 }
                 if (index == 1) {
-                    changeCamera(cameraSelectorModel.getEarthCamera());
+                    changeCamera(new GL3DEarthCamera());
                 }
                 if (index == 2) {
-                    changeCamera(cameraSelectorModel.getFollowObjectCamera());
+                    changeCamera(new GL3DFollowObjectCamera());
                 }
                 if (index == 3) {
                     optionsPanel = infoPanel();
@@ -71,7 +66,6 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
 
     private void initCamera(GL3DCamera newCamera) {
         changeCamera(newCamera);
-        cameraSelectorModel.setCurrentCamera(newCamera);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
         Displayer.display();
         tab.setComponentAt(0, optionsPanel);
@@ -79,14 +73,12 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     private void changeCamera(GL3DCamera newCamera) {
-
-        cameraSelectorModel.getCurrentCamera().deactivate();
-        boolean trackingMode = cameraSelectorModel.getCurrentCamera().getTrackingMode();
+        boolean trackingMode = previousCamera.getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
-        cameraSelectorModel.setCurrentCamera(newCamera);
-        cameraSelectorModel.getCurrentCamera().activate();
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getCurrentCamera());
+        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
+        GL3DState.setActiveCamera(newCamera);
         Displayer.display();
+        previousCamera = newCamera;
     }
 
     private JPanel infoPanel() {
@@ -116,9 +108,8 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
         return new JPanel();
     }
 
-    @Override
     public void fireInit() {
-        this.initCamera(cameraSelectorModel.getObserverCamera());
+        this.initCamera(new GL3DObserverCamera());
         if (Displayer.getLayersModel().getNumLayers() > 0) {
             visactivate();
         } else {
@@ -137,24 +128,35 @@ public class GL3DCameraOptionsPanel extends JPanel implements GL3DCameraSelectio
     }
 
     void visactivate() {
-        GL3DCameraOptionPanel optionsPanel;
-        enableComponents(tab, true);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
-        enableComponents(optionsPanel, true);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
-        enableComponents(optionsPanel, true);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
-        enableComponents(optionsPanel, true);
+        /*
+         * GL3DCameraOptionPanel optionsPanel; enableComponents(tab, true);
+         * optionsPanel =
+         * cameraOptionsAttributeManager.getCameraOptionAttributePanel
+         * (cameraSelectorModel.getObserverCamera());
+         * enableComponents(optionsPanel, true); optionsPanel =
+         * cameraOptionsAttributeManager
+         * .getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
+         * enableComponents(optionsPanel, true); optionsPanel =
+         * cameraOptionsAttributeManager
+         * .getCameraOptionAttributePanel(cameraSelectorModel
+         * .getFollowObjectCamera()); enableComponents(optionsPanel, true);
+         */
     }
 
     void visdeactivate() {
-        enableComponents(tab, false);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getObserverCamera());
-        enableComponents(optionsPanel, false);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
-        enableComponents(optionsPanel, false);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(cameraSelectorModel.getFollowObjectCamera());
-        enableComponents(optionsPanel, false);
+        /*
+         * enableComponents(tab, false); optionsPanel =
+         * cameraOptionsAttributeManager
+         * .getCameraOptionAttributePanel(cameraSelectorModel
+         * .getObserverCamera()); enableComponents(optionsPanel, false);
+         * optionsPanel =
+         * cameraOptionsAttributeManager.getCameraOptionAttributePanel
+         * (cameraSelectorModel.getEarthCamera());
+         * enableComponents(optionsPanel, false); optionsPanel =
+         * cameraOptionsAttributeManager
+         * .getCameraOptionAttributePanel(cameraSelectorModel
+         * .getFollowObjectCamera()); enableComponents(optionsPanel, false);
+         */
     }
 
     @Override
