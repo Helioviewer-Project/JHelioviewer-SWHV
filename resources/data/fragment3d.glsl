@@ -103,14 +103,30 @@ void main(void)
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
     }
-
-    for(int i=0; i<3; i++)
-    {
-        for(int j=0; j<3; j++)
+    if(isdifference != NODIFFERENCE){
+        vec4 diffcolor;
+        for(int i=0; i<3; i++)
         {
-            tmpConvolutionSum += texture2D(image, texcoord.xy + vec2(i-1, j-1)*pixelSizeWeighting.xy).r * unsharpMaskingKernel[3*i+j];
+            for(int j=0; j<3; j++)
+            {
+                diffcolor.r = texture2D(image, texcoord + vec2(i-1, j-1)*pixelSizeWeighting.xy).r 
+                            - texture2D(differenceImage, difftexcoord + vec2(i-1, j-1)*pixelSizeWeighting.xy).r;
+                diffcolor.r = clamp(diffcolor.r,-truncationValue,truncationValue)/truncationValue;
+                diffcolor.r = (diffcolor.r + 1.0)/2.0;
+                tmpConvolutionSum += diffcolor.r * unsharpMaskingKernel[3*i+j]; 
+            }
         }
     }
+    else{
+        for(int i=0; i<3; i++)
+        {
+            for(int j=0; j<3; j++)
+            {
+                tmpConvolutionSum += texture2D(image, texcoord.xy + vec2(i-1, j-1)*pixelSizeWeighting.xy).r * unsharpMaskingKernel[3*i+j];
+            }
+        }
+    }
+
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
     color.r = pow(color.r, gamma);
     color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
