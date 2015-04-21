@@ -199,11 +199,10 @@ public class GL3DImageLayer implements Renderable {
                 gl.glCullFace(GL2.GL_BACK);
 
                 gl.glEnable(GL2.GL_BLEND);
-                AbstractView jp2view = this.getMainLayerView();
+                AbstractView jp2view = this.mainLayerView;
 
-                if (jp2view != null) {
-                    jp2view.applyFilters(gl);
-                }
+                jp2view.applyFilters(gl);
+
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
                 GLSLShader.filter(gl);

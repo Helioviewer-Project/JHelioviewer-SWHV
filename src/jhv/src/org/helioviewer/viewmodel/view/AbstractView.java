@@ -81,9 +81,7 @@ public abstract class AbstractView implements View {
 
     public void applyFilters(GL2 gl) {
         copyScreenToTexture(gl);
-        if (this.differenceMode) {
-            applyRunningDifferenceGL(gl);
-        }
+        applyRunningDifferenceGL(gl);
 
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
@@ -230,7 +228,7 @@ public abstract class AbstractView implements View {
             } else {
                 previousFrame = this.getBaseDifferenceImageData();
             }
-            if (this.imageData != previousFrame && previousFrame != null) {
+            if (this.differenceMode && this.imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
