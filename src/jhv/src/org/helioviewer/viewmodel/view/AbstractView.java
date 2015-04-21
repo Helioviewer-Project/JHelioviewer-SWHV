@@ -84,14 +84,23 @@ public abstract class AbstractView implements View {
         if (this.differenceMode) {
             applyRunningDifferenceGL(gl);
         }
+
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
         GLSLShader.setGamma(gamma);
         GLSLShader.setAlpha(opacity);
-        float pixelWidth = 1.0f / 512f;
-        float pixelHeight = 1.0f / 512f;
-        GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 2f);
+
+        float pixelWidth, pixelHeight;
+        if (imageData != null) {
+            pixelWidth = 1.0f / imageData.getWidth();
+            pixelHeight = 1.0f / imageData.getHeight();
+        } else {
+            pixelWidth = 1.0f / 512;
+            pixelHeight = 1.0f / 512;
+        }
+        GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 1f);
         applyGLLUT(gl);
+
         if (imageData != null) {
             int width = imageData.getWidth();
             int height = imageData.getHeight();
@@ -115,14 +124,18 @@ public abstract class AbstractView implements View {
 
                 gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
                 gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-                gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageData.getWidth());
+                gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, width);
                 gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
                 ImageFormat imageFormat = imageData.getImageFormat();
+                int inputGLFormat = GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat);
+                int bppGLType = GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel);
+
                 gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
 
                 if (width != previousWidth || height != previousHeight) {
-                    gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat), width, height, 0, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), null);
+                    int internalGLFormat = GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat);
+                    gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalGLFormat, width, height, 0, inputGLFormat, bppGLType, null);
                     gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
                     gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
                     gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
@@ -130,8 +143,7 @@ public abstract class AbstractView implements View {
                     previousWidth = width;
                     previousHeight = height;
                 }
-                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat), GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel), buffer);
-
+                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
             }
         }
     }
@@ -194,7 +206,6 @@ public abstract class AbstractView implements View {
         this.lutChanged = false;
 
         gl.glActiveTexture(GL2.GL_TEXTURE0);
-
     }
 
     private void applyRunningDifferenceGL(GL2 gl) {
