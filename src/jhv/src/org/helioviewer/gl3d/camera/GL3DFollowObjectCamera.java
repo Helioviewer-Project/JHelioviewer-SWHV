@@ -40,6 +40,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
+        this.timeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override

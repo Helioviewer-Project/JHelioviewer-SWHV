@@ -67,7 +67,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
         GLInfo.update((GLCanvas) drawable);
 
         GLSLShader.initShader(gl);
-        GL3DState.create(gl);
+        GL3DState.setUpdated(gl, 100, 100);
 
         gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
 
@@ -91,8 +91,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
 
     private static void displayBody(GL2 gl, int width, int height) {
         GL3DState state = GL3DState.get();
-        GL3DCamera camera = ImageViewerGui.getSingletonInstance().getCameraView().getCurrentCamera();
-        state.setActiveChamera(camera);
+        GL3DCamera camera = state.getActiveCamera();
 
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);

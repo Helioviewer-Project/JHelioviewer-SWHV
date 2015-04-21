@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.viewmodel.region.Region;
@@ -28,7 +29,7 @@ public class GL3DZoomFitAction extends ZoomFitAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         AbstractView view = Displayer.getLayersModel().getActiveView();
-        GL3DCamera camera = GL3DCameraSelectorModel.getInstance().getCurrentCamera();
+        GL3DCamera camera = GL3DState.getActiveCamera();
         if (view != null) {
             Region region = view.getMetaData().getPhysicalRegion();
             if (region != null) {

@@ -10,12 +10,11 @@ import java.awt.event.MouseWheelEvent;
 
 import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.AbstractImagePanelMouseController;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 
 /**
  * Acts as the global Delegate for Mouse and KeyEvents. Mouse Events are
@@ -33,19 +32,13 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     private boolean buttonDown = false;
     private long lastTime = System.currentTimeMillis();
 
-    private GL3DCameraView cameraView;
-
     @Override
     public void setView(ComponentView newView) {
-        cameraView = ImageViewerGui.getSingletonInstance().getCameraView();
         super.setView(newView);
     }
 
     private GL3DCamera getCamera() {
-        if (this.cameraView != null) {
-            return this.cameraView.getCurrentCamera();
-        }
-        return null;
+        return GL3DState.get().getActiveCamera();
     }
 
     /**
@@ -54,7 +47,8 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
-            if (cameraView != null && cameraView.getCurrentCamera().getCurrentInteraction() == cameraView.getCurrentCamera().getZoomInteraction()) {
+            GL3DCamera camera = getCamera();
+            if (camera.getCurrentInteraction() == camera.getZoomInteraction()) {
             } else {
                 imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
             }
@@ -77,14 +71,13 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
      */
     @Override
     public void mousePressed(MouseEvent e) {
+        GL3DCamera currentCamera = getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (cameraView != null && cameraView.getCurrentCamera().getCurrentInteraction() == cameraView.getCurrentCamera().getZoomInteraction()) {
-            } else {
+            if (currentCamera.getCurrentInteraction() != currentCamera.getZoomInteraction()) {
                 imagePanel.setCursor(closedHandCursor);
             }
             buttonDown = true;
         }
-        GL3DCamera currentCamera = getCamera();
         if (currentCamera != null) {
             currentCamera.getCurrentInteraction().mousePressed(e);
         }

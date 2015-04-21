@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
@@ -32,6 +31,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void reset() {
         super.reset();
+        this.timeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override
@@ -65,25 +65,15 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
         AbstractView mdv = Displayer.getLayersModel().getActiveView();
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
-            if (metadata instanceof HelioviewerMetaData) {
-                HelioviewerMetaData hvMetadata = (HelioviewerMetaData) metadata;
-                if (!hvMetadata.isStonyhurstProvided()) {
-                    addb0 = Astronomy.getB0InRadians(date);
-                } else {
-                    addl0 = hvMetadata.getStonyhurstLongitude() / MathUtils.radeg;
-                    addb0 = hvMetadata.getStonyhurstLatitude() / MathUtils.radeg;
-                }
-                this.setZTranslation(-hvMetadata.getDobs() / Constants.SunRadiusInMeter);
-            } else {
-                addb0 = Astronomy.getB0InRadians(date);
-            }
+            HelioviewerMetaData hvMetadata = (HelioviewerMetaData) metadata;
+            this.localRotation = hvMetadata.getLocalRotation();
+            this.setZTranslation(-hvMetadata.getDobs() / Constants.SunRadiusInMeter);
+        } else {
+            double currentRotation = Astronomy.getL0Radians(date);
+
+            this.localRotation = GL3DQuatd.createRotation(addb0, GL3DVec3d.XAxis);
+            this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation - addl0, GL3DVec3d.YAxis));
         }
-
-        double currentRotation = Astronomy.getL0Radians(date);
-
-        this.localRotation = GL3DQuatd.createRotation(addb0, GL3DVec3d.XAxis);
-        this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation - addl0, GL3DVec3d.YAxis));
-
         this.updateCameraTransformation();
         this.setTime(date.getTime());
     }

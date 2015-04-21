@@ -6,13 +6,14 @@ import javax.swing.AbstractAction;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DInteraction;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 
 /**
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Panning (Camera Translation).
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
 public class GL3DSetPanInteractionAction extends AbstractAction {
 
@@ -28,8 +29,10 @@ public class GL3DSetPanInteractionAction extends AbstractAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCameraSelectorModel.getInstance().getSelectedItem().setCurrentInteraction(GL3DCameraSelectorModel.getInstance().getSelectedItem().getPanInteraction());
+        GL3DCamera cam = GL3DState.get().getActiveCamera();
+        cam.setCurrentInteraction(cam.getPanInteraction());
     }
 
 }
