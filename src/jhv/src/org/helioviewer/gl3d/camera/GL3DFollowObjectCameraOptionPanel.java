@@ -361,5 +361,4 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     public void fireNewDate(Date date) {
         this.cameraTime.setText(this.format.format(date));
     }
-
 }

@@ -57,6 +57,8 @@ public abstract class GL3DCamera {
 
     private double cameraWidthTimesAspect;
 
+    private double FOVangleToDraw;
+
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
         this.rotation = new GL3DQuatd();
@@ -86,6 +88,8 @@ public abstract class GL3DCamera {
         if (precedingCamera != null) {
             this.rotation = precedingCamera.getRotation().copy();
             this.translation = precedingCamera.translation.copy();
+            this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
+
             this.updateCameraTransformation();
 
             if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getRotateInteraction())) {
@@ -99,6 +103,10 @@ public abstract class GL3DCamera {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
             this.reset();
         }
+    }
+
+    public double getFOVAngleToDraw() {
+        return this.FOVangleToDraw;
     }
 
     protected void setZTranslation(double z) {
@@ -328,4 +336,7 @@ public abstract class GL3DCamera {
         Displayer.display();
     }
 
+    public void setFOVangleDegrees(double fovAngle) {
+        this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
+    }
 }

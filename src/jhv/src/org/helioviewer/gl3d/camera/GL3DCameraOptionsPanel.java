@@ -38,7 +38,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private void addCameraTabs() {
         tab = new JTabbedPane();
-        tab.add("Observer", new JPanel(new BorderLayout()));
+        tab.add("Observer", new GL3DObserverCameraOptionPanel((GL3DObserverCamera) GL3DState.getActiveCamera()));
         tab.add("Earth", new JPanel(new BorderLayout()));
         tab.add("Expert", new JPanel(new BorderLayout()));
         tab.add(new JPanel());
