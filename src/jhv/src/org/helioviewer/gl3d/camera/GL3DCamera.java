@@ -46,8 +46,6 @@ public abstract class GL3DCamera {
 
     private long timeDelay;
 
-    private final double ratio = 1.0;
-
     private long time;
 
     private boolean trackingMode;
@@ -105,7 +103,7 @@ public abstract class GL3DCamera {
 
     protected void setZTranslation(double z) {
         double truncatedz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
-        this.translation.z = this.ratio * truncatedz;
+        this.translation.z = truncatedz;
     }
 
     public void setPanning(double x, double y) {
