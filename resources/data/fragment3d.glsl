@@ -88,7 +88,7 @@ void main(void)
 
     color = texture2D(image, texcoord);
     if(isdifference == BASEDIFFERENCE_NO_ROT || isdifference == RUNNINGDIFFERENCE_NO_ROT) {
-        difftexcoord = vec2((rotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (rotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
+        difftexcoord = vec2((rotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (-rotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
