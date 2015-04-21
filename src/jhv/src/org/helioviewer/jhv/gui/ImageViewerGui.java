@@ -64,7 +64,6 @@ import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GL3DCameraView;
 import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
@@ -109,8 +108,6 @@ public class ImageViewerGui {
     private final ComponentView mainComponentView = new GL3DComponentView();;
 
     private FilterTabPanelManager filterTabPanelManager;
-
-    private GL3DCameraView cameraView;
 
     private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
 
@@ -224,11 +221,6 @@ public class ImageViewerGui {
     public void createViewchains() {
         State newState = StateController.getInstance().getCurrentState();
 
-        cameraView = new GL3DCameraView();
-
-        //ComponentView componentView = viewFactory.createNewView(ComponentView.class);
-
-        // prepare gui again
         updateComponentPanels();
         mainImagePanel.setInputController(newState.getDefaultInputController());
         mainComponentView.activate();
@@ -405,9 +397,7 @@ public class ImageViewerGui {
         } else {
             leftPane.remove(GL3DCameraOptionsPanel.class);
         }
-
         this.getTopToolBar().updateStateButtons();
-
     }
 
     private void updateComponentPanels() {
@@ -621,10 +611,6 @@ public class ImageViewerGui {
 
     public FilterTabPanelManager getFilterTabPanelManager() {
         return filterTabPanelManager;
-    }
-
-    public GL3DCameraView getCameraView() {
-        return cameraView;
     }
 
     public ImageDataPanel getObservationImagePane() {
