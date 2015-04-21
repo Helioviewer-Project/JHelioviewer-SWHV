@@ -26,8 +26,8 @@ public abstract class GL3DCamera {
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
-    public static final double MIN_FOV = INITFOV * 0.05;
-    public static final double MAX_FOV = INITFOV * 100;
+    public static final double MIN_FOV = INITFOV * 0.02;
+    public static final double MAX_FOV = INITFOV * 10;
     private final double clipNear = Constants.SunRadius * 3;
     private final double clipFar = Constants.SunRadius * 10000.;
     private double fov = INITFOV;
@@ -331,10 +331,8 @@ public abstract class GL3DCamera {
     }
 
     public void zoomIn(int wr) {
-        double currentWidth = this.getCameraWidth();
-        double newWidth = currentWidth + wr * 0.1;
-        double fov = 2. * Math.atan(-newWidth / this.getTranslation().z);
-        this.setCameraFOV(fov);
+
+        this.setCameraFOV(this.fov + 0.001 * wr);
         Displayer.display();
     }
 
