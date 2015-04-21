@@ -9,10 +9,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.gl3d.model.image.GL3DImageLayer;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableImageType;
-import org.helioviewer.jhv.renderable.RenderableSolarAxes;
-import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 
 public class RenderableContainer implements TableModel, Reorderable {
     private final ArrayList<Renderable> renderables = new ArrayList<Renderable>();
@@ -23,12 +20,6 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     public RenderableContainer() {
         super();
-
-        RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
-        addRenderable(new RenderableSolarAxes(solarAxesType));
-        RenderableSolarAxesType gridType = new RenderableSolarAxesType("Grids");
-        addRenderable(new RenderableGrid(gridType, false));
-
     }
 
     public void addBeforeRenderable(Renderable renderable) {

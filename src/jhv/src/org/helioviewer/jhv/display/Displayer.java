@@ -19,18 +19,14 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class Displayer implements JHVEventHighlightListener {
 
-    private static final Displayer instance = new Displayer();
     private static final RenderableContainer renderableContainer = new RenderableContainer();
     private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
     private static final LayersModel layersModel = new LayersModel();
 
-    public static Displayer getSingletonInstance() {
-        return instance;
-    }
-
     private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+
     private static Date lastTimestamp;
 
     private static boolean torender = false;
@@ -149,4 +145,10 @@ public class Displayer implements JHVEventHighlightListener {
         return layersModel;
     }
 
+    private static final Displayer instance = new Displayer();
+
+    public static Displayer getSingletonInstance() {
+        return instance;
+
+    }
 }

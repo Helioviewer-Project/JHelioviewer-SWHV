@@ -14,12 +14,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.RenderableCamera;
 import org.helioviewer.gl3d.movie.MovieExport;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.renderable.RenderableGrid;
+import org.helioviewer.jhv.renderable.RenderableGridType;
+import org.helioviewer.jhv.renderable.RenderableSolarAxes;
+import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
@@ -43,10 +48,15 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private int previousScreenshot = -1;
     private File outputFile;
 
-   /**
-     * Activate is called before the component view will be the active component
-     * view displayed on the GUI.
-     */
+    public GL3DComponentView() {
+        RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
+        Displayer.getRenderablecontainer().addRenderable(new RenderableSolarAxes(solarAxesType));
+        RenderableGridType gridType = new RenderableGridType("Grids");
+        Displayer.getRenderablecontainer().addRenderable(new RenderableGrid(gridType, false));
+        Displayer.getRenderablecontainer().addRenderable(new RenderableCamera());
+    }
+
+    @Override
     public void activate() {
         canvas.addGLEventListener(this);
         Displayer.addListener(this);
