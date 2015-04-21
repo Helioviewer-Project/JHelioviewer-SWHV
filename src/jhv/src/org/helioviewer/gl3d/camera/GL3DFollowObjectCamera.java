@@ -30,6 +30,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
         Displayer.getLayersModel().addLayersListener(this);
+        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        Displayer.addTimeListener(this);
     }
 
     @Override
@@ -40,6 +42,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
+        this.activeLayerChanged(Displayer.getLayersModel().getActiveView());
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
@@ -62,6 +65,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void timeChanged(Date date) {
+
         if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
             //Layer times
             long t1 = Displayer.getLayersModel().getFirstDate().getTime();
