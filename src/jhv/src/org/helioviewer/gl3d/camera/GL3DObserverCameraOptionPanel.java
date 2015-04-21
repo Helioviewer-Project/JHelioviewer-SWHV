@@ -1,9 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
-import java.awt.Dimension;
-
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
+import java.awt.BorderLayout;
 
 public class GL3DObserverCameraOptionPanel extends GL3DCameraOptionPanel {
 
@@ -14,10 +11,7 @@ public class GL3DObserverCameraOptionPanel extends GL3DCameraOptionPanel {
     public GL3DObserverCameraOptionPanel(GL3DObserverCamera camera) {
         super();
         this.camera = camera;
-        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(0, 200));
-        add(panel);
+        this.setLayout(new BorderLayout());
     }
 
     @Override

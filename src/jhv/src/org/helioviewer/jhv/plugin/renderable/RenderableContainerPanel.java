@@ -208,7 +208,7 @@ public class RenderableContainerPanel extends JPanel {
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
-        optionsPanelWrapper = new JPanel();
+        optionsPanelWrapper = new JPanel(new BorderLayout());
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -228,7 +228,7 @@ public class RenderableContainerPanel extends JPanel {
     void setOptionsPanel(Renderable renderable) {
         optionsPanelWrapper.remove(optionsPanel);
         optionsPanel = renderable.getOptionsPanel();
-        optionsPanelWrapper.add(optionsPanel);
+        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         this.getParent().revalidate();
         this.getParent().repaint();
     }

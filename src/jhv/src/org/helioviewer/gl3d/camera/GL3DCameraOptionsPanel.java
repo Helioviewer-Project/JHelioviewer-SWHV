@@ -1,5 +1,6 @@
 package org.helioviewer.gl3d.camera;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 
@@ -37,9 +38,9 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private void addCameraTabs() {
         tab = new JTabbedPane();
-        tab.add("Observer", new JPanel());
-        tab.add("Earth", new JPanel());
-        tab.add("Expert", new JPanel());
+        tab.add("Observer", new JPanel(new BorderLayout()));
+        tab.add("Earth", new JPanel(new BorderLayout()));
+        tab.add("Expert", new JPanel(new BorderLayout()));
         tab.add(new JPanel());
         tab.setTabComponentAt(3, new JLabel(IconBank.getIcon(JHVIcon.INFO)));
         add(tab);
