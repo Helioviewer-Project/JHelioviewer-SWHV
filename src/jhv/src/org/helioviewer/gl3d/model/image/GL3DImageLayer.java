@@ -108,14 +108,14 @@ public class GL3DImageLayer implements Renderable {
         indexBufferSize = indexBuffer.capacity();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-        state.getActiveCamera().updateCameraTransformation();
+        GL3DState.getActiveCamera().updateCameraTransformation();
         state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
 
     }
 
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
-        GL3DCamera activeCamera = state.getActiveCamera();
+        GL3DCamera activeCamera = GL3DState.getActiveCamera();
 
         if (metaData == null || activeCamera == null) {
             return;
@@ -207,7 +207,7 @@ public class GL3DImageLayer implements Renderable {
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
 
                 GLSLShader.filter(gl);
-                GL3DCamera camera = state.getActiveCamera();
+                GL3DCamera camera = GL3DState.getActiveCamera();
                 GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
                 vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");

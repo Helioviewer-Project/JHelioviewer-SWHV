@@ -31,7 +31,7 @@ public class GL3DSetPanInteractionAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera cam = GL3DState.get().getActiveCamera();
+        GL3DCamera cam = GL3DState.getActiveCamera();
         cam.setCurrentInteraction(cam.getPanInteraction());
     }
 

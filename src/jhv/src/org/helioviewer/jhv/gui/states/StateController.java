@@ -31,7 +31,7 @@ public class StateController {
 
     public void set2DState() {
         setState(ViewStateEnum.View2D.getState());
-        GL3DState.get().getActiveCamera().reset();
+        GL3DState.getActiveCamera().reset();
         Displayer.display();
     }
 
