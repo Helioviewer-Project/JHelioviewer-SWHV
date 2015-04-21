@@ -108,7 +108,7 @@ void main(void)
     {
         for(int j=0; j<3; j++)
         {
-            tmpConvolutionSum += texture2D(image, texcoord.xy + vec2(i-1, j-1)*pixelSizeWeighting.x).r * unsharpMaskingKernel[3*i+j];
+            tmpConvolutionSum += texture2D(image, texcoord.xy + vec2(i-1, j-1)*pixelSizeWeighting.xy).r * unsharpMaskingKernel[3*i+j];
         }
     }
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
