@@ -52,7 +52,7 @@ public abstract class AbstractView implements View {
     private boolean baseDifferenceMode = false;
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
-    private float truncation = 0.8f;
+    private float truncation = 1f - 0.8f;
 
     public void setContrast(float contrast) {
         this.contrast = contrast;
@@ -266,7 +266,12 @@ public abstract class AbstractView implements View {
     }
 
     public void setTruncation(float truncation) {
+        System.out.println("TRUNCATION" + this.truncation);
         this.truncation = truncation;
+    }
+
+    public float getTruncation() {
+        return this.truncation;
     }
 
     public float getOpacity() {

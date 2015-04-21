@@ -21,6 +21,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
@@ -178,4 +179,9 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         super.setEnabled(enabled);
     }
 
+    @Override
+    public void setJP2View(AbstractView jp2view) {
+        super.setJP2View(jp2view);
+        truncateSpinner.setValue(1.f - jp2view.getTruncation());
+    }
 }
