@@ -24,7 +24,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.opengl.GL3DComponentView;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
@@ -49,7 +48,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     private static final int yOffset = 12;
     private boolean aPressed = false;
 
-    private GL3DComponentView view;
+    private ComponentView view;
 
     private MainImagePanel imagePanel;
 
@@ -78,7 +77,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
      */
     @Override
     public void setView(ComponentView newView) {
-        view = (GL3DComponentView) newView;
+        view = newView;
     }
 
     /**
