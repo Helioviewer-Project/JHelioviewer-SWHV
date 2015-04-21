@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
-import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
+import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;

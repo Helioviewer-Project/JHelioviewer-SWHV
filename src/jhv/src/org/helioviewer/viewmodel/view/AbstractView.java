@@ -20,8 +20,8 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
+import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.shader.GLSLShader;
 
 public abstract class AbstractView implements View {
     private GL3DImageLayer imageLayer;
