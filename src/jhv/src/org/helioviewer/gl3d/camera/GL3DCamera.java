@@ -326,7 +326,7 @@ public abstract class GL3DCamera {
 
     public void zoomIn(int wr) {
 
-        this.setCameraFOV(this.fov + 0.001 * wr);
+        this.setCameraFOV(this.fov + 0.0005 * wr);
         Displayer.display();
     }
 
