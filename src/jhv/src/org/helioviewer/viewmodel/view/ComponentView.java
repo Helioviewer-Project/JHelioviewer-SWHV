@@ -25,7 +25,6 @@ import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableGridType;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
-import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -48,7 +47,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private int previousScreenshot = -1;
     private File outputFile;
 
-    public GL3DComponentView() {
+    public ComponentView() {
         RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
         Displayer.getRenderablecontainer().addRenderable(new RenderableSolarAxes(solarAxesType));
         RenderableGridType gridType = new RenderableGridType("Grids");
@@ -56,7 +55,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderablecontainer().addRenderable(new RenderableCamera());
     }
 
-    @Override
     public void activate() {
         canvas.addGLEventListener(this);
         Displayer.addListener(this);
@@ -227,7 +225,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         exportMovieDialog = null;
     }
 
-   /**
+    /**
      * Saves the current screen content to the given file in the given format.
      *
      * @param imageFormat
@@ -245,8 +243,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     /**
-     * Sets the component where the image will be displayed.
-     * This component has to be build in the graphical user interface somewhere.
+     * Sets the component where the image will be displayed. This component has
+     * to be build in the graphical user interface somewhere.
      */
     public void setComponent(Component component) {
         canvas = (GLCanvas) component;
