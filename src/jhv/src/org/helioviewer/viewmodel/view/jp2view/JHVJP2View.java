@@ -477,8 +477,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = jp2Image.metaDataList[frameNumber];
         int h = 512;
         int w = 512;
-        if (GL3DState.get() != null && GL3DState.get().getActiveCamera() != null) {
-            GL3DCamera cam = GL3DState.get().getActiveCamera();
+        if (GL3DState.get() != null && GL3DState.getActiveCamera() != null) {
+            GL3DCamera cam = GL3DState.getActiveCamera();
             h = (int) (r.getHeight() / (cam.getCameraWidth() * 2.) * GL3DState.get().getViewportHeight() * 2);
             w = (int) (r.getWidth() / (cam.getCameraWidth() * 2.) * GL3DState.get().getViewportHeight() * 2);
         }

@@ -38,7 +38,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
     }
 
     private GL3DCamera getCamera() {
-        return GL3DState.get().getActiveCamera();
+        return GL3DState.getActiveCamera();
     }
 
     /**

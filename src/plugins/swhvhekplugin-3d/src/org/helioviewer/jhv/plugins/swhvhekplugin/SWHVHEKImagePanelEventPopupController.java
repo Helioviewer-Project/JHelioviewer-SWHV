@@ -271,14 +271,9 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        GL3DState state = GL3DState.get();
-        /* workaround for null GL3DState on startup */
-        if (state != null) {
-            GL3DCamera activeCamera = state.getActiveCamera();
-            GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
-            return pt;
-        } else
-            return null;
+        GL3DCamera activeCamera = GL3DState.getActiveCamera();
+        GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
+        return pt;
     }
 
 }

@@ -23,7 +23,7 @@ public class GL3DZoomInAction extends ZoomInAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DState.get().getActiveCamera().zoomIn(-1);
+        GL3DState.getActiveCamera().zoomIn(-1);
     }
 
 }

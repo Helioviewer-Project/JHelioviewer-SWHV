@@ -91,7 +91,7 @@ public class GL3DComponentView implements GLEventListener, ComponentView, Displa
 
     private static void displayBody(GL2 gl, int width, int height) {
         GL3DState state = GL3DState.get();
-        GL3DCamera camera = state.getActiveCamera();
+        GL3DCamera camera = GL3DState.getActiveCamera();
 
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
