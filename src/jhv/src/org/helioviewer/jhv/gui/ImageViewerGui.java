@@ -24,7 +24,6 @@ import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
@@ -55,7 +54,6 @@ import org.helioviewer.jhv.gui.filters.SharpenPanel;
 import org.helioviewer.jhv.gui.states.State;
 import org.helioviewer.jhv.gui.states.StateController;
 import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -95,8 +93,6 @@ public class ImageViewerGui {
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
     private final JMenuBar menuBar;
-
-    private GL3DCameraOptionsPanel cameraOptionsPanel;
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
@@ -336,8 +332,7 @@ public class ImageViewerGui {
             JTabbedPane cameraTab = new JTabbedPane();
             GL3DCamera camera = new GL3DObserverCamera();
             GL3DState.setActiveCamera(camera);
-            cameraOptionsPanel = new GL3DCameraOptionsPanel(camera);
-            cameraTab.addTab("Camera Adjustments", cameraOptionsPanel);
+
             cameraTab.setEnabled(false);
             // leftPane.add("Camera Options", cameraOptionsPanel, false);
 
@@ -391,11 +386,6 @@ public class ImageViewerGui {
      * @param stateEnum
      */
     private void activateState(final State newState, State oldState) {
-        if (newState.getType() == ViewStateEnum.View3D) {
-            leftPane.add("Camera Adjustments", cameraOptionsPanel, false);
-        } else {
-            leftPane.remove(GL3DCameraOptionsPanel.class);
-        }
         this.getTopToolBar().updateStateButtons();
     }
 
