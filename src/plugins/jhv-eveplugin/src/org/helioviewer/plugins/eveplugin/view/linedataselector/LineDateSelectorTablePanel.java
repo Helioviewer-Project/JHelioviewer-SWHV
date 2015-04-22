@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -12,10 +13,12 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableRemoveCellRenderer;
 import org.helioviewer.jhv.plugin.renderable.TableRowTransferHandler;
@@ -52,7 +55,13 @@ public class LineDateSelectorTablePanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        this.add(grid, gc);
+        JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 5 + 2));
+        JPanel jspContainer = new JPanel(new BorderLayout());
+        jspContainer.setBorder(BorderFactory.createTitledBorder(""));
+        jspContainer.add(jsp, BorderLayout.NORTH);
+        this.add(jspContainer, gc);
 
         grid.setTableHeader(null);
         grid.setShowGrid(false);
