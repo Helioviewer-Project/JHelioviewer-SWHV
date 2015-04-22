@@ -157,7 +157,7 @@ public class ImageViewerGui {
     }
 
     private static JFrame createMainFrame() {
-        JFrame frame = new JFrame("ESA JHelioviewer v2");
+        JFrame frame = new JFrame("ESA JHelioviewer NT");
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
@@ -170,13 +170,14 @@ public class ImageViewerGui {
 
         Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();
         Dimension minSize = new Dimension(800, 600);
-
         minSize.width = Math.min(minSize.width, maxSize.width);
         minSize.height = Math.min(minSize.height, maxSize.height);
+
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
-        enableFullScreen(frame);
         frame.setFont(new Font("SansSerif", Font.BOLD, 12));
+        enableFullScreen(frame);
+
         return frame;
     }
 

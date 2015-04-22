@@ -171,9 +171,9 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
         JPanel addLayerButtonWrapper = new JPanel(new GridBagLayout());
         GridBagConstraints gbc2 = new GridBagConstraints();
+
         JButton addLayerButton = new JButton();
         addLayerButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);

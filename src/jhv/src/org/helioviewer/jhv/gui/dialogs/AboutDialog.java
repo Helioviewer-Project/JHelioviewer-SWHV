@@ -205,4 +205,5 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
     @Override
     public void init() {
     }
+
 }
