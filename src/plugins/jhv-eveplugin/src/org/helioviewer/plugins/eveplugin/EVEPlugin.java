@@ -18,7 +18,7 @@ import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.TimelinePluginPanel;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotPanel;
+import org.helioviewer.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**

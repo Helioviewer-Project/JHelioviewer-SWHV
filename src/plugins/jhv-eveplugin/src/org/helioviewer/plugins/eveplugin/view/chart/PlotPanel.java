@@ -1,11 +1,8 @@
-package org.helioviewer.plugins.eveplugin.view.plot;
+package org.helioviewer.plugins.eveplugin.view.chart;
 
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
-
-import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawGraphPane;
-import org.helioviewer.plugins.eveplugin.view.chart.ChartDrawIntervalPane;
 
 public class PlotPanel extends JPanel {
 
