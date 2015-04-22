@@ -23,7 +23,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
-import org.helioviewer.gl3d.GL3DCameraMouseController;
 import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
@@ -41,6 +40,7 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
+import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
@@ -95,7 +95,7 @@ public class ImageViewerGui {
     public static final int SIDE_PADDING = 10;
     private final ObservationDialog observationDialog;
 
-    private final GL3DCameraMouseController mouseController = new GL3DCameraMouseController();
+    private final CameraMouseController mouseController = new CameraMouseController();
     private final ComponentView mainComponentView = new ComponentView();
 
     private FilterTabPanelManager filterTabPanelManager;

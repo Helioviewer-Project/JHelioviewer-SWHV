@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d;
+package org.helioviewer.jhv.gui.controller;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -9,6 +9,7 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -23,7 +24,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DCameraMouseController implements ImagePanelInputController {
+public class CameraMouseController implements ImagePanelInputController {
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
