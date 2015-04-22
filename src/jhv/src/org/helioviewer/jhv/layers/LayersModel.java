@@ -10,7 +10,7 @@ import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
-import org.helioviewer.gl3d.model.image.GL3DImageLayer;
+import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;

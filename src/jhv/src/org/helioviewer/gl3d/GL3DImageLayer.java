@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.model.image;
+package org.helioviewer.gl3d;
 
 import java.awt.Component;
 import java.nio.FloatBuffer;
@@ -14,7 +14,6 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;

@@ -8,8 +8,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.BorderFactory;
 
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -64,9 +63,8 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         GL3DState state = GL3DState.get();
         if (position == lastPosition || state == null)
             return;
-        GL3DCamera camera = GL3DState.getActiveCamera();
 
-        GL3DVec3d computedposition = camera.getVectorFromSphereAlt(position);
+        GL3DVec3d computedposition = GL3DState.getActiveCamera().getVectorFromSphereAlt(position);
         double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
         double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
         if (computedposition.x * computedposition.x + computedposition.y * computedposition.y > 1.) {

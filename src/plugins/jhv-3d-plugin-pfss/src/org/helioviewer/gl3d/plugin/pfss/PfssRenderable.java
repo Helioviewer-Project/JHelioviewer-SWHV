@@ -7,10 +7,10 @@ import java.util.concurrent.Executors;
 
 import javax.media.opengl.GL2;
 
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssNewDataLoader;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
@@ -66,7 +66,6 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void remove(GL3DState state) {
-
     }
 
     @Override
@@ -92,16 +91,13 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void setVisible(boolean isVisible) {
         this.isVisible = isVisible;
-
     }
 
     String datetime = "";
 
     @Override
     public String getTimeString() {
-
         return datetime;
-
     }
 
     @Override
@@ -119,4 +115,5 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void activeLayerChanged(AbstractView view) {
     }
+
 }

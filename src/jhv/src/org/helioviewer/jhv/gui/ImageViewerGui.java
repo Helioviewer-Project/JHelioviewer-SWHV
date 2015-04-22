@@ -23,10 +23,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.gl3d.GL3DCameraMouseController;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
-import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;

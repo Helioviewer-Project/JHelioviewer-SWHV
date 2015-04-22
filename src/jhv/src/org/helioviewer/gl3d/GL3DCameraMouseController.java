@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.gui;
+package org.helioviewer.gl3d;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.controller.AbstractImagePanelMouseController;

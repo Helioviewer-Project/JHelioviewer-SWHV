@@ -7,7 +7,7 @@ import java.nio.ShortBuffer;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.model.image.GL3DImageLayer;
+import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;

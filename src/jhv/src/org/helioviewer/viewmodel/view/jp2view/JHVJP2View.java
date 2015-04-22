@@ -8,8 +8,8 @@ import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
 import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
