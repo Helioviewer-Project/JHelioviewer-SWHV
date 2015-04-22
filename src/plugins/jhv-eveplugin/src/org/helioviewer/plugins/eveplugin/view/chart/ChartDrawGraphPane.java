@@ -41,10 +41,10 @@ import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.plugins.eveplugin.draw.DrawableType;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 

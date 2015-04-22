@@ -6,8 +6,8 @@ package org.helioviewer.plugins.eveplugin.radio.model;
 import java.awt.EventQueue;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
 /**
  * Keeps the y value information for one plot identifier.

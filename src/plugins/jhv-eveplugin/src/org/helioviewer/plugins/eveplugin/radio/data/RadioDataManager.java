@@ -18,7 +18,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.plugins.eveplugin.EVEState;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.plugins.eveplugin.radio.model.YValueModel;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;

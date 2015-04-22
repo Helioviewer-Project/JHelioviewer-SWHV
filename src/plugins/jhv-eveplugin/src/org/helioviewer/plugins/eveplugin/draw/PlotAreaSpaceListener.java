@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.model;
+package org.helioviewer.plugins.eveplugin.draw;
 
 public interface PlotAreaSpaceListener {
 

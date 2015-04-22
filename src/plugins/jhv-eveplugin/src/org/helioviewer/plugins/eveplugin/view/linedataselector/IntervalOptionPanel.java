@@ -23,8 +23,8 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 

@@ -29,8 +29,8 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 

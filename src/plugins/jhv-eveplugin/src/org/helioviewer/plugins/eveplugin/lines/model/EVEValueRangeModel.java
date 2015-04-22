@@ -3,8 +3,8 @@ package org.helioviewer.plugins.eveplugin.lines.model;
 import java.util.List;
 
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
 public class EVEValueRangeModel implements PlotAreaSpaceListener {
 

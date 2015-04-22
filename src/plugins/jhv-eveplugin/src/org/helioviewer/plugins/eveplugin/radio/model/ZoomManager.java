@@ -12,9 +12,9 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.GraphDimensionListener;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
 public class ZoomManager implements TimingListener, PlotAreaSpaceListener, GraphDimensionListener {
     private static ZoomManager instance;
