@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.events.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -60,6 +61,12 @@ public class EventsSelectorElement implements LineDataSelectorElement {
     @Override
     public String getUnitLabel() {
         return "";
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
