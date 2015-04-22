@@ -61,10 +61,6 @@ public class LineDataSelectorModel {
         fireLineDataSelectorElementUpdated(element);
     }
 
-    public void lineDataGroupChanged() {
-
-    }
-
     public boolean atLeastOneDownloading() {
         for (LineDataSelectorElement el : elements) {
             if (el.isDownloading()) {
@@ -72,6 +68,10 @@ public class LineDataSelectorModel {
             }
         }
         return false;
+    }
+
+    public void addLineData(LineDataSelectorElement element, int rowIndex) {
+        elements.add(rowIndex, element);
     }
 
     private void fireLineDataSelectorElementRemoved(LineDataSelectorElement element) {
@@ -104,4 +104,5 @@ public class LineDataSelectorModel {
             listener.lineDataUpdated(element);
         }
     }
+
 }
