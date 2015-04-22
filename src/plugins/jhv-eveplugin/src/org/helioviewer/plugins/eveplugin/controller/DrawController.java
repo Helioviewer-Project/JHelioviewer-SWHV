@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +37,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
     private static final DrawController instance = new DrawController();;
-    private final DrawControllerData drawControllerData;
+    // private final DrawControllerData drawControllerData;
 
     private Interval<Date> selectedInterval = new Interval<Date>(null, null);
     private Interval<Date> availableInterval = new Interval<Date>(null, null);
@@ -49,8 +51,17 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private Rectangle leftAxisArea;
     private final List<GraphDimensionListener> gdListeners;
 
+    private int nrOfDrawableElements;
+    private Set<YAxisElement> yAxisSet;
+    private final Map<DrawableType, Set<DrawableElement>> drawableElements;
+    private final List<DrawControllerListener> listeners;
+
     private DrawController() {
-        drawControllerData = new DrawControllerData();
+        nrOfDrawableElements = 0;
+        drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
+        listeners = new ArrayList<DrawControllerListener>();
+        yAxisSet = new HashSet<YAxisElement>();
+        // drawControllerData = new DrawControllerData();
         tListeners = new ArrayList<TimingListener>();
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         Displayer.getLayersModel().addLayersListener(this);
@@ -66,11 +77,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
-        drawControllerData.addDrawControllerListener(listener);
+        listeners.add(listener);
     }
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
-        drawControllerData.removeDrawControllerListener(listener);
+        listeners.remove(listener);
     }
 
     public void addGraphDimensionListener(GraphDimensionListener l) {
@@ -91,14 +102,32 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void addDrawableElement(DrawableElement element, boolean redraw) {
-        drawControllerData.addDrawableElement(element);
+        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+        if (elements == null) {
+            elements = new HashSet<DrawableElement>();
+            drawableElements.put(element.getDrawableElementType().getLevel(), elements);
+        }
+
+        elements.add(element);
+
+        Set<YAxisElement> tempSet = new HashSet<YAxisElement>(yAxisSet);
+        if (element.getYAxisElement() != null) {
+            tempSet.add(element.getYAxisElement());
+            yAxisSet = tempSet;
+        }
+        nrOfDrawableElements++;
         if (redraw) {
             this.fireRedrawRequest();
         }
     }
 
     private void removeDrawableElement(DrawableElement element, boolean redraw) {
-        drawControllerData.removeDrawableElement(element);
+        Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
+        if (elements != null) {
+            elements.remove(element);
+            nrOfDrawableElements--;
+            createYAxisSet();
+        }
         if (redraw) {
             this.fireRedrawRequest();
         }
@@ -109,11 +138,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Set<YAxisElement> getYAxisElements() {
-        return drawControllerData.getyAxisSet();
+        return yAxisSet;
     }
 
     public Map<DrawableType, Set<DrawableElement>> getDrawableElements() {
-        return drawControllerData.getDrawableElements();
+        return drawableElements;
     }
 
     public List<DrawableElement> getAllDrawableElements() {
@@ -143,17 +172,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireRedrawRequest() {
-        for (DrawControllerListener l : drawControllerData.getListeners()) {
+        for (DrawControllerListener l : listeners) {
             l.drawRequest();
         }
     }
 
     public void setAvailableInterval(final Interval<Date> interval) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         availableInterval = makeCompleteDay(interval);
         // Log.debug("New available interval : " + availableInterval);
         fireAvailableIntervalChanged(availableInterval);
@@ -208,7 +232,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireRedrawRequestMovieFrameChanged(final Date time) {
-        for (DrawControllerListener l : drawControllerData.getListeners()) {
+        for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest(time);
         }
     }
@@ -220,12 +244,21 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public Date getLastDateWithData() {
         Date lastDate = null;
-        if (drawControllerData.getLastDateWithData() != null) {
-            if (lastDate == null || lastDate.before(drawControllerData.getLastDateWithData())) {
-                lastDate = drawControllerData.getLastDateWithData();
+        Date tempLastDate = null;
+        for (Set<DrawableElement> des : drawableElements.values()) {
+            for (DrawableElement de : des) {
+                if (de.getLastDateWithData() != null) {
+                    if (tempLastDate == null || de.getLastDateWithData().before(lastDate)) {
+                        tempLastDate = de.getLastDateWithData();
+                    }
+                }
             }
         }
-
+        if (tempLastDate != null) {
+            if (lastDate == null || lastDate.before(tempLastDate)) {
+                lastDate = tempLastDate;
+            }
+        }
         return lastDate;
     }
 
@@ -444,5 +477,17 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public Rectangle getLeftAxisArea() {
         return leftAxisArea;
+    }
+
+    private void createYAxisSet() {
+        Set<YAxisElement> tempSet = new HashSet<YAxisElement>();
+        for (Set<DrawableElement> elementsSet : drawableElements.values()) {
+            for (DrawableElement de : elementsSet) {
+                if (de.getYAxisElement() != null) {
+                    tempSet.add(de.getYAxisElement());
+                }
+            }
+        }
+        yAxisSet = tempSet;
     }
 }
