@@ -34,8 +34,6 @@ public class MainImagePanel extends JPanel {
     private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
 
     private final CameraMouseController mouseController = new CameraMouseController();
-    private CameraMouseController inputController;
-
     private final Component renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
 
     protected ComponentView componentView;
@@ -51,7 +49,8 @@ public class MainImagePanel extends JPanel {
         // initialize list of plugins
         plugins = new LinkedList<ImagePanelPlugin>();
         add(renderedImageComponent);
-        setInputController(mouseController);
+
+        mouseController.setImagePanel(this);
     }
 
     /**
@@ -100,14 +99,14 @@ public class MainImagePanel extends JPanel {
             renderedImageComponent.removeMouseMotionListener(l);
         }
 
-        renderedImageComponent.removeMouseListener(inputController);
-        renderedImageComponent.removeMouseMotionListener(inputController);
-        renderedImageComponent.removeMouseWheelListener(inputController);
+        renderedImageComponent.removeMouseListener(mouseController);
+        renderedImageComponent.removeMouseMotionListener(mouseController);
+        renderedImageComponent.removeMouseWheelListener(mouseController);
 
         componentView = newView;
         if (componentView != null) {
             componentView.setComponent(renderedImageComponent);
-            setInputController(inputController);
+            setInputController(mouseController);
         }
 
         for (ImagePanelPlugin p : plugins) {
@@ -170,29 +169,13 @@ public class MainImagePanel extends JPanel {
      * @see #addPlugin(ImagePanelPlugin)
      */
     private void setInputController(CameraMouseController newInputController) {
-        addPlugin(newInputController);
+        renderedImageComponent.addMouseListener(newInputController);
+        renderedImageComponent.addMouseMotionListener(newInputController);
+        renderedImageComponent.addMouseWheelListener(newInputController);
 
-        if (inputController != null) {
-            renderedImageComponent.removeMouseListener(inputController);
-            renderedImageComponent.removeMouseMotionListener(inputController);
-            renderedImageComponent.removeMouseWheelListener(inputController);
-
-            if (KeyListener.class.isAssignableFrom(inputController.getClass())) {
-                renderedImageComponent.removeKeyListener((KeyListener) inputController);
-            }
+        if (KeyListener.class.isAssignableFrom(newInputController.getClass())) {
+            renderedImageComponent.addKeyListener((KeyListener) newInputController);
         }
-        removePlugin(inputController);
-
-        if (newInputController != null) {
-            renderedImageComponent.addMouseListener(newInputController);
-            renderedImageComponent.addMouseMotionListener(newInputController);
-            renderedImageComponent.addMouseWheelListener(newInputController);
-
-            if (KeyListener.class.isAssignableFrom(newInputController.getClass())) {
-                renderedImageComponent.addKeyListener((KeyListener) newInputController);
-            }
-        }
-        inputController = newInputController;
     }
 
     @Override
