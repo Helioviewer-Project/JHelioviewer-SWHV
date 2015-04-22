@@ -260,9 +260,8 @@ public class JavaHelioViewer {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    ImageViewerGui.getSingletonInstance().prepareGui();
-                    ImageViewerGui.getSingletonInstance().createViewchains();
-
+                    ImageViewerGui.getSingletonInstance(); // build UI
+                    ImageViewerGui.getSingletonInstance().loadAtStart();
                     Settings.getSingletonInstance().update();
                 }
             });

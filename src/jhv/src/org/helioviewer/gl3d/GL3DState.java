@@ -19,7 +19,7 @@ import org.helioviewer.gl3d.camera.GL3DObserverCamera;
  */
 public class GL3DState {
 
-    private static GL3DState instance = new GL3DState(null);
+    private static final GL3DState instance = new GL3DState(null);
 
     public GL2 gl;
 
