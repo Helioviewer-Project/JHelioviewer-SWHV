@@ -32,17 +32,13 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         super.setView(newView);
     }
 
-    private GL3DCamera getCamera() {
-        return GL3DState.getActiveCamera();
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
-            GL3DCamera camera = getCamera();
+            GL3DCamera camera = GL3DState.getActiveCamera();
             if (camera.getCurrentInteraction() == camera.getZoomInteraction()) {
             } else {
                 imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
@@ -66,16 +62,14 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DCamera currentCamera = getCamera();
+        GL3DCamera camera = GL3DState.getActiveCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (currentCamera.getCurrentInteraction() != currentCamera.getZoomInteraction()) {
+            if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
                 imagePanel.setCursor(closedHandCursor);
             }
             buttonDown = true;
         }
-        if (currentCamera != null) {
-            currentCamera.getCurrentInteraction().mousePressed(e);
-        }
+        camera.getCurrentInteraction().mousePressed(e);
     }
 
     /**
@@ -87,10 +81,7 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
             imagePanel.setCursor(openHandCursor);
             buttonDown = false;
         }
-        GL3DCamera currentCamera = getCamera();
-        if (currentCamera != null) {
-            currentCamera.getCurrentInteraction().mouseReleased(e);
-        }
+        GL3DState.getActiveCamera().getCurrentInteraction().mouseReleased(e);
     }
 
     /**
@@ -101,36 +92,23 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-
-            GL3DCamera currentCamera = getCamera();
-            if (currentCamera != null) {
-                currentCamera.getCurrentInteraction().mouseDragged(e);
-            }
+            GL3DState.getActiveCamera().getCurrentInteraction().mouseDragged(e);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        GL3DCamera currentCamera = getCamera();
-        if (currentCamera != null) {
-            currentCamera.getCurrentInteraction().mouseClicked(e);
-        }
+        GL3DState.getActiveCamera().getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        GL3DCamera currentCamera = getCamera();
-        if (currentCamera != null) {
-            currentCamera.getCurrentInteraction().mouseWheelMoved(e);
-        }
+        GL3DState.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        GL3DCamera currentCamera = getCamera();
-        if (currentCamera != null) {
-            currentCamera.getCurrentInteraction().mouseMoved(e);
-        }
+        GL3DState.getActiveCamera().getCurrentInteraction().mouseMoved(e);
     }
 
 }
