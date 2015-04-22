@@ -35,6 +35,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Load
 
 public class LineDateSelectorTablePanel extends JPanel {
 
+    private static final long serialVersionUID = -8443699382736126351L;
     private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 16;
 
@@ -45,14 +46,16 @@ public class LineDateSelectorTablePanel extends JPanel {
 
     private final JTable grid;
 
-    private final LineDataSelectorTableModel tableModel;
+    private final LineDataSelectorModel tableModel;
     private final JPanel optionsPanelWrapper;
-    GridBagConstraints gc = new GridBagConstraints();
+    private final GridBagConstraints gc = new GridBagConstraints();
     private Component optionsPanel = new JPanel();
+    private final IntervalOptionPanel intervalOptionPanel;
 
     public LineDateSelectorTablePanel() {
+        intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
-        tableModel = new LineDataSelectorTableModel();
+        tableModel = LineDataSelectorModel.getSingletonInstance();
         grid = new JTable(tableModel);
         tableModel.addTableModelListener(grid);
 
@@ -84,10 +87,12 @@ public class LineDateSelectorTablePanel extends JPanel {
         grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH);
 
         grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
-        grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
-        grid.getColumnModel().getColumn(TITLE_ROW).setMaxWidth(80);
+        // grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
+        // grid.getColumnModel().getColumn(TITLE_ROW).setMaxWidth(80);
 
         grid.getColumnModel().getColumn(LOADING_ROW).setCellRenderer(new LoadingCellRenderer());
+        grid.getColumnModel().getColumn(LOADING_ROW).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LOADING_ROW).setMaxWidth(20);
 
         grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RenderableRemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH);
@@ -126,7 +131,7 @@ public class LineDateSelectorTablePanel extends JPanel {
 
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
-                LineDataSelectorTableModel model = (LineDataSelectorTableModel) grid.getModel();
+                LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
                 if (col == VISIBLE_ROW) {
                     Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
@@ -148,7 +153,13 @@ public class LineDateSelectorTablePanel extends JPanel {
 
         optionsPanelWrapper = new JPanel();
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
-        optionsPanelWrapper.add(optionsPanel);
+        optionsPanelWrapper.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        optionsPanelWrapper.add(optionsPanel, gbc);
+        gbc.gridx = 1;
+        optionsPanelWrapper.add(intervalOptionPanel, gbc);
 
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton();
@@ -173,7 +184,9 @@ public class LineDateSelectorTablePanel extends JPanel {
     private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
         optionsPanelWrapper.remove(optionsPanel);
         optionsPanel = lineDataElement.getOptionsPanel();
-        optionsPanelWrapper.add(optionsPanel);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        optionsPanelWrapper.add(optionsPanel, gbc);
         this.getParent().revalidate();
         this.getParent().repaint();
     }
