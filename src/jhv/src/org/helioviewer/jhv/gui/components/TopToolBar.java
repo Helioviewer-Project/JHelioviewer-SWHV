@@ -27,7 +27,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.SetPanSelectionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxSelectionAction;
-import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;

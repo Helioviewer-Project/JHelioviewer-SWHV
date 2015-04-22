@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -41,12 +40,7 @@ public class ZoomStatusPanel extends ViewStatusPanelPlugin {
      */
     private void updateZoomLevel(AbstractView view) {
         if (view != null) {
-            long zoom = Math.round(ZoomController.getZoom(view) * 100);
-            if (zoom != 0.0) {
-                setText("Zoom: " + zoom + "%");
-            } else {
-                setText("Zoom: n/a");
-            }
+            // TBD
             setVisible(true);
         } else {
             setVisible(false);
