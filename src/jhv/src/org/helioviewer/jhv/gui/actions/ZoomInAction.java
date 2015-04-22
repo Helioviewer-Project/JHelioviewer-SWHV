@@ -10,9 +10,6 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
-/**
- * Action to zoom in.
- */
 public class ZoomInAction extends AbstractAction {
 
     /**
