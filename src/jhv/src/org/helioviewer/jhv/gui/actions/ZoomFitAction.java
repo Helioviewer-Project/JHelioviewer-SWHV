@@ -6,20 +6,20 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.controller.ZoomController;
+
+import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
- * Action to zoom, such that the active layer fits completely in the viewport.
- *
- * @author Markus Langenberg
+ * Action to zoom such that the active layer fits completely in the viewport.
  */
 public class ZoomFitAction extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
-    ZoomController zoomController;
 
     /**
      * Constructor
@@ -39,11 +39,20 @@ public class ZoomFitAction extends AbstractAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent arg0) {
-        if (zoomController == null) {
-            zoomController = new ZoomController();
+    public void actionPerformed(ActionEvent e) {
+        AbstractView view = Displayer.getLayersModel().getActiveView();
+        GL3DCamera camera = GL3DState.getActiveCamera();
+        if (view != null) {
+            Region region = view.getMetaData().getPhysicalRegion();
+            if (region != null) {
+                double halfWidth = region.getWidth() / 2.;
+                double halfFOVRad = Math.toRadians(camera.getCameraFOV() / 2.);
+                double distance = halfWidth * Math.sin(Math.PI / 2. - halfFOVRad) / Math.sin(halfFOVRad);
+                distance = -distance - camera.getZTranslation();
+                GL3DVec3d cameraTranslation = camera.getTranslation().copy();
+                cameraTranslation.negate(); // Huh?
+            }
         }
-        zoomController.zoomFit(Displayer.getLayersModel().getActiveView());
     }
 
 }
