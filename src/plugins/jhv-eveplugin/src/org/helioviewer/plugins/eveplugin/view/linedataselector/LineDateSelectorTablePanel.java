@@ -1,10 +1,27 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
+import javax.swing.DropMode;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.plugin.renderable.Renderable;
+import org.helioviewer.jhv.plugin.renderable.RenderableRemoveCellRenderer;
+import org.helioviewer.jhv.plugin.renderable.TableRowTransferHandler;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 
 public class LineDateSelectorTablePanel extends JPanel {
 
@@ -19,8 +36,9 @@ public class LineDateSelectorTablePanel extends JPanel {
     private final JTable grid;
 
     private final LineDataSelectorTableModel tableModel;
-
+    private final JPanel optionsPanelWrapper;
     GridBagConstraints gc = new GridBagConstraints();
+    private Component optionsPanel = new JPanel();
 
     public LineDateSelectorTablePanel() {
         this.setLayout(new GridBagLayout());
@@ -34,5 +52,95 @@ public class LineDateSelectorTablePanel extends JPanel {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
+        this.add(grid, gc);
+
+        grid.setTableHeader(null);
+        grid.setShowGrid(false);
+        grid.setRowSelectionAllowed(true);
+        grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        grid.setColumnSelectionAllowed(false);
+        grid.setIntercellSpacing(new Dimension(0, 0));
+
+        grid.setRowHeight(ROW_HEIGHT);
+        grid.setBackground(Color.white);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setCellRenderer(new LineDataVisibleCellRenderer());
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH);
+
+        grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
+        grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
+        grid.getColumnModel().getColumn(TITLE_ROW).setMaxWidth(80);
+
+        grid.getColumnModel().getColumn(LOADING_ROW).setCellRenderer(new LoadingCellRenderer());
+
+        grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RenderableRemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(REMOVE_ROW).setMaxWidth(ICON_WIDTH);
+
+        grid.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    handlePopup(e);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    handlePopup(e);
+                }
+            }
+
+            /**
+             * Handle with right-click menus
+             *
+             * @param e
+             */
+            public void handlePopup(MouseEvent e) {
+
+            }
+
+            /**
+             * Handle with clicks on hide/show/remove layer icons
+             */
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
+                int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
+                LineDataSelectorTableModel model = (LineDataSelectorTableModel) grid.getModel();
+
+                if (col == VISIBLE_ROW) {
+                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
+                    renderable.setVisible(!renderable.isVisible());
+                }
+                if (col == TITLE_ROW || col == VISIBLE_ROW || col == LOADING_ROW) {
+                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) Displayer.getRenderablecontainer().getValueAt(row, col);
+                    setOptionsPanel(lineDataElement);
+                }
+                if (col == REMOVE_ROW) {
+                    model.removeRow(row);
+                    Displayer.display();
+                }
+            }
+        });
+        grid.setDragEnabled(true);
+        grid.setDropMode(DropMode.INSERT_ROWS);
+        grid.setTransferHandler(new TableRowTransferHandler(grid));
+
+        optionsPanelWrapper = new JPanel();
+        optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
+        optionsPanelWrapper.add(optionsPanel);
+
+    }
+
+    private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
+        optionsPanelWrapper.remove(optionsPanel);
+        optionsPanel = lineDataElement.getOptionsPanel();
+        optionsPanelWrapper.add(optionsPanel);
+        this.getParent().revalidate();
+        this.getParent().repaint();
     }
 }
