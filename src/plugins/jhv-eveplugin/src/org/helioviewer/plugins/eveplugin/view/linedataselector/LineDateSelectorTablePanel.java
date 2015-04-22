@@ -4,24 +4,31 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableRemoveCellRenderer;
 import org.helioviewer.jhv.plugin.renderable.TableRowTransferHandler;
+import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
@@ -143,6 +150,24 @@ public class LineDateSelectorTablePanel extends JPanel {
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.add(optionsPanel);
 
+        JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        JButton addLayerButton = new JButton();
+        addLayerButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
+            }
+        });
+        addLayerButton.setText("");
+        addLayerButton.setToolTipText("Click to add extra layers");
+        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
+        addLayerButton.setBorder(null);
+        addLayerButtonWrapper.add(addLayerButton);
+        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
+
+        gc.gridy = 1;
+        add(optionsPanelWrapper, gc);
     }
 
     private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
