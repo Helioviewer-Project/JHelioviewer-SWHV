@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.awt.Color;
+import java.awt.Component;
 
 public interface LineDataSelectorElement {
     public abstract void removeLineData();
@@ -20,4 +21,6 @@ public interface LineDataSelectorElement {
     public abstract boolean isAvailable();
 
     public abstract String getUnitLabel();
+
+    public abstract Component getOptionsPanel();
 }
