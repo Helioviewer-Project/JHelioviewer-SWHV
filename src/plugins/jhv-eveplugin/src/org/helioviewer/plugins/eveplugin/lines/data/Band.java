@@ -1,12 +1,13 @@
 package org.helioviewer.plugins.eveplugin.lines.data;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 /**
- * 
+ *
  * @author Stephan Pagel
  * */
 public class Band implements LineDataSelectorElement {
@@ -113,4 +114,9 @@ public class Band implements LineDataSelectorElement {
         return bandType.getUnitLabel();
     }
 
+    @Override
+    public Component getOptionsPanel() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

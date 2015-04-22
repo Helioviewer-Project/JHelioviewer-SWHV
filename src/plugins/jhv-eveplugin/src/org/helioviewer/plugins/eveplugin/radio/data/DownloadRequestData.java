@@ -1,6 +1,7 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,7 +108,7 @@ public class DownloadRequestData implements LineDataSelectorElement {
      * images are added to the radio images of this download request data. The
      * downloading status and visibility status of this download request data is
      * kept.
-     * 
+     *
      * @param downloadRequestData
      *            The download request data to be merged in this
      */
@@ -115,5 +116,11 @@ public class DownloadRequestData implements LineDataSelectorElement {
         if (downloadRequestData.getDownloadID() == downloadID) {
             radioImages.putAll(downloadRequestData.getRadioImages());
         }
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
