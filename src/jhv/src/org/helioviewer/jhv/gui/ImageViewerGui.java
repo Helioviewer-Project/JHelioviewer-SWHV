@@ -75,8 +75,6 @@ public class ImageViewerGui {
 
     private static MainContentPanel mainContentPanel;
     private static MainImagePanel mainImagePanel;
-    private static JMenuBar menuBar;
-    private static TopToolBar topToolBar;
 
     private static ObservationDialog observationDialog;
 
@@ -97,7 +95,7 @@ public class ImageViewerGui {
     public static void prepareGui() {
         mainFrame = createMainFrame();
 
-        menuBar = new MenuBar();
+        JMenuBar menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
         observationDialog = new ObservationDialog(mainFrame);
 
@@ -115,7 +113,7 @@ public class ImageViewerGui {
         mainContentPanel = new MainContentPanel();
         mainContentPanel.setMainComponent(mainImagePanel);
 
-        topToolBar = new TopToolBar();
+        TopToolBar topToolBar = new TopToolBar();
         contentPanel.add(topToolBar, BorderLayout.PAGE_START);
 
         leftPane = new SideContentPane();
@@ -342,10 +340,6 @@ public class ImageViewerGui {
         }
     }
 
-    public JScrollPane getLeftScrollPane() {
-        return leftScrollPane;
-    }
-
     public static JFrame getMainFrame() {
         return mainFrame;
     }
@@ -368,14 +362,6 @@ public class ImageViewerGui {
 
     public ControlPanelContainer getMoviePanelContainer() {
         return moviePanelContainer;
-    }
-
-    public JMenuBar getMenuBar() {
-        return menuBar;
-    }
-
-    public TopToolBar getTopToolBar() {
-        return topToolBar;
     }
 
     public MainImagePanel getMainImagePanel() {
