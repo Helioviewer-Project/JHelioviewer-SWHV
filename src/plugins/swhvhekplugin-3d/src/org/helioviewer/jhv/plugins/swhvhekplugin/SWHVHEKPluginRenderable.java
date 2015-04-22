@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.base.physics.Astronomy;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;

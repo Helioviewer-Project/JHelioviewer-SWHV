@@ -14,7 +14,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
-import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
+import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class CameraMouseController implements ImagePanelInputController {
+public class CameraMouseController implements MouseInputListener, MouseWheelListener, ImagePanelPlugin {
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
