@@ -34,7 +34,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     private static final ImageIcon collapsedIcon = IconBank.getIcon(JHVIcon.RIGHT2);
 
     protected CollapsiblePaneButton toggleButton;
-    private final Component component;
+    private final JPanel component;
     protected JPanel topButtonsPanel;
     static final int BUTTONHEIGHT = 18;
 
@@ -66,7 +66,8 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, BUTTONHEIGHT));
         toggleButton.addActionListener(this);
 
-        this.component = component;
+        this.component = new JPanel(new BorderLayout());
+        this.component.add(component);
         component.setVisible(startExpanded);
         add(component, BorderLayout.CENTER);
         setButtons();
