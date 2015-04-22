@@ -15,7 +15,6 @@ import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
-import org.helioviewer.plugins.eveplugin.view.ControlsPanel;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.TimelinePluginPanel;
@@ -31,6 +30,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel("Plot 1: ");
+    private final TimelinePluginPanel timelinePluginPanel = new TimelinePluginPanel();
 
     @Override
     public void installPlugin() {
@@ -43,7 +43,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         EVEDrawController.getSingletonInstance();
         pluginPanes.add(plotOne);
 
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", new TimelinePluginPanel(), true);
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
 
         ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
         ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
@@ -58,7 +58,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
         ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
         ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(ControlsPanel.getSingletonInstance());
+        ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(timelinePluginPanel);
     }
 
     public static URL getResourceUrl(String name) {

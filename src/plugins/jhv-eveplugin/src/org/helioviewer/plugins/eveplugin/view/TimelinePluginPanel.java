@@ -16,7 +16,7 @@ public class TimelinePluginPanel extends JPanel {
 
     private void initVisualComponents() {
         tabs = new JTabbedPane();
-        tabs.addTab("Layers", ControlsPanel.getSingletonInstance());
+        tabs.addTab("Layers", new ControlsPanel());
         tabs.addTab("Radio Options", new RadioOptionsPanel());
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

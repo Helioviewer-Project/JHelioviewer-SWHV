@@ -51,7 +51,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private static final long serialVersionUID = 3639870635351984819L;
 
-    private static ControlsPanel singletongInstance;
     private final JPanel lineDataSelectorContainer = new JPanel();
     private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
     private final JButton addLayerButton = new JButton("Add layer", addIcon);
@@ -70,7 +69,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
 
     private boolean selectedIndexSetByProgram;
 
-    private ControlsPanel() {
+    public ControlsPanel() {
         initVisualComponents();
         Displayer.getLayersModel().addLayersListener(this);
         DrawController.getSingletonInstance().addTimingListener(this);
@@ -133,14 +132,6 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         gc.weighty = 1.0;
         add(flowPanel, gc);
 
-    }
-
-    public static ControlsPanel getSingletonInstance() {
-        if (singletongInstance == null) {
-            singletongInstance = new ControlsPanel();
-        }
-
-        return singletongInstance;
     }
 
     public void addLineDataSelector(JComponent lineDataSelectorPanel) {
