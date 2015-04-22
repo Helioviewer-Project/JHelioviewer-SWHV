@@ -13,7 +13,6 @@ import org.helioviewer.jhv.gui.actions.SaveScreenshotAction;
 import org.helioviewer.jhv.gui.actions.SaveScreenshotAsAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.ToggleFullscreenAction;
-import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
@@ -67,8 +66,7 @@ public class MenuBar extends JMenuBar {
         viewMenu.addSeparator();
         viewMenu.add(new ZoomInAction(true));
         viewMenu.add(new ZoomOutAction(true));
-        viewMenu.add(new ZoomFitAction(true));
-        viewMenu.add(new Zoom1to1Action(true));
+        //viewMenu.add(new ZoomFitAction(true));
         add(viewMenu);
 
         JMenu movieMenu = new JMenu("Movie");

@@ -41,7 +41,6 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
-import org.helioviewer.jhv.gui.controller.ZoomController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
@@ -55,7 +54,6 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
-import org.helioviewer.viewmodel.metadata.ImageSizeMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -395,11 +393,6 @@ public class ImageViewerGui {
 
                             // if view has been found
                             if (view.equals(subView)) {
-                                // Set the correct image scale
-                                ImageSizeMetaData imageSizeMetaData = (ImageSizeMetaData) subView.getMetaData();
-                                ZoomController zoomController = new ZoomController();
-                                zoomController.zoom(Displayer.getLayersModel().getActiveView(), imageSizeMetaData.getUnitsPerPixel() / (jhvRequest.imageScale * 1000.0));
-
                                 // Lock movie
                                 if (jhvRequest.linked) {
                                     if (subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
