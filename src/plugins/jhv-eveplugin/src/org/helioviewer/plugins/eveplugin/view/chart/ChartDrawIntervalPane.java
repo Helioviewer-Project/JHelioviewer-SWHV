@@ -201,7 +201,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     }
 
-    private void drawLabels(Graphics g) {
+    private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
