@@ -13,8 +13,8 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 

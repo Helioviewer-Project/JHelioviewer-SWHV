@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.awt.Component;
 
-import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.GL3DState;
 
 public interface Renderable {
 

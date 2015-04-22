@@ -6,7 +6,7 @@ import java.net.URI;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;

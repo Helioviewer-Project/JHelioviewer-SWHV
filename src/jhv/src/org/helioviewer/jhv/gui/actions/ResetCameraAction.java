@@ -4,8 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;

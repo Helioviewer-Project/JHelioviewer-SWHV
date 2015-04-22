@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.scenegraph;
+package org.helioviewer.gl3d;
 
 import java.util.Date;
 

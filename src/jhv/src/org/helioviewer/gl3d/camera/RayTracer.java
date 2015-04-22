@@ -4,7 +4,7 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.GL3DVec4d;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.scenegraph.GL3DState;
+import org.helioviewer.gl3d.GL3DState;
 
 public class RayTracer {
     public enum HITPOINT {

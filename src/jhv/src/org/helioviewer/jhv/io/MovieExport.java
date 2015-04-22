@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.movie;
+package org.helioviewer.jhv.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
