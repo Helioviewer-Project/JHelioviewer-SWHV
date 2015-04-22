@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -16,7 +16,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.gl3d.gui.GL3DResetCameraAction;
 import org.helioviewer.gl3d.gui.GL3DSetPanInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
@@ -25,6 +24,7 @@ import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SetPanSelectionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxSelectionAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -62,7 +62,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton coronaVisibilityButton;
     private JButton resetCamera;
 
-    protected CopyOnWriteArrayList<JToggleButton> pluginList = new CopyOnWriteArrayList<JToggleButton>();
+    protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
 
     /**
      * Default constructor.
@@ -151,8 +151,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         // Zoom
         addButton(new JButton(new ZoomInAction(false)));
         addButton(new JButton(new ZoomOutAction(false)));
-        //addButton(new JButton(new GL3DZoomFitAction(false)));
-        addButton(new JButton(new GL3DResetCameraAction()));
+        //addButton(new JButton(new ZoomFitAction(false)));
+        addButton(new JButton(new ResetCameraAction(false)));
 
         addSeparator();
 
@@ -208,7 +208,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 this.add(new JToggleButton(button.getText()));
             else
                 this.add(new JToggleButton(button.getIcon()));
-
         }
     }
 
@@ -257,16 +256,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
             Settings.getSingletonInstance().save();
         }
-        SelectionMode selectionMode = SelectionMode.ROTATE;
 
+        SelectionMode selectionMode = SelectionMode.ROTATE;
         if (zoomBoxButton.isSelected()) {
             selectionMode = SelectionMode.ZOOMBOX;
         }
 
         createNewToolBar(selectionMode);
-
         firePropertyChange("displayMode", oldDisplayMode, displayMode);
-
         revalidate();
     }
 
@@ -286,7 +283,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
      */
     protected void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
-
             JPopupMenu popUpMenu = new JPopupMenu();
             ButtonGroup group = new ButtonGroup();
 
