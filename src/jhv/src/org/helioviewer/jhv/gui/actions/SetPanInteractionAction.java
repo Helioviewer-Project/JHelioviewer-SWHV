@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.gui;
+package org.helioviewer.jhv.gui.actions;
 
 import java.awt.event.ActionEvent;
 
@@ -11,18 +11,13 @@ import org.helioviewer.gl3d.scenegraph.GL3DState;
 /**
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Panning (Camera Translation).
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
  */
-public class GL3DSetPanInteractionAction extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
+public class SetPanInteractionAction extends AbstractAction {
 
     /**
      * Default constructor.
      */
-    public GL3DSetPanInteractionAction() {
+    public SetPanInteractionAction() {
         super("Pan");
     }
 
