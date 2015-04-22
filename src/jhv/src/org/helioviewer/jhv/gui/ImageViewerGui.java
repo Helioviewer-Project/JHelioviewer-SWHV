@@ -26,7 +26,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
-import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -154,30 +153,11 @@ public class ImageViewerGui {
      * @param _show
      *            If GUI should be displayed.
      */
-    public void packAndShow(final boolean _show) {
-
-        final JHVSplashScreen splash = JHVSplashScreen.getSingletonInstance();
-
-        // load images which should be displayed first in a separated thread
-        // that splash screen will be updated
-        splash.setProgressText("Loading Images...");
-
+    private void loadAtStart() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 loadImagesAtStartup();
-
-                // show GUI
-                splash.setProgressText("Starting JHelioviewer...");
-                splash.nextStep();
-                mainFrame.pack();
-                mainFrame.setLocationRelativeTo(null);
-                mainFrame.setVisible(_show);
-                splash.setProgressValue(100);
-
-                // remove splash screen
-                splash.dispose();
-                // splash.setVisible(false);
             }
         }, "LoadImagesOnStartUp");
         thread.start();
@@ -189,10 +169,12 @@ public class ImageViewerGui {
     public void createViewchains() {
         updateComponentPanels();
         mainComponentView.activate();
-        mainFrame.validate();
 
-        packAndShow(true);
-        mainFrame.validate();
+        mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
+
+        loadAtStart();
     }
 
     /**
