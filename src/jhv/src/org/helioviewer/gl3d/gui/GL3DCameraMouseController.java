@@ -3,12 +3,9 @@ package org.helioviewer.gl3d.gui;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import org.helioviewer.gl3d.GL3DKeyController;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.IconBank;
@@ -17,14 +14,13 @@ import org.helioviewer.jhv.gui.controller.AbstractImagePanelMouseController;
 import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
- * Acts as the global Delegate for Mouse and KeyEvents. Mouse Events are
- * delegated to the {@link GL3DCamera} and Key Events to the singleton
- * {@link GL3DKeyController}.
+ * Acts as the global Delegate for Mouse. Mouse Events are
+ * delegated to the {@link GL3DCamera}
  *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DCameraMouseController extends AbstractImagePanelMouseController implements KeyListener {
+public class GL3DCameraMouseController extends AbstractImagePanelMouseController {
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
@@ -136,21 +132,6 @@ public class GL3DCameraMouseController extends AbstractImagePanelMouseController
         if (currentCamera != null) {
             currentCamera.getCurrentInteraction().mouseMoved(e);
         }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent arg0) {
-        GL3DKeyController.getInstance().keyPressed(arg0);
-    }
-
-    @Override
-    public void keyTyped(KeyEvent arg0) {
-        GL3DKeyController.getInstance().keyTyped(arg0);
-    }
-
-    @Override
-    public void keyReleased(KeyEvent arg0) {
-        GL3DKeyController.getInstance().keyReleased(arg0);
     }
 
 }
