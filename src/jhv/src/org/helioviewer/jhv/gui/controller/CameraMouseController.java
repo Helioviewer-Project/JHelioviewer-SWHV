@@ -14,8 +14,6 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
-import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
-import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * Acts as the global Delegate for Mouse. Mouse Events are
@@ -24,47 +22,18 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class CameraMouseController implements MouseInputListener, MouseWheelListener, ImagePanelPlugin {
+public class CameraMouseController implements MouseInputListener, MouseWheelListener {
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     private static MainImagePanel imagePanel;
-    private static ComponentView view;
 
     private boolean buttonDown = false;
     private long lastTime = System.currentTimeMillis();
 
-    @Override
     public void setImagePanel(MainImagePanel newImagePanel) {
         imagePanel = newImagePanel;
-    }
-
-    /**
-     * Get the assigned image panel of this pan controller instance
-     *
-     * @return Reference to the assigned image panel.
-     * */
-    @Override
-    public MainImagePanel getImagePanel() {
-        return imagePanel;
-    }
-
-    @Override
-    public void setView(ComponentView newView) {
-        view = newView;
-    }
-
-    @Override
-    public ComponentView getView() {
-        return view;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void detach() {
     }
 
     /**
