@@ -99,7 +99,6 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setSelected(true);
         component.setVisible(true);
         toggleButton.setIcon(expandedIcon);
-        ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
     }
 
     /**
@@ -109,7 +108,6 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setSelected(false);
         component.setVisible(false);
         toggleButton.setIcon(collapsedIcon);
-        ImageViewerGui.getSingletonInstance().getContentPane().revalidate();
     }
 
     /**

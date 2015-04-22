@@ -68,12 +68,11 @@ public class ImageViewerGui {
     private JSplitPane midSplitPane;
     private JScrollPane leftScrollPane;
 
-    private MainContentPanel mainContentPanel;
-
     private SideContentPane leftPane;
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
 
+    private MainContentPanel mainContentPanel;
     private static final MainImagePanel mainImagePanel = new MainImagePanel();
     private static final JMenuBar menuBar = new MenuBar();
     private static final TopToolBar topToolBar = new TopToolBar();
@@ -135,12 +134,6 @@ public class ImageViewerGui {
         }
     }
 
-    /**
-     * Packs, positions and shows the GUI
-     *
-     * @param _show
-     *            If GUI should be displayed.
-     */
     private void loadAtStart() {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -420,15 +413,6 @@ public class ImageViewerGui {
         } else {
             midSplitPane.setDividerLocation(SIDE_PANEL_WIDTH);
         }
-    }
-
-    /**
-     * Returns the content panel of JHV
-     *
-     * @return The content panel of JHV
-     */
-    public JPanel getContentPane() {
-        return contentPanel;
     }
 
     public final MainContentPanel getMainContentPanel() {
