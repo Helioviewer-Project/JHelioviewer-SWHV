@@ -25,6 +25,7 @@ import javax.swing.JTabbedPane;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
+import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
 import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.JHVSplashScreen;
@@ -51,9 +52,6 @@ import org.helioviewer.jhv.gui.filters.OpacityPanel;
 import org.helioviewer.jhv.gui.filters.RunningDifferencePanel;
 import org.helioviewer.jhv.gui.filters.SOHOLUTPanel;
 import org.helioviewer.jhv.gui.filters.SharpenPanel;
-import org.helioviewer.jhv.gui.states.State;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.StateController.StateChangeListener;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -99,6 +97,7 @@ public class ImageViewerGui {
     private final ObservationDialog observationDialog;
 
     private final GL3DTopToolBar topToolBar;
+    private final GL3DCameraMouseController mouseController = new GL3DCameraMouseController();
 
     private final ComponentView mainComponentView = new ComponentView();;
 
@@ -111,13 +110,6 @@ public class ImageViewerGui {
      * components.
      */
     private ImageViewerGui() {
-        StateController.getInstance().addStateChangeListener(new StateChangeListener() {
-            @Override
-            public void stateChanged(State newState, State oldState, StateController stateController) {
-                activateState(newState, oldState);
-            }
-        });
-
         mainFrame = createMainFrame();
         observationDialog = new ObservationDialog(mainFrame);
         menuBar = new MenuBar();
@@ -214,14 +206,11 @@ public class ImageViewerGui {
      * Initializes the main view chain.
      */
     public void createViewchains() {
-        State newState = StateController.getInstance().getCurrentState();
-
         updateComponentPanels();
-        mainImagePanel.setInputController(newState.getDefaultInputController());
+        mainImagePanel.setInputController(mouseController);
         mainComponentView.activate();
         mainFrame.validate();
 
-        this.activateState(newState, null);
         packAndShow(true);
         mainFrame.validate();
     }
@@ -378,15 +367,6 @@ public class ImageViewerGui {
 
     public TopToolBar getTopToolBar() {
         return this.topToolBar;
-    }
-
-    /**
-     * Change the current state
-     *
-     * @param stateEnum
-     */
-    private void activateState(final State newState, State oldState) {
-        this.getTopToolBar().updateStateButtons();
     }
 
     private void updateComponentPanels() {

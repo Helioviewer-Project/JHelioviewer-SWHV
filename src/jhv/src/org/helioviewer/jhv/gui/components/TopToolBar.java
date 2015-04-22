@@ -33,8 +33,6 @@ import org.helioviewer.jhv.gui.actions.Zoom1to1Action;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
-import org.helioviewer.jhv.gui.states.StateController;
-import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
 /**
  * Toolbar containing the most common actions.
@@ -154,16 +152,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
         removeAll();
 
         // Zoom
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
-            addButton(new JButton(new ZoomInAction(false)));
-            addButton(new JButton(new ZoomOutAction(false)));
-            addButton(new JButton(new ZoomFitAction(false)));
-            addButton(new JButton(new Zoom1to1Action(false)));
-        } else {
-            addButton(new JButton(new GL3DZoomInAction(false)));
-            addButton(new JButton(new GL3DZoomOutAction(false)));
-            //addButton(new JButton(new GL3DZoomFitAction(false)));
-        }
+        addButton(new JButton(new GL3DZoomInAction(false)));
+        addButton(new JButton(new GL3DZoomOutAction(false)));
+        //addButton(new JButton(new GL3DZoomFitAction(false)));
+
         resetCamera = new JButton(new GL3DResetCameraAction());
         addButton(resetCamera);
 
@@ -172,39 +164,21 @@ public class TopToolBar extends JToolBar implements MouseListener {
         // Selection
         ButtonGroup group = new ButtonGroup();
 
-        if (StateController.getInstance().getCurrentState().getType() == ViewStateEnum.View2D) {
-            panButton = new JToggleButton(new SetPanSelectionAction());
-            panButton.setSelected(selectionMode == SelectionMode.PAN);
-            panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
-            panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
-            panButton.setToolTipText("Select Panning");
-            group.add(panButton);
-            addButton(panButton);
+        panButton = new JToggleButton(new GL3DSetPanInteractionAction());
+        panButton.setSelected(selectionMode == SelectionMode.PAN);
+        panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
+        panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
+        panButton.setToolTipText("Select Panning");
+        group.add(panButton);
+        addButton(panButton);
 
-            zoomBoxButton = new JToggleButton(new SetZoomBoxSelectionAction());
-            zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
-            zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
-            zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
-            zoomBoxButton.setToolTipText("Select Zoom Box");
-            group.add(zoomBoxButton);
-            addButton(zoomBoxButton);
-        } else {
-            panButton = new JToggleButton(new GL3DSetPanInteractionAction());
-            panButton.setSelected(selectionMode == SelectionMode.PAN);
-            panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
-            panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
-            panButton.setToolTipText("Select Panning");
-            group.add(panButton);
-            addButton(panButton);
-
-            zoomBoxButton = new JToggleButton(new GL3DSetZoomBoxInteractionAction());
-            zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
-            zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
-            zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
-            zoomBoxButton.setToolTipText("Select Zoom Box");
-            group.add(zoomBoxButton);
-            addButton(zoomBoxButton);
-        }
+        zoomBoxButton = new JToggleButton(new GL3DSetZoomBoxInteractionAction());
+        zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
+        zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
+        zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
+        zoomBoxButton.setToolTipText("Select Zoom Box");
+        group.add(zoomBoxButton);
+        addButton(zoomBoxButton);
 
         rotateButton = new JToggleButton(new GL3DSetRotationInteractionAction());
         rotateButton.setSelected(selectionMode == SelectionMode.ROTATE);
@@ -223,7 +197,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton3D.setToolTipText("Enable Solar Rotation Tracking");
         addButton(trackSolarRotationButton3D);
 
-        // coronaVisibilityButton =
         coronaVisibilityButton = new JToggleButton(new GL3DToggleCoronaVisibilityAction());
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
@@ -242,15 +215,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 this.add(new JToggleButton(button.getIcon()));
 
         }
-
-        updateStateButtons();
-    }
-
-    public void updateStateButtons() {
-        this.coronaVisibilityButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
-        this.rotateButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState());
-        this.zoomBoxButton.setEnabled(StateController.getInstance().getCurrentState() == ViewStateEnum.View2D.getState());
-        this.repaint();
     }
 
     /**
@@ -298,12 +262,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().setProperty("display.toolbar", mode.toString().toLowerCase());
             Settings.getSingletonInstance().save();
         }
-        SelectionMode selectionMode;
-        if (StateController.getInstance().getCurrentState() == ViewStateEnum.View3D.getState())
-            selectionMode = SelectionMode.ROTATE;
+        SelectionMode selectionMode = SelectionMode.ROTATE;
 
-        else
-            selectionMode = SelectionMode.PAN;
         if (zoomBoxButton.isSelected()) {
             selectionMode = SelectionMode.ZOOMBOX;
         }
