@@ -16,15 +16,15 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
-import org.helioviewer.gl3d.gui.GL3DToggleCoronaVisibilityAction;
-import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.SetPanInteractionAction;
+import org.helioviewer.jhv.gui.actions.SetRotationInteractionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxInteractionAction;
+import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
+import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
@@ -56,7 +56,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton rotateButton;
     private JToggleButton zoomBoxButton;
 
-    private JToggleButton trackSolarRotationButton3D;
+    private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
     private JButton resetCamera;
 
@@ -173,7 +173,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         group.add(zoomBoxButton);
         addButton(zoomBoxButton);
 
-        rotateButton = new JToggleButton(new GL3DSetRotationInteractionAction());
+        rotateButton = new JToggleButton(new SetRotationInteractionAction());
         rotateButton.setSelected(selectionMode == SelectionMode.ROTATE);
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
         rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
@@ -183,14 +183,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        trackSolarRotationButton3D = new JToggleButton(new GL3DToggleSolarRotationAction());
-        trackSolarRotationButton3D.setSelected(false);
-        trackSolarRotationButton3D.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
-        trackSolarRotationButton3D.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
-        trackSolarRotationButton3D.setToolTipText("Enable Solar Rotation Tracking");
-        addButton(trackSolarRotationButton3D);
+        trackSolarRotationButton = new JToggleButton(new ToggleSolarRotationAction());
+        trackSolarRotationButton.setSelected(false);
+        trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
+        trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
+        trackSolarRotationButton.setToolTipText("Enable Solar Rotation Tracking");
+        addButton(trackSolarRotationButton);
 
-        coronaVisibilityButton = new JToggleButton(new GL3DToggleCoronaVisibilityAction());
+        coronaVisibilityButton = new JToggleButton(new ToggleCoronaVisibilityAction());
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));

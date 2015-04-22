@@ -16,7 +16,6 @@ import org.helioviewer.jhv.JHVGlobals;
  */
 public class OpenURLinBrowserAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
     private String urlToOpen;
 
     /**

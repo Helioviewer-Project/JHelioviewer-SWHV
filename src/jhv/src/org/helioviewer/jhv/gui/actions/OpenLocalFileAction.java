@@ -32,8 +32,6 @@ import org.helioviewer.jhv.io.APIRequestManager;
  */
 public class OpenLocalFileAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Default constructor.
      */

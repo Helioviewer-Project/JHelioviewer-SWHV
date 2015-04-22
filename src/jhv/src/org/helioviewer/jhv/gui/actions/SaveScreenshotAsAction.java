@@ -25,8 +25,6 @@ import org.helioviewer.jhv.gui.actions.filefilters.PNGFilter;
  */
 public class SaveScreenshotAsAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Default constructor.
      */

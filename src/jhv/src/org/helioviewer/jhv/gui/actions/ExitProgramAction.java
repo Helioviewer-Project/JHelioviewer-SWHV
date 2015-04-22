@@ -27,8 +27,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  */
 public class ExitProgramAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Default constructor.
      */
