@@ -97,7 +97,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             drawLabels(g, availableInterval, selectedInterval);
             drawBorders(g);
             drawIntervalGraspPoints(g);
-            // drawGraspPointLabels(g);
         }
     }
 
@@ -202,7 +201,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     }
 
-    private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
+    private void drawLabels(Graphics g) {
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
@@ -211,7 +210,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
         final int availableIntervalWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
         final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
-        final double ratioX = (double) availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
+        final double ratioX = availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
 
         final Calendar calendar = new GregorianCalendar();
         calendar.clear();
