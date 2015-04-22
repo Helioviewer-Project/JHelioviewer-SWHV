@@ -60,110 +60,106 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
  */
 public class ImageViewerGui {
 
-    /** The sole instance of this class. */
-    private static final ImageViewerGui singletonImageViewer = new ImageViewerGui();
-
-    private static JFrame mainFrame;
-    private JPanel contentPanel;
-    private JSplitPane midSplitPane;
-    private JScrollPane leftScrollPane;
-
-    private SideContentPane leftPane;
-    private MoviePanel moviePanel;
-    private ControlPanelContainer moviePanelContainer;
-
-    private MainContentPanel mainContentPanel;
-    private static final MainImagePanel mainImagePanel = new MainImagePanel();
-    private static final JMenuBar menuBar = new MenuBar();
-    private static final TopToolBar topToolBar = new TopToolBar();
-
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
-    private final ObservationDialog observationDialog;
 
-    private final ComponentView mainComponentView = new ComponentView();
-    private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
+    private static ImageViewerGui instance;
 
-    /**
-     * The private constructor that creates and positions all the gui
-     * components.
-     */
+    private static JFrame mainFrame;
+    private static JPanel contentPanel;
+    private static JSplitPane midSplitPane;
+    private static JScrollPane leftScrollPane;
+
+    private static SideContentPane leftPane;
+    private static MoviePanel moviePanel;
+    private static ControlPanelContainer moviePanelContainer;
+
+    private static MainContentPanel mainContentPanel;
+    private static MainImagePanel mainImagePanel;
+    private static JMenuBar menuBar;
+    private static TopToolBar topToolBar;
+
+    private static ObservationDialog observationDialog;
+
+    private static ComponentView mainComponentView;
+    private static ImageDataPanel imageObservationPanel;
+
     private ImageViewerGui() {
+    }
+
+    public static ImageViewerGui getSingletonInstance() {
+        if (instance == null) {
+            prepareGui();
+            instance = new ImageViewerGui();
+        }
+        return instance;
+    }
+
+    public static void prepareGui() {
         mainFrame = createMainFrame();
+
+        menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
         observationDialog = new ObservationDialog(mainFrame);
-    }
 
-    public void prepareGui() {
-        if (contentPanel == null) {
-            contentPanel = new JPanel(new BorderLayout());
-            mainFrame.setContentPane(contentPanel);
+        contentPanel = new JPanel(new BorderLayout());
+        mainFrame.setContentPane(contentPanel);
 
-            midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
-            midSplitPane.setOneTouchExpandable(false);
+        midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
+        midSplitPane.setOneTouchExpandable(false);
+        contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
-            contentPanel.add(midSplitPane, BorderLayout.CENTER);
+        mainImagePanel = new MainImagePanel();
+        mainImagePanel.setAutoscrolls(true);
+        mainImagePanel.setFocusable(false);
 
-            mainImagePanel.setAutoscrolls(true);
-            mainImagePanel.setFocusable(false);
+        mainContentPanel = new MainContentPanel();
+        mainContentPanel.setMainComponent(mainImagePanel);
 
-            mainContentPanel = new MainContentPanel();
-            mainContentPanel.setMainComponent(mainImagePanel);
+        topToolBar = new TopToolBar();
+        contentPanel.add(topToolBar, BorderLayout.PAGE_START);
 
-            contentPanel.add(getTopToolBar(), BorderLayout.PAGE_START);
+        leftPane = new SideContentPane();
+        // Movie control
+        moviePanelContainer = new ControlPanelContainer();
+        moviePanel = new MoviePanel();
+        moviePanelContainer.setDefaultPanel(moviePanel);
+        leftPane.add("Movie Controls", moviePanelContainer, true);
+        // Layer control
+        imageObservationPanel = new ImageDataPanel();
+        observationDialog.addUserInterface("Image data", imageObservationPanel);
+        leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
 
-            leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            leftScrollPane.setFocusable(false);
-            leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-            midSplitPane.setLeftComponent(leftScrollPane);
+        leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        leftScrollPane.setFocusable(false);
+        leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
-            midSplitPane.setRightComponent(mainContentPanel);
+        midSplitPane.setLeftComponent(leftScrollPane);
+        midSplitPane.setRightComponent(mainContentPanel);
 
-            // STATUS PANEL
-            ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
-            FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
-            PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
-            mainImagePanel.addPlugin(positionStatusPanel);
+        // STATUS PANEL
+        ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
+        FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
+        PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
+        mainImagePanel.addPlugin(positionStatusPanel);
 
-            StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
-            statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
-            statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
-            statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
+        StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
+        statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
+        statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
+        statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
 
-            contentPanel.add(statusPanel, BorderLayout.PAGE_END);
-        }
-    }
+        contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
-    private void loadAtStart() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                loadImagesAtStartup();
-            }
-        }, "LoadImagesOnStartUp");
-        thread.start();
-    }
-
-    /**
-     * Initializes the main view chain.
-     */
-    public void createViewchains() {
+        mainComponentView = new ComponentView();
         mainImagePanel.setView(mainComponentView);
         mainComponentView.activate();
 
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
-
-        loadAtStart();
     }
 
-    /**
-     * Method that creates and initializes the main JFrame.
-     *
-     * @return the created and initialized main frame.
-     */
-    private JFrame createMainFrame() {
+    private static JFrame createMainFrame() {
         JFrame frame = new JFrame("ESA JHelioviewer v2");
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -199,54 +195,14 @@ public class ImageViewerGui {
         }
     }
 
-    /**
-     * Returns instance of the main ComponentView.
-     *
-     * @return instance of the main ComponentView.
-     */
-    public ComponentView getMainView() {
-        return mainComponentView;
-    }
-
-    /**
-     * Returns the scrollpane containing the left content pane.
-     *
-     * @return instance of the scrollpane containing the left content pane.
-     * */
-    public SideContentPane getLeftContentPane() {
-        if (leftPane != null) {
-            return leftPane;
-        } else {
-            leftPane = new SideContentPane();
-
-            // Movie control
-            moviePanelContainer = new ControlPanelContainer();
-            moviePanel = new MoviePanel();
-            moviePanelContainer.setDefaultPanel(moviePanel);
-            leftPane.add("Movie Controls", moviePanelContainer, true);
-
-            // Layer control
-            ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image data", imageObservationPanel);
-            leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
-
-            return leftPane;
-        }
-    }
-
-    public ControlPanelContainer getMoviePanelContainer() {
-        return moviePanelContainer;
-    }
-
-    public JMenuBar getMenuBar() {
-        return menuBar;
-    }
-
-    public TopToolBar getTopToolBar() {
-        return topToolBar;
-    }
-
-    public MainImagePanel getMainImagePanel() {
-        return mainImagePanel;
+    public void loadAtStart() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadImagesAtStartup();
+            }
+        }, "LoadImagesOnStartUp");
+        thread.start();
     }
 
     /**
@@ -374,33 +330,6 @@ public class ImageViewerGui {
     }
 
     /**
-     * Returns the only instance of this class.
-     *
-     * @return the only instance of this class.
-     * */
-    public static ImageViewerGui getSingletonInstance() {
-        return singletonImageViewer;
-    }
-
-    /**
-     * Returns the main frame.
-     *
-     * @return the main frame.
-     * */
-    public static JFrame getMainFrame() {
-        return mainFrame;
-    }
-
-    /**
-     * Returns the scrollpane containing the left content pane.
-     *
-     * @return instance of the scrollpane containing the left content pane.
-     * */
-    public JScrollPane getLeftScrollPane() {
-        return leftScrollPane;
-    }
-
-    /**
      * Toggles the visibility of the control panel on the left side.
      */
     public void toggleShowSidePanel() {
@@ -415,6 +344,18 @@ public class ImageViewerGui {
         }
     }
 
+    public JScrollPane getLeftScrollPane() {
+        return leftScrollPane;
+    }
+
+    public static JFrame getMainFrame() {
+        return mainFrame;
+    }
+
+    public SideContentPane getLeftContentPane() {
+        return leftPane;
+    }
+
     public final MainContentPanel getMainContentPanel() {
         return mainContentPanel;
     }
@@ -425,6 +366,26 @@ public class ImageViewerGui {
 
     public ImageDataPanel getObservationImagePane() {
         return imageObservationPanel;
+    }
+
+    public ControlPanelContainer getMoviePanelContainer() {
+        return moviePanelContainer;
+    }
+
+    public JMenuBar getMenuBar() {
+        return menuBar;
+    }
+
+    public TopToolBar getTopToolBar() {
+        return topToolBar;
+    }
+
+    public MainImagePanel getMainImagePanel() {
+        return mainImagePanel;
+    }
+
+    public ComponentView getMainView() {
+        return mainComponentView;
     }
 
 }
