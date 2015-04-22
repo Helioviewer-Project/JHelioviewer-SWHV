@@ -20,12 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableRemoveCellRenderer;
 import org.helioviewer.jhv.plugin.renderable.TableRowTransferHandler;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
@@ -33,7 +33,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Line
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 
-public class LineDateSelectorTablePanel extends JPanel {
+public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
     private static final long serialVersionUID = -8443699382736126351L;
     private static final int ROW_HEIGHT = 20;
@@ -79,7 +79,7 @@ public class LineDateSelectorTablePanel extends JPanel {
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
-
+        tableModel.addTableModelListener(this);
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLE_ROW).setCellRenderer(new LineDataVisibleCellRenderer());
@@ -134,17 +134,18 @@ public class LineDateSelectorTablePanel extends JPanel {
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
                 if (col == VISIBLE_ROW) {
-                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
-                    renderable.setVisible(!renderable.isVisible());
+                    LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
+                    renderable.setVisibility(!renderable.isVisible());
                 }
                 if (col == TITLE_ROW || col == VISIBLE_ROW || col == LOADING_ROW) {
-                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) Displayer.getRenderablecontainer().getValueAt(row, col);
+                    LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
                 if (col == REMOVE_ROW) {
                     model.removeRow(row);
-                    Displayer.display();
                 }
+                revalidate();
+                repaint();
             }
         });
         grid.setDragEnabled(true);
@@ -157,8 +158,9 @@ public class LineDateSelectorTablePanel extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
+        gbc.gridy = 0;
         optionsPanelWrapper.add(optionsPanel, gbc);
-        gbc.gridx = 1;
+        gbc.gridy = 1;
         optionsPanelWrapper.add(intervalOptionPanel, gbc);
 
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -183,11 +185,32 @@ public class LineDateSelectorTablePanel extends JPanel {
 
     private void setOptionsPanel(LineDataSelectorElement lineDataElement) {
         optionsPanelWrapper.remove(optionsPanel);
-        optionsPanel = lineDataElement.getOptionsPanel();
+        optionsPanel = null;
+        if (lineDataElement != null) {
+            optionsPanel = lineDataElement.getOptionsPanel();
+        }
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
+        if (optionsPanel == null) {
+            optionsPanel = new JPanel();
+        }
         optionsPanelWrapper.add(optionsPanel, gbc);
-        this.getParent().revalidate();
-        this.getParent().repaint();
+        revalidate();
+        repaint();
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        int[] sr = grid.getSelectedRows();
+        if (sr.length > 0) {
+            setOptionsPanel((LineDataSelectorElement) tableModel.getValueAt(sr[0], 0));
+        } else {
+            if (tableModel.getRowCount() > 0) {
+                setOptionsPanel((LineDataSelectorElement) tableModel.getValueAt(0, 0));
+            } else {
+                setOptionsPanel(null);
+            }
+        }
+
     }
 }
