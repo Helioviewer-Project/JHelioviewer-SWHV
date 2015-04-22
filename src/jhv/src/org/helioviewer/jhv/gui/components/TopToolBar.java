@@ -22,8 +22,6 @@ import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DToggleCoronaVisibilityAction;
 import org.helioviewer.gl3d.gui.GL3DToggleSolarRotationAction;
-import org.helioviewer.gl3d.gui.GL3DZoomInAction;
-import org.helioviewer.gl3d.gui.GL3DZoomOutAction;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -152,12 +150,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
         removeAll();
 
         // Zoom
-        addButton(new JButton(new GL3DZoomInAction(false)));
-        addButton(new JButton(new GL3DZoomOutAction(false)));
+        addButton(new JButton(new ZoomInAction(false)));
+        addButton(new JButton(new ZoomOutAction(false)));
         //addButton(new JButton(new GL3DZoomFitAction(false)));
-
-        resetCamera = new JButton(new GL3DResetCameraAction());
-        addButton(resetCamera);
+        addButton(new JButton(new GL3DResetCameraAction()));
 
         addSeparator();
 

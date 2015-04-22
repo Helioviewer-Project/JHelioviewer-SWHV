@@ -6,21 +6,15 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.controller.ZoomController;
 
 /**
  * Action to zoom out.
  *
- * @author Markus Langenberg
  */
 public class ZoomOutAction extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
-    private ZoomController zoomController;
 
     /**
      * Constructor
@@ -31,7 +25,7 @@ public class ZoomOutAction extends AbstractAction {
      */
     public ZoomOutAction(boolean small) {
         super("Zoom out", small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT));
-        putValue(SHORT_DESCRIPTION, "Zoom out x2");
+        putValue(SHORT_DESCRIPTION, "Zoom out");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.ALT_MASK));
     }
@@ -41,11 +35,7 @@ public class ZoomOutAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        if (zoomController == null) {
-            zoomController = new ZoomController();
-            zoomController.setImagePanel(ImageViewerGui.getSingletonInstance().getMainImagePanel());
-        }
-        zoomController.zoomSteps(Displayer.getLayersModel().getActiveView(), -2);
+        GL3DState.getActiveCamera().zoomIn(+1);
     }
 
 }
