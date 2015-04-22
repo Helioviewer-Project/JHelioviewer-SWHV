@@ -68,8 +68,8 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
         this.component = new JPanel(new BorderLayout());
         this.component.add(component);
-        component.setVisible(startExpanded);
-        add(component, BorderLayout.CENTER);
+        this.component.setVisible(startExpanded);
+        add(this.component, BorderLayout.CENTER);
         setButtons();
         setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
 
