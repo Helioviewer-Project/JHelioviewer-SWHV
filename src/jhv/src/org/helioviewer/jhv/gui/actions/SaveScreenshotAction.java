@@ -26,8 +26,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  */
 public class SaveScreenshotAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Default constructor.
      */

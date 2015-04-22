@@ -14,10 +14,6 @@ import org.helioviewer.jhv.JHVUpdate;
  * @author Helge Dietert
  */
 public class CheckUpdateAction extends AbstractAction {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     public CheckUpdateAction() {
         super("Check for updates...");
@@ -38,4 +34,5 @@ public class CheckUpdateAction extends AbstractAction {
             Log.error("Error while parsing update URL " + e.getLocalizedMessage(), e);
         }
     }
+
 }
