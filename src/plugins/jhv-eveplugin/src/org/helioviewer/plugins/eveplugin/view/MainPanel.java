@@ -1,12 +1,9 @@
 package org.helioviewer.plugins.eveplugin.view;
 
 import java.awt.BorderLayout;
-import java.util.Date;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 //import org.helioviewer.plugins.eveplugin.model.PlotTimeSpace;
@@ -29,7 +26,7 @@ public class MainPanel extends JPanel {
 
     public MainPanel() {
         initVisualComponents();
-        DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
+
     }
 
     private void initVisualComponents() {

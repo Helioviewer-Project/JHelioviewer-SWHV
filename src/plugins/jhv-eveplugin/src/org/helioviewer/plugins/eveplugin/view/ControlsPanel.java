@@ -16,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
@@ -54,6 +55,8 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
     private final JPanel lineDataSelectorContainer = new JPanel();
     private final ImageIcon addIcon = IconBank.getIcon(JHVIcon.ADD);
     private final JButton addLayerButton = new JButton("Add layer", addIcon);
+
+    private final LineDataSelectorPanel lineDataSelectorPanel = new LineDataSelectorPanel("Plot 1:");
 
     private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
     private Interval<Date> selectedIntervalByZoombox = null;
@@ -100,7 +103,7 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         gc.weighty = 1.0;
         gc.fill = GridBagConstraints.BOTH;
         add(lineDataSelectorContainer, gc);
-
+        lineDataSelectorContainer.add(lineDataSelectorPanel);
         JPanel pageEndPanel = new JPanel();
         pageEndPanel.setBackground(Color.BLUE);
 
@@ -140,12 +143,12 @@ public class ControlsPanel extends JPanel implements ActionListener, LayersListe
         return singletongInstance;
     }
 
-    public void addLineDataSelector(LineDataSelectorPanel lineDataSelectorPanel) {
-        lineDataSelectorContainer.add(lineDataSelectorPanel);
+    public void addLineDataSelector(JComponent lineDataSelectorPanel) {
+        // lineDataSelectorContainer.add(lineDataSelectorPanel);
     }
 
-    public void removeLineDataSelector(LineDataSelectorPanel lineDataSelectorPanel) {
-        lineDataSelectorContainer.remove(lineDataSelectorPanel);
+    public void removeLineDataSelector(JComponent lineDataSelectorPanel) {
+        // lineDataSelectorContainer.remove(lineDataSelectorPanel);
     }
 
     @Override

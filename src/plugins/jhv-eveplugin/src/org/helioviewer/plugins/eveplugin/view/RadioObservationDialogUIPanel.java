@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.io.DataSourceServerListener;
 import org.helioviewer.jhv.io.DataSourceServers;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements DataSourceServerListener {
 
@@ -22,8 +21,8 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
     private final JLabel labelServer = new JLabel("Server");
     private boolean setFromOutside;
 
-    public RadioObservationDialogUIPanel(PlotsContainerPanel plotsContainerPanel) {
-        super(plotsContainerPanel);
+    public RadioObservationDialogUIPanel() {
+        super();
         serverList = DataSourceServers.getSingletonInstance().getServerList();
         comboServer = new JComboBox(serverList);
         setFromOutside = true;

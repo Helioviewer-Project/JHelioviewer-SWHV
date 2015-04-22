@@ -27,7 +27,6 @@ import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 
 /**
  * @author Stephan Pagel
@@ -50,8 +49,8 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public ObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
-        super(plotsContainerPanel);
+    public ObservationDialogUIPanel() {
+        super();
 
         // long start = System.currentTimeMillis();
         labelGroup = new JLabel("Group");
@@ -142,19 +141,19 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * private boolean isStartDateBeforeOrEqualEndDate() { final
      * GregorianCalendar calendar = new GregorianCalendar();
      * calendar.setTime(getStartDate());
-     *
+     * 
      * final GregorianCalendar calendar2 = new
      * GregorianCalendar(calendar.get(Calendar.YEAR),
      * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
      * long start = calendar2.getTimeInMillis();
-     *
+     * 
      * calendar.clear(); calendar2.clear();
-     *
+     * 
      * calendar.setTime(getEndDate());
      * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
      * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
      * calendar2.getTimeInMillis();
-     *
+     * 
      * return start <= end; }
      */
 

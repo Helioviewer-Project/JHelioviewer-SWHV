@@ -31,16 +31,12 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
-import org.helioviewer.plugins.eveplugin.view.plot.PlotsContainerPanel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
     private static final long serialVersionUID = 1L;
-
-    protected PlotsContainerPanel plotsContainerPanel;
-
     protected boolean enableLoadButton = true;
 
     private final JLabel labelStartDate;
@@ -51,8 +47,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     private final JPanel timePane;
     private final JPanel plotPane;
 
-    public SimpleObservationDialogUIPanel(final PlotsContainerPanel plotsContainerPanel) {
-        this.plotsContainerPanel = plotsContainerPanel;
+    public SimpleObservationDialogUIPanel() {
         ObservationDialogDateModel.getInstance().addListener(this);
 
         labelStartDate = new JLabel("Start date");
