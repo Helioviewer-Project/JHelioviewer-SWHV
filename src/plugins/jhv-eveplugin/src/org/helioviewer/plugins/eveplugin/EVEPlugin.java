@@ -17,8 +17,8 @@ import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
-import org.helioviewer.plugins.eveplugin.view.TimelinePluginPanel;
 import org.helioviewer.plugins.eveplugin.view.chart.PlotPanel;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
@@ -30,7 +30,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
     private final PlotPanel plotOne = new PlotPanel();
-    private final TimelinePluginPanel timelinePluginPanel = new TimelinePluginPanel();
+    private final LineDateSelectorTablePanel timelinePluginPanel = new LineDateSelectorTablePanel();
 
     @Override
     public void installPlugin() {
