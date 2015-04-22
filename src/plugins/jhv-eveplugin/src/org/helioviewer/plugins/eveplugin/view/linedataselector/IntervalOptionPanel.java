@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -23,8 +24,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.controller.DrawController;
 import org.helioviewer.plugins.eveplugin.controller.TimingListener;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController;
-import org.helioviewer.plugins.eveplugin.controller.ZoomController.ZOOM;
 import org.helioviewer.plugins.eveplugin.model.TimeIntervalLockModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -37,10 +36,16 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private boolean setDefaultPeriod = true;
     private boolean selectedIndexSetByProgram;
     private Interval<Date> selectedIntervalByZoombox = null;
+    private final DrawController drawController;
+
+    private enum ZOOM {
+        CUSTOM, All, Year, Month, Day, Hour, Carrington
+    };
 
     public IntervalOptionPanel() {
         Displayer.getLayersModel().addLayersListener(this);
-        DrawController.getSingletonInstance().addTimingListener(this);
+        drawController = DrawController.getSingletonInstance();
+        drawController.addTimingListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         initVisualComponents();
     }
@@ -80,7 +85,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             selectedIntervalByZoombox = null;
 
             if (item != null && !selectedIndexSetByProgram) {
-                selectedIntervalByZoombox = ZoomController.getSingletonInstance().zoomTo(item.getZoom(), item.getNumber());
+                selectedIntervalByZoombox = zoomTo(item.getZoom(), item.getNumber());
             } else {
                 if (selectedIndexSetByProgram) {
                     selectedIndexSetByProgram = false;
@@ -256,4 +261,114 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
+    public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
+        Interval<Date> newInterval = new Interval<Date>(null, null);
+        Interval<Date> selectedInterval = drawController.getSelectedInterval();
+        Interval<Date> availableInterval = drawController.getAvailableInterval();
+        switch (zoom) {
+        case CUSTOM:
+            newInterval = selectedInterval;
+            break;
+        case All:
+            newInterval = availableInterval;
+            break;
+        case Day:
+            newInterval = computeZoomInterval(selectedInterval, Calendar.DAY_OF_MONTH, value);
+            break;
+        case Hour:
+            newInterval = computeZoomInterval(selectedInterval, Calendar.HOUR, value);
+            break;
+        case Month:
+            newInterval = computeZoomInterval(selectedInterval, Calendar.MONTH, value);
+            break;
+        case Year:
+            newInterval = computeZoomInterval(selectedInterval, Calendar.YEAR, value);
+            break;
+        case Carrington:
+            newInterval = computeCarringtonInterval(selectedInterval, value);
+        }
+        return drawController.setSelectedInterval(newInterval, true);
+    }
+
+    private Interval<Date> computeCarringtonInterval(Interval<Date> interval, int value) {
+        return computeZoomForMilliSeconds(interval, value * 2356585920l);
+    }
+
+    private Interval<Date> computeZoomForMilliSeconds(final Interval<Date> interval, long differenceMilli) {
+        Date middle = new Date(interval.getStart().getTime() + (interval.getEnd().getTime() - interval.getStart().getTime()) / 2);
+        Date startDate = interval.getStart();
+        Interval<Date> availableInterval = drawController.getAvailableInterval();
+        // Date endDate = interval.getEnd();
+        GregorianCalendar gce = new GregorianCalendar();
+        gce.clear();
+        gce.setTime(new Date(middle.getTime() + differenceMilli / 2));
+        Date endDate = gce.getTime();
+
+        final Date lastdataDate = DrawController.getSingletonInstance().getLastDateWithData();
+        if (lastdataDate != null) {
+            if (endDate.after(lastdataDate)) {
+                endDate = lastdataDate;
+            }
+        } else if (endDate.after(new Date())) {
+            endDate = new Date();
+        }
+        final Date availableStartDate = availableInterval.getStart();
+
+        if (startDate == null || endDate == null || availableStartDate == null) {
+            return new Interval<Date>(null, null);
+        }
+
+        final GregorianCalendar calendar = new GregorianCalendar();
+
+        // add difference to start date -> when calculated end date is within
+        // available interval it is the result
+        calendar.clear();
+        calendar.setTime(new Date(endDate.getTime() - differenceMilli));
+
+        startDate = calendar.getTime();
+
+        boolean sInAvailable = availableInterval.containsPointInclusive(startDate);
+        boolean eInAvailable = availableInterval.containsPointInclusive(endDate);
+
+        if (sInAvailable && eInAvailable) {
+            return new Interval<Date>(startDate, endDate);
+        }
+
+        Date availableS = sInAvailable ? availableInterval.getStart() : startDate;
+        Date availableE = eInAvailable ? availableInterval.getEnd() : endDate;
+
+        drawController.setAvailableInterval(new Interval<Date>(availableS, availableE));
+
+        return new Interval<Date>(startDate, endDate);
+
+    }
+
+    private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final int difference) {
+        return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
+    }
+
+    private Long differenceInMilliseconds(final int calendarField, final int value) {
+        switch (calendarField) {
+        case Calendar.YEAR:
+            return value * 365 * 24 * 60 * 60 * 1000l;
+        case Calendar.MONTH:
+            return value * 30 * 24 * 60 * 60 * 1000l;
+        case Calendar.DAY_OF_MONTH:
+        case Calendar.DAY_OF_WEEK:
+        case Calendar.DAY_OF_WEEK_IN_MONTH:
+        case Calendar.DAY_OF_YEAR:
+            return value * 24 * 60 * 60 * 1000l;
+        case Calendar.HOUR:
+        case Calendar.HOUR_OF_DAY:
+            return value * 60 * 60 * 1000l;
+        case Calendar.MINUTE:
+            return value * 60 * 1000l;
+        case Calendar.SECOND:
+            return value * 1000l;
+        case Calendar.MILLISECOND:
+            return value * 1l;
+        default:
+            return null;
+        }
+    }
 }
