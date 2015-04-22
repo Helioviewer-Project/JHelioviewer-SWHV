@@ -11,6 +11,8 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
@@ -20,8 +22,6 @@ import org.helioviewer.plugins.eveplugin.lines.data.EVECacheController;
 import org.helioviewer.plugins.eveplugin.lines.data.EVECacheControllerListener;
 import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.gui.EVEDrawableElement;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
 /**
  * @author Stephan Pagel

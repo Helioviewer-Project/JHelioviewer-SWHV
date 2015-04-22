@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
+import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
 public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListener {
     private Date minX;

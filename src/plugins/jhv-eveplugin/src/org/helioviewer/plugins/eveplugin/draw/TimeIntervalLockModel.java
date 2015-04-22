@@ -1,16 +1,13 @@
 /**
  *
  */
-package org.helioviewer.plugins.eveplugin.model;
+package org.helioviewer.plugins.eveplugin.draw;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.plugins.eveplugin.draw.DrawController;
-import org.helioviewer.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.plugins.eveplugin.draw.TimingListener;
 
 /**
  * Adapts the plot area space of the plots in case the interval is locked.
