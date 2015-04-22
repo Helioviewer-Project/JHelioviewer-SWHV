@@ -40,7 +40,6 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
-import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
@@ -95,7 +94,6 @@ public class ImageViewerGui {
     public static final int SIDE_PADDING = 10;
     private final ObservationDialog observationDialog;
 
-    private final CameraMouseController mouseController = new CameraMouseController();
     private final ComponentView mainComponentView = new ComponentView();
 
     private FilterTabPanelManager filterTabPanelManager;
@@ -190,7 +188,6 @@ public class ImageViewerGui {
      */
     public void createViewchains() {
         updateComponentPanels();
-        mainImagePanel.setInputController(mouseController);
         mainComponentView.activate();
         mainFrame.validate();
 

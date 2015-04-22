@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.interfaces.ImagePanelInputController;
+import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
@@ -33,11 +33,13 @@ public class MainImagePanel extends JPanel {
 
     private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
 
-    protected ComponentView componentView;
-    protected ImagePanelInputController inputController;
-    protected AbstractList<ImagePanelPlugin> plugins;
+    private final CameraMouseController mouseController = new CameraMouseController();
+    private CameraMouseController inputController;
 
     private final Component renderedImageComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
+
+    protected ComponentView componentView;
+    protected AbstractList<ImagePanelPlugin> plugins;
 
     /**
      * Default constructor.
@@ -49,6 +51,7 @@ public class MainImagePanel extends JPanel {
         // initialize list of plugins
         plugins = new LinkedList<ImagePanelPlugin>();
         add(renderedImageComponent);
+        setInputController(mouseController);
     }
 
     /**
@@ -146,7 +149,7 @@ public class MainImagePanel extends JPanel {
      *
      * @see MainImagePanel#addPlugin(ImagePanelPlugin)
      */
-    public void removePlugin(ImagePanelPlugin oldPlugin) {
+    private void removePlugin(ImagePanelPlugin oldPlugin) {
         if (oldPlugin == null) {
             return;
         }
@@ -154,15 +157,6 @@ public class MainImagePanel extends JPanel {
         oldPlugin.setView(null);
         oldPlugin.setImagePanel(null);
         plugins.remove(oldPlugin);
-    }
-
-    /**
-     * Returns the associated input controller.
-     *
-     * @return input controller of this component.
-     */
-    public ImagePanelInputController getInputController() {
-        return inputController;
     }
 
     /**
@@ -175,7 +169,7 @@ public class MainImagePanel extends JPanel {
      *            new input controller.
      * @see #addPlugin(ImagePanelPlugin)
      */
-    public void setInputController(ImagePanelInputController newInputController) {
+    private void setInputController(CameraMouseController newInputController) {
         addPlugin(newInputController);
 
         if (inputController != null) {
