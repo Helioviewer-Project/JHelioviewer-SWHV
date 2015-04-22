@@ -41,13 +41,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
-import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
-import org.helioviewer.jhv.gui.filters.ContrastPanel;
-import org.helioviewer.jhv.gui.filters.GammaCorrectionPanel;
-import org.helioviewer.jhv.gui.filters.OpacityPanel;
-import org.helioviewer.jhv.gui.filters.RunningDifferencePanel;
-import org.helioviewer.jhv.gui.filters.SOHOLUTPanel;
-import org.helioviewer.jhv.gui.filters.SharpenPanel;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -83,7 +76,6 @@ public class ImageViewerGui {
     private SideContentPane leftPane;
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
-    private ControlPanelContainer filterPanelContainer;
 
     private static final MainImagePanel mainImagePanel = new MainImagePanel();
     private static final JMenuBar menuBar = new MenuBar();
@@ -94,9 +86,6 @@ public class ImageViewerGui {
     private final ObservationDialog observationDialog;
 
     private final ComponentView mainComponentView = new ComponentView();
-
-    private FilterTabPanelManager filterTabPanelManager;
-
     private final ImageDataPanel imageObservationPanel = new ImageDataPanel();
 
     /**
@@ -252,30 +241,6 @@ public class ImageViewerGui {
 
             //leftPane.add("Image Layers", imageSelectorPanel, false);
 
-            // Image adjustments and filters
-            filterTabPanelManager = new FilterTabPanelManager();
-            getFilterTabPanelManager().add(new OpacityPanel());
-            getFilterTabPanelManager().add(new SOHOLUTPanel());
-            getFilterTabPanelManager().add(new GammaCorrectionPanel());
-            getFilterTabPanelManager().add(new ContrastPanel());
-            getFilterTabPanelManager().add(new SharpenPanel());
-            getFilterTabPanelManager().add(new ChannelMixerPanel());
-            RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-            getFilterTabPanelManager().addAbstractFilterPanel(runningDifferencePanel);
-
-            JPanel compactPanel = getFilterTabPanelManager().createCompactPanel();
-
-            JPanel tab = new JPanel(new BorderLayout());
-            tab.add(runningDifferencePanel, BorderLayout.NORTH);
-
-            tab.add(compactPanel, BorderLayout.CENTER);
-
-            tab.setEnabled(true);
-
-            filterPanelContainer = new ControlPanelContainer();
-            filterPanelContainer.setDefaultPanel(tab);
-
-            //leftPane.add("Image Adjustments", filterPanelContainer, false);
             leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
 
             JTabbedPane cameraTab = new JTabbedPane();
@@ -296,10 +261,6 @@ public class ImageViewerGui {
 
     public ControlPanelContainer getMoviePanelContainer() {
         return moviePanelContainer;
-    }
-
-    public ControlPanelContainer getFilterPanelContainer() {
-        return filterPanelContainer;
     }
 
     public JMenuBar getMenuBar() {
@@ -339,7 +300,6 @@ public class ImageViewerGui {
         if (jhvRequests.isEmpty() && jpipUris.isEmpty() && downloadAddresses.isEmpty() && jpxUrls.isEmpty()) {
             return;
         }
-
 
         // -jhv
         // go through all jhv values
@@ -507,10 +467,6 @@ public class ImageViewerGui {
 
     public ObservationDialog getObservationDialog() {
         return this.observationDialog;
-    }
-
-    public FilterTabPanelManager getFilterTabPanelManager() {
-        return filterTabPanelManager;
     }
 
     public ImageDataPanel getObservationImagePane() {
