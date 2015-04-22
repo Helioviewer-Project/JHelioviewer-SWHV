@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class DataSourceServers {
 
@@ -60,20 +59,15 @@ public class DataSourceServers {
             Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/");
             Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
         }
-        Thread t = new Thread(new Runnable() {
 
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (!donotloadStartup) {
-                    ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(false);
-                }
                 DataSources.getSingletonInstance().reload();
                 for (DataSourceServerListener l : listeners) {
                     l.serverChanged(donotloadStartup);
                 }
-                ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
             }
-
         }, "change server");
         t.start();
     }
@@ -85,4 +79,5 @@ public class DataSourceServers {
     public String getSelectedServer() {
         return selectedServer;
     }
+
 }

@@ -36,7 +36,6 @@ import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -58,13 +57,6 @@ import org.helioviewer.jhv.io.DataSources.Item;
  * */
 public class ImageDataPanel extends ObservationDialogPanel implements DataSourceServerListener {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
-    private boolean enableLoadButton = false;
     private boolean isSelected = false;
 
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
@@ -76,13 +68,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      */
     public static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public ImageDataPanel() {
         super();
         instrumentsPanel = new InstrumentsPanel(this);
@@ -121,44 +106,29 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (!donotloadStartup) {
-                    ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(false);
-                }
                 DataSources.getSingletonInstance().reload();
 
                 try {
                     instrumentsPanel.setupSources();
-
-                    enableLoadButton = true;
-                    if (isSelected) {
-                        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
-                    }
-
                     // Check if we were able to set it up
                     if (instrumentsPanel.validSelection()) {
                         if (!donotloadStartup) {
                             timeSelectionPanel.setupTime();
                         }
                         if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            // wait until view chain is ready to go
-                            while (ImageViewerGui.getSingletonInstance() == null || ImageViewerGui.getSingletonInstance().getMainView() == null) {
-                                Thread.sleep(100);
-                            }
-
                             loadMovie();
                         }
                     } else {
-                        Message.err("1Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                        Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                     }
                 } catch (InterruptedException e) {
                     Log.error("Could not setup observation dialog", e);
-                    Message.err("2Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 } catch (InvocationTargetException e) {
                     Log.error("Could not setup observation dialog", e);
-                    Message.err("3Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
-                ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
-            }
+             }
         }, "ObservationSetup");
         t.start();
     }
@@ -258,7 +228,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * GUI which represents the image.
      * */
     private void loadImage() {
-
         // download and open the requested image in a separated thread and hide
         // loading animation when finished
         Thread thread = new Thread(new Runnable() {
@@ -280,8 +249,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * the GUI which represents the image series.
      * */
     private void loadMovie() {
-        // show loading animation
-
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
         Thread thread = new Thread(new Runnable() {
@@ -298,9 +265,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         thread.start();
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Methods derived from Observation Dialog Panel
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -308,7 +273,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     @Override
     public void selected() {
         isSelected = true;
-        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
     }
 
     /**
@@ -337,10 +301,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             Log.debug("Date could not be parsed" + e);
         }
         if (timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime())) {
-
             // load image
             loadImage();
-
         } else {
             // check if start date is before end date -> if not show message
             if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
@@ -374,42 +336,30 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             public void run() {
                 try {
                     instrumentsPanel.setupSources();
-
-                    enableLoadButton = true;
-                    if (isSelected) {
-                        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
-                    }
                     // Check if we were able to set it up
                     if (instrumentsPanel.validSelection()) {
                         if (!donotloadStartup) {
                             timeSelectionPanel.setupTime();
                         }
                         if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            // wait until view chain is ready to go
-                            while (ImageViewerGui.getSingletonInstance() == null || ImageViewerGui.getSingletonInstance().getMainView() == null) {
-                                Thread.sleep(100);
-                            }
                             loadMovie();
                         }
                     } else {
-                        Message.err("4Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                        Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                     }
                 } catch (InterruptedException e) {
                     Log.error("Could not setup observation dialog", e);
-                    Message.err("5Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 } catch (InvocationTargetException e) {
                     Log.error("Could not setup observation dialog", e);
-                    Message.err("6Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
-                ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(true);
             }
         }, "ObservationSetup");
         t.start();
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Time Selection Panel
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * The panel bundles the components to select the start and end time.
@@ -417,12 +367,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * @author Stephan Pagel
      * */
     private class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
 
         private final JLabel labelStartDate = new JLabel("Start date");
         private final JLabel labelStartTime = new JLabel("Start time");
@@ -435,10 +379,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private JHVCalendarDatePicker calendarEndDate;
 
         private boolean setFromOutside = false;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         public TimeSelectionPanel() {
             // set up the visual components (GUI)
@@ -680,9 +620,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Cadence Panel
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * The panel bundles the components to select the cadence.
@@ -691,12 +629,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     @SuppressWarnings("unused")
     private class CadencePanel extends JPanel implements ActionListener {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
 
         private final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
@@ -709,10 +641,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private final JLabel labelTimeStep = new JLabel("Time step");
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         /**
          * Default constructor.
@@ -785,9 +713,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Instruments Panel
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * The panel bundles the components to select the instrument etc.
@@ -798,8 +724,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * @author original Stephan Pagel
      * */
     private static class InstrumentsPanel extends JPanel implements DataSourceServerListener {
-
-        private static final long serialVersionUID = 1L;
         /**
          * Label for observatory
          */
@@ -857,11 +781,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
             // Advanced rendering with tooltips for the items
             final ListCellRenderer itemRenderer = new DefaultListCellRenderer() {
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = 1L;
-
                 /**
                  * Override display component to show tooltip
                  *
