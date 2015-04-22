@@ -29,7 +29,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     private final LinkedList<JComponent> pluginPanes = new LinkedList<JComponent>();
-    private final PlotPanel plotOne = new PlotPanel("Plot 1: ");
+    private final PlotPanel plotOne = new PlotPanel();
     private final TimelinePluginPanel timelinePluginPanel = new TimelinePluginPanel();
 
     @Override
