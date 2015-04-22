@@ -79,15 +79,15 @@ public class ImageViewerGui {
     private JScrollPane leftScrollPane;
 
     private MainContentPanel mainContentPanel;
-    protected MainImagePanel mainImagePanel;
 
     private SideContentPane leftPane;
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
 
-    private final JMenuBar menuBar = new MenuBar();
-    private final TopToolBar topToolBar = new TopToolBar();
+    private static final MainImagePanel mainImagePanel = new MainImagePanel();
+    private static final JMenuBar menuBar = new MenuBar();
+    private static final TopToolBar topToolBar = new TopToolBar();
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
@@ -119,8 +119,11 @@ public class ImageViewerGui {
 
             contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
+            mainImagePanel.setAutoscrolls(true);
+            mainImagePanel.setFocusable(false);
+
             mainContentPanel = new MainContentPanel();
-            mainContentPanel.setMainComponent(getMainImagePanel());
+            mainContentPanel.setMainComponent(mainImagePanel);
 
             contentPanel.add(getTopToolBar(), BorderLayout.PAGE_START);
 
@@ -134,9 +137,8 @@ public class ImageViewerGui {
             // STATUS PANEL
             ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
             FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
-
             PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
-            getMainImagePanel().addPlugin(positionStatusPanel);
+            mainImagePanel.addPlugin(positionStatusPanel);
 
             StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
             statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
@@ -292,44 +294,29 @@ public class ImageViewerGui {
         }
     }
 
-    /**
-     * @return the movie panel container
-     */
     public ControlPanelContainer getMoviePanelContainer() {
         return moviePanelContainer;
     }
 
-    /**
-     * @return the filter panel container
-     */
     public ControlPanelContainer getFilterPanelContainer() {
         return filterPanelContainer;
     }
 
-    /**
-     * @return the menu bar of jhv
-     */
     public JMenuBar getMenuBar() {
         return menuBar;
     }
 
-    public MainImagePanel getMainImagePanel() {
-        if (mainImagePanel == null) {
-            mainImagePanel = new MainImagePanel();
-            mainImagePanel.setAutoscrolls(true);
-            mainImagePanel.setFocusable(false);
-        }
-
-        return mainImagePanel;
+    public TopToolBar getTopToolBar() {
+        return topToolBar;
     }
 
-    public TopToolBar getTopToolBar() {
-        return this.topToolBar;
+    public MainImagePanel getMainImagePanel() {
+        return mainImagePanel;
     }
 
     private void updateComponentPanels() {
         if (getMainView() != null) {
-            getMainImagePanel().setView(getMainView());
+            mainImagePanel.setView(getMainView());
         }
         mainFrame.validate();
     }

@@ -216,7 +216,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
         text.setBackground(null);
-        JOptionPane.showMessageDialog(ImageViewerGui.getSingletonInstance().getMainImagePanel(), text);
+        JOptionPane.showMessageDialog(canvas, text);
 
         ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
 
