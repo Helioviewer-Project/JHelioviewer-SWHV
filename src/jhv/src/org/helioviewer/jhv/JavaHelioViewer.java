@@ -261,7 +261,7 @@ public class JavaHelioViewer {
                 @Override
                 public void run() {
                     ImageViewerGui.getSingletonInstance().prepareGui();
-                    // ImageViewerGui.getSingletonInstance().createViewchains();
+                    ImageViewerGui.getSingletonInstance().createViewchains();
 
                     Settings.getSingletonInstance().update();
                 }
@@ -337,18 +337,6 @@ public class JavaHelioViewer {
             String message = "The following files are affected:\n" + e.getMessage();
             Log.error(title + " " + message, e);
             Message.warn(title, message);
-        }
-
-        // PFSS & SWHEK-3D plugins don't like to be loaded after view chain creation, TBD
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    ImageViewerGui.getSingletonInstance().createViewchains();
-                }
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
 
         splash.destroy();
