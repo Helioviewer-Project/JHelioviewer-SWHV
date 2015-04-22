@@ -266,7 +266,6 @@ public abstract class AbstractView implements View {
     }
 
     public void setTruncation(float truncation) {
-        System.out.println("TRUNCATION" + this.truncation);
         this.truncation = truncation;
     }
 
