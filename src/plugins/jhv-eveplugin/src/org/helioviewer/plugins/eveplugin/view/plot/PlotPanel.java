@@ -17,7 +17,7 @@ public class PlotPanel extends JPanel {
 
     private final JPanel plotPane = new JPanel();
     private final ChartDrawGraphPane graphPane;
-    private ChartDrawIntervalPane intervalPane = null;
+    private ChartDrawIntervalPane intervalPane = new ChartDrawIntervalPane();
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -35,8 +35,10 @@ public class PlotPanel extends JPanel {
 
         plotPane.setLayout(new BorderLayout());
         plotPane.add(graphPane, BorderLayout.CENTER);
+        plotPane.add(intervalPane, BorderLayout.PAGE_END);
 
         add(plotPane, BorderLayout.CENTER);
+
     }
 
     public void setIntervalSlider(final ChartDrawIntervalPane intervalPane) {
@@ -47,7 +49,7 @@ public class PlotPanel extends JPanel {
         this.intervalPane = intervalPane;
 
         if (intervalPane != null) {
-            plotPane.add(intervalPane, BorderLayout.PAGE_END);
+
         }
     }
 }
