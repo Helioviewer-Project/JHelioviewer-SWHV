@@ -26,7 +26,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.gl3d.gui.GL3DCameraMouseController;
-import org.helioviewer.gl3d.gui.GL3DTopToolBar;
 import org.helioviewer.gl3d.scenegraph.GL3DState;
 import org.helioviewer.jhv.JHVSplashScreen;
 import org.helioviewer.jhv.display.Displayer;
@@ -90,16 +89,16 @@ public class ImageViewerGui {
     private MoviePanel moviePanel;
     private ControlPanelContainer moviePanelContainer;
     private ControlPanelContainer filterPanelContainer;
-    private final JMenuBar menuBar;
+
+    private final JMenuBar menuBar = new MenuBar();
+    private final TopToolBar topToolBar = new TopToolBar();
 
     public static final int SIDE_PANEL_WIDTH = 320;
     public static final int SIDE_PADDING = 10;
     private final ObservationDialog observationDialog;
 
-    private final GL3DTopToolBar topToolBar;
     private final GL3DCameraMouseController mouseController = new GL3DCameraMouseController();
-
-    private final ComponentView mainComponentView = new ComponentView();;
+    private final ComponentView mainComponentView = new ComponentView();
 
     private FilterTabPanelManager filterTabPanelManager;
 
@@ -111,13 +110,8 @@ public class ImageViewerGui {
      */
     private ImageViewerGui() {
         mainFrame = createMainFrame();
-        observationDialog = new ObservationDialog(mainFrame);
-        menuBar = new MenuBar();
-        menuBar.setFocusable(false);
-
         mainFrame.setJMenuBar(menuBar);
-        mainFrame.setFocusable(true);
-        topToolBar = new GL3DTopToolBar();
+        observationDialog = new ObservationDialog(mainFrame);
     }
 
     public void prepareGui() {
@@ -133,14 +127,8 @@ public class ImageViewerGui {
             mainContentPanel = new MainContentPanel();
             mainContentPanel.setMainComponent(getMainImagePanel());
 
-            // STATE - GET TOP TOOLBAR
             contentPanel.add(getTopToolBar(), BorderLayout.PAGE_START);
 
-            // // FEATURES / EVENTS
-            // solarEventCatalogsPanel = new SolarEventCatalogsPanel();
-            // leftPane.add("Features/Events", solarEventCatalogsPanel, false);
-
-            // STATE - GET LEFT PANE
             leftScrollPane = new JScrollPane(getLeftContentPane(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             leftScrollPane.setFocusable(false);
             leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
@@ -148,10 +136,7 @@ public class ImageViewerGui {
 
             midSplitPane.setRightComponent(mainContentPanel);
 
-            // ///////////////////////////////////////////////////////////////////////////////
             // STATUS PANEL
-            // ///////////////////////////////////////////////////////////////////////////////
-
             ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
             FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
@@ -271,10 +256,6 @@ public class ImageViewerGui {
      * @return instance of the scrollpane containing the left content pane.
      * */
     public SideContentPane getLeftContentPane() {
-        // ////////////////////////////////////////////////////////////////////////////////
-        // LEFT CONTROL PANEL
-        // ////////////////////////////////////////////////////////////////////////////////
-
         if (leftPane != null) {
             return leftPane;
         } else {
@@ -395,10 +376,8 @@ public class ImageViewerGui {
             return;
         }
 
-        // //////////////////////
-        // -jhv
-        // //////////////////////
 
+        // -jhv
         // go through all jhv values
         for (JHVRequest jhvRequest : jhvRequests) {
             try {
@@ -449,10 +428,7 @@ public class ImageViewerGui {
 
         }
 
-        // //////////////////////
         // -jpx
-        // //////////////////////
-
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
@@ -484,10 +460,8 @@ public class ImageViewerGui {
                 }
             }
         }
-        // //////////////////////
-        // -jpip
-        // //////////////////////
 
+        // -jpip
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
@@ -497,10 +471,8 @@ public class ImageViewerGui {
                 }
             }
         }
-        // //////////////////////
-        // -download
-        // //////////////////////
 
+        // -download
         for (URI downloadAddress : downloadAddresses) {
             if (downloadAddress != null) {
                 try {
