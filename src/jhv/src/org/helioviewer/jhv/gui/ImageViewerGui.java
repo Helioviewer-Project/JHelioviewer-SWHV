@@ -23,9 +23,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
-import org.helioviewer.gl3d.GL3DState;
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -158,7 +155,7 @@ public class ImageViewerGui {
      * Initializes the main view chain.
      */
     public void createViewchains() {
-        updateComponentPanels();
+        mainImagePanel.setView(mainComponentView);
         mainComponentView.activate();
 
         mainFrame.pack();
@@ -233,28 +230,12 @@ public class ImageViewerGui {
             moviePanelContainer = new ControlPanelContainer();
             moviePanel = new MoviePanel();
             moviePanelContainer.setDefaultPanel(moviePanel);
-
             leftPane.add("Movie Controls", moviePanelContainer, true);
 
             // Layer control
             ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface("Image data", imageObservationPanel);
-
-            //leftPane.add("Image Layers", imageSelectorPanel, false);
-
             leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
 
-            JTabbedPane cameraTab = new JTabbedPane();
-            GL3DCamera camera = new GL3DObserverCamera();
-            GL3DState.setActiveCamera(camera);
-
-            cameraTab.setEnabled(false);
-            // leftPane.add("Camera Options", cameraOptionsPanel, false);
-
-            // JTabbedPane planetTab = new JTabbedPane();
-            // PlanetOptionsPanel planetOptionsPanel = new PlanetOptionsPanel();
-            // planetTab.addTab("Planet Options", planetOptionsPanel);
-            // planetTab.setEnabled(false);
-            // leftPane.add("Object Options", planetOptionsPanel, false);
             return leftPane;
         }
     }
@@ -273,13 +254,6 @@ public class ImageViewerGui {
 
     public MainImagePanel getMainImagePanel() {
         return mainImagePanel;
-    }
-
-    private void updateComponentPanels() {
-        if (getMainView() != null) {
-            mainImagePanel.setView(getMainView());
-        }
-        mainFrame.validate();
     }
 
     /**
@@ -459,10 +433,6 @@ public class ImageViewerGui {
 
     public final MainContentPanel getMainContentPanel() {
         return mainContentPanel;
-    }
-
-    public boolean viewchainCreated() {
-        return getMainView() != null;
     }
 
     public ObservationDialog getObservationDialog() {
