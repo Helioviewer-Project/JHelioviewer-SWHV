@@ -92,4 +92,8 @@ public class LineDataSelectorTableModel implements TableModel, LineDataSelectorM
     public void removeTableModelListener(TableModelListener l) {
         listeners.remove(l);
     }
+
+    public void removeRow(int row) {
+        lineDataSelectorModel.removeLineData(lineDataSelectorModel.getAllLineDataSelectorElements().get(row));
+    }
 }
