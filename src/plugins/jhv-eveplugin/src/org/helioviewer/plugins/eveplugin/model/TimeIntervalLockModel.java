@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.DrawControllerListener;
-import org.helioviewer.plugins.eveplugin.controller.TimingListener;
+import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.DrawControllerListener;
+import org.helioviewer.plugins.eveplugin.draw.TimingListener;
 
 /**
  * Adapts the plot area space of the plots in case the interval is locked.

@@ -12,7 +12,7 @@ import java.util.Map;
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.DrawController;
 
 /**
  *

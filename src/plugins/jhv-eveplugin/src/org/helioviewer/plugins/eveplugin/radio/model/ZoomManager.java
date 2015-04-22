@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.plugins.eveplugin.controller.DrawController;
-import org.helioviewer.plugins.eveplugin.controller.GraphDimensionListener;
-import org.helioviewer.plugins.eveplugin.controller.TimingListener;
+import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.GraphDimensionListener;
+import org.helioviewer.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpaceListener;
 
