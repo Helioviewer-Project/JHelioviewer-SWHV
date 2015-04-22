@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.controller;
+package org.helioviewer.plugins.eveplugin.draw;
 
 import java.awt.EventQueue;
 import java.awt.Rectangle;
@@ -21,9 +21,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.plugins.eveplugin.base.Range;
-import org.helioviewer.plugins.eveplugin.draw.DrawableElement;
-import org.helioviewer.plugins.eveplugin.draw.DrawableType;
-import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.model.PlotAreaSpace;
