@@ -16,7 +16,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.gl3d.gui.GL3DSetPanInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetRotationInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DSetZoomBoxInteractionAction;
 import org.helioviewer.gl3d.gui.GL3DToggleCoronaVisibilityAction;
@@ -25,7 +24,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.SetPanSelectionAction;
+import org.helioviewer.jhv.gui.actions.SetPanInteractionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxSelectionAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
@@ -159,7 +158,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         // Selection
         ButtonGroup group = new ButtonGroup();
 
-        panButton = new JToggleButton(new GL3DSetPanInteractionAction());
+        panButton = new JToggleButton(new SetPanInteractionAction());
         panButton.setSelected(selectionMode == SelectionMode.PAN);
         panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
         panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
