@@ -60,14 +60,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.addListener(this);
     }
 
-    /**
-     * Deactivate the Component View can be used to clean up the component view
-     */
-    public void deactivate() {
-        Displayer.removeListener(this);
-        canvas.removeGLEventListener(this);
-    }
-
     @Override
     public void init(GLAutoDrawable drawable) {
         final GL2 gl = drawable.getGL().getGL2();

@@ -66,7 +66,6 @@ public class ImageViewerGui {
     private static ImageViewerGui instance;
 
     private static JFrame mainFrame;
-    private static JPanel contentPanel;
     private static JSplitPane midSplitPane;
     private static JScrollPane leftScrollPane;
 
@@ -102,7 +101,7 @@ public class ImageViewerGui {
         mainFrame.setJMenuBar(menuBar);
         observationDialog = new ObservationDialog(mainFrame);
 
-        contentPanel = new JPanel(new BorderLayout());
+        JPanel contentPanel = new JPanel(new BorderLayout());
         mainFrame.setContentPane(contentPanel);
 
         midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
@@ -334,7 +333,6 @@ public class ImageViewerGui {
      */
     public void toggleShowSidePanel() {
         leftScrollPane.setVisible(!leftScrollPane.isVisible());
-        contentPanel.revalidate();
 
         int lastLocation = midSplitPane.getLastDividerLocation();
         if (lastLocation > 10) {
