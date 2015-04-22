@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.plugins.eveplugin.view.RadioOptionsPanel;
+import org.helioviewer.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
 public class DownloadRequestData implements LineDataSelectorElement {

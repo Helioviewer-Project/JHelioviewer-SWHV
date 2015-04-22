@@ -1,4 +1,4 @@
-package org.helioviewer.plugins.eveplugin.view;
+package org.helioviewer.plugins.eveplugin.radio.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
