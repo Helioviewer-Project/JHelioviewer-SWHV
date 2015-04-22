@@ -15,7 +15,7 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.FilterPanelContainer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;
@@ -192,7 +192,6 @@ public class GL3DImageLayer implements Renderable {
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         GLSLShader.bind(gl);
         {
-
             gl.glEnable(GL2.GL_CULL_FACE);
             {
                 gl.glCullFace(GL2.GL_BACK);
@@ -416,11 +415,9 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        ImageViewerGui ivg = ImageViewerGui.getSingletonInstance();
-        //if (mainLayerView instanceof JHVJPXView) {
-        ivg.getFilterTabPanelManager().setActivejp2(mainLayerView);
-        //}
-        return ivg.getFilterPanelContainer();
+        FilterPanelContainer fpc = FilterPanelContainer.getSingletonInstance();
+        fpc.getFilterTabPanelManager().setActivejp2(mainLayerView);
+        return fpc.getFilterPanelContainer();
     }
 
     @Override
@@ -446,4 +443,5 @@ public class GL3DImageLayer implements Renderable {
     public AbstractView getMainLayerView() {
         return mainLayerView;
     }
+
 }
