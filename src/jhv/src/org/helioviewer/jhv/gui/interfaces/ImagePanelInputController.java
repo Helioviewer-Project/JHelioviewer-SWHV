@@ -4,8 +4,6 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.math.Vector2dInt;
-
 /**
  * Interface representing an input controller for an image panel.
  * 
@@ -19,11 +17,5 @@ import org.helioviewer.base.math.Vector2dInt;
  * 
  */
 public interface ImagePanelInputController extends MouseInputListener, MouseWheelListener, ImagePanelPlugin {
-    /**
-     * Get the last mouse position
-     * 
-     * @return mouse position or null if the mouse is not within the panel
-     */
-    public Vector2dInt getMousePosition();
 
 }
