@@ -37,7 +37,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        Displayer.addTimeListener(this);
+        Displayer.addFirstTimeListener(this);
     }
 
     @Override
