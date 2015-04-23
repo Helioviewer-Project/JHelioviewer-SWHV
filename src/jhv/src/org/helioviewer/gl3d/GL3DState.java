@@ -1,7 +1,5 @@
 package org.helioviewer.gl3d;
 
-import java.util.Date;
-
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -11,23 +9,18 @@ import org.helioviewer.gl3d.camera.GL3DObserverCamera;
  * The {@link GL3DState} is recreated every render pass by the
  * {@link ComponentView}. It provides the reference to the {@link GL2} object
  * and stores some globally relevant information such as width and height of the
- * viewport, etc. Also it allows for the stacking of the view transformations.
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
+ * viewport, etc.
  *
  */
 public class GL3DState {
 
-    private static GL3DState instance = new GL3DState(null);
+    private final static GL3DState instance = new GL3DState(null);
 
-    public GL2 gl;
+    public static GL2 gl;
 
     private static GL3DCamera activeCamera;
-
-    private int viewportWidth;
-    private int viewportHeight;
-
-    private Date currentObservationDate;
+    private static int viewportWidth;
+    private static int viewportHeight;
 
     private GL3DState(GL2 gl) {
         this.gl = gl;
@@ -45,20 +38,12 @@ public class GL3DState {
         return instance;
     }
 
-    public int getViewportHeight() {
+    public static int getViewportHeight() {
         return viewportHeight;
     }
 
-    public int getViewportWidth() {
+    public static int getViewportWidth() {
         return viewportWidth;
-    }
-
-    public Date getCurrentObservationDate() {
-        return currentObservationDate;
-    }
-
-    public void setCurrentObservationDate(Date currentObservationDate) {
-        this.currentObservationDate = currentObservationDate;
     }
 
     public static void setActiveCamera(GL3DCamera camera) {
