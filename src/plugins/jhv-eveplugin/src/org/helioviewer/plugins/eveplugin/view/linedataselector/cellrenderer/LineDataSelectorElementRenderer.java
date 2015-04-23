@@ -7,6 +7,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
 public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
 
@@ -18,6 +19,7 @@ public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
         String layerName = ((LineDataSelectorElement) value).getName();
         label.setText(layerName);
         label.setToolTipText("Line or spectrogram name: " + layerName);
+        label.setBorder(LineDateSelectorTablePanel.commonBorder);
         return label;
     }
 
