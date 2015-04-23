@@ -65,7 +65,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         add(zoomComboBox);
 
         add(periodFromLayersButton);
-
     }
 
     @Override
@@ -161,16 +160,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     private class ZoomComboboxItem {
 
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
         private final ZOOM zoom;
         private final int number;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         public ZoomComboboxItem(final ZOOM zoom, final int number) {
             this.zoom = zoom;
@@ -366,4 +357,5 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             return null;
         }
     }
+
 }

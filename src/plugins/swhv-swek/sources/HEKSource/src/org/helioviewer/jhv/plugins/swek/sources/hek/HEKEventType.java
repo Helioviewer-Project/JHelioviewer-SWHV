@@ -74,4 +74,5 @@ public class HEKEventType implements JHVEventType {
     public int hashCode() {
         return ("" + eventType + eventSource + "" + eventProvider).hashCode();
     }
+
 }

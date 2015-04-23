@@ -35,12 +35,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  * */
 public class ObservationDialog extends JDialog implements ActionListener, ShowableDialog {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final HashMap<String, ObservationDialogPanel> uiMap = new HashMap<String, ObservationDialogPanel>();
 
     private final JPanel contentPane = new JPanel();
@@ -54,16 +48,8 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
     private JButton availabilityButton;
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public ObservationDialog(JFrame mainFrame) {
         super(mainFrame, true);
-
         initVisualComponents();
     }
 
@@ -158,7 +144,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             contentPane.add(selectedPane);
         }
         contentPane.add(buttonPane);
-
         contentPane.revalidate();
         pack();
     }
@@ -230,9 +215,8 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         dispose();
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
+
     // Showable Dialog
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -242,9 +226,8 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         showDialog(null);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
+
     // Action Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * Reacts on user input.
@@ -259,7 +242,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             if (selectedPane != null) {
                 result = selectedPane.loadButtonPressed();
             }
-
             if (result) {
                 closeDialog();
             }

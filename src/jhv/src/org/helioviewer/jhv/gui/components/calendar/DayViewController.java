@@ -14,16 +14,8 @@ import java.util.GregorianCalendar;
  */
 public class DayViewController implements CalendarViewController {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     Calendar calendar = new GregorianCalendar();
     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     public DayViewController() {
         calendar.setFirstDayOfWeek(Calendar.SUNDAY);
@@ -36,7 +28,6 @@ public class DayViewController implements CalendarViewController {
      * A period of one month will be added to the current date.
      */
     public Date moveForward() {
-
         calendar.add(Calendar.MONTH, 1);
         return calendar.getTime();
     }
@@ -47,7 +38,6 @@ public class DayViewController implements CalendarViewController {
      * A period of one month will be removed from the current date.
      */
     public Date moveBack() {
-
         calendar.add(Calendar.MONTH, -1);
         return calendar.getTime();
     }
@@ -65,7 +55,6 @@ public class DayViewController implements CalendarViewController {
      * The column headers are the short names of the weekdays.
      */
     public String[] getGridColumnHeader() {
-
         String[] values = new DateFormatSymbols().getShortWeekdays();
         String[] result = new String[7];
 
@@ -79,7 +68,6 @@ public class DayViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public Point getCorrespondingCellOfCurrentDate() {
-
         return new Point(calendar.get(Calendar.WEEK_OF_MONTH) - 1, calendar.get(Calendar.DAY_OF_WEEK) - 1);
     }
 
@@ -87,7 +75,6 @@ public class DayViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public void setDateOfCellValue(Object value) {
-
         if (value instanceof Integer) {
             calendar.set(Calendar.DAY_OF_MONTH, ((Integer) value).intValue());
         }
@@ -100,10 +87,8 @@ public class DayViewController implements CalendarViewController {
      * against the corresponding weekday.
      */
     public Object[][] getGridData() {
-
         // compute number of days in selected month
         Calendar cal = (Calendar) calendar.clone();
-
         int numberOfDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         // put all days at correct position in grid data
@@ -119,9 +104,7 @@ public class DayViewController implements CalendarViewController {
             offset = cal.get(Calendar.WEEK_OF_MONTH);
 
         for (int i = 1; i <= numberOfDaysInMonth; i++) {
-
             cal.set(Calendar.DAY_OF_MONTH, i);
-
             data[cal.get(Calendar.WEEK_OF_MONTH) - offset][cal.get(Calendar.DAY_OF_WEEK) - 1] = new Integer(i);
         }
 
@@ -141,4 +124,5 @@ public class DayViewController implements CalendarViewController {
     public void setDate(Date date) {
         calendar.setTime(date);
     }
+
 }

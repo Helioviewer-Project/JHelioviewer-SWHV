@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import org.helioviewer.base.math.Vector2dInt;
 
 public class ResolutionSetting {
+
     private double xRatio;
     private double yRatio;
     private int resolutionNb;
@@ -86,7 +87,7 @@ public class ResolutionSetting {
     }
 
     public boolean equals(Object other) {
-        if (other != null && other instanceof ResolutionSetting) {
+        if (other instanceof ResolutionSetting) {
             ResolutionSetting temprs = (ResolutionSetting) other;
             return temprs.getHeight() == height && temprs.getWidth() == width && temprs.getxRatio() == xRatio && temprs.getyRatio() == yRatio;
         }

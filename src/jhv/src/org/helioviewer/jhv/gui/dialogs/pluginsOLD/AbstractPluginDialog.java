@@ -35,12 +35,6 @@ import org.helioviewer.viewmodelplugin.interfaces.Container;
  */
 public abstract class AbstractPluginDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     protected final JList activatedPluginsList = new JList();
     protected final JList availablePluginsList = new JList();
 
@@ -56,10 +50,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
     protected boolean changed = false;
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
     /**
      * Basic constructor which has to be called from inherited class.
      *
@@ -67,9 +57,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      *            Title which should be displayed in the dialog header.
      */
     protected AbstractPluginDialog(String title) {
-
         super(ImageViewerGui.getMainFrame(), title, true);
-
         initVisualComponents();
     }
 
@@ -77,7 +65,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * Initialize the visual parts of the component.
      */
     private void initVisualComponents() {
-
         // basic window layout
         setLayout(new GridBagLayout());
         setResizable(false);
@@ -85,10 +72,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
 
         GridBagConstraints c = new GridBagConstraints();
 
-        // /////////////////////////
         // activated plug-ins pane
-        // /////////////////////////
-
         // header
         c.gridx = 0;
         c.gridy = 0;
@@ -126,10 +110,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         c.insets = new Insets(0, 4, 0, 2);
         add(activatedPluginsControlPane, c);
 
-        // /////////////////////////
         // middle pane
-        // /////////////////////////
-
         JPanel middlePane = new JPanel(new GridBagLayout());
         JPanel middleButtonPane = new JPanel();
         middleButtonPane.setLayout(new BoxLayout(middleButtonPane, BoxLayout.Y_AXIS));
@@ -153,10 +134,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         c.insets = new Insets(4, 0, 0, 0);
         add(middlePane, c);
 
-        // /////////////////////////
         // available plug ins pane
-        // /////////////////////////
-
         // header
         c.gridx = 2;
         c.gridy = 0;
@@ -194,10 +172,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         c.insets = new Insets(0, 2, 0, 4);
         add(availablePluginsControlPane, c);
 
-        // /////////////////////////
         // bottom pane
-        // /////////////////////////
-
         JPanel bottomPane = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         closeButton.addActionListener(this);
         bottomPane.add(closeButton);
@@ -223,7 +198,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * with the current activated plug ins.
      */
     private void closeDialog() {
-
         // execute functions of inherited classes which have to be done before
         // leaving the dialog
         beforeSaveAndClose();
@@ -231,9 +205,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         if (changed) {
             // save plug-in settings to XML file
             PluginManager.getSingletonInstance().saveSettings();
-
-            // rebuild the view chains
-            recreateViewChains();
         }
         changed = false;
         // close dialog
@@ -245,13 +216,6 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
      * things here.
      */
     protected void beforeSaveAndClose() {
-    }
-
-    /**
-     * Rebuilds the existing view chains and removes and adds corresponding
-     * parts from plug ins.
-     */
-    private void recreateViewChains() {
     }
 
     /**
@@ -304,7 +268,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         // ...)
         final Object selected = availablePluginsList.getSelectedValue();
 
-        if (selected != null && selected instanceof Container) {
+        if (selected instanceof Container) {
             ((Container) selected).setActive(true);
             ((Container) selected).changeSettings();
             availablePluginsListModel.removeElement(selected);
@@ -318,7 +282,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         // overlay, ...)
         final Object selected = activatedPluginsList.getSelectedValue();
 
-        if (selected != null && selected instanceof Container) {
+        if (selected instanceof Container) {
             ((Container) selected).setActive(false);
             ((Container) selected).changeSettings();
             activatedPluginsListModel.removeElement(selected);
@@ -326,9 +290,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         }
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * React on clicked buttons.
@@ -344,9 +306,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         }
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Showable Dialog
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -359,9 +319,7 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
         setVisible(true);
     };
 
-    // ////////////////////////////////////////////////////////////////
     // Window Listener
-    // ////////////////////////////////////////////////////////////////
 
     @Override
     public void windowActivated(WindowEvent e) {
@@ -391,4 +349,5 @@ public abstract class AbstractPluginDialog extends JDialog implements ShowableDi
     @Override
     public void windowOpened(WindowEvent e) {
     }
+
 }

@@ -14,16 +14,8 @@ import java.util.GregorianCalendar;
  */
 public class MonthViewController implements CalendarViewController {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     Calendar calendar = new GregorianCalendar();
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -31,7 +23,6 @@ public class MonthViewController implements CalendarViewController {
      * A period of one year will be added to the current date.
      */
     public Date moveForward() {
-
         calendar.add(Calendar.YEAR, 1);
         return calendar.getTime();
     }
@@ -42,7 +33,6 @@ public class MonthViewController implements CalendarViewController {
      * A period of one year will be removed from the current date.
      */
     public Date moveBack() {
-
         calendar.add(Calendar.YEAR, -1);
         return calendar.getTime();
     }
@@ -51,7 +41,6 @@ public class MonthViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public String getSelectionButtonText() {
-
         return dateFormat.format(calendar.getTime());
     }
 
@@ -59,7 +48,6 @@ public class MonthViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public Date getDate() {
-
         return calendar.getTime();
     }
 
@@ -70,7 +58,6 @@ public class MonthViewController implements CalendarViewController {
      * special meaning (except uniqueness).
      */
     public String[] getGridColumnHeader() {
-
         String[] names = new String[4];
 
         for (int i = 0; i < 4; i++)
@@ -85,10 +72,8 @@ public class MonthViewController implements CalendarViewController {
      * Returns a 2 dimensional array where all month of a year are placed.
      */
     public Object[][] getGridData() {
-
         // get short names of the months
         String[] months = new DateFormatSymbols().getShortMonths();
-
         Object[][] data = new Object[3][4];
 
         // write names to table
@@ -103,7 +88,6 @@ public class MonthViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public Point getCorrespondingCellOfCurrentDate() {
-
         return new Point(calendar.get(Calendar.MONTH) / 4, calendar.get(Calendar.MONTH) % 4);
     }
 
@@ -111,13 +95,10 @@ public class MonthViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public void setDateOfCellValue(Object value) {
-
         if (value instanceof String) {
-
             String[] months = new DateFormatSymbols().getShortMonths();
 
             for (int i = 0; i < 12; i++) {
-
                 if (months[i].equals((String) value)) {
                     calendar.set(Calendar.MONTH, i);
                 }
@@ -129,7 +110,7 @@ public class MonthViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public void setDate(Date date) {
-
         calendar.setTime(date);
     }
+
 }

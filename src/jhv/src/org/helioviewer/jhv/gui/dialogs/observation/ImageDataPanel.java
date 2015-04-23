@@ -791,14 +791,12 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 @Override
                 public Component getListCellRendererComponent(JList list, Object value, int arg2, boolean arg3, boolean arg4) {
                     JLabel result = (JLabel) super.getListCellRendererComponent(list, value, arg2, arg3, arg4);
-                    if (value != null) {
-                        if (value instanceof DataSources.Item) {
-                            DataSources.Item item = (DataSources.Item) value;
-                            result.setToolTipText(item.getDescription());
-                        } else if (value instanceof ItemPair) {
-                            ItemPair item = (ItemPair) value;
-                            result.setToolTipText(item.getDescription());
-                        }
+                    if (value instanceof DataSources.Item) {
+                        DataSources.Item item = (DataSources.Item) value;
+                        result.setToolTipText(item.getDescription());
+                    } else if (value instanceof ItemPair) {
+                        ItemPair item = (ItemPair) value;
+                        result.setToolTipText(item.getDescription());
                     }
                     return result;
                 }
@@ -943,9 +941,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * */
         public String getObservatory() {
             Object selectedItem = comboObservatory.getSelectedItem();
-            if (selectedItem != null) {
-                DataSources.Item i = (DataSources.Item) selectedItem;
-                return i.getKey();
+            if (selectedItem instanceof DataSources.Item) {
+                return ((DataSources.Item) selectedItem).getKey();
             } else {
                 return null;
             }
@@ -958,9 +955,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * */
         public String getInstrument() {
             Object selectedItem = comboInstrument.getSelectedItem();
-            if (selectedItem != null) {
-                DataSources.Item i = (DataSources.Item) selectedItem;
-                return i.getKey();
+            if (selectedItem instanceof DataSources.Item) {
+                return ((DataSources.Item) selectedItem).getKey();
             } else {
                 return null;
             }
@@ -973,9 +969,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * */
         public String getDetector() {
             Object selectedItem = comboDetectorMeasurement.getSelectedItem();
-            if (selectedItem != null) {
-                DataSources.Item i = ((ItemPair) selectedItem).getFirstItem();
-                return i.getKey();
+            if (selectedItem instanceof ItemPair) {
+                return ((ItemPair) selectedItem).getFirstItem().getKey();
             } else {
                 return null;
             }
@@ -988,9 +983,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * */
         public String getMeasurement() {
             Object selectedItem = comboDetectorMeasurement.getSelectedItem();
-            if (selectedItem != null) {
-                DataSources.Item i = ((ItemPair) selectedItem).getSecondItem();
-                return i.getKey();
+            if (selectedItem instanceof ItemPair) {
+                return ((ItemPair) selectedItem).getSecondItem().getKey();
             } else {
                 return null;
             }

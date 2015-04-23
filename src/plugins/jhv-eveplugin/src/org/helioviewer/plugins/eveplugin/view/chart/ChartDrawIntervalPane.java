@@ -40,12 +40,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * */
 public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private Interval<Date> movieInterval = new Interval<Date>(null, null);
 
     private boolean mouseOverInterval = true;
@@ -61,10 +55,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public ChartDrawIntervalPane() {
         initVisualComponents();
@@ -180,7 +170,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // g.drawRect(leftIntervalBorderPosition, getHeight() / 7 * 3,
         // rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight()
         // / 7);
-
     }
 
     private void drawIntervalGraspPoints(Graphics g) {
@@ -198,7 +187,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // 12, 5, 5));
         // g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 2,
         // 0, 2, 12, 5, 5));
-
     }
 
     private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
@@ -238,7 +226,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
 
         drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
-
     }
 
     private void drawLabelsTime(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
@@ -257,13 +244,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             } else {
                 tickText = ChartConstants.HOUR_TIME_FORMAT_NO_SEC.format(tickValue);
             }
-
             drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, tickValue, ratioX);
         }
     }
 
     private void drawLabelsDay(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
-
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -336,7 +321,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             calendar.add(Calendar.MONTH, (int) (i * ratioMonth));
 
             final String tickText = ChartConstants.MONTH_YEAR_TIME_FORMAT.format(calendar.getTime());
-
             drawLabel(g, availableInterval, selectedInterval, tickText, availableIntervalWidth, calendar.getTime(), ratioX);
         }
     }
@@ -381,11 +365,9 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         } else {
             g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         }
-
         g.drawLine(x, 2, x, getHeight() - 1);
 
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-
         if (x + textWidth > ChartConstants.getGraphLeftSpace() + availableIntervalWidth) {
             g.drawString(tickText, x - 2 - textWidth, getHeight() - 3);
         } else {
@@ -447,11 +429,10 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
                 useThisX = rightIntervalBorderPosition;
             }
             final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
-
             final double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
             final double timestamp = plotAreaSpace.getScaledMinTime() + ((useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
-            plotAreaSpace.setScaledSelectedTime(Math.max(timestamp, plotAreaSpace.getScaledMinTime()), plotAreaSpace.getScaledSelectedMaxTime(), forced);
 
+            plotAreaSpace.setScaledSelectedTime(Math.max(timestamp, plotAreaSpace.getScaledMinTime()), plotAreaSpace.getScaledSelectedMaxTime(), forced);
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition) {
                 useThisX = leftIntervalBorderPosition;
@@ -461,13 +442,10 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             final double timestamp = plotAreaSpace.getScaledMinTime() + (1.0 * (useThisX - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
 
             plotAreaSpace.setScaledSelectedTime(plotAreaSpace.getScaledSelectedMinTime(), Math.min(timestamp, plotAreaSpace.getScaledMaxTime()), forced);
-
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Zoom Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void availableIntervalChanged() {
@@ -478,9 +456,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         repaint();
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Mouse Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -585,9 +561,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         repaint();
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Mouse Motion Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -619,9 +593,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Layers Listener
-    // //////////////////////////////////////////////////////////////////////////////
+
     @Override
     public void layerAdded(int idx) {
 
@@ -642,4 +615,5 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             repaint();
         }
     }
+
 }

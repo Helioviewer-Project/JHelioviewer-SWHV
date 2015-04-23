@@ -29,18 +29,8 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  */
 public class PluginDialog extends AbstractPluginDialog implements ListSelectionListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final JButton availablePluginsImportButton = new JButton("Import");
     private final JButton availablePluginsDeleteButton = new JButton("Delete");
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -112,9 +102,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
             @Override
             public void actionPerformed(ActionEvent _e) {
                 if (_e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION) && fileChooser.getSelectedFile().exists() && fileChooser.getSelectedFile().isFile()) {
-
                     fileChooser.setVisible(false);
-
                     final File dstFile = new File(JHVDirectory.PLUGINS.getPath() + fileChooser.getSelectedFile().getName());
 
                     if (dstFile.exists()) {
@@ -153,7 +141,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         if (JOptionPane.showConfirmDialog(this, "Are you sure to delete the corresponding plug in file permanently from your file system?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             final Object selected = availablePluginsList.getSelectedValue();
 
-            if (selected != null && selected instanceof PluginContainer) {
+            if (selected instanceof PluginContainer) {
                 final URI pluginLocation = ((PluginContainer) selected).getPluginLocation();
                 PluginManager.getSingletonInstance().removePluginContainer((PluginContainer) selected);
                 availablePluginsListModel.removeElement(selected);
@@ -163,7 +151,6 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
                 if (!file.delete()) {
                     Message.err("An error occured while deleting the plugin file!", "Please check manually!", false);
                 }
-
             }
         }
     }
@@ -172,9 +159,7 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         availablePluginsDeleteButton.setEnabled(availablePluginsList.getSelectedIndex() >= 0);
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -191,18 +176,14 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
         }
     }
 
-    // ////////////////////////////////////////////////////////////////
     // List Selection Listener
-    // ////////////////////////////////////////////////////////////////
 
     @Override
     public void valueChanged(final ListSelectionEvent event) {
         updateDeleteButton();
     }
 
-    // ////////////////////////////////////////////////////////////////
     // JAR Filter
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * File Chooser Filter which allows JAR files only.
@@ -241,4 +222,5 @@ public class PluginDialog extends AbstractPluginDialog implements ListSelectionL
     @Override
     public void init() {
     }
+
 }

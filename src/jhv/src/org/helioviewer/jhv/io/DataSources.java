@@ -377,4 +377,5 @@ public class DataSources {
     private JSONObject getObservatory(String observatory) throws JSONException {
         return jsonResult.getJSONObject(observatory);
     }
+
 }

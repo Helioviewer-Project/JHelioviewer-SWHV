@@ -27,11 +27,6 @@ import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
  */
 public class StatusPanel extends JPanel {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
     private static final int HEIGHT = 30;
 
     private JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -42,10 +37,6 @@ public class StatusPanel extends JPanel {
     public enum Alignment {
         LEFT, RIGHT
     };
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor
@@ -86,14 +77,12 @@ public class StatusPanel extends JPanel {
      *            Alignment of the new plugin, can be either LEFT or RIGHT
      */
     public void addPlugin(StatusPanelPlugin newPlugin, Alignment alignment) {
-        if (newPlugin == null || !(newPlugin instanceof JLabel)) {
-            return;
-        }
-
-        if (alignment == Alignment.LEFT) {
-            leftPanel.add((JLabel) newPlugin);
-        } else {
-            rightPanel.add((JLabel) newPlugin, 0);
+        if (newPlugin instanceof JLabel) {
+            if (alignment == Alignment.LEFT) {
+                leftPanel.add((JLabel) newPlugin);
+            } else {
+                rightPanel.add((JLabel) newPlugin, 0);
+            }
         }
     }
 
@@ -104,12 +93,10 @@ public class StatusPanel extends JPanel {
      *            Plugin to remove
      */
     public void removePlugin(StatusPanelPlugin oldPlugin) {
-        if (oldPlugin == null || !(oldPlugin instanceof JLabel)) {
-            return;
+        if (oldPlugin instanceof JLabel) {
+            leftPanel.remove((JLabel) oldPlugin);
+            rightPanel.remove((JLabel) oldPlugin);
         }
-
-        leftPanel.remove((JLabel) oldPlugin);
-        rightPanel.remove((JLabel) oldPlugin);
     }
 
 }
