@@ -19,8 +19,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 public class TextDialog extends JDialog implements ActionListener, ShowableDialog {
 
-    private static final long serialVersionUID = 1L;
-
     public TextDialog(String title, URL textFile) {
         super(ImageViewerGui.getMainFrame(), title, true);
         setResizable(false);

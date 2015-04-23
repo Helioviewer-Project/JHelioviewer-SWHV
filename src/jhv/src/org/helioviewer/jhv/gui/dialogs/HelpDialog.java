@@ -17,13 +17,9 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Dialog used to display basic usage tips for the program.
- *
- * <p>
  * Basically, the dialog contains all shortcuts.
  */
 public class HelpDialog extends JDialog implements ActionListener, ShowableDialog {
-
-    private static final long serialVersionUID = 1L;
 
     private final JButton closeButton = new JButton("Close");
 
@@ -92,4 +88,5 @@ public class HelpDialog extends JDialog implements ActionListener, ShowableDialo
     @Override
     public void init() {
     }
+
 }

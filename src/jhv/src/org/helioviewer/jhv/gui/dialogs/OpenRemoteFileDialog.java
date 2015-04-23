@@ -37,19 +37,13 @@ import org.helioviewer.jhv.io.FileDownloader;
 /**
  * Dialog that is used to open user defined JPIP images.
  *
- *
  * @author Stephan Pagel
  * @author Andreas Hoelzl
  */
 public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, ActionListener {
 
-    // ///////////////////////////////////////////////////////////////////////////////
-    // DEFINITIONS
-    // ///////////////////////////////////////////////////////////////////////////////
-
-    // weather the advanced or the normal options are currently displayed
+    // whether the advanced or the normal options are currently displayed
     private boolean advancedOptions = false;
-    private static final long serialVersionUID = 1L;
     private static JTextField inputAddress = new JTextField();
     private static JTextField imageAddress = new JTextField();
     private final JLabel secondLabel = new JLabel("Remote Image Path: ");
@@ -64,15 +58,10 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     private JScrollPane scrollPane = new JScrollPane();
     private static JCheckBox fromJPIP = new JCheckBox("Download From HTTP");
 
-    // ///////////////////////////////////////////////////////////////////////////////
-    // METHODS
-    // ///////////////////////////////////////////////////////////////////////////////
-
     /**
      * The constructor that sets the fields and the dialog.
      */
     public OpenRemoteFileDialog() {
-
         super(ImageViewerGui.getMainFrame(), "Open Remote File", true);
 
         try {
@@ -108,7 +97,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         buttonCancel.setPreferredSize(new Dimension(90, 25));
 
         try {
-
             mouseListener = new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -131,7 +119,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                             if (parsed.toLowerCase().endsWith(".jp2") || parsed.toLowerCase().endsWith(".jpx")) {
                                 buttonOpen.doClick(100);
                             } else {
-
                             }
                         }
                     }
@@ -194,11 +181,9 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
          * the user can choose the files fromt he server he put into the
          * http-field
          */
-
         if (arg.getSource() == buttonShow) {
             show(arg);
         }
-
         /*
          * when the the refresh ("Connect") button is pressed a new JTree is
          * loaded
@@ -206,28 +191,24 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         if (arg.getSource() == refresh) {
             refresh();
         }
-
         /*
          * the Cancel button is pressed
          */
         if (arg.getSource() == buttonCancel) {
             dispose();
         }
-
         /*
          * the selected file is streamed from the server
          */
         if (arg.getSource() == buttonOpen) {
             open();
         }
-
         /*
          * changes the download source from http to jpip or vice versa
          */
         if (arg.getSource() == fromJPIP) {
             changeSource();
         }
-
     }
 
     /**
@@ -253,7 +234,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     public void show(ActionEvent arg) {
         this.setSize(this.getPreferredSize());
         if (advancedOptions == true) {
-
             connectPanel.setVisible(false);
             secondLabel.setText("Remote Image Path:");
             imageAddress.setText("");
@@ -284,14 +264,11 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      */
     public void refresh() {
         String http = imageAddress.getText();
-
         if (!http.endsWith("/"))
             http = http + "/";
-
         if (http.startsWith(" ")) {
             http = http.substring(1);
         }
-
         imageAddress.setText(http);
 
         /*
@@ -331,22 +308,18 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             }
 
             treeModel = new DynamicModel(imageAddress.getText());
-
             tree.setModel(treeModel);
 
             tree.getParent().setSize(tree.getParent().getPreferredSize());
 
             Settings.getSingletonInstance().setProperty("default.httpRemote.path", imageAddress.getText());
-
             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
 
             Settings.getSingletonInstance().update();
             Settings.getSingletonInstance().save();
             tree.getParent().getParent().repaint();
         } catch (BadLocationException i) {
-
             Message.err("No .jp2 or .jpx on the server.", "", false);
-
         } catch (IOException i) {
             Message.err("The requested URL was not found or you have no access to it.", "", false);
         }
@@ -357,7 +330,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      * JHelioViewer and loads it locally from there
      */
     public void downloadFromHTTP() {
-
         if (tree.getLastSelectedPathComponent() != null) {
             if (!tree.getModel().isLeaf(tree.getLastSelectedPathComponent())) {
                 tree.expandPath(tree.getSelectionPath());
@@ -366,16 +338,12 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         }
 
         String srv = Settings.getSingletonInstance().getProperty("default.httpRemote.path");
-
         srv = srv.trim();
-
         if (srv.endsWith("/"))
             srv = srv.substring(0, srv.length() - 1);
-
         imageAddress.setText(srv);
 
         String img = chosenFile;
-
         img = img.trim();
         if (!img.startsWith("/"))
             img = "/" + img;
@@ -403,14 +371,12 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-
     }
 
     /**
      * The selected file is streamed from the server.
      */
     public void open() {
-
         if (tree.getLastSelectedPathComponent() != null) {
             if (!tree.getModel().isLeaf(tree.getLastSelectedPathComponent())) {
                 tree.expandPath(tree.getSelectionPath());

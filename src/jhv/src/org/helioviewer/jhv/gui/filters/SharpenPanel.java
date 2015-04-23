@@ -21,16 +21,10 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class SharpenPanel extends AbstractFilterPanel implements ChangeListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
-
     private final JSlider sharpeningSlider;
     private final JLabel sharpeningLabel;
     private final JLabel title;
 
-    /**
-     * Default constructor.
-     *
-     */
     public SharpenPanel() {
         //setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 

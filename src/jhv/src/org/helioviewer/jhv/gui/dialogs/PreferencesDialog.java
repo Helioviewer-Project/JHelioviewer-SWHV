@@ -57,8 +57,6 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
  */
 public class PreferencesDialog extends JDialog implements ShowableDialog {
 
-    private static final long serialVersionUID = 1L;
-
     private final String defaultDateFormat = "yyyy-MM-dd";
 
     private JRadioButton loadDefaultMovieOnStartUp;
@@ -155,7 +153,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         resetBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 if (JOptionPane.showConfirmDialog(null, "Do you really want to reset the setting values?", "Attention", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     defaultsPanel.resetSettings();
                     loadDefaultMovieOnStartUp.setSelected(true);
@@ -241,7 +238,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      */
     private UIManager.LookAndFeelInfo[] getAllowedLookAndFeels() {
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
-
         // erase disallowed look and feels:
         List<LookAndFeelInfo> result = new LinkedList<LookAndFeelInfo>();
         for (int i = 0; i < this.disallowedLafs.length; i++) {
@@ -251,7 +247,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 }
             }
         }
-
         return result.toArray(new UIManager.LookAndFeelInfo[0]);
     }
 
@@ -270,7 +265,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 break;
             }
         }
-
         Settings.getSingletonInstance().setLookAndFeelEverywhere(lafClassName);
     }
 
@@ -283,17 +277,13 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private void loadSettings() {
         // In principle the settings have been previously loaded
         // settings.load();
-
         // Start up
         loadDefaultMovieOnStartUp.setSelected(Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
         doNothingOnStartUp.setSelected(!Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
-
         // The current cache size
         occupiedSizeLabel.setText(getCacheSizeText());
-
         // Look and feel
         setLookAndFeelCombo(settings.getProperty("display.laf"));
-
         // Debug options
         LogSettings logSettings = LogSettings.getSingletonInstance();
 
@@ -308,7 +298,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Default date format
         String fmt = settings.getProperty("default.date.format");
-
         if (fmt == null)
             dateFormatField.setText(defaultDateFormat);
         else
@@ -316,7 +305,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Default values
         defaultsPanel.loadSettings();
-
         // Maximum JPIP cache size
         maxCacheBox.setText(settings.getProperty("jpip.cache.size"));
 
@@ -339,11 +327,9 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private void saveSettings() {
         // Start up
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovieOnStartUp.isSelected()));
-
         // Look and feel
         UIManager.LookAndFeelInfo[] lafs = getAllowedLookAndFeels();
         settings.setProperty("display.laf", lafs[lafCombo.getSelectedIndex()].getClassName());
-
         // Debug options
         LogSettings logSettings = LogSettings.getSingletonInstance();
 
@@ -360,10 +346,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Default date format
         settings.setProperty("default.date.format", dateFormatField.getText());
-
         // Default values
         defaultsPanel.saveSettings();
-
         // Maximum JPIP cache size
         if (limitMaxSize.isSelected())
             settings.setProperty("jpip.cache.size", maxCacheBox.getText());
@@ -413,7 +397,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         maxCacheBox.setPreferredSize(new Dimension(80, maxCacheBox.getPreferredSize().height));
 
         limitMaxSize.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 maxCacheBox.setVisible(limitMaxSize.isSelected());
@@ -570,13 +553,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private class DefaultsSelectionPanel extends JPanel {
 
-        private static final long serialVersionUID = 1L;
-
         private JTable table = null;
         private Object[][] tableData = null;
 
         public DefaultsSelectionPanel() {
-
             super(new BorderLayout());
             setPreferredSize(new Dimension(150, 180));
 
@@ -585,8 +565,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") }, { "Default local path", settings.getProperty("default.local.path") }, { "Default remote path", settings.getProperty("default.remote.path") } };
 
             table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
-                private static final long serialVersionUID = 1L;
-
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return ((row == 2) && (column == 1));
@@ -626,7 +604,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         public void loadSettings() {
             TableModel model = table.getModel();
             Settings settings = Settings.getSingletonInstance();
-
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
             model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
             model.setValueAt(settings.getProperty("default.remote.path"), 2, 1);
@@ -635,7 +612,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         public void saveSettings() {
             TableModel model = table.getModel();
             Settings settings = Settings.getSingletonInstance();
-
             settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
             settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
             settings.setProperty("default.remote.path", model.getValueAt(2, 1).toString());
@@ -643,7 +619,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         public void resetSettings() {
             TableModel model = table.getModel();
-
             model.setValueAt(JHVDirectory.EXPORTS.getPath(), 0, 1);
             model.setValueAt(JHVDirectory.HOME.getPath(), 1, 1);
             model.setValueAt("jpip://delphi.nascom.nasa.gov:8090", 2, 1);

@@ -26,8 +26,6 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
-
     private final JCheckBox redCheckBox;
     private final JCheckBox greenCheckBox;
     private final JCheckBox blueCheckBox;
@@ -104,7 +102,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     /**
      * Sets the panel values.
      *
-     * This may be useful, if the values are changed from another source than
+     * This may be useful if the values are changed from another source than
      * the panel itself.
      *
      * @param colorMask
@@ -124,19 +122,17 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
 
     @Override
     public Component getTitle() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Component getSlider() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Component getValue() {
-        // TODO Auto-generated method stub
         return null;
     }
+
 }

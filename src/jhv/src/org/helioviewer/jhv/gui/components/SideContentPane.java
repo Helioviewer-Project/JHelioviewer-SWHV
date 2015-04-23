@@ -17,13 +17,8 @@ import javax.swing.JComponent;
  */
 public class SideContentPane extends JComponent {
 
-    private static final long serialVersionUID = 1L;
-
     private final HashMap<Component, CollapsiblePane> map = new HashMap<Component, CollapsiblePane>();
 
-    /**
-     * Default constructor.
-     */
     public SideContentPane() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(Box.createGlue());
@@ -169,7 +164,6 @@ public class SideContentPane extends JComponent {
                 remove((Component) components[i]);
             }
         }
-
         // go through sub components of the side panel in case a component is
         // not added to a collapsible pane
         for (Component member : getComponents()) {

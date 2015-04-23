@@ -53,12 +53,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  */
 public class JHVCalendar extends JPanel implements ComponentListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private enum DisplayMode {
         DAYS, MONTHS, YEARS
     }
@@ -72,15 +66,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
     private final SelectionPanel selectionPanel = new SelectionPanel();
     private final BottomPanel bottomPanel = new BottomPanel();
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     */
     public JHVCalendar() {
-
         this(true);
     }
 
@@ -93,10 +79,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            the bottom; false if not.
      */
     public JHVCalendar(boolean showToday) {
-
         // load day selection view
         changeDisplayMode(DisplayMode.DAYS);
-
         // initialize visual components
         initVisualComponents(showToday);
     }
@@ -109,10 +93,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            the bottom; false if not.
      */
     private void initVisualComponents(boolean showToday) {
-
         // set basic layout
         setLayout(new BorderLayout());
-
         // add listener
         addComponentListener(this);
 
@@ -136,7 +118,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            Defines which view has to be displayed.
      */
     private void changeDisplayMode(DisplayMode newMode) {
-
         // memorize the selected date if a date is available
         // at the current view controller
         Date date = null;
@@ -169,13 +150,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      * Updates the data which has to be displayed at the visual components.
      */
     private void updateDateDisplay() {
-
         // fill grid with data
         selectionPanel.fillGrid(calendarViewController.getGridData(), calendarViewController.getGridColumnHeader(), calendarViewController.getCorrespondingCellOfCurrentDate(), displayMode == DisplayMode.DAYS);
-
         // enable or disable buttons
         navigationPanel.updateButtonsVisibility();
-
         // refresh button text
         navigationPanel.setSelectButtonText(calendarViewController.getSelectionButtonText());
     }
@@ -188,11 +166,9 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      * @return boolean value if pattern is valid.
      */
     public boolean setDateFormat(String pattern) {
-
         try {
             dateFormat.applyPattern(pattern);
             return true;
-
         } catch (NullPointerException e1) {
         } catch (IllegalArgumentException e2) {
         }
@@ -207,10 +183,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            Selected date of the calendar component.
      */
     public void setDate(Date date) {
-
         // set date
         calendarViewController.setDate(date);
-
         // update visual components
         updateDateDisplay();
     }
@@ -231,7 +205,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            listener which has to be informed.
      */
     public void addJHVCalendarListener(JHVCalendarListener l) {
-
         if (l != null)
             listeners.add(l);
     }
@@ -244,7 +217,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            listener which should not be informed anymore.
      */
     public void removeJHVCalendarListener(JHVCalendarListener l) {
-
         if (l != null)
             listeners.remove(l);
     }
@@ -256,7 +228,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *            event
      */
     private void informAllJHVCalendarListeners(JHVCalendarEvent e) {
-
         for (JHVCalendarListener l : listeners) {
             l.actionPerformed(e);
         }
@@ -281,7 +252,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     @Override
     public void componentResized(ComponentEvent arg0) {
-
         if (selectionPanel != null) {
             selectionPanel.resizeTableSpace();
             selectionPanel.resizeTableRowHeight();
@@ -304,27 +274,13 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class NavigationPanel extends JPanel implements ActionListener {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
         private final JButton quickForwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_RIGHT));
         private final JButton quickBackButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_LEFT));
         private final JButton forwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_RIGHT));
         private final JButton backButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_LEFT));
         private final JButton selectButton = new JButton("");
 
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
-
-        /**
-         * Default constructor.
-         */
         public NavigationPanel() {
-
             initVisualComponents();
             addActionListeners();
         }
@@ -333,7 +289,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Initialize the visual parts of the component.
          */
         private void initVisualComponents() {
-
             // set basic layout
             setLayout(new BorderLayout());
 
@@ -364,7 +319,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Sets the needed action listeners to the visual components.
          */
         private void addActionListeners() {
-
             quickForwardButton.addActionListener(this);
             forwardButton.addActionListener(this);
             backButton.addActionListener(this);
@@ -379,7 +333,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          *            text to display on the button.
          */
         public void setSelectButtonText(String text) {
-
             selectButton.setText(text);
         }
 
@@ -388,24 +341,18 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-
             if (e.getSource() == forwardButton) {
-
                 // depending on the current view controller the next date period
                 // will be shown
                 calendarViewController.moveForward();
                 updateDateDisplay();
-
             } else if (e.getSource() == backButton) {
-
                 // depending on the current view controller the previous date
                 // period
                 // will be shown
                 calendarViewController.moveBack();
                 updateDateDisplay();
-
             } else if (e.getSource() == selectButton) {
-
                 // change the view mode and the corresponding controller
                 switch (displayMode) {
                 case DAYS:
@@ -419,9 +366,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
                 default:
                     break;
                 }
-
             } else if (e.getSource() == quickForwardButton) {
-
                 // increase current date by using the view controller of the
                 // next higher period control.
                 CalendarViewController cvc = null;
@@ -437,9 +382,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
                     calendarViewController.setDate(cvc.moveForward());
                     updateDateDisplay();
                 }
-
             } else if (e.getSource() == quickBackButton) {
-
                 // reduce current date by using the view controller of the next
                 // higher period control.
                 CalendarViewController cvc = null;
@@ -463,10 +406,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * not depending on the current display mode.
          */
         public void updateButtonsVisibility() {
-
             quickForwardButton.setVisible(displayMode != DisplayMode.YEARS);
             quickBackButton.setVisible(displayMode != DisplayMode.YEARS);
         }
+
     }
 
     /**
@@ -477,24 +420,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class SelectionPanel extends JPanel implements MouseListener {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
         private JTable table;
         private JPanel contentPane;
 
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
-
-        /**
-         * Default constructor.
-         */
         public SelectionPanel() {
-
             initVisualComponents();
         }
 
@@ -502,9 +431,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Initialize the visual parts of the component.
          */
         private void initVisualComponents() {
-
             setLayout(new GridLayout(1, 1));
-
             // create table
             table = new JTable();
 
@@ -532,7 +459,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
             contentPane.add(headerPane);
             contentPane.add(tablePane);
-
             add(contentPane);
         }
 
@@ -551,17 +477,13 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          *            true if the header should be displayed; false if not.
          */
         public void fillGrid(Object[][] data, String[] columnNames, Point selectedCell, boolean showHeader) {
-
             // check if valid data is available
             if (data == null || columnNames == null)
                 return;
-
             // change model of table
             table.setModel(new SelectionTableModel(data, columnNames));
-
             // set header visible or not
             table.getTableHeader().setVisible(showHeader);
-
             // add a cell renderer to all cells which shows cell content
             // centered
             TableCellRenderer cellRenderer = new CenterTableCellRenderer();
@@ -588,7 +510,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          *         a cell.
          */
         private boolean isValidCellSelected(Point point) {
-
             return table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) != null && table.rowAtPoint(point) >= 0;
         }
 
@@ -596,7 +517,6 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Sets the size of the table to the size of the available space.
          */
         public void resizeTableSpace() {
-
             table.setSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
             table.setPreferredSize(new Dimension(contentPane.getWidth() - 4, contentPane.getHeight()));
         }
@@ -606,14 +526,11 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * of the the table.
          */
         public void resizeTableRowHeight() {
-
             int headerHeight = 0;
-
             if (displayMode == DisplayMode.DAYS)
                 headerHeight = table.getTableHeader().getHeight();
 
             int rowHeight = (table.getHeight() - headerHeight) / table.getRowCount();
-
             if (rowHeight > 0)
                 table.setRowHeight(rowHeight);
         }
@@ -623,9 +540,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * and all columns will fit into the space of the table component.
          */
         public void resizeTableColumnWidth() {
-
             JTableHeader tableHeader = table.getTableHeader();
-
             for (int i = 0; i < tableHeader.getColumnModel().getColumnCount(); i++) {
                 tableHeader.getColumnModel().getColumn(i).setWidth(table.getColumnModel().getColumn(i).getWidth());
             }
@@ -639,11 +554,8 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          */
         @Override
         public void mouseClicked(MouseEvent arg0) {
-
             if (arg0.getButton() == MouseEvent.BUTTON1) {
-
                 if (isValidCellSelected(arg0.getPoint())) {
-
                     calendarViewController.setDateOfCellValue(table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()));
 
                     switch (displayMode) {
@@ -690,6 +602,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         @Override
         public void mouseReleased(MouseEvent arg0) {
         }
+
     }
 
     /**
@@ -700,21 +613,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class SelectionTableModel extends DefaultTableModel {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
-
-        /**
-         * Default constructor.
-         */
         public SelectionTableModel(Object[][] data, String[] columnNames) {
-
             super(data, columnNames);
         }
 
@@ -726,9 +625,9 @@ public class JHVCalendar extends JPanel implements ComponentListener {
 
         @Override
         public boolean isCellEditable(int row, int column) {
-
             return false;
         }
+
     }
 
     /**
@@ -740,21 +639,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
-
-        /**
-         * Default constructor.
-         */
         public CenterTableCellRenderer() {
-
             setHorizontalAlignment(CENTER);
         }
 
@@ -764,10 +649,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          */
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             return this;
         }
+
     }
 
     /**
@@ -778,23 +663,9 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      */
     private class BottomPanel extends JPanel implements ActionListener {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
         private final JButton dateButton = new JButton();
 
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
-
-        /**
-         * Default constructor.
-         */
         public BottomPanel() {
-
             initVisualComponents();
         }
 
@@ -802,15 +673,12 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          * Initialize the visual parts of the component.
          */
         private void initVisualComponents() {
-
             // set basic layout
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
-
             // set up button
             dateButton.setText("Today is " + dateFormat.format(new GregorianCalendar().getTime()));
             dateButton.setBorder(BorderFactory.createEtchedBorder());
             dateButton.addActionListener(this);
-
             // add label to component
             add(dateButton);
         }
@@ -822,9 +690,10 @@ public class JHVCalendar extends JPanel implements ComponentListener {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-
             changeDisplayMode(DisplayMode.DAYS);
             setDate(new GregorianCalendar().getTime());
         }
+
     }
+
 }

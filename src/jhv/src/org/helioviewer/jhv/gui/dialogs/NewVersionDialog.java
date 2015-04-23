@@ -23,9 +23,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  * @author Helge Dietert
  */
 public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * New setting for check.update.next
      */
@@ -127,4 +124,5 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     @Override
     public void init() {
     }
+
 }

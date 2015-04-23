@@ -25,7 +25,6 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
     private static final float sliderToContrastScale = 25.0f;
 
     private final JSlider contrastSlider;
@@ -129,4 +128,5 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     public Component getValue() {
         return this.contrastLabel;
     }
+
 }

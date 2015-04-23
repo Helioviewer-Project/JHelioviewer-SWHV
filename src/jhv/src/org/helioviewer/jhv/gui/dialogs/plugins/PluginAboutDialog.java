@@ -27,12 +27,6 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  */
 public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private static final Dimension DIALOG_SIZE = new Dimension(500, 350);
 
     private final Plugin plugin;
@@ -40,18 +34,9 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
     private final JPanel contentPane = new JPanel();
     private final JButton closeButton = new JButton("Close");
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     private PluginAboutDialog(final Plugin plugin) {
         super(ImageViewerGui.getMainFrame(), "About...", true);
-
         this.plugin = plugin;
-
         initVisualComponents();
     }
 
@@ -111,7 +96,6 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
      * */
     private String getHeaderText() {
         final String pluginName = plugin.getName() == null ? "Unknown plug-in name" : plugin.getName();
-
         final StringBuilder headerText = new StringBuilder();
         headerText.append("<html><center>");
         headerText.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + (getFont().getSize() + 2) + ";\">");
@@ -179,9 +163,7 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         setVisible(true);
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -192,9 +174,7 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
         }
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Opens a browser or email client after clicking on a hyperlink.
@@ -209,4 +189,5 @@ public class PluginAboutDialog extends JDialog implements ActionListener, Hyperl
             }
         }
     }
+
 }

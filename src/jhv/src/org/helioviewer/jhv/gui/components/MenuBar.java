@@ -34,11 +34,6 @@ import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
  */
 public class MenuBar extends JMenuBar {
 
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Default constructor.
-     */
     public MenuBar() {
         super();
 

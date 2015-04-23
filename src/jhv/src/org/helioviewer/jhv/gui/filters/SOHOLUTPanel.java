@@ -32,8 +32,6 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
 
     private final Map<String, LUT> lutMap;
@@ -174,19 +172,17 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
 
     @Override
     public Component getTitle() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Component getSlider() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Component getValue() {
-        // TODO Auto-generated method stub
         return null;
     }
+
 }

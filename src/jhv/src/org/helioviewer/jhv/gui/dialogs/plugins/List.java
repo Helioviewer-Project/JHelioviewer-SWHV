@@ -17,12 +17,6 @@ import javax.swing.JScrollPane;
  * */
 public class List extends JScrollPane {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final LinkedList<ListEntryChangeListener> listeners = new LinkedList<ListEntryChangeListener>();
 
     private final Color selectionBackgroundColor = new JList().getSelectionBackground();
@@ -33,16 +27,8 @@ public class List extends JScrollPane {
 
     private String selectedEntryName = null;
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public List() {
         super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
         initVisualComponents();
     }
 
@@ -51,7 +37,6 @@ public class List extends JScrollPane {
      */
     private void initVisualComponents() {
         setViewportView(contentPane);
-
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBackground(Color.WHITE);
     }
@@ -100,7 +85,6 @@ public class List extends JScrollPane {
         }
 
         entryMap.put(name, entry);
-
         updateList();
     }
 
@@ -113,7 +97,6 @@ public class List extends JScrollPane {
         }
 
         entryMap.remove(name);
-
         updateList();
     }
 
@@ -145,7 +128,6 @@ public class List extends JScrollPane {
             if (pluginNames.length == 0) {
                 return;
             }
-
             newSelectedEntryName = pluginNames[0];
         }
 
@@ -198,4 +180,5 @@ public class List extends JScrollPane {
             listener.listChanged();
         }
     }
+
 }

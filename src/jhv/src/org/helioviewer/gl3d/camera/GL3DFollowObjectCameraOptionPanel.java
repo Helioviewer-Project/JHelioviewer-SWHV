@@ -29,8 +29,6 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
 
-    private static final long serialVersionUID = 1L;
-
     private final JLabel loadedLabel;
     private JLabel beginDateLabel;
     private JPanel beginDatetimePanel;
@@ -348,7 +346,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     public void fireLoaded(String state) {
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
-
         this.loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
     }
 
@@ -361,4 +358,5 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     public void fireNewDate(Date date) {
         this.cameraTime.setText(this.format.format(date));
     }
+
 }

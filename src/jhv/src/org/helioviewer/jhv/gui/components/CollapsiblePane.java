@@ -28,8 +28,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  */
 public class CollapsiblePane extends JComponent implements ActionListener {
 
-    private static final long serialVersionUID = 1L;
-
     private static final ImageIcon expandedIcon = IconBank.getIcon(JHVIcon.DOWN2);
     private static final ImageIcon collapsedIcon = IconBank.getIcon(JHVIcon.RIGHT2);
 

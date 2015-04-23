@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 public abstract class GL3DCameraOptionPanel extends JPanel {
 
-    private static final long serialVersionUID = 1L;
     private JPanel fovPanel;
     private JSpinner fovSpinner;
 
@@ -52,4 +51,5 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         this.fovPanel.add(Box.createHorizontalGlue());
         add(this.fovPanel, BorderLayout.CENTER);
     }
+
 }

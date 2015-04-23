@@ -13,7 +13,6 @@ import org.helioviewer.viewmodel.view.View;
 
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
-    private static final long serialVersionUID = 5760418851530682634L;
     HashMap<View, Component> controlMap = new HashMap<View, Component>();
 
     public ControlPanelContainer() {

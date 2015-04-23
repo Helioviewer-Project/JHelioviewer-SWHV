@@ -7,6 +7,7 @@ import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.components.CollapsiblePane;
 
 public class DataCollapsiblePanel extends CollapsiblePane {
+
     private boolean isExpanded;
 
     private final DataCollapsiblePanelModel model;
@@ -16,11 +17,6 @@ public class DataCollapsiblePanel extends CollapsiblePane {
         this.model = model;
         isExpanded = startExpanded;
     }
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4318197859567084201L;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -32,4 +28,5 @@ public class DataCollapsiblePanel extends CollapsiblePane {
     public boolean isExpanded() {
         return isExpanded;
     }
+
 }

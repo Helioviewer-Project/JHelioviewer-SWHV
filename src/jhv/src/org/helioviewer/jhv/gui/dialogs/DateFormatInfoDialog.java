@@ -23,23 +23,9 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  */
 public class DateFormatInfoDialog extends JDialog implements ActionListener, ShowableDialog {
 
-    // ////////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final JButton closeButton = new JButton("Close");
 
-    // ////////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     */
     public DateFormatInfoDialog() {
-
         super(ImageViewerGui.getMainFrame(), "Date format information", true);
         setLayout(new BorderLayout());
         setResizable(false);
@@ -88,4 +74,5 @@ public class DateFormatInfoDialog extends JDialog implements ActionListener, Sho
     @Override
     public void init() {
     }
+
 }

@@ -48,16 +48,13 @@ public class FileDownloader {
      * @return URI to the downloaded file or null if download fails.
      */
     public URI downloadFromHTTP(URI sourceURI, boolean downloadIfAlreadyExists) {
-
         // check if sourceURI is an http address
         if (sourceURI == null)
             return null;
 
         String scheme = sourceURI.getScheme();
-
         if (scheme == null)
             return null;
-
         if (!scheme.equalsIgnoreCase("http")) {
             return null;
         }
@@ -154,7 +151,6 @@ public class FileDownloader {
         if (source == null) {
             return null;
         }
-
         return new File(JHVDirectory.REMOTEFILES.getPath() + source.getPath().substring(Math.max(0, source.getPath().lastIndexOf("/"))));
     }
 
@@ -189,7 +185,6 @@ public class FileDownloader {
      * @throws IOException
      */
     public boolean get(URI source, File dest, String title) throws IOException {
-
         // create own dialog where to display the progress
         progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         // progressBar.setPreferredSize(new Dimension(200, 20));
@@ -199,18 +194,15 @@ public class FileDownloader {
 
         // download the file
         boolean result = downloadFile(source, dest);
-
         dialog.dispose();
 
         return result;
     }
 
     public boolean get(URI source, File dest, JProgressBar progressBar) throws IOException {
-
         // set up progress bar and progress label
         this.progressBar = progressBar;
         progressBar.setName("Downloading '" + source.getPath().substring(source.getPath().lastIndexOf("/") + 1) + "'...");
-
         // download the file
         return downloadFile(source, dest);
     }
@@ -227,7 +219,6 @@ public class FileDownloader {
      * @throws URISyntaxException
      * */
     private boolean downloadFile(URI source, File dest) throws IOException {
-
         final URI finalSource;
         final File finalDest;
         if (source == null || dest == null)
@@ -257,7 +248,6 @@ public class FileDownloader {
 
         downloadThread = new Thread(new Runnable() {
             public void run() {
-
                 URLConnection conn = null;
                 FileOutputStream out = null;
                 InputStream in = null;
@@ -283,7 +273,6 @@ public class FileDownloader {
                             progressBar.setValue(numTotalRead);
                         }
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -322,12 +311,9 @@ public class FileDownloader {
      */
     private class StandAloneDialog extends JWindow implements ActionListener {
 
-        private static final long serialVersionUID = 1L;
         private boolean wasInterrupted;
 
         /**
-         * Default constructor
-         * 
          * @param title
          *            Text to show on top of the progress bar
          */
@@ -358,5 +344,7 @@ public class FileDownloader {
                 wasInterrupted = true;
             }
         }
+
     }
+
 }

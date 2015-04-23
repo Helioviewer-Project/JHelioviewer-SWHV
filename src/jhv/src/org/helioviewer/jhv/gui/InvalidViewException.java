@@ -7,6 +7,5 @@ package org.helioviewer.jhv.gui;
  * 
  */
 public class InvalidViewException extends Exception {
-    private static final long serialVersionUID = 1L;
 
 }

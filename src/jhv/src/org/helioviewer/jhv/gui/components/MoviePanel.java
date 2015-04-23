@@ -78,8 +78,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  */
 public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, UIViewListener {
 
-    private static final long serialVersionUID = 1L;
-
     // different animation speeds
     private enum SpeedUnit {
         FRAMESPERSECOND {
@@ -586,7 +584,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * also to provide shortcuts. They always refer to the active layer.
      */
     private static abstract class StaticMovieAction extends AbstractAction implements ActionListener, LayersListener {
-        private static final long serialVersionUID = 1L;
+
         protected MoviePanel activePanel;
 
         /**
@@ -656,11 +654,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * also to provide shortcuts. They always refer to the active layer.
      */
     public static class StaticPlayPauseAction extends StaticMovieAction {
-        private static final long serialVersionUID = 1L;
 
-        /**
-         * Default constructor.
-         */
         public StaticPlayPauseAction() {
             super("Play movie", playIcon);
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
@@ -700,11 +694,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * also to provide shortcuts. They always refer to the active layer.
      */
     public static class StaticPreviousFrameAction extends StaticMovieAction {
-        private static final long serialVersionUID = 1L;
 
-        /**
-         * Default constructor.
-         */
         public StaticPreviousFrameAction() {
             super("Step to previous frame", IconBank.getIcon(JHVIcon.BACK));
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
@@ -730,11 +720,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * also to provide shortcuts. They always refer to the active layer.
      */
     public static class StaticNextFrameAction extends StaticMovieAction {
-        private static final long serialVersionUID = 1L;
 
-        /**
-         * Default constructor.
-         */
         public StaticNextFrameAction() {
             super("Step to next frame", IconBank.getIcon(JHVIcon.FORWARD));
             putValue(MNEMONIC_KEY, KeyEvent.VK_N);
@@ -861,8 +847,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * from the global look and feel.
      */
     private static class TimeSlider extends JSlider {
-
-        private static final long serialVersionUID = 1L;
 
         private static final Color notCachedColor = Color.LIGHT_GRAY;
         private static final Color partialCachedColor = new Color(0x8080FF);

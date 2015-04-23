@@ -41,14 +41,9 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  */
 public final class AboutDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
 
-    private static final long serialVersionUID = 1L;
-
     private final JButton closeButton = new JButton("Close");
     private final JScrollPane scrollPane;
 
-    /**
-     * Default constructor.
-     */
     public AboutDialog() {
         super(ImageViewerGui.getMainFrame(), "About JHelioviewer", true);
         setLayout(new BorderLayout());
@@ -74,25 +69,15 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         boxPanel.add(new JSeparator());
         String text = "<html><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
-
         "This software uses the <a href=http://www.kakadusoftware.com>Kakadu JPEG2000 Toolkit</a>,<br> " + '\u00A9' + " 2009, NewSouth Innovations Ltd (NSI), <a href=Kakadu.txt>(License)</a><br>" +
-
         "<p>This software uses the <a href=http://kenai.com/projects/jogl>Java OpenGL Bindings (JOGL)</a>,<br>" + '\u00A9' + " 2003-2007 Sun Microsystems, Inc., <a href=JOGL2.txt>(License)</a><br>" +
-
         "<p>This software uses the <a href=https://gluegen.dev.java.net/>GlueGen Toolkit</a>,<br>" + '\u00A9' + " 2003-2005 Sun Microsystems, Inc., <a href=GlueGen.txt>(License)</a><br>" +
-
         "<p>This software uses the <a href=http://developer.nvidia.com/object/cg_toolkit.html>Cg Compiler</a>,<br>" + '\u00A9' + " 2009, NVIDIA Corp., <a href=Cg.txt>(License)</a><br>" +
-
         "<p>This software uses the <a href=http://www.raben.com/articles/JulianDay/JulianDayTutorial.html>JulianDay class</a>,<br>" + '\u00A9' + " 2002, Raben Systems, Inc., <a href=JulianDay.txt>(License)</a><br>" +
-
         "<p>This software uses <a href=http://logging.apache.org/log4j/index.html>log4j from the Apache Logging Services Project</a>,<br>" + '\u00A9' + " 2010, Apache Software Foundation, <a href=log4j.txt>(License)</a><br>" +
-
         "<p>This software uses the <a href=http://www.ffmpeg.org>FFmpeg project</a>, licensed under the LGPLv2.1.<br>" + "Its source code can be downloaded <a href=http://jhelioviewer.org/libjhv/ffmpeg/source/ffmpeg-source.tar.bz2>here</a>.<br>" +
-
         "<p>This software uses MP4Box from the <a href=http://gpac.sourceforge.net/index.php>GPAC Project</a>, licensed under LGPL.<br>" + "Its source code can be downloaded <a href=http://gpac.sourceforge.net/home_download.php>here</a>.<br>" +
-
         "<p>This software uses the Chrystal Project, licensed under the LGPL.<br> Its source code can be downloaded <a href=\"http://everaldo.com/crystal/?action=downloads\">here</a>.<br>" +
-
         "<p>This software uses the <a href=\"http://www.davekoelle.com/alphanum.html\">Alphanum Algorithm</a>, licensed under the LGPLv2.1.<br> Its source code can be downloaded <a href=\"http://jhelioviewer.org/libjhv/external/AlphanumComparator.java\">here</a>.<br>";
 
         for (PluginContainer pluginContainer : PluginManager.getSingletonInstance().getAllPlugins()) {

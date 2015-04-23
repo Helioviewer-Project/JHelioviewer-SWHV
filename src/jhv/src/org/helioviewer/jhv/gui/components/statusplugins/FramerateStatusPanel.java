@@ -9,18 +9,13 @@ import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
 
 /**
  * Status panel for displaying the framerate for image series.
- * 
- * <p>
  * The information of this panel is always shown for the active layer.
- * 
- * <p>
- * This panel is not visible, if the active layer is not an image series.
+ * This panel is not visible if the active layer is not an image series.
  * 
  * @author Markus Langenberg
  */
 public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
 
-    private static final long serialVersionUID = 1L;
     private static final FramerateStatusPanel instance = new FramerateStatusPanel();
 
     private FramerateStatusPanel() {

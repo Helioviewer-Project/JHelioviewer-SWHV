@@ -17,9 +17,6 @@ public class ParameterTableModel extends AbstractTableModel {
     /** The parameters in this model */
     private final List<JHVEventParameter> parameters;
 
-    /** UID */
-    private static final long serialVersionUID = 1963880595668739342L;
-
     /**
      * Creates a parameter model for the given parameters.
      * 
@@ -66,4 +63,5 @@ public class ParameterTableModel extends AbstractTableModel {
             return super.getColumnName(column);
         }
     }
+
 }

@@ -30,10 +30,6 @@ public class TimeTextField extends JTextField {
      * Used time formatter
      */
     public static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4082442421210153142L;
 
     /**
      * Creates a new time text field
@@ -107,4 +103,5 @@ public class TimeTextField extends JTextField {
     public void setValue(Date time) {
         setText(formatter.format(time));
     }
+
 }
