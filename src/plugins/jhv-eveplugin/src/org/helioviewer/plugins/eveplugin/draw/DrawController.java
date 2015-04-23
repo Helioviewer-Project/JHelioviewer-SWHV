@@ -72,10 +72,14 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
+        Log.debug("add draw controller listener : " + Thread.currentThread().getName());
+        Thread.dumpStack();
         listeners.add(listener);
     }
 
     public void removeDrawControllerListener(DrawControllerListener listener) {
+        Log.debug("remove draw controller listener : " + Thread.currentThread().getName());
+        Thread.dumpStack();
         listeners.remove(listener);
     }
 
@@ -167,6 +171,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireRedrawRequest() {
+        Log.debug("fire redraw request : " + Thread.currentThread().getName());
+        Thread.dumpStack();
         for (DrawControllerListener l : listeners) {
             l.drawRequest();
         }
@@ -227,6 +233,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void fireRedrawRequestMovieFrameChanged(final Date time) {
+        Log.debug("fire redraw request movie frame : " + Thread.currentThread().getName());
+        Thread.dumpStack();
         for (DrawControllerListener l : listeners) {
             l.drawMovieLineRequest(time);
         }
