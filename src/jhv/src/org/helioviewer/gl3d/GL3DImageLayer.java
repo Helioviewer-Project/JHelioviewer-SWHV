@@ -111,16 +111,15 @@ public class GL3DImageLayer implements Renderable {
 
     private void updateROI(GL3DState state) {
         MetaData metaData = getMainLayerView().getMetaData();
-        GL3DCamera activeCamera = GL3DState.getActiveCamera();
-
-        if (metaData == null || activeCamera == null) {
+        if (metaData == null)
             return;
-        }
 
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
-        double maxPhysicalX = -Double.MAX_VALUE;
-        double maxPhysicalY = -Double.MAX_VALUE;
+        double maxPhysicalX = Double.MIN_VALUE;
+        double maxPhysicalY = Double.MIN_VALUE;
+
+        GL3DCamera activeCamera = GL3DState.getActiveCamera();
         GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, this.getMainLayerView().getImageData());
 
         for (int i = 0; i < pointlist.length; i++) {
@@ -209,7 +208,6 @@ public class GL3DImageLayer implements Renderable {
 
                 if (this.mainLayerView.getBaseDifferenceMode()) {
                     GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getBaseDifferenceImageData()), "diffcameraDifferenceRotationQuat");
-
                 } else if (this.mainLayerView.getDifferenceMode()) {
                     GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()), "diffcameraDifferenceRotationQuat");
                 }
