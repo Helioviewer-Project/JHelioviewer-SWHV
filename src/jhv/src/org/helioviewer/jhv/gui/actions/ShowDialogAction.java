@@ -8,8 +8,6 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-//import org.helioviewer.jhv.gui.states.StateController;
-//import org.helioviewer.jhv.gui.states.ViewStateEnum;
 
 /**
  * Action to show any given dialog.
@@ -19,7 +17,6 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 public class ShowDialogAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
     private final Class<ShowableDialog> dialogToShow;
     private ShowableDialog dialog;
 

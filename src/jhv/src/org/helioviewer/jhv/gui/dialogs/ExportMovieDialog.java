@@ -32,8 +32,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
  */
 public class ExportMovieDialog extends JDialog implements ActionListener, ShowableDialog {
 
-    private static final long serialVersionUID = 1L;
-
     private final JLabel movieLabel = new JLabel("", SwingConstants.CENTER);
     final JButton exportButton = new JButton("Click to start export");
 
@@ -61,9 +59,6 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         timer.schedule(new CloseDialogTask(), 2000);
     }
 
-    /**
-     * Default constructor
-     */
     public ExportMovieDialog() {
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getLeftContentPane().setEnabled(false);

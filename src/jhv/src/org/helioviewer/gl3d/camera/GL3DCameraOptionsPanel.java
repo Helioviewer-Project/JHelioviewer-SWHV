@@ -22,7 +22,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
 
 public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
-    private static final long serialVersionUID = 3942154069677445408L;
     private JPanel optionsPanel;
     private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
     private JTabbedPane tab;

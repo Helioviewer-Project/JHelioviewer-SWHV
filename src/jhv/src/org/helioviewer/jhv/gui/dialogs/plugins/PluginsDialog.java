@@ -42,12 +42,6 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  * */
 public class PluginsDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener, ListEntryChangeListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private boolean changesMade = false;
 
     private static final Dimension DIALOG_SIZE_MINIMUM = new Dimension(400, 500);
@@ -67,16 +61,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
     private final JButton okButton = new JButton("Ok", IconBank.getIcon(JHVIcon.CHECK));
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public PluginsDialog() {
         super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
-
         initVisualComponents();
     }
 
@@ -116,7 +102,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         filterComboBox.addActionListener(this);
 
-        // ////////
         pluginList.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         emptyScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -131,7 +116,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
 
         pluginList.addListEntryChangeListener(this);
 
-        // ////////
         final JPanel installedButtonPane = new JPanel();
         installedButtonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         installedButtonPane.add(addButton);
@@ -188,7 +172,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
                 emptyLabel.setText("No Plug-ins disabled");
                 break;
             }
-
             listLayout.show(listContainerPane, "empty");
         }
     }
@@ -203,7 +186,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
             // save plug-in settings to XML file
             PluginManager.getSingletonInstance().saveSettings();
         }
-
         // close dialog
         dispose();
     }
@@ -222,13 +204,10 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         pluginList.removeAllEntries();
 
         for (final PluginContainer plugin : plugins) {
-
             if (filterIndex == 0 || (plugin.isActive() && filterIndex == 1) || (!plugin.isActive() && filterIndex == 2)) {
                 pluginList.addEntry(plugin.getName(), new PluginListEntry(plugin, pluginList));
             }
-
         }
-
         pluginList.selectItem(selectedPlugin);
 
         updateVisualComponents();
@@ -255,7 +234,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
                     fileChooser.setVisible(false);
 
                     final File dstFile = new File(JHVDirectory.PLUGINS.getPath() + fileChooser.getSelectedFile().getName());
-
                     if (dstFile.exists()) {
                         Message.err("An error occured while importing the plugin.", "A plugin with the same name already exists!", false);
                         return;
@@ -285,18 +263,11 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         fileChooser.showOpenDialog(this);
     }
 
-    /**
-     *
-     * */
     private void downloadPlugins() {
-        // TODO SP: show download dialog
-
         updatePluginList();
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Showable Dialog
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -314,9 +285,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         setVisible(true);
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -334,9 +303,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         }
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Window Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -388,9 +355,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     public void windowOpened(final WindowEvent e) {
     }
 
-    // ////////////////////////////////////////////////////////////////
     // List Entry Change Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -410,9 +375,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         updateVisualComponents();
     }
 
-    // ////////////////////////////////////////////////////////////////
     // JAR Filter
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * File Chooser Filter which allows JAR files only.
@@ -426,7 +389,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
          */
         @Override
         public boolean accept(File f) {
-
             if (f.isDirectory())
                 return true;
 
@@ -446,9 +408,11 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         public String getDescription() {
             return "JAR files (\".jar\")";
         }
+
     }
 
     @Override
     public void init() {
     }
+
 }

@@ -58,8 +58,6 @@ import org.w3c.dom.NodeList;
  */
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
 
-    private static final long serialVersionUID = 1L;
-
     private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
 
@@ -112,10 +110,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      */
     public void resetData() {
         infoList.removeAllElements();
-
         // update the listBox
         listBox.setListData(this.infoList);
-
         // set the status of export button
         if (!metaDataOK) {
             exportFitsButton.setEnabled(false);
@@ -133,7 +129,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      */
     public void addDataItem(String _item) {
         infoList.add(_item);
-
         // update the listBox
         listBox.setListData(this.infoList);
     }

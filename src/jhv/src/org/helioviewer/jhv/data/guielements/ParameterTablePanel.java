@@ -27,9 +27,6 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
  */
 public class ParameterTablePanel extends JPanel {
 
-    /** The UID */
-    private static final long serialVersionUID = -4399453042145630686L;
-
     /** the table */
     private final JTable table;
     /** the model for the table */
@@ -75,8 +72,8 @@ public class ParameterTablePanel extends JPanel {
             return;
         }
         sorter.setRowFilter(rf);
-        nullValue.addActionListener(new ActionListener() {
 
+        nullValue.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (nullValue.isSelected()) {

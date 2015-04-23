@@ -121,15 +121,11 @@ public class FilterTabPanelManager {
     public JPanel createCompactPanel() {
 
         JPanel compactPanel = new JPanel() {
-
-            private static final long serialVersionUID = 1L;
-
             /**
              * Override the setEnabled method in order to keep the containing
              * components' enabledState synced with the enabledState of this
              * component.
              */
-
             @Override
             public void setEnabled(boolean enabled) {
                 for (Component c : this.getComponents()) {
@@ -205,7 +201,6 @@ public class FilterTabPanelManager {
             c.setJP2View(jp2view);
         }
         downloadLayerAction = new AbstractAction() {
-            private static final long serialVersionUID = 1L;
             {
                 putValue(SHORT_DESCRIPTION, "Download the selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
@@ -218,7 +213,6 @@ public class FilterTabPanelManager {
         };
         downloadLayerButton.setAction(downloadLayerAction);
         showMetaAction = new AbstractAction() {
-            private static final long serialVersionUID = 1L;
             {
                 putValue(SHORT_DESCRIPTION, "Show metadata of the selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));

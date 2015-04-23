@@ -36,12 +36,6 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  * */
 public class PluginListEntry extends AbstractListEntry implements MouseListener, ComponentListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final PluginContainer plugin;
     private final List list;
 
@@ -56,19 +50,10 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
     private final JPanel descPane = new JPanel();
     private final JPanel buttonPane = new JPanel();
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public PluginListEntry(final PluginContainer plugin, final List list) {
         this.plugin = plugin;
         this.list = list;
-
         initVisualComponents();
-
         list.addComponentListener(this);
     }
 
@@ -131,13 +116,11 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
         title.append("<font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
         title.append("<b>" + plugin.getName() + "</b>");
         title.append("</font></html>");
-
         return title.toString();
     }
 
     private String getDescriptionText() {
         final String pluginDesc = plugin.getDescription() == null ? "" : plugin.getDescription();
-
         return pluginDesc;
     }
 
@@ -173,7 +156,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
      * Shows up the preferences dialog of the corresponding plug-in.
      * */
     private void showPreferencesDialog() {
-        // TODO: implement
     }
 
     /**
@@ -188,7 +170,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
         plugin.changeSettings();
 
         updateEnableLabel();
-
         list.fireItemChanged();
     }
 
@@ -213,11 +194,9 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
 
         while (in.hasMoreTokens()) {
             final String next = in.nextToken() + " ";
-
             if (getStringLength(g, out.toString() + next) >= maxPixelLength) {
                 break;
             }
-
             out.append(next);
         }
 
@@ -240,16 +219,12 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
 
     private void updateDescriptionTextToDisplay(final Graphics g) {
         descLabel.setText(" ");
-
         final int contentWidth = list.getSize().width - list.getVerticalScrollBar().getSize().width;
         final int maxDescLabelWidth = contentWidth - buttonPane.getSize().width - descPane.getPreferredSize().width;
-
         descLabel.setText(reduceTextLength(getDescriptionText(), maxDescLabelWidth, g));
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Mouse Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -292,9 +267,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
     public void mouseReleased(final MouseEvent e) {
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Component Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -322,21 +295,9 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
         updateDescriptionTextToDisplay(e.getComponent().getGraphics());
     }
 
-    // ////////////////////////////////////////////////////////////////
     // Link Label
-    // ////////////////////////////////////////////////////////////////
 
     private class LinkLabel extends JLabel {
-
-        // ////////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
-        // ////////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////////
 
         public LinkLabel(final String text) {
             initVisualComponents(text);
@@ -356,5 +317,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
                 }
             });
         }
+
     }
+
 }

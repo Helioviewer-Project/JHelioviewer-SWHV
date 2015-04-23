@@ -10,18 +10,8 @@ import javax.swing.JPanel;
  * */
 public abstract class ObservationDialogPanel extends JPanel {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     protected static final int GRIDLAYOUT_HGAP = 5;
     protected static final int GRIDLAYOUT_VGAP = 2;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     /**
      * This method will be executed when the {@link ObservationDialog} shows up.
@@ -51,4 +41,5 @@ public abstract class ObservationDialogPanel extends JPanel {
      * been pressed.
      * */
     public abstract void cancelButtonPressed();
+
 }

@@ -29,20 +29,14 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
     private static double factor = 0.01 * Math.log(10);
 
     private final JSlider gammaSlider;
     private final JLabel title;
     private final JLabel gammaLabel;
 
-    /**
-     * Default constructor.
-     *
-     */
     public GammaCorrectionPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Gamma");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
@@ -67,7 +61,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     /**
      * {@inheritDoc}
      */
-
     public Area getArea() {
         return Area.TOP;
     }
@@ -183,4 +176,5 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     public Component getValue() {
         return gammaLabel;
     }
+
 }

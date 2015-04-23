@@ -27,12 +27,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  */
 public class JHVSplashScreen extends JFrame {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private static final Dimension splashScreenSize = new Dimension(400, 215);
 
     private static JHVSplashScreen instance = new JHVSplashScreen();
@@ -43,10 +37,6 @@ public class JHVSplashScreen extends JFrame {
     private int steps = 1;
     private int currentStep = 1;
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
     public void destroy() {
         instance = null;
     }
@@ -55,13 +45,10 @@ public class JHVSplashScreen extends JFrame {
      * Default constructor.
      * */
     private JHVSplashScreen() {
-
         // initialize the frame itself
         initFrame();
-
         // initialize the visual components
         initVisualComponents();
-
         // show the splash screen
         setVisible(true);
     }
@@ -214,24 +201,13 @@ public class JHVSplashScreen extends JFrame {
      * */
     private class SplashImagePanel extends JPanel {
 
-        // ////////////////////////////////////////////////////////////
-        // Definitions
-        // ////////////////////////////////////////////////////////////
-
-        private static final long serialVersionUID = 1L;
-
         private final BufferedImage image = IconBank.getImage(JHVIcon.SPLASH);
         private final JLabel label = new JLabel("");
-
-        // ////////////////////////////////////////////////////////////
-        // Methods
-        // ////////////////////////////////////////////////////////////
 
         /**
          * Default constructor.
          * */
         public SplashImagePanel() {
-
             // set basic layout
             setLayout(null);
 

@@ -24,16 +24,10 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class OpacityPanel extends AbstractFilterPanel implements ChangeListener, FilterAlignmentDetails {
 
-    private static final long serialVersionUID = 1L;
-
     private final JSlider opacitySlider;
     private final JLabel opacityLabel;
     private final JLabel title;
 
-    /**
-     * Default constructor.
-     *
-     */
     public OpacityPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
@@ -122,4 +116,5 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     public Component getValue() {
         return opacityLabel;
     }
+
 }

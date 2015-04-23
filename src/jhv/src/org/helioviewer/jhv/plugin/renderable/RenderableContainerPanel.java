@@ -39,6 +39,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class RenderableContainerPanel extends JPanel {
+
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -53,10 +54,7 @@ public class RenderableContainerPanel extends JPanel {
     public static final int NUMBEROFCOLUMNS = 4;
 
     private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
+
         {
             putValue(SHORT_DESCRIPTION, "Add a new layer");
         }
@@ -177,7 +175,6 @@ public class RenderableContainerPanel extends JPanel {
              */
             @Override
             public void mouseClicked(MouseEvent e) {
-
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
                 RenderableContainer model = (RenderableContainer) grid.getModel();

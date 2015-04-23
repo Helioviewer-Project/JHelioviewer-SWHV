@@ -39,8 +39,6 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
  */
 public class TopToolBar extends JToolBar implements MouseListener {
 
-    private static final long serialVersionUID = 1L;
-
     public enum SelectionMode {
         PAN, ZOOMBOX, ROTATE
     };

@@ -44,8 +44,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  */
 public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
 
-    private static final long serialVersionUID = 1L;
-
     private JPanel allTablePanel;
 
     private DataCollapsiblePanel standardParameters;
@@ -89,8 +87,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void windowGainedFocus(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -103,8 +99,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void focusGained(FocusEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -117,14 +111,10 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void windowOpened(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void windowClosing(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -134,26 +124,18 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     @Override
     public void windowIconified(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void windowDeiconified(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void windowActivated(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void windowDeactivated(WindowEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     private void initDialog(JHVEvent event) {
@@ -393,4 +375,5 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         }
         return newExpandedPanels;
     }
+
 }

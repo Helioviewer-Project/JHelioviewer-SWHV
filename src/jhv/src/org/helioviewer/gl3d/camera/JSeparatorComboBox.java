@@ -21,8 +21,6 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 public class JSeparatorComboBox extends JComboBox implements KeyListener {
 
-    private static final long serialVersionUID = -13987864729937697L;
-
     //  Track key presses and releases
     private boolean released = true;
 
@@ -74,18 +72,15 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
         Object value = getItemAt(index);
 
         //  Attempting to select a separator
-
         if (value instanceof JSeparator) {
             //  If no keys have been pressed then we must be using the mouse.
             //  Prevent selection of the Separator when using the mouse
-
             if (released) {
                 separatorSelected = true;
                 return;
             }
 
             //  Skip over the Separator when using the Up/Down keys
-
             int current = getSelectedIndex();
             index += (index > current) ? 1 : -1;
 
@@ -103,7 +98,6 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
     @Override
     public void setPopupVisible(boolean visible) {
         //  Keep the popup open when the separator was clicked on
-
         if (separatorSelected) {
             separatorSelected = false;
             return;
@@ -133,7 +127,6 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
      * Class to render the JSeparator compenent
      */
     class SeparatorRenderer extends BasicComboBoxRenderer {
-        private static final long serialVersionUID = -5948578422346341592L;
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

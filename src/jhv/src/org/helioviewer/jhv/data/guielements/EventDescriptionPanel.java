@@ -20,8 +20,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  *
  */
 public class EventDescriptionPanel extends JPanel {
-    /** UID */
-    private static final long serialVersionUID = -2859591591100257931L;
 
     /** The event */
     private final JHVEvent event;
@@ -109,7 +107,6 @@ public class EventDescriptionPanel extends JPanel {
         shortPanelConstraint.weighty = 0;
         shortPanelConstraint.gridwidth = 1;
         this.add(summaryPanel, shortPanelConstraint);
-
     }
 
     /**
@@ -117,7 +114,6 @@ public class EventDescriptionPanel extends JPanel {
      *
      */
     private void initDescriptionText() {
-
         textType = new JTextArea(event.getJHVEventType().getEventType());
         textType.setBackground(this.getBackground());
         textType.setLineWrap(true);
@@ -139,7 +135,6 @@ public class EventDescriptionPanel extends JPanel {
         textEndTime.setWrapStyleWord(true);
         textEndTime.setFont(labelIcon.getFont());
         textEndTime.setMargin(new Insets(0, 0, 0, 0));
-
     }
 
     /**
@@ -155,7 +150,6 @@ public class EventDescriptionPanel extends JPanel {
      *            the component to add
      */
     private void addLineToSummaryPanel(JPanel panel, int y, String fieldName, Component component) {
-
         GridBagConstraints shortPanelLabelConstraint = new GridBagConstraints();
         shortPanelLabelConstraint.weightx = 0;
         shortPanelLabelConstraint.weighty = 0;
@@ -174,7 +168,6 @@ public class EventDescriptionPanel extends JPanel {
         shortPanelLabelConstraint.weightx = 1;
         shortPanelLabelConstraint.fill = GridBagConstraints.BOTH;
         panel.add(component, shortPanelLabelConstraint);
-
     }
 
 }

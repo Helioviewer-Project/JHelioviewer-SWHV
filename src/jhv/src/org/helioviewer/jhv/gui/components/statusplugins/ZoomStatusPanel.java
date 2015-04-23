@@ -22,7 +22,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
  */
 public class ZoomStatusPanel extends ViewStatusPanelPlugin {
 
-    private static final long serialVersionUID = 1L;
     private static final ZoomStatusPanel instance = new ZoomStatusPanel();
 
     private ZoomStatusPanel() {

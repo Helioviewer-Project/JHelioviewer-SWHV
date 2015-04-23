@@ -12,25 +12,12 @@ import java.util.EventObject;
  * @author Stephan Pagel
  */
 public class JHVCalendarEvent extends EventObject {
-
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
     /**
-     * Default constructor.
-     * 
      * @param source
      *            The object on which the Event initially occurred.
      */
     public JHVCalendarEvent(Object source) {
-
         super(source);
     }
+
 }

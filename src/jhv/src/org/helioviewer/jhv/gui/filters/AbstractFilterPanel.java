@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 public abstract class AbstractFilterPanel extends JPanel {
-    private static final long serialVersionUID = 1L;
+
     protected AbstractView jp2view;
 
     public void setJP2View(AbstractView jp2view) {
@@ -14,4 +14,5 @@ public abstract class AbstractFilterPanel extends JPanel {
             this.jp2view = jp2view;
         }
     }
+
 }

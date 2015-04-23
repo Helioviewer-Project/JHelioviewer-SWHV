@@ -13,8 +13,6 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
  */
 public class SetZoomBoxInteractionAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-
     public SetZoomBoxInteractionAction() {
         super("Zoom Box");
     }

@@ -32,10 +32,6 @@ import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
  */
 public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
     /**
-     * Generated serial id from Eclipse
-     */
-    private static final long serialVersionUID = -7744622478498519850L;
-    /**
      * Controlled filter by this panel
      */
     private final JSpinner truncateSpinner;
@@ -46,7 +42,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      * valid filter has been set.
      */
     public RunningDifferencePanel() {
-
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
         truncateSpinner = new JSpinner();
@@ -184,4 +179,5 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         super.setJP2View(jp2view);
         truncateSpinner.setValue(1.f - jp2view.getTruncation());
     }
+
 }
