@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +9,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -28,7 +31,6 @@ import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
-import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
@@ -38,7 +40,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
-    private static final GLCanvas canvas = GLSharedDrawable.getCanvas();
+    private final static GLCanvas canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -55,8 +57,13 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderablecontainer().addRenderable(new RenderableGrid(gridType, false));
         Displayer.getRenderablecontainer().addRenderable(new RenderableCamera());
 
+        canvas.setMinimumSize(new Dimension(0, 0));
         canvas.addGLEventListener(this);
         Displayer.addListener(this);
+    }
+
+    public final Component getComponent() {
+        return (Component) canvas;
     }
 
     @Override
