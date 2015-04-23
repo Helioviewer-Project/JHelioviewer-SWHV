@@ -46,7 +46,7 @@ public abstract class GL3DCamera {
 
     private long timeDelay;
 
-    private long time;
+    protected long time;
 
     private boolean trackingMode;
 
