@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Cursor;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -36,12 +33,11 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher, ImagePanelPlugin, MouseListener, MouseMotionListener {
+public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
-    private boolean aPressed = false;
 
     private ComponentView view;
 
@@ -51,10 +47,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
     private SWEKEventInformationDialog hekPopUp;
-
-    public SWHVHEKImagePanelEventPopupController() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
-    }
 
     /**
      * {@inheritDoc}
@@ -78,8 +70,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     @Override
     public void setImagePanel(MainImagePanel newImagePanel) {
         imagePanel = newImagePanel;
-        imagePanel.addMouseListener(this);
-        imagePanel.addMouseMotionListener(this);
     }
 
     /**
@@ -117,36 +107,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
         }
 
         return new Point(xCoord, yCoord);
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent ke) {
-        synchronized (this) {
-            switch (ke.getID()) {
-            case KeyEvent.KEY_PRESSED:
-                if (ke.getKeyCode() == KeyEvent.VK_A) {
-                    aPressed = true;
-                }
-                if (ke.getKeyCode() == KeyEvent.VK_R) {
-                    Displayer.display();
-                }
-                break;
-
-            case KeyEvent.KEY_RELEASED:
-                if (ke.getKeyCode() == KeyEvent.VK_A) {
-                    aPressed = false;
-                }
-                break;
-            }
-
-            return false;
-        }
-    }
-
-    public boolean isAPressed() {
-        synchronized (this) {
-            return aPressed;
-        }
     }
 
     /**
