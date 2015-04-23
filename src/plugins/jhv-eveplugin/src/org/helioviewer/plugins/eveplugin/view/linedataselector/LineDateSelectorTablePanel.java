@@ -37,7 +37,6 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Load
 
 public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
-    private static final long serialVersionUID = -8443699382736126351L;
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     public static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     public static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -126,7 +125,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
              * @param e
              */
             public void handlePopup(MouseEvent e) {
-
             }
 
             /**
@@ -134,7 +132,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
              */
             @Override
             public void mouseClicked(MouseEvent e) {
-
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
@@ -212,7 +209,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
                 setOptionsPanel(null);
             }
         }
-
     }
 
 }

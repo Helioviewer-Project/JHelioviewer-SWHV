@@ -31,8 +31,6 @@ import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
  * */
 public class PfssPluginPanel extends JPanel {
 
-    private static final long serialVersionUID = 1L;
-
     private JSpinner qualitySpinner;
     public static PfssPluginPanel currentPluginPanel;
 
@@ -42,7 +40,6 @@ public class PfssPluginPanel extends JPanel {
      * */
     public PfssPluginPanel() {
         currentPluginPanel = this;
-
         initVisualComponents();
     }
 

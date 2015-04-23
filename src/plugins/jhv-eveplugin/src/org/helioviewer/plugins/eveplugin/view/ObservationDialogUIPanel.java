@@ -33,7 +33,6 @@ import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
  * */
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
-    private static final long serialVersionUID = 8932098719271808631L;
     private final JLabel labelGroup;
     private final JLabel labelData;
     private final JComboBox comboBoxGroup;
@@ -43,7 +42,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     public ObservationDialogUIPanel() {
         super();
-
         // long start = System.currentTimeMillis();
         labelGroup = new JLabel("Group");
         labelData = new JLabel();
@@ -191,7 +189,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     @Override
     public void dialogOpened() {
         final Interval<Date> interval = DrawController.getSingletonInstance().getAvailableInterval();
-
         final GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(interval.getEnd());
         calendar.add(Calendar.DAY_OF_MONTH, -1);

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.BorderLayout;
@@ -21,9 +18,6 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
  * 
  */
 public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
-
-    /** Serial version UID */
-    private static final long serialVersionUID = 212085486418646472L;
 
     /** The singleton panel used */
     private static SWEKPluginPanel swekPluginPanel;
@@ -82,13 +76,10 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
 
     @Override
     public void startedDownloadingEventType(SWEKEventType eventType) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void stoppedDownloadingEventType(SWEKEventType eventType) {
-        // TODO Auto-generated method stub
-
     }
+
 }

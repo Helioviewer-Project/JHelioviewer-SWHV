@@ -30,8 +30,6 @@ import org.helioviewer.jhv.plugins.swek.download.FilterManager;
  */
 public abstract class AbstractFilterPanel extends JPanel {
 
-    /** The UID. */
-    private static final long serialVersionUID = 8128418401123128270L;
     /** the SWEK parameter for this filter */
     protected SWEKParameter parameter;
     /** the SWEK the event type */
@@ -103,7 +101,6 @@ public abstract class AbstractFilterPanel extends JPanel {
 
     /**
      * Creates the filter panel.
-     * 
      */
     private void initVisualComponents() {
         setLayout(new BorderLayout());
@@ -131,7 +128,6 @@ public abstract class AbstractFilterPanel extends JPanel {
     /**
      * Initializes the min, max, middle and step size values based on the
      * information found in the parameter.
-     * 
      */
     private void initValues() {
         min = parameter.getParameterFilter().getMin() == null ? Double.MIN_VALUE : parameter.getParameterFilter().getMin();
@@ -140,4 +136,5 @@ public abstract class AbstractFilterPanel extends JPanel {
         middleValue = parameter.getParameterFilter().getStartValue() == null ? (min + max) / 2 : parameter.getParameterFilter().getStartValue();
         units = parameter.getParameterFilter().getUnits();
     }
+
 }

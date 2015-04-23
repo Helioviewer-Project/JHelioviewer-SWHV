@@ -13,8 +13,6 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorT
 
 public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
-    private static final long serialVersionUID = 2173458369966852891L;
-
     private final JProgressBar downloadProgressBar = new JProgressBar();
 
     @Override
@@ -32,4 +30,5 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
             return p;
         }
     }
+
 }

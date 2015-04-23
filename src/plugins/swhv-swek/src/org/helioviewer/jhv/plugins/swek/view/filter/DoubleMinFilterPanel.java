@@ -26,13 +26,7 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
 
     public DoubleMinFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
-        // TODO Auto-generated constructor stub
     }
-
-    /**
-     * The UID.
-     */
-    private static final long serialVersionUID = 979250707589258006L;
 
     @Override
     public void filter(boolean active) {
@@ -55,7 +49,6 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
         minimumValueSpinner = new JSpinner(minimumSpinnerModel);
         minimumValueSpinner.setEditor(new JSpinner.NumberEditor(minimumValueSpinner, getSpinnerFormat(min, max)));
         minimumValueSpinner.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent e) {
                 filterManager.removedFilter(eventType, parameter);

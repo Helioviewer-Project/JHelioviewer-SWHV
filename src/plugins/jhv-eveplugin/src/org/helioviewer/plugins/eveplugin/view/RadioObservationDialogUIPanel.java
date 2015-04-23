@@ -14,8 +14,6 @@ import org.helioviewer.jhv.io.DataSourceServers;
 
 public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements DataSourceServerListener {
 
-    private static final long serialVersionUID = -885570748845807311L;
-
     private final String[] serverList;
     private final JComboBox comboServer;
     private final JLabel labelServer = new JLabel("Server");

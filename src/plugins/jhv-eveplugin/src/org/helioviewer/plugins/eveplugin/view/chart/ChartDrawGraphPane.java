@@ -54,11 +54,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * */
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
     private final DrawController drawController;
     private Map<YAxisElement, Double> yRatios;
     private Date movieTimestamp = null;
@@ -84,10 +79,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastHeight;
     private boolean updateRequestReceived;
     private final Timer timer;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public ChartDrawGraphPane() {
         updateRequestReceived = false;
@@ -496,9 +487,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         LinkedMovieManager.getSingletonInstance().setCurrentFrame(new ImmutableDateTime(timestamp), false);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Mouse Input Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void mouseClicked(final MouseEvent e) {
@@ -652,9 +641,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Component Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void componentHidden(ComponentEvent e) {
@@ -688,15 +675,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         drawController.setGraphInformation(graphArea, plotArea, leftAxisArea);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Graph Polyline
-    // //////////////////////////////////////////////////////////////////////////////
 
     public class GraphPolyline {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
 
         public final int numberOfPoints;
         public final int numberOfWarnLevels;
@@ -705,10 +686,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         public final int[] warnLevels;
 
         public final Color color;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels) {
             numberOfPoints = points.size();
@@ -836,7 +813,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void windowLostFocus(WindowEvent e) {
-        // TODO Auto-generated method stub
     }
 
     private class RedrawTimerTask extends TimerTask {

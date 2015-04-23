@@ -26,13 +26,7 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
 
     public DoubleMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
-        // TODO Auto-generated constructor stub
     }
-
-    /**
-     * The UID.
-     */
-    private static final long serialVersionUID = -6593939617306920649L;
 
     @Override
     public void filter(boolean active) {
@@ -54,7 +48,6 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
         maximumValueSpinner = new JSpinner(maximumSpinnerModel);
         maximumValueSpinner.setEditor(new JSpinner.NumberEditor(maximumValueSpinner, getSpinnerFormat(min, max)));
         maximumValueSpinner.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (filterToggleButton.isSelected()) {
@@ -76,7 +69,6 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
         c.gridx = 2;
         p.add(new JLabel(super.units), c);
         return p;
-
     }
 
 }
