@@ -6,8 +6,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -20,16 +18,9 @@ import org.helioviewer.viewmodel.view.ComponentView;
 /**
  * This class represents an image component that is used to display the image of
  * all images.
- *
- * @author caplins
- * @author Alen Agheksanterian
- * @author Benjamin Wamsler
- * @author Stephan Pagel
- * @author Markus Langenberg
  */
 public class MainImagePanel extends JPanel {
 
-    private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
     private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
 
     private final static CameraMouseController mouseController = new CameraMouseController();
@@ -43,10 +34,9 @@ public class MainImagePanel extends JPanel {
         component.addMouseListener(mouseController);
         component.addMouseMotionListener(mouseController);
         component.addMouseWheelListener(mouseController);
-
-        if (KeyListener.class.isAssignableFrom(mouseController.getClass())) {
+        if (mouseController instanceof KeyListener)
             component.addKeyListener((KeyListener) mouseController);
-        }
+
         add(component);
 
         mouseController.setImagePanel(this);
@@ -64,7 +54,7 @@ public class MainImagePanel extends JPanel {
      *            new plug-in which has to to be added to this component
      */
     public void addPlugin(ImagePanelPlugin newPlugin) {
-        if (newPlugin == null) {
+        if (newPlugin == null || plugins.contains(newPlugin)) {
             return;
         }
 
@@ -73,16 +63,12 @@ public class MainImagePanel extends JPanel {
         plugins.add(newPlugin);
 
         Component component = componentView.getComponent();
-
-        if (newPlugin instanceof MouseListener && !Arrays.asList(component.getMouseListeners()).contains(newPlugin)) {
+        if (newPlugin instanceof MouseListener)
             component.addMouseListener((MouseListener) newPlugin);
-        }
-        if (newPlugin instanceof MouseMotionListener && !Arrays.asList(component.getMouseMotionListeners()).contains(newPlugin)) {
+        if (newPlugin instanceof MouseMotionListener)
             component.addMouseMotionListener((MouseMotionListener) newPlugin);
-        }
-        if (newPlugin instanceof MouseWheelListener && !Arrays.asList(component.getMouseWheelListeners()).contains(newPlugin)) {
+        if (newPlugin instanceof MouseWheelListener)
             component.addMouseWheelListener((MouseWheelListener) newPlugin);
-        }
     }
 
     /**
@@ -94,7 +80,7 @@ public class MainImagePanel extends JPanel {
      * @see MainImagePanel#addPlugin(ImagePanelPlugin)
      */
     public void removePlugin(ImagePanelPlugin oldPlugin) {
-        if (oldPlugin == null) {
+        if (oldPlugin == null || !plugins.contains(oldPlugin)) {
             return;
         }
 
@@ -102,12 +88,13 @@ public class MainImagePanel extends JPanel {
         oldPlugin.setImagePanel(null);
         plugins.remove(oldPlugin);
 
+        Component component = componentView.getComponent();
         if (oldPlugin instanceof MouseListener)
-            componentView.getComponent().removeMouseListener((MouseListener) oldPlugin);
+            component.removeMouseListener((MouseListener) oldPlugin);
         if (oldPlugin instanceof MouseMotionListener)
-            componentView.getComponent().removeMouseMotionListener((MouseMotionListener) oldPlugin);
+            component.removeMouseMotionListener((MouseMotionListener) oldPlugin);
         if (oldPlugin instanceof MouseWheelListener)
-            componentView.getComponent().removeMouseWheelListener((MouseWheelListener) oldPlugin);
+            component.removeMouseWheelListener((MouseWheelListener) oldPlugin);
     }
 
 }
