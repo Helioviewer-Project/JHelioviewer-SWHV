@@ -43,6 +43,7 @@ import com.jogamp.common.nio.Buffers;
  */
 public class GL3DImageLayer implements Renderable {
 
+    private static boolean showCorona = true;
     private static int nextLayerId = 0;
     private final int layerId;
 
@@ -55,8 +56,6 @@ public class GL3DImageLayer implements Renderable {
 
     private final int resolution = 3;
     private final GL3DVec2d[] pointlist = new GL3DVec2d[(resolution + 1) * 2 * 2];
-    private final boolean showSphere;
-    private boolean showCorona;
     private int positionBufferID;
     private int indexBufferID;
     private int indexBufferSize;
@@ -66,7 +65,7 @@ public class GL3DImageLayer implements Renderable {
     private final RenderableType type;
     private boolean isVisible = true;
 
-    public GL3DImageLayer(String name, AbstractView view, boolean showSphere, boolean showCorona, boolean restoreColorMask) {
+    public GL3DImageLayer(String name, AbstractView view) {
         this.type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         this.mainLayerView = view;
@@ -85,8 +84,6 @@ public class GL3DImageLayer implements Renderable {
             }
         }
 
-        this.showSphere = showSphere;
-        this.showCorona = showCorona;
         Displayer.getRenderablecontainer().addBeforeRenderable(this);
     }
 
@@ -221,7 +218,7 @@ public class GL3DImageLayer implements Renderable {
                 enableIndexVBO(state);
                 {
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-                    if (this.showCorona) {
+                    if (GL3DImageLayer.showCorona) {
                         GLSLShader.bindIsDisc(gl, 0);
 
                         gl.glDepthRange(1.f, 1.f);
@@ -229,12 +226,9 @@ public class GL3DImageLayer implements Renderable {
 
                         gl.glDepthRange(0.f, 1.f);
                     }
-                    if (this.showSphere) {
-                        GLSLShader.bindIsDisc(gl, 1);
 
-                        gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-                    }
-
+                    GLSLShader.bindIsDisc(gl, 1);
+                    gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                 }
                 disableIndexVBO(state);
                 disablePositionVBO(state);
@@ -404,8 +398,8 @@ public class GL3DImageLayer implements Renderable {
         }
     }
 
-    public void setCoronaVisibility(boolean visible) {
-        this.showCorona = visible;
+    public static void toggleCorona() {
+        showCorona = !showCorona;
     }
 
     @Override

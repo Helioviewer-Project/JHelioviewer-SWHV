@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DSolarRotationTrackingTrackballCamera;
 import org.helioviewer.jhv.display.Displayer;
@@ -24,6 +25,7 @@ public class ToggleCoronaVisibilityAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        GL3DImageLayer.toggleCorona();
         Displayer.display();
     }
 
