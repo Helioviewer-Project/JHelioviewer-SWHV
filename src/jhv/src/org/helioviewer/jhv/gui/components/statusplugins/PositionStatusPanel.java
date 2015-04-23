@@ -15,26 +15,14 @@ import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * Status panel for displaying the current mouse position.
- *
- * <p>
- * If the the physical dimension of the image are known, the physical position
- * will be shown, otherwise, shows the screen position.
- *
- * <p>
- * Basically, the information of this panel is independent from the active
- * layer.
- *
- * <p>
- * If there is no layer present, this panel will be invisible.
  */
 public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseMotionListener, ImagePanelPlugin {
 
-    private static final long serialVersionUID = 1L;
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
-    private ComponentView view;
+    private static ComponentView view;
+    private static MainImagePanel imagePanel;
 
-    private MainImagePanel imagePanel;
     private Point lastPosition;
 
     private PositionStatusPanel() {
@@ -42,7 +30,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
         setPreferredSize(new Dimension(170, 20));
 
         setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
-
     }
 
     public static PositionStatusPanel getSingletonInstance() {
@@ -104,11 +91,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
     @Override
     public void setImagePanel(MainImagePanel newImagePanel) {
-        if (imagePanel != null) {
-            imagePanel.removeMouseMotionListener(this);
-        }
         imagePanel = newImagePanel;
-        imagePanel.addMouseMotionListener(this);
     }
 
     /**
