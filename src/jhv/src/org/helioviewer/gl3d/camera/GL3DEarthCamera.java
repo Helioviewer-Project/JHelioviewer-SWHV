@@ -56,7 +56,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     }
 
     private void updateRotation(Date date) {
-        this.setZTranslation(-Astronomy.getDistance(date));
+        this.setZTranslation(-Astronomy.getDistanceSolarRadii(date));
         double b0 = Astronomy.getB0InRadians(date);
         double currentRotation = Astronomy.getL0Radians(date);
 
