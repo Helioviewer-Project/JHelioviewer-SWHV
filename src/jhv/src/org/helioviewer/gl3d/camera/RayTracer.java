@@ -22,8 +22,7 @@ public class RayTracer {
     }
 
     public Ray cast(double x, double y) {
-        GL3DState state = GL3DState.get();
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (x / state.getViewportWidth() - 0.5), -2. * (y / state.getViewportHeight() - 0.5), 1., 1.);
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (x / GL3DState.getViewportWidth() - 0.5), -2. * (y / GL3DState.getViewportHeight() - 0.5), 1., 1.);
 
         GL3DMat4d roti = camera.getCameraTransformation().inverse();
         GL3DMat4d vpmi = camera.orthoMatrixInverse;

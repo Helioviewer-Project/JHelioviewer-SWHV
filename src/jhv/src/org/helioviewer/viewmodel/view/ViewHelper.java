@@ -122,23 +122,13 @@ public final class ViewHelper {
      * @return resulting image size of the region within the viewport
      */
     public static ViewportImageSize calculateViewportImageSize(Region r) {
-        int viewportwidth;
-        int viewportheight;
-        if (GL3DState.get() == null) {
-            viewportwidth = 512;
-            viewportheight = 512;
-        } else {
-            viewportwidth = GL3DState.get().getViewportWidth();
-            viewportheight = GL3DState.get().getViewportHeight();
-        }
-        double screenMeterPerPixel;
-        double screenSubImageWidth;
-        double screenSubImageHeight;
+        int viewportheight = GL3DState.getViewportHeight();
+
         // fit region of interest into viewport
-        screenMeterPerPixel = r.getHeight() / viewportheight;
-        screenSubImageHeight = viewportheight;
-        screenSubImageWidth = r.getWidth() / screenMeterPerPixel;
-        System.out.println("SIW" + screenSubImageWidth + " " + screenSubImageHeight);
+        double screenMeterPerPixel = r.getHeight() / viewportheight;
+        double screenSubImageHeight = viewportheight;
+        double screenSubImageWidth = r.getWidth() / screenMeterPerPixel;
+
         return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
     }
 

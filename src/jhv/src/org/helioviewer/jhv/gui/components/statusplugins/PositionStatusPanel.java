@@ -60,8 +60,7 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
      */
 
     private void updatePosition(Point position) {
-        GL3DState state = GL3DState.get();
-        if (position == lastPosition || state == null)
+        if (position == lastPosition)
             return;
 
         GL3DVec3d computedposition = GL3DState.getActiveCamera().getVectorFromSphereAlt(position);
