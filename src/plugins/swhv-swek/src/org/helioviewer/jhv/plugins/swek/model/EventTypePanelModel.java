@@ -295,4 +295,5 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
             fireNewEventTypeAndSourceInActive(swekEventType, supplier.getSource(), supplier);
         }
     }
+
 }

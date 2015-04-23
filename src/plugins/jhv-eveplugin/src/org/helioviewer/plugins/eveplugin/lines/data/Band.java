@@ -14,18 +14,10 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorE
  * */
 public class Band implements LineDataSelectorElement {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
     private final BandType bandType;
 
     private boolean isVisible = true;
     private Color graphColor = Color.BLACK;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public Band(final BandType bandType) {
         this.bandType = bandType;
@@ -59,10 +51,6 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-
         if (!(obj instanceof Band)) {
             return false;
         }
@@ -121,4 +109,5 @@ public class Band implements LineDataSelectorElement {
     public Component getOptionsPanel() {
         return new LineColorOptionPanel(this);
     }
+
 }

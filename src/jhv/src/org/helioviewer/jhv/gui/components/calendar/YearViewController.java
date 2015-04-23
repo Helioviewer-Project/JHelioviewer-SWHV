@@ -13,15 +13,7 @@ import java.util.GregorianCalendar;
  */
 public class YearViewController implements CalendarViewController {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     Calendar calendar = new GregorianCalendar();
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
@@ -29,7 +21,6 @@ public class YearViewController implements CalendarViewController {
      * A period of 10 years will be added to the current date.
      */
     public Date moveForward() {
-
         calendar.add(Calendar.YEAR, 10);
         return calendar.getTime();
     }
@@ -40,7 +31,6 @@ public class YearViewController implements CalendarViewController {
      * A period of 10 years will be removed from the current date.
      */
     public Date moveBack() {
-
         calendar.add(Calendar.YEAR, -10);
         return calendar.getTime();
     }
@@ -49,7 +39,6 @@ public class YearViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public String getSelectionButtonText() {
-
         int currentYear = calendar.get(Calendar.YEAR);
         return Integer.toString(currentYear - 6) + " - " + Integer.toString(currentYear + 5);
     }
@@ -58,7 +47,6 @@ public class YearViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public Date getDate() {
-
         return calendar.getTime();
     }
 
@@ -69,7 +57,6 @@ public class YearViewController implements CalendarViewController {
      * special meaning (except uniqueness).
      */
     public String[] getGridColumnHeader() {
-
         String[] names = new String[4];
 
         for (int i = 0; i < 4; i++)
@@ -85,9 +72,7 @@ public class YearViewController implements CalendarViewController {
      * are placed.
      */
     public Object[][] getGridData() {
-
         Object[][] data = new Object[3][4];
-
         int year = calendar.get(Calendar.YEAR) - 6;
 
         for (int i = 0; i < 12; i++) {
@@ -101,7 +86,6 @@ public class YearViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public Point getCorrespondingCellOfCurrentDate() {
-
         return new Point(1, 2);
     }
 
@@ -109,7 +93,6 @@ public class YearViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public void setDateOfCellValue(Object value) {
-
         if (value instanceof Integer) {
             calendar.set(Calendar.YEAR, ((Integer) value).intValue());
         }
@@ -119,7 +102,7 @@ public class YearViewController implements CalendarViewController {
      * {@inheritDoc}
      */
     public void setDate(Date date) {
-
         calendar.setTime(date);
     }
+
 }

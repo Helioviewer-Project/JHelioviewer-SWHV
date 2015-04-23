@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ObservationDialogDateModel {
+
     private final List<ObservationDialogDateModelListener> listeners;
 
     private static ObservationDialogDateModel instance;
@@ -12,9 +13,8 @@ public class ObservationDialogDateModel {
     private Date startDate;
     private Date endDate;
 
-    private boolean endDateSetByUser;
-
     private boolean startDateSetByUser;
+    private boolean endDateSetByUser;
 
     private ObservationDialogDateModel() {
         listeners = new ArrayList<ObservationDialogDateModelListener>();
@@ -82,4 +82,5 @@ public class ObservationDialogDateModel {
             l.endDateChanged(endDate);
         }
     }
+
 }

@@ -18,9 +18,6 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
 
 public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
-    /** the serial verion UID */
-    private static final long serialVersionUID = -436392148995692409L;
-
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object whatToDisplay, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         if (whatToDisplay instanceof SWEKTreeModelEventType) {

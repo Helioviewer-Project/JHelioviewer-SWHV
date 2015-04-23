@@ -16,6 +16,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class DownloadedJPXData {
+
     private JHVJP2View view;
     private Long imageID;
     private Date startDate;
@@ -206,4 +207,5 @@ public class DownloadedJPXData {
             return byteData;
         }
     }
+
 }
