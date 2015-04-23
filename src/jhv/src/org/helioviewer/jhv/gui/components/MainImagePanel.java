@@ -71,6 +71,18 @@ public class MainImagePanel extends JPanel {
         newPlugin.setImagePanel(this);
         newPlugin.setView(componentView);
         plugins.add(newPlugin);
+
+        Component component = componentView.getComponent();
+
+        if (newPlugin instanceof MouseListener && !Arrays.asList(component.getMouseListeners()).contains(newPlugin)) {
+            component.addMouseListener((MouseListener) newPlugin);
+        }
+        if (newPlugin instanceof MouseMotionListener && !Arrays.asList(component.getMouseMotionListeners()).contains(newPlugin)) {
+            component.addMouseMotionListener((MouseMotionListener) newPlugin);
+        }
+        if (newPlugin instanceof MouseWheelListener && !Arrays.asList(component.getMouseWheelListeners()).contains(newPlugin)) {
+            component.addMouseWheelListener((MouseWheelListener) newPlugin);
+        }
     }
 
     /**
@@ -89,42 +101,13 @@ public class MainImagePanel extends JPanel {
         oldPlugin.setView(null);
         oldPlugin.setImagePanel(null);
         plugins.remove(oldPlugin);
-    }
 
-    @Override
-    public void addMouseListener(MouseListener l) {
-        if (!Arrays.asList(componentView.getComponent().getMouseListeners()).contains(l)) {
-            componentView.getComponent().addMouseListener(l);
-        }
-    }
-
-    @Override
-    public void addMouseWheelListener(MouseWheelListener l) {
-        componentView.getComponent().addMouseWheelListener(l);
-    }
-
-    @Override
-    public void removeMouseListener(MouseListener l) {
-        componentView.getComponent().removeMouseListener(l);
-    }
-
-    @Override
-    public void removeMouseWheelListener(MouseWheelListener l) {
-        componentView.getComponent().removeMouseWheelListener(l);
-    }
-
-    @Override
-    public void addMouseMotionListener(MouseMotionListener l) {
-        if (l != null) {
-            mouseMotionListeners.add(l);
-        }
-    }
-
-    @Override
-    public void removeMouseMotionListener(MouseMotionListener l) {
-        if (l != null) {
-            mouseMotionListeners.remove(l);
-        }
+        if (oldPlugin instanceof MouseListener)
+            componentView.getComponent().removeMouseListener((MouseListener) oldPlugin);
+        if (oldPlugin instanceof MouseMotionListener)
+            componentView.getComponent().removeMouseMotionListener((MouseMotionListener) oldPlugin);
+        if (oldPlugin instanceof MouseWheelListener)
+            componentView.getComponent().removeMouseWheelListener((MouseWheelListener) oldPlugin);
     }
 
 }
