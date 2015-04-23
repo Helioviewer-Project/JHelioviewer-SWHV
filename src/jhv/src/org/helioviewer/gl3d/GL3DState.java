@@ -6,7 +6,7 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 
 /**
- * The {@link GL3DState} is recreated every render pass by the
+ * The {@link GL3DState} is updated every render pass by the
  * {@link ComponentView}. It provides the reference to the {@link GL2} object
  * and stores some globally relevant information such as width and height of the
  * viewport, etc.
