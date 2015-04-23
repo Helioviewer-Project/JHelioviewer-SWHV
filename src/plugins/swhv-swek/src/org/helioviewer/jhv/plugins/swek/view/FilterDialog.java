@@ -27,9 +27,6 @@ import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
  */
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
-    /** the UID */
-    private static final long serialVersionUID = -3671511621882458171L;
-
     /** The event type */
     private final SWEKEventType eventType;
 
@@ -131,8 +128,6 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
 
     @Override
     public void focusGained(FocusEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -143,8 +138,6 @@ public class FilterDialog extends JDialog implements FocusListener, WindowFocusL
 
     @Override
     public void windowGainedFocus(WindowEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

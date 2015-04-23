@@ -6,8 +6,6 @@ import javax.swing.JPanel;
 
 public class PlotPanel extends JPanel {
 
-    private static final long serialVersionUID = 1L;
-
     public PlotPanel() {
         JPanel plotPane = new JPanel();
         setLayout(new BorderLayout());
@@ -16,4 +14,5 @@ public class PlotPanel extends JPanel {
         plotPane.add(new ChartDrawIntervalPane(), BorderLayout.PAGE_END);
         add(plotPane, BorderLayout.CENTER);
     }
+
 }

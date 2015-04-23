@@ -36,7 +36,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
-    private static final long serialVersionUID = 1L;
     protected boolean enableLoadButton = true;
 
     private final JLabel labelStartDate;
@@ -221,6 +220,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     // Action Listener
+
     public void setLoadButtonEnabled(boolean shouldBeEnabled) {
         enableLoadButton = shouldBeEnabled;
     }

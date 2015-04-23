@@ -29,13 +29,11 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
  * 
  */
 public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
-    /** seriolVersionUID */
-    private static final long serialVersionUID = 1057300852220893978L;
 
     /** The event type for which the event panel is created */
     private final SWEKEventType eventType;
 
-    /** Tree containing the event type and it's sources. */
+    /** Tree containing the event type and its sources. */
     private JTree eventTypeTree;
 
     /** The model for this panel */
@@ -138,28 +136,22 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
     }
 
     @Override
     public void expansionChanged() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

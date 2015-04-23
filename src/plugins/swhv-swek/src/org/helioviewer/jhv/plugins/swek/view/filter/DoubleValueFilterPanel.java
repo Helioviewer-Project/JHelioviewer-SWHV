@@ -21,9 +21,6 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
 public class DoubleValueFilterPanel extends AbstractFilterPanel {
 
-    /** The UID */
-    private static final long serialVersionUID = 1849764035063972566L;
-
     /** The value spinner */
     private JSpinner spinner;
 

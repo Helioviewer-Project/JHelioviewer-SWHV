@@ -27,9 +27,6 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
  */
 public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
 
-    /** The UID */
-    private static final long serialVersionUID = -580186824513381393L;
-
     /** Minimum value spinner */
     private JSpinner minimumValueSpinner;
 
@@ -46,7 +43,6 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
      */
     public DoubleMinMaxFilterPanel(SWEKEventType eventType, SWEKParameter parameter) {
         super(eventType, parameter);
-
     }
 
     @Override
