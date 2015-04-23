@@ -10,17 +10,12 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Action to switch fullscreen mode on and off.
- * 
- * <p>
  * In this case, "fullscreen" means hiding the panel at left side of the window.
  * 
  * @author Markus Langenberg
  */
 public class ToggleFullscreenAction extends AbstractAction {
 
-    /**
-     * Default constructor.
-     */
     public ToggleFullscreenAction() {
         super("Toggle fullscreen");
         putValue(SHORT_DESCRIPTION, "Toggle fullscreen");
