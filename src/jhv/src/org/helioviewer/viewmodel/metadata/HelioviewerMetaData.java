@@ -35,8 +35,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private boolean stonyhurstAvailable = false;
     private double refb0;
     private double refl0;
-    private final double innerRadius = 0.;
-    private final double outerRadius = 40.;
+    private double innerRadius = 0.;
+    private double outerRadius = 40.;
 
     private String instrument = "";
     private String detector = "";
@@ -63,6 +63,36 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         retrieveDateTime(m);
         retrievePosition(m);
         retrievePixelParameters(m);
+        retrieveOcculterRadii(m);
+    }
+
+    private void retrieveOcculterRadii(MetaDataContainer m) {
+        innerRadius = m.tryGetDouble("HV_ROCC_INNER") * Constants.SunRadius;
+        outerRadius = m.tryGetDouble("HV_ROCC_OUTER") * Constants.SunRadius;
+
+        if (innerRadius == 0.0 && getDetector() != null) {
+            if (getDetector().equalsIgnoreCase("C2")) {
+                innerRadius = 2.3 * Constants.SunRadius;
+                outerRadius = 8.0 * Constants.SunRadius;
+            } else if (getDetector().equalsIgnoreCase("C3")) {
+                innerRadius = 4.4 * Constants.SunRadius;
+                outerRadius = 31.5 * Constants.SunRadius;
+            } else if (getObservatory().equalsIgnoreCase("STEREO_A") && getDetector().equalsIgnoreCase("COR1")) {
+                innerRadius = 1.36 * Constants.SunRadius;
+                outerRadius = 4.5 * Constants.SunRadius;
+            } else if (getObservatory().equalsIgnoreCase("STEREO_A") && getDetector().equalsIgnoreCase("COR2")) {
+                innerRadius = 2.4 * Constants.SunRadius;
+                outerRadius = 15.6 * Constants.SunRadius;
+            } else if (getObservatory().equalsIgnoreCase("STEREO_B") && getDetector().equalsIgnoreCase("COR1")) {
+                innerRadius = 1.5 * Constants.SunRadius;
+                outerRadius = 4.9 * Constants.SunRadius;
+            } else if (getObservatory().equalsIgnoreCase("STEREO_B") && getDetector().equalsIgnoreCase("COR2")) {
+                innerRadius = 3.25 * Constants.SunRadius;
+                outerRadius = 17 * Constants.SunRadius;
+            }
+        }
+        if (outerRadius == 0.)
+            outerRadius = Double.MAX_VALUE;
     }
 
     private void identifyObservation(MetaDataContainer m) {
@@ -125,6 +155,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     private void retrievePosition(MetaDataContainer m) {
         this.dobs = m.tryGetDouble("DSUN_OBS");
+        if (this.dobs == 0.) {
+            this.dobs = Astronomy.getDistanceMeters(this.getDateTime().getTime());
+        }
 
         double crlt = m.tryGetDouble("CRLT_OBS");
         double crln = m.tryGetDouble("CRLN_OBS");
