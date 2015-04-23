@@ -22,7 +22,7 @@ public class RadioImage {
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(DownloadedJPXData jpxData, long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
+    public RadioImage(long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
         super();
         this.downloadID = downloadID;
         imageTimeInterval = timeInterval;
@@ -38,7 +38,7 @@ public class RadioImage {
 
     /**
      * Gives the size of the latest data received
-     * 
+     *
      * @return Rectangle with the size of the latest received data for this
      *         RadioImage
      */
@@ -49,7 +49,7 @@ public class RadioImage {
 
     /**
      * Sets the size of the latest received data.
-     * 
+     *
      * @param lastDataSize
      *            The size of the last data download
      */
@@ -60,7 +60,7 @@ public class RadioImage {
 
     /**
      * Indicates if this radio image is downloading.
-     * 
+     *
      * @return True if the radio image is downloading, false if not
      */
     public boolean isDownloading() {
@@ -70,7 +70,7 @@ public class RadioImage {
 
     /**
      * Sets whether the radio image is downloading
-     * 
+     *
      * @param isDownloading
      *            True if the radio image is downloading, false if not
      */
@@ -168,7 +168,7 @@ public class RadioImage {
      * time and frequency. If the given visible interval start or end (both time
      * and frequency) lies within the time and frequency interval of this image.
      * The part of this image that is visible is defined.
-     * 
+     *
      * @param visibleXStart
      *            The start time of the visible time interval
      * @param visibleXEnd
@@ -239,7 +239,7 @@ public class RadioImage {
      * Defines the region of interest based on the visible time and frequency
      * interval. The region of interest is given in coordinates in the highest
      * resolution level.
-     * 
+     *
      * @return A Rectangle containing the region of interest of the visible time
      *         and frequency interface.
      */
