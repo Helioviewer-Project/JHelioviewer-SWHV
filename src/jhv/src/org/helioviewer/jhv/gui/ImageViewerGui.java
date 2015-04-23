@@ -20,7 +20,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
@@ -45,7 +44,6 @@ import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
 
 /**
  * A class that sets up the graphical user interface.

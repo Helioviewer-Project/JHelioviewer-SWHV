@@ -272,8 +272,8 @@ public class LayersModel {
     /**
      * Downloads the complete image from the JPIP server.
      *
-     * Changes the source of the View afterwards, since a local file is
-     * always faster.
+     * Changes the source of the View afterwards, since a local file is always
+     * faster.
      */
     private void downloadFromJPIP(JHVJP2View v) {
         FileDownloader fileDownloader = new FileDownloader();
@@ -320,7 +320,7 @@ public class LayersModel {
     public void addLayer(AbstractView view) {
         movieManager.pauseLinkedMovies();
 
-        GL3DImageLayer imageLayer = new GL3DImageLayer("", view, true, true, true);
+        GL3DImageLayer imageLayer = new GL3DImageLayer("", view);
         view.setImageLayer(imageLayer);
         layers.add(view);
 
