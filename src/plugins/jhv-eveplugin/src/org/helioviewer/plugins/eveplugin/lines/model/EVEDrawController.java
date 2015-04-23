@@ -355,4 +355,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         return EVECacheController.getSingletonInstance().downloadData(band, interval, graphArea);
     }
 
+    public void bandColorChanged(Band band) {
+        fireRedrawRequest(false);
+    }
+
 }

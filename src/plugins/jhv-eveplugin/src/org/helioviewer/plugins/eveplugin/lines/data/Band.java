@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 
 import org.helioviewer.plugins.eveplugin.lines.gui.LineColorOptionPanel;
+import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 
@@ -49,6 +50,7 @@ public class Band implements LineDataSelectorElement {
 
     public void setGraphColor(final Color color) {
         graphColor = color;
+        EVEDrawController.getSingletonInstance().bandColorChanged(this);
     }
 
     public final Color getGraphColor() {
@@ -117,6 +119,6 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public Component getOptionsPanel() {
-        return new LineColorOptionPanel(graphColor);
+        return new LineColorOptionPanel(this);
     }
 }
