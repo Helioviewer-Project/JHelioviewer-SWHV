@@ -25,7 +25,6 @@ import org.helioviewer.jhv.gui.actions.SetRotationInteractionAction;
 import org.helioviewer.jhv.gui.actions.SetZoomBoxInteractionAction;
 import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
 import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
-import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 
