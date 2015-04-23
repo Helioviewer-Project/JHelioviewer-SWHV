@@ -80,11 +80,9 @@ public class ColorMask {
         if (red) {
             mask |= 0x00FF0000;
         }
-
         if (green) {
             mask |= 0x0000FF00;
         }
-
         if (blue) {
             mask |= 0x000000FF;
         }
@@ -99,4 +97,5 @@ public class ColorMask {
         ColorMask m = (ColorMask) o;
         return m.red == red && m.green == green && m.blue == blue;
     }
+
 }

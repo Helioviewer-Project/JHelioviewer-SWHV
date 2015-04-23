@@ -32,22 +32,11 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  */
 public class PluginManager {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static PluginManager singeltonInstance = new PluginManager();
+    private static PluginManager singletonInstance = new PluginManager();
 
     private final PluginSettings pluginSettings = PluginSettings.getSingletonInstance();
     private final Map<Plugin, PluginContainer> plugins = new HashMap<Plugin, PluginContainer>();
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * The private constructor to support the singleton pattern.
-     * */
     private PluginManager() {
     }
 
@@ -57,7 +46,7 @@ public class PluginManager {
      * @return the only instance of this class.
      * */
     public static PluginManager getSingletonInstance() {
-        return singeltonInstance;
+        return singletonInstance;
     }
 
     /**
@@ -105,11 +94,9 @@ public class PluginManager {
         // exception and add plug-in names to the message of the exception.
         if (list.size() > 0) {
             String message = "";
-
             for (String item : list) {
                 message += item + "\n";
             }
-
             throw new IOException(message);
         }
     }
