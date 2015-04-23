@@ -1,5 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +35,15 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
     private final YValueModel yValueModel;
+    private final YAxisElement yAxisElement;
+    private final RadioImagePane radioImagePane;
+    private final Set<RadioPlotModelListener> listeners;
+    private final Map<Long, DownloadRequestData> downloadRequestData;
+    private final Map<Long, Map<Long, PlotConfig>> plotConfigList;
+    /** Map containing per download id a list of no data configurations */
+    private final Map<Long, List<NoDataConfig>> noDataConfigList;
 
-    private final RadioPlotModelData radioPlotModelData;
+    // private final RadioPlotModelData radioPlotModelData;
 
     private RadioPlotModel() {
         ColorLookupModel.getInstance().addFilterModelListener(this);
@@ -43,8 +52,18 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
         bufferedImages = new HashMap<Long, BufferedImage>();
-        radioPlotModelData = new RadioPlotModelData();
+        // radioPlotModelData = new RadioPlotModelData();
         yValueModel = YValueModel.getSingletonInstance();
+        yAxisElement = new RadioYAxisElement();
+        yAxisElement.setColor(Color.BLACK);
+        yAxisElement.setLabel("MHz");
+        yAxisElement.setIsLogScale(false);
+        radioImagePane = new RadioImagePane();
+        radioImagePane.setYAxisElement(yAxisElement);
+        downloadRequestData = new HashMap<Long, DownloadRequestData>();
+        plotConfigList = new HashMap<Long, Map<Long, PlotConfig>>();
+        noDataConfigList = new HashMap<Long, List<NoDataConfig>>();
+        listeners = new HashSet<RadioPlotModelListener>();
 
     }
 
@@ -56,20 +75,14 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     public void addRadioPlotModelListener(RadioPlotModelListener listener, String plotIdentifier) {
-        radioPlotModelData.addRadioPlotModelListener(listener);
+        listeners.add(listener);
     }
 
     public void removeRadioPlotModelListener(RadioPlotModelListener listener, String plotIdentifier) {
-        radioPlotModelData.removeRadioPlotModelListener(listener);
+        listeners.remove(listener);
     }
 
     public Collection<PlotConfig> getPlotConfigurations() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called from an other thread : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(345);
-        }
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
         List<PlotConfig> tempAllConfig = new ArrayList<PlotConfig>();
         for (Map<Long, PlotConfig> map : plotConfigList.values()) {
             for (PlotConfig pc : map.values()) {
@@ -89,7 +102,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
      * @return A collection containing all the no data configurations.
      */
     public Collection<NoDataConfig> getNoDataConfigurations() {
-        Map<Long, List<NoDataConfig>> noDataConfigList = radioPlotModelData.getNoDataConfigList();
         List<NoDataConfig> allNoDataConfigs = new ArrayList<NoDataConfig>();
         for (List<NoDataConfig> ndcl : noDataConfigList.values()) {
             allNoDataConfigs.addAll(ndcl);
@@ -103,26 +115,18 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void downloadRequestAnswered(Interval<Date> timeInterval, long ID) {
         zoomManager.addZoomDataConfig(timeInterval, this, ID);
-        /*
-         * YValueModel yValueModel =
-         * this.yValueModelManager.getYValueModel(identifier);
-         * yValueModel.setAvailableYMax(freqInterval.getStart());
-         * yValueModel.setAvailableYMax(freqInterval.getEnd());
-         */
     }
 
     @Override
     public void newDataAvailable(DownloadRequestData data, long downloadID) {
-        Map<Long, DownloadRequestData> drd = radioPlotModelData.getDownloadRequestData();
-        if (drd.containsKey(downloadID)) {
-            drd.get(downloadID).mergeDownloadRequestData(data);
+        if (downloadRequestData.containsKey(downloadID)) {
+            downloadRequestData.get(downloadID).mergeDownloadRequestData(data);
         } else {
-            drd.put(downloadID, data);
+            downloadRequestData.put(downloadID, data);
         }
-        Map<Long, Map<Long, PlotConfig>> plotConfigListMap = radioPlotModelData.getPlotConfigList();
-        if (!plotConfigListMap.containsKey(downloadID)) {
-            Map<Long, PlotConfig> plotConfigList = new HashMap<Long, PlotConfig>();
-            radioPlotModelData.getPlotConfigList().put(downloadID, plotConfigList);
+        if (!plotConfigList.containsKey(downloadID)) {
+            Map<Long, PlotConfig> tempPlotConfigList = new HashMap<Long, PlotConfig>();
+            plotConfigList.put(downloadID, tempPlotConfigList);
         }
     }
 
@@ -132,8 +136,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> downloadIDList, long radioImageID) {
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
         for (long ID : downloadIDList) {
             BufferedImage newImage = bufferedImages.get(radioImageID);
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, ID);
@@ -160,16 +162,12 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void clearAllSavedImages() {
-        radioPlotModelData.getPlotConfigList().clear();
+        plotConfigList.clear();
     }
 
     @Override
     public void downloadRequestDataRemoved(DownloadRequestData drd, long ID) {
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
-        RadioImagePane radioImagePane = radioPlotModelData.getRadioImagePane();
-        Map<Long, List<NoDataConfig>> noDataList = radioPlotModelData.getNoDataConfigList();
-        noDataList.remove(ID);
+        noDataConfigList.remove(ID);
         plotConfigList.remove(ID);
         downloadRequestData.remove(ID);
         zoomManager.removeZoomManagerDataConfig(ID);
@@ -182,14 +180,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void downloadRequestDataVisibilityChanged(DownloadRequestData drd, long ID) {
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
-        Map<Long, List<NoDataConfig>> noDataList = radioPlotModelData.getNoDataConfigList();
         downloadRequestData.put(ID, drd);
         for (PlotConfig pc : plotConfigList.get(ID).values()) {
             pc.setVisible(drd.isVisible());
         }
-        for (NoDataConfig ndc : noDataList.get(ID)) {
+        for (NoDataConfig ndc : noDataConfigList.get(ID)) {
             ndc.setVisible(drd.isVisible());
         }
 
@@ -198,25 +193,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long downloadID, Long radioImageID) {
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
         BufferedImage newImage = createBufferedImage(area.width, area.height, data);
         data = new int[0];
         bufferedImages.put(radioImageID, newImage);
-        radioPlotModelData.getRadioImagePane().setIntervalTooBig(false);
-        // Log.trace("+===============================================================+");
-        // Log.trace("buffered images size : " + bufferedImages.size());
-        // Log.trace("Size of the data : " + data.length);
-        // Log.trace("timeinterval start : " + timeInterval.getStart());
-        // Log.trace("timeinterval end : " + timeInterval.getEnd());
-        // Log.trace("freqinterval start : " + freqInterval.getStart());
-        // Log.trace("freqinterval end : " + freqInterval.getEnd());
-        // Log.trace("Area : " + area);
-        // Log.trace("DownloadID : " + downloadID);
-        // Log.trace("Identifier : " + identifier);
+        radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID);
-        // Log.trace("Drawable Area Map : " + dam);
-        // Log.trace("-===============================================================-");
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(), downloadID, radioImageID);
         if (plotConfigList.containsKey(downloadID)) {
             plotConfigList.get(downloadID).put(radioImageID, pc);
@@ -230,25 +211,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, long radioImageID) {
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
         BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
         byteData = new byte[0];
         bufferedImages.put(radioImageID, newImage);
-        radioPlotModelData.getRadioImagePane().setIntervalTooBig(false);
-        // Log.trace("+===============================================================+");
-        // Log.trace("buffered images size : " + bufferedImages.size());
-        // Log.trace("Size of the data : " + data.length);
-        // Log.trace("timeinterval start : " + timeInterval.getStart());
-        // Log.trace("timeinterval end : " + timeInterval.getEnd());
-        // Log.trace("freqinterval start : " + freqInterval.getStart());
-        // Log.trace("freqinterval end : " + freqInterval.getEnd());
-        // Log.trace("Area : " + area);
-        // Log.trace("DownloadID : " + downloadID);
-        // Log.trace("Identifier : " + identifier);
+        radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID);
-        // Log.trace("Drawable Area Map : " + dam);
-        // Log.trace("-===============================================================-");
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(), downloadID, radioImageID);
         if (plotConfigList.containsKey(downloadID)) {
             plotConfigList.get(downloadID).put(radioImageID, pc);
@@ -262,7 +229,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void clearAllSavedImagesForID(Long downloadID, Long imageID) {
-        Map<Long, Map<Long, PlotConfig>> plotConfigList = radioPlotModelData.getPlotConfigList();
         Map<Long, PlotConfig> plotConfigPerDID = plotConfigList.get(downloadID);
         if (plotConfigPerDID != null) {
             plotConfigPerDID.remove(imageID);
@@ -271,19 +237,15 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void intervalTooBig(long iD) {
-        RadioImagePane radioImagePane = radioPlotModelData.getRadioImagePane();
-        Map<Long, PlotConfig> plotConfigList = new HashMap<Long, PlotConfig>();
-        radioPlotModelData.getPlotConfigList().put(iD, plotConfigList);
+        Map<Long, PlotConfig> plotConfigMap = new HashMap<Long, PlotConfig>();
+        plotConfigList.put(iD, plotConfigMap);
         radioImagePane.setIntervalTooBig(true);
         drawController.updateDrawableElement(radioImagePane);
     }
 
     @Override
     public void noDataInterval(List<Interval<Date>> noDataList, Long downloadID) {
-        RadioImagePane radioImagePane = radioPlotModelData.getRadioImagePane();
         radioImagePane.setIntervalTooBig(false);
-        Map<Long, List<NoDataConfig>> noDataConfigList = radioPlotModelData.getNoDataConfigList();
-        Map<Long, DownloadRequestData> downloadRequestData = radioPlotModelData.getDownloadRequestData();
         if (!noDataConfigList.containsKey(downloadID)) {
             noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
         } else {
@@ -320,8 +282,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void fireDrawNewBufferedImage() {// BufferedImage
-        RadioImagePane radioImagePane = radioPlotModelData.getRadioImagePane();
-        YAxisElement yAxisElement = radioPlotModelData.getyAxisElement();
         radioImagePane.setYAxisElement(yAxisElement);
         drawController.updateDrawableElement(radioImagePane);
     }
@@ -359,21 +319,18 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void fireRemoveRadioImage(long ID) {
-        Set<RadioPlotModelListener> listeners = radioPlotModelData.getListeners();
         for (RadioPlotModelListener l : listeners) {
             l.removeDownloadRequestData(ID);
         }
     }
 
     private void fireChangeVisibility(long ID, boolean visible) {
-        Set<RadioPlotModelListener> listeners = radioPlotModelData.getListeners();
         for (RadioPlotModelListener l : listeners) {
             l.changeVisibility(ID);
         }
     }
 
     private void updateNoDataConfig(Long downloadID) {
-        Map<Long, List<NoDataConfig>> noDataConfigList = radioPlotModelData.getNoDataConfigList();
         if (!noDataConfigList.containsKey(downloadID)) {
             noDataConfigList.put(downloadID, new ArrayList<NoDataConfig>());
         } else {
@@ -403,9 +360,9 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void updatePlotConfigurations() {
-        for (Long downloadID : radioPlotModelData.getPlotConfigList().keySet()) {
-            for (Long imageID : radioPlotModelData.getPlotConfigList().get(downloadID).keySet()) {
-                PlotConfig tempPC = radioPlotModelData.getPlotConfigList().get(downloadID).get(imageID);
+        for (Long downloadID : plotConfigList.keySet()) {
+            for (Long imageID : plotConfigList.get(downloadID).keySet()) {
+                PlotConfig tempPC = plotConfigList.get(downloadID).get(imageID);
                 if (bufferedImages.containsKey(imageID)) {
                     tempPC.setBufferedImage(bufferedImages.get(imageID));
                 }
