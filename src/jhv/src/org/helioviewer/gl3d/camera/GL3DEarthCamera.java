@@ -35,7 +35,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         super.activate(precedingCamera);
         Displayer.addFirstTimeListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-
+        this.setZTranslation(-DEFAULT_CAMERA_DISTANCE);
     }
 
     @Override
