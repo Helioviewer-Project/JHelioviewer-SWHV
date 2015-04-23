@@ -7,6 +7,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.plugins.eveplugin.lines.data.BandColors;
+
 public class LineDataSelectorModel implements TableModel {
     private final List<LineDataSelectorModelListener> listeners;
     private final List<LineDataSelectorElement> elements;
@@ -52,6 +54,7 @@ public class LineDataSelectorModel implements TableModel {
 
     public void addLineData(LineDataSelectorElement element) {
         elements.add(element);
+        element.setDataColor(BandColors.getNextColor());
         fireLineDataSelectorElementAdded(element);
         fireListeners();
     }
@@ -63,6 +66,7 @@ public class LineDataSelectorModel implements TableModel {
     public void removeLineData(LineDataSelectorElement element) {
         if (elements != null) {
             elements.remove(element);
+            BandColors.resetColor(element.getDataColor());
         }
         fireLineDataSelectorElementRemoved(element);
         fireListeners();
