@@ -153,6 +153,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static Displayer getSingletonInstance() {
         return instance;
-
     }
+
 }

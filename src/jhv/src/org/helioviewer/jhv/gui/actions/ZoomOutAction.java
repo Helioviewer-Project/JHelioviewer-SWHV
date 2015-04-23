@@ -31,7 +31,7 @@ public class ZoomOutAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        GL3DState.getActiveCamera().zoomIn(+1);
+        GL3DState.getActiveCamera().zoom(+1);
     }
 
 }
