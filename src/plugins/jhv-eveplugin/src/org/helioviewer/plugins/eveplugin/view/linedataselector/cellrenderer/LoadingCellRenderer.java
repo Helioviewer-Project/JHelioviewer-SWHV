@@ -1,12 +1,15 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer;
 
+import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
 public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
@@ -20,9 +23,13 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
         if (element.isDownloading()) {
             downloadProgressBar.setIndeterminate(true);
             downloadProgressBar.setVisible(element.isDownloading());
+            downloadProgressBar.setBorder(LineDateSelectorTablePanel.commonBorder);
             return downloadProgressBar;
         } else {
-            return null;
+            JPanel p = new JPanel();
+            p.setBorder(LineDateSelectorTablePanel.commonBorder);
+            p.setBackground(Color.WHITE);
+            return p;
         }
     }
 }

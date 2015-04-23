@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -36,6 +38,10 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Load
 public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
     private static final long serialVersionUID = -8443699382736126351L;
+    public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+    public static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+    public static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
+
     private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 16;
 
@@ -83,8 +89,8 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLE_ROW).setCellRenderer(new LineDataVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH);
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH + 3);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH + 3);
 
         grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
         // grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
