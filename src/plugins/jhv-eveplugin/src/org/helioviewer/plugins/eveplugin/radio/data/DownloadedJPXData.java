@@ -125,6 +125,13 @@ public class DownloadedJPXData {
         view = null;
     }
 
+    public void setInitialData() {
+        DownloadedJPXDataWorkerResult result = getJPXData(view);
+        if (result != null) {
+            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
+        }
+    }
+
     private class DownloadedJPXDataWorkerResult {
         private final int[] data;
         private final long imageID;
@@ -199,5 +206,4 @@ public class DownloadedJPXData {
             return byteData;
         }
     }
-
 }
