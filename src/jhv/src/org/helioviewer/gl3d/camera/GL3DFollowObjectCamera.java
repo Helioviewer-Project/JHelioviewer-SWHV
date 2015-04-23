@@ -60,8 +60,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void timeChanged(Date date) {
-
-        if (this.positionLoading.isLoaded() && !this.getTrackingMode()) {
+        if (date != null && this.positionLoading.isLoaded() && !this.getTrackingMode()) {
             //Layer times
             long t1 = Displayer.getLayersModel().getFirstDate().getTime();
             long t2 = Displayer.getLayersModel().getLastDate().getTime();

@@ -33,8 +33,8 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        Displayer.addFirstTimeListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        Displayer.addFirstTimeListener(this);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     @Override
     public void timeChanged(Date date) {
-        if (!this.getTrackingMode()) {
+        if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
         }
     }
