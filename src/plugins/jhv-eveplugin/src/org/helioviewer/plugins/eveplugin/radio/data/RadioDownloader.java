@@ -111,6 +111,9 @@ public class RadioDownloader {
                                     cache.add(dJPXD);
                                 }
                                 fireNewJPXDataAvailable(result.getViews(), result.getRequestInterval().getStart(), result.getRequestInterval().getEnd(), result.getDownloadID());
+                                for (DownloadedJPXData d : result.getViews()) {
+                                    d.setInitialData();
+                                }
                             }
                             if (!result.getNoDataIntervals().isEmpty()) {
                                 if (!result.isIntervalTooBig() && result.getViews().isEmpty()) {
