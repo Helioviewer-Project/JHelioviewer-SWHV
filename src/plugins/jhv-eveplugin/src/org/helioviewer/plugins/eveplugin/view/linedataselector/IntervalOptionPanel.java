@@ -1,8 +1,8 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,12 +63,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         setEnabledStateOfPeriodMovieButton();
 
         GridBagConstraints gbc = new GridBagConstraints();
-        setLayout(new GridBagLayout());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox, gbc);
 
-        gbc.gridx = 1;
         add(periodFromLayersButton, gbc);
 
     }

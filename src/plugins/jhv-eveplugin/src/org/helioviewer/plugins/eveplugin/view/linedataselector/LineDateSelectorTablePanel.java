@@ -154,14 +154,10 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
         optionsPanelWrapper = new JPanel();
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
-        optionsPanelWrapper.setLayout(new GridBagLayout());
+        optionsPanelWrapper.setLayout(new BorderLayout());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        optionsPanelWrapper.add(optionsPanel, gbc);
-        gbc.gridy = 1;
-        optionsPanelWrapper.add(intervalOptionPanel, gbc);
+        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        optionsPanelWrapper.add(intervalOptionPanel, BorderLayout.PAGE_END);
 
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton();
@@ -190,12 +186,10 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         if (lineDataElement != null) {
             optionsPanel = lineDataElement.getOptionsPanel();
         }
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
         if (optionsPanel == null) {
             optionsPanel = new JPanel();
         }
-        optionsPanelWrapper.add(optionsPanel, gbc);
+        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
     }
