@@ -48,14 +48,13 @@ public class SaveScreenshotAsAction extends AbstractAction {
 
         if (retVal == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-
             ExtensionFileFilter fileFilter = (ExtensionFileFilter) fileChooser.getFileFilter();
 
             if (!fileFilter.accept(selectedFile)) {
                 selectedFile = new File(selectedFile.getPath() + "." + fileFilter.getDefaultExtension());
             }
 
-            ImageViewerGui.getSingletonInstance().getMainView().saveScreenshot(fileFilter.getDefaultExtension(), selectedFile);
+            ImageViewerGui.getMainImagePanel().getComponentView().saveScreenshot(fileFilter.getDefaultExtension(), selectedFile);
         }
     }
 

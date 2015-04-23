@@ -27,9 +27,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  */
 public class ExitProgramAction extends AbstractAction {
 
-    /**
-     * Default constructor.
-     */
     public ExitProgramAction() {
         super("Quit");
         putValue(SHORT_DESCRIPTION, "Quit program");
@@ -41,12 +38,10 @@ public class ExitProgramAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (ImageViewerGui.getSingletonInstance().getMainView() != null) {
-            if (Displayer.getRenderablecontainer().countImageLayers() > 0) {
-                int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
-                if (option == JOptionPane.CANCEL_OPTION) {
-                    return;
-                }
+        if (Displayer.getRenderablecontainer().countImageLayers() > 0) {
+            int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.CANCEL_OPTION) {
+                return;
             }
         }
 
@@ -76,4 +71,5 @@ public class ExitProgramAction extends AbstractAction {
 
         System.exit(0);
     }
+
 }

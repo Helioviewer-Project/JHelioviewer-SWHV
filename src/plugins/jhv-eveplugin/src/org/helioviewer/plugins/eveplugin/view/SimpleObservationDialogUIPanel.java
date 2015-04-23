@@ -164,7 +164,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void selected() {
-        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(enableLoadButton);
+        ImageViewerGui.getObservationDialog().setLoadButtonEnabled(enableLoadButton);
     }
 
     @Override
@@ -206,9 +206,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     public void cancelButtonPressed() {
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // JHV Calendar Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void actionPerformed(final JHVCalendarEvent e) {
@@ -222,9 +220,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          */
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Action Listener
-    // //////////////////////////////////////////////////////////////////////////////
     public void setLoadButtonEnabled(boolean shouldBeEnabled) {
         enableLoadButton = shouldBeEnabled;
     }

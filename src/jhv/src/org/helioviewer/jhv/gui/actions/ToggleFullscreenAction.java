@@ -27,7 +27,7 @@ public class ToggleFullscreenAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        ImageViewerGui.getSingletonInstance().toggleShowSidePanel();
+        ImageViewerGui.toggleShowSidePanel();
     }
 
 }

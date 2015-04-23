@@ -78,8 +78,8 @@ public class RenderableContainerPanel extends JPanel {
                         try {
                             Date startDate = start.getTime();
                             Date endDate = end.getTime();
-                            Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getSingletonInstance().getObservationImagePane().getStartTime());
-                            Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getSingletonInstance().getObservationImagePane().getEndTime());
+                            Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
+                            Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
                             // only updates if its really necessary with a
                             // tolerance of an hour
                             final int tolerance = 60 * 60 * 1000;
@@ -99,7 +99,7 @@ public class RenderableContainerPanel extends JPanel {
                 }
             }
             // Show dialog
-            ImageViewerGui.getSingletonInstance().getObservationDialog().showDialog();
+            ImageViewerGui.getObservationDialog().showDialog();
         }
     };
     public final JTable grid;

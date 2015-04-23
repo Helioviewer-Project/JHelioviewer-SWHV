@@ -12,13 +12,9 @@ public class SWHVHEKPlugin implements Plugin {
 
     private boolean builtin_mode = false;
 
-    /**
-     * Reference to the eventPlugin
-     */
+    private SWHVHEKPluginRenderable renderable;
+    private SWHVHEKImagePanelEventPopupController controller;
 
-    /**
-     * Default constructor.
-     */
     public SWHVHEKPlugin() {
         this(false);
     }
@@ -43,15 +39,16 @@ public class SWHVHEKPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-        ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
-        new SWHVHEKPluginRenderable();
+        controller = new SWHVHEKImagePanelEventPopupController();
+        renderable = new SWHVHEKPluginRenderable();
+        ImageViewerGui.getMainImagePanel().addPlugin(controller);
     }
 
     @Override
     public void uninstallPlugin() {
-        // tbd
-        // ImageViewerGui.getSingletonInstance().getMainImagePanel().addPlugin(new SWHVHEKImagePanelEventPopupController());
-        // new SWHVHEKPluginRenderable();
+        ImageViewerGui.getMainImagePanel().removePlugin(controller);
+        renderable = null;
+        controller = null;
     }
 
     /**
@@ -73,11 +70,6 @@ public class SWHVHEKPlugin implements Plugin {
         return "SWHV HEK Plugin " + "$Rev$" + (builtin_mode ? " Built-In Version" : "");
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * null because this is an internal plugin
-     */
     @Override
     public String getAboutLicenseText() {
         String description = "";
@@ -92,16 +84,10 @@ public class SWHVHEKPlugin implements Plugin {
         return SWHVHEKPlugin.class.getResource(name);
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public void setState(String state) {
     }
 
-    /**
-     * {@inheritDoc} In this case, does nothing.
-     */
     @Override
     public String getState() {
         return "";
