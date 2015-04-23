@@ -10,6 +10,7 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
@@ -41,6 +42,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
         // Create an instance of eveDrawController and leave it here.
         EVEDrawController.getSingletonInstance();
+        // Avoid concurrent modification error.
+        TimeIntervalLockModel.getInstance();
         pluginPanes.add(plotOne);
 
         ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
