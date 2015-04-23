@@ -28,6 +28,7 @@ import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
+import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
@@ -37,7 +38,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
-    private GLCanvas canvas;
+    private static final GLCanvas canvas = GLSharedDrawable.getCanvas();
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -53,9 +54,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         RenderableGridType gridType = new RenderableGridType("Grids");
         Displayer.getRenderablecontainer().addRenderable(new RenderableGrid(gridType, false));
         Displayer.getRenderablecontainer().addRenderable(new RenderableCamera());
-    }
 
-    public void activate() {
         canvas.addGLEventListener(this);
         Displayer.addListener(this);
     }
@@ -232,14 +231,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         this.outputFile = outputFile;
         screenshotMode = true;
         return true;
-    }
-
-    /**
-     * Sets the component where the image will be displayed. This component has
-     * to be build in the graphical user interface somewhere.
-     */
-    public void setComponent(Component component) {
-        canvas = (GLCanvas) component;
     }
 
 }

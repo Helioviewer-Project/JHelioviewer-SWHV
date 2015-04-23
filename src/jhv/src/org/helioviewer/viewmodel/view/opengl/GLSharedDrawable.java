@@ -8,7 +8,7 @@ import javax.media.opengl.awt.GLCanvas;
 
 public class GLSharedDrawable {
 
-    private static GLCanvas canvas;
+    private final static GLCanvas canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
     private final static GLSharedDrawable instance = new GLSharedDrawable();
 
     public static GLSharedDrawable getSingletonInstance() {
@@ -16,11 +16,10 @@ public class GLSharedDrawable {
     }
 
     private GLSharedDrawable() {
-        canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
         canvas.setMinimumSize(new Dimension(0, 0));
     }
 
-    public GLCanvas getCanvas() {
+    public static GLCanvas getCanvas() {
         return canvas;
     }
 
