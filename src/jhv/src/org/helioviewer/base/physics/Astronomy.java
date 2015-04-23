@@ -14,13 +14,26 @@ public class Astronomy {
         return getB0InRadians(calendar);
     }
 
-    // This method is based on the SolarSoft GET_SUN routine
+    public static double getDistance(Date date) {
+        calendar.setTime(date);
+        return getDistance(calendar);
+    }
+
+    public static double getDistance(Calendar time) {
+        JulianDay jd = new JulianDay(time);
+        double t = (jd.getJDN() - 2415020) / 36525;
+        double L0 = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
+        L0 = L0 % 360.;
+        double M = 357.52910 + 35999.05030 * t - 0.0001559 * t * t - 0.0000048 * t * t * t;
+        M = M % 360.;
+        double e = 0.0167908617 + t * 0.000042037 + t * t * 0.0000001236;
+        double C = (1.914600 * t + 0.004817 * t + 0.000014 * t * t) * Math.sin(M / MathUtils.radeg) + (0.019993 - 0.000101 * t) * Math.sin(2. * M / MathUtils.radeg) + 0.000290 * Math.sin(3. * M / MathUtils.radeg);
+        double R = 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
+        return Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter * R;
+    }
+
     public static double getB0InRadians(Calendar time) {
-        Calendar item = time;
-
-        Calendar itemx = item;
-
-        JulianDay jd = new JulianDay(itemx);
+        JulianDay jd = new JulianDay(time);
 
         double t = (jd.getJDN() - 2415020) / 36525;
 
