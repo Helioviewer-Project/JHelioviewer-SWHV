@@ -22,9 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.base.message.Message;
-import org.helioviewer.gl3d.GL3DState;
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -127,9 +124,6 @@ public class ImageViewerGui {
         imageObservationPanel = new ImageDataPanel();
         observationDialog.addUserInterface("Image data", imageObservationPanel);
         leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
-
-        GL3DCamera camera = new GL3DObserverCamera();
-        GL3DState.setActiveCamera(camera);
 
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);

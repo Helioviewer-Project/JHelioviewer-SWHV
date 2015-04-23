@@ -91,6 +91,10 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.add(timeListener);
     }
 
+    public static void addFirstTimeListener(final TimeListener timeListener) {
+        timeListeners.add(0, timeListener);
+    }
+
     public static void removeTimeListener(final TimeListener timeListener) {
         timeListeners.remove(timeListener);
     }

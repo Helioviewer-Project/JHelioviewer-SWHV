@@ -162,9 +162,6 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation();
     }
 
-    public void activate() {
-    }
-
     public void applyPerspective(GL3DState state) {
         GL2 gl = state.gl;
         gl.glMatrixMode(GL2.GL_PROJECTION);
