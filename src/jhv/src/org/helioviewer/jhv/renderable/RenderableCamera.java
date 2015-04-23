@@ -6,6 +6,7 @@ import java.awt.Component;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
@@ -32,12 +33,14 @@ public class RenderableCamera implements Renderable {
         if (!isVisible)
             return;
 
-        double width = GL3DState.getActiveCamera().getZTranslation() * Math.tan(GL3DState.getActiveCamera().getFOVAngleToDraw());
+        GL3DCamera activeCamera = GL3DState.getActiveCamera();
+        double width = activeCamera.getZTranslation() * Math.tan(activeCamera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
         GL2 gl = state.gl;
+
         gl.glPushMatrix();
-        gl.glMultMatrixd(GL3DState.getActiveCamera().getLocalRotation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
         {
             gl.glLineWidth(2.5f);
             gl.glBegin(GL2.GL_LINE_LOOP);

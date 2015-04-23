@@ -9,7 +9,6 @@ import kdu_jni.KduException;
 
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.gl3d.GL3DState;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
@@ -475,16 +474,10 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      */
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
         MetaData metaData = jp2Image.metaDataList[frameNumber];
-        int h = 512;
-        int w = 512;
-        double m;
 
-        GL3DCamera cam = GL3DState.getActiveCamera();
-        if (cam != null) {
-            m = GL3DState.getViewportHeight() / cam.getCameraWidth();
-            h = (int) (r.getHeight() * m);
-            w = (int) (r.getWidth() * m);
-        }
+        double m = GL3DState.getViewportHeight() / GL3DState.getActiveCamera().getCameraWidth();
+        int h = (int) (r.getHeight() * m);
+        int w = (int) (r.getWidth() * m);
 
         m = metaData.getPhysicalImageWidth() / r.getWidth();
         int totalHeight = (int) (h * m);

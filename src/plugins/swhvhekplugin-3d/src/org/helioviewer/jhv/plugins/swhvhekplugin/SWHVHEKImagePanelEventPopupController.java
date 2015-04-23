@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.GL3DState;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
@@ -263,9 +262,7 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        GL3DCamera activeCamera = GL3DState.getActiveCamera();
-        GL3DVec3d pt = activeCamera.getVectorFromSphere(e.getPoint());
-        return pt;
+        return GL3DState.getActiveCamera().getVectorFromSphere(e.getPoint());
     }
 
 }

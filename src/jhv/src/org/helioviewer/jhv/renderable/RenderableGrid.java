@@ -64,13 +64,16 @@ public class RenderableGrid implements Renderable {
     public void render(GL3DState state) {
         if (!isVisible)
             return;
+
+        GL3DCamera activeCamera = GL3DState.getActiveCamera();
         GL2 gl = state.gl;
+
         gl.glPushMatrix();
-        gl.glMultMatrixd(GL3DState.getActiveCamera().getLocalRotation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
         {
             gl.glColor3d(1., 1., 0.);
 
-            float relhi = (float) (GL3DCamera.INITFOV / (GL3DState.getActiveCamera().getCameraFOV())) * scale;
+            float relhi = (float) (GL3DCamera.INITFOV / activeCamera.getCameraFOV()) * scale;
             if (relhi != oldrelhi) {
                 oldrelhi = relhi;
 
