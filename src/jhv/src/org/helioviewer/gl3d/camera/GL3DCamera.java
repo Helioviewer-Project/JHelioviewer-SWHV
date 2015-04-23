@@ -3,7 +3,6 @@ package org.helioviewer.gl3d.camera;
 import java.awt.Point;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
@@ -14,14 +13,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 
-/**
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public abstract class GL3DCamera {
-
-    protected GLU glu = new GLU();
 
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
@@ -147,7 +139,6 @@ public abstract class GL3DCamera {
         this.localRotation = localRotation;
         this.rotation.clear();
         this.updateCameraTransformation();
-
     }
 
     public void setCurrentDragRotation(GL3DQuatd currentDragRotation) {
@@ -205,7 +196,7 @@ public abstract class GL3DCamera {
                 return rotatedHitPoint;
             }
         }
-        GL3DVec3d altnormal = cameraDifferenceRotation.rotateVector(new GL3DVec3d(0., 0., 1.));
+        GL3DVec3d altnormal = cameraDifferenceRotation.rotateVector(GL3DVec3d.ZAxis);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
         hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
         rotatedHitPoint = cameraDifferenceRotation.rotateInverseVector(hitPoint);
@@ -241,20 +232,17 @@ public abstract class GL3DCamera {
     }
 
     public abstract GL3DInteraction getPanInteraction();
-
     public abstract GL3DInteraction getRotateInteraction();
-
     public abstract GL3DInteraction getZoomInteraction();
+
+    public abstract GL3DInteraction getCurrentInteraction();
+    public abstract void setCurrentInteraction(GL3DInteraction currentInteraction);
 
     public abstract String getName();
 
     public void drawCamera(GL3DState state) {
         getCurrentInteraction().drawInteractionFeedback(state, this);
     }
-
-    public abstract GL3DInteraction getCurrentInteraction();
-
-    public abstract void setCurrentInteraction(GL3DInteraction currentInteraction);
 
     public double getCameraFOV() {
         return this.fov;
@@ -327,13 +315,13 @@ public abstract class GL3DCamera {
         return cameraWidth;
     }
 
-    public void zoomIn(int wr) {
-
+    public void zoom(int wr) {
         this.setCameraFOV(this.fov + 0.0005 * wr);
-        Displayer.display();
+        Displayer.render();
     }
 
     public void setFOVangleDegrees(double fovAngle) {
         this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
     }
+
 }

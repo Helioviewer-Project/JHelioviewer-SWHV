@@ -52,10 +52,6 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new SaveScreenshotAsAction());
         fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class));
 
-        // VSO Export - DEACTIVATED FOR NOW
-        // fileMenu.addSeparator();
-        // fileMenu.add(new NewQueryAction(false));
-
         fileMenu.addSeparator();
         fileMenu.add(new ExitProgramAction());
         add(fileMenu);

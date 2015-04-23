@@ -32,8 +32,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e, GL3DCamera camera) {
-        int wr = e.getWheelRotation();
-        camera.zoomIn(wr);
+        camera.zoom(e.getWheelRotation());
     }
 
 }
