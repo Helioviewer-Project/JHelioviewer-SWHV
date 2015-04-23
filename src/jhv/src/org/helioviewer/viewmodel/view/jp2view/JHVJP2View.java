@@ -477,25 +477,27 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = jp2Image.metaDataList[frameNumber];
         int h = 512;
         int w = 512;
+        double m;
 
         GL3DCamera cam = GL3DState.getActiveCamera();
         if (cam != null) {
-            h = (int) (r.getHeight() / (cam.getCameraWidth() * 2.) * GL3DState.getViewportHeight() * 2);
-            w = (int) (r.getWidth() / (cam.getCameraWidth() * 2.) * GL3DState.getViewportHeight() * 2);
+            m = GL3DState.getViewportHeight() / cam.getCameraWidth();
+            h = (int) (r.getHeight() * m);
+            w = (int) (r.getWidth() * m);
         }
 
-        int totalHeight = (int) (h * metaData.getPhysicalImageWidth() / r.getWidth());
-        int totalWidth = (int) (w * metaData.getPhysicalImageWidth() / r.getWidth());
+        m = metaData.getPhysicalImageWidth() / r.getWidth();
+        int totalHeight = (int) (h * m);
+        int totalWidth = (int) (w * m);
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
         double imageMeterPerPixel = metaData.getPhysicalImageWidth() / res.getResolutionBounds().getWidth();
-
         int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
 
         Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
-
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
+
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
     }
 
