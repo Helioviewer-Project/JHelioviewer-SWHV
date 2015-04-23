@@ -66,9 +66,9 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
      */
     public ExportMovieDialog() {
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        ImageViewerGui.getLeftContentPane().setEnabled(false);
 
-        final ComponentView component = (ComponentView) ImageViewerGui.getSingletonInstance().getMainView();
+        final ComponentView component = ImageViewerGui.getMainImagePanel().getComponentView();
         final ExportMovieDialog exportMovieDialog = this;
 
         exportButton.addActionListener(new ActionListener() {
@@ -86,7 +86,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
 
     @Override
     public void init() {
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        ImageViewerGui.getLeftContentPane().setEnabled(false);
     }
 
     /**

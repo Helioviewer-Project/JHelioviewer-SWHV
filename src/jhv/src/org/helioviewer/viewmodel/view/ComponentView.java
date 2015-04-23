@@ -181,7 +181,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(false);
+        ImageViewerGui.getLeftContentPane().setEnabled(false);
 
         AbstractView mv = Displayer.getLayersModel().getActiveView();
         if (mv instanceof JHVJPXView) {
@@ -210,7 +210,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         text.setBackground(null);
         JOptionPane.showMessageDialog(canvas, text);
 
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().setEnabled(true);
+        ImageViewerGui.getLeftContentPane().setEnabled(true);
 
         ((JHVJPXView) mv).pauseMovie();
         exportMovieDialog.reset();

@@ -39,10 +39,6 @@ import org.helioviewer.viewmodel.view.ComponentView;
  */
 public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher, ImagePanelPlugin, MouseListener, MouseMotionListener {
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // ///////////////////////////////////////////////////////////////////////////
-
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
@@ -57,9 +53,6 @@ public class SWHVHEKImagePanelEventPopupController implements KeyEventDispatcher
     private Cursor lastCursor;
     private SWEKEventInformationDialog hekPopUp;
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // Methods
-    // ///////////////////////////////////////////////////////////////////////////
     public SWHVHEKImagePanelEventPopupController() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
     }

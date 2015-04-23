@@ -42,7 +42,6 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -73,11 +72,8 @@ public class ImageViewerGui {
 
     private static MainContentPanel mainContentPanel;
     private static MainImagePanel mainImagePanel;
-
-    private static ObservationDialog observationDialog;
-
-    private static ComponentView mainComponentView;
     private static ImageDataPanel imageObservationPanel;
+    private static ObservationDialog observationDialog;
 
     private ImageViewerGui() {
     }
@@ -144,10 +140,6 @@ public class ImageViewerGui {
         statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
 
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
-
-        mainComponentView = new ComponentView();
-        mainImagePanel.setView(mainComponentView);
-        mainComponentView.activate();
 
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
@@ -227,7 +219,7 @@ public class ImageViewerGui {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
                     AbstractView view = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
-                    if (view != null && getMainView() != null) {
+                    if (view != null) {
                         // get the layered view
 
                         // go through all sub view chains of the layered
@@ -271,7 +263,7 @@ public class ImageViewerGui {
             if (jpxUrl != null) {
                 try {
                     AbstractView view = APIRequestManager.newLoad(jpxUrl, true);
-                    if (view != null && getMainView() != null) {
+                    if (view != null) {
 
                         // go through all sub view chains of the layered
                         // view and try to find the
@@ -328,7 +320,7 @@ public class ImageViewerGui {
     /**
      * Toggles the visibility of the control panel on the left side.
      */
-    public void toggleShowSidePanel() {
+    public static void toggleShowSidePanel() {
         leftScrollPane.setVisible(!leftScrollPane.isVisible());
 
         int lastLocation = midSplitPane.getLastDividerLocation();
@@ -343,32 +335,28 @@ public class ImageViewerGui {
         return mainFrame;
     }
 
-    public SideContentPane getLeftContentPane() {
+    public static SideContentPane getLeftContentPane() {
         return leftPane;
     }
 
-    public final MainContentPanel getMainContentPanel() {
+    public static MainContentPanel getMainContentPanel() {
         return mainContentPanel;
     }
 
-    public ObservationDialog getObservationDialog() {
-        return this.observationDialog;
+    public static ObservationDialog getObservationDialog() {
+        return observationDialog;
     }
 
-    public ImageDataPanel getObservationImagePane() {
+    public static ImageDataPanel getObservationImagePane() {
         return imageObservationPanel;
     }
 
-    public ControlPanelContainer getMoviePanelContainer() {
+    public static ControlPanelContainer getMoviePanelContainer() {
         return moviePanelContainer;
     }
 
-    public MainImagePanel getMainImagePanel() {
+    public static MainImagePanel getMainImagePanel() {
         return mainImagePanel;
-    }
-
-    public ComponentView getMainView() {
-        return mainComponentView;
     }
 
 }

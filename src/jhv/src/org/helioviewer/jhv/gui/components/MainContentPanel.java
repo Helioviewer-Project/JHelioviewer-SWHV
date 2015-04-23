@@ -24,12 +24,6 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * */
 public class MainContentPanel extends JPanel implements ActionListener {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
-    private static final long serialVersionUID = 1L;
-
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
     private final JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
@@ -37,13 +31,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
     private final JPanel pluginContainer = new JPanel();
     private final CollapsiblePane collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
 
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * Default constructor.
-     * */
     public MainContentPanel() {
         initVisualComponents();
     }
@@ -64,10 +51,9 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitpane.setOneTouchExpandable(false);
         splitpane.setDividerSize(5);
         // splitpane.setContinuousLayout(true);
+        add(splitpane, BorderLayout.CENTER);
 
         collapsiblePane.toggleButton.addActionListener(this);
-
-        add(splitpane, BorderLayout.CENTER);
     }
 
     /**
@@ -80,23 +66,18 @@ public class MainContentPanel extends JPanel implements ActionListener {
         if (comp == null || mainComponent == comp) {
             return false;
         }
-
         if (mainComponent != null) {
             splitpane.remove(mainComponent);
             remove(mainComponent);
         }
-
         mainComponent = comp;
-
         if (mainComponent != null) {
             splitpane.setTopComponent(mainComponent);
         }
+
         return true;
     }
 
-    /**
-     * Get the main component.
-     * */
     public final Component getMainComponent() {
         return mainComponent;
     }
@@ -112,11 +93,9 @@ public class MainContentPanel extends JPanel implements ActionListener {
         if (plugin == null || pluginList.contains(plugin)) {
             return false;
         }
-
         if (!pluginList.add(plugin)) {
             return false;
         }
-
         updateLayout();
 
         return true;
@@ -132,7 +111,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         if (!pluginList.remove(plugin)) {
             return false;
         }
-
         updateLayout();
 
         return true;
@@ -180,10 +158,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
         revalidate();
         repaint();
     }
-
-    // ////////////////////////////////////////////////////////////////
-    // Action Listener
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}

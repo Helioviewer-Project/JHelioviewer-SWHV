@@ -33,10 +33,6 @@ import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
  * */
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
     private static final long serialVersionUID = 8932098719271808631L;
     private final JLabel labelGroup;
     private final JLabel labelData;
@@ -44,10 +40,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private final JComboBox comboBoxData;
 
     private final JPanel dataPane;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     public ObservationDialogUIPanel() {
         super();
@@ -127,7 +119,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         }
 
         super.setLoadButtonEnabled(model.getSize() > 0);
-        ImageViewerGui.getSingletonInstance().getObservationDialog().setLoadButtonEnabled(super.getLoadButtonEnabled());
+        ImageViewerGui.getObservationDialog().setLoadButtonEnabled(super.getLoadButtonEnabled());
     }
 
     /**
@@ -224,9 +216,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         return true;
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Action Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void actionPerformed(final ActionEvent e) {

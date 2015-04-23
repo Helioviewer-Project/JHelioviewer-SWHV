@@ -46,22 +46,22 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         TimeIntervalLockModel.getInstance();
         pluginPanes.add(plotOne);
 
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
 
-        ImageViewerGui.getSingletonInstance().getMainContentPanel().addPlugin(EVEPlugin.this);
-        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ImageViewerGui.getSingletonInstance().getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
-        // initialize database connection
+        ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
+        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+
         RadioPlotModel.getSingletonInstance();
         EventModel.getSingletonInstance().activateEvents();
     }
 
     @Override
     public void uninstallPlugin() {
-        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ImageViewerGui.getSingletonInstance().getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
-        ImageViewerGui.getSingletonInstance().getMainContentPanel().removePlugin(this);
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().remove(timelinePluginPanel);
+        ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+        ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+        ImageViewerGui.getMainContentPanel().removePlugin(this);
+        ImageViewerGui.getLeftContentPane().remove(timelinePluginPanel);
     }
 
     public static URL getResourceUrl(String name) {
@@ -81,7 +81,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     @Override
     public String getAboutLicenseText() {
         String description = "";
-
         description += "<p>The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
         description += "<p>The plugin uses <a href=\"http://db.apache.org/derby/\">Apache Derby, an Apache DB subproject</a>,<br>" + '\u00A9' + " 2011, Apache Software Foundation, <a href=\"http://www.apache.org/licenses/\">Apache License, Version 2.0</a><br>";
 
@@ -100,12 +99,10 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void setState(String state) {
-        // TODO SP: Implement setState for EVEPlugin
     }
 
     @Override
     public String getState() {
-        // TODO SP: Implement getState for EVEPlugin
         return "";
     }
 
