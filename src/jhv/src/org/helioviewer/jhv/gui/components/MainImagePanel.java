@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.opengl.GLSharedDrawable;
 
 /**
  * This class represents an image component that is used to display the image of
@@ -33,23 +32,23 @@ public class MainImagePanel extends JPanel {
     private final ArrayList<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
     private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
 
-    private final CameraMouseController mouseController = new CameraMouseController();
-    private final Component renderComponent = GLSharedDrawable.getCanvas();
-    private final ComponentView componentView = new ComponentView();
+    private final static CameraMouseController mouseController = new CameraMouseController();
+    private final static ComponentView componentView = new ComponentView();
 
     public MainImagePanel() {
         super(new BorderLayout(0, 0));
         setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        add(renderComponent);
-
-        renderComponent.addMouseListener(mouseController);
-        renderComponent.addMouseMotionListener(mouseController);
-        renderComponent.addMouseWheelListener(mouseController);
+        Component component = componentView.getComponent();
+        component.addMouseListener(mouseController);
+        component.addMouseMotionListener(mouseController);
+        component.addMouseWheelListener(mouseController);
 
         if (KeyListener.class.isAssignableFrom(mouseController.getClass())) {
-            renderComponent.addKeyListener((KeyListener) mouseController);
+            component.addKeyListener((KeyListener) mouseController);
         }
+        add(component);
+
         mouseController.setImagePanel(this);
     }
 
@@ -94,24 +93,24 @@ public class MainImagePanel extends JPanel {
 
     @Override
     public void addMouseListener(MouseListener l) {
-        if (!Arrays.asList(renderComponent.getMouseListeners()).contains(l)) {
-            renderComponent.addMouseListener(l);
+        if (!Arrays.asList(componentView.getComponent().getMouseListeners()).contains(l)) {
+            componentView.getComponent().addMouseListener(l);
         }
     }
 
     @Override
     public void addMouseWheelListener(MouseWheelListener l) {
-        renderComponent.addMouseWheelListener(l);
+        componentView.getComponent().addMouseWheelListener(l);
     }
 
     @Override
     public void removeMouseListener(MouseListener l) {
-        renderComponent.removeMouseListener(l);
+        componentView.getComponent().removeMouseListener(l);
     }
 
     @Override
     public void removeMouseWheelListener(MouseWheelListener l) {
-        renderComponent.removeMouseWheelListener(l);
+        componentView.getComponent().removeMouseWheelListener(l);
     }
 
     @Override
