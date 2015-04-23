@@ -72,7 +72,7 @@ public class GLInfo {
         }
     }
 
-    public boolean checkGLErrors(String message, GL2 gl) {
+    public static boolean checkGLErrors(String message, GL2 gl) {
         if (gl == null) {
             Log.warn("OpenGL not yet Initialised!");
             return true;
@@ -98,7 +98,7 @@ public class GLInfo {
         }
     }
 
-    public boolean checkGLErrors(GL2 gl) {
+    public static boolean checkGLErrors(GL2 gl) {
         if (gl == null) {
             Log.warn("OpenGL not yet Initialised!");
             return true;

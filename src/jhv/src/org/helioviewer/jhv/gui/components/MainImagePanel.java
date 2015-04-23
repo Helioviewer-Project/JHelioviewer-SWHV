@@ -34,7 +34,7 @@ public class MainImagePanel extends JPanel {
     private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
 
     private final CameraMouseController mouseController = new CameraMouseController();
-    private final Component renderComponent = GLSharedDrawable.getSingletonInstance().getCanvas();
+    private final Component renderComponent = GLSharedDrawable.getCanvas();
     private final ComponentView componentView = new ComponentView();
 
     public MainImagePanel() {
@@ -43,10 +43,6 @@ public class MainImagePanel extends JPanel {
 
         add(renderComponent);
 
-        componentView.setComponent(renderComponent);
-        componentView.activate();
-
-        mouseController.setImagePanel(this);
         renderComponent.addMouseListener(mouseController);
         renderComponent.addMouseMotionListener(mouseController);
         renderComponent.addMouseWheelListener(mouseController);
@@ -54,6 +50,7 @@ public class MainImagePanel extends JPanel {
         if (KeyListener.class.isAssignableFrom(mouseController.getClass())) {
             renderComponent.addKeyListener((KeyListener) mouseController);
         }
+        mouseController.setImagePanel(this);
     }
 
     public ComponentView getComponentView() {
