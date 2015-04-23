@@ -27,30 +27,21 @@ public class SWEKPlugin implements Plugin {
     /** Instance of the SWEKDownloadManager */
     private final SWEKSourceManager SWEKSources;
 
-    /** The outgoing request manager */
-    // private final OutgoingRequestManager outgoingRequestManager;
-
     /** the incoming request manager */
     private final IncomingRequestManager incomingRequestManager;
 
     /** instance of the event container */
     private final JHVEventContainer eventContainer;
 
-    /**  */
     private final boolean loadExternalJars;
 
-    /**
-     * Default constructor
-     * 
-     */
     public SWEKPlugin() {
         SWEKConfig = SWEKConfigurationManager.getSingletonInstance();
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         loadExternalJars = true;
         SWEKSources.setPlugin(this);
         SWEKSources.loadExternalJars(loadExternalJars);
-        // outgoingRequestManager =
-        // OutgoingRequestManager.getSingletonInstance();
+
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
     }
@@ -67,8 +58,7 @@ public class SWEKPlugin implements Plugin {
         SWEKSources = SWEKSourceManager.getSingletonInstance();
         this.loadExternalJars = loadExternalJars;
         SWEKSources.loadExternalJars(loadExternalJars);
-        // outgoingRequestManager =
-        // OutgoingRequestManager.getSingletonInstance();
+
         incomingRequestManager = IncomingRequestManager.getSingletonInstance();
         eventContainer = JHVEventContainer.getSingletonInstance();
     }
@@ -94,12 +84,10 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public void setState(String state) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public String getState() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -131,9 +119,8 @@ public class SWEKPlugin implements Plugin {
         SWEKConfig.loadConfiguration();
         SWEKSources.loadSources();
         eventContainer.registerHandler(incomingRequestManager);
-        ImageViewerGui.getSingletonInstance().getLeftContentPane()
-                .add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
-        ImageViewerGui.getSingletonInstance().getLeftContentPane().revalidate();
+        ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
+        ImageViewerGui.getLeftContentPane().revalidate();
     }
 
     @Override
