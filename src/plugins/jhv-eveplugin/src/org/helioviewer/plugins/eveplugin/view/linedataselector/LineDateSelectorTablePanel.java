@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -16,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -33,7 +33,7 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Line
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 
-public class LineDateSelectorTablePanel extends JPanel implements TableModelListener, LineDataSelectorModelListener {
+public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
     private static final long serialVersionUID = -8443699382736126351L;
     private static final int ROW_HEIGHT = 20;
@@ -52,18 +52,12 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
     private Component optionsPanel = new JPanel();
     private final IntervalOptionPanel intervalOptionPanel;
 
-    private static final String PROGRESSBAR_TOOLTIP_ACTIVEDOWNLOAD = "Downloading data from server.";
-    private static final String PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD = "No data selected to download from server.";
-
-    private final JProgressBar progressBar = new JProgressBar();
-
     public LineDateSelectorTablePanel() {
         intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
         tableModel = LineDataSelectorModel.getSingletonInstance();
         grid = new JTable(tableModel);
         tableModel.addTableModelListener(grid);
-        tableModel.addLineDataSelectorModelListener(this);
 
         gc.gridx = 0;
         gc.gridy = 0;
@@ -169,9 +163,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         gbc.gridy = 1;
         optionsPanelWrapper.add(intervalOptionPanel, gbc);
 
-        JPanel addLayerButtonWrapper = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc2 = new GridBagConstraints();
-
+        JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton();
         addLayerButton.addActionListener(new ActionListener() {
             @Override
@@ -184,18 +176,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.setBorder(null);
 
-        progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD);
-
-        gbc2.gridx = 0;
-        gbc2.gridy = 0;
-        gbc2.fill = GridBagConstraints.HORIZONTAL;
-        gbc2.weightx = 1;
-        addLayerButtonWrapper.add(progressBar, gbc2);
-
-        gbc2.gridx = 1;
-        gbc2.fill = GridBagConstraints.NONE;
-        gbc2.weightx = 0;
-        addLayerButtonWrapper.add(addLayerButton, gbc2);
+        addLayerButtonWrapper.add(addLayerButton);
 
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 
@@ -234,41 +215,4 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
     }
 
-    @Override
-    public void downloadStartded(LineDataSelectorElement element) {
-        if (element.isAvailable()) {
-            progressBar.setIndeterminate(true);
-            progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_ACTIVEDOWNLOAD);
-        }
-    }
-
-    @Override
-    public void downloadFinished(LineDataSelectorElement element) {
-        boolean active = tableModel.atLeastOneDownloading();
-
-        progressBar.setIndeterminate(active);
-
-        if (!active) {
-            progressBar.setToolTipText(PROGRESSBAR_TOOLTIP_INACTIVEDOWNLOAD);
-        }
-
-    }
-
-    @Override
-    public void lineDataAdded(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void lineDataRemoved(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void lineDataUpdated(LineDataSelectorElement element) {
-        // TODO Auto-generated method stub
-
-    }
 }
