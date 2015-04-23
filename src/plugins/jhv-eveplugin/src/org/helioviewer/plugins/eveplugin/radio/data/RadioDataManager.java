@@ -639,7 +639,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
-    private static String getValueFromXML(NodeList nodeList, String _keyword, String _box) throws JHV_KduException {
+    private static String getValueFromXML(NodeList nodeList, String _keyword) throws JHV_KduException {
         try {
             NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
             Element line = (Element) value.item(0);
@@ -661,8 +661,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
     private static String getKey(NodeList nodeList, String key) {
         try {
-            String value = getValueFromXML(nodeList, key, "fits");
-            return value;
+            return getValueFromXML(nodeList, key);
         } catch (JHV_KduException e) {
             if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
                 try {

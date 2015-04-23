@@ -446,7 +446,7 @@ public class KakaduUtils {
             this.nodeList = nodeList;
         }
 
-        private String getValueFromXML(String _keyword, String _box) throws JHV_KduException {
+        private String getValueFromXML(String _keyword) throws JHV_KduException {
             try {
                 NodeList value = ((Element) this.nodeList.item(0)).getElementsByTagName(_keyword);
                 Element line = (Element) value.item(0);
@@ -471,8 +471,7 @@ public class KakaduUtils {
         @Override
         public String get(String key) {
             try {
-                String value = getValueFromXML(key, "fits");
-                return value;
+                return getValueFromXML(key);
             } catch (JHV_KduException e) {
                 if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
                     try {
