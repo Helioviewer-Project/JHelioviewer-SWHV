@@ -2,6 +2,7 @@ package org.helioviewer.plugins.eveplugin.lines.gui;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -22,9 +23,10 @@ public class LineColorOptionPanel extends JPanel {
     }
 
     private void initVisualComponents() {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        JButton pickColor = new JButton("Pick new Color");
+        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JButton pickColor = new JButton("Change Line Color");
+        pickColor.setMargin(new Insets(0, 0, 0, 0));
+        pickColor.setToolTipText("Change the color of the current line");
         pickColor.addActionListener(new ActionListener() {
 
             @Override
@@ -35,7 +37,6 @@ public class LineColorOptionPanel extends JPanel {
                 }
             }
         });
-
         add(pickColor);
     }
 
