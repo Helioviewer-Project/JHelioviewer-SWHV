@@ -199,7 +199,9 @@ public class GL3DImageLayer implements Renderable {
                 jp2view.applyFilters(gl);
 
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
-
+                if (!GL3DImageLayer.showCorona) {
+                    GLSLShader.setOuterCutOffRadius(1.);
+                }
                 GLSLShader.filter(gl);
                 GL3DCamera camera = GL3DState.getActiveCamera();
                 GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
@@ -217,14 +219,12 @@ public class GL3DImageLayer implements Renderable {
                 enableIndexVBO(state);
                 {
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-                    if (GL3DImageLayer.showCorona) {
-                        GLSLShader.bindIsDisc(gl, 0);
+                    GLSLShader.bindIsDisc(gl, 0);
 
-                        gl.glDepthRange(1.f, 1.f);
-                        gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                    gl.glDepthRange(1.f, 1.f);
+                    gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
 
-                        gl.glDepthRange(0.f, 1.f);
-                    }
+                    gl.glDepthRange(0.f, 1.f);
 
                     GLSLShader.bindIsDisc(gl, 1);
                     gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);

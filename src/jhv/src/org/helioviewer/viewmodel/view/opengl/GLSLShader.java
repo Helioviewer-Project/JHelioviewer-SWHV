@@ -294,6 +294,10 @@ public class GLSLShader {
         outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
     }
 
+    public static void setOuterCutOffRadius(double cutOffRadius) {
+        outerCutOffRadiusFloat[0] = (float) cutOffRadius;
+    }
+
     public static void setAlpha(float alpha) {
         alphaParamFloat[0] = alpha;
     }
