@@ -306,7 +306,7 @@ public class LayersModel {
      *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
-    public void showMetaInfo(JHVJP2View view) {
+    public void showMetaInfo(AbstractView view) {
         MetaDataDialog dialog = new MetaDataDialog();
         dialog.setMetaData(view);
         dialog.showDialog();
