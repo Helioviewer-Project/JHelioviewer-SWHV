@@ -74,13 +74,7 @@ public class LayersModel {
     }
 
     public void setActiveLayer(AbstractView view) {
-        int idx = findView(view);
-        if (view == null && idx != -1) {
-            return;
-        }
-        activeLayer = idx;
-        fireActiveLayerChanged(view);
-
+        setActiveLayer(findView(view));
     }
 
     /**
