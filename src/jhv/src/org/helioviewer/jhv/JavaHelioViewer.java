@@ -338,6 +338,7 @@ public class JavaHelioViewer {
             Message.warn(title, message);
         }
 
+        splash.dispose();
         splash.destroy();
     }
 
