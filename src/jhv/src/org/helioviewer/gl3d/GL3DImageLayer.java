@@ -86,6 +86,7 @@ public class GL3DImageLayer implements Renderable {
         }
 
         Displayer.getRenderablecontainer().addBeforeRenderable(this);
+
         float opacity = (float) (1. / (1. + Displayer.getLayersModel().getNumLayers()));
         if (mainLayerView instanceof JHVJP2View) {
             JHVJP2View jp2v = ((JHVJP2View) mainLayerView);
@@ -94,7 +95,6 @@ public class GL3DImageLayer implements Renderable {
             }
         }
         mainLayerView.setOpacity(opacity);
-
     }
 
     @Override
