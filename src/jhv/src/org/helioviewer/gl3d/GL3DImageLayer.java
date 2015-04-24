@@ -25,6 +25,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
@@ -85,7 +86,15 @@ public class GL3DImageLayer implements Renderable {
         }
 
         Displayer.getRenderablecontainer().addBeforeRenderable(this);
-        mainLayerView.setOpacity((float) (1. / (1. + Displayer.getLayersModel().getNumLayers())));
+        float opacity = (float) (1. / (1. + Displayer.getLayersModel().getNumLayers()));
+        if (mainLayerView instanceof JHVJP2View) {
+            JHVJP2View jp2v = ((JHVJP2View) mainLayerView);
+            if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
+                opacity = 1.f;
+            }
+        }
+        mainLayerView.setOpacity(opacity);
+
     }
 
     @Override
