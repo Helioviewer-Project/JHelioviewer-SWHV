@@ -21,7 +21,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void addBeforeRenderable(Renderable renderable) {
-        System.out.println("GG" + renderable);
         int lastImagelayerIndex = -1;
         int size = renderables.size();
         for (int i = 0; i < size; i++) {
