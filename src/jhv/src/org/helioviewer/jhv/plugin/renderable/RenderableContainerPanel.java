@@ -239,7 +239,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        setOptionsPanel(view.getImageLayer());
+        if (view != null)
+            setOptionsPanel(view.getImageLayer());
     }
 
 }

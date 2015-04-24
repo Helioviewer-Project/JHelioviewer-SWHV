@@ -437,9 +437,4 @@ public class GL3DImageLayer implements Renderable {
         return mainLayerView;
     }
 
-    @Override
-    public void destroy() {
-        Displayer.getLayersModel().removeLayer(this.mainLayerView);
-    }
-
 }

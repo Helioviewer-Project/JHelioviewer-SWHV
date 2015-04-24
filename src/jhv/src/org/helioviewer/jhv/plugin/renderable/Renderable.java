@@ -12,8 +12,6 @@ public interface Renderable {
 
     public void remove(GL3DState state);
 
-    public void destroy();
-
     public RenderableType getType();
 
     public Component getOptionsPanel();
