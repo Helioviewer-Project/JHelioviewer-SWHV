@@ -328,4 +328,8 @@ public class RenderableGrid implements Renderable {
         return "";
     }
 
+    @Override
+    public void destroy() {
+    }
+
 }

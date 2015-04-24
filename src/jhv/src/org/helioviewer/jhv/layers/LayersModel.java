@@ -80,6 +80,7 @@ public class LayersModel {
         }
         activeLayer = idx;
         fireActiveLayerChanged(view);
+
     }
 
     /**
@@ -352,6 +353,7 @@ public class LayersModel {
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
+                ((JHVJPXView) view).pauseMovie();
                 moviePanel.remove();
             }
         }

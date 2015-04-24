@@ -260,8 +260,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
         if (render != null) {
             render.setMovieMode(false);
         }
-
-        // send notification
         MoviePanel.getMoviePanel(this).playStateChanged(false);
     }
 
@@ -315,7 +313,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
         if (unlinkMovie) {
             linkedMovieManager.unlinkMovie(this);
         }
-        pauseMovie();
         super.abolish();
     }
 

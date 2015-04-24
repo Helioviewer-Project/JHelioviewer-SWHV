@@ -63,7 +63,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     public final Component getComponent() {
-        return (Component) canvas;
+        return canvas;
     }
 
     @Override
