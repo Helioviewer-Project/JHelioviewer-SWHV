@@ -117,6 +117,7 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         if (view != null) {
             view.abolish();
         }
+        view.removeJHVJP2DataHandler();
         view = null;
     }
 
