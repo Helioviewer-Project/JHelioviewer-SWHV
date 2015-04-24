@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
-
 /**
  * @author Stephan Pagel
  * */
@@ -89,34 +86,8 @@ public class ChartConstants {
         return RANGE_SELECTION_WIDTH;
     }
 
-    public static int getScreenfactor() {
-        return GLInfo.pixelScale[0];
-    }
+    public static final Font font = new Font("SansSerif", Font.PLAIN, 10);
 
-    private static Font font = new Font("SansSerif", Font.PLAIN, 10);
+    public static final String absentText = "No band / diode / line selected";
 
-    public static Font getFont() {
-        if (font == null) {
-            InputStream is = FileUtils.getResourceInputStream("/fonts/DroidSans-Bold.ttf");
-            try {
-                font = Font.createFont(Font.TRUETYPE_FONT, is);
-            } catch (FontFormatException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            font = font.deriveFont(10.f);
-
-        }
-
-        return font;
-    }
-
-    private final static String absentText = "No band / diode / line selected";
-
-    public static String getAbsentText() {
-        return absentText;
-    }
 }

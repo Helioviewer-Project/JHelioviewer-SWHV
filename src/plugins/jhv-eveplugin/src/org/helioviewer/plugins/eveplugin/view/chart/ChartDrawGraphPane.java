@@ -47,6 +47,7 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
  *
@@ -136,11 +137,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void redrawGraph() {
-        int screenfactor = ChartConstants.getScreenfactor();
-        int width = screenfactor * getWidth();
-        int height = screenfactor * getHeight();
+        int sx = GLInfo.pixelScale[0], sy = GLInfo.pixelScale[1];
+        int width = sx * getWidth();
+        int height = sy * getHeight();
 
-        if (width > 0 && height > 0 && screenfactor * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && screenfactor * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
+        if (width > 0 && height > 0 && sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
             if (width != lastWidth || height != lastHeight) {
                 screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
                 lastWidth = width;
@@ -149,11 +150,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             final Graphics2D g = screenImage.createGraphics();
             AffineTransform tf = g.getTransform();
-            tf.preConcatenate(AffineTransform.getScaleInstance(screenfactor, screenfactor));
+            tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
 
-            BufferedImage plotPart = screenImage.getSubimage(screenfactor * ChartConstants.getGraphLeftSpace(), screenfactor * ChartConstants.getGraphTopSpace(), width - screenfactor * ChartConstants.getGraphLeftSpace() - screenfactor * ChartConstants.getGraphRightSpace() - screenfactor * twoYAxis * ChartConstants.getTwoAxisGraphRight(), height - screenfactor * ChartConstants.getGraphTopSpace() - screenfactor * ChartConstants.getGraphBottomSpace());
+            BufferedImage plotPart = screenImage.getSubimage(sx * ChartConstants.getGraphLeftSpace(),
+                                                             sy * ChartConstants.getGraphTopSpace(),
+                                                             width - sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight()),
+                                                             height - sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
             Graphics2D gplotPart = plotPart.createGraphics();
             gplotPart.setTransform(tf);
             BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
@@ -214,7 +218,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setFont(ChartConstants.getFont());
+        g.setFont(ChartConstants.font);
 
         // draw vertical ticks
         int counter = 0;
@@ -280,7 +284,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         // inform when no data is available
         if (!drawController.hasElementsToBeDrawn()) {
-            final String text = ChartConstants.getAbsentText();
+            final String text = ChartConstants.absentText;
             final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
             final int x = graphArea.x + (graphArea.width / 2) - (textWidth / 2);
             final int y = graphArea.y + graphArea.height / 2;
