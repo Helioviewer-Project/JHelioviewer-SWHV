@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
-
 /**
  * Status panel for displaying the framerate for image series.
  * The information of this panel is always shown for the active layer.
@@ -14,7 +12,7 @@ import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
  * 
  * @author Markus Langenberg
  */
-public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
+public class FramerateStatusPanel extends JLabel {
 
     private static final FramerateStatusPanel instance = new FramerateStatusPanel();
 
@@ -22,8 +20,6 @@ public class FramerateStatusPanel extends JLabel implements StatusPanelPlugin {
         setBorder(BorderFactory.createEtchedBorder());
         setPreferredSize(new Dimension(70, 20));
         setText("fps:");
-
-        setVisible(true);
     }
 
     public static FramerateStatusPanel getSingletonInstance() {

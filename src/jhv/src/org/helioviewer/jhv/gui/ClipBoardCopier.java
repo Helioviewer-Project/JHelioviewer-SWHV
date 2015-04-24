@@ -32,7 +32,6 @@ public final class ClipBoardCopier implements ClipboardOwner {
     }
 
     public void lostOwnership(Clipboard aClipboard, Transferable aContents) {
-        // do nothing
     }
 
     /**
@@ -68,4 +67,5 @@ public final class ClipBoardCopier implements ClipboardOwner {
         }
         return result;
     }
+
 }
