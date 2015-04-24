@@ -13,18 +13,10 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  */
 public class PluginContainer implements Container {
 
-    // ////////////////////////////////////////////////////////////////
-    // Definitions
-    // ////////////////////////////////////////////////////////////////
-
     private Plugin plugin;
     private URI pluginLocation;
     private boolean pluginActive;
     private ClassLoader classLoader;
-
-    // ////////////////////////////////////////////////////////////////
-    // Methods
-    // ////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -121,8 +113,8 @@ public class PluginContainer implements Container {
     /**
      * {@inheritDoc}
      */
-
     public String toString() {
         return this.plugin.getName();
     }
+
 }

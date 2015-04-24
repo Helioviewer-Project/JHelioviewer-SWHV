@@ -13,7 +13,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -29,9 +28,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private final JLabel title;
     private final JLabel contrastLabel;
 
-    /**
-     * Default constructor.
-     */
     public ContrastPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
@@ -52,10 +48,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         contrastLabel.setHorizontalAlignment(JLabel.RIGHT);
         contrastLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
         add(contrastLabel);
-    }
-
-    public Area getArea() {
-        return Area.TOP;
     }
 
     @Override

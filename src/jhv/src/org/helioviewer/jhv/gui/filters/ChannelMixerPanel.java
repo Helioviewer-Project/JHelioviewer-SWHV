@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -29,10 +28,6 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     private final JCheckBox blueCheckBox;
     private final JLabel title;
 
-    /**
-     * Default constructor.
-     *
-     */
     public ChannelMixerPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
@@ -62,11 +57,6 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
 
         add(boxPanel);
-        //setEnabled(false);
-    }
-
-    public Area getArea() {
-        return Area.TOP;
     }
 
     /**
@@ -87,7 +77,6 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);

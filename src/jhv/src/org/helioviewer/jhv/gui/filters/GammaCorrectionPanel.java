@@ -13,7 +13,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -54,13 +53,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         add(gammaLabel);
 
         //setEnabled(false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Area getArea() {
-        return Area.TOP;
     }
 
     /**
