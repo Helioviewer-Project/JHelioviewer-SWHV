@@ -27,7 +27,7 @@ public class RenderableSolarAxes implements Renderable {
     public void render(GL3DState state) {
         if (!isVisible)
             return;
-        GL2 gl = GL3DState.gl;
+        GL2 gl = state.gl;
         gl.glColor4d(0., 0., 1., 1.);
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex3d(0, -1.2, 0);

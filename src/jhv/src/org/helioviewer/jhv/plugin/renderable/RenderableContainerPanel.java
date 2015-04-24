@@ -168,7 +168,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
              * @param e
              */
             public void handlePopup(MouseEvent e) {
-
             }
 
             /**
@@ -178,28 +177,25 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             public void mouseClicked(MouseEvent e) {
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
-                RenderableContainer model = (RenderableContainer) grid.getModel();
+                Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
 
                 if (col == VISIBLEROW) {
-                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     renderable.setVisible(!renderable.isVisible());
                     Displayer.display();
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
-                    Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     if (renderable instanceof GL3DImageLayer) {
-                        GL3DImageLayer imageLayer = (GL3DImageLayer) renderable;
-                        Displayer.getLayersModel().setActiveLayer(imageLayer.getMainLayerView());
+                        Displayer.getLayersModel().setActiveLayer(((GL3DImageLayer) renderable).getMainLayerView());
                     }
-
                     setOptionsPanel(renderable);
                 }
                 if (col == REMOVEROW) {
-                    model.removeRow(row);
+                    ((RenderableContainer) grid.getModel()).removeRow(row);
                     Displayer.display();
                 }
             }
         });
+
         grid.setDragEnabled(true);
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
