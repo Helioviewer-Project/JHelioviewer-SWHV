@@ -34,11 +34,12 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
+import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
-public class RenderableContainerPanel extends JPanel {
+public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -217,7 +218,7 @@ public class RenderableContainerPanel extends JPanel {
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
-
+        Displayer.getLayersModel().addLayersListener(this);
     }
 
     void setOptionsPanel(Renderable renderable) {
@@ -226,6 +227,19 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         this.getParent().revalidate();
         this.getParent().repaint();
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+    }
+
+    @Override
+    public void layerRemoved(int oldIdx) {
+    }
+
+    @Override
+    public void activeLayerChanged(AbstractView view) {
+        setOptionsPanel(view.getImageLayer());
     }
 
 }
