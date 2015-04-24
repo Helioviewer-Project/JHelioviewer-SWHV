@@ -24,8 +24,11 @@ import org.helioviewer.viewmodel.view.AbstractView;
  */
 public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
 
-    public GL3DObserverCamera() {
+    public GL3DObserverCamera(boolean init) {
         super();
+        if (init) {
+            Displayer.addFirstTimeListener(this);
+        }
     }
 
     @Override
@@ -37,7 +40,11 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        if (Displayer.getLastUpdatedTimestamp() != null)
+            this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        else
+            this.timeChanged(new Date());
+
         Displayer.addFirstTimeListener(this);
     }
 
@@ -56,7 +63,12 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     public void timeChanged(Date date) {
         if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
+            if (Displayer.getRenderableCamera() != null) {
+                Displayer.getRenderableCamera().setTimeString(date);
+                Displayer.getRenderablecontainer().fireTimeUpdated(Displayer.getRenderableCamera());
+            }
         }
+
     }
 
     private void updateRotation(Date date) {

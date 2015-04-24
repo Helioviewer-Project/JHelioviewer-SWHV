@@ -16,18 +16,21 @@ import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
+import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class Displayer implements JHVEventHighlightListener {
-
-    private static GL3DCamera activeCamera = new GL3DObserverCamera();
+    private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
+    private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+    private static GL3DCamera activeCamera = new GL3DObserverCamera(true);
     private static int viewportWidth;
     private static int viewportHeight;
 
     public static void setViewportSize(int width, int height) {
-       viewportWidth = width;
-       viewportHeight = height;
+        viewportWidth = width;
+        viewportHeight = height;
     }
 
     public static int getViewportHeight() {
@@ -47,14 +50,6 @@ public class Displayer implements JHVEventHighlightListener {
     public static GL3DCamera getActiveCamera() {
         return activeCamera;
     }
-
-    private static final LayersModel layersModel = new LayersModel();
-    private static final RenderableContainer renderableContainer = new RenderableContainer();
-    private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
-
-    private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
-    private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
 
     private static Date lastTimestamp;
 
@@ -129,6 +124,12 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.remove(timeListener);
     }
 
+    private static final LayersModel layersModel = new LayersModel();
+    private static final RenderableCamera renderableCamera = new RenderableCamera();
+
+    private static final RenderableContainer renderableContainer = new RenderableContainer();
+    private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
+
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = layersModel.findView(view);
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
@@ -165,6 +166,10 @@ public class Displayer implements JHVEventHighlightListener {
     @Override
     public void eventHightChanged(JHVEvent event) {
         Displayer.display();
+    }
+
+    public static RenderableCamera getRenderableCamera() {
+        return renderableCamera;
     }
 
     public static RenderableContainer getRenderablecontainer() {

@@ -2,12 +2,14 @@ package org.helioviewer.jhv.renderable;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 
@@ -19,6 +21,7 @@ public class RenderableCamera implements Renderable {
     private static final Color firstcolor = Color.BLUE;
     private static final Color secondcolor = Color.WHITE;
     private boolean isVisible = false;
+    private String timeString = "N/A";
 
     public RenderableCamera() {
         this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getActiveCamera());
@@ -139,7 +142,12 @@ public class RenderableCamera implements Renderable {
 
     @Override
     public String getTimeString() {
-        return "N/A";
+        return this.timeString;
+    }
+
+    public void setTimeString(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        this.timeString = sdf.format(date);
     }
 
 }

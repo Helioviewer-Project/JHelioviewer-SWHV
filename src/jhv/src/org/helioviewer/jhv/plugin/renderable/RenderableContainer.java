@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugin.renderable;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
-
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
