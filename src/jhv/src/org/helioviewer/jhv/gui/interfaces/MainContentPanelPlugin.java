@@ -13,4 +13,5 @@ public interface MainContentPanelPlugin {
     public String getTabName();
 
     public LinkedList<JComponent> getVisualInterfaces();
+
 }
