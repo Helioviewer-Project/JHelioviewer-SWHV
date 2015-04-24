@@ -22,7 +22,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.io.MovieExport;
-import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableGridType;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
@@ -54,7 +53,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderablecontainer().addRenderable(new RenderableSolarAxes(solarAxesType));
         RenderableGridType gridType = new RenderableGridType("Grids");
         Displayer.getRenderablecontainer().addRenderable(new RenderableGrid(gridType, false));
-        Displayer.getRenderablecontainer().addRenderable(new RenderableCamera());
+        Displayer.getRenderablecontainer().addRenderable(Displayer.getRenderableCamera());
 
         canvas.setMinimumSize(new Dimension(0, 0));
         canvas.addGLEventListener(this);

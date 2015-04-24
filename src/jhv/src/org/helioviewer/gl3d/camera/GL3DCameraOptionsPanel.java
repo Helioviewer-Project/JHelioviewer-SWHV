@@ -48,7 +48,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
             public void stateChanged(ChangeEvent e) {
                 int index = tab.getSelectedIndex();
                 if (index == 0) {
-                    changeCamera(new GL3DObserverCamera());
+                    changeCamera(new GL3DObserverCamera(false));
                 }
                 if (index == 1) {
                     changeCamera(new GL3DEarthCamera());
@@ -110,7 +110,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
     }
 
     public void fireInit() {
-        this.initCamera(new GL3DObserverCamera());
+        this.initCamera(new GL3DObserverCamera(false));
         if (Displayer.getLayersModel().getNumLayers() > 0) {
             visactivate();
         } else {
