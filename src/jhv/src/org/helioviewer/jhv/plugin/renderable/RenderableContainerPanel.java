@@ -19,6 +19,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -218,8 +219,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     }
 
     void setOptionsPanel(Renderable renderable) {
+        setOptionsPanel(renderable.getOptionsPanel());
+    }
+
+    private void setOptionsPanel(Component cmp) {
         optionsPanelWrapper.remove(optionsPanel);
-        optionsPanel = renderable.getOptionsPanel();
+        optionsPanel = cmp;
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         this.getParent().revalidate();
         this.getParent().repaint();
@@ -237,6 +242,10 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public void activeLayerChanged(AbstractView view) {
         if (view != null)
             setOptionsPanel(view.getImageLayer());
+        else {
+            JPanel jpl = new JPanel();
+            jpl.add(new JLabel("No layer selected"));
+            setOptionsPanel(jpl);
+        }
     }
-
 }
