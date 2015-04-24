@@ -312,6 +312,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return meterPerPixel;
     }
 
+    @Override
     public GL3DQuatd getLocalRotation() {
         return this.localRotation;
     }

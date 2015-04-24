@@ -1,9 +1,12 @@
 package org.helioviewer.viewmodel.metadata;
 
+import java.util.Date;
+
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.region.Region;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Implementation of MetaData representing images without information about
@@ -22,6 +25,7 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
 
     private double unitsPerPixel = 1.0;
     private final Vector2dInt resolution;
+    private final GL3DQuatd localRotation = new GL3DQuatd();
 
     /**
      * Constructor, setting the size. The position is set to (0,0) by default.
@@ -34,77 +38,11 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
     public PixelBasedMetaData(int newWidth, int newHeight) {
         super(0, 0, newWidth, newHeight);
         resolution = new Vector2dInt(getPhysicalImageSize());
+        this.dateTime = new ImmutableDateTime(new Date().getTime());
     }
 
-    /**
-     * Constructor, setting size and position.
-     *
-     * @param newLowerLeftCorner
-     *            Lower left corner of the corresponding image
-     * @param newSizeVector
-     *            Size of the corresponding image
-     */
-    public PixelBasedMetaData(Vector2dInt newLowerLeftCorner, Vector2dInt newSizeVector) {
-        super(new GL3DVec2d(newLowerLeftCorner), new GL3DVec2d(newSizeVector));
-        resolution = new Vector2dInt(getPhysicalImageSize());
-    }
-
-    /**
-     * Constructor, setting size and position.
-     *
-     * @param newLowerLeftCornerX
-     *            Lower left x-coordinate of the corresponding image
-     * @param newLowerLeftCornerY
-     *            Lower left y-coordinate of the corresponding image
-     * @param newWidth
-     *            Width of the corresponding image
-     * @param newHeight
-     *            Height of the corresponding image
-     */
-    public PixelBasedMetaData(int newLowerLeftCornerX, int newLowerLeftCornerY, int newWidth, int newHeight) {
-        super(newLowerLeftCornerX, newLowerLeftCornerY, newWidth, newHeight);
-        resolution = new Vector2dInt(getPhysicalImageSize());
-    }
-
-    /**
-     * Constructor, setting size and position.
-     *
-     * @param newLowerLeftCorner
-     *            Lower left corner of the corresponding image
-     * @param newWidth
-     *            Width of the corresponding image
-     * @param newHeight
-     *            Height of the corresponding image
-     */
-    public PixelBasedMetaData(Vector2dInt newLowerLeftCorner, int newWidth, int newHeight) {
-        super(new GL3DVec2d(newLowerLeftCorner), newWidth, newHeight);
-        resolution = new Vector2dInt(getPhysicalImageSize());
-    }
-
-    /**
-     * Constructor, setting size and position.
-     *
-     * @param newLowerLeftCornerX
-     *            Lower left x-coordinate of the corresponding image
-     * @param newLowerLeftCornerY
-     *            Lower left y-coordinate of the corresponding image
-     * @param newSizeVector
-     *            Size of the corresponding image
-     */
-    public PixelBasedMetaData(int newLowerLeftCornerX, int newLowerLeftCornerY, Vector2dInt newSizeVector) {
-        super(newLowerLeftCornerX, newLowerLeftCornerY, new GL3DVec2d(newSizeVector));
-        resolution = new Vector2dInt(getPhysicalImageSize());
-    }
-
-    /**
-     * Constructor, setting size and position.
-     *
-     * @param newRectangle
-     *            Full rectangle of the corresponding image
-     */
-    public PixelBasedMetaData(RectangleDouble newRectangle) {
-        super(newRectangle);
-        resolution = new Vector2dInt(getPhysicalImageSize());
+    public GL3DQuatd getLocalRotation() {
+        return localRotation;
     }
 
     /**

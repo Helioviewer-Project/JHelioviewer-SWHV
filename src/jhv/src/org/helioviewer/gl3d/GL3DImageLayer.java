@@ -20,7 +20,6 @@ import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -181,7 +180,7 @@ public class GL3DImageLayer implements Renderable {
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
         if (imageData == null)
             return new GL3DQuatd();
-        HelioviewerMetaData md = (HelioviewerMetaData) (imageData.getMETADATA());
+        MetaData md = imageData.getMETADATA();
 
         GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
         cameraDifferenceRotation.rotateWithConjugate(md.getLocalRotation());
