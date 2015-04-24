@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.RectangleDouble;
 import org.helioviewer.viewmodel.region.Region;
@@ -90,5 +91,7 @@ public interface MetaData {
     public Region getPhysicalRegion();
 
     public ImmutableDateTime getDateTime();
+
+    public GL3DQuatd getLocalRotation();
 
 }

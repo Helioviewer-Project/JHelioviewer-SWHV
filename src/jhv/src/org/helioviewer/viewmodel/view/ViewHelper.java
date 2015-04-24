@@ -15,6 +15,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
@@ -363,6 +364,15 @@ public final class ViewHelper {
                 JHVFITSView fitsView = new JHVFITSView(uri);
 
                 return fitsView;
+            } catch (Exception e) {
+                Log.debug("ViewerHelper::loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
+            try {
+                JHVSimpleImageView imView = new JHVSimpleImageView(uri);
+
+                return imView;
             } catch (Exception e) {
                 Log.debug("ViewerHelper::loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
                 throw new IOException(e.getMessage());
