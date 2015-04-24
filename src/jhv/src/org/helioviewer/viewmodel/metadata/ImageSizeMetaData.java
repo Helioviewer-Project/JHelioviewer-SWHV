@@ -15,7 +15,6 @@ import org.helioviewer.base.math.Vector2dInt;
  * 
  */
 public interface ImageSizeMetaData extends MetaData {
-
     /**
      * Returns the pixel resolution of the image.
      * 
@@ -29,4 +28,5 @@ public interface ImageSizeMetaData extends MetaData {
      * @return conversion factor from pixels to a physical unit.
      */
     public double getUnitsPerPixel();
+
 }

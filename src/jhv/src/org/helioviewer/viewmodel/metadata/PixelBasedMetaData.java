@@ -19,6 +19,7 @@ import org.helioviewer.viewmodel.region.Region;
  *
  */
 public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMetaData {
+
     private double unitsPerPixel = 1.0;
     private final Vector2dInt resolution;
 

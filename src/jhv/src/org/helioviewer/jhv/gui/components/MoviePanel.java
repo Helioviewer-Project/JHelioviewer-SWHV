@@ -464,15 +464,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    // This is needed for the CardLayout
-    @Override
-    @SuppressWarnings("deprecation")
-    public void show(boolean visible) {
-        super.show(visible);
-        this.setAdvanced(MoviePanel.isAdvanced);
-        // update
-    }
-
     /**
      * {@inheritDoc}
      */
