@@ -235,7 +235,7 @@ public class ImageViewerGui {
                                     if (subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
                                         MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) subView);
                                         if (moviePanel == null) {
-                                            throw new InvalidViewException();
+                                            throw new Exception();
                                         }
                                         moviePanel.setMovieLink(true);
                                     }
@@ -252,7 +252,7 @@ public class ImageViewerGui {
                 Message.err("An error occured while opening the remote file!", e.getMessage(), false);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-            } catch (InvalidViewException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -276,7 +276,7 @@ public class ImageViewerGui {
                                 JHVJPXView movieView = (JHVJPXView) subView;
                                 MoviePanel moviePanel = MoviePanel.getMoviePanel(movieView);
                                 if (moviePanel == null) {
-                                    throw new InvalidViewException();
+                                    throw new Exception();
                                 }
                                 moviePanel.setMovieLink(true);
                                 break;
@@ -285,7 +285,7 @@ public class ImageViewerGui {
                     }
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                } catch (InvalidViewException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
