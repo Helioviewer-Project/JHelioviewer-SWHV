@@ -9,8 +9,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import org.helioviewer.jhv.gui.interfaces.StatusPanelPlugin;
-
 /**
  * Class used for displaying information and statuses in a panel at the very
  * bottom of JHV.
@@ -76,13 +74,11 @@ public class StatusPanel extends JPanel {
      * @param alignment
      *            Alignment of the new plugin, can be either LEFT or RIGHT
      */
-    public void addPlugin(StatusPanelPlugin newPlugin, Alignment alignment) {
-        if (newPlugin instanceof JLabel) {
-            if (alignment == Alignment.LEFT) {
-                leftPanel.add((JLabel) newPlugin);
-            } else {
-                rightPanel.add((JLabel) newPlugin, 0);
-            }
+    public void addPlugin(JLabel newPlugin, Alignment alignment) {
+        if (alignment == Alignment.LEFT) {
+            leftPanel.add(newPlugin);
+        } else {
+            rightPanel.add(newPlugin, 0);
         }
     }
 
@@ -92,11 +88,9 @@ public class StatusPanel extends JPanel {
      * @param oldPlugin
      *            Plugin to remove
      */
-    public void removePlugin(StatusPanelPlugin oldPlugin) {
-        if (oldPlugin instanceof JLabel) {
-            leftPanel.remove((JLabel) oldPlugin);
-            rightPanel.remove((JLabel) oldPlugin);
-        }
+    public void removePlugin(JLabel oldPlugin) {
+        leftPanel.remove(oldPlugin);
+        rightPanel.remove(oldPlugin);
     }
 
 }

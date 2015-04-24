@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components.statusplugins;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -20,7 +21,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  * <p>
  * If there is no layer present, this panel will be invisible.
  */
-public class ZoomStatusPanel extends ViewStatusPanelPlugin {
+public class ZoomStatusPanel extends JLabel {
 
     private static final ZoomStatusPanel instance = new ZoomStatusPanel();
 

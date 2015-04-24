@@ -255,7 +255,6 @@ public class ImageViewerGui {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
 
         // -jpx

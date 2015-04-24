@@ -22,7 +22,6 @@ import org.helioviewer.base.FileUtils;
  * @author Stephan Pagel
  */
 public class IconBank {
-
     /**
      * The enum has all the icons, you supply these enums to the getIcon method.
      * 
@@ -31,7 +30,6 @@ public class IconBank {
      * 
      */
     public static enum JHVIcon {
-
         // The formatter will not merge together multiple lines, if at least one
         // empty line is inserted in between:
 
@@ -103,7 +101,7 @@ public class IconBank {
         String getFilename() {
             return fname;
         }
-    };
+    }
 
     /** The location of the image files relative to this folder. */
     private static final String RESOURCE_PATH = "/images/";
@@ -128,14 +126,11 @@ public class IconBank {
      * @return Image for the given name or null if it fails to load the image.
      * */
     public static BufferedImage getImage(JHVIcon icon) {
-
         ImageIcon imageIcon = getIcon(icon);
-
         if (imageIcon == null)
             return null;
 
         Image image = imageIcon.getImage();
-
         if (image != null && image.getWidth(null) > 0 && image.getHeight(null) > 0) {
             BufferedImage bi = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 
@@ -164,19 +159,14 @@ public class IconBank {
         }
 
         int totalPixels = bufImg.getWidth() * bufImg.getHeight();
-
         float red = ((float) (sumRed / totalPixels)) / 255.0f;
         float green = ((float) (sumGreen / totalPixels)) / 255.0f;
         float blue = ((float) (sumBlue / totalPixels)) / 255.0f;
 
-        // Log.info("RGB: " + red + " " + green + " " + blue);
-
         return new Color(red, green, blue);
-
     }
 
     public static BufferedImage stackImages(BufferedImage[] bufImgs, double horizontal, double vertical) {
-
         // exit if no real image data is available
         if (bufImgs.length == 0 || bufImgs[0] == null) {
             return null;
@@ -205,7 +195,6 @@ public class IconBank {
         }
 
         return result;
-
     }
 
 }

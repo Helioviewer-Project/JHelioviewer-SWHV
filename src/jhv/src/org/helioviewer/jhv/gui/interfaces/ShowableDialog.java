@@ -12,11 +12,11 @@ package org.helioviewer.jhv.gui.interfaces;
  *
  */
 public interface ShowableDialog {
-
     /**
      * Shows the dialog on the screen.
      */
     public void showDialog();
 
     public void init();
+
 }

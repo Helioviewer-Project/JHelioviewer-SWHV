@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.gl3d.GL3DState;
@@ -16,7 +17,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
 /**
  * Status panel for displaying the current mouse position.
  */
-public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseMotionListener, ImagePanelPlugin {
+public class PositionStatusPanel extends JLabel implements MouseMotionListener, ImagePanelPlugin {
 
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
@@ -28,7 +29,6 @@ public class PositionStatusPanel extends ViewStatusPanelPlugin implements MouseM
     private PositionStatusPanel() {
         setBorder(BorderFactory.createEtchedBorder());
         setPreferredSize(new Dimension(170, 20));
-
         setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
     }
 
