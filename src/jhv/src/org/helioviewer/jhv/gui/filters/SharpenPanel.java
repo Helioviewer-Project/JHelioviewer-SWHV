@@ -10,9 +10,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
-import org.helioviewer.viewmodelplugin.filter.FilterPanel;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
+import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a slider for changing the weighting of the sharpening.
@@ -27,7 +25,6 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
 
     public SharpenPanel() {
         //setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Sharpen");
         title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         //add(title);

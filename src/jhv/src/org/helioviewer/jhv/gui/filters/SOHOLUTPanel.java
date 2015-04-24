@@ -18,11 +18,9 @@ import javax.swing.border.BevelBorder;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
-import org.helioviewer.viewmodelplugin.filter.FilterPanel;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a combobox for choosing the color table and button to add
@@ -76,7 +74,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         invertButton.addActionListener(this);
         add(invertButton);
 
-        setEnabled(false);
+        //setEnabled(false);
     }
 
     public Area getArea() {

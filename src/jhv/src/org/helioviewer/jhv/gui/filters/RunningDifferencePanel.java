@@ -21,8 +21,8 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel to control running differences
