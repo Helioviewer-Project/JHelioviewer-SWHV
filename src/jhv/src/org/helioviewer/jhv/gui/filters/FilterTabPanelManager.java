@@ -224,6 +224,11 @@ public class FilterTabPanelManager {
         };
         showMetaButton.setAction(showMetaAction);
         showMetaButton.revalidate();
+        if (jp2view instanceof JHVJP2View) {
+            this.downloadLayerButton.setEnabled(true);
+        } else {
+            this.downloadLayerButton.setEnabled(false);
+        }
     }
 
 }
