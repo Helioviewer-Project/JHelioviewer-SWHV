@@ -73,7 +73,4 @@ public class RenderableSolarAxes implements Renderable {
         return "";
     }
 
-    @Override
-    public void destroy() {
-    }
 }

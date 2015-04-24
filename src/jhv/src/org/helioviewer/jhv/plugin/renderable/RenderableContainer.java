@@ -45,6 +45,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
         fireListeners();
+        Displayer.display();
     }
 
     public void render(GL3DState state) {
@@ -141,11 +142,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     public void removeRow(int row) {
         Renderable el = this.renderables.get(row);
-        this.renderables.remove(row);
-        this.removedRenderables.remove(el);
-        el.destroy();
-
-        fireListeners();
+        this.removeRenderable(el);
     }
 
     private void fireListeners() {
