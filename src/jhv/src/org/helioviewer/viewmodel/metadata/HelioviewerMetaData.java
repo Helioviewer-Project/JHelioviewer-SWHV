@@ -46,6 +46,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private double meterPerPixel;
     private GL3DQuatd localRotation;
     private GL3DVec2d sunPixelPositionImage = new GL3DVec2d();
+    private int pixelImageWidth;
+    private int pixelImageHeight;
 
     /**
      * Default constructor.
@@ -185,8 +187,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        int pixelImageWidth = m.getPixelWidth();
-        int pixelImageHeight = m.getPixelHeight();
+        this.pixelImageWidth = m.getPixelWidth();
+        this.pixelImageHeight = m.getPixelHeight();
 
         double newSolarPixelRadius = -1.0;
 
@@ -332,4 +334,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return outerRadius;
     }
 
+    public int pixelImageWidth() {
+        return this.pixelImageWidth;
+    }
+
+    public int pixelImageHeight() {
+        return this.pixelImageHeight;
+    }
 }
