@@ -75,4 +75,5 @@ public interface Plugin {
      * plugin in the about dialog of jhv.
      */
     public String getAboutLicenseText();
+
 }

@@ -49,4 +49,5 @@ public interface Container {
      * If this method is called an update to the settings file will be executed.
      */
     public void changeSettings();
+
 }

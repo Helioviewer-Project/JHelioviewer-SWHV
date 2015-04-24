@@ -18,7 +18,6 @@ import javax.swing.border.BevelBorder;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -47,9 +46,6 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
      */
     private final JLabel title;
 
-    /**
-     * Creates a filter panel with the standard list of filters
-     */
     public SOHOLUTPanel() {
         lutMap = LUT.getStandardList();
 
@@ -73,12 +69,6 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         invertButton.setPreferredSize(new Dimension(FilterPanel.valueWidth - 14, FilterPanel.height));
         invertButton.addActionListener(this);
         add(invertButton);
-
-        //setEnabled(false);
-    }
-
-    public Area getArea() {
-        return Area.BOTTOM;
     }
 
     /**

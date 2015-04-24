@@ -21,7 +21,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -37,10 +36,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private final JSpinner truncateSpinner;
     private JCheckBox diffRot;
 
-    /**
-     * Creates a new panel to control the running difference. Not active until a
-     * valid filter has been set.
-     */
     public RunningDifferencePanel() {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addRadioButtons();
@@ -160,10 +155,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         jp2view.setTruncation(1 - value);
         Displayer.display();
 
-    }
-
-    public Area getArea() {
-        return Area.TOP;
     }
 
     /**

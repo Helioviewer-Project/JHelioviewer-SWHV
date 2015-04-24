@@ -11,7 +11,6 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -45,12 +44,6 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         opacityLabel.setHorizontalAlignment(JLabel.RIGHT);
         opacityLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
         //add(opacityLabel);
-
-        //setEnabled(false);
-    }
-
-    public Area getArea() {
-        return Area.TOP;
     }
 
     /**
@@ -72,7 +65,6 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
