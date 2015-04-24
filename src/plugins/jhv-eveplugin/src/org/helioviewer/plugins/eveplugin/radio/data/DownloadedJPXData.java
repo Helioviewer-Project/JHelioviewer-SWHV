@@ -69,10 +69,6 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         this.endDate = endDate;
     }
 
-    public void viewChanged(final View sender) {
-
-    }
-
     private DownloadedJPXDataWorkerResult getJPXData(View view) {
         if (view != null) {
             JHVJP2CallistoView jp2CallistoView = (JHVJP2CallistoView) view;
