@@ -8,7 +8,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -41,9 +40,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     TimeTextField endTimePicker;
     JSeparatorComboBox objectCombobox;
     private final GL3DFollowObjectCamera camera;
-    private final JLabel cameraTime;
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    private final String DISABLED_TEXT = "----";
     private JPanel addBeginDatePanel;
     private JPanel addEndDatePanel;
     private JButton synchronizeWithLayersButton;
@@ -66,12 +62,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(new JSeparator(SwingConstants.HORIZONTAL));
 
         add(new JSeparator(SwingConstants.HORIZONTAL));
-        JPanel cameraTimePanel = new JPanel();
-        cameraTimePanel.setLayout(new BoxLayout(cameraTimePanel, BoxLayout.LINE_AXIS));
-        cameraTime = new JLabel("Camera time: " + DISABLED_TEXT);
-        cameraTimePanel.add(cameraTime);
-        cameraTimePanel.add(Box.createHorizontalGlue());
-        add(cameraTimePanel);
         JPanel loadedLabelPanel = new JPanel();
         loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
 
@@ -159,7 +149,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     @Override
     public void deactivate() {
         this.camera.removeFollowObjectCameraListener(this);
-        cameraTime.setText(DISABLED_TEXT);
     }
 
     private void addObjectCombobox() {
@@ -347,16 +336,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
         this.loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
-    }
-
-    @Override
-    public void fireCameraTime(Date cameraDate) {
-        this.cameraTime.setText("Camera time: " + format.format(cameraDate));
-    }
-
-    @Override
-    public void fireNewDate(Date date) {
-        this.cameraTime.setText(this.format.format(date));
     }
 
 }

@@ -289,14 +289,6 @@ public abstract class GL3DCamera {
         return this.currentDragRotation;
     }
 
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
     public void setTrackingMode(boolean trackingMode) {
         this.trackingMode = trackingMode;
     }
