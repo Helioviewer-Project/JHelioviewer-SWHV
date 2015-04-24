@@ -82,7 +82,7 @@ void main(void)
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     } 
     texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
-    if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.) {
+    if(texcoord.x<0.||texcoord.y<0.||texcoord.x>1.|| texcoord.y>1.||dot(rotatedHitPoint.xy,rotatedHitPoint.xy) > outerCutOffRadius* outerCutOffRadius) {
         discard;
     }
 
