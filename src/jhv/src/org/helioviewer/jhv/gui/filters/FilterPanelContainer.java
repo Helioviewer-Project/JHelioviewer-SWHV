@@ -1,17 +1,10 @@
-package org.helioviewer.jhv.gui.components;
+package org.helioviewer.jhv.gui.filters;
 
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.filters.ChannelMixerPanel;
-import org.helioviewer.jhv.gui.filters.ContrastPanel;
-import org.helioviewer.jhv.gui.filters.GammaCorrectionPanel;
-import org.helioviewer.jhv.gui.filters.OpacityPanel;
-import org.helioviewer.jhv.gui.filters.RunningDifferencePanel;
-import org.helioviewer.jhv.gui.filters.SOHOLUTPanel;
-import org.helioviewer.jhv.gui.filters.SharpenPanel;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager;
+import org.helioviewer.jhv.gui.components.ControlPanelContainer;
 
 public class FilterPanelContainer {
 

@@ -13,10 +13,8 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
-import org.helioviewer.viewmodelplugin.filter.FilterPanel;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing a slider for changing the gamma value of the image.
@@ -55,7 +53,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         gammaLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
         add(gammaLabel);
 
-        setEnabled(false);
+        //setEnabled(false);
     }
 
     /**

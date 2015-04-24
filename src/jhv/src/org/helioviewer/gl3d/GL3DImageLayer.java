@@ -15,7 +15,7 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.FilterPanelContainer;
+import org.helioviewer.jhv.gui.filters.FilterPanelContainer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.renderable.RenderableImageType;

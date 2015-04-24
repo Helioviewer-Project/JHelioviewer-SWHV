@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodelplugin.filter;
+package org.helioviewer.jhv.gui.filters;
 
 import javax.swing.JPanel;
 

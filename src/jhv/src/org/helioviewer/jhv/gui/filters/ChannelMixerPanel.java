@@ -13,11 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.filters.FilterTabPanelManager.Area;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodelplugin.filter.FilterAlignmentDetails;
-import org.helioviewer.viewmodelplugin.filter.FilterPanel;
-import org.helioviewer.viewmodelplugin.filter.FilterTabPanelManager.Area;
 
 /**
  * Panel containing three check boxes to modify the color mask of an image.
@@ -64,7 +62,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
 
         add(boxPanel);
-        setEnabled(false);
+        //setEnabled(false);
     }
 
     public Area getArea() {
