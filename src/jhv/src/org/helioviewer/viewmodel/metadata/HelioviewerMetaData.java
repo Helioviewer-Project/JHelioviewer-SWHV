@@ -30,9 +30,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private double dobs;
     private final boolean carringtonAvailable = false;
 
-    private double stonyhurstLongitude;
-    private double stonyhurstLatitude;
-    private boolean stonyhurstAvailable = false;
     private double refb0;
     private double refl0;
     private double innerRadius = 0.;
@@ -159,34 +156,29 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             this.dobs = Astronomy.getDistanceMeters(this.getDateTime().getTime());
         }
 
-        double crlt = m.tryGetDouble("CRLT_OBS");
-        double crln = m.tryGetDouble("CRLN_OBS");
-
         this.refb0 = m.tryGetDouble("REF_B0");
         this.refl0 = m.tryGetDouble("REF_L0");
 
-        this.stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
-        if (this.stonyhurstLatitude == 0) {
-            this.stonyhurstLatitude = crlt;
-            if (this.stonyhurstLatitude == 0) {
-                this.stonyhurstLatitude = this.refb0;
+        double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
+        if (stonyhurstLatitude == 0) {
+            stonyhurstLatitude = m.tryGetDouble("CRLT_OBS");
+            if (stonyhurstLatitude == 0) {
+                stonyhurstLatitude = this.refb0;
             }
         }
-        this.stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
+        double stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
         if (this.refl0 != 0.) {
-            this.stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
+            stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
         }
 
         if (this.getInstrument().contains("GONG") || this.getObservatory().contains("USET") || this.getObservatory().contains("SOLIS")) {
-            this.stonyhurstLongitude = 0.0;
+            stonyhurstLongitude = 0.0;
         }
-
-        this.stonyhurstAvailable = this.stonyhurstLatitude != 0.0 || this.stonyhurstLongitude != 0.0;
 
         double theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
         double phi = Astronomy.getL0Radians(this.getDateTime().getTime());
-        phi -= getStonyhurstLongitude() / MathUtils.radeg;
-        theta = getStonyhurstLatitude() / MathUtils.radeg;
+        phi -= stonyhurstLongitude / MathUtils.radeg;
+        theta = stonyhurstLatitude / MathUtils.radeg;
 
         localRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         localRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
@@ -324,22 +316,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     public double getDobs() {
         return dobs;
-    }
-
-    public boolean isCarringtonProvided() {
-        return carringtonAvailable;
-    }
-
-    public boolean isStonyhurstProvided() {
-        return stonyhurstAvailable;
-    }
-
-    public double getStonyhurstLatitude() {
-        return stonyhurstLatitude;
-    }
-
-    public double getStonyhurstLongitude() {
-        return stonyhurstLongitude;
     }
 
     /**
