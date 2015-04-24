@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 
 /**
@@ -23,7 +23,7 @@ public class ToggleSolarRotationAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera cam = GL3DState.getActiveCamera();
+        GL3DCamera cam = Displayer.getActiveCamera();
         cam.setTrackingMode(!cam.getTrackingMode());
     }
 

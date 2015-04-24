@@ -4,7 +4,6 @@ import java.awt.Component;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 
@@ -20,14 +19,14 @@ public class RenderableSolarAxes implements Renderable {
     }
 
     @Override
-    public void init(GL3DState state) {
+    public void init(GL2 gl) {
     }
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (!isVisible)
             return;
-        GL2 gl = state.gl;
+
         gl.glColor4d(0., 0., 1., 1.);
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex3d(0, -1.2, 0);
@@ -39,13 +38,12 @@ public class RenderableSolarAxes implements Renderable {
     }
 
     @Override
-    public void remove(GL3DState state) {
+    public void remove(GL2 gl) {
     }
 
     @Override
     public RenderableType getType() {
         return renderableType;
-
     }
 
     @Override

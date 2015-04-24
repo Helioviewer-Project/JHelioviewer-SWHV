@@ -13,7 +13,7 @@ import javax.media.opengl.GL2;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
@@ -61,12 +61,11 @@ public class RenderableGrid implements Renderable {
     private int colorBufferID;
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (!isVisible)
             return;
 
-        GL3DCamera activeCamera = GL3DState.getActiveCamera();
-        GL2 gl = state.gl;
+        GL3DCamera activeCamera = Displayer.getActiveCamera();
 
         gl.glPushMatrix();
         gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
@@ -91,14 +90,12 @@ public class RenderableGrid implements Renderable {
                 drawText(gl);
             }
 
-            drawCircles(state);
+            drawCircles(gl);
         }
         gl.glPopMatrix();
     }
 
-    private void drawCircles(GL3DState state) {
-        GL2 gl = state.gl;
-
+    private void drawCircles(GL2 gl) {
         gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
@@ -237,7 +234,7 @@ public class RenderableGrid implements Renderable {
     }
 
     @Override
-    public void init(GL3DState state) {
+    public void init(GL2 gl) {
         FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
         FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
@@ -260,26 +257,26 @@ public class RenderableGrid implements Renderable {
         int positionBufferSize = positionBuffer.capacity();
         int colorBufferSize = colorBuffer.capacity();
 
-        positionBufferID = generate(state);
-        colorBufferID = generate(state);
+        positionBufferID = generate(gl);
+        colorBufferID = generate(gl);
 
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBufferSize * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
-
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, colorBufferSize * Buffers.SIZEOF_FLOAT, colorBuffer, GL2.GL_STATIC_DRAW);
     }
 
-    private int generate(GL3DState state) {
+    private int generate(GL2 gl) {
         int[] tmpId = new int[1];
-        state.gl.glGenBuffers(1, tmpId, 0);
+        gl.glGenBuffers(1, tmpId, 0);
+
         return tmpId[0];
     }
 
     @Override
-    public void remove(GL3DState state) {
-        state.gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
-        state.gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
+    public void remove(GL2 gl) {
+        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
+        gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
     }
 
     @Override

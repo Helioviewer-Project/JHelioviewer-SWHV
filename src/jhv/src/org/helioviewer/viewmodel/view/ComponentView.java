@@ -16,7 +16,6 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
@@ -73,7 +72,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GLInfo.update((GLCanvas) drawable);
 
         GLSLShader.initShader(gl);
-        GL3DState.setUpdated(gl, 100, 100);
 
         gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
 
@@ -96,8 +94,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     private static void displayBody(GL2 gl, int width, int height) {
-        GL3DState state = GL3DState.get();
-        GL3DCamera camera = GL3DState.getActiveCamera();
+        GL3DCamera camera = Displayer.getActiveCamera();
 
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
@@ -107,11 +104,11 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         gl.glPushMatrix();
         {
-            camera.applyPerspective(state);
-            camera.applyCamera(state);
-            Displayer.getRenderablecontainer().render(state);
-            camera.drawCamera(state);
-            camera.resumePerspective(state);
+            camera.applyPerspective(gl);
+            camera.applyCamera(gl);
+            Displayer.getRenderablecontainer().render(gl);
+            camera.drawCamera(gl);
+            camera.resumePerspective(gl);
         }
         gl.glPopMatrix();
 
@@ -124,7 +121,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
         int width = canvas.getWidth();
         int height = canvas.getHeight();
 
-        GL3DState.setUpdated(gl, width, height);
+        Displayer.setViewportSize(width, height);
+
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         gl.glPushMatrix();

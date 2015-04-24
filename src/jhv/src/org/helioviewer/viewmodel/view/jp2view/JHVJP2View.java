@@ -8,7 +8,6 @@ import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
@@ -477,16 +476,16 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
         MetaData metaData = jp2Image.metaDataList[frameNumber];
 
-        double m = GL3DState.getViewportHeight() / GL3DState.getActiveCamera().getCameraWidth();
+        double m = Displayer.getViewportHeight() / (double) Displayer.getActiveCamera().getCameraWidth();
         int h = (int) (r.getHeight() * m);
         int w = (int) (r.getWidth() * m);
 
-        m = metaData.getPhysicalImageWidth() / r.getWidth();
+        m = metaData.getPhysicalImageWidth() / (double) r.getWidth();
         int totalHeight = (int) (h * m);
         int totalWidth = (int) (w * m);
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
-        double imageMeterPerPixel = metaData.getPhysicalImageWidth() / res.getResolutionBounds().getWidth();
+        double imageMeterPerPixel = metaData.getPhysicalImageWidth() / (double) res.getResolutionBounds().getWidth();
         int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
 

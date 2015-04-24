@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import javax.media.opengl.GL2;
 
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 
 /**
@@ -29,7 +28,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void drawInteractionFeedback(GL3DState state, GL3DCamera camera) {
+    public void drawInteractionFeedback(GL2 gl, GL3DCamera camera) {
         if (this.isValidZoomBox()) {
             double x0, x1, y0, y1, z0, z1;
             if (this.zoomBoxEndPoint.x > this.zoomBoxStartPoint.x) {
@@ -51,7 +50,6 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
                 y0 = this.zoomBoxEndPoint.y;
             }
 
-            GL2 gl = state.gl;
             gl.glColor3d(1, 1, 0);
             gl.glDisable(GL2.GL_TEXTURE_2D);
 

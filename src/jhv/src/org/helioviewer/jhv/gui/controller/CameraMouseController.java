@@ -9,7 +9,7 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -42,7 +42,7 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
     @Override
     public void mouseEntered(MouseEvent e) {
         if (imagePanel != null) {
-            GL3DCamera camera = GL3DState.getActiveCamera();
+            GL3DCamera camera = Displayer.getActiveCamera();
             if (camera.getCurrentInteraction() == camera.getZoomInteraction()) {
             } else {
                 imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
@@ -65,7 +65,7 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DCamera camera = GL3DState.getActiveCamera();
+        GL3DCamera camera = Displayer.getActiveCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
                 imagePanel.setCursor(closedHandCursor);
@@ -84,7 +84,7 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
             imagePanel.setCursor(openHandCursor);
             buttonDown = false;
         }
-        GL3DState.getActiveCamera().getCurrentInteraction().mouseReleased(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);
     }
 
     /**
@@ -95,23 +95,23 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-            GL3DState.getActiveCamera().getCurrentInteraction().mouseDragged(e);
+            Displayer.getActiveCamera().getCurrentInteraction().mouseDragged(e);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        GL3DState.getActiveCamera().getCurrentInteraction().mouseClicked(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        GL3DState.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        GL3DState.getActiveCamera().getCurrentInteraction().mouseMoved(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseMoved(e);
     }
 
 }

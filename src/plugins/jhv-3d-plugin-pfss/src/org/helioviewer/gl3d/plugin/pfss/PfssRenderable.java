@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssNewDataLoader;
@@ -23,6 +22,7 @@ import org.helioviewer.viewmodel.view.TimedMovieView;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssRenderable implements Renderable, LayersListener {
+
     private final static ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
 
     private PfssCache pfssCache = null;
@@ -42,14 +42,12 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void init(GL3DState state) {
+    public void init(GL2 gl) {
     }
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (isVisible) {
-            GL2 gl = state.gl;
-
             PfssData pfssData;
             TimedMovieView movie = LinkedMovieManager.getSingletonInstance().getMasterMovie();
             if (movie != null && (pfssData = pfssCache.getData(movie.getCurrentDateMillis())) != null) {
@@ -65,7 +63,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void remove(GL3DState state) {
+    public void remove(GL2 gl) {
     }
 
     @Override

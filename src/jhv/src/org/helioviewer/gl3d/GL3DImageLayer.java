@@ -98,28 +98,28 @@ public class GL3DImageLayer implements Renderable {
     }
 
     @Override
-    public void init(GL3DState state) {
+    public void init(GL2 gl) {
         Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
         this.positionBufferSize = positionBuffer.capacity();
-        positionBufferID = generate(state);
+        positionBufferID = generate(gl);
 
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        state.gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
-        indexBufferID = generate(state);
+        indexBufferID = generate(gl);
         indexBufferSize = indexBuffer.capacity();
-        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-        state.gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-        GL3DState.getActiveCamera().updateCameraTransformation();
-        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
 
+        Displayer.getActiveCamera().updateCameraTransformation();
+        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    private void updateROI(GL3DState state) {
+    private void updateROI() {
         MetaData metaData = getMainLayerView().getMetaData();
         if (metaData == null)
             return;
@@ -129,7 +129,7 @@ public class GL3DImageLayer implements Renderable {
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera activeCamera = GL3DState.getActiveCamera();
+        GL3DCamera activeCamera = Displayer.getActiveCamera();
         GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, this.getMainLayerView().getImageData());
 
         for (int i = 0; i < pointlist.length; i++) {
@@ -174,7 +174,7 @@ public class GL3DImageLayer implements Renderable {
         }
         this.getMainLayerView().setRegion(newRegion);
 
-        Viewport layerViewport = new ViewportAdapter(new StaticViewport(state.getViewportWidth(), state.getViewportHeight()));
+        Viewport layerViewport = new ViewportAdapter(new StaticViewport(Displayer.getViewportWidth(), Displayer.getViewportHeight()));
         this.getMainLayerView().setViewport(layerViewport);
     }
 
@@ -190,10 +190,10 @@ public class GL3DImageLayer implements Renderable {
     }
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (!this.isVisible)
             return;
-        GL2 gl = state.gl;
+
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         GLSLShader.bind(gl);
@@ -207,12 +207,13 @@ public class GL3DImageLayer implements Renderable {
 
                 jp2view.applyFilters(gl);
 
-                GLSLShader.setViewport(GLInfo.pixelScale[0] * state.getViewportWidth(), GLInfo.pixelScale[1] * state.getViewportHeight());
+                GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
                 if (!GL3DImageLayer.showCorona) {
                     GLSLShader.setOuterCutOffRadius(1.);
                 }
                 GLSLShader.filter(gl);
-                GL3DCamera camera = GL3DState.getActiveCamera();
+
+                GL3DCamera camera = Displayer.getActiveCamera();
                 GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
                 vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
                 GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
@@ -224,8 +225,8 @@ public class GL3DImageLayer implements Renderable {
                     GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()), "diffcameraDifferenceRotationQuat");
                 }
 
-                enablePositionVBO(state);
-                enableIndexVBO(state);
+                enablePositionVBO(gl);
+                enableIndexVBO(gl);
                 {
                     gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                     GLSLShader.bindIsDisc(gl, 0);
@@ -238,8 +239,8 @@ public class GL3DImageLayer implements Renderable {
                     GLSLShader.bindIsDisc(gl, 1);
                     gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
                 }
-                disableIndexVBO(state);
-                disablePositionVBO(state);
+                disableIndexVBO(gl);
+                disablePositionVBO(gl);
                 GLSLShader.unbind(gl);
 
                 gl.glColorMask(true, true, true, true);
@@ -250,47 +251,47 @@ public class GL3DImageLayer implements Renderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_BLEND);
 
-        updateROI(state);
+        updateROI();
     }
 
-    private int generate(GL3DState state) {
+    private int generate(GL2 gl) {
         int[] tmpId = new int[1];
-        state.gl.glGenBuffers(1, tmpId, 0);
+        gl.glGenBuffers(1, tmpId, 0);
         return tmpId[0];
     }
 
-    private void enableIndexVBO(GL3DState state) {
-        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+    private void enableIndexVBO(GL2 gl) {
+        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
     }
 
-    private void disableIndexVBO(GL3DState state) {
-        state.gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+    private void disableIndexVBO(GL2 gl) {
+        gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    private void enablePositionVBO(GL3DState state) {
-        state.gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+    private void enablePositionVBO(GL2 gl) {
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
     }
 
-    private void disablePositionVBO(GL3DState state) {
-        state.gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        state.gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+    private void disablePositionVBO(GL2 gl) {
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
-    private void deletePositionVBO(GL3DState state) {
-        state.gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
+    private void deletePositionVBO(GL2 gl) {
+        gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
     }
 
-    private void deleteIndexVBO(GL3DState state) {
-        state.gl.glDeleteBuffers(1, new int[] { this.indexBufferID }, 0);
+    private void deleteIndexVBO(GL2 gl) {
+        gl.glDeleteBuffers(1, new int[] { this.indexBufferID }, 0);
     }
 
     @Override
-    public void remove(GL3DState state) {
-        disablePositionVBO(state);
-        disableIndexVBO(state);
-        deletePositionVBO(state);
-        deleteIndexVBO(state);
+    public void remove(GL2 gl) {
+        disablePositionVBO(gl);
+        disableIndexVBO(gl);
+        deletePositionVBO(gl);
+        deleteIndexVBO(gl);
         Displayer.getLayersModel().removeLayer(getMainLayerView());
     }
 

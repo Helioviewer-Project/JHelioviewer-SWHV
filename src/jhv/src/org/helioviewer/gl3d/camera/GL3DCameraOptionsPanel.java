@@ -13,7 +13,6 @@ import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -37,12 +36,13 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private void addCameraTabs() {
         tab = new JTabbedPane();
-        tab.add("Observer", new GL3DObserverCameraOptionPanel((GL3DObserverCamera) GL3DState.getActiveCamera()));
+        tab.add("Observer", new GL3DObserverCameraOptionPanel((GL3DObserverCamera) Displayer.getActiveCamera()));
         tab.add("Earth", new JPanel(new BorderLayout()));
         tab.add("Expert", new JPanel(new BorderLayout()));
         tab.add(new JPanel());
         tab.setTabComponentAt(3, new JLabel(IconBank.getIcon(JHVIcon.INFO)));
         add(tab);
+
         tab.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -76,7 +76,8 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
         boolean trackingMode = previousCamera.getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
         optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
-        GL3DState.setActiveCamera(newCamera);
+
+        Displayer.setActiveCamera(newCamera);
         Displayer.display();
         previousCamera = newCamera;
     }
