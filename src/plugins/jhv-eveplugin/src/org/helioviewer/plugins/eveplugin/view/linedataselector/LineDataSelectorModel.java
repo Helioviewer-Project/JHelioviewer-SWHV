@@ -174,6 +174,7 @@ public class LineDataSelectorModel implements TableModel {
     }
 
     public void removeRow(int row) {
-        elements.remove(row);
+        LineDataSelectorElement el = elements.get(row);
+        el.removeLineData();
     }
 }
