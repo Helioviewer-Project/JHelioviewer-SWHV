@@ -16,7 +16,7 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 
 public class RadioDownloader {
     // Make connection with server to request the jpx
@@ -72,7 +72,7 @@ public class RadioDownloader {
                             // case there were not more than three days
 
                             while (startDate.before(endDate) || startDate.equals(endDate)) {
-                                JHVJP2View v = (JHVJP2View) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                                JHVJP2CallistoView v = (JHVJP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                                 if (v != null) {
                                     long imageID = getNextID();
                                     DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, downloadID);
@@ -204,9 +204,9 @@ public class RadioDownloader {
                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                 List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 for (Date date : datesToDownload) {
-                    JHVJP2View v = null;
+                    JHVJP2CallistoView v = null;
                     try {
-                        v = (JHVJP2View) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                        v = (JHVJP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(false, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                     }
