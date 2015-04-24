@@ -72,46 +72,19 @@ public class GLInfo {
         }
     }
 
-    public static boolean checkGLErrors(String message, GL2 gl) {
-        if (gl == null) {
-            Log.warn("OpenGL not yet Initialised!");
-            return true;
-        }
-        /*
-         * To allow for distributed implementations, there may be several error
-         * flags. If any single error flag has recorded an error, the value of
-         * that flag is returned and that flag is reset to GL_NO_ERROR when
-         * glGetError is called. If more than one flag has recorded an error,
-         * glGetError returns and clears an arbitrary error flag value. Thus,
-         * glGetError should always be called in a loop, until it returns
-         * GL_NO_ERROR, if all error flags are to be reset.
-         */
-        int glErrorCode = gl.glGetError();
+    public static boolean checkGLErrors(GL2 gl, String message) {
+        GLU glu = new GLU();
+        int glErrorCode, errors = 0;
 
-        if (glErrorCode != GL2.GL_NO_ERROR) {
-            GLU glu = new GLU();
+        while ((glErrorCode = gl.glGetError()) != GL2.GL_NO_ERROR) {
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
-
-            return true;
-        } else {
-            return false;
+            errors++;
         }
+
+        if (errors != 0)
+            return true;
+        else
+            return false;
     }
 
-    public static boolean checkGLErrors(GL2 gl) {
-        if (gl == null) {
-            Log.warn("OpenGL not yet Initialised!");
-            return true;
-        }
-        int glErrorCode = gl.glGetError();
-
-        if (glErrorCode != GL2.GL_NO_ERROR) {
-            GLU glu = new GLU();
-            Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode));
-
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
