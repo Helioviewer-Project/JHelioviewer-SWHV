@@ -240,9 +240,11 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        if (view != null)
+        if (view != null) {
             setOptionsPanel(view.getImageLayer());
-        else {
+            int index = Displayer.getRenderablecontainer().getRowIndex(view.getImageLayer());
+            grid.getSelectionModel().setSelectionInterval(index, index);
+        } else {
             JPanel jpl = new JPanel();
             jpl.add(new JLabel("No layer selected"));
             setOptionsPanel(jpl);
