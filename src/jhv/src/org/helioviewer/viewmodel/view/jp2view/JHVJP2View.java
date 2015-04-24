@@ -211,8 +211,9 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
             jp2Image.getLock().lock();
             Jp2_palette palette = jp2Image.getJpxSource().Access_codestream(0).Access_palette();
 
-            if (palette.Get_num_luts() == 0)
+            if (palette.Get_num_luts() == 0) {
                 return null;
+            }
 
             int[] lut = new int[palette.Get_num_entries()];
 
@@ -383,8 +384,9 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * @return True, if connected to a JPIP server, false otherwise
      */
     public boolean isConnectedToJPIP() {
-        if (reader != null)
+        if (reader != null) {
             return reader.isConnected();
+        }
 
         return false;
     }
@@ -401,7 +403,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
             render.abolish(jp2Image);
             render = null;
         }
-        //jp2Image.abolish();
+        // jp2Image.abolish();
     }
 
     /**
@@ -621,11 +623,12 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
         ImmutableDateTime dtc = null;
-        if (metaData instanceof ObserverMetaData)
+        if (metaData instanceof ObserverMetaData) {
             dtc = metaData.getDateTime();
+        }
 
         if (compositionLayer == 0) {
-            this.baseDifferenceImageData = newImageData;
+            baseDifferenceImageData = newImageData;
         }
         newImageData.setFrameNumber(compositionLayer);
 
@@ -636,21 +639,21 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         }
         newImageData.setFullyLoaded(fullyLoaded);
 
-        if (this.imageData != null && compositionLayer == this.imageData.getFrameNumber() + 1) {
-            this.previousImageData = this.imageData;
-        } else if (this.previousImageData != null && this.previousImageData.getFrameNumber() - compositionLayer > 2) {
-            this.previousImageData = newImageData;
-        } else if (this.imageData != null && compositionLayer == this.imageData.getFrameNumber() - 1) {
-            this.previousImageData = this.imageData;
+        if (imageData != null && compositionLayer == imageData.getFrameNumber() + 1) {
+            previousImageData = imageData;
+        } else if (previousImageData != null && previousImageData.getFrameNumber() - compositionLayer > 2) {
+            previousImageData = newImageData;
+        } else if (imageData != null && compositionLayer == imageData.getFrameNumber() - 1) {
+            previousImageData = imageData;
         }
         newImageData.setMETADATA(metaData);
 
-        this.imageData = newImageData;
+        imageData = newImageData;
 
         fireFrameChanged(this, dtc);
     }
 
-    private void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
+    protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
         EventQueue.invokeLater(new Runnable() {
             private JHVJP2View theView;
             private ImmutableDateTime theDateTime;
@@ -699,17 +702,17 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
 
     @Override
     public ImageData getImageData() {
-        return this.imageData;
+        return imageData;
     }
 
     @Override
     public ImageData getPreviousImageData() {
-        return this.previousImageData;
+        return previousImageData;
     }
 
     @Override
     public ImageData getBaseDifferenceImageData() {
-        return this.baseDifferenceImageData;
+        return baseDifferenceImageData;
     }
 
     public void setPreviousImageData(ImageData previousImageData) {

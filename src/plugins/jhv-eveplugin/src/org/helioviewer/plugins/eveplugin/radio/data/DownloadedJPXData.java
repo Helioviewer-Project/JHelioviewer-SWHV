@@ -13,11 +13,12 @@ import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoViewDataHandler;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
-public class DownloadedJPXData {
+public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
 
-    private JHVJP2View view;
+    private JHVJP2CallistoView view;
     private Long imageID;
     private Date startDate;
     private Date endDate;
@@ -25,9 +26,10 @@ public class DownloadedJPXData {
     private final Long downloadID;
     private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
 
-    public DownloadedJPXData(JHVJP2View view, Long imageID, Date startDate, Date endDate, Long downloadID) {
+    public DownloadedJPXData(JHVJP2CallistoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
         this.view = view;
+        this.view.setJHVJP2CallistoViewDataHandler(this);
         this.imageID = imageID;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -39,7 +41,7 @@ public class DownloadedJPXData {
         return view;
     }
 
-    public void setView(JHVJP2View view) {
+    public void setView(JHVJP2CallistoView view) {
         this.view = view;
     }
 
@@ -68,11 +70,7 @@ public class DownloadedJPXData {
     }
 
     public void viewChanged(final View sender) {
-        DownloadedJPXDataWorkerResult result = getJPXData(sender);
-        if (result != null) {
-            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
-            radioDataManager.finishedDownloadingID(imageID, downloadID);
-        }
+
     }
 
     private DownloadedJPXDataWorkerResult getJPXData(View view) {
@@ -121,7 +119,7 @@ public class DownloadedJPXData {
             worker = null;
         }
         if (view != null) {
-            ((JHVJP2CallistoView) view).abolish();
+            view.abolish();
         }
         view = null;
     }
@@ -205,6 +203,15 @@ public class DownloadedJPXData {
          */
         public byte[] getByteData() {
             return byteData;
+        }
+    }
+
+    @Override
+    public void handleData(JHVJP2CallistoView callistoView) {
+        DownloadedJPXDataWorkerResult result = getJPXData(callistoView);
+        if (result != null) {
+            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
+            radioDataManager.finishedDownloadingID(imageID, downloadID);
         }
     }
 

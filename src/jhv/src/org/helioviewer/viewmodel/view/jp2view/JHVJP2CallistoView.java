@@ -1,11 +1,13 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
+import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -17,6 +19,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     private boolean viewportSet;
     private boolean regionSet;
+    private JHVJP2CallistoViewDataHandler dataHandler;
 
     public JHVJP2CallistoView(boolean isMainView) {
         super(isMainView);
@@ -28,8 +31,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     public boolean setViewport(Viewport v) {
-        // Log.debug("Set viewport: " + v);
-        // Thread.dumpStack();
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewportSet = true;
         viewport = v;
@@ -48,8 +49,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     public boolean setRegion(Region r) {
-        // Log.debug("Set region : " + r);
-        // Thread.dumpStack();
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
         regionSet = true;
@@ -60,25 +59,17 @@ public class JHVJP2CallistoView extends JHVJP2View {
         return changed;
     }
 
+    public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler dataHandler) {
+        this.dataHandler = dataHandler;
+    }
+
     @Override
     protected JP2ImageParameter calculateParameter() {
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        // Thread.dumpStack();
-        // Log.debug("Region : " + region);
-        // Log.debug("Viewport: " + viewport);
-        // Log.debug("Available dimension : " + new Dimension((int)
-        // Math.ceil(viewport.getWidth() / region.getWidth() * maxWidth), 2 *
-        // (int) Math.ceil(viewport.getHeight() / region.getHeight() *
-        // maxHeight)));
         ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension((int) Math.ceil(viewport.getWidth() / region.getWidth() * maxWidth), 2 * (int) Math.ceil(viewport.getHeight() / region.getHeight() * maxHeight)));
 
         SubImage subImage = new SubImage((int) (1.0 * region.getCornerX() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getCornerY() / maxHeight * res.getResolutionBounds().height), (int) (1.0 * region.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getHeight() / maxHeight * res.getResolutionBounds().height));
-        // subImageBuffer.putSubImage(subImage, region);
-
-        // Log.debug("SubImage : " + subImage + ", resolutionLevel: " + res +
-        // " quality layers " + getCurrentNumQualityLayers());
-
         return new JP2ImageParameter(subImage, res, getCurrentNumQualityLayers(), 0);
     }
 
@@ -86,22 +77,20 @@ public class JHVJP2CallistoView extends JHVJP2View {
     protected JP2ImageParameter calculateParameter(int numQualityLayers, int frameNumber) {
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        // Thread.dumpStack();
-        // Log.debug("Region : " + region);
-        // Log.debug("Viewport: " + viewport);
-        // Log.debug("Available dimension : " + new Dimension((int)
-        // Math.ceil(viewport.getWidth() / region.getWidth() * maxWidth), 2 *
-        // (int) Math.ceil(viewport.getHeight() / region.getHeight() *
-        // maxHeight)));
         ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension((int) Math.ceil(viewport.getWidth() / region.getWidth() * maxWidth), 2 * (int) Math.ceil(viewport.getHeight() / region.getHeight() * maxHeight)));
-
         SubImage subImage = new SubImage((int) (1.0 * region.getCornerX() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getCornerY() / maxHeight * res.getResolutionBounds().height), (int) (1.0 * region.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (1.0 * region.getHeight() / maxHeight * res.getResolutionBounds().height));
-        // subImageBuffer.putSubImage(subImage, region);
-
-        // Log.debug("SubImage : " + subImage + ", resolutionLevel: " + res +
-        // " quality layers " + numQualityLayers);
-
         return new JP2ImageParameter(subImage, res, numQualityLayers, 0);
     }
 
+    @Override
+    protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (dataHandler != null) {
+                    dataHandler.handleData(JHVJP2CallistoView.this);
+                }
+            }
+        });
+    }
 }
