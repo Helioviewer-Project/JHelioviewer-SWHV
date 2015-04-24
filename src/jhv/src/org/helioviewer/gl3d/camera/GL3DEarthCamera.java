@@ -52,6 +52,10 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     public void timeChanged(Date date) {
         if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
+            if (Displayer.getRenderableCamera() != null) {
+                Displayer.getRenderableCamera().setTimeString(date);
+                Displayer.getRenderablecontainer().fireTimeUpdated(Displayer.getRenderableCamera());
+            }
         }
     }
 
@@ -64,7 +68,6 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
 
         this.updateCameraTransformation();
-        this.setTime(date.getTime());
     }
 
 }

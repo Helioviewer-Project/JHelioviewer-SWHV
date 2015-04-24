@@ -4,6 +4,4 @@ public interface GL3DPositionLoadingListener {
 
     public void fireNewLoaded(String string);
 
-    public void fireNewDate();
-
 }

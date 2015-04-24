@@ -80,11 +80,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             }
 
             cameraDate = new Date(currentCameraTime);
-            for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-                listener.fireCameraTime(cameraDate);
+            if (Displayer.getRenderableCamera() != null) {
+                Displayer.getRenderableCamera().setTimeString(new Date(currentCameraTime));
+                Displayer.getRenderablecontainer().fireTimeUpdated(Displayer.getRenderableCamera());
             }
-
-            this.setTime(currentCameraTime);
 
             GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
             if (position != null) {
@@ -93,6 +92,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
                 currentDistance = position.x;
 
                 updateRotation(date);
+
             }
         }
     }
@@ -122,13 +122,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     public void fireNewLoaded(String state) {
         for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
             listener.fireLoaded(state);
-        }
-    }
-
-    @Override
-    public void fireNewDate() {
-        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-            listener.fireNewDate(cameraDate);
         }
     }
 
