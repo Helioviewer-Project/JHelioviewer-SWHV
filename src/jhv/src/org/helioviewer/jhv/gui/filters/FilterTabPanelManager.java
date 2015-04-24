@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.filters.AbstractFilterPanel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -220,7 +219,7 @@ public class FilterTabPanelManager {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                Displayer.getLayersModel().showMetaInfo((JHVJP2View) jp2view);
+                Displayer.getLayersModel().showMetaInfo(jp2view);
             }
         };
         showMetaButton.setAction(showMetaAction);
