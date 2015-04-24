@@ -116,4 +116,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     public void activeLayerChanged(AbstractView view) {
     }
 
+    @Override
+    public void destroy() {
+    }
+
 }

@@ -6,7 +6,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.RenderableImageType;
@@ -16,13 +15,13 @@ public class RenderableContainer implements TableModel, Reorderable {
     private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
     private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
-    private int countImagelayers = 0;
 
     public RenderableContainer() {
         super();
     }
 
     public void addBeforeRenderable(Renderable renderable) {
+        System.out.println("GG" + renderable);
         int lastImagelayerIndex = -1;
         int size = renderables.size();
         for (int i = 0; i < size; i++) {
@@ -32,11 +31,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
         renderables.add(lastImagelayerIndex + 1, renderable);
         newRenderables.add(renderable);
-        if (renderable instanceof GL3DImageLayer) {
-            GL3DImageLayer ri = ((GL3DImageLayer) renderable);
-            ri.getMainLayerView().setOpacity((float) (1. / (1. + countImagelayers)));
-            countImagelayers++;
-        }
+
         Displayer.getRenderableContainerPanel().setOptionsPanel(renderable);
         fireListeners();
     }
@@ -48,9 +43,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void removeRenderable(Renderable renderable) {
-        if (renderable instanceof GL3DImageLayer) {
-            countImagelayers--;
-        }
         renderables.remove(renderable);
         removedRenderables.add(renderable);
         fireListeners();
@@ -74,9 +66,6 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     private void removeRenderables(GL3DState state) {
         for (Renderable renderable : removedRenderables) {
-            if (renderable instanceof GL3DImageLayer) {
-                countImagelayers--;
-            }
             renderable.remove(state);
         }
         removedRenderables.clear();
@@ -155,6 +144,8 @@ public class RenderableContainer implements TableModel, Reorderable {
         Renderable el = this.renderables.get(row);
         this.renderables.remove(row);
         this.removedRenderables.remove(el);
+        el.destroy();
+
         fireListeners();
     }
 
@@ -173,9 +164,5 @@ public class RenderableContainer implements TableModel, Reorderable {
             TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIMEROW, TableModelEvent.UPDATE);
             listener.tableChanged(e);
         }
-    }
-
-    public int countImageLayers() {
-        return countImagelayers;
     }
 }

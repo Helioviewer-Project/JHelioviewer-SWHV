@@ -85,6 +85,7 @@ public class GL3DImageLayer implements Renderable {
         }
 
         Displayer.getRenderablecontainer().addBeforeRenderable(this);
+        mainLayerView.setOpacity((float) (1. / (1. + Displayer.getLayersModel().getNumLayers())));
     }
 
     @Override
@@ -434,6 +435,11 @@ public class GL3DImageLayer implements Renderable {
 
     public AbstractView getMainLayerView() {
         return mainLayerView;
+    }
+
+    @Override
+    public void destroy() {
+        Displayer.getLayersModel().removeLayer(this.mainLayerView);
     }
 
 }

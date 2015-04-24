@@ -338,4 +338,8 @@ public class SWHVHEKPluginRenderable implements Renderable {
         return "";
     }
 
+    @Override
+    public void destroy() {
+    }
+
 }

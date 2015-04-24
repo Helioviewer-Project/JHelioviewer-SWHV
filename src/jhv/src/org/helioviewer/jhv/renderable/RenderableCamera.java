@@ -143,4 +143,8 @@ public class RenderableCamera implements Renderable {
         return "N/A";
     }
 
+    @Override
+    public void destroy() {
+    }
+
 }

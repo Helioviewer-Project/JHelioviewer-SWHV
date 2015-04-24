@@ -188,9 +188,7 @@ public class RenderableContainerPanel extends JPanel {
                     Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
                     if (renderable instanceof GL3DImageLayer) {
                         GL3DImageLayer imageLayer = (GL3DImageLayer) renderable;
-                        if (imageLayer.getMainLayerView() instanceof JHVJPXView) {
-                            Displayer.getLayersModel().setActiveLayer(imageLayer.getMainLayerView());
-                        }
+                        Displayer.getLayersModel().setActiveLayer(imageLayer.getMainLayerView());
                     }
 
                     setOptionsPanel(renderable);
