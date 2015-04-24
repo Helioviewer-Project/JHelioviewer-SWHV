@@ -9,7 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -50,7 +50,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         if (position == lastPosition)
             return;
 
-        GL3DVec3d computedposition = GL3DState.getActiveCamera().getVectorFromSphereAlt(position);
+        GL3DVec3d computedposition = Displayer.getActiveCamera().getVectorFromSphereAlt(position);
         double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
         double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
         if (computedposition.x * computedposition.x + computedposition.y * computedposition.y > 1.) {

@@ -12,7 +12,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
@@ -34,12 +33,12 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         this.fovPanel.add(new JLabel("FOV angle"));
         this.fovSpinner = new JSpinner();
         this.fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
-        GL3DState.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+        Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
         this.fovSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                GL3DState.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+                Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
                 Displayer.display();
             }
         });

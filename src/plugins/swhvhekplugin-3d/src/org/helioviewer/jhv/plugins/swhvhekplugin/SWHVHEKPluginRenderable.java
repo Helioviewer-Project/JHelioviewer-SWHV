@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -43,7 +42,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         Displayer.getRenderablecontainer().addRenderable(this);
     }
 
-    public void bindTexture(GL2 gl, String key, ImageIcon icon) {
+    private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             tex = new GLTextureHelper.GLTexture();
@@ -276,14 +275,12 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public void init(GL3DState state) {
-
+    public void init(GL2 gl) {
     }
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (isVisible) {
-            GL2 gl = state.gl;
             TimedMovieView masterView = LinkedMovieManager.getSingletonInstance().getMasterMovie();
             if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
                 Date currentDate = masterView.getCurrentFrameDateTime().getTime();
@@ -305,7 +302,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public void remove(GL3DState state) {
+    public void remove(GL2 gl) {
     }
 
     @Override

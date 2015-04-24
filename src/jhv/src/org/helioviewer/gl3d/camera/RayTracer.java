@@ -4,7 +4,7 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.GL3DVec4d;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 
 public class RayTracer {
     public enum HITPOINT {
@@ -22,7 +22,7 @@ public class RayTracer {
     }
 
     public Ray cast(double x, double y) {
-        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (x / GL3DState.getViewportWidth() - 0.5), -2. * (y / GL3DState.getViewportHeight() - 0.5), 1., 1.);
+        GL3DVec4d centeredViewportCoordinates = new GL3DVec4d(2. * (x / Displayer.getViewportWidth() - 0.5), -2. * (y / Displayer.getViewportHeight() - 0.5), 1., 1.);
 
         GL3DMat4d roti = camera.getCameraTransformation().inverse();
         GL3DMat4d vpmi = camera.orthoMatrixInverse;

@@ -2,15 +2,17 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.util.ArrayList;
 
+import javax.media.opengl.GL2;
+
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.RenderableImageType;
 
 public class RenderableContainer implements TableModel, Reorderable {
+
     private final ArrayList<Renderable> renderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> newRenderables = new ArrayList<Renderable>();
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
@@ -48,25 +50,25 @@ public class RenderableContainer implements TableModel, Reorderable {
         Displayer.display();
     }
 
-    public void render(GL3DState state) {
-        removeRenderables(state);
-        initRenderables(state);
+    public void render(GL2 gl) {
+        removeRenderables(gl);
+        initRenderables(gl);
 
         for (Renderable renderable : renderables) {
-            renderable.render(state);
+            renderable.render(gl);
         }
     }
 
-    private void initRenderables(GL3DState state) {
+    private void initRenderables(GL2 gl) {
         for (Renderable renderable : newRenderables) {
-            renderable.init(state);
+            renderable.init(gl);
         }
         newRenderables.clear();
     }
 
-    private void removeRenderables(GL3DState state) {
+    private void removeRenderables(GL2 gl) {
         for (Renderable renderable : removedRenderables) {
-            renderable.remove(state);
+            renderable.remove(gl);
         }
         removedRenderables.clear();
     }

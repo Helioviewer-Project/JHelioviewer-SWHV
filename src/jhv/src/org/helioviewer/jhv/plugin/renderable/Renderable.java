@@ -2,15 +2,15 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.awt.Component;
 
-import org.helioviewer.gl3d.GL3DState;
+import javax.media.opengl.GL2;
 
 public interface Renderable {
 
-    public void init(GL3DState state);
+    public void init(GL2 gl);
 
-    public void render(GL3DState state);
+    public void render(GL2 gl);
 
-    public void remove(GL3DState state);
+    public void remove(GL2 gl);
 
     public RenderableType getType();
 

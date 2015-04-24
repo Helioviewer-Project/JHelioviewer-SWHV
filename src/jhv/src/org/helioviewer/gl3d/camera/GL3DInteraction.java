@@ -6,7 +6,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import org.helioviewer.gl3d.GL3DState;
+import javax.media.opengl.GL2;
 
 /**
  * An Interaction is responsible for turning user events into camera behavior.
@@ -30,7 +30,7 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
         this.camera = camera;
     }
 
-    public void drawInteractionFeedback(GL3DState state, GL3DCamera camera) {
+    public void drawInteractionFeedback(GL2 gl, GL3DCamera camera) {
     }
 
     public abstract void reset(GL3DCamera camera);

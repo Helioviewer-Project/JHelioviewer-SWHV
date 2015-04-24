@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
@@ -31,7 +31,7 @@ public class ZoomInAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        GL3DState.getActiveCamera().zoom(-1);
+        Displayer.getActiveCamera().zoom(-1);
     }
 
 }

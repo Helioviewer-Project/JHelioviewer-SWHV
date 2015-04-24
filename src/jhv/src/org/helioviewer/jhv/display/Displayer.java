@@ -7,6 +7,8 @@ import java.util.Date;
 
 import javax.swing.Timer;
 
+import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.gl3d.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -18,6 +20,33 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class Displayer implements JHVEventHighlightListener {
+
+    private static GL3DCamera activeCamera = new GL3DObserverCamera();
+    private static int viewportWidth;
+    private static int viewportHeight;
+
+    public static void setViewportSize(int width, int height) {
+       viewportWidth = width;
+       viewportHeight = height;
+    }
+
+    public static int getViewportHeight() {
+        return viewportHeight;
+    }
+
+    public static int getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public static void setActiveCamera(GL3DCamera camera) {
+        activeCamera.deactivate();
+        camera.activate(activeCamera);
+        activeCamera = camera;
+    }
+
+    public static GL3DCamera getActiveCamera() {
+        return activeCamera;
+    }
 
     private static final LayersModel layersModel = new LayersModel();
     private static final RenderableContainer renderableContainer = new RenderableContainer();

@@ -5,7 +5,7 @@ import java.awt.Component;
 
 import javax.media.opengl.GL2;
 
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
@@ -21,23 +21,22 @@ public class RenderableCamera implements Renderable {
     private boolean isVisible = false;
 
     public RenderableCamera() {
-        this.optionsPanel = new GL3DCameraOptionsPanel(GL3DState.getActiveCamera());
+        this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getActiveCamera());
     }
 
     @Override
-    public void init(GL3DState state) {
+    public void init(GL2 gl) {
     }
 
     @Override
-    public void render(GL3DState state) {
+    public void render(GL2 gl) {
         if (!isVisible)
             return;
 
-        GL3DCamera activeCamera = GL3DState.getActiveCamera();
+        GL3DCamera activeCamera = Displayer.getActiveCamera();
         double width = activeCamera.getZTranslation() * Math.tan(activeCamera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
-        GL2 gl = state.gl;
 
         gl.glPushMatrix();
         gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
@@ -110,7 +109,7 @@ public class RenderableCamera implements Renderable {
     }
 
     @Override
-    public void remove(GL3DState state) {
+    public void remove(GL2 gl) {
     }
 
     @Override

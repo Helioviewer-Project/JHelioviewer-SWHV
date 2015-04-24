@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
@@ -222,7 +221,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        return GL3DState.getActiveCamera().getVectorFromSphere(e.getPoint());
+        return Displayer.getActiveCamera().getVectorFromSphere(e.getPoint());
     }
 
 }

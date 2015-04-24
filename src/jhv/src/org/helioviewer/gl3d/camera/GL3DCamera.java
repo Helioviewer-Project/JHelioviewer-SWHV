@@ -10,7 +10,6 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.gl3d.GL3DState;
 import org.helioviewer.jhv.display.Displayer;
 
 public abstract class GL3DCamera {
@@ -153,11 +152,11 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation();
     }
 
-    public void applyPerspective(GL3DState state) {
-        GL2 gl = state.gl;
+    public void applyPerspective(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPushMatrix();
-        this.aspect = state.getViewportWidth() / (double) state.getViewportHeight();
+
+        this.aspect = Displayer.getViewportWidth() / (double) Displayer.getViewportHeight();
         cameraWidth = -translation.z * Math.tan(fov / 2.);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
@@ -175,8 +174,7 @@ public abstract class GL3DCamera {
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
-    public void resumePerspective(GL3DState state) {
-        GL2 gl = state.gl;
+    public void resumePerspective(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glPopMatrix();
         gl.glMatrixMode(GL2.GL_MODELVIEW);
@@ -227,8 +225,8 @@ public abstract class GL3DCamera {
         return this.getRotation().toMatrix();
     }
 
-    public void applyCamera(GL3DState state) {
-        state.gl.glMultMatrixd(cameraTransformation.m, 0);
+    public void applyCamera(GL2 gl) {
+        gl.glMultMatrixd(cameraTransformation.m, 0);
     }
 
     public abstract GL3DInteraction getPanInteraction();
@@ -240,8 +238,8 @@ public abstract class GL3DCamera {
 
     public abstract String getName();
 
-    public void drawCamera(GL3DState state) {
-        getCurrentInteraction().drawInteractionFeedback(state, this);
+    public void drawCamera(GL2 gl) {
+        getCurrentInteraction().drawInteractionFeedback(gl, this);
     }
 
     public double getCameraFOV() {

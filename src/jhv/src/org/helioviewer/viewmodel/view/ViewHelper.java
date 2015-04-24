@@ -6,7 +6,7 @@ import java.net.URI;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.gl3d.GL3DState;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -122,7 +122,7 @@ public final class ViewHelper {
      * @return resulting image size of the region within the viewport
      */
     public static ViewportImageSize calculateViewportImageSize(Region r) {
-        int viewportheight = GL3DState.getViewportHeight();
+        int viewportheight = Displayer.getViewportHeight();
 
         // fit region of interest into viewport
         double screenMeterPerPixel = r.getHeight() / viewportheight;
