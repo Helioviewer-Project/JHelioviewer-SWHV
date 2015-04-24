@@ -181,8 +181,8 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec2d normalizedScreenpos, GL3DQuatd cameraDifferenceRotation) {
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect;
-        double up1y = normalizedScreenpos.y * cameraWidth;
+        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
 
         GL3DVec3d hitPoint;
         GL3DVec3d rotatedHitPoint;
@@ -230,10 +230,13 @@ public abstract class GL3DCamera {
     }
 
     public abstract GL3DInteraction getPanInteraction();
+
     public abstract GL3DInteraction getRotateInteraction();
+
     public abstract GL3DInteraction getZoomInteraction();
 
     public abstract GL3DInteraction getCurrentInteraction();
+
     public abstract void setCurrentInteraction(GL3DInteraction currentInteraction);
 
     public abstract String getName();
