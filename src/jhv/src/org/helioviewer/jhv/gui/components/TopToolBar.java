@@ -39,9 +39,11 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
  */
 public class TopToolBar extends JToolBar implements MouseListener {
 
-    public enum SelectionMode {
+    private enum InteractionMode {
         PAN, ZOOMBOX, ROTATE
     };
+
+    private static final InteractionMode defaultInteractionMode = InteractionMode.PAN;
 
     private enum DisplayMode {
         ICONANDTEXT, ICONONLY, TEXTONLY
@@ -50,8 +52,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private DisplayMode displayMode;
 
     private JToggleButton panButton;
-    private JToggleButton rotateButton;
     private JToggleButton zoomBoxButton;
+    private JToggleButton rotateButton;
 
     private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
@@ -59,9 +61,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
 
-    /**
-     * Default constructor.
-     */
     public TopToolBar() {
         setRollover(true);
 
@@ -72,23 +71,26 @@ public class TopToolBar extends JToolBar implements MouseListener {
             displayMode = DisplayMode.ICONANDTEXT;
         }
 
-        createNewToolBar(SelectionMode.PAN);
+        createNewToolBar(defaultInteractionMode);
         addMouseListener(this);
     }
 
     /**
-     * Sets the active selection mode.
+     * Sets the active interaction mode.
      *
      * @param mode
-     *            Selection mode, can be either PAN, ZOOMBOX or FOCUS.
+     *            Interaction mode can be either PAN, ZOOMBOX or ROTATE.
      */
-    public void setActiveSelectionMode(SelectionMode mode) {
+    private void setActiveInteractionMode(InteractionMode mode) {
         switch (mode) {
         case PAN:
             panButton.doClick();
             break;
         case ZOOMBOX:
             zoomBoxButton.doClick();
+            break;
+        case ROTATE:
+            rotateButton.doClick();
             break;
         }
     }
@@ -136,11 +138,11 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * This function is called during the construction of this panel as well as
      * after the display mode has changed.
      *
-     * @param selectionMode
-     *            Current selection mode, to select the correct button.
+     * @param InteractionMode
+     *            Current interaction mode
      * @see #setDisplayMode(DisplayMode)
      */
-    protected void createNewToolBar(SelectionMode selectionMode) {
+    protected void createNewToolBar(InteractionMode interactionMode) {
         removeAll();
 
         // Zoom
@@ -151,11 +153,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        // Selection
+        // Interaction
         ButtonGroup group = new ButtonGroup();
 
         panButton = new JToggleButton(new SetPanInteractionAction());
-        panButton.setSelected(selectionMode == SelectionMode.PAN);
         panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
         panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
         panButton.setToolTipText("Select Panning");
@@ -163,7 +164,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
         addButton(panButton);
 
         zoomBoxButton = new JToggleButton(new SetZoomBoxInteractionAction());
-        zoomBoxButton.setSelected(selectionMode == SelectionMode.ZOOMBOX);
         zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         zoomBoxButton.setToolTipText("Select Zoom Box");
@@ -171,12 +171,13 @@ public class TopToolBar extends JToolBar implements MouseListener {
         addButton(zoomBoxButton);
 
         rotateButton = new JToggleButton(new SetRotationInteractionAction());
-        rotateButton.setSelected(selectionMode == SelectionMode.ROTATE);
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
         rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
         rotateButton.setToolTipText("Select Rotating");
         group.add(rotateButton);
         addButton(rotateButton);
+
+        setActiveInteractionMode(interactionMode);
 
         addSeparator();
 
@@ -242,7 +243,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      * This changes the way the toolbar is display.
      *
      * @param mode
-     *            Display mode, can be either ICONANDTEXT, ICONONLY or TEXTONLY
+     *            Display mode can be either ICONANDTEXT, ICONONLY or TEXTONLY.
      */
     public void setDisplayMode(DisplayMode mode) {
         DisplayMode oldDisplayMode = displayMode;
@@ -252,12 +253,15 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().save();
         }
 
-        SelectionMode selectionMode = SelectionMode.ROTATE;
-        if (zoomBoxButton.isSelected()) {
-            selectionMode = SelectionMode.ZOOMBOX;
-        }
+        InteractionMode interactionMode = defaultInteractionMode;
+        if (panButton.isSelected())
+            interactionMode = InteractionMode.PAN;
+        else if (zoomBoxButton.isSelected())
+            interactionMode = InteractionMode.ZOOMBOX;
+        else if (rotateButton.isSelected())
+            interactionMode = InteractionMode.ROTATE;
 
-        createNewToolBar(selectionMode);
+        createNewToolBar(interactionMode);
         firePropertyChange("displayMode", oldDisplayMode, displayMode);
         revalidate();
     }
