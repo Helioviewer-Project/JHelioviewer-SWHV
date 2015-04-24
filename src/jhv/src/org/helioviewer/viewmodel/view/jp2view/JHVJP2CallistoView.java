@@ -93,4 +93,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
             }
         });
     }
+
+    public void removeJHVJP2DataHandler() {
+        dataHandler = null;
+    }
 }
