@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -22,6 +20,8 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+
+import com.jogamp.opengl.GL2;
 
 public abstract class AbstractView implements View {
     private GL3DImageLayer imageLayer;

@@ -2,10 +2,10 @@ package org.helioviewer.gl3d.camera;
 
 import java.awt.event.MouseEvent;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
+
+import com.jogamp.opengl.GL2;
 
 /**
  * The zoom box interaction allows the user to select a region of interest in

@@ -2,8 +2,6 @@ package org.helioviewer.gl3d.camera;
 
 import java.awt.Point;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
@@ -11,6 +9,8 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
+
+import com.jogamp.opengl.GL2;
 
 public abstract class GL3DCamera {
 

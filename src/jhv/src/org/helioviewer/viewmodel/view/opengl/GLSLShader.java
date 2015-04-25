@@ -2,13 +2,14 @@ package org.helioviewer.viewmodel.view.opengl;
 
 import java.io.InputStream;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 
+import com.jogamp.opengl.GL2;
+
 public class GLSLShader {
+
     public static final int NODIFFERENCE = 0;
     public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
     public static final int RUNNINGDIFFERENCE_ROT = 2;
@@ -84,15 +85,12 @@ public class GLSLShader {
             setTextureUnit(gl, "differenceImage", 2);
             unbind(gl);
         }
-
     }
 
     public static void destroy(GL2 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
-
         gl.glDeleteProgram(progID);
-
     }
 
     public static void bind(GL2 gl) {
@@ -104,7 +102,6 @@ public class GLSLShader {
     }
 
     public static void bindQuat(GL2 gl, GL3DQuatd quat, String name) {
-
         gl.glUniform4fv(gl.glGetUniformLocation(progID, name), 1, quat.getFloatArray(), 0);
     }
 
@@ -162,7 +159,6 @@ public class GLSLShader {
     }
 
     public static void attachVertexShader(GL2 gl, String vertexText) {
-
         int iID = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 
         String[] akProgramText = new String[1];
@@ -190,11 +186,9 @@ public class GLSLShader {
             System.exit(-1);
         }
         vertexID = iID;
-
     }
 
     public static void attachFragmentShader(GL2 gl, String fragmentText) {
-
         int iID = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
 
         String[] akProgramText = new String[1];
@@ -286,7 +280,6 @@ public class GLSLShader {
     public static void bindIsDisc(GL2 gl, int isDisc) {
         isDiscValue[0] = isDisc;
         gl.glUniform1iv(GLSLShader.isDiscRef, 1, GLSLShader.isDiscValue, 0);
-
     }
 
     public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {

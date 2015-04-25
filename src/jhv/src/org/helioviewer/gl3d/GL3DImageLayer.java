@@ -5,8 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
@@ -32,6 +30,7 @@ import org.helioviewer.viewmodel.viewport.Viewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.GL2;
 
 /**
  * This is the scene graph equivalent of an image layer sub view chain attached
