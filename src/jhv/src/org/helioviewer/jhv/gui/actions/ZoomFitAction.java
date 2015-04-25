@@ -31,7 +31,6 @@ public class ZoomFitAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Zoom to fit");
         putValue(MNEMONIC_KEY, KeyEvent.VK_F);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
-
     }
 
     /**
@@ -41,7 +40,7 @@ public class ZoomFitAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         AbstractView view = Displayer.getLayersModel().getActiveView();
         GL3DCamera camera = Displayer.getActiveCamera();
-        System.out.println(view);
+
         if (view != null) {
             Region region = view.getMetaData().getPhysicalRegion();
             double imheight = ((HelioviewerMetaData) view.getMetaData()).pixelImageHeight();

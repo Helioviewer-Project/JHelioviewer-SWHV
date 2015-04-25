@@ -50,10 +50,10 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     public ComponentView() {
         RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
-        Displayer.getRenderablecontainer().addRenderable(new RenderableSolarAxes(solarAxesType));
+        Displayer.getRenderableContainer().addRenderable(new RenderableSolarAxes(solarAxesType));
         RenderableGridType gridType = new RenderableGridType("Grids");
-        Displayer.getRenderablecontainer().addRenderable(new RenderableGrid(gridType, false));
-        Displayer.getRenderablecontainer().addRenderable(Displayer.getRenderableCamera());
+        Displayer.getRenderableContainer().addRenderable(new RenderableGrid(gridType, false));
+        Displayer.getRenderableContainer().addRenderable(Displayer.getRenderableCamera());
 
         canvas.setMinimumSize(new Dimension(0, 0));
         canvas.addGLEventListener(this);
@@ -111,7 +111,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
             GL3DCamera camera = Displayer.getActiveCamera();
             camera.applyPerspective(gl);
             camera.applyCamera(gl);
-            Displayer.getRenderablecontainer().render(gl);
+            Displayer.getRenderableContainer().render(gl);
             camera.drawCamera(gl);
             camera.resumePerspective(gl);
         }

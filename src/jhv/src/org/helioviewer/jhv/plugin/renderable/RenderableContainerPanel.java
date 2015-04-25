@@ -178,7 +178,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             public void mouseClicked(MouseEvent e) {
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
-                Renderable renderable = (Renderable) Displayer.getRenderablecontainer().getValueAt(row, col);
+                Renderable renderable = (Renderable) Displayer.getRenderableContainer().getValueAt(row, col);
 
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
@@ -242,7 +242,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public void activeLayerChanged(AbstractView view) {
         if (view != null) {
             setOptionsPanel(view.getImageLayer());
-            int index = Displayer.getRenderablecontainer().getRowIndex(view.getImageLayer());
+            int index = Displayer.getRenderableContainer().getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
         } else {
             JPanel jpl = new JPanel();

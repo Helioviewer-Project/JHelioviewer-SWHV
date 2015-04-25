@@ -21,9 +21,11 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 public class Displayer implements JHVEventHighlightListener {
+
     private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+
     private static GL3DCamera activeCamera = new GL3DObserverCamera(true);
     private static int viewportWidth;
     private static int viewportHeight;
@@ -134,7 +136,7 @@ public class Displayer implements JHVEventHighlightListener {
         int idx = layersModel.findView(view);
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
             // update timestamp labels
-            Displayer.getRenderablecontainer().fireTimeUpdated(view.getImageLayer());
+            renderableContainer.fireTimeUpdated(view.getImageLayer());
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 framerateStatus.updateFramerate(layersModel.getFPS(view));
@@ -172,7 +174,7 @@ public class Displayer implements JHVEventHighlightListener {
         return renderableCamera;
     }
 
-    public static RenderableContainer getRenderablecontainer() {
+    public static RenderableContainer getRenderableContainer() {
         return renderableContainer;
     }
 

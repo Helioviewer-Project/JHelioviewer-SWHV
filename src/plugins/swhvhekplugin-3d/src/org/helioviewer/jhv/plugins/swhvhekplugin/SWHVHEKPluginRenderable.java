@@ -40,7 +40,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     public SWHVHEKPluginRenderable() {
         this.type = new RenderableType("HEK plugin");
-        Displayer.getRenderablecontainer().addRenderable(this);
+        Displayer.getRenderableContainer().addRenderable(this);
     }
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
