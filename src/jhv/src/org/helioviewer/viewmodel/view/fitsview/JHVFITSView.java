@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -21,6 +19,8 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
+
+import com.jogamp.opengl.GL2;
 
 /**
  * Implementation of View for FITS images.
@@ -241,4 +241,5 @@ public class JHVFITSView extends AbstractView {
     public void applyFilters(GL2 gl) {
         super.applyFilters(gl);
     }
+
 }

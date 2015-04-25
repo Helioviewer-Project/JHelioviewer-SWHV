@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.media.opengl.GL2;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -28,6 +27,8 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper.GLTexture;
+
+import com.jogamp.opengl.GL2;
 
 public class SWHVHEKPluginRenderable implements Renderable {
 

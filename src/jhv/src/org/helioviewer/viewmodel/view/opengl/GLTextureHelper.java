@@ -11,8 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
@@ -22,6 +20,8 @@ import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
+
+import com.jogamp.opengl.GL2;
 
 /**
  * Helper class to handle OpenGL textures.

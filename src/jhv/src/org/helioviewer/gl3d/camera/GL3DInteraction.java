@@ -6,7 +6,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 /**
  * An Interaction is responsible for turning user events into camera behavior.

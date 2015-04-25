@@ -2,13 +2,14 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.util.ArrayList;
 
-import javax.media.opengl.GL2;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.RenderableImageType;
+
+import com.jogamp.opengl.GL2;
 
 public class RenderableContainer implements TableModel, Reorderable {
 

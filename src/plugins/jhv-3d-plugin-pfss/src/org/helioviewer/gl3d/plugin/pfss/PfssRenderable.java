@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssNewDataLoader;
@@ -17,6 +15,8 @@ import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
+
+import com.jogamp.opengl.GL2;
 
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)

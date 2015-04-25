@@ -2,10 +2,10 @@ package org.helioviewer.jhv.renderable;
 
 import java.awt.Component;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
+
+import com.jogamp.opengl.GL2;
 
 public class RenderableSolarAxes implements Renderable {
 

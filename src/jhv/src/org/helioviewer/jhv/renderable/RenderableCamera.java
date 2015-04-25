@@ -5,13 +5,13 @@ import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.media.opengl.GL2;
-
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.gl3d.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
+
+import com.jogamp.opengl.GL2;
 
 public class RenderableCamera implements Renderable {
 

@@ -3,12 +3,12 @@ package org.helioviewer.viewmodel.view.opengl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
+
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 
 /**
  * Class to check and manage some OpenGL properties.
@@ -66,7 +66,10 @@ public class GLInfo {
             maxTextureSize = out[0];
             Log.debug(">> GLInfo > max texture size: " + out[0]);
 
-            pixelScale = canvas.getCurrentSurfaceScale(pixelScale);
+            float[] scale = new float[2];
+            canvas.getCurrentSurfaceScale(scale);
+            pixelScale[0] = (int) scale[0];
+            pixelScale[1] = (int) scale[1];
 
             J2KRenderGlobalOptions.setDoubleBufferingOption(true);
         }

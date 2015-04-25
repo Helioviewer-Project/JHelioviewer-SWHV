@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugin.renderable;
 
 import java.awt.Component;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 

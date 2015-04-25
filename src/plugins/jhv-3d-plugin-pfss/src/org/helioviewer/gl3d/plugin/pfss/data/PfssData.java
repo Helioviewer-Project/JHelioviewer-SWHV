@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import javax.media.opengl.GL2;
-
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
@@ -20,6 +18,7 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.GL2;
 
 /**
  * Loader of fitsfile & VBO generation & OpenGL visualization
@@ -27,6 +26,7 @@ import com.jogamp.common.nio.Buffers;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssData {
+
     private final static Color OPENFIELDCOLOR = Color.RED;
     private final static Color LOOPCOLOR = Color.WHITE;
     private final static Color INSIDEFIELDCOLOR = Color.MAGENTA;

@@ -7,12 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
@@ -30,6 +24,12 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
@@ -57,6 +57,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         canvas.setMinimumSize(new Dimension(0, 0));
         canvas.addGLEventListener(this);
+
         Displayer.addListener(this);
     }
 
@@ -66,7 +67,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        final GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
 
         GLInfo.update((GLCanvas) drawable);
 
@@ -90,10 +91,14 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        Displayer.setViewportSize(canvas.getWidth(), canvas.getHeight());
     }
 
-    private static void displayBody(GL2 gl, int width, int height) {
-        GL3DCamera camera = Displayer.getActiveCamera();
+    @Override
+    public void display(GLAutoDrawable drawable) {
+        GL2 gl = drawable.getGL().getGL2();
+
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_FUNC_ADD);
@@ -103,6 +108,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         gl.glPushMatrix();
         {
+            GL3DCamera camera = Displayer.getActiveCamera();
             camera.applyPerspective(gl);
             camera.applyCamera(gl);
             Displayer.getRenderablecontainer().render(gl);
@@ -112,21 +118,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         gl.glPopMatrix();
 
         gl.glEnable(GL2.GL_BLEND);
-    }
-
-    @Override
-    public void display(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
-        int width = canvas.getWidth();
-        int height = canvas.getHeight();
-
-        Displayer.setViewportSize(width, height);
-
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-        gl.glPushMatrix();
-        displayBody(gl, width, height);
-        gl.glPopMatrix();
 
         if (exportMode || screenshotMode) {
             exportFrame();
