@@ -9,6 +9,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
+import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -56,19 +57,20 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     @Override
     public String getName() {
-        return "View from Observer";
+        return "View from observer";
     }
 
     @Override
     public void timeChanged(Date date) {
         if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
-            if (Displayer.getRenderableCamera() != null) {
-                Displayer.getRenderableCamera().setTimeString(date);
-                Displayer.getRenderablecontainer().fireTimeUpdated(Displayer.getRenderableCamera());
+
+            RenderableCamera renderableCamera = Displayer.getRenderableCamera();
+            if (renderableCamera != null) {
+                renderableCamera.setTimeString(date);
+                Displayer.getRenderableContainer().fireTimeUpdated(renderableCamera);
             }
         }
-
     }
 
     private void updateRotation(Date date) {

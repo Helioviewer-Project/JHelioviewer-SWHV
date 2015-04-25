@@ -54,10 +54,8 @@ public class JHVSimpleImageView extends AbstractView {
      *             thrown, if the image is not readable
      */
     public JHVSimpleImageView(URI _uri) throws MalformedURLException, IOException {
-
         uri = _uri;
         bufferedImage = ImageIO.read(uri.toURL());
-
         initSimpleImageView();
     }
 
@@ -69,11 +67,9 @@ public class JHVSimpleImageView extends AbstractView {
      * @param uri
      *            Specifies the location of the simple image file.
      */
-    public JHVSimpleImageView(BufferedImage image, URI uri) {
-
-        this.uri = uri;
+    public JHVSimpleImageView(BufferedImage image, URI _uri) {
+        uri = _uri;
         bufferedImage = image;
-
         initSimpleImageView();
     }
 
@@ -90,16 +86,12 @@ public class JHVSimpleImageView extends AbstractView {
         }
 
         pixelBasedMetaData = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
-
         region = StaticRegion.createAdaptedRegion(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-
         viewport = StaticViewport.createAdaptedViewport(100, 100);
-
         updateImageData();
     }
 
     public BufferedImage getSimpleImage() {
-
         return bufferedImage;
     }
 
@@ -114,7 +106,6 @@ public class JHVSimpleImageView extends AbstractView {
      * {@inheritDoc}
      */
     public boolean setViewport(Viewport v, ChangeEvent event) {
-
         // check if viewport has changed
         if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
             return false;
@@ -131,7 +122,6 @@ public class JHVSimpleImageView extends AbstractView {
      *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData() {
-
         int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalImageSize().x);
         int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalImageSize().y);
         int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().x) / pixelBasedMetaData.getPhysicalImageWidth() * bufferedImage.getWidth());
@@ -241,4 +231,5 @@ public class JHVSimpleImageView extends AbstractView {
     public boolean setViewport(Viewport v) {
         return true;
     }
+
 }

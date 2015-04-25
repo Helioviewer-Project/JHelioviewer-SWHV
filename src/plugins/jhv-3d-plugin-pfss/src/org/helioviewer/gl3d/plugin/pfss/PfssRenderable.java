@@ -36,8 +36,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     public PfssRenderable(PfssCache pfssCache) {
         type = new RenderableType("PFSS plugin");
         this.pfssCache = pfssCache;
-        Displayer.getRenderablecontainer().addRenderable(this);
         this.optionsPanel = new PfssPluginPanel();
+        Displayer.getRenderableContainer().addRenderable(this);
         Displayer.getLayersModel().addLayersListener(this);
     }
 
@@ -56,7 +56,7 @@ public class PfssRenderable implements Renderable, LayersListener {
                 if (pfssData.isInit()) {
                     pfssData.display(gl);
                     datetime = pfssData.getDateString();
-                    Displayer.getRenderablecontainer().fireTimeUpdated(this);
+                    Displayer.getRenderableContainer().fireTimeUpdated(this);
                 }
             }
         }

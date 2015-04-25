@@ -145,9 +145,10 @@ public class RenderableCamera implements Renderable {
         return this.timeString;
     }
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
     public void setTimeString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        this.timeString = sdf.format(date);
+        this.timeString = dateFormat.format(date);
     }
 
 }

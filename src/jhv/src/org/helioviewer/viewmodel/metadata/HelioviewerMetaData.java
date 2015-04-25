@@ -187,8 +187,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        this.pixelImageWidth = m.getPixelWidth();
-        this.pixelImageHeight = m.getPixelHeight();
+        pixelImageWidth = m.getPixelWidth();
+        pixelImageHeight = m.getPixelHeight();
 
         double newSolarPixelRadius = -1.0;
 
@@ -336,10 +336,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     public int pixelImageWidth() {
-        return this.pixelImageWidth;
+        return pixelImageWidth;
     }
 
     public int pixelImageHeight() {
-        return this.pixelImageHeight;
+        return pixelImageHeight;
     }
+
 }
