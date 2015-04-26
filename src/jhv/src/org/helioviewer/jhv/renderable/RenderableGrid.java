@@ -98,6 +98,7 @@ public class RenderableGrid implements Renderable {
 
     private void drawCircles(GL2 gl) {
         gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+        gl.glLineWidth(1f);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);

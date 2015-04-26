@@ -27,6 +27,8 @@ public class RenderableSolarAxes implements Renderable {
         if (!isVisible)
             return;
 
+        gl.glLineWidth(2.5f);
+
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINES);
         {
