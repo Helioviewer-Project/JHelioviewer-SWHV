@@ -118,7 +118,7 @@ public class GL3DImageLayer implements Renderable {
     }
 
     private void updateROI() {
-        MetaData metaData = getMainLayerView().getMetaData();
+        MetaData metaData = mainLayerView.getMetaData();
         if (metaData == null)
             return;
 
@@ -128,7 +128,7 @@ public class GL3DImageLayer implements Renderable {
         double maxPhysicalY = Double.MIN_VALUE;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
-        GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, this.getMainLayerView().getImageData());
+        GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, mainLayerView.getImageData());
 
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
@@ -170,10 +170,10 @@ public class GL3DImageLayer implements Renderable {
         } else {
             newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        this.getMainLayerView().setRegion(newRegion);
+        mainLayerView.setRegion(newRegion);
 
         Viewport layerViewport = new ViewportAdapter(new StaticViewport(Displayer.getViewportWidth(), Displayer.getViewportHeight()));
-        this.getMainLayerView().setViewport(layerViewport);
+        mainLayerView.setViewport(layerViewport);
     }
 
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
@@ -198,7 +198,7 @@ public class GL3DImageLayer implements Renderable {
             {
                 gl.glCullFace(GL2.GL_BACK);
 
-                this.mainLayerView.applyFilters(gl);
+                mainLayerView.applyFilters(gl);
 
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
                 if (!GL3DImageLayer.showCorona) {
@@ -226,7 +226,6 @@ public class GL3DImageLayer implements Renderable {
 
                     gl.glDepthRange(1.f, 1.f);
                     gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
-
                     gl.glDepthRange(0.f, 1.f);
 
                     GLSLShader.bindIsDisc(gl, 1);
@@ -283,7 +282,7 @@ public class GL3DImageLayer implements Renderable {
         disableIndexVBO(gl);
         deletePositionVBO(gl);
         deleteIndexVBO(gl);
-        Displayer.getLayersModel().removeLayer(getMainLayerView());
+        Displayer.getLayersModel().removeLayer(mainLayerView);
     }
 
     private static Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
@@ -426,12 +425,12 @@ public class GL3DImageLayer implements Renderable {
 
     @Override
     public String getName() {
-        return getMainLayerView().getName();
+        return mainLayerView.getName();
     }
 
     @Override
     public String getTimeString() {
-        return getMainLayerView().getMetaData().getDateTime().getCachedDate();
+        return mainLayerView.getMetaData().getDateTime().getCachedDate();
     }
 
     public AbstractView getMainLayerView() {

@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
+import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodelplugin.controller.PluginManager;
@@ -219,6 +220,8 @@ public class JavaHelioViewer {
         // Apply settings after kakadu engine has been initialized
         Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
+
+        J2KRenderGlobalOptions.setDoubleBufferingOption(true);
 
         /* ----------Setup FFmpeg ----------- */
         splash.nextStep();
