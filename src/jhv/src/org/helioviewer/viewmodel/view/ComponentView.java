@@ -67,22 +67,27 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = (GL2) drawable.getGL();
 
         GLInfo.update((GLCanvas) drawable);
 
         GLSLShader.initShader(gl);
 
+        gl.glEnable(GL2.GL_TEXTURE_1D);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+
         gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
+        gl.glEnable(GL2.GL_POINT_SMOOTH);
+
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+        gl.glDepthFunc(GL2.GL_LEQUAL);
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_POINT_SMOOTH);
-
-        gl.glEnable(GL2.GL_NORMALIZE);
-        gl.glDepthFunc(GL2.GL_LEQUAL);
     }
 
     @Override
@@ -96,15 +101,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = (GL2) drawable.getGL();
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_FUNC_ADD);
-
-        gl.glDisable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_DEPTH_TEST);
 
         gl.glPushMatrix();
         {
@@ -116,8 +115,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
             camera.resumePerspective(gl);
         }
         gl.glPopMatrix();
-
-        gl.glEnable(GL2.GL_BLEND);
 
         if (exportMode || screenshotMode) {
             exportFrame();

@@ -89,7 +89,9 @@ public class RenderableGrid implements Renderable {
                 drawText(gl);
             }
 
+            gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl);
+            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
     }
@@ -167,7 +169,6 @@ public class RenderableGrid implements Renderable {
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-
     }
 
     private void drawText(GL2 gl) {

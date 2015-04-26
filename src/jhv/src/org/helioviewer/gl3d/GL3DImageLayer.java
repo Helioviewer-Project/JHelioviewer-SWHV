@@ -192,18 +192,13 @@ public class GL3DImageLayer implements Renderable {
         if (!this.isVisible)
             return;
 
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
         GLSLShader.bind(gl);
         {
             gl.glEnable(GL2.GL_CULL_FACE);
             {
                 gl.glCullFace(GL2.GL_BACK);
 
-                gl.glEnable(GL2.GL_BLEND);
-                AbstractView jp2view = this.mainLayerView;
-
-                jp2view.applyFilters(gl);
+                this.mainLayerView.applyFilters(gl);
 
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
                 if (!GL3DImageLayer.showCorona) {
@@ -246,8 +241,6 @@ public class GL3DImageLayer implements Renderable {
             gl.glDisable(GL2.GL_CULL_FACE);
         }
         GLSLShader.unbind(gl);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glDisable(GL2.GL_BLEND);
 
         updateROI();
     }
