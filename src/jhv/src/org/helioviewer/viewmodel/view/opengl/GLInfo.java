@@ -4,10 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 
+import com.jogamp.nativewindow.ScalableSurface;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 
 /**
@@ -37,9 +36,7 @@ public class GLInfo {
      * Updates the OpenGL settings by reading the OpenGL properties.
      *
      */
-    public static void update(GLCanvas canvas) {
-        final GL2 gl = canvas.getGL().getGL2();
-
+    public static void update(GL2 gl) {
         String version = gl.glGetString(GL2.GL_VERSION);
         Log.debug(">> GLInfo > Version string: " + version);
         Matcher versionMatcher = Pattern.compile("\\d+(\\.(\\d+))*").matcher(version);
@@ -65,14 +62,15 @@ public class GLInfo {
             gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
             maxTextureSize = out[0];
             Log.debug(">> GLInfo > max texture size: " + out[0]);
-
-            float[] scale = new float[2];
-            canvas.getCurrentSurfaceScale(scale);
-            pixelScale[0] = (int) scale[0];
-            pixelScale[1] = (int) scale[1];
-
-            J2KRenderGlobalOptions.setDoubleBufferingOption(true);
         }
+    }
+
+    public static void updatePixelScale(ScalableSurface surface) {
+        float[] scale = new float[2];
+
+        surface.getCurrentSurfaceScale(scale);
+        pixelScale[0] = (int) scale[0];
+        pixelScale[1] = (int) scale[1];
     }
 
     public static boolean checkGLErrors(GL2 gl, String message) {

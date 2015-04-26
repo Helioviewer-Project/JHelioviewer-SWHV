@@ -69,7 +69,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
     public void init(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
 
-        GLInfo.update((GLCanvas) drawable);
+        GLInfo.update(gl);
+        GLInfo.updatePixelScale(canvas);
 
         GLSLShader.initShader(gl);
 
