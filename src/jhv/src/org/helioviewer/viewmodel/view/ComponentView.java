@@ -24,6 +24,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 
+import com.jogamp.newt.awt.NewtCanvasAWT;
+import com.jogamp.newt.opengl.GLWindow;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -38,7 +41,8 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
-    private final static GLCanvas canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
+    private static GLWindow window;
+    private static Component canvas;
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -55,8 +59,12 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderableContainer().addRenderable(new RenderableGrid(gridType, false));
         Displayer.getRenderableContainer().addRenderable(Displayer.getRenderableCamera());
 
+        window = GLWindow.create(new GLCapabilities(GLProfile.getDefault()));
+        window.setUndecorated(true);
+        window.addGLEventListener(this);
+
+        canvas = new NewtCanvasAWT(window);
         canvas.setMinimumSize(new Dimension(0, 0));
-        canvas.addGLEventListener(this);
 
         Displayer.addListener(this);
     }
@@ -70,7 +78,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GL2 gl = (GL2) drawable.getGL();
 
         GLInfo.update(gl);
-        GLInfo.updatePixelScale(canvas);
+        GLInfo.updatePixelScale(window);
 
         GLSLShader.initShader(gl);
 
@@ -135,8 +143,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
             return;
         }
 
-        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(canvas.getGLProfile(), false);
-        GL2 gl = canvas.getGL().getGL2();
+        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(window.getGLProfile(), false);
+        GL2 gl = (GL2) window.getGL();
         int width = canvas.getWidth();
 
         BufferedImage screenshot;
