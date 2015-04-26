@@ -162,7 +162,6 @@ public class RenderableGrid implements Renderable {
                     rotation += latstepDegrees;
                 }
                 gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-
             }
             gl.glPopMatrix();
         }
@@ -250,8 +249,8 @@ public class RenderableGrid implements Renderable {
                 colorBuffer.put(this.secondColor.getGreen() / 255f);
                 colorBuffer.put(this.secondColor.getBlue() / 255f);
             }
-
         }
+
         positionBuffer.flip();
         colorBuffer.flip();
         int positionBufferSize = positionBuffer.capacity();
@@ -269,7 +268,6 @@ public class RenderableGrid implements Renderable {
     private int generate(GL2 gl) {
         int[] tmpId = new int[1];
         gl.glGenBuffers(1, tmpId, 0);
-
         return tmpId[0];
     }
 
