@@ -83,13 +83,13 @@ public class SWHVHEKPluginRenderable implements Renderable {
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
         if (evt.isHighlighted()) {
             gl.glLineWidth(1.6f);
         } else {
             gl.glLineWidth(0.8f);
         }
+
+        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution; i++) {
             double alpha = 1. - 1. * i / arcResolution;
@@ -133,8 +133,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3d(xrot, yrot, zrot);
         }
         gl.glEnd();
-
-        gl.glDisable(GL2.GL_LINE_SMOOTH);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     /**
@@ -171,15 +170,14 @@ public class SWHVHEKPluginRenderable implements Renderable {
         } else {
             gl.glColor3d(evt.getColor().getRed() / 255., evt.getColor().getGreen() / 255., evt.getColor().getBlue() / 255.);
         }
-        gl.glEnable(GL2.GL_BLEND);
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
         if (evt.isHighlighted()) {
             gl.glLineWidth(1.6f);
         } else {
             gl.glLineWidth(0.7f);
         }
+
+        gl.glDisable(GL2.GL_TEXTURE_2D);
         for (JHVPoint point : points) {
             int divpoints = 10;
             gl.glBegin(GL2.GL_LINE_STRIP);
@@ -201,7 +199,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
             oldBoundaryPoint3d = point;
         }
-        gl.glDisable(GL2.GL_LINE_SMOOTH);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     public void drawIcon(GL2 gl, JHVEvent evt, Date now) {
@@ -238,10 +236,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         axis.normalize();
         GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), GL3DVec3d.YAxis);
         r.rotate(-Math.asin(y / targetDir.length()), GL3DVec3d.XAxis);
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glEnable(GL2.GL_CULL_FACE);
-        gl.glEnable(GL2.GL_TEXTURE_2D);
+
 
         GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
         GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
@@ -257,6 +252,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         p2.add(targetDir);
         p3.add(targetDir);
 
+        gl.glEnable(GL2.GL_CULL_FACE);
         gl.glBegin(GL2.GL_QUADS);
         {
             gl.glTexCoord2f(1.0f, 1.0f);
@@ -269,10 +265,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3d(p0.x, p0.y, p0.z);
         }
         gl.glEnd();
-
-        gl.glDisable(GL2.GL_BLEND);
         gl.glDisable(GL2.GL_CULL_FACE);
-        gl.glEnable(GL2.GL_BLEND);
     }
 
     @Override

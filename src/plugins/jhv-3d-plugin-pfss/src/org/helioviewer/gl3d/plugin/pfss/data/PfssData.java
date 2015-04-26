@@ -246,13 +246,8 @@ public class PfssData {
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glDisable(GL2.GL_TEXTURE_1D);
-
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE);
-        gl.glBlendEquation(GL2.GL_FUNC_ADD);
-
         gl.glDepthMask(false);
+
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
         gl.glColorPointer(4, GL2.GL_FLOAT, 7 * 4, 3 * 4);
         gl.glVertexPointer(3, GL2.GL_FLOAT, 7 * 4, 0);
@@ -260,13 +255,11 @@ public class PfssData {
         gl.glLineWidth(PfssSettings.LINE_WIDTH);
         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
+        gl.glDepthMask(true);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-
-        gl.glDisable(GL2.GL_LINE_SMOOTH);
-        gl.glDisable(GL2.GL_BLEND);
-        gl.glDepthMask(true);
-        gl.glLineWidth(1f);
     }
 
     public boolean isInit() {
