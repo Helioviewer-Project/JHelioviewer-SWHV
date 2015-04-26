@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
@@ -23,23 +22,20 @@ public class MainImagePanel extends JPanel {
 
     private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
 
-    private final static CameraMouseController mouseController = new CameraMouseController();
     private final static ComponentView componentView = new ComponentView();
 
     public MainImagePanel() {
         super(new BorderLayout(0, 0));
         setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
+        CameraMouseController mouseController = new CameraMouseController(this);
+
         Component component = componentView.getComponent();
         component.addMouseListener(mouseController);
         component.addMouseMotionListener(mouseController);
         component.addMouseWheelListener(mouseController);
-        if (mouseController instanceof KeyListener)
-            component.addKeyListener((KeyListener) mouseController);
 
         add(component);
-
-        mouseController.setImagePanel(this);
     }
 
     public ComponentView getComponentView() {
