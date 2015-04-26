@@ -45,6 +45,8 @@ public class RenderableCamera implements Renderable {
         gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
         {
             gl.glLineWidth(2.5f);
+
+            gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glBegin(GL2.GL_LINE_LOOP);
 
             double bw = width * scale / 2.;
@@ -107,6 +109,7 @@ public class RenderableCamera implements Renderable {
                 gl.glVertex3d(x, y, z);
             }
             gl.glEnd();
+            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
     }
