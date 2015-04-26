@@ -4,10 +4,10 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-
-import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -22,7 +22,7 @@ import org.helioviewer.jhv.gui.components.MainImagePanel;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class CameraMouseController implements MouseInputListener, MouseWheelListener {
+public class CameraMouseController implements MouseListener, MouseMotionListener, MouseWheelListener {
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
@@ -32,8 +32,8 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
     private boolean buttonDown = false;
     private long lastTime = System.currentTimeMillis();
 
-    public void setImagePanel(MainImagePanel newImagePanel) {
-        imagePanel = newImagePanel;
+    public CameraMouseController(MainImagePanel _imagePanel) {
+        imagePanel = _imagePanel;
     }
 
     /**
@@ -41,12 +41,9 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
      */
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (imagePanel != null) {
-            GL3DCamera camera = Displayer.getActiveCamera();
-            if (camera.getCurrentInteraction() == camera.getZoomInteraction()) {
-            } else {
-                imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
-            }
+        GL3DCamera camera = Displayer.getActiveCamera();
+        if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
+            imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
         }
     }
 
@@ -55,9 +52,7 @@ public class CameraMouseController implements MouseInputListener, MouseWheelList
      */
     @Override
     public void mouseExited(MouseEvent e) {
-        if (imagePanel != null) {
-            imagePanel.setCursor(Cursor.getDefaultCursor());
-        }
+        imagePanel.setCursor(Cursor.getDefaultCursor());
     }
 
     /**
