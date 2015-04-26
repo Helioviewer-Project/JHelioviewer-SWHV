@@ -76,8 +76,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
         gl.glEnable(GL2.GL_TEXTURE_1D);
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
-        gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
         gl.glEnable(GL2.GL_POINT_SMOOTH);
+        gl.glEnable(GL2.GL_LINE_SMOOTH);
+        gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);

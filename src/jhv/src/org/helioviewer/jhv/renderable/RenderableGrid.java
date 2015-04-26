@@ -118,6 +118,7 @@ public class RenderableGrid implements Renderable {
                 }
             }
             gl.glPopMatrix();
+
             gl.glPushMatrix();
             {
                 float rotation = 0f;
@@ -131,6 +132,7 @@ public class RenderableGrid implements Renderable {
                 }
             }
             gl.glPopMatrix();
+
             gl.glPushMatrix();
             {
                 float rotation = 0f;
