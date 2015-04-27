@@ -20,7 +20,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
+import org.helioviewer.jhv.gui.interfaces.ComponentViewPlugin;
 import org.helioviewer.jhv.io.MovieExport;
 import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableGridType;
@@ -240,7 +240,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         return true;
     }
 
-    private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
+    private final LinkedList<ComponentViewPlugin> plugins = new LinkedList<ComponentViewPlugin>();
 
     /**
      * Adds a new plug-in to the component. Plug-ins in this case are controller
@@ -249,12 +249,11 @@ public class ComponentView implements GLEventListener, DisplayListener {
      * @param newPlugin
      *            new plug-in which has to to be added to this component
      */
-    public void addPlugin(ImagePanelPlugin newPlugin) {
+    public void addPlugin(ComponentViewPlugin newPlugin) {
         if (newPlugin == null || plugins.contains(newPlugin)) {
             return;
         }
 
-        newPlugin.setImagePanel(canvas);
         newPlugin.setView(this);
         plugins.add(newPlugin);
 
@@ -266,13 +265,12 @@ public class ComponentView implements GLEventListener, DisplayListener {
             canvas.addMouseWheelListener((MouseWheelListener) newPlugin);
     }
 
-    public void removePlugin(ImagePanelPlugin oldPlugin) {
+    public void removePlugin(ComponentViewPlugin oldPlugin) {
         if (oldPlugin == null || !plugins.contains(oldPlugin)) {
             return;
         }
 
         oldPlugin.setView(null);
-        oldPlugin.setImagePanel(null);
         plugins.remove(oldPlugin);
 
         if (oldPlugin instanceof MouseListener)

@@ -11,18 +11,17 @@ import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
+import org.helioviewer.jhv.gui.interfaces.ComponentViewPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * Status panel for displaying the current mouse position.
  */
-public class PositionStatusPanel extends JLabel implements MouseMotionListener, ImagePanelPlugin {
+public class PositionStatusPanel extends JLabel implements MouseMotionListener, ComponentViewPlugin {
 
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
-    private static ComponentView view;
-    private static Component imagePanel;
+    private static Component component;
 
     private Point lastPosition;
 
@@ -45,7 +44,6 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      * @param position
      *            Position on the screen.
      */
-
     private void updatePosition(Point position) {
         if (position == lastPosition)
             return;
@@ -66,32 +64,11 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      * {@inheritDoc}
      */
     @Override
-    public ComponentView getView() {
-        return view;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setView(ComponentView newView) {
-        view = newView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Component getImagePanel() {
-        return imagePanel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setImagePanel(Component newImagePanel) {
-        imagePanel = newImagePanel;
+    public void setView(ComponentView componentView) {
+        if (componentView == null)
+            component = null;
+        else
+            component = componentView.getComponent();
     }
 
     /**
@@ -108,16 +85,6 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
     @Override
     public void mouseMoved(MouseEvent e) {
         updatePosition(e.getPoint());
-    }
-
-    public void updatePosition() {
-        if (lastPosition != null) {
-            updatePosition(lastPosition);
-        }
-    }
-
-    @Override
-    public void detach() {
     }
 
 }
