@@ -27,13 +27,13 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
-    private static Component imagePanel;
+    private static Component component;
 
     private boolean buttonDown = false;
     private long lastTime = System.currentTimeMillis();
 
-    public CameraMouseController(Component _imagePanel) {
-        imagePanel = _imagePanel;
+    public CameraMouseController(Component _component) {
+        component = _component;
     }
 
     /**
@@ -43,7 +43,7 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
     public void mouseEntered(MouseEvent e) {
         GL3DCamera camera = Displayer.getActiveCamera();
         if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
-            imagePanel.setCursor(buttonDown ? closedHandCursor : openHandCursor);
+            component.setCursor(buttonDown ? closedHandCursor : openHandCursor);
         }
     }
 
@@ -52,7 +52,7 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
      */
     @Override
     public void mouseExited(MouseEvent e) {
-        imagePanel.setCursor(Cursor.getDefaultCursor());
+        component.setCursor(Cursor.getDefaultCursor());
     }
 
     /**
@@ -63,7 +63,7 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
         GL3DCamera camera = Displayer.getActiveCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
-                imagePanel.setCursor(closedHandCursor);
+                component.setCursor(closedHandCursor);
             }
             buttonDown = true;
         }
@@ -76,7 +76,7 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            imagePanel.setCursor(openHandCursor);
+            component.setCursor(openHandCursor);
             buttonDown = false;
         }
         Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);

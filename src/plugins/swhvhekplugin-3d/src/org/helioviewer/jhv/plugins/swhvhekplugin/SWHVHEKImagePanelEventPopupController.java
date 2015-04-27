@@ -43,7 +43,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
-    private SWEKEventInformationDialog hekPopUp;
 
     /**
      * {@inheritDoc}
@@ -56,29 +55,35 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
             component = componentView.getComponent();
     }
 
-    private Point calcWindowPosition(Point p) {
+    private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
         int yCoord = 0;
         boolean yCoordInMiddle = false;
-        if (p.y + hekPopUp.getSize().height + yOffset < component.getSize().height) {
-            yCoord = p.y + component.getLocationOnScreen().y + yOffset;
+
+        int compWidth = component.getWidth();
+        int compHeight = component.getHeight();
+        int compLocX = component.getLocationOnScreen().x;
+        int compLocY = component.getLocationOnScreen().y;
+
+        if (p.y + hekHeight + yOffset < compHeight) {
+            yCoord = p.y + compLocY + yOffset;
         } else {
-            yCoord = p.y + component.getLocationOnScreen().y - hekPopUp.getSize().height - yOffset;
-            if (yCoord < component.getLocationOnScreen().y) {
-                yCoord = component.getLocationOnScreen().y + component.getSize().height - hekPopUp.getSize().height;
-                if (yCoord < component.getLocationOnScreen().y) {
-                    yCoord = component.getLocationOnScreen().y;
+            yCoord = p.y + compLocY - hekHeight - yOffset;
+            if (yCoord < compLocY) {
+                yCoord = compLocY + compHeight - hekHeight;
+                if (yCoord < compLocY) {
+                    yCoord = compLocY;
                 }
                 yCoordInMiddle = true;
             }
         }
 
         int xCoord = 0;
-        if (p.x + hekPopUp.getSize().width + xOffset < component.getSize().width) {
-            xCoord = p.x + component.getLocationOnScreen().x + xOffset;
+        if (p.x + hekWidth + xOffset < compWidth) {
+            xCoord = p.x + compLocX + xOffset;
         } else {
-            xCoord = p.x + component.getLocationOnScreen().x - hekPopUp.getSize().width - xOffset;
-            if (xCoord < component.getLocationOnScreen().x && !yCoordInMiddle) {
-                xCoord = component.getLocationOnScreen().x + component.getSize().width - hekPopUp.getSize().width;
+            xCoord = p.x + compLocX - hekWidth - xOffset;
+            if (xCoord < compLocX && !yCoordInMiddle) {
+                xCoord = compLocX + compWidth - hekWidth;
             }
         }
 
@@ -89,19 +94,13 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      * {@inheritDoc}
      */
     @Override
-    public void mouseClicked(final MouseEvent e) {
-        //Uncomment to enable point and click
-        if (mouseOverJHVEvent != null) {
-            // should never be the case
-            // if (hekPopUp == null) {
-            hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
-            // }
-            // hekPopUp.setVisible(false);
-
-            Point windowPosition = calcWindowPosition(mouseOverPosition);
-            hekPopUp.setLocation(windowPosition);
-            hekPopUp.setVisible(true);
+    public void mouseClicked(MouseEvent e) {
+        if (component != null && mouseOverJHVEvent != null) {
+            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
+            hekPopUp.setLocation(calcWindowPosition(mouseOverPosition, hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.pack();
+            hekPopUp.setVisible(true);
+
             component.setCursor(helpCursor);
         }
     }
@@ -146,6 +145,9 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (component == null)
+            return;
+
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
         Date currentDate = Displayer.getLastUpdatedTimestamp();
 
