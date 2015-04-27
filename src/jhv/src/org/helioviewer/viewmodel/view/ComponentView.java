@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
@@ -13,7 +12,6 @@ import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -32,9 +30,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 
-import com.jogamp.newt.awt.NewtCanvasAWT;
-import com.jogamp.newt.opengl.GLWindow;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -49,8 +44,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
-    private static GLWindow window;
-    private static JPanel canvas;
+    private static GLCanvas canvas;
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -67,14 +61,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderableContainer().addRenderable(new RenderableGrid(gridType, false));
         Displayer.getRenderableContainer().addRenderable(Displayer.getRenderableCamera());
 
-        window = GLWindow.create(new GLCapabilities(GLProfile.getDefault()));
-        window.setUndecorated(true);
-        window.addGLEventListener(this);
-
-        // to allow resizing of SplitPane
-        canvas = new JPanel(new BorderLayout(0, 0));
-        canvas.add(new NewtCanvasAWT(window), BorderLayout.CENTER);
+        canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
         canvas.setMinimumSize(new Dimension(0, 0));
+        canvas.addGLEventListener(this);
 
         CameraMouseController mouseController = new CameraMouseController(canvas);
         canvas.addMouseListener(mouseController);
@@ -93,7 +82,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GL2 gl = (GL2) drawable.getGL();
 
         GLInfo.update(gl);
-        GLInfo.updatePixelScale(window);
+        GLInfo.updatePixelScale(canvas);
 
         GLSLShader.initShader(gl);
 
@@ -149,7 +138,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     @Override
     public void display() {
         //canvas.repaint();
-        window.display();
+        canvas.display();
     }
 
     private void exportFrame() {
@@ -159,8 +148,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
             return;
         }
 
-        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(window.getGLProfile(), false);
-        GL2 gl = (GL2) window.getGL();
+        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(canvas.getGLProfile(), false);
+        GL2 gl = (GL2) canvas.getGL();
         int width = canvas.getWidth();
 
         BufferedImage screenshot;
