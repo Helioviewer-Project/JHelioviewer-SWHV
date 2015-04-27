@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.helioviewer.gl3d.camera.GL3DCamera;
@@ -48,7 +50,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 public class ComponentView implements GLEventListener, DisplayListener {
 
     private static GLWindow window;
-    private static Component component;
+    private static JPanel canvas;
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -69,19 +71,21 @@ public class ComponentView implements GLEventListener, DisplayListener {
         window.setUndecorated(true);
         window.addGLEventListener(this);
 
-        component = new NewtCanvasAWT(window);
-        component.setMinimumSize(new Dimension(0, 0));
+        // to allow resizing of SplitPane
+        canvas = new JPanel(new BorderLayout(0, 0));
+        canvas.add(new NewtCanvasAWT(window), BorderLayout.CENTER);
+        canvas.setMinimumSize(new Dimension(0, 0));
 
-        CameraMouseController mouseController = new CameraMouseController(component);
-        component.addMouseListener(mouseController);
-        component.addMouseMotionListener(mouseController);
-        component.addMouseWheelListener(mouseController);
+        CameraMouseController mouseController = new CameraMouseController(canvas);
+        canvas.addMouseListener(mouseController);
+        canvas.addMouseMotionListener(mouseController);
+        canvas.addMouseWheelListener(mouseController);
 
         Displayer.addListener(this);
     }
 
     public final Component getComponent() {
-        return component;
+        return canvas;
     }
 
     @Override
@@ -117,7 +121,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setViewportSize(component.getWidth(), component.getHeight());
+        Displayer.setViewportSize(canvas.getWidth(), canvas.getHeight());
     }
 
     @Override
@@ -144,7 +148,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void display() {
-        //component.repaint();
+        //canvas.repaint();
         window.display();
     }
 
@@ -157,7 +161,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(window.getGLProfile(), false);
         GL2 gl = (GL2) window.getGL();
-        int width = component.getWidth();
+        int width = canvas.getWidth();
 
         BufferedImage screenshot;
 
@@ -198,7 +202,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         AbstractView mv = Displayer.getLayersModel().getActiveView();
         if (mv instanceof JHVJPXView) {
-            export = new MovieExport(component.getWidth(), component.getHeight());
+            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
             export.createProcess();
             exportMode = true;
 
@@ -221,7 +225,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
         text.setBackground(null);
-        JOptionPane.showMessageDialog(component, text);
+        JOptionPane.showMessageDialog(canvas, text);
 
         ImageViewerGui.getLeftContentPane().setEnabled(true);
 
@@ -261,16 +265,16 @@ public class ComponentView implements GLEventListener, DisplayListener {
             return;
         }
 
-        newPlugin.setImagePanel(component);
+        newPlugin.setImagePanel(canvas);
         newPlugin.setView(this);
         plugins.add(newPlugin);
 
         if (newPlugin instanceof MouseListener)
-            component.addMouseListener((MouseListener) newPlugin);
+            canvas.addMouseListener((MouseListener) newPlugin);
         if (newPlugin instanceof MouseMotionListener)
-            component.addMouseMotionListener((MouseMotionListener) newPlugin);
+            canvas.addMouseMotionListener((MouseMotionListener) newPlugin);
         if (newPlugin instanceof MouseWheelListener)
-            component.addMouseWheelListener((MouseWheelListener) newPlugin);
+            canvas.addMouseWheelListener((MouseWheelListener) newPlugin);
     }
 
     public void removePlugin(ImagePanelPlugin oldPlugin) {
@@ -283,11 +287,11 @@ public class ComponentView implements GLEventListener, DisplayListener {
         plugins.remove(oldPlugin);
 
         if (oldPlugin instanceof MouseListener)
-            component.removeMouseListener((MouseListener) oldPlugin);
+            canvas.removeMouseListener((MouseListener) oldPlugin);
         if (oldPlugin instanceof MouseMotionListener)
-            component.removeMouseMotionListener((MouseMotionListener) oldPlugin);
+            canvas.removeMouseMotionListener((MouseMotionListener) oldPlugin);
         if (oldPlugin instanceof MouseWheelListener)
-            component.removeMouseWheelListener((MouseWheelListener) oldPlugin);
+            canvas.removeMouseWheelListener((MouseWheelListener) oldPlugin);
     }
 
 }
