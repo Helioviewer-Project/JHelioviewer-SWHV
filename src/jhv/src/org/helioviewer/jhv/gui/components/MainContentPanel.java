@@ -90,6 +90,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
             if (pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1) {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
+
                 splitpane.setBottomComponent(collapsiblePane);
                 splitpane.setDividerSize(5);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {

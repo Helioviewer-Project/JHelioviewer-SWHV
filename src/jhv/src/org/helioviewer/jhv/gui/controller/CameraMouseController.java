@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.controller;
 
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -14,6 +13,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 
 /**
  * Acts as the global Delegate for Mouse. Mouse Events are
@@ -27,12 +27,12 @@ public class CameraMouseController implements MouseListener, MouseMotionListener
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
-    private static Component imagePanel;
+    private static MainImagePanel imagePanel;
 
     private boolean buttonDown = false;
     private long lastTime = System.currentTimeMillis();
 
-    public CameraMouseController(Component _imagePanel) {
+    public CameraMouseController(MainImagePanel _imagePanel) {
         imagePanel = _imagePanel;
     }
 

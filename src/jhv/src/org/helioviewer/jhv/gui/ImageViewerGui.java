@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -27,6 +26,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.SideContentPane;
@@ -42,7 +42,6 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -72,7 +71,7 @@ public class ImageViewerGui {
     private static ControlPanelContainer moviePanelContainer;
 
     private static MainContentPanel mainContentPanel;
-    private static ComponentView componentView;
+    private static MainImagePanel mainImagePanel;
     private static ImageDataPanel imageObservationPanel;
     private static ObservationDialog observationDialog;
 
@@ -119,8 +118,11 @@ public class ImageViewerGui {
         leftScrollPane.setFocusable(false);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
-        componentView = new ComponentView();
-        mainContentPanel = new MainContentPanel(componentView.getComponent());
+        mainImagePanel = new MainImagePanel();
+        mainImagePanel.setAutoscrolls(true);
+        mainImagePanel.setFocusable(false);
+
+        mainContentPanel = new MainContentPanel(mainImagePanel);
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
@@ -129,7 +131,7 @@ public class ImageViewerGui {
         ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
         FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
         PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
-        componentView.addPlugin(positionStatusPanel);
+        mainImagePanel.addPlugin(positionStatusPanel);
 
         StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
         statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
@@ -351,8 +353,8 @@ public class ImageViewerGui {
         return moviePanelContainer;
     }
 
-    public static ComponentView getComponentView() {
-        return componentView;
+    public static MainImagePanel getMainImagePanel() {
+        return mainImagePanel;
     }
 
 }
