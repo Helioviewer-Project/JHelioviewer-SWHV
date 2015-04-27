@@ -17,7 +17,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
+import org.helioviewer.jhv.gui.interfaces.ComponentViewPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
@@ -32,14 +32,13 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, MouseListener, MouseMotionListener {
+public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, ComponentViewPlugin {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
-    private ComponentView view;
-    private Component imagePanel;
+    private Component component;
 
     private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
@@ -50,57 +49,36 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
      * {@inheritDoc}
      */
     @Override
-    public ComponentView getView() {
-        return view;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setView(ComponentView newView) {
-        view = newView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setImagePanel(Component newImagePanel) {
-        imagePanel = newImagePanel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Component getImagePanel() {
-        return imagePanel;
+    public void setView(ComponentView componentView) {
+        if (componentView == null)
+            component = null;
+        else
+            component = componentView.getComponent();
     }
 
     private Point calcWindowPosition(Point p) {
         int yCoord = 0;
         boolean yCoordInMiddle = false;
-        if (p.y + hekPopUp.getSize().height + yOffset < imagePanel.getSize().height) {
-            yCoord = p.y + imagePanel.getLocationOnScreen().y + yOffset;
+        if (p.y + hekPopUp.getSize().height + yOffset < component.getSize().height) {
+            yCoord = p.y + component.getLocationOnScreen().y + yOffset;
         } else {
-            yCoord = p.y + imagePanel.getLocationOnScreen().y - hekPopUp.getSize().height - yOffset;
-            if (yCoord < imagePanel.getLocationOnScreen().y) {
-                yCoord = imagePanel.getLocationOnScreen().y + imagePanel.getSize().height - hekPopUp.getSize().height;
-                if (yCoord < imagePanel.getLocationOnScreen().y) {
-                    yCoord = imagePanel.getLocationOnScreen().y;
+            yCoord = p.y + component.getLocationOnScreen().y - hekPopUp.getSize().height - yOffset;
+            if (yCoord < component.getLocationOnScreen().y) {
+                yCoord = component.getLocationOnScreen().y + component.getSize().height - hekPopUp.getSize().height;
+                if (yCoord < component.getLocationOnScreen().y) {
+                    yCoord = component.getLocationOnScreen().y;
                 }
                 yCoordInMiddle = true;
             }
         }
 
         int xCoord = 0;
-        if (p.x + hekPopUp.getSize().width + xOffset < imagePanel.getSize().width) {
-            xCoord = p.x + imagePanel.getLocationOnScreen().x + xOffset;
+        if (p.x + hekPopUp.getSize().width + xOffset < component.getSize().width) {
+            xCoord = p.x + component.getLocationOnScreen().x + xOffset;
         } else {
-            xCoord = p.x + imagePanel.getLocationOnScreen().x - hekPopUp.getSize().width - xOffset;
-            if (xCoord < imagePanel.getLocationOnScreen().x && !yCoordInMiddle) {
-                xCoord = imagePanel.getLocationOnScreen().x + imagePanel.getSize().width - hekPopUp.getSize().width;
+            xCoord = p.x + component.getLocationOnScreen().x - hekPopUp.getSize().width - xOffset;
+            if (xCoord < component.getLocationOnScreen().x && !yCoordInMiddle) {
+                xCoord = component.getLocationOnScreen().x + component.getSize().width - hekPopUp.getSize().width;
             }
         }
 
@@ -124,7 +102,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
             hekPopUp.setLocation(windowPosition);
             hekPopUp.setVisible(true);
             hekPopUp.pack();
-            imagePanel.setCursor(helpCursor);
+            component.setCursor(helpCursor);
         }
     }
 
@@ -207,16 +185,12 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
                 lastJHVEvent.highlight(false, this);
             }
             if (lastJHVEvent == null && mouseOverJHVEvent != null) {
-                lastCursor = imagePanel.getCursor();
-                imagePanel.setCursor(helpCursor);
+                lastCursor = component.getCursor();
+                component.setCursor(helpCursor);
             } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
-                imagePanel.setCursor(lastCursor);
+                component.setCursor(lastCursor);
             }
         }
-    }
-
-    @Override
-    public void detach() {
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
