@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins.swhvhekplugin;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -16,7 +17,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 
@@ -39,8 +39,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
     private static final int yOffset = 12;
 
     private ComponentView view;
-
-    private MainImagePanel imagePanel;
+    private Component imagePanel;
 
     private JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
@@ -67,7 +66,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
      * {@inheritDoc}
      */
     @Override
-    public void setImagePanel(MainImagePanel newImagePanel) {
+    public void setImagePanel(Component newImagePanel) {
         imagePanel = newImagePanel;
     }
 
@@ -75,7 +74,7 @@ public class SWHVHEKImagePanelEventPopupController implements ImagePanelPlugin, 
      * {@inheritDoc}
      */
     @Override
-    public MainImagePanel getImagePanel() {
+    public Component getImagePanel() {
         return imagePanel;
     }
 
