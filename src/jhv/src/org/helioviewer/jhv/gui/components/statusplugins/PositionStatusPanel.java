@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -11,6 +10,7 @@ import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.MainImagePanel;
 import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.viewmodel.view.ComponentView;
 
@@ -22,7 +22,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
     private static ComponentView view;
-    private static Component imagePanel;
+    private static MainImagePanel imagePanel;
 
     private Point lastPosition;
 
@@ -82,7 +82,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      * {@inheritDoc}
      */
     @Override
-    public Component getImagePanel() {
+    public MainImagePanel getImagePanel() {
         return imagePanel;
     }
 
@@ -90,7 +90,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      * {@inheritDoc}
      */
     @Override
-    public void setImagePanel(Component newImagePanel) {
+    public void setImagePanel(MainImagePanel newImagePanel) {
         imagePanel = newImagePanel;
     }
 
