@@ -120,8 +120,7 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
         componentView = new ComponentView();
-        mainContentPanel = new MainContentPanel();
-        mainContentPanel.setMainComponent(componentView.getComponent());
+        mainContentPanel = new MainContentPanel(componentView.getComponent());
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);

@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
 /**
@@ -27,59 +26,22 @@ public class MainContentPanel extends JPanel implements ActionListener {
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
     private final JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
-    private Component mainComponent = null;
     private final JPanel pluginContainer = new JPanel();
     private final CollapsiblePane collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
 
-    public MainContentPanel() {
-        initVisualComponents();
-    }
-
-    /**
-     * Initialize the visual parts of the component.
-     */
-    private void initVisualComponents() {
-        setLayout(new BorderLayout());
-        setMinimumSize(new Dimension());
-        add(splitpane, BorderLayout.CENTER);
+    public MainContentPanel(Component mainComponent) {
+        collapsiblePane.toggleButton.addActionListener(this);
 
         pluginContainer.setLayout(new BorderLayout());
-        pluginContainer.setPreferredSize(new Dimension(pluginContainer.getWidth(), (int) (getHeight() * 0.66)));
-        pluginContainer.setSize(pluginContainer.getPreferredSize());
 
+        splitpane.setTopComponent(mainComponent);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
         splitpane.setDividerSize(5);
-        // splitpane.setContinuousLayout(true);
+
+        setLayout(new BorderLayout());
+        setMinimumSize(new Dimension());
         add(splitpane, BorderLayout.CENTER);
-
-        collapsiblePane.toggleButton.addActionListener(this);
-    }
-
-    /**
-     * Set the main component to the container, e.g. the main image panel.
-     * 
-     * @param comp
-     *            Main component to be displayed.
-     * */
-    public boolean setMainComponent(final Component comp) {
-        if (comp == null || mainComponent == comp) {
-            return false;
-        }
-        if (mainComponent != null) {
-            splitpane.remove(mainComponent);
-            remove(mainComponent);
-        }
-        mainComponent = comp;
-        if (mainComponent != null) {
-            splitpane.setTopComponent(mainComponent);
-        }
-
-        return true;
-    }
-
-    public final Component getMainComponent() {
-        return mainComponent;
     }
 
     /**
@@ -89,16 +51,12 @@ public class MainContentPanel extends JPanel implements ActionListener {
      * @param plugin
      *            Plugin to be added to the container.
      * */
-    public boolean addPlugin(final MainContentPanelPlugin plugin) {
+    public void addPlugin(MainContentPanelPlugin plugin) {
         if (plugin == null || pluginList.contains(plugin)) {
-            return false;
+            return;
         }
-        if (!pluginList.add(plugin)) {
-            return false;
-        }
+        pluginList.add(plugin);
         updateLayout();
-
-        return true;
     }
 
     /**
@@ -107,13 +65,11 @@ public class MainContentPanel extends JPanel implements ActionListener {
      * @param plugin
      *            Plugin to be removed from the container.
      * */
-    public boolean removePlugin(final MainContentPanelPlugin plugin) {
+    public void removePlugin(MainContentPanelPlugin plugin) {
         if (!pluginList.remove(plugin)) {
-            return false;
+            return;
         }
         updateLayout();
-
-        return true;
     }
 
     /**
@@ -134,7 +90,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
             if (pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 1) {
                 pluginContainer.add(pluginList.get(0).getVisualInterfaces().get(0), BorderLayout.CENTER);
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
-                collapsiblePane.setMinimumSize(new Dimension(200, 180));
                 splitpane.setBottomComponent(collapsiblePane);
                 splitpane.setDividerSize(5);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
@@ -165,7 +120,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         updateLayout();
-        Log.warn("Event " + e);
     }
 
 }
