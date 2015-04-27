@@ -33,6 +33,7 @@ import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -61,7 +62,16 @@ public class ComponentView implements GLEventListener, DisplayListener {
         Displayer.getRenderableContainer().addRenderable(new RenderableGrid(gridType, false));
         Displayer.getRenderableContainer().addRenderable(Displayer.getRenderableCamera());
 
-        canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
+        GLProfile glp = GLProfile.getDefault();
+        GLCapabilities caps = new GLCapabilities(glp);
+
+        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(glp).createDummyAutoDrawable(null, true, caps, null);
+        sharedDrawable.display();
+
+        canvas = new GLCanvas(caps);
+        // GUI events can lead to context destruction and invalidation of GL objects and state
+        canvas.setSharedAutoDrawable(sharedDrawable);
+
         canvas.setMinimumSize(new Dimension(1, 1));
         canvas.addGLEventListener(this);
 
