@@ -21,8 +21,6 @@ public class GLInfo {
     /*
      * TBD
      *
-     * - pixel scale at startup
-     *
      * if (!GLInfo.glIsUsable()) { Message.err("Could not initialize OpenGL",
      * "OpenGL could not be initialized properly during startup. JHelioviewer
      * will start in Software Mode. For detailed information please read the log

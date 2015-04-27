@@ -86,35 +86,31 @@ public class JavaHelioViewerLauncher {
                 System.out.println("Failed to create directory " + libpath);
             }
         }
-        String libs[] = new String[5];
+        String libs[] = new String[4];
         String pathlib = "";
         if (System.getProperty("jhv.os").equals("mac")) {
             libs[0] = "libgluegen-rt.jnilib";
             libs[1] = "libnativewindow_awt.jnilib";
             libs[2] = "libnativewindow_macosx.jnilib";
             libs[3] = "libjogl_desktop.jnilib";
-            libs[4] = "libnewt.jnilib";
             pathlib = "macosx-universal/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
             libs[0] = "gluegen-rt.dll";
             libs[1] = "nativewindow_awt.dll";
             libs[2] = "nativewindow_win32.dll";
             libs[3] = "jogl_desktop.dll";
-            libs[4] = "newt.dll";
             pathlib = "windows-amd64/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-32")) {
             libs[0] = "gluegen-rt.dll";
             libs[1] = "nativewindow_awt.dll";
             libs[2] = "nativewindow_win32.dll";
             libs[3] = "jogl_desktop.dll";
-            libs[4] = "newt.dll";
             pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
             libs[0] = "libgluegen-rt.so";
             libs[1] = "libnativewindow_awt.so";
             libs[2] = "libnativewindow_x11.so";
             libs[3] = "libjogl_desktop.so";
-            libs[4] = "libnewt.so";
             pathlib = "linux-amd64/";
         }
         // if (System.getProperty("jhv.os").equals("linux") &&
@@ -124,7 +120,6 @@ public class JavaHelioViewerLauncher {
             libs[1] = "libnativewindow_awt.so";
             libs[2] = "libnativewindow_x11.so";
             libs[3] = "libjogl_desktop.so";
-            libs[4] = "libnewt.so";
             pathlib = "linux-i586/";
         }
         for (int i = 0; i < libs.length; i++) {
