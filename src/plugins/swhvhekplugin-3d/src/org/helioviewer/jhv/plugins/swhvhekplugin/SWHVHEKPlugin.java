@@ -42,12 +42,12 @@ public class SWHVHEKPlugin implements Plugin {
     public void installPlugin() {
         controller = new SWHVHEKImagePanelEventPopupController();
         renderable = new SWHVHEKPluginRenderable();
-        ImageViewerGui.getMainImagePanel().addPlugin(controller);
+        ImageViewerGui.getComponentView().addPlugin(controller);
     }
 
     @Override
     public void uninstallPlugin() {
-        ImageViewerGui.getMainImagePanel().removePlugin(controller);
+        ImageViewerGui.getComponentView().removePlugin(controller);
         Displayer.getRenderableContainer().removeRenderable(renderable);
         controller = null;
     }

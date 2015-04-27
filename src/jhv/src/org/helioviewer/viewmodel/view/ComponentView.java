@@ -2,9 +2,13 @@ package org.helioviewer.viewmodel.view;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
@@ -14,7 +18,9 @@ import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.controller.CameraMouseController;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.gui.interfaces.ImagePanelPlugin;
 import org.helioviewer.jhv.io.MovieExport;
 import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableGridType;
@@ -42,7 +48,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 public class ComponentView implements GLEventListener, DisplayListener {
 
     private static GLWindow window;
-    private static Component canvas;
+    private static Component component;
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
@@ -63,14 +69,19 @@ public class ComponentView implements GLEventListener, DisplayListener {
         window.setUndecorated(true);
         window.addGLEventListener(this);
 
-        canvas = new NewtCanvasAWT(window);
-        canvas.setMinimumSize(new Dimension(0, 0));
+        component = new NewtCanvasAWT(window);
+        component.setMinimumSize(new Dimension(0, 0));
+
+        CameraMouseController mouseController = new CameraMouseController(component);
+        component.addMouseListener(mouseController);
+        component.addMouseMotionListener(mouseController);
+        component.addMouseWheelListener(mouseController);
 
         Displayer.addListener(this);
     }
 
     public final Component getComponent() {
-        return canvas;
+        return component;
     }
 
     @Override
@@ -106,7 +117,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setViewportSize(canvas.getWidth(), canvas.getHeight());
+        Displayer.setViewportSize(component.getWidth(), component.getHeight());
     }
 
     @Override
@@ -133,7 +144,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void display() {
-        canvas.repaint();
+        //component.repaint();
+        window.display();
     }
 
     private void exportFrame() {
@@ -145,7 +157,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(window.getGLProfile(), false);
         GL2 gl = (GL2) window.getGL();
-        int width = canvas.getWidth();
+        int width = component.getWidth();
 
         BufferedImage screenshot;
 
@@ -186,7 +198,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         AbstractView mv = Displayer.getLayersModel().getActiveView();
         if (mv instanceof JHVJPXView) {
-            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
+            export = new MovieExport(component.getWidth(), component.getHeight());
             export.createProcess();
             exportMode = true;
 
@@ -209,7 +221,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
         text.setBackground(null);
-        JOptionPane.showMessageDialog(canvas, text);
+        JOptionPane.showMessageDialog(component, text);
 
         ImageViewerGui.getLeftContentPane().setEnabled(true);
 
@@ -233,6 +245,49 @@ public class ComponentView implements GLEventListener, DisplayListener {
         this.outputFile = outputFile;
         screenshotMode = true;
         return true;
+    }
+
+    private final LinkedList<ImagePanelPlugin> plugins = new LinkedList<ImagePanelPlugin>();
+
+    /**
+     * Adds a new plug-in to the component. Plug-ins in this case are controller
+     * which e.g. has to react on inputs made to this component.
+     *
+     * @param newPlugin
+     *            new plug-in which has to to be added to this component
+     */
+    public void addPlugin(ImagePanelPlugin newPlugin) {
+        if (newPlugin == null || plugins.contains(newPlugin)) {
+            return;
+        }
+
+        newPlugin.setImagePanel(component);
+        newPlugin.setView(this);
+        plugins.add(newPlugin);
+
+        if (newPlugin instanceof MouseListener)
+            component.addMouseListener((MouseListener) newPlugin);
+        if (newPlugin instanceof MouseMotionListener)
+            component.addMouseMotionListener((MouseMotionListener) newPlugin);
+        if (newPlugin instanceof MouseWheelListener)
+            component.addMouseWheelListener((MouseWheelListener) newPlugin);
+    }
+
+    public void removePlugin(ImagePanelPlugin oldPlugin) {
+        if (oldPlugin == null || !plugins.contains(oldPlugin)) {
+            return;
+        }
+
+        oldPlugin.setView(null);
+        oldPlugin.setImagePanel(null);
+        plugins.remove(oldPlugin);
+
+        if (oldPlugin instanceof MouseListener)
+            component.removeMouseListener((MouseListener) oldPlugin);
+        if (oldPlugin instanceof MouseMotionListener)
+            component.removeMouseMotionListener((MouseMotionListener) oldPlugin);
+        if (oldPlugin instanceof MouseWheelListener)
+            component.removeMouseWheelListener((MouseWheelListener) oldPlugin);
     }
 
 }
