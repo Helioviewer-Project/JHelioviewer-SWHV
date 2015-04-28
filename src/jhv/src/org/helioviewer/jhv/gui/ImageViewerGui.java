@@ -101,6 +101,7 @@ public class ImageViewerGui {
 
         midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
         midSplitPane.setOneTouchExpandable(false);
+        midSplitPane.setDividerSize(6);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         TopToolBar topToolBar = new TopToolBar();

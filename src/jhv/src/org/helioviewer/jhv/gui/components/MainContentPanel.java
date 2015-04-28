@@ -42,7 +42,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitpane.setTopComponent(pane);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
-        splitpane.setDividerSize(5);
+        splitpane.setDividerSize(6);
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
@@ -97,7 +97,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(5);
+                splitpane.setDividerSize(6);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -111,7 +111,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle("Plugins");
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(5);
+                splitpane.setDividerSize(6);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
