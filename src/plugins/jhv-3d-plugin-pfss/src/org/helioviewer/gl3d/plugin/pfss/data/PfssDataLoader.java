@@ -35,8 +35,10 @@ public class PfssDataLoader implements Runnable {
             URL u = new URL(PfssSettings.baseUrl + url);
             URLConnection uc = u.openConnection();
 
-            InputStream in = new BufferedInputStream(uc.getInputStream(), 65536);
-            if (uc.getHeaderField("Content-Encoding") != null && uc.getHeaderField("Content-Encoding").equals("gzip")) {
+            in = new BufferedInputStream(uc.getInputStream(), 65536);
+
+            String encoding = uc.getHeaderField("Content-Encoding");
+            if (encoding != null && encoding.equals("gzip")) {
                 in = new GZIPInputStream(in);
             }
 

@@ -13,14 +13,9 @@ public class PfssSettings {
     public final static String PLUGIN_LOCATION = "PfssPlugin";
 
     /**
-     * Maximal preload of cache data.
+     * Maximal preload of cache data
      */
-    public final static int PRELOAD = 25;
-
-    /**
-     * Maximal preload of cache data.
-     */
-    public final static int CACHE_SIZE = 125;
+    public final static int CACHE_SIZE = 32;
 
     public final static float LINE_ALPHA = 1.0f;
 
