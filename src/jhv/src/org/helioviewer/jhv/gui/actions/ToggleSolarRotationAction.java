@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 
 /**
  * Action that enables the Solar Rotation Tracking, which ultimately changes the

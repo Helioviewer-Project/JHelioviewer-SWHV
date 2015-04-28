@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 
 /**
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to

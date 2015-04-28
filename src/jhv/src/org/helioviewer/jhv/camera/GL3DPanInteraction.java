@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.camera;
+package org.helioviewer.jhv.camera;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;

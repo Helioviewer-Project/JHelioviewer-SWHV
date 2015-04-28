@@ -7,8 +7,8 @@ import java.util.Date;
 
 import javax.swing.Timer;
 
-import org.helioviewer.gl3d.camera.GL3DCamera;
-import org.helioviewer.gl3d.camera.GL3DObserverCamera;
+import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.components.MoviePanel;

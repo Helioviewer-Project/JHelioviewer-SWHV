@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.camera;
+package org.helioviewer.jhv.camera;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
