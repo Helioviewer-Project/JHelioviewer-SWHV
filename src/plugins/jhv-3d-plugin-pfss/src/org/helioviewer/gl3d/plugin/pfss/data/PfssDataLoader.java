@@ -34,13 +34,11 @@ public class PfssDataLoader implements Runnable {
         try {
             URL u = new URL(PfssSettings.baseUrl + url);
             URLConnection uc = u.openConnection();
-            InputStream raw;
+
+            InputStream in = new BufferedInputStream(uc.getInputStream(), 65536);
             if (uc.getHeaderField("Content-Encoding") != null && uc.getHeaderField("Content-Encoding").equals("gzip")) {
-                raw = new GZIPInputStream(uc.getInputStream());
-            } else {
-                raw = uc.getInputStream();
+                in = new GZIPInputStream(in);
             }
-            in = new BufferedInputStream(raw);
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
@@ -76,4 +74,5 @@ public class PfssDataLoader implements Runnable {
             }
         }
     }
+
 }
