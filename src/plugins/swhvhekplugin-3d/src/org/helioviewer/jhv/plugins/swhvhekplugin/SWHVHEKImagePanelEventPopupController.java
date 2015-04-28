@@ -17,8 +17,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.ComponentViewPlugin;
-import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
@@ -32,7 +31,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, ComponentViewPlugin {
+public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -48,11 +47,8 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      * {@inheritDoc}
      */
     @Override
-    public void setView(ComponentView componentView) {
-        if (componentView == null)
-            component = null;
-        else
-            component = componentView.getComponent();
+    public void setComponent(Component _component) {
+        component = _component; // may be null
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {

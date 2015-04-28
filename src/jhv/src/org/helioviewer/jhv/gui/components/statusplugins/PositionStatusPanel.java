@@ -11,13 +11,12 @@ import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.ComponentViewPlugin;
-import org.helioviewer.viewmodel.view.ComponentView;
+import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
  * Status panel for displaying the current mouse position.
  */
-public class PositionStatusPanel extends JLabel implements MouseMotionListener, ComponentViewPlugin {
+public class PositionStatusPanel extends JLabel implements MouseMotionListener, InputControllerPlugin {
 
     private static final PositionStatusPanel instance = new PositionStatusPanel();
 
@@ -64,11 +63,8 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      * {@inheritDoc}
      */
     @Override
-    public void setView(ComponentView componentView) {
-        if (componentView == null)
-            component = null;
-        else
-            component = componentView.getComponent();
+    public void setComponent(Component _component) {
+        component = _component; // may be null
     }
 
     /**
