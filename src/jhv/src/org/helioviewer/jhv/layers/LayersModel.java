@@ -10,11 +10,11 @@ import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
-import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
+import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.TimedMovieView;
@@ -315,7 +315,7 @@ public class LayersModel {
     public void addLayer(AbstractView view) {
         movieManager.pauseLinkedMovies();
 
-        GL3DImageLayer imageLayer = new GL3DImageLayer("", view);
+        RenderableImageLayer imageLayer = new RenderableImageLayer("", view);
         view.setImageLayer(imageLayer);
         layers.add(view);
 

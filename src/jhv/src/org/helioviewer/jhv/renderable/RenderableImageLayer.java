@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d;
+package org.helioviewer.jhv.renderable;
 
 import java.awt.Component;
 import java.nio.FloatBuffer;
@@ -16,7 +16,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.FilterPanelContainer;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
-import org.helioviewer.jhv.renderable.RenderableImageType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
@@ -40,7 +39,7 @@ import com.jogamp.opengl.GL2;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DImageLayer implements Renderable {
+public class RenderableImageLayer implements Renderable {
 
     private static boolean showCorona = true;
     private static int nextLayerId = 0;
@@ -64,7 +63,7 @@ public class GL3DImageLayer implements Renderable {
     private final RenderableType type;
     private boolean isVisible = true;
 
-    public GL3DImageLayer(String name, AbstractView view) {
+    public RenderableImageLayer(String name, AbstractView view) {
         this.type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         this.mainLayerView = view;
@@ -201,7 +200,7 @@ public class GL3DImageLayer implements Renderable {
                 mainLayerView.applyFilters(gl);
 
                 GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
-                if (!GL3DImageLayer.showCorona) {
+                if (!RenderableImageLayer.showCorona) {
                     GLSLShader.setOuterCutOffRadius(1.);
                 }
                 GLSLShader.filter(gl);
