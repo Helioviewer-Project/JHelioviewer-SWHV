@@ -46,10 +46,10 @@ public class RenderableGrid implements Renderable {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException e) {
             Log.warn("Font Not loaded correctly, fallback to default");
-            font = new Font("Serif", Font.PLAIN, fontsize);
+            font = new Font("SansSerif", Font.PLAIN, fontsize);
         } catch (IOException e) {
             Log.warn("Font Not loaded correctly, fallback to default");
-            font = new Font("Serif", Font.PLAIN, fontsize);
+            font = new Font("SansSerif", Font.PLAIN, fontsize);
         }
 
         optionsPanel = new RenderableGridOptionsPanel(this);

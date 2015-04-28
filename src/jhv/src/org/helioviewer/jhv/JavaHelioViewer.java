@@ -1,7 +1,6 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,6 +22,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
@@ -266,11 +266,8 @@ public class JavaHelioViewer {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    if (System.getProperty("jhv.os").equals("mac")) {
-                        FontUIResource uiFont = new FontUIResource("HelveticaNeue", Font.PLAIN, 12);
-                        if (uiFont != null)
-                            setUIFont(uiFont);
-                    }
+                    UIGlobals.getSingletonInstance(); // initialize
+                    setUIFont(new FontUIResource(UIGlobals.UIFont));
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.getSingletonInstance().loadAtStart();
                     Settings.getSingletonInstance().update();

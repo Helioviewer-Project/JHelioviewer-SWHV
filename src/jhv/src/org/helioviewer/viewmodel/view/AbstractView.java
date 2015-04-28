@@ -24,6 +24,7 @@ import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import com.jogamp.opengl.GL2;
 
 public abstract class AbstractView implements View {
+
     private GL3DImageLayer imageLayer;
 
     protected ImageData imageData;

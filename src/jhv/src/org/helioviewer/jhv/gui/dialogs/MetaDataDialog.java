@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -76,7 +77,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         setLayout(new BorderLayout());
         setResizable(false);
 
-        listBox.setFont(new Font("Courier", Font.PLAIN, 12));
+        listBox.setFont(UIGlobals.UIFontMono);
 
         listBox.setCellRenderer(new ListCellRenderer() {
             @Override

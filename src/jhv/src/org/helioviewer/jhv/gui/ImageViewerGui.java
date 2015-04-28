@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui;
 import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -167,7 +166,6 @@ public class ImageViewerGui {
 
         frame.setMinimumSize(minSize);
         frame.setPreferredSize(new Dimension(maxSize.width - 100, maxSize.height - 100));
-        frame.setFont(new Font("SansSerif", Font.BOLD, 12));
         enableFullScreen(frame);
 
         return frame;
