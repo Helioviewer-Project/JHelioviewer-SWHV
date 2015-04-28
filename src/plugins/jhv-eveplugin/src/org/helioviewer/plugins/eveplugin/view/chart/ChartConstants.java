@@ -86,7 +86,17 @@ public class ChartConstants {
         return RANGE_SELECTION_WIDTH;
     }
 
-    public static final Font font = new Font("SansSerif", Font.PLAIN, 10);
+    public static Font font;
+
+    public static Font getFont() {
+        if (font == null) {
+            if (System.getProperty("jhv.os").equals("mac"))
+                font = new Font("HelveticaNeue", Font.PLAIN, 10);
+            if (font == null)
+                font = new Font("SansSerif", Font.PLAIN, 10);
+        }
+        return font;
+    }
 
     public static final String absentText = "No band / diode / line selected";
 

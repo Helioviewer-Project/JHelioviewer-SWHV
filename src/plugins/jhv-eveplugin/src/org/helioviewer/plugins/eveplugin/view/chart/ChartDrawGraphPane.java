@@ -218,7 +218,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             return;
         }
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setFont(ChartConstants.font);
+        g.setFont(ChartConstants.getFont());
 
         // draw vertical ticks
         int counter = 0;
