@@ -1,14 +1,15 @@
 package org.helioviewer.gl3d.plugin.pfss.data;
 
+import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+
 /**
  * Datastructur to cache the Pfss-Data with preload function
  *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssCache {
-    public final static int CACHE_SIZE = 125;
 
-    private final PfssData[] data = new PfssData[CACHE_SIZE];
+    private final PfssData[] data = new PfssData[PfssSettings.CACHE_SIZE];
     private int numberOfElementsInCache = 0;
 
     /**
@@ -22,7 +23,7 @@ public class PfssCache {
     }
 
     public void addData(PfssData pfssData) {
-        if (numberOfElementsInCache < CACHE_SIZE) {
+        if (numberOfElementsInCache < PfssSettings.CACHE_SIZE) {
             this.data[numberOfElementsInCache] = pfssData;
             numberOfElementsInCache++;
             bubbleSort();
@@ -86,4 +87,5 @@ public class PfssCache {
         }
         return -(low + 1);
     }
+
 }
