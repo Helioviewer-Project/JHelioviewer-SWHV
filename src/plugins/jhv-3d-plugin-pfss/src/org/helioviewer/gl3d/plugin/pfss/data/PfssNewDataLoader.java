@@ -45,7 +45,7 @@ public class PfssNewDataLoader implements Runnable {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            while (startYear == endYear && startMonth == endMonth) {
+            do {
                 URL data;
                 try {
                     String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
@@ -82,7 +82,8 @@ public class PfssNewDataLoader implements Runnable {
                         startMonth++;
                     }
                 }
-            }
+            } while (startYear != endYear && startMonth != endMonth);
+
         }
     }
 }
