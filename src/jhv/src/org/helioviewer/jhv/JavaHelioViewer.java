@@ -267,7 +267,7 @@ public class JavaHelioViewer {
                 @Override
                 public void run() {
                     if (System.getProperty("jhv.os").equals("mac")) {
-                        FontUIResource uiFont = new FontUIResource(new Font("HelveticaNeue", Font.PLAIN, 12));
+                        FontUIResource uiFont = new FontUIResource("HelveticaNeue", Font.PLAIN, 12);
                         if (uiFont != null)
                             setUIFont(uiFont);
                     }
