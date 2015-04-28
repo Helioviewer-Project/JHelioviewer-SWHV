@@ -19,12 +19,10 @@ import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 public class PfssNewDataLoader implements Runnable {
     private final static ExecutorService pfssPool = Executors.newFixedThreadPool(5);
-    private final PfssCache cache;
     private final Date start;
     private final Date end;
 
-    public PfssNewDataLoader(Date start, Date end, PfssCache cache) {
-        this.cache = cache;
+    public PfssNewDataLoader(Date start, Date end) {
         this.start = start;
         this.end = end;
     }
@@ -32,7 +30,6 @@ public class PfssNewDataLoader implements Runnable {
     @Override
     public void run() {
         if (start != null && end != null) {
-
             Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(start);
 
@@ -48,12 +45,11 @@ public class PfssNewDataLoader implements Runnable {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            while (run) {
+            while (startYear == endYear && startMonth == endMonth) {
                 URL data;
                 try {
                     String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
                     data = new URL(PfssSettings.baseUrl + startYear + "/" + m + "/list.txt");
-                    System.out.println(PfssSettings.baseUrl + startYear + "/" + m + "/list.txt");
                     BufferedReader in = new BufferedReader(new InputStreamReader(data.openStream()));
 
                     String inputLine;
@@ -65,7 +61,7 @@ public class PfssNewDataLoader implements Runnable {
 
                         try {
                             Date dd = dateFormat.parse(splitted[0]);
-                            Thread t = new Thread(new PfssDataLoader(url, dd.getTime(), cache), "PFFSLoader");
+                            Thread t = new Thread(new PfssDataLoader(url, dd.getTime()), "PFFSLoader");
                             pfssPool.submit(t);
                         } catch (ParseException e) {
                             Log.debug("Date could not be parsed from url " + url + "Exception was thrown : " + e);
@@ -76,20 +72,17 @@ public class PfssNewDataLoader implements Runnable {
                     e.printStackTrace();
                 } catch (IOException e) {
                 }
-
-                if (startYear == endYear && startMonth == endMonth)
-                    run = false;
-                else if (startYear == endYear && startMonth < endMonth) {
+                if (startYear == endYear && startMonth < endMonth) {
                     startMonth++;
                 } else if (startYear < endYear) {
                     if (startMonth == 11) {
                         startMonth = 1;
                         startYear++;
+                    } else {
+                        startMonth++;
                     }
                 }
-
             }
         }
     }
-
 }
