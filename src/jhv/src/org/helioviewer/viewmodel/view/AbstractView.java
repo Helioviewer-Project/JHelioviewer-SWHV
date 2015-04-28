@@ -5,8 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.gl3d.GL3DImageLayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -25,7 +25,7 @@ import com.jogamp.opengl.GL2;
 
 public abstract class AbstractView implements View {
 
-    private GL3DImageLayer imageLayer;
+    private RenderableImageLayer imageLayer;
 
     protected ImageData imageData;
     public GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
@@ -342,11 +342,11 @@ public abstract class AbstractView implements View {
         GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
     }
 
-    public void setImageLayer(GL3DImageLayer imageLayer) {
+    public void setImageLayer(RenderableImageLayer imageLayer) {
         this.imageLayer = imageLayer;
     }
 
-    public GL3DImageLayer getImageLayer() {
+    public RenderableImageLayer getImageLayer() {
         return imageLayer;
     }
 
