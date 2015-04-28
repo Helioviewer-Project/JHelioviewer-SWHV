@@ -35,6 +35,7 @@ import org.helioviewer.jhv.gui.components.TopToolBar;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
+import org.helioviewer.jhv.gui.controller.InputController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
@@ -71,8 +72,10 @@ public class ImageViewerGui {
     private static MoviePanel moviePanel;
     private static ControlPanelContainer moviePanelContainer;
 
-    private static MainContentPanel mainContentPanel;
     private static ComponentView componentView;
+    private static InputController inputController;
+    private static MainContentPanel mainContentPanel;
+
     private static ImageDataPanel imageObservationPanel;
     private static ObservationDialog observationDialog;
 
@@ -120,7 +123,9 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
         componentView = new ComponentView();
-        mainContentPanel = new MainContentPanel(componentView.getComponent());
+        Component canvas = componentView.getComponent();
+        inputController = new InputController(canvas);
+        mainContentPanel = new MainContentPanel(canvas);
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
@@ -129,7 +134,7 @@ public class ImageViewerGui {
         ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
         FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
         PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
-        componentView.addPlugin(positionStatusPanel);
+        inputController.addPlugin(positionStatusPanel);
 
         StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
         statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
@@ -353,6 +358,10 @@ public class ImageViewerGui {
 
     public static ComponentView getComponentView() {
         return componentView;
+    }
+
+    public static InputController getInputController() {
+        return inputController;
     }
 
 }
