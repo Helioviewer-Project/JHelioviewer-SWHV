@@ -29,7 +29,7 @@ public class PfssData {
 
     private final static Color OPENFIELDCOLOR = Color.RED;
     private final static Color LOOPCOLOR = Color.WHITE;
-    private final static Color INSIDEFIELDCOLOR = Color.MAGENTA;
+    private final static Color INSIDEFIELDCOLOR = Color.BLUE;
 
     private byte[] gzipFitsFile = null;
 
@@ -151,16 +151,16 @@ public class PfssData {
                         if (!PfssSettings.fixedColor) {
                             counter = this.addColor(bright, 1.f, counter);
                         } else {
-                            int rox = fieldlinex[i] + 32768;
-                            int roy = fieldliney[i] + 32768;
-                            int roz = fieldlinez[i] + 32768;
+                            int rox = fieldlinex[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
+                            int roy = fieldliney[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
+                            int roz = fieldlinez[i + PfssSettings.POINTS_PER_LINE - 1] + 32768;
                             double xo = 3. * (rox * 2. / 65535 - 1.);
                             double yo = 3. * (roy * 2. / 65535 - 1.);
                             double zo = 3. * (roz * 2. / 65535 - 1.);
                             double ro = Math.sqrt(xo * xo + yo * yo + zo * zo);
                             double r = Math.sqrt(x * x + y * y + z * z);
 
-                            if (r < 1.5 && ro < 1.5) {
+                            if (Math.abs(r - ro) < 2.5 - 1.0 - 0.2) {
                                 type = 0;
                                 counter = this.addColor(PfssData.LOOPCOLOR, counter);
                             } else if (bright < 0) {
