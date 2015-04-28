@@ -34,7 +34,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     protected CollapsiblePaneButton toggleButton;
     private final JPanel component;
     protected JPanel topButtonsPanel;
-    static final int BUTTONHEIGHT = 12;
+    private static final int BUTTONHEIGHT = 16;
 
     /**
      * Default constructor.
@@ -54,7 +54,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setMargin(new Insets(0, 0, 0, 0));
         toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
         toggleButton.setSelected(startExpanded);
-        toggleButton.setFont(UIGlobals.UIFontSmallBold);
+        toggleButton.setFont(UIGlobals.UIFontBold);
         toggleButton.getMaximumSize().height = BUTTONHEIGHT;
         if (startExpanded) {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.DOWN2));
