@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.Component;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Window;
@@ -15,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.AbstractList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -116,7 +118,7 @@ public class ImageViewerGui {
         imageObservationPanel = new ImageDataPanel();
         observationDialog.addUserInterface("Image data", imageObservationPanel);
         leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
-
+        leftPane.setBorder(BorderFactory.createLineBorder(Color.GREEN));
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);

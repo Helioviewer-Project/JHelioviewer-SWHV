@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +34,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     protected CollapsiblePaneButton toggleButton;
     private final JPanel component;
     protected JPanel topButtonsPanel;
-    static final int BUTTONHEIGHT = 18;
+    static final int BUTTONHEIGHT = 12;
 
     /**
      * Default constructor.
@@ -49,14 +48,14 @@ public class CollapsiblePane extends JComponent implements ActionListener {
      */
     public CollapsiblePane(String title, Component component, boolean startExpanded) {
         setLayout(new BorderLayout());
-        this.getMaximumSize().height = BUTTONHEIGHT;
+        //this.getMaximumSize().height = BUTTONHEIGHT;
         toggleButton = new CollapsiblePaneButton(title);
         toggleButton.setBorderPainted(false);
         toggleButton.setMargin(new Insets(0, 0, 0, 0));
         toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
         toggleButton.setSelected(startExpanded);
         toggleButton.setFont(UIGlobals.UIFontSmallBold);
-        toggleButton.getMaximumSize().height = 12;
+        toggleButton.getMaximumSize().height = BUTTONHEIGHT;
         if (startExpanded) {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.DOWN2));
         } else {
@@ -70,8 +69,6 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         this.component.setVisible(startExpanded);
         add(this.component, BorderLayout.CENTER);
         setButtons();
-        setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
-
     }
 
     public void setButtons() {

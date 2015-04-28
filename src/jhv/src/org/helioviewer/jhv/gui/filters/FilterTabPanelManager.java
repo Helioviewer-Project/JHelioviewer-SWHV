@@ -2,24 +2,15 @@ package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
  * This manager collects all filter control components and creates a panel where
@@ -91,7 +82,9 @@ public class FilterTabPanelManager {
         c.gridwidth = 1;
 
         c.gridx = 0;
-        c.weightx = 1.0;
+        c.weightx = 0.1;
+        c.weighty = 1.0;
+
         c.anchor = GridBagConstraints.LINE_START;
 
         //((JLabel) details.getTitle()).setHorizontalAlignment(SwingConstants.LEFT);
@@ -102,7 +95,7 @@ public class FilterTabPanelManager {
 
         compactPanel.add(details.getSlider(), c);
         c.gridx = 2;
-        c.weightx = 0.0;
+        c.weightx = 0.1;
         c.anchor = GridBagConstraints.LINE_END;
         details.getValue().setBackground(Color.blue);
         compactPanel.add(details.getValue(), c);
@@ -138,7 +131,10 @@ public class FilterTabPanelManager {
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
+        c.weighty = 1;
+
         c.gridx = 0;
+
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -178,56 +174,15 @@ public class FilterTabPanelManager {
             c.gridy = 6;
             c.gridwidth = 3;
 
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            buttonPanel.setOpaque(false);
-            buttonPanel.add(downloadLayerButton);
-            buttonPanel.add(showMetaButton);
-
-            compactPanel.add(buttonPanel, c);
         }
 
         return compactPanel;
     }
 
-    private Action downloadLayerAction;
-    private Action showMetaAction;
-    private final JButton downloadLayerButton = new JButton();
-    private final JButton showMetaButton = new JButton();
-
     public void setActivejp2(final AbstractView jp2view) {
         for (AbstractFilterPanel c : this.abstractFilterPanels) {
             c.setEnabled(true);
             c.setJP2View(jp2view);
-        }
-        downloadLayerAction = new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Download the selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                Displayer.getLayersModel().downloadLayer((JHVJP2View) jp2view);
-            }
-        };
-        downloadLayerButton.setAction(downloadLayerAction);
-        showMetaAction = new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Show metadata of the selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                Displayer.getLayersModel().showMetaInfo(jp2view);
-            }
-        };
-        showMetaButton.setAction(showMetaAction);
-        showMetaButton.revalidate();
-        if (jp2view instanceof JHVJP2View) {
-            this.downloadLayerButton.setEnabled(true);
-        } else {
-            this.downloadLayerButton.setEnabled(false);
         }
     }
 

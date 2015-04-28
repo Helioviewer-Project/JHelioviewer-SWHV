@@ -14,7 +14,6 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -125,7 +124,7 @@ public class PfssData {
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());
-            double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;
+            double phi = 0.;//Astronomy.getL0Radians(dd) - Math.PI / 2.;
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {

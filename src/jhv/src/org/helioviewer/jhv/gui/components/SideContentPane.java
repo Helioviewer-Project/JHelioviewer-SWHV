@@ -1,11 +1,13 @@
 package org.helioviewer.jhv.gui.components;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.HashMap;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
  * Panel managing multiple {@link CollapsiblePane}s.
@@ -18,25 +20,11 @@ import javax.swing.JComponent;
 public class SideContentPane extends JComponent {
 
     private final HashMap<Component, CollapsiblePane> map = new HashMap<Component, CollapsiblePane>();
+    private final JPanel dummy = new JPanel();
 
     public SideContentPane() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(Box.createGlue());
-    }
-
-    /**
-     * Add new component into a new {@link CollapsiblePane}.
-     *
-     * @param title
-     *            Text on the toggle button
-     * @param component
-     *            Component to manage
-     * @param index
-     *            the position in the container's list at which to insert the
-     *            component; -1 means insert at the end component
-     */
-    public void add(String title, Component component, int index) {
-        add(title, component, index, true);
+        setLayout(new GridBagLayout());
+        add(dummy);
     }
 
     /**
@@ -67,14 +55,28 @@ public class SideContentPane extends JComponent {
      *            if true, the component will be visible right from the start
      */
     public void add(String title, Component component, int index, boolean startExpanded) {
+        remove(dummy);
         CollapsiblePane newPane = new CollapsiblePane(title, component, startExpanded);
         map.put(component, newPane);
+        final GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(0, 0, 0, 0);
+        c.weightx = 1;
+        c.weighty = 0.;
+        c.gridx = 0;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.PAGE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         if (index < 0) {
-            add(newPane, getComponentCount() - 1);
+            c.gridy = getComponentCount();
+            add(newPane, c);
         } else {
-            add(newPane, index);
+            c.gridy = index;
+            add(newPane, c);
         }
+        c.weighty = 1.;
+        c.gridy = c.gridy + 1;
+        add(dummy, c);
     }
 
     /**
