@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.gui.filters;
 
-import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.JPanel;
 
@@ -14,8 +16,8 @@ public class FilterPanelContainer {
         return instance;
     }
 
-    private FilterTabPanelManager filterTabPanelManager;
-    private ControlPanelContainer filterPanelContainer;
+    private final FilterTabPanelManager filterTabPanelManager;
+    private final ControlPanelContainer filterPanelContainer;
 
     private FilterPanelContainer() {
         filterTabPanelManager = new FilterTabPanelManager();
@@ -29,9 +31,23 @@ public class FilterPanelContainer {
         filterTabPanelManager.addAbstractFilterPanel(runningDifferencePanel);
 
         JPanel compactPanel = filterTabPanelManager.createCompactPanel();
-        JPanel tab = new JPanel(new BorderLayout());
-        tab.add(runningDifferencePanel, BorderLayout.NORTH);
-        tab.add(compactPanel, BorderLayout.CENTER);
+        JPanel tab = new JPanel(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(0, 0, 0, 0);
+        gc.weightx = 1;
+        gc.weighty = 0.0;
+
+        gc.gridx = 0;
+        gc.gridwidth = 1;
+        gc.anchor = GridBagConstraints.CENTER;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.gridy = 0;
+        gc.gridx = 0;
+        tab.add(runningDifferencePanel, gc);
+        gc.gridy = 1;
+        gc.weighty = 1.;
+
+        tab.add(compactPanel, gc);
         tab.setEnabled(true);
 
         filterPanelContainer = new ControlPanelContainer();
