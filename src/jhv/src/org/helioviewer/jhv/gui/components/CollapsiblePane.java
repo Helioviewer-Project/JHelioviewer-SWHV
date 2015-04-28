@@ -16,6 +16,7 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 
 /**
  * Panel managing a collapsible area.
@@ -54,7 +55,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.setMargin(new Insets(0, 0, 0, 0));
         toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
         toggleButton.setSelected(startExpanded);
-        toggleButton.setFont(new Font("SansSerif", Font.BOLD, 10));
+        toggleButton.setFont(UIGlobals.UIFontSmallBold);
         toggleButton.getMaximumSize().height = 12;
         if (startExpanded) {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.DOWN2));

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
@@ -39,7 +40,7 @@ public class HelpDialog extends JDialog implements ActionListener, ShowableDialo
         // the content panel:
         JTextArea shortcuts = new JTextArea("Keyboard shortcuts:                        Mouse shortcuts:" + sep + sep + "ALT + c       Center active image          Double left-click   Zoom in" + sep + "ALT + t       Toggle fullscreen display    Double right-click  Zoom out" + sep + "ALT + Comma   Zoom in                      Scroll wheel up     Zoom in" + sep + "ALT + Period  Zoom out                     Scroll wheel down   Zoom out" + sep + "ALT + k       Zoom to fit" + sep + "ALT + l       Zoom to native resolution" + sep + "ALT + p       Play/pause movie" + sep + "ALT + b       Step to previous frame" + sep + "ALT + n       Step to next frame" + sep + "F1            Show shortcuts");
         shortcuts.setEditable(false);
-        shortcuts.setFont(new Font("Courier", Font.PLAIN, 13));
+        shortcuts.setFont(UIGlobals.UIFontMono);
         shortcuts.setBackground(getBackground());
         shortcuts.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         add(shortcuts, BorderLayout.CENTER);
