@@ -71,7 +71,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         diffRot.setSelected(true);
         final JPanel radPanel = new JPanel(new FlowLayout());
         final JPanel topPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 1;
@@ -159,7 +159,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
+    public void setJP2View(final AbstractView jp2view) {
         super.setJP2View(jp2view);
         truncateSpinner.setValue(1.f - jp2view.getTruncation());
 

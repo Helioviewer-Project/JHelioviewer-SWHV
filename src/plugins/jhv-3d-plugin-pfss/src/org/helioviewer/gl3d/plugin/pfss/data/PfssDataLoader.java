@@ -10,17 +10,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
+import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 public class PfssDataLoader implements Runnable {
 
     private final String url;
-    private final PfssCache cache;
     private final long time;
 
-    public PfssDataLoader(String url, long time, PfssCache cache) {
+    public PfssDataLoader(String url, long time) {
         this.url = url;
-        this.cache = cache;
         this.time = time;
     }
 
@@ -59,7 +58,7 @@ public class PfssDataLoader implements Runnable {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    cache.addData(pfssData);
+                    PfssPlugin.getPfsscache().addData(pfssData);
                 }
             });
         } catch (MalformedURLException e) {

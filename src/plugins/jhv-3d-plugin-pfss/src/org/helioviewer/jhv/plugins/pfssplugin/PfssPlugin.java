@@ -13,7 +13,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 public class PfssPlugin implements Plugin {
 
     private boolean builtin_mode = false;
-    private PfssCache pfssCache;
+    private static PfssCache pfssCache = new PfssCache();
     private PfssRenderable renderable;
 
     /**
@@ -42,8 +42,7 @@ public class PfssPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-        pfssCache = new PfssCache();
-        renderable = new PfssRenderable(pfssCache);
+        renderable = new PfssRenderable();
     }
 
     @Override
@@ -102,6 +101,10 @@ public class PfssPlugin implements Plugin {
     @Override
     public String getState() {
         return "";
+    }
+
+    public static PfssCache getPfsscache() {
+        return pfssCache;
     }
 
 }
