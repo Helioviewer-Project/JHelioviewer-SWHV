@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.gl3d.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;

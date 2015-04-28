@@ -9,11 +9,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-
 import java.util.LinkedList;
 
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.gl3d.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;

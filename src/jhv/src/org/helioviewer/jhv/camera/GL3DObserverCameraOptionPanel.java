@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.camera;
+package org.helioviewer.jhv.camera;
 
 public class GL3DObserverCameraOptionPanel extends GL3DCameraOptionPanel {
 

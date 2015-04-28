@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.camera;
+package org.helioviewer.jhv.camera;
 
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
