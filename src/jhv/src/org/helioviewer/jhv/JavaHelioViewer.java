@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,12 +9,14 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import javax.swing.plaf.FontUIResource;
 import javax.swing.UIManager;
 
 import org.helioviewer.base.logging.Log;
@@ -263,6 +266,11 @@ public class JavaHelioViewer {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
+                    if (System.getProperty("jhv.os").equals("mac")) {
+                        FontUIResource uiFont = new FontUIResource(new Font("HelveticaNeue", Font.PLAIN, 12));
+                        if (uiFont != null)
+                            setUIFont(uiFont);
+                    }
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.getSingletonInstance().loadAtStart();
                     Settings.getSingletonInstance().update();
@@ -343,6 +351,16 @@ public class JavaHelioViewer {
 
         splash.dispose();
         splash.destroy();
+    }
+
+    private static void setUIFont(FontUIResource f) {
+        Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value != null && value instanceof FontUIResource)
+                UIManager.put (key, f);
+        }
     }
 
 }
