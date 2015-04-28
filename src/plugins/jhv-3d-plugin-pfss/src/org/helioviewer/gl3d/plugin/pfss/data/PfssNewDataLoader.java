@@ -29,7 +29,7 @@ public class PfssNewDataLoader implements Runnable {
 
     @Override
     public void run() {
-        if (start != null && end != null) {
+        if (start != null && end != null && start.before(end)) {
             Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(start);
 
