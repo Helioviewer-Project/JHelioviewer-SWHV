@@ -14,7 +14,6 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.io.MovieExport;
 import org.helioviewer.jhv.renderable.RenderableGrid;
@@ -121,7 +120,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         gl.glPushMatrix();
         {
             GL3DCamera camera = Displayer.getActiveCamera();
-            ZoomStatusPanel.getSingletonInstance().updateZoomLevel(camera);
             camera.applyPerspective(gl);
             camera.applyCamera(gl);
             Displayer.getRenderableContainer().render(gl);
