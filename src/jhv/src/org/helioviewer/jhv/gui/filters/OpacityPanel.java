@@ -29,21 +29,19 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Opacity");
-        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
-        //add(title);
+        title.setHorizontalAlignment(JLabel.RIGHT);
+        add(title);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMajorTickSpacing(25);
         opacitySlider.setPaintTicks(true);
-        opacitySlider.setPreferredSize(new Dimension(150, opacitySlider.getPreferredSize().height));
+
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);
-        //add(opacitySlider);
+        add(opacitySlider);
 
         opacityLabel = new JLabel("0%");
-        opacityLabel.setHorizontalAlignment(JLabel.RIGHT);
-        opacityLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
-        //add(opacityLabel);
+        add(opacityLabel);
     }
 
     /**

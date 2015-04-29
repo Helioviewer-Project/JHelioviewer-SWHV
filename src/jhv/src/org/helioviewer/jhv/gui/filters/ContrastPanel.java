@@ -32,21 +32,19 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Contrast");
-        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
+        title.setHorizontalAlignment(JLabel.RIGHT);
         add(title);
 
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         contrastSlider.setMajorTickSpacing(25 * 2); // twice wider
         contrastSlider.setPaintTicks(true);
-        contrastSlider.setPreferredSize(new Dimension(150, contrastSlider.getPreferredSize().height));
+
         contrastSlider.addMouseListener(this);
         contrastSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(contrastSlider);
         add(contrastSlider);
 
         contrastLabel = new JLabel("0");
-        contrastLabel.setHorizontalAlignment(JLabel.RIGHT);
-        contrastLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
         add(contrastLabel);
     }
 

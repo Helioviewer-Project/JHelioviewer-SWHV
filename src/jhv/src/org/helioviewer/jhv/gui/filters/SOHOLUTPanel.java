@@ -37,13 +37,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
      * Shown combobox to choose
      */
     private final JComboBox combobox;
-    /**
-     * Shown invert button
-     */
-    private final JToggleButton invertButton = new JToggleButton(invertIcon);
-    /**
-     * Shown label
-     */
+    private final JToggleButton invertButton;
     private final JLabel title;
 
     public SOHOLUTPanel() {
@@ -52,21 +46,20 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Color");
-        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
         add(title);
 
-        // Add add entry
         combobox = new JComboBox(lutMap.keySet().toArray());
+        combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
-        combobox.setPreferredSize(new Dimension(150, combobox.getPreferredSize().height));
         combobox.addActionListener(this);
         add(combobox);
 
         add(Box.createHorizontalStrut(14));
 
+        invertButton = new JToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
         invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        invertButton.setPreferredSize(new Dimension(FilterPanel.valueWidth - 14, FilterPanel.height));
+        //invertButton.setPreferredSize(new Dimension(FilterPanel.valueWidth - 14, FilterPanel.height));
         invertButton.addActionListener(this);
         add(invertButton);
     }

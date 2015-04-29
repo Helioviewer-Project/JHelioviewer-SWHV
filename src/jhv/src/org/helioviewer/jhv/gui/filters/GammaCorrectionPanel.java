@@ -34,25 +34,22 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
 
     public GammaCorrectionPanel() {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
         title = new JLabel("Gamma");
-        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
+        title.setHorizontalAlignment(JLabel.RIGHT);
         add(title);
 
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         gammaSlider.setMajorTickSpacing(25 * 2); // twice wider
         gammaSlider.setPaintTicks(true);
-        gammaSlider.setPreferredSize(new Dimension(150, gammaSlider.getPreferredSize().height));
+
         gammaSlider.addChangeListener(this);
         gammaSlider.addMouseListener(this);
         WheelSupport.installMouseWheelSupport(gammaSlider);
         add(gammaSlider);
 
         gammaLabel = new JLabel("1.0");
-        gammaLabel.setHorizontalAlignment(JLabel.RIGHT);
-        gammaLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
         add(gammaLabel);
-
-        //setEnabled(false);
     }
 
     /**
@@ -65,13 +62,13 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         double gamma = Math.exp(sliderValue * factor);
         jp2view.setGamma((float) gamma);
 
-        String label = Double.toString(Math.round(gamma * 10.0) * 0.1);
+        String text = Double.toString(Math.round(gamma * 10.0) * 0.1);
         if (sliderValue == 100) {
-            label = label.substring(0, 4);
+            text = text.substring(0, 4);
         } else {
-            label = label.substring(0, 3);
+            text = text.substring(0, 3);
         }
-        gammaLabel.setText(label);
+        gammaLabel.setText(text);
         Displayer.display();
     }
 

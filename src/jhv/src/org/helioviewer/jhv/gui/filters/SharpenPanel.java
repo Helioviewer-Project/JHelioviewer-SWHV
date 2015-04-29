@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.filters;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -23,24 +24,21 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel title;
 
     public SharpenPanel() {
-        //setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
         title = new JLabel("Sharpen");
-        title.setPreferredSize(new Dimension(FilterPanel.titleWidth, FilterPanel.height));
-        //add(title);
+        add(title);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         sharpeningSlider.setMajorTickSpacing(25);
         sharpeningSlider.setPaintTicks(true);
-        sharpeningSlider.setPreferredSize(new Dimension(150, sharpeningSlider.getPreferredSize().height));
 
         sharpeningSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(sharpeningSlider);
-        //add(sharpeningSlider);
+        add(sharpeningSlider);
 
         sharpeningLabel = new JLabel("0%");
-        sharpeningLabel.setHorizontalAlignment(JLabel.RIGHT);
-        sharpeningLabel.setPreferredSize(new Dimension(FilterPanel.valueWidth, FilterPanel.height));
-        //add(sharpeningLabel);
+        add(sharpeningLabel);
     }
 
     /**
