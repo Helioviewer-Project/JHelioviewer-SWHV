@@ -45,11 +45,6 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         Displayer.display();
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_SHARPEN;
-    }
-
     public void setEnabled(boolean enabled) {
         sharpeningSlider.setEnabled(enabled);
         sharpeningLabel.setEnabled(enabled);

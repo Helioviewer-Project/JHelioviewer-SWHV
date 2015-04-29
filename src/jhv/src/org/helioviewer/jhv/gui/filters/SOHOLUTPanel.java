@@ -95,11 +95,6 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         jp2view.setLUT(lut, invertButton.isSelected());
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_COLORTABLES;
-    }
-
     public void setEnabled(boolean enabled) {
         title.setEnabled(enabled);
         combobox.setEnabled(enabled);

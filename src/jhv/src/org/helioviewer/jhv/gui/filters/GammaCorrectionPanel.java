@@ -105,11 +105,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         }
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_GAMMA;
-    }
-
     public void setEnabled(boolean enabled) {
         gammaSlider.setEnabled(enabled);
         gammaLabel.setEnabled(enabled);

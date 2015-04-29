@@ -47,11 +47,6 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         Displayer.display();
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_OPACITY;
-    }
-
     public void setEnabled(boolean enabled) {
         opacitySlider.setEnabled(enabled);
         opacityLabel.setEnabled(enabled);

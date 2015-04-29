@@ -73,11 +73,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         }
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_CONTRAST;
-    }
-
     public void setEnabled(boolean enabled) {
         contrastSlider.setEnabled(enabled);
         contrastLabel.setEnabled(enabled);

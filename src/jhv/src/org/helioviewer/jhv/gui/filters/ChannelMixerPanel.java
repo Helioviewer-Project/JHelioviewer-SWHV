@@ -60,11 +60,6 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
         Displayer.display();
     }
 
-    @Override
-    public int getDetails() {
-        return FilterAlignmentDetails.POSITION_CHANNELMIXER;
-    }
-
     /**
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
