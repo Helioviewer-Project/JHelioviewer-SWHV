@@ -18,7 +18,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Markus Langenberg
  */
-public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
+public class ContrastPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
 
     private static final float sliderToContrastScale = 25.0f;
 
@@ -27,7 +27,6 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private final JLabel contrastLabel;
 
     public ContrastPanel() {
-
         title = new JLabel("Contrast");
         title.setHorizontalAlignment(JLabel.RIGHT);
 

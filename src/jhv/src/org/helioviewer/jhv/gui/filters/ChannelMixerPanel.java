@@ -19,21 +19,19 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Markus Langenberg
  */
-public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListener, FilterAlignmentDetails {
+public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListener, FilterDetails {
 
     private final JCheckBox redCheckBox;
     private final JCheckBox greenCheckBox;
     private final JCheckBox blueCheckBox;
     private final JLabel title;
-    JPanel boxPanel;
+    private final JPanel boxPanel;
 
     public ChannelMixerPanel() {
-
         title = new JLabel("Channels");
         title.setHorizontalAlignment(JLabel.RIGHT);
 
         boxPanel = new JPanel(new GridLayout(1, 3));
-        // boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
 
         redCheckBox = new JCheckBox("Red", true);
         redCheckBox.setToolTipText("Unchecked to omit the red color channel when drawing this layer");
