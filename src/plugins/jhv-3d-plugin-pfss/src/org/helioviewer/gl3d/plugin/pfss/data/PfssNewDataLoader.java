@@ -56,7 +56,7 @@ public class PfssNewDataLoader implements Runnable {
 
                 try {
                     URL data;
-                    Integer cacheKey = startYear * 1000 + startMonth;
+                    Integer cacheKey = startYear * 10000 + startMonth;
                     synchronized (parsedCache) {
                         urls = parsedCache.get(cacheKey);
                     }
@@ -86,7 +86,6 @@ public class PfssNewDataLoader implements Runnable {
                 } catch (ParseException e) {
                     Log.warn("Could not parse date time during pfss loading");
                 }
-
                 for (Pair<String, Long> pair : urls) {
                     Long dd = pair.b;
                     String url = pair.a;
@@ -106,7 +105,7 @@ public class PfssNewDataLoader implements Runnable {
                         startMonth++;
                     }
                 }
-            } while (startYear != endYear && startMonth != endMonth);
+            } while (startYear != endYear || startMonth != endMonth);
 
         }
     }
