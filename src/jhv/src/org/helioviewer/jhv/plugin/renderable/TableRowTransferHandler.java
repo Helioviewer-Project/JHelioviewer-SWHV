@@ -16,6 +16,8 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
+import org.helioviewer.jhv.display.Displayer;
+
 /**
  * Handles drag & drop row reordering
  */
@@ -97,6 +99,7 @@ public class TableRowTransferHandler extends TransferHandler {
         if (act == TransferHandler.MOVE) {
             grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
+        Displayer.display();
     }
 
 }
