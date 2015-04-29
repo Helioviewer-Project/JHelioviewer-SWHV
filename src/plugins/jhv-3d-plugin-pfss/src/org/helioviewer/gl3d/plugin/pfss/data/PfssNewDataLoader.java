@@ -110,8 +110,7 @@ public class PfssNewDataLoader implements Runnable {
                         startMonth++;
                     }
                 }
-            } while (errorState != true && (startYear != endYear || startMonth != endMonth));
-
+            } while (startYear < endYear || (startYear >= endYear && startMonth <= endMonth));
         }
     }
 }
