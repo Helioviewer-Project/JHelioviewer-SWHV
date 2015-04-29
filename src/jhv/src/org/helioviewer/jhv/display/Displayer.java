@@ -13,6 +13,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
+import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
@@ -25,7 +26,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
     private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
-
+    private static final FiltersPanel filtersPanel = new FiltersPanel();
     private static GL3DCamera activeCamera = new GL3DObserverCamera(true);
     private static int viewportWidth;
     private static int viewportHeight;
@@ -190,6 +191,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static Displayer getSingletonInstance() {
         return instance;
+    }
+
+    public static FiltersPanel getFiltersPanel() {
+        return filtersPanel;
     }
 
 }

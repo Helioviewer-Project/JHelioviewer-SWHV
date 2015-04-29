@@ -13,7 +13,7 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.filters.FilterPanelContainer;
+import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -407,9 +407,9 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        FilterPanelContainer fpc = FilterPanelContainer.getSingletonInstance();
-        fpc.getFilterTabPanelManager().setActivejp2(mainLayerView);
-        return fpc.getFilterPanelContainer();
+        FiltersPanel fp = Displayer.getFiltersPanel();
+        fp.setActivejp2(mainLayerView);
+        return fp;
     }
 
     @Override
