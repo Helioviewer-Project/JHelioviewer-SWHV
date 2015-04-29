@@ -40,7 +40,7 @@ public class PfssNewDataLoader implements Runnable {
             startCal.setTime(start);
 
             final Calendar endCal = GregorianCalendar.getInstance();
-            endCal.setTime(end);
+            endCal.setTime(new Date(end.getTime() + 31 * 24 * 60 * 60 * 1000));
 
             int startYear = startCal.get(Calendar.YEAR);
             int startMonth = startCal.get(Calendar.MONTH);
@@ -60,7 +60,7 @@ public class PfssNewDataLoader implements Runnable {
                     synchronized (parsedCache) {
                         urls = parsedCache.get(cacheKey);
                     }
-                    if (urls == null) {
+                    if (urls == null || urls.isEmpty()) {
                         urls = new ArrayList<Pair<String, Long>>();
                         String m = (startMonth) < 9 ? "0" + (startMonth + 1) : (startMonth + 1) + "";
                         String url = PfssSettings.baseUrl + startYear + "/" + m + "/list.txt";
@@ -100,7 +100,7 @@ public class PfssNewDataLoader implements Runnable {
                     startMonth++;
                 } else if (startYear < endYear) {
                     if (startMonth == 11) {
-                        startMonth = 1;
+                        startMonth = 0;
                         startYear++;
                     } else {
                         startMonth++;
