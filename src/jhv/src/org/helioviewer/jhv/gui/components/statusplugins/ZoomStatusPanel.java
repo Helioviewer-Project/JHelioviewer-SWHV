@@ -5,8 +5,7 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.camera.GL3DCamera;
 
 /**
  * Status panel for displaying the current zoom.
@@ -38,17 +37,12 @@ public class ZoomStatusPanel extends JLabel {
     /**
      * Updates the displayed zoom.
      */
-    private void updateZoomLevel(AbstractView view) {
-        if (view != null) {
-            // TBD
-            setVisible(true);
+    public void updateZoomLevel(GL3DCamera camera) {
+        if (camera != null) {
+            setText(String.format("Zoom: %.2f Rsun", camera.getCameraWidth()));
+
         } else {
             setVisible(false);
         }
     }
-
-    public void updateZoomLevel() {
-        updateZoomLevel(Displayer.getLayersModel().getActiveView());
-    }
-
 }
