@@ -77,7 +77,7 @@ public class MovieExport {
         //BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         /*
          * Graphics2D g2d = bufferedImage.createGraphics();
-         * 
+         *
          * g2d.drawString("Iets van text", 100, 100); g2d.dispose();
          */
         try {
@@ -150,8 +150,6 @@ public class MovieExport {
         }
 
         args.add(f.getPath());
-        //args.add("/Users/freekv/test/ttt.mov");
-        //[-f, image2pipe, -vcodec, bmp, -s, 640x640, -r, 20, -y, -i, -, -vcodec, mpeg4, -qscale:v, 1, -an, /Users/freekv/JHelioviewer/Exports/JHV_movie_created_2014-09-22_19.14.23.mov]
         try {
             ffmpegProcess = FileUtils.invokeExecutable("ffmpeg", args);
             ffmpegStdin = ffmpegProcess.getOutputStream();
