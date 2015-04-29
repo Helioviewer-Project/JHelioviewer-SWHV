@@ -2,12 +2,10 @@ package org.helioviewer.jhv.gui.filters;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,15 +25,14 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     private final JCheckBox greenCheckBox;
     private final JCheckBox blueCheckBox;
     private final JLabel title;
+    JPanel boxPanel;
 
     public ChannelMixerPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Channels");
         title.setHorizontalAlignment(JLabel.RIGHT);
-        add(title);
 
-        JPanel boxPanel = new JPanel(new GridLayout(1, 3));
+        boxPanel = new JPanel(new GridLayout(1, 3));
         // boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.LINE_AXIS));
 
         redCheckBox = new JCheckBox("Red", true);
@@ -52,8 +49,6 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
         blueCheckBox.setToolTipText("Unchecked to omit the blue color channel when drawing this layer");
         blueCheckBox.addItemListener(this);
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
-
-        add(boxPanel);
     }
 
     /**
@@ -74,9 +69,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
      * Override the setEnabled method in order to keep the containing
      * components' enabledState synced with the enabledState of this component.
      */
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         redCheckBox.setEnabled(enabled);
         greenCheckBox.setEnabled(enabled);
         blueCheckBox.setEnabled(enabled);
@@ -86,8 +79,8 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     /**
      * Sets the panel values.
      *
-     * This may be useful if the values are changed from another source than
-     * the panel itself.
+     * This may be useful if the values are changed from another source than the
+     * panel itself.
      *
      * @param colorMask
      *            Mask representing the new values
@@ -106,12 +99,12 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
 
     @Override
     public Component getTitle() {
-        return null;
+        return title;
     }
 
     @Override
     public Component getSlider() {
-        return null;
+        return boxPanel;
     }
 
     @Override
