@@ -134,6 +134,18 @@ public enum JHVDirectory {
         }
     },
     /** The plugins directory. */
+    PLUGINSCACHE {
+        @Override
+        public String getPath() {
+            return HOME.getPath() + "Plugins" + File.separator + "Cache" + File.separator;
+        }
+
+        @Override
+        public File getFile() {
+            return new File(getPath());
+        }
+    },
+    /** The plugins directory. */
     PLUGINS_LAST_CONFIG {
         @Override
         public String getPath() {
