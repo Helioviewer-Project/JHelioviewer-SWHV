@@ -50,19 +50,15 @@ public class PfssPluginPanel extends JPanel {
     private void initVisualComponents() {
         // set general appearance
         GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 0.0, 1., 0.0, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         setLayout(gridBagLayout);
-
-        setEnabled(true);
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.anchor = GridBagConstraints.WEST;
-        c0.insets = new Insets(0, 0, 5, 0);
+        c0.insets = new Insets(0, 0, 0, 0);
+        c0.weightx = 1.;
+        c0.weighty = 1.;
         c0.gridx = 0;
-        c0.gridy = 1;
+        c0.gridy = 0;
         this.qualitySpinner = new JSpinner();
         this.qualitySpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), new Integer(8), new Integer(1)));
 
@@ -88,9 +84,11 @@ public class PfssPluginPanel extends JPanel {
             }
         });
         helpPanel.add(fixedColors);
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridx = 1;
+        c0.gridy = 0;
         this.add(helpPanel, c0);
-
-        GridBagConstraints gbc = new GridBagConstraints();
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.setToolTipText("Click here to check the availability of PFSS data");
@@ -101,11 +99,11 @@ public class PfssPluginPanel extends JPanel {
                 JHVGlobals.openURL(url);
             }
         });
-        gbc.insets = new Insets(0, 0, 5, 0);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        this.add(availabilityButton, gbc);
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridx = 2;
+        c0.gridy = 0;
+        this.add(availabilityButton, c0);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class PfssSettings {
     /**
      * Maximal preload of cache data
      */
-    public final static int CACHE_SIZE = 32;
+    public final static int CACHE_SIZE = 365 * 4;
 
     public final static float LINE_ALPHA = 1.0f;
 

@@ -98,6 +98,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void layerAdded(int idx) {
+        PfssPlugin.getPfsscache().clear();
         Date start = Displayer.getLayersModel().getFirstDate();
         Date end = Displayer.getLayersModel().getLastDate();
         Thread t = new Thread(new PfssNewDataLoader(start, end), "PFFSLoader");
