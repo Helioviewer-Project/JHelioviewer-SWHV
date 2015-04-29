@@ -155,7 +155,7 @@ public abstract class GL3DCamera {
 
     public void applyPerspective(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glPushMatrix();
+        gl.glLoadIdentity();
 
         this.aspect = Displayer.getViewportWidth() / (double) Displayer.getViewportHeight();
         cameraWidth = -translation.z * Math.tan(fov / 2.);
@@ -163,9 +163,10 @@ public abstract class GL3DCamera {
             cameraWidth = 1.;
 
         cameraWidthTimesAspect = cameraWidth * aspect;
-        gl.glLoadIdentity();
         gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
+
         if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
             return;
         }
@@ -179,7 +180,6 @@ public abstract class GL3DCamera {
 
     public void resumePerspective(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glPopMatrix();
         gl.glMatrixMode(GL2.GL_MODELVIEW);
     }
 

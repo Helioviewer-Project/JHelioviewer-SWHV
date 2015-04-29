@@ -117,16 +117,13 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GL2 gl = (GL2) drawable.getGL();
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        gl.glPushMatrix();
-        {
-            GL3DCamera camera = Displayer.getActiveCamera();
-            camera.applyPerspective(gl);
-            camera.applyCamera(gl);
-            Displayer.getRenderableContainer().render(gl);
-            camera.drawCamera(gl);
-            camera.resumePerspective(gl);
-        }
-        gl.glPopMatrix();
+
+        GL3DCamera camera = Displayer.getActiveCamera();
+        camera.applyPerspective(gl);
+        camera.applyCamera(gl);
+        Displayer.getRenderableContainer().render(gl);
+        camera.drawCamera(gl);
+        camera.resumePerspective(gl);
 
         if (exportMode || screenshotMode) {
             exportFrame();
