@@ -28,9 +28,9 @@ public class ZoomOneToOneAction extends AbstractAction {
      */
     public ZoomOneToOneAction(boolean small) {
         super("Zoom 1:1", small ? IconBank.getIcon(JHVIcon.ZOOM_1TO1_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_1TO1));
-        putValue(SHORT_DESCRIPTION, "Zoom 1:1");
-        putValue(MNEMONIC_KEY, KeyEvent.VK_F);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
+        putValue(SHORT_DESCRIPTION, "Zoom to native resolution");
+        putValue(MNEMONIC_KEY, KeyEvent.VK_Z);
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
     }
 
     /**
