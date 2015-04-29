@@ -23,7 +23,7 @@ public class ZoomInAction extends AbstractAction {
         super("Zoom in", small ? IconBank.getIcon(JHVIcon.ZOOM_IN_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_IN));
         putValue(SHORT_DESCRIPTION, "Zoom in");
         putValue(MNEMONIC_KEY, KeyEvent.VK_I);
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.ALT_MASK));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, KeyEvent.ALT_MASK));
     }
 
     /**

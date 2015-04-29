@@ -162,21 +162,21 @@ public class TopToolBar extends JToolBar implements MouseListener {
         panButton = new JToggleButton(new SetPanInteractionAction());
         panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
         panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
-        panButton.setToolTipText("Select Panning");
+        panButton.setToolTipText("Pan");
         group.add(panButton);
         addButton(panButton);
 
         zoomBoxButton = new JToggleButton(new SetZoomBoxInteractionAction());
         zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
-        zoomBoxButton.setToolTipText("Select Zoom Box");
+        zoomBoxButton.setToolTipText("Zoom box");
         //group.add(zoomBoxButton);
         //addButton(zoomBoxButton);
 
         rotateButton = new JToggleButton(new SetRotationInteractionAction());
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
         rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
-        rotateButton.setToolTipText("Select Rotating");
+        rotateButton.setToolTipText("Rotate");
         group.add(rotateButton);
         addButton(rotateButton);
 
@@ -188,14 +188,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton.setSelected(false);
         trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
         trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
-        trackSolarRotationButton.setToolTipText("Enable Solar Rotation Tracking");
+        trackSolarRotationButton.setToolTipText("Solar rotation tracking");
         addButton(trackSolarRotationButton);
 
         coronaVisibilityButton = new JToggleButton(new ToggleCoronaVisibilityAction());
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
-        coronaVisibilityButton.setToolTipText("Toggle Corona Visibility");
+        coronaVisibilityButton.setToolTipText("Corona visibility");
         addButton(coronaVisibilityButton);
 
         addSeparator();

@@ -16,7 +16,7 @@ public class ResetCameraAction extends AbstractAction {
 
     public ResetCameraAction(boolean small) {
         super("Reset Camera", IconBank.getIcon(JHVIcon.RESET));
-        putValue(SHORT_DESCRIPTION, "Reset Camera Position to Default");
+        putValue(SHORT_DESCRIPTION, "Reset camera position to default");
         // putValue(MNEMONIC_KEY, KeyEvent.VK_R);
         // putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA,
         // KeyEvent.ALT_MASK));
