@@ -51,6 +51,8 @@ public class PfssNewDataLoader implements Runnable {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+            boolean errorState = false;
+
             do {
                 ArrayList<Pair<String, Long>> urls = null;
 
@@ -80,10 +82,13 @@ public class PfssNewDataLoader implements Runnable {
                         }
                     }
                 } catch (MalformedURLException e) {
+                    errorState = true;
                     Log.warn("Could not read pfss entries : URL unavailable");
                 } catch (IOException e) {
+                    errorState = true;
                     Log.warn("Could not read pfss entries");
                 } catch (ParseException e) {
+                    errorState = true;
                     Log.warn("Could not parse date time during pfss loading");
                 }
                 for (Pair<String, Long> pair : urls) {
@@ -105,7 +110,7 @@ public class PfssNewDataLoader implements Runnable {
                         startMonth++;
                     }
                 }
-            } while (startYear != endYear || startMonth != endMonth);
+            } while (errorState != true && (startYear != endYear || startMonth != endMonth));
 
         }
     }
