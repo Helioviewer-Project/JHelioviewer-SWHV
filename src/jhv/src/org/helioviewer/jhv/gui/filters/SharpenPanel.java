@@ -27,6 +27,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Sharpen");
+        title.setHorizontalAlignment(JLabel.RIGHT);
         add(title);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
