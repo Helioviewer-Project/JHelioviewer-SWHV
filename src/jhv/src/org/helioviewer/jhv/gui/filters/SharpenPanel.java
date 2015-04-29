@@ -15,7 +15,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
  *
  * @author Markus Langenberg
  */
-public class SharpenPanel extends AbstractFilterPanel implements ChangeListener, FilterAlignmentDetails {
+public class SharpenPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private final JSlider sharpeningSlider;
     private final JLabel sharpeningLabel;

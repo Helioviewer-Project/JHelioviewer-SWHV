@@ -24,7 +24,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Helge Dietert (extended)
  */
-public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener, FilterAlignmentDetails {
+public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
 
@@ -46,10 +46,10 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);
+
         invertButton = new JToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
         invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        //invertButton.setPreferredSize(new Dimension(FilterPanel.valueWidth - 14, FilterPanel.height));
         invertButton.addActionListener(this);
     }
 

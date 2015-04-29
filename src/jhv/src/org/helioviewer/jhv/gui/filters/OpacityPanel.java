@@ -17,7 +17,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  * @author Markus Langenberg
  * @author Malte Nuhn
  */
-public class OpacityPanel extends AbstractFilterPanel implements ChangeListener, FilterAlignmentDetails {
+public class OpacityPanel extends AbstractFilterPanel implements ChangeListener, FilterDetails {
 
     private final JSlider opacitySlider;
     private final JLabel opacityLabel;

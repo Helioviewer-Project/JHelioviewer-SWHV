@@ -21,12 +21,12 @@ import org.helioviewer.viewmodel.view.AbstractView;
 public class FiltersPanel extends JPanel {
 
     private final RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-    final OpacityPanel opacityPanel = new OpacityPanel();
-    final ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
-    final SOHOLUTPanel lUTPanel = new SOHOLUTPanel();
-    final GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
-    final ContrastPanel contrastPanel = new ContrastPanel();
-    final SharpenPanel sharpenPanel = new SharpenPanel();
+    private final OpacityPanel opacityPanel = new OpacityPanel();
+    private final ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
+    private final SOHOLUTPanel lUTPanel = new SOHOLUTPanel();
+    private final GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
+    private final ContrastPanel contrastPanel = new ContrastPanel();
+    private final SharpenPanel sharpenPanel = new SharpenPanel();
 
     public enum Area {
         TOP, CENTER, BOTTOM
@@ -40,7 +40,6 @@ public class FiltersPanel extends JPanel {
     }
 
     public FiltersPanel() {
-
         this.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
@@ -71,38 +70,43 @@ public class FiltersPanel extends JPanel {
         c.gridy++;
     }
 
-    private void addToGridBag(GridBagConstraints c, FilterAlignmentDetails details) {
+    private void addToGridBag(GridBagConstraints c, FilterDetails details) {
         c.gridwidth = 1;
 
         c.gridx = 0;
         c.weightx = 0.1;
         c.weighty = 1.0;
-        c.anchor = GridBagConstraints.LINE_START;
-
-        //((JLabel) details.getTitle()).setHorizontalAlignment(SwingConstants.LEFT);
+        c.anchor = GridBagConstraints.LINE_END;
+        c.fill = GridBagConstraints.NONE;
         add(details.getTitle(), c);
+
         c.gridx = 1;
         c.weightx = 1.;
         c.anchor = GridBagConstraints.CENTER;
-
+        c.fill = GridBagConstraints.HORIZONTAL;
         add(details.getSlider(), c);
+
         c.gridx = 2;
         c.weightx = 0.1;
-        c.anchor = GridBagConstraints.LINE_END;
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.NONE;
         add(details.getValue(), c);
     }
 
-    private void addToGridBag2(GridBagConstraints c, FilterAlignmentDetails details) {
+    private void addToGridBag2(GridBagConstraints c, FilterDetails details) {
         c.gridwidth = 1;
         c.gridx = 0;
         c.weightx = 0.1;
         c.weighty = 1.0;
-        c.anchor = GridBagConstraints.LINE_START;
+        c.anchor = GridBagConstraints.LINE_END;
+        c.fill = GridBagConstraints.NONE;
         add(details.getTitle(), c);
+
         c.gridx = 1;
         c.weightx = 1.1;
         c.anchor = GridBagConstraints.CENTER;
         c.gridwidth = 2;
+        c.fill = GridBagConstraints.HORIZONTAL;
         add(details.getSlider(), c);
     }
 

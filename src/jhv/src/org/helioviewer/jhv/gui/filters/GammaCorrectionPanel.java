@@ -22,7 +22,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Markus Langenberg
  */
-public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterAlignmentDetails {
+public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeListener, MouseListener, FilterDetails {
 
     private static double factor = 0.01 * Math.log(10);
 
