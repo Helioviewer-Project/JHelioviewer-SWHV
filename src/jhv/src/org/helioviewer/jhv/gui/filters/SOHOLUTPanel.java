@@ -1,14 +1,11 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -42,26 +39,18 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
 
     public SOHOLUTPanel() {
         lutMap = LUT.getStandardList();
-
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Color");
-        add(title);
+        title.setHorizontalAlignment(JLabel.RIGHT);
 
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
         combobox.addActionListener(this);
-        add(combobox);
-
-        add(Box.createHorizontalStrut(14));
-
         invertButton = new JToggleButton(invertIcon);
         invertButton.setToolTipText("Invert color table");
         invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         //invertButton.setPreferredSize(new Dimension(FilterPanel.valueWidth - 14, FilterPanel.height));
         invertButton.addActionListener(this);
-        add(invertButton);
     }
 
     /**
@@ -111,13 +100,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         return FilterAlignmentDetails.POSITION_COLORTABLES;
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         title.setEnabled(enabled);
         combobox.setEnabled(enabled);
         invertButton.setEnabled(enabled);
@@ -153,17 +136,17 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
 
     @Override
     public Component getTitle() {
-        return null;
+        return title;
     }
 
     @Override
     public Component getSlider() {
-        return null;
+        return combobox;
     }
 
     @Override
     public Component getValue() {
-        return null;
+        return invertButton;
     }
 
 }

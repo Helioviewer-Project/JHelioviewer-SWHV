@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Component;
-import java.awt.Dimension;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -26,11 +24,8 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel title;
 
     public OpacityPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Opacity");
         title.setHorizontalAlignment(JLabel.RIGHT);
-        add(title);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMajorTickSpacing(25);
@@ -38,10 +33,8 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
 
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);
-        add(opacitySlider);
 
         opacityLabel = new JLabel("0%");
-        add(opacityLabel);
     }
 
     /**
@@ -59,13 +52,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         return FilterAlignmentDetails.POSITION_OPACITY;
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         opacitySlider.setEnabled(enabled);
         opacityLabel.setEnabled(enabled);
         title.setEnabled(enabled);

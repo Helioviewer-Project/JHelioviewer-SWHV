@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.filters;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +43,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      */
     private final JSpinner truncateSpinner;
     private final JLabel truncationLabel;
+    private final JPanel diffPanel = new JPanel();
 
     private JCheckBox diffRot;
     private final static String[] combolist = { "No differences", "Running difference", "Base difference" };
@@ -51,7 +53,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private final JButton showMetaButton = new JButton();
 
     public RunningDifferencePanel() {
-        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.PAGE_AXIS));
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
@@ -88,7 +90,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         topPanel.add(downloadLayerButton, c);
         c.gridx = 2;
         topPanel.add(showMetaButton, c);
-        add(topPanel);
+        diffPanel.add(topPanel);
         c.gridy = 1;
         c.gridx = 0;
         c.gridwidth = 3;
@@ -150,12 +152,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     }
 
-    /**
-     * Overridden setEnabled to keep in sync with child elements
-     */
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
+        diffPanel.setEnabled(enabled);
     }
 
     @Override
@@ -194,6 +192,10 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             this.downloadLayerButton.setEnabled(false);
         }
 
+    }
+
+    public Component getPanel() {
+        return this.diffPanel;
     }
 
 }

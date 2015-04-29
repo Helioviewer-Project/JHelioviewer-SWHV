@@ -1,16 +1,13 @@
 package org.helioviewer.jhv.gui.filters;
 
-import javax.swing.JPanel;
-
 import org.helioviewer.viewmodel.view.AbstractView;
 
-public abstract class AbstractFilterPanel extends JPanel {
+public abstract class AbstractFilterPanel {
 
     protected AbstractView jp2view;
 
     public void setJP2View(AbstractView jp2view) {
         if (this.jp2view != jp2view) {
-            setEnabled(jp2view == null);
             this.jp2view = jp2view;
         }
     }

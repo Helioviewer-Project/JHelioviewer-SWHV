@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -29,11 +27,9 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     private final JLabel contrastLabel;
 
     public ContrastPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         title = new JLabel("Contrast");
         title.setHorizontalAlignment(JLabel.RIGHT);
-        add(title);
 
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         contrastSlider.setMajorTickSpacing(25 * 2); // twice wider
@@ -42,10 +38,8 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         contrastSlider.addMouseListener(this);
         contrastSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(contrastSlider);
-        add(contrastSlider);
 
         contrastLabel = new JLabel("0");
-        add(contrastLabel);
     }
 
     @Override
@@ -84,9 +78,7 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         return FilterAlignmentDetails.POSITION_CONTRAST;
     }
 
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         contrastSlider.setEnabled(enabled);
         contrastLabel.setEnabled(enabled);
         title.setEnabled(enabled);

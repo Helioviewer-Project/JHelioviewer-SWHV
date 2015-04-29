@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Component;
-import java.awt.Dimension;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -24,11 +22,8 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel title;
 
     public SharpenPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Sharpen");
         title.setHorizontalAlignment(JLabel.RIGHT);
-        add(title);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         sharpeningSlider.setMajorTickSpacing(25);
@@ -36,10 +31,8 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
 
         sharpeningSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(sharpeningSlider);
-        add(sharpeningSlider);
 
         sharpeningLabel = new JLabel("0%");
-        add(sharpeningLabel);
     }
 
     /**
@@ -57,13 +50,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         return FilterAlignmentDetails.POSITION_SHARPEN;
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         sharpeningSlider.setEnabled(enabled);
         sharpeningLabel.setEnabled(enabled);
         title.setEnabled(enabled);

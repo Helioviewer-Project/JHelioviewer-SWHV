@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.gui.filters;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -33,11 +31,8 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     private final JLabel gammaLabel;
 
     public GammaCorrectionPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
         title = new JLabel("Gamma");
         title.setHorizontalAlignment(JLabel.RIGHT);
-        add(title);
 
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         gammaSlider.setMajorTickSpacing(25 * 2); // twice wider
@@ -46,10 +41,8 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         gammaSlider.addChangeListener(this);
         gammaSlider.addMouseListener(this);
         WheelSupport.installMouseWheelSupport(gammaSlider);
-        add(gammaSlider);
 
         gammaLabel = new JLabel("1.0");
-        add(gammaLabel);
     }
 
     /**
@@ -117,14 +110,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         return FilterAlignmentDetails.POSITION_GAMMA;
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-
-    @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
         gammaSlider.setEnabled(enabled);
         gammaLabel.setEnabled(enabled);
         title.setEnabled(enabled);
