@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
 import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
+import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 
 /**
@@ -150,6 +151,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         addButton(new JButton(new ZoomInAction(false)));
         addButton(new JButton(new ZoomOutAction(false)));
         addButton(new JButton(new ZoomFitAction(false)));
+        addButton(new JButton(new ZoomOneToOneAction(false)));
         addButton(new JButton(new ResetCameraAction(false)));
 
         addSeparator();
@@ -168,8 +170,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         zoomBoxButton.setToolTipText("Select Zoom Box");
-        group.add(zoomBoxButton);
-        addButton(zoomBoxButton);
+        //group.add(zoomBoxButton);
+        //addButton(zoomBoxButton);
 
         rotateButton = new JToggleButton(new SetRotationInteractionAction());
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
