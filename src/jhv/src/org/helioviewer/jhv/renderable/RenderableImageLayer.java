@@ -148,10 +148,11 @@ public class RenderableImageLayer implements Renderable {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
+        GL3DVec2d metPhysicalSize = metaData.getPhysicalSize();
         double metLLX = metaData.getPhysicalLowerLeft().x;
         double metLLY = metaData.getPhysicalLowerLeft().y;
-        double metURX = metaData.getPhysicalUpperRight().x;
-        double metURY = metaData.getPhysicalUpperRight().y;
+        double metURX = metLLX + metPhysicalSize.x;
+        double metURY = metLLY + metPhysicalSize.y;
 
         if (minPhysicalX < metLLX)
             minPhysicalX = metLLX;

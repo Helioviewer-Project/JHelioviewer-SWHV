@@ -34,27 +34,6 @@ public interface MetaData {
      */
     public GL3DVec2d getPhysicalLowerLeft();
     /**
-     * Returns the physical position of the lower right corner of the
-     * corresponding image.
-     *
-     * @return Physical position of the lower right corner
-     */
-    public GL3DVec2d getPhysicalLowerRight();
-    /**
-     * Returns the physical position of the upper left corner of the
-     * corresponding image.
-     *
-     * @return Physical position of the upper left corner
-     */
-    public GL3DVec2d getPhysicalUpperLeft();
-    /**
-     * Returns the physical position of the upper right corner of the
-     * corresponding image.
-     *
-     * @return Physical position of the upper right corner
-     */
-    public GL3DVec2d getPhysicalUpperRight();
-    /**
      * Returns the width of the image in pixels.
      *
      * @return width of the image in pixels

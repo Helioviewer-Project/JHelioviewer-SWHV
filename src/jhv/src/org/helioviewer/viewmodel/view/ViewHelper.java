@@ -126,35 +126,6 @@ public final class ViewHelper {
     }
 
     /**
-     * Ensures, that the given region is within the maximal bounds of the image
-     * data.
-     *
-     * If that is not the case, moves and/or crops the region to the maximal
-     * area given by the meta data.
-     *
-     * @param r
-     *            Region to move and crop, if necessary
-     * @param m
-     *            Meta data defining the maximal region
-     * @return Region located inside the maximal region
-     */
-    public static Region cropRegionToImage(Region r, MetaData m) {
-        if (r == null || m == null) {
-            return r;
-        }
-
-        GL3DVec2d halfSize = GL3DVec2d.scale(r.getSize(), 0.5);
-        GL3DVec2d oldCenter = GL3DVec2d.add(r.getLowerLeftCorner(), halfSize);
-        GL3DVec2d newCenter = GL3DVec2d.crop(oldCenter, m.getPhysicalLowerLeft(), m.getPhysicalUpperRight());
-
-        if (oldCenter.equals(newCenter)) {
-            return r;
-        }
-
-        return StaticRegion.createAdaptedRegion(GL3DVec2d.subtract(newCenter, halfSize), r.getSize());
-    }
-
-    /**
      * Calculates the inner viewport to the corresponding inner region.
      *
      * Given the outer region and the outer viewport image size, this function
