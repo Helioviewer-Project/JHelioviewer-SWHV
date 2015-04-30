@@ -7,28 +7,30 @@ import java.awt.FlowLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 /**
  * Class used for displaying information and statuses in a panel at the very
  * bottom of JHV.
- * 
+ *
  * <p>
  * The class manages two different areas in the panel, one at the lower left and
  * one at the lower right corner. New plugins can be placed at one of the two
  * areas.
- * 
+ *
  * <p>
  * In addition, a status text can be displayed in the lower left corner.
- * 
+ *
  * @author Markus Langenberg
  */
 public class StatusPanel extends JPanel {
+    public static final Border paddingBorder = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
-    private static final int HEIGHT = 30;
+    public static final int HEIGHT = 30;
 
-    private JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    private JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
     private static JLabel statusInfoLabel = new JLabel("");
 
@@ -38,7 +40,7 @@ public class StatusPanel extends JPanel {
 
     /**
      * Default constructor
-     * 
+     *
      * @param leftMargin
      *            left margin. If greater zero, the status text will be
      *            displayed here.
@@ -68,7 +70,7 @@ public class StatusPanel extends JPanel {
 
     /**
      * Adds a new plugin to the status panel.
-     * 
+     *
      * @param newPlugin
      *            Plugin to add
      * @param alignment
@@ -84,7 +86,7 @@ public class StatusPanel extends JPanel {
 
     /**
      * Removes a plugin from the status panel.
-     * 
+     *
      * @param oldPlugin
      *            Plugin to remove
      */
