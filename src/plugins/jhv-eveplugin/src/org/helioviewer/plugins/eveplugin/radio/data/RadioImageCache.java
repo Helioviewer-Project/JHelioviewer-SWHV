@@ -80,6 +80,7 @@ public class RadioImageCache {
             useCache.remove(reverseUseCache.get(data));
             reverseUseCache.remove(data);
             startDates.remove(data.getStartDate());
+            noDataCache.clear();
             data.remove();
         }
     }
