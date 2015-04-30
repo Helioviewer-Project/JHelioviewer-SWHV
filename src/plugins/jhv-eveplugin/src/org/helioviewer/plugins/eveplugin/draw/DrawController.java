@@ -24,6 +24,7 @@ import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.plugins.eveplugin.settings.BandType;
+import org.helioviewer.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
@@ -41,18 +42,17 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     private final List<TimingListener> tListeners;
     private boolean keepFullValueRange;
-    private Rectangle graphArea;
-    private Rectangle plotArea;
-    private Rectangle leftAxisArea;
+    private Rectangle graphSize;
+    // private Rectangle graphArea;
+    // private Rectangle plotArea;
+    // private Rectangle leftAxisArea;
     private final List<GraphDimensionListener> gdListeners;
 
-    private int nrOfDrawableElements;
     private Set<YAxisElement> yAxisSet;
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
 
     private DrawController() {
-        nrOfDrawableElements = 0;
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new HashSet<YAxisElement>();
@@ -65,6 +65,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         pas = PlotAreaSpace.getSingletonInstance();
         pas.addPlotAreaSpaceListener(this);
         gdListeners = new ArrayList<GraphDimensionListener>();
+        graphSize = new Rectangle();
     }
 
     public static DrawController getSingletonInstance() {
@@ -92,6 +93,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         this.addDrawableElement(drawableElement, false);
 
         if (drawableElement.hasElementsToDraw()) {
+            Log.debug("Update drawable element");
+            Thread.dumpStack();
             this.fireRedrawRequest();
         }
     }
@@ -110,7 +113,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             tempSet.add(element.getYAxisElement());
             yAxisSet = tempSet;
         }
-        nrOfDrawableElements++;
         if (redraw) {
             this.fireRedrawRequest();
         }
@@ -120,7 +122,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
         if (elements != null) {
             elements.remove(element);
-            nrOfDrawableElements--;
             createYAxisSet();
         }
         if (redraw) {
@@ -448,10 +449,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return pas;
     }
 
-    public void setGraphInformation(Rectangle graphArea, Rectangle plotArea, Rectangle leftAxisArea) {
-        this.graphArea = graphArea;
-        this.plotArea = plotArea;
-        this.leftAxisArea = leftAxisArea;
+    public void setGraphInformation(Rectangle graphSize) {
+        this.graphSize = graphSize;
         fireGraphDimensionsChanged();
         fireRedrawRequest();
     }
@@ -463,15 +462,27 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Rectangle getPlotArea() {
-        return plotArea;
+        return new Rectangle(0, 0, getGraphWidth(), getGraphHeight());
     }
 
     public Rectangle getGraphArea() {
-        return graphArea;
+        return new Rectangle(ChartConstants.getGraphLeftSpace(), ChartConstants.getGraphTopSpace(), getGraphWidth(), getGraphHeight());
     }
 
     public Rectangle getLeftAxisArea() {
-        return leftAxisArea;
+        return new Rectangle(0, ChartConstants.getGraphTopSpace(), ChartConstants.getGraphLeftSpace(), getGraphHeight() - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
+    }
+
+    private int getGraphHeight() {
+        return graphSize.height - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
+    }
+
+    private int getGraphWidth() {
+        int twoYAxis = 0;
+        if (getYAxisElements().size() >= 2) {
+            twoYAxis = 1;
+        }
+        return graphSize.width - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight());
     }
 
     private void createYAxisSet() {
