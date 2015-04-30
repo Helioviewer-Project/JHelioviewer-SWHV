@@ -19,8 +19,8 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.MetaDataContainer;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -553,7 +553,7 @@ public class KakaduUtils {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
                         hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
-                        metaDataList[i] = MetaDataConstructor.getMetaData(hvMetaData);
+                        metaDataList[i] = new HelioviewerMetaData(hvMetaData);
                         hvMetaData.setNode(null);
                     }
 
@@ -569,7 +569,7 @@ public class KakaduUtils {
             xmlBox = findBoxResult[0];
             if (xmlBox != null) {
                 hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
-                metaDataList[0] = MetaDataConstructor.getMetaData(hvMetaData);
+                metaDataList[0] = new HelioviewerMetaData(hvMetaData);
                 hvMetaData.setNode(null);
             }
         }
