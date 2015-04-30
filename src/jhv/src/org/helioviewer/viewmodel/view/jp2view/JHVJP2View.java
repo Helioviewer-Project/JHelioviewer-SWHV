@@ -489,7 +489,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
 
-        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, metaData.getPhysicalRegion(), new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
+        Region mr = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
