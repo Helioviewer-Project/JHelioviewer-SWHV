@@ -76,18 +76,19 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
-        drawBackground(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        drawBackground(g2d);
         Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (availableInterval != null && selectedInterval != null) {
             computeIntervalBorderPositions(availableInterval, selectedInterval);
 
-            drawInterval(g);
-            drawMovieInterval(g, availableInterval);
-            drawLabels(g, availableInterval, selectedInterval);
-            drawBorders(g);
-            drawIntervalGraspPoints(g);
+            drawInterval(g2d);
+            drawMovieInterval(g2d, availableInterval);
+            drawLabels(g2d, availableInterval, selectedInterval);
+            drawBorders(g2d);
+            drawIntervalGraspPoints(g2d);
         }
     }
 
@@ -105,24 +106,19 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + ChartConstants.getGraphLeftSpace();
     }
 
-    private void drawBackground(Graphics g) {
+    private void drawBackground(Graphics2D g) {
         final int availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
 
         g.setColor(ChartConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(ChartConstants.getGraphLeftSpace(), 2, availableIntervalSpace, getHeight() - 3);
     }
 
-    private void drawInterval(Graphics g) {
-        Graphics2D g2 = ((Graphics2D) g);
-        // GradientPaint redtowhite = new GradientPaint(0, getHeight() / 2 -
-        // getHeight() / (3 * 2), Color.BLACK, 0, getHeight() / 2
-        // + getHeight() / (3 * 2), Color.WHITE);
-        // g2.setPaint(redtowhite);
-        g2.setColor(Color.black);
-        g2.fillRect(leftIntervalBorderPosition, 5, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
+    private void drawInterval(Graphics2D g) {
+        g.setColor(Color.black);
+        g.fillRect(leftIntervalBorderPosition, 5, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
     }
 
-    private void drawMovieInterval(Graphics g, Interval<Date> availableInterval) {
+    private void drawMovieInterval(Graphics2D g, Interval<Date> availableInterval) {
         if (availableInterval == null || movieInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null || movieInterval.getStart() == null || movieInterval.getEnd() == null) {
             return;
         }
@@ -166,31 +162,17 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawBorders(Graphics g) {
+    private void drawBorders(Graphics2D g) {
         g.setColor(ChartConstants.BORDER_COLOR);
-        // g.drawRect(leftIntervalBorderPosition, getHeight() / 7 * 3,
-        // rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight()
-        // / 7);
     }
 
-    private void drawIntervalGraspPoints(Graphics g) {
-        Graphics2D g2 = ((Graphics2D) g);
-        g2.setColor(Color.BLACK);
-        // GradientPaint redtowhite = new GradientPaint(0, 0, Color.BLACK, 0,
-        // getHeight() - 5, Color.WHITE);
-        // g2.setPaint(redtowhite);
-
-        g2.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
-        g2.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
-
-        // g.setColor(ChartConstants.BORDER_COLOR);
-        // g2.draw(new RoundRectangle2D.Double(leftIntervalBorderPosition, 0, 2,
-        // 12, 5, 5));
-        // g2.draw(new RoundRectangle2D.Double(rightIntervalBorderPosition - 2,
-        // 0, 2, 12, 5, 5));
+    private void drawIntervalGraspPoints(Graphics2D g) {
+        g.setColor(Color.BLACK);
+        g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
+        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
     }
 
-    private void drawLabels(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
+    private void drawLabels(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
@@ -229,7 +211,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, availableIntervalWidth, ratioX);
     }
 
-    private void drawLabelsTime(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsTime(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final long timeDiff = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -249,7 +231,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsDay(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsDay(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -285,7 +267,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsMonth(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsMonth(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -326,7 +308,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabelsYear(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
+    private void drawLabelsYear(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final int maxTicks, final int availableIntervalWidth, final double ratioX) {
         final Calendar calendar = new GregorianCalendar();
 
         calendar.clear();
@@ -357,7 +339,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
     }
 
-    private void drawLabel(Graphics g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
+    private void drawLabel(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         final int x = ChartConstants.getGraphLeftSpace() + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
 
@@ -367,13 +349,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         }
         g.drawLine(x, 2, x, getHeight() - 1);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setColor(ChartConstants.LABEL_TEXT_COLOR);
+        g.setColor(ChartConstants.LABEL_TEXT_COLOR);
         if (x + textWidth > ChartConstants.getGraphLeftSpace() + availableIntervalWidth) {
-            g2d.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
+            g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
         } else {
-            g2d.drawString(tickText, x + 2, getHeight() - 5);
+            g.drawString(tickText, x + 2, getHeight() - 5);
         }
     }
 
