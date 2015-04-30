@@ -65,7 +65,6 @@ public class StatusPanel extends JPanel {
         }
 
         setPreferredSize(new Dimension(0, HEIGHT));
-        setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
     }
 
     /**

@@ -174,8 +174,11 @@ public class RenderableGrid implements Renderable {
     }
 
     private void drawText(GL2 gl) {
+        float textScale = scale * 0.08f / font.getSize();
+        float zdist = 0f;
+
         double size = Constants.SunRadius * 1.06;
-        double zdist = 0.0;
+
         renderer.begin3DRendering();
         for (double phi = 0; phi <= 90; phi = phi + this.getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
@@ -183,9 +186,9 @@ public class RenderableGrid implements Renderable {
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
             if (phi != 90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
             }
         }
         for (double phi = -this.getLatstepDegrees(); phi >= -90; phi = phi - this.getLatstepDegrees()) {
@@ -194,9 +197,9 @@ public class RenderableGrid implements Renderable {
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
             if (phi != -90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), (float) zdist, scale * 0.08f / font.getSize());
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
             }
         }
         renderer.end3DRendering();
@@ -209,28 +212,34 @@ public class RenderableGrid implements Renderable {
                 txt = txt.substring(0, txt.length() - 2);
             }
             double angle = (90 - theta) * Math.PI / 180.;
-            renderer.begin3DRendering();
             gl.glPushMatrix();
-            gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
-            gl.glRotated(theta, 0.f, 1.f, 0.f);
-            renderer.draw3D(txt, 0.f, 0f, 0.f, scale * 0.08f / font.getSize());
-            renderer.flush();
-            renderer.end3DRendering();
+            {
+                gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
+                gl.glRotated(theta, 0.f, 1.f, 0.f);
+
+                renderer.begin3DRendering();
+                renderer.draw3D(txt, 0.f, 0f, 0.f, textScale);
+                renderer.end3DRendering();
+            }
             gl.glPopMatrix();
         }
+
         for (double theta = -this.getLonstepDegrees(); theta > -180.; theta = theta - this.getLonstepDegrees()) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
             double angle = (90 - theta) * Math.PI / 180.;
-            renderer.begin3DRendering();
+
             gl.glPushMatrix();
-            gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
-            gl.glRotated(theta, 0.f, 1.f, 0.f);
-            renderer.draw3D(txt, 0.f, 0f, 0.f, scale * 0.08f / font.getSize());
-            renderer.flush();
-            renderer.end3DRendering();
+            {
+                gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
+                gl.glRotated(theta, 0.f, 1.f, 0.f);
+
+                renderer.begin3DRendering();
+                renderer.draw3D(txt, 0.f, 0f, 0.f, textScale);
+                renderer.end3DRendering();
+            }
             gl.glPopMatrix();
         }
     }
