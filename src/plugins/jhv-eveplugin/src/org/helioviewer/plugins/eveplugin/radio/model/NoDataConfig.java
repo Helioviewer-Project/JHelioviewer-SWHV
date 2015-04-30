@@ -39,7 +39,6 @@ public class NoDataConfig {
      *            Is it visible
      */
     public NoDataConfig(Interval<Date> dateInterval, DrawableAreaMap drawableAreaMap, long downloadId, boolean visible) {
-        super();
         this.dateInterval = dateInterval;
         this.drawableAreaMap = drawableAreaMap;
         this.downloadId = downloadId;
