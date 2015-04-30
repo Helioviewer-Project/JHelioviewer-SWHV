@@ -51,8 +51,6 @@ public class PfssNewDataLoader implements Runnable {
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            boolean errorState = false;
-
             do {
                 ArrayList<Pair<String, Long>> urls = null;
 
