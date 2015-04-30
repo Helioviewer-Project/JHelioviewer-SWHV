@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -366,12 +367,13 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             g.setColor(ChartConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
         }
         g.drawLine(x, 2, x, getHeight() - 1);
-
-        g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(ChartConstants.LABEL_TEXT_COLOR);
         if (x + textWidth > ChartConstants.getGraphLeftSpace() + availableIntervalWidth) {
-            g.drawString(tickText, x - 2 - textWidth, getHeight() - 3);
+            g2d.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
         } else {
-            g.drawString(tickText, x + 2, getHeight() - 3);
+            g2d.drawString(tickText, x + 2, getHeight() - 5);
         }
     }
 
