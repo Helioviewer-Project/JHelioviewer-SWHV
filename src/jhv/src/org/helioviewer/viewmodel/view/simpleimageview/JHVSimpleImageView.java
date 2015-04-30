@@ -122,8 +122,8 @@ public class JHVSimpleImageView extends AbstractView {
      *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData() {
-        int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalSize().x);
-        int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalSize().y);
+        int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalWidth());
+        int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalHeight());
         int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().x) / pixelBasedMetaData.getPhysicalWidth() * bufferedImage.getWidth());
         int y = (int) ((region.getCornerY() - pixelBasedMetaData.getPhysicalLowerLeft().y) / pixelBasedMetaData.getPhysicalHeight() * bufferedImage.getHeight());
         if (width > 0 && height > 0) {
