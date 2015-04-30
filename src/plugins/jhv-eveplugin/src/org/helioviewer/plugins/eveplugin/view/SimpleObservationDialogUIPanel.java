@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -38,7 +37,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     protected boolean enableLoadButton = true;
 
-    private final JLabel labelStartDate;
     private final JHVCalendarDatePicker calendarStartDate;
     protected JComboBox comboBoxGroup;
     protected JComboBox comboBoxData;
@@ -49,19 +47,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     public SimpleObservationDialogUIPanel() {
         ObservationDialogDateModel.getInstance().addListener(this);
 
-        labelStartDate = new JLabel("Start date");
+        JLabel labelStartDate = new JLabel("Start date");
+
         calendarStartDate = new JHVCalendarDatePicker();
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
         timePane = new JPanel();
         plotPane = new JPanel();
-        initVisualComponents();
-        Displayer.getLayersModel().addLayersListener(SimpleObservationDialogUIPanel.this);
 
-        // initGroups();
-    }
-
-    private void initVisualComponents() {
         // set up time settings
         calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
         calendarStartDate.addJHVCalendarListener(this);
@@ -72,13 +65,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         startDatePane.add(calendarStartDate, BorderLayout.CENTER);
 
         timePane.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-        timePane.setBorder(BorderFactory.createEtchedBorder());
         timePane.add(startDatePane);
 
         // set basic layout
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.add(timePane);
         this.add(plotPane);
+
+        Displayer.getLayersModel().addLayersListener(SimpleObservationDialogUIPanel.this);
     }
 
     public void setDate(final Date start) {

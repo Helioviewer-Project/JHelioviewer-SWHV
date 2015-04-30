@@ -4,7 +4,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,7 +15,6 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
     private final String[] serverList;
     private final JComboBox comboServer;
-    private final JLabel labelServer = new JLabel("Server");
     private boolean setFromOutside;
 
     public RadioObservationDialogUIPanel() {
@@ -26,16 +24,14 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         setFromOutside = true;
         comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
         setFromOutside = false;
-        DataSourceServers.getSingletonInstance().addListener(this);
-        initVisualComponents();
-    }
 
-    private void initVisualComponents() {
+        JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
         JPanel container = new JPanel();
-        container.setBorder(BorderFactory.createEtchedBorder());
+
         container.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
         container.add(labelServer);
         container.add(comboServer);
+
         comboServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -49,6 +45,8 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         });
 
         add(container);
+
+        DataSourceServers.getSingletonInstance().addListener(this);
     }
 
     @Override
