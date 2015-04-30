@@ -36,7 +36,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
         // this is needed to avoid crash of JOGL components inside JSplitPane
         JPanel pane = new JPanel(new BorderLayout(0, 0));
-        // pane.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pane.add(mainComponent, BorderLayout.CENTER);
 
         splitpane.setTopComponent(pane);

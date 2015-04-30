@@ -12,7 +12,7 @@ public class DataCollapsiblePanelModel {
         listeners = new HashSet<DataCollapsiblePanelModelListener>();
     }
 
-    public void repackCollasiblePanels() {
+    public void repackCollapsiblePanels() {
         for (DataCollapsiblePanelModelListener l : listeners) {
             l.repack();
         }
