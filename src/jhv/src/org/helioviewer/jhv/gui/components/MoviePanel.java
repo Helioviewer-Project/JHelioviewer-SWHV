@@ -210,12 +210,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(mainPanel, BorderLayout.NORTH);
 
         // Time line
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
-        timeSlider.setBorder(BorderFactory.createEmptyBorder());
         timeSlider.setSnapToTicks(true);
         timeSlider.addChangeListener(this);
         timeSlider.addMouseListener(this);
@@ -227,7 +225,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         // Control buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", this);
         buttonPanel.add(previousFrameButton);
@@ -246,8 +243,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         // Current frame number
         frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
-        frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        frameNumberLabel.setPreferredSize(new Dimension(75, 20));
+        frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         secondLine.add(frameNumberLabel, BorderLayout.EAST);
 
         mainPanel.add(secondLine);

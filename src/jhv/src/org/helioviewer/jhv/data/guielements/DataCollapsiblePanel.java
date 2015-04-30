@@ -22,7 +22,7 @@ public class DataCollapsiblePanel extends CollapsiblePane {
     public void actionPerformed(ActionEvent e) {
         super.actionPerformed(e);
         isExpanded = !isExpanded;
-        model.repackCollasiblePanels();
+        model.repackCollapsiblePanels();
     }
 
     public boolean isExpanded() {
