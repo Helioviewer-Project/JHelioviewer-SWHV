@@ -11,7 +11,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -33,8 +32,6 @@ import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
  * */
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
-    private final JLabel labelGroup;
-    private final JLabel labelData;
     private final JComboBox comboBoxGroup;
     private final JComboBox comboBoxData;
 
@@ -42,19 +39,15 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
     public ObservationDialogUIPanel() {
         super();
+
         // long start = System.currentTimeMillis();
-        labelGroup = new JLabel("Group");
-        labelData = new JLabel();
+        JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
+        JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
+
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
         dataPane = new JPanel();
-        initVisualComponents();
-        initGroups();
-        // Log.debug("ObservationDialogUIPanel time: " +
-        // (System.currentTimeMillis() - start));
-    }
 
-    private void initVisualComponents() {
         comboBoxGroup.addActionListener(this);
 
         JPanel container = new JPanel();
@@ -68,7 +61,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
 
-        dataPane.setBorder(BorderFactory.createEtchedBorder());
         dataPane.add(labelGroup, c);
 
         c.gridx = 1;
@@ -85,6 +77,10 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         container.add(dataPane, BorderLayout.CENTER);
         this.add(container);
+
+        initGroups();
+        // Log.debug("ObservationDialogUIPanel time: " +
+        // (System.currentTimeMillis() - start));
     }
 
     private void initGroups() {
@@ -98,7 +94,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void updateGroupValues() {
-        labelData.setText("Dataset");
         final BandController bandController = BandController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
