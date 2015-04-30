@@ -257,33 +257,32 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
-        speedPanel = new JPanel(new BorderLayout());
-        speedPanel.add(new JSeparator(SwingConstants.VERTICAL), BorderLayout.PAGE_START);
-        speedPanel.add(new JLabel("Speed        "), BorderLayout.WEST);
+        speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
         speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
         speedSpinner.addChangeListener(this);
         ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
-        speedPanel.add(speedSpinner, BorderLayout.CENTER);
+        speedPanel.add(speedSpinner);
 
         SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND };
         speedUnitComboBox = new JComboBox(units);
 
         speedUnitComboBox.addActionListener(this);
-        speedPanel.add(speedUnitComboBox, BorderLayout.EAST);
+        speedPanel.add(speedUnitComboBox);
 
         mainPanel.add(speedPanel);
 
         // Animation mode
-        modePanel = new JPanel(new BorderLayout());
-        modePanel.add(new JLabel("Animation mode"), BorderLayout.WEST);
+        modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
         AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
         animationModeComboBox = new JComboBox(modi);
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(this);
-        modePanel.add(animationModeComboBox, BorderLayout.EAST);
+        modePanel.add(animationModeComboBox);
 
         mainPanel.add(modePanel);
         panelList.add(this);
