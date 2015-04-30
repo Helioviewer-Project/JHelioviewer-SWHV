@@ -78,6 +78,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setFont(ChartConstants.font);
         drawBackground(g2d);
         Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
@@ -176,7 +177,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null || availableInterval.getStart().getTime() > availableInterval.getEnd().getTime()) {
             return;
         }
-        g.setFont(ChartConstants.font);
 
         final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(ChartConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
         final int availableIntervalWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1;
