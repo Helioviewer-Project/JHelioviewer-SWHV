@@ -28,8 +28,7 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     private final JPanel boxPanel;
 
     public ChannelMixerPanel() {
-        title = new JLabel("Channels");
-        title.setHorizontalAlignment(JLabel.RIGHT);
+        title = new JLabel("Channels", JLabel.RIGHT);
 
         boxPanel = new JPanel(new GridLayout(1, 3));
 

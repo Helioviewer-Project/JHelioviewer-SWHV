@@ -22,8 +22,7 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel title;
 
     public SharpenPanel() {
-        title = new JLabel("Sharpen");
-        title.setHorizontalAlignment(JLabel.RIGHT);
+        title = new JLabel("Sharpen", JLabel.RIGHT);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         sharpeningSlider.setMajorTickSpacing(25);

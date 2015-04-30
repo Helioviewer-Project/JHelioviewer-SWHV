@@ -180,7 +180,7 @@ public class RenderableGrid implements Renderable {
         double size = Constants.SunRadius * 1.06;
 
         renderer.begin3DRendering();
-        for (double phi = 0; phi <= 90; phi = phi + this.getLatstepDegrees()) {
+        for (double phi = 0; phi <= 90; phi += getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -191,7 +191,7 @@ public class RenderableGrid implements Renderable {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
             }
         }
-        for (double phi = -this.getLatstepDegrees(); phi >= -90; phi = phi - this.getLatstepDegrees()) {
+        for (double phi = -getLatstepDegrees(); phi >= -90; phi -= getLatstepDegrees()) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -206,7 +206,7 @@ public class RenderableGrid implements Renderable {
 
         size = Constants.SunRadius * 1.02;
 
-        for (double theta = 0; theta <= 180.; theta = theta + this.getLonstepDegrees()) {
+        for (double theta = 0; theta <= 180.; theta += getLonstepDegrees()) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -224,7 +224,7 @@ public class RenderableGrid implements Renderable {
             gl.glPopMatrix();
         }
 
-        for (double theta = -this.getLonstepDegrees(); theta > -180.; theta = theta - this.getLonstepDegrees()) {
+        for (double theta = -getLonstepDegrees(); theta > -180.; theta -= getLonstepDegrees()) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);

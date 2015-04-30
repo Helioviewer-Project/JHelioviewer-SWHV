@@ -635,7 +635,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         private final static int TIMESTEP_DAYS = 3;
         private final static int TIMESTEP_ALL = 4;
 
-        private final JLabel labelTimeStep = new JLabel("Time step");
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);
 
@@ -666,7 +665,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             panel.add(spinnerCadence);
             panel.add(comboUnit);
 
-            // add components to panel
+            JLabel labelTimeStep = new JLabel("Time step", JLabel.RIGHT);
             add(labelTimeStep);
             add(panel);
         }
@@ -722,18 +721,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     private static class InstrumentsPanel extends JPanel implements DataSourceServerListener {
         /**
-         * Label for observatory
-         */
-        private final JLabel labelObservatory = new JLabel("Observatory");
-        /**
-         * Label for instrument
-         */
-        private final JLabel labelInstrument = new JLabel("Instrument");
-        /**
-         * Label for detector and/or measurement
-         */
-        private final JLabel labelDetectorMeasurement = new JLabel("Detector/Measurement");
-        /**
          * Combobox to select observatory
          */
         private final JComboBox comboObservatory = new JComboBox(new String[] { "Loading..." });
@@ -745,9 +732,9 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * Combobox to select detector and/or measurement
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
+
         private final String[] serverList;
         private final JComboBox comboServer;
-        private final JLabel labelServer = new JLabel("Server");
 
         private boolean setFromOutside;
 
@@ -762,16 +749,26 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             setFromOutside = false;
             serverList = DataSourceServers.getSingletonInstance().getServerList();
             DataSourceServers.getSingletonInstance().addListener(this);
-            comboServer = new JComboBox(serverList);
+
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
+
+            JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
             add(labelServer);
+            comboServer = new JComboBox(serverList);
             add(comboServer);
+
+            JLabel labelObservatory = new JLabel("Observatory", JLabel.RIGHT);
             add(labelObservatory);
             add(comboObservatory);
+
+            JLabel labelInstrument = new JLabel("Instrument", JLabel.RIGHT);
             add(labelInstrument);
             add(comboInstrument);
+
+            JLabel labelDetectorMeasurement = new JLabel("Detector/Measurement", JLabel.RIGHT);
             add(labelDetectorMeasurement);
             add(comboDetectorMeasurement);
+
             comboObservatory.setEnabled(false);
             comboInstrument.setEnabled(false);
             comboDetectorMeasurement.setEnabled(false);
