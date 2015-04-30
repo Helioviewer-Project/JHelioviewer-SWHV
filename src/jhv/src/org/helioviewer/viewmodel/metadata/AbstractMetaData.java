@@ -57,30 +57,6 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public GL3DVec2d getPhysicalLowerRight() {
-        return GL3DVec2d.add(lowerLeftCorner, sizeVector.getXVector());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GL3DVec2d getPhysicalUpperLeft() {
-        return GL3DVec2d.add(lowerLeftCorner, sizeVector.getYVector());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GL3DVec2d getPhysicalUpperRight() {
-        return GL3DVec2d.add(lowerLeftCorner, sizeVector);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GL3DVec2d getPhysicalSize() {
         return sizeVector;
     }
