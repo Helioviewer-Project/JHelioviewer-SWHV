@@ -91,7 +91,7 @@ public class JHVFITSView extends AbstractView {
         }
         imageData.setMETADATA(m);
 
-        region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalImageSize().x, m.getPhysicalImageSize().y);
+        region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
         imageData.setRegion(region);
         imageData.setMETADATA(this.m);
         viewport = StaticViewport.createAdaptedViewport(100, 100);

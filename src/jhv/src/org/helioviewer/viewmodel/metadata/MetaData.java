@@ -28,7 +28,7 @@ public interface MetaData {
      *
      * @return Physical image size
      */
-    public GL3DVec2d getPhysicalImageSize();
+    public GL3DVec2d getPhysicalSize();
 
     /**
      * Returns the physical position of the lower left corner of the
@@ -43,14 +43,14 @@ public interface MetaData {
      *
      * @return Physical image width
      */
-    public double getPhysicalImageWidth();
+    public double getPhysicalWidth();
 
     /**
      * Returns the physical image height of the corresponding image.
      *
      * @return Physical image height
      */
-    public double getPhysicalImageHeight();
+    public double getPhysicalHeight();
 
     /**
      * Returns the physical position of the upper left corner of the
