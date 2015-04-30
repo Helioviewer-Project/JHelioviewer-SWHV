@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,6 +22,7 @@ import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
+import org.helioviewer.plugins.eveplugin.view.chart.ChartConstants;
 
 public class EVEDrawableElement implements DrawableElement {
 
@@ -56,6 +58,8 @@ public class EVEDrawableElement implements DrawableElement {
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         updateGraphsData(interval, graphArea);
+        g.setFont(ChartConstants.font);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         drawGraphs(g, graphArea);
     }
 

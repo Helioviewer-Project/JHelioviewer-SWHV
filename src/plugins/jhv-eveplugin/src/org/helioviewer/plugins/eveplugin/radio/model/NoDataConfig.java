@@ -2,14 +2,16 @@ package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Date;
 
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.plugins.eveplugin.view.chart.ChartConstants;
 
 /**
  * Contains the configuration of an interval with no data used in the
  * RadioPlotModel.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
  */
 public class NoDataConfig {
@@ -28,7 +30,7 @@ public class NoDataConfig {
     /**
      * Creates a no data configuration with a date interval, drawable area map,
      * download id and an indication the no data configuration is visible.
-     * 
+     *
      * @param dateInterval
      *            The date interval
      * @param drawableAreaMap
@@ -48,7 +50,7 @@ public class NoDataConfig {
 
     /**
      * The date interval.
-     * 
+     *
      * @return the date interval
      */
     public Interval<Date> getDateInterval() {
@@ -57,7 +59,7 @@ public class NoDataConfig {
 
     /**
      * Sets the date interval.
-     * 
+     *
      * @param dateInterval
      *            The date interval
      */
@@ -67,7 +69,7 @@ public class NoDataConfig {
 
     /**
      * The drawable area map.
-     * 
+     *
      * @return The drawable area map
      */
     public DrawableAreaMap getDrawableAreaMap() {
@@ -76,7 +78,7 @@ public class NoDataConfig {
 
     /**
      * Set the drawable area map.
-     * 
+     *
      * @param drawableAreaMap
      *            The drawable area map
      */
@@ -86,7 +88,7 @@ public class NoDataConfig {
 
     /**
      * The download id.
-     * 
+     *
      * @return The download id
      */
     public long getDownloadId() {
@@ -95,7 +97,7 @@ public class NoDataConfig {
 
     /**
      * Sets the download id.
-     * 
+     *
      * @param downloadId
      *            The download id
      */
@@ -105,7 +107,7 @@ public class NoDataConfig {
 
     /**
      * Is the no data config visible?
-     * 
+     *
      * @return Is the no data config visible
      */
     public boolean isVisible() {
@@ -115,7 +117,7 @@ public class NoDataConfig {
     /**
      * Sets the no data config visible. True is the no data config is visible,
      * false if the no data config is not visible.
-     * 
+     *
      * @param visible
      *            True is the no data config is visible, false if the no data
      *            config is not visible.
@@ -126,7 +128,7 @@ public class NoDataConfig {
 
     /**
      * Draws the no data configuration on the given Graphics.
-     * 
+     *
      * @param g
      *            The Graphics on which the no data configuration should be
      *            drawn
@@ -145,6 +147,8 @@ public class NoDataConfig {
             final int textHeight = (int) g.getFontMetrics().getStringBounds(text, g).getHeight();
             final int x1 = drawableAreaMap.getDestinationX0() + (spaceWidth / 2) - (textWidth / 2);
             final int y1 = (int) ((spaceHeight / 2) - (0.5 * textHeight));
+            g.setFont(ChartConstants.font);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.drawString(text, x1, y1);
         }
     }

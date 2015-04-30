@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import org.helioviewer.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.PlotConfig;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModelListener;
+import org.helioviewer.plugins.eveplugin.view.chart.ChartConstants;
 
 public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement {
     ArrayList<BufferedImage> views = new ArrayList<BufferedImage>();
@@ -76,6 +78,8 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             final int x2 = graphArea.x + (graphArea.width / 2) - (text2Width / 2);
             final int y2 = (int) (graphArea.y + graphArea.height / 2 + 0.5 * text2height);
             g.setColor(Color.black);
+            g.setFont(ChartConstants.font);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
 
