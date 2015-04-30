@@ -245,10 +245,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         double sunY = m.tryGetDouble("CRPIX2") - 1;
         sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
-        GL3DVec2d sunPixelPosition = new GL3DVec2d(sunX, sunY);
-
         meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
-        setPhysicalLowerLeftCorner(GL3DVec2d.scale(sunPixelPosition, -meterPerPixel));
+        setPhysicalLowerLeftCorner(new GL3DVec2d(-meterPerPixel * sunX, -meterPerPixel * sunY));
         setPhysicalSize(new GL3DVec2d(pixelWidth * meterPerPixel, pixelHeight * meterPerPixel));
     }
 

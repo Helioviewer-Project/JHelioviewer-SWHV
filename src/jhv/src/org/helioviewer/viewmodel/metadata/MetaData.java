@@ -55,18 +55,6 @@ public interface MetaData {
      */
     public GL3DVec2d getPhysicalUpperRight();
     /**
-     * Returns the physical image width of the corresponding image.
-     *
-     * @return Physical image width
-     */
-    public double getPhysicalWidth();
-    /**
-     * Returns the physical image height of the corresponding image.
-     *
-     * @return Physical image height
-     */
-    public double getPhysicalHeight();
-    /**
      * Returns the width of the image in pixels.
      *
      * @return width of the image in pixels
