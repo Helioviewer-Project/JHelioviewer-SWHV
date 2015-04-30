@@ -41,7 +41,7 @@ public class JHVSimpleImageView extends AbstractView {
     protected Region region;
     protected ImageData subImageData;
     protected BufferedImage bufferedImage;
-    protected PixelBasedMetaData pixelBasedMetaData;
+    protected PixelBasedMetaData m;
 
     /**
      * Constructor which loads the corresponding image from given URI.
@@ -85,7 +85,7 @@ public class JHVSimpleImageView extends AbstractView {
             subImageData = new ARGBInt32ImageData(bufferedImage, new ColorMask());
         }
 
-        pixelBasedMetaData = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
+        m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
         region = StaticRegion.createAdaptedRegion(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
         viewport = StaticViewport.createAdaptedViewport(100, 100);
         updateImageData();
@@ -122,10 +122,10 @@ public class JHVSimpleImageView extends AbstractView {
      *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData() {
-        int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalWidth());
-        int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalHeight());
-        int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().x) / pixelBasedMetaData.getPhysicalWidth() * bufferedImage.getWidth());
-        int y = (int) ((region.getCornerY() - pixelBasedMetaData.getPhysicalLowerLeft().y) / pixelBasedMetaData.getPhysicalHeight() * bufferedImage.getHeight());
+        int width = (int) (bufferedImage.getWidth() * region.getWidth() / m.getPhysicalSize().x);
+        int height = (int) (bufferedImage.getHeight() * region.getHeight() / m.getPhysicalSize().y);
+        int x = (int) ((region.getCornerX() - m.getPhysicalLowerLeft().x) / m.getPhysicalSize().x * bufferedImage.getWidth());
+        int y = (int) ((region.getCornerY() - m.getPhysicalLowerLeft().y) / m.getPhysicalSize().y * bufferedImage.getHeight());
         if (width > 0 && height > 0) {
             BufferedImage bI = new BufferedImage(width, height, bufferedImage.getType());
             bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
@@ -139,7 +139,7 @@ public class JHVSimpleImageView extends AbstractView {
             }
             region = StaticRegion.createAdaptedRegion(-1.5, -1.5, 3., 3.);
             subImageData.setRegion(region);
-            subImageData.setMETADATA(this.pixelBasedMetaData);
+            subImageData.setMETADATA(this.m);
         } else {
             subImageData = null;
         }
@@ -166,7 +166,7 @@ public class JHVSimpleImageView extends AbstractView {
      */
     @Override
     public MetaData getMetaData() {
-        return pixelBasedMetaData;
+        return m;
     }
 
     /**

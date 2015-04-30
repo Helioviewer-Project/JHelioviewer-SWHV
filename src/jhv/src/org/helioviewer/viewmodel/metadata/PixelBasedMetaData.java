@@ -78,8 +78,8 @@ public class PixelBasedMetaData extends AbstractMetaData {
         double unitsPerPixelY = region.getHeight() / pixelHeight;
         double newUnitsPerPixel = Math.max(unitsPerPixelX, unitsPerPixelY);
 
-        setPhysicalSize(GL3DVec2d.scale(new GL3DVec2d(getPhysicalWidth(), getPhysicalHeight()), newUnitsPerPixel / unitsPerPixel));
-        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getCornerX(), region.getCornerY() - getPhysicalHeight() + region.getHeight()));
+        setPhysicalSize(GL3DVec2d.scale(getPhysicalSize(), newUnitsPerPixel / unitsPerPixel));
+        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getCornerX(), region.getCornerY() - getPhysicalSize().y + region.getHeight()));
         unitsPerPixel = newUnitsPerPixel;
     }
 

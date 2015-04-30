@@ -57,22 +57,6 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public double getPhysicalHeight() {
-        return sizeVector.y;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getPhysicalWidth() {
-        return sizeVector.x;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GL3DVec2d getPhysicalLowerRight() {
         return GL3DVec2d.add(lowerLeftCorner, sizeVector.getXVector());
     }

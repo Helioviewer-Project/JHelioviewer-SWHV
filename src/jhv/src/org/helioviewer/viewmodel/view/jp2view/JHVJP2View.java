@@ -131,7 +131,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalWidth(), metaData.getPhysicalHeight());
+                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
             }
             if (viewport == null) {
                 viewport = StaticViewport.createAdaptedViewport(100, 100);
@@ -476,18 +476,18 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
         MetaData metaData = jp2Image.metaDataList[frameNumber];
 
-        double m = Displayer.getViewportHeight() / (double) Displayer.getActiveCamera().getCameraWidth();
+        double m = Displayer.getViewportHeight() / Displayer.getActiveCamera().getCameraWidth();
         int h = (int) (r.getHeight() * m);
         int w = (int) (r.getWidth() * m);
 
-        m = metaData.getPhysicalWidth() / (double) r.getWidth();
+        m = metaData.getPhysicalSize().x / r.getWidth();
         int totalHeight = (int) (h * m);
         int totalWidth = (int) (w * m);
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
-        double imageMeterPerPixel = metaData.getPhysicalWidth() / (double) res.getResolutionBounds().getWidth();
-        int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
-        int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
+        double currentMeterPerPixel = metaData.getPhysicalSize().x / (double) res.getResolutionBounds().getWidth();
+        int imageWidth = (int) Math.round(r.getWidth() / currentMeterPerPixel);
+        int imageHeight = (int) Math.round(r.getHeight() / currentMeterPerPixel);
 
         Region mr = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));

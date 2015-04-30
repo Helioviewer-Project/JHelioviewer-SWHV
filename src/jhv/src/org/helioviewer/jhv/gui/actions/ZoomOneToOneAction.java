@@ -43,7 +43,7 @@ public class ZoomOneToOneAction extends AbstractAction {
         if (view != null) {
             double imheight = ((HelioviewerMetaData) view.getMetaData()).getPixelHeight();
             double imageFraction = Displayer.getViewportHeight() / imheight;
-            double fov = 2. * Math.atan(-view.getMetaData().getPhysicalHeight() * imageFraction / 2. / camera.getTranslation().z);
+            double fov = 2. * Math.atan(-view.getMetaData().getPhysicalSize().y * imageFraction / 2. / camera.getTranslation().z);
 
             camera.setCameraFOV(fov);
             Displayer.display();
