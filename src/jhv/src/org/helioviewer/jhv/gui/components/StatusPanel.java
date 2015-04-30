@@ -4,11 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 
 /**
  * Class used for displaying information and statuses in a panel at the very
@@ -25,9 +22,6 @@ import javax.swing.border.EtchedBorder;
  * @author Markus Langenberg
  */
 public class StatusPanel extends JPanel {
-    public static final Border paddingBorder = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-    public static final int HEIGHT = 30;
 
     private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -54,7 +48,7 @@ public class StatusPanel extends JPanel {
         add(rightPanel, BorderLayout.EAST);
 
         if (leftMargin != 0) {
-            statusInfoLabel.setPreferredSize(new Dimension(leftMargin, 20));
+            statusInfoLabel.setPreferredSize(new Dimension(leftMargin, 1));
             leftPanel.add(statusInfoLabel);
         }
 
@@ -63,8 +57,6 @@ public class StatusPanel extends JPanel {
             spacer.setPreferredSize(new Dimension(rightMargin, 1));
             rightPanel.add(spacer);
         }
-
-        setPreferredSize(new Dimension(0, HEIGHT));
     }
 
     /**
