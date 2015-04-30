@@ -6,11 +6,11 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
@@ -25,7 +25,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
     private Point lastPosition;
 
     private PositionStatusPanel() {
-        setBorder(BorderFactory.createEtchedBorder());
+        setBorder(StatusPanel.paddingBorder);
         setPreferredSize(new Dimension(170, 20));
         setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
     }

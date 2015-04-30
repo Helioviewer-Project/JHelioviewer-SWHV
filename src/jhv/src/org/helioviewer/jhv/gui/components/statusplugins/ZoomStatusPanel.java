@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import java.awt.Dimension;
-
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+
+import org.helioviewer.jhv.gui.components.StatusPanel;
 
 /**
  * Status panel for displaying the current zoom.
@@ -23,8 +22,10 @@ public class ZoomStatusPanel extends JLabel {
     private static final ZoomStatusPanel instance = new ZoomStatusPanel();
 
     private ZoomStatusPanel() {
-        setBorder(BorderFactory.createEtchedBorder());
-        setPreferredSize(new Dimension(100, 20));
+        setBorder(StatusPanel.paddingBorder);
+
+        getPreferredSize().height = StatusPanel.HEIGHT;
+        //setPreferredSize(new Dimension(100, 20));
         setText("Zoom:");
     }
 
