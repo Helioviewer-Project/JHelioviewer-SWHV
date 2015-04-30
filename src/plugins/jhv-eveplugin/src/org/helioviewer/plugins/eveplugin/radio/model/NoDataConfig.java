@@ -2,11 +2,9 @@ package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.util.Date;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.plugins.eveplugin.view.chart.ChartConstants;
 
 /**
  * Contains the configuration of an interval with no data used in the
@@ -147,8 +145,6 @@ public class NoDataConfig {
             final int textHeight = (int) g.getFontMetrics().getStringBounds(text, g).getHeight();
             final int x1 = drawableAreaMap.getDestinationX0() + (spaceWidth / 2) - (textWidth / 2);
             final int y1 = (int) ((spaceHeight / 2) - (0.5 * textHeight));
-            g.setFont(ChartConstants.font);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.drawString(text, x1, y1);
         }
     }

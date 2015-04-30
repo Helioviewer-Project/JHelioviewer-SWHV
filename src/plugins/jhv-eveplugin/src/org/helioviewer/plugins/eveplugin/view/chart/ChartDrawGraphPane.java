@@ -158,6 +158,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
             Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
             gleftAxisPart.setTransform(tf);
+            gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            gplotPart.setFont(ChartConstants.font);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setFont(ChartConstants.font);
+            gleftAxisPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            gleftAxisPart.setFont(ChartConstants.font);
             drawData(gplotPart, g, gleftAxisPart, mousePosition);
             gplotPart.dispose();
             gleftAxisPart.dispose();
@@ -212,8 +218,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (!drawController.getIntervalAvailable()) {
             return;
         }
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setFont(ChartConstants.font);
 
         // draw vertical ticks
         int counter = 0;
