@@ -10,8 +10,8 @@ import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
+import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.MetaDataConstructor;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
@@ -79,7 +79,7 @@ public class JHVFITSView extends AbstractView {
      * Initializes global variables.
      */
     private void initFITSImageView() {
-        m = MetaDataConstructor.getMetaData(fits);
+        m = new HelioviewerMetaData(fits);
 
         BufferedImage bi = fits.getImage(0, 0, fits.getPixelHeight(), fits.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
