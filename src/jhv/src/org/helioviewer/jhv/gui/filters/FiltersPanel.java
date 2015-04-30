@@ -28,10 +28,6 @@ public class FiltersPanel extends JPanel {
     private final ContrastPanel contrastPanel = new ContrastPanel();
     private final SharpenPanel sharpenPanel = new SharpenPanel();
 
-    public enum Area {
-        TOP, CENTER, BOTTOM
-    }
-
     @Override
     public void setEnabled(boolean enabled) {
         for (Component c : this.getComponents()) {
@@ -66,7 +62,7 @@ public class FiltersPanel extends JPanel {
         c.gridy++;
         this.addToGridBag(c, lUTPanel);
         c.gridy++;
-        this.addToGridBag2(c, channelMixerPanel);
+        this.addToGridBag(c, channelMixerPanel);
         c.gridy++;
     }
 
@@ -74,7 +70,7 @@ public class FiltersPanel extends JPanel {
         c.gridwidth = 1;
 
         c.gridx = 0;
-        c.weightx = 0.1;
+        c.weightx = 0.;
         c.weighty = 1.0;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
@@ -87,27 +83,10 @@ public class FiltersPanel extends JPanel {
         add(details.getSlider(), c);
 
         c.gridx = 2;
-        c.weightx = 0.1;
+        c.weightx = 0.;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
         add(details.getValue(), c);
-    }
-
-    private void addToGridBag2(GridBagConstraints c, FilterDetails details) {
-        c.gridwidth = 1;
-        c.gridx = 0;
-        c.weightx = 0.1;
-        c.weighty = 1.0;
-        c.anchor = GridBagConstraints.LINE_END;
-        c.fill = GridBagConstraints.NONE;
-        add(details.getTitle(), c);
-
-        c.gridx = 1;
-        c.weightx = 1.1;
-        c.anchor = GridBagConstraints.CENTER;
-        c.gridwidth = 2;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        add(details.getSlider(), c);
     }
 
     public void setActivejp2(final AbstractView jp2view) {
