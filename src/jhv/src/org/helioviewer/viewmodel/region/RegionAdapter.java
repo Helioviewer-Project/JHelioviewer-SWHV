@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.region;
 
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.RectangleDouble;
 
 /**
  * Implementation of {@link Region}.
@@ -74,14 +73,6 @@ public class RegionAdapter implements Region {
      * {@inheritDoc}
      * */
     @Override
-    public RectangleDouble getRectangle() {
-        return new RectangleDouble(region.getLowerLeftCorner(), region.getSize());
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
     public GL3DVec2d getLowerRightCorner() {
         return GL3DVec2d.add(region.getLowerLeftCorner(), region.getSize().getXVector());
     }
@@ -122,6 +113,7 @@ public class RegionAdapter implements Region {
 
     @Override
     public String toString() {
-        return "[RegionAdapter: Rectangle " + this.getRectangle() + "]";
+        return "[RegionAdapter: Corner: " + getLowerLeftCorner() + ", Size: " + getSize() + "]";
     }
+
 }

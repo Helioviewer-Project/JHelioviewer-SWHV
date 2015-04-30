@@ -131,7 +131,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalWidth(), metaData.getPhysicalHeight());
             }
             if (viewport == null) {
                 viewport = StaticViewport.createAdaptedViewport(100, 100);

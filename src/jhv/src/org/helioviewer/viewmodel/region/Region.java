@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.region;
 
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.RectangleDouble;
 
 /**
  * Extension of {@link BasicRegion}, representing a region.
@@ -42,13 +41,6 @@ public interface Region extends BasicRegion {
     public double getHeight();
 
     /**
-     * Returns a RectangleDouble object containing the basic region information.
-     *
-     * @return a RectangleDouble object containing the basic region information.
-     * */
-    public RectangleDouble getRectangle();
-
-    /**
      * Returns the position of the upper left corner of the region.
      *
      * @return a GL3DVec2d object which points to the upper left corner of the
@@ -77,4 +69,5 @@ public interface Region extends BasicRegion {
      */
     @Override
     public boolean equals(Object o);
+
 }
