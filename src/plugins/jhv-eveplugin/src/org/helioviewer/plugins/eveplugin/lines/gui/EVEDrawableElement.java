@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.lines.gui;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -147,7 +146,7 @@ public class EVEDrawableElement implements DrawableElement {
         return (int) (ratioY * (orig - minV));
     }
 
-    private void drawGraphs(final Graphics g, Rectangle graphArea) {
+    private void drawGraphs(final Graphics2D g, Rectangle graphArea) {
         Iterator<GraphPolyline> i = graphPolylines.iterator();
         while (i.hasNext()) {
             GraphPolyline line = i.next();
