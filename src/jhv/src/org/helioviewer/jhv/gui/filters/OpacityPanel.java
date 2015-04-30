@@ -24,8 +24,7 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     private final JLabel title;
 
     public OpacityPanel() {
-        title = new JLabel("Opacity");
-        title.setHorizontalAlignment(JLabel.RIGHT);
+        title = new JLabel("Opacity", JLabel.RIGHT);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         opacitySlider.setMajorTickSpacing(25);

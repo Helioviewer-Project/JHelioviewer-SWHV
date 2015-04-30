@@ -31,8 +31,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     private final JLabel gammaLabel;
 
     public GammaCorrectionPanel() {
-        title = new JLabel("Gamma");
-        title.setHorizontalAlignment(JLabel.RIGHT);
+        title = new JLabel("Gamma", JLabel.RIGHT);
 
         gammaSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         gammaSlider.setMajorTickSpacing(25 * 2); // twice wider

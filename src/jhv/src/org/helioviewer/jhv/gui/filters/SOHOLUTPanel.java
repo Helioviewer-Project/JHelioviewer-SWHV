@@ -39,8 +39,8 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
 
     public SOHOLUTPanel() {
         lutMap = LUT.getStandardList();
-        title = new JLabel("Color");
-        title.setHorizontalAlignment(JLabel.RIGHT);
+
+        title = new JLabel("Color", JLabel.RIGHT);
 
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setMaximumSize(combobox.getPreferredSize());

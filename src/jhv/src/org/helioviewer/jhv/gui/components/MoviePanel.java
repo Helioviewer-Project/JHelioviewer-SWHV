@@ -245,9 +245,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         buttonPanel.add(advancedButton);
 
         // Current frame number
-        frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1));
+        frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
         frameNumberLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        frameNumberLabel.setHorizontalAlignment(JLabel.RIGHT);
         frameNumberLabel.setPreferredSize(new Dimension(75, 20));
         secondLine.add(frameNumberLabel, BorderLayout.EAST);
 
