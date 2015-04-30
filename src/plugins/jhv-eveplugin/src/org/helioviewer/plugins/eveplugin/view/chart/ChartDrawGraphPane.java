@@ -153,11 +153,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
-
-            BufferedImage plotPart = screenImage.getSubimage(sx * ChartConstants.getGraphLeftSpace(),
-                                                             sy * ChartConstants.getGraphTopSpace(),
-                                                             width - sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight()),
-                                                             height - sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
+            BufferedImage plotPart = screenImage.getSubimage(sx * ChartConstants.getGraphLeftSpace(), sy * ChartConstants.getGraphTopSpace(), width - sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight()), height - sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
             Graphics2D gplotPart = plotPart.createGraphics();
             gplotPart.setTransform(tf);
             BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * ChartConstants.getGraphLeftSpace(), height);
@@ -666,20 +662,19 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void setChartInformation() {
+        setTwoAxisInformation();
+        drawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+    }
+
+    // Graph Polyline
+
+    private void setTwoAxisInformation() {
         if (drawController.getYAxisElements().size() >= 2) {
             twoYAxis = 1;
         } else {
             twoYAxis = 0;
         }
-        final int graphWidth = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight());
-        final int graphHeight = getHeight() - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
-        Rectangle graphArea = new Rectangle(ChartConstants.getGraphLeftSpace(), ChartConstants.getGraphTopSpace(), graphWidth, graphHeight);
-        Rectangle plotArea = new Rectangle(0, 0, graphWidth, graphHeight);
-        Rectangle leftAxisArea = new Rectangle(0, ChartConstants.getGraphTopSpace(), ChartConstants.getGraphLeftSpace(), graphHeight - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
-        drawController.setGraphInformation(graphArea, plotArea, leftAxisArea);
     }
-
-    // Graph Polyline
 
     public class GraphPolyline {
 
@@ -716,6 +711,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void drawRequest() {
+        setTwoAxisInformation();
         updateGraph();
     }
 
@@ -799,11 +795,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
