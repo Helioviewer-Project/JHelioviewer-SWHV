@@ -1,17 +1,12 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -24,6 +19,7 @@ import org.helioviewer.plugins.eveplugin.radio.model.YValueModel;
 import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
@@ -32,14 +28,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.ViewportAdapter;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * The radio data manager manages all the downloaded data for radio
@@ -275,7 +266,6 @@ public class RadioDataManager implements RadioDownloaderListener {
         fireIntervalTooBig(ID);
         fireNewDataAvailable(drd, ID);
         fireDownloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime), ID);
-
     }
 
     @Override
@@ -603,7 +593,6 @@ public class RadioDataManager implements RadioDownloaderListener {
         for (RadioDataManagerListener l : listeners) {
             l.dataNotChanged(timeInterval, freqInterval, rectangle, tempList, imageID);
         }
-
     }
 
     /**
@@ -618,62 +607,6 @@ public class RadioDataManager implements RadioDownloaderListener {
         for (RadioDataManagerListener l : listeners) {
             l.intervalTooBig(downloadID);
         }
-    }
-
-    /* temporarily copied here */
-    private static NodeList parseXML(String xml) throws JHV_KduException {
-        if (xml == null) {
-            throw new JHV_KduException("No XML data present");
-        } else if (!xml.contains("</meta>")) {
-            throw new JHV_KduException("XML data incomplete");
-        }
-
-        try {
-            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes("UTF-8"));
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            return builder.parse(in).getElementsByTagName("meta");
-
-        } catch (Exception e) {
-            throw new JHV_KduException("Failed parsing XML data", e);
-        }
-    }
-
-    private static String getValueFromXML(NodeList nodeList, String _keyword) throws JHV_KduException {
-        try {
-            NodeList value = ((Element) nodeList.item(0)).getElementsByTagName(_keyword);
-            Element line = (Element) value.item(0);
-
-            if (line == null) {
-                return null;
-            }
-
-            Node child = line.getFirstChild();
-            if (child instanceof CharacterData) {
-                CharacterData cd = (CharacterData) child;
-                return cd.getData();
-            }
-            return null;
-        } catch (Exception e) {
-            throw new JHV_KduException("Failed parsing XML data", e);
-        }
-    }
-
-    private static String getKey(NodeList nodeList, String key) {
-        try {
-            return getValueFromXML(nodeList, key);
-        } catch (JHV_KduException e) {
-            if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                }
-
-                getKey(nodeList, key);
-            } else if (e.getMessage() != "No XML data present") {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
     /**
@@ -697,16 +630,17 @@ public class RadioDataManager implements RadioDownloaderListener {
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
 
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    NodeList nodeList = parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
-
-                    Double freqStart = Double.parseDouble(getKey(nodeList, "STARTFRQ"));
-                    Double freqEnd = Double.parseDouble(getKey(nodeList, "END-FREQ"));
+                    hvMetaData.parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
+                    Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
+                    Double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
+                    Date start = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-OBS")).getTime();
+                    Date end = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-END")).getTime();
+                    hvMetaData.destroyXML();
 
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
-                    Date start = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-OBS")).getTime();
-                    Date end = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-END")).getTime();
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
                     if (start != null && end != null) {
@@ -734,8 +668,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                     } else {
                         Log.error("Start and/or stop is null");
                     }
-                } catch (JHV_KduException e) {
-                    Log.error("Some of the metadata could not be read aborting...");
+                } catch (Exception e) {
+                    Log.error("Some of the metadata could not be read, aborting...");
                     return;
                 }
             }
@@ -769,16 +703,17 @@ public class RadioDataManager implements RadioDownloaderListener {
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
 
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
             for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
                 try {
-                    NodeList nodeList = parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
-
-                    Double freqStart = Double.parseDouble(getKey(nodeList, "STARTFRQ"));
-                    Double freqEnd = Double.parseDouble(getKey(nodeList, "END-FREQ"));
+                    hvMetaData.parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
+                    Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
+                    Double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
+                    Date start = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-OBS")).getTime();
+                    Date end = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-END")).getTime();
+                    hvMetaData.destroyXML();
 
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
-                    Date start = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-OBS")).getTime();
-                    Date end = ImmutableDateTime.parseDateTime(getKey(nodeList, "DATE-END")).getTime();
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
                     if (start != null && end != null) {
@@ -799,7 +734,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     } else {
                         Log.error("Start and/or stop is null");
                     }
-                } catch (JHV_KduException e) {
+                } catch (Exception e) {
                     return;
                 }
             }
@@ -832,7 +767,6 @@ public class RadioDataManager implements RadioDownloaderListener {
         lineDataSelectorModel.addLineData(drd);
         fireNewDataAvailable(drd, downloadID);
         fireDownloadRequestAnswered(requestInterval, downloadID);
-
     }
 
 }
