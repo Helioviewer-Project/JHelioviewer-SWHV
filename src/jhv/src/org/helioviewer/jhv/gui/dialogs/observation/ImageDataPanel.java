@@ -18,7 +18,6 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -84,13 +83,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
         final JPanel timePane = new JPanel();
         timePane.setLayout(new BoxLayout(timePane, BoxLayout.PAGE_AXIS));
-        timePane.setBorder(BorderFactory.createEtchedBorder());
         timePane.add(timeSelectionPanel);
         timePane.add(cadencePanel);
 
         final JPanel instrumentsPane = new JPanel();
         instrumentsPane.setLayout(new BorderLayout());
-        instrumentsPane.setBorder(BorderFactory.createEtchedBorder());
         instrumentsPane.add(instrumentsPanel, BorderLayout.CENTER);
 
         add(timePane);

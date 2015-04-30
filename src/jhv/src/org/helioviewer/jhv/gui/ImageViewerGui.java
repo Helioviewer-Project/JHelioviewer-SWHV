@@ -144,11 +144,15 @@ public class ImageViewerGui {
 
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
+        prepareGuiExtra();
+
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
-        filtersPanel = new FiltersPanel();
+    }
 
+    private static void prepareGuiExtra() {
+        filtersPanel = new FiltersPanel();
     }
 
     private static JFrame createMainFrame() {
@@ -369,4 +373,5 @@ public class ImageViewerGui {
     public static FiltersPanel getFiltersPanel() {
         return filtersPanel;
     }
+
 }
