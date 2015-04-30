@@ -5,7 +5,6 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.viewmodel.region.Region;
@@ -25,7 +24,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * @author Andre Dau
  *
  */
-public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData, ImageSizeMetaData {
+public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
 
     private double dobs;
 
@@ -43,11 +42,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private GL3DQuatd localRotation;
 
     private double meterPerPixel;
-
     private GL3DVec2d sunPixelPosition = new GL3DVec2d();
+
     private int pixelWidth;
     private int pixelHeight;
-    private Vector2dInt pixelSize = new Vector2dInt();
 
     /**
      * Default constructor.
@@ -245,11 +243,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         double sunX = m.tryGetDouble("CRPIX1") - 1;
         double sunY = m.tryGetDouble("CRPIX2") - 1;
-
-        pixelSize = new Vector2dInt(pixelWidth, pixelHeight);
         sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
         GL3DVec2d sunPixelPosition = new GL3DVec2d(sunX, sunY);
+
         meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
         setPhysicalLowerLeftCorner(GL3DVec2d.scale(sunPixelPosition, -meterPerPixel));
         setPhysicalSize(new GL3DVec2d(pixelWidth * meterPerPixel, pixelHeight * meterPerPixel));
@@ -294,14 +291,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     @Override
     public String getFullName() {
         return fullName;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Vector2dInt getResolution() {
-        return pixelSize;
     }
 
     /**

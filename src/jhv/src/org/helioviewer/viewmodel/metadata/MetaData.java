@@ -22,14 +22,12 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  *
  */
 public interface MetaData {
-
     /**
      * Returns the physical image size of the corresponding image.
      *
      * @return Physical image size
      */
     public GL3DVec2d getPhysicalSize();
-
     /**
      * Returns the physical position of the lower left corner of the
      * corresponding image.
@@ -37,29 +35,6 @@ public interface MetaData {
      * @return Physical position of the lower left corner
      */
     public GL3DVec2d getPhysicalLowerLeft();
-
-    /**
-     * Returns the physical image width of the corresponding image.
-     *
-     * @return Physical image width
-     */
-    public double getPhysicalWidth();
-
-    /**
-     * Returns the physical image height of the corresponding image.
-     *
-     * @return Physical image height
-     */
-    public double getPhysicalHeight();
-
-    /**
-     * Returns the physical position of the upper left corner of the
-     * corresponding image.
-     *
-     * @return Physical position of the upper left corner
-     */
-    public GL3DVec2d getPhysicalUpperLeft();
-
     /**
      * Returns the physical position of the lower right corner of the
      * corresponding image.
@@ -67,7 +42,13 @@ public interface MetaData {
      * @return Physical position of the lower right corner
      */
     public GL3DVec2d getPhysicalLowerRight();
-
+    /**
+     * Returns the physical position of the upper left corner of the
+     * corresponding image.
+     *
+     * @return Physical position of the upper left corner
+     */
+    public GL3DVec2d getPhysicalUpperLeft();
     /**
      * Returns the physical position of the upper right corner of the
      * corresponding image.
@@ -75,14 +56,24 @@ public interface MetaData {
      * @return Physical position of the upper right corner
      */
     public GL3DVec2d getPhysicalUpperRight();
-
     /**
      * Returns the complete physical rectangle of the corresponding image.
      *
      * @return Physical rectangle
      */
     public RectangleDouble getPhysicalRectangle();
-
+    /**
+     * Returns the physical image width of the corresponding image.
+     *
+     * @return Physical image width
+     */
+    public double getPhysicalWidth();
+    /**
+     * Returns the physical image height of the corresponding image.
+     *
+     * @return Physical image height
+     */
+    public double getPhysicalHeight();
     /**
      * Returns the physical rectangle as a region of the corresponding image.
      *
@@ -92,17 +83,23 @@ public interface MetaData {
 
     /**
      * Returns the width of the image in pixels.
-     *.
+     *
      * @return width of the image in pixels
      */
     public int getPixelWidth();
 
     /**
      * Returns the height of the image in pixels.
-     *.
+     *
      * @return height of the image in pixels
      */
     public int getPixelHeight();
+    /**
+     * Returns the conversion factor from pixels to a physical unit.
+     *
+     * @return conversion factor from pixels to a physical unit.
+     */
+    public double getUnitsPerPixel();
 
     public ImmutableDateTime getDateTime();
 
