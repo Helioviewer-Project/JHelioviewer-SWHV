@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
@@ -21,14 +20,13 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Ldwig Schmidt
  *
  */
-public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMetaData {
+public class PixelBasedMetaData extends AbstractMetaData {
 
     private double unitsPerPixel = 1.0;
-    private final Vector2dInt resolution;
     private final GL3DQuatd localRotation = new GL3DQuatd();
 
-    private final int pixelImageWidth;
-    private final int pixelImageHeight;
+    private final int pixelWidth;
+    private final int pixelHeight;
 
     /**
      * Constructor, setting the size. The position is set to (0,0) by default.
@@ -41,22 +39,13 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
     public PixelBasedMetaData(int newWidth, int newHeight) {
         super(0, 0, newWidth, newHeight);
 
-        pixelImageWidth = newWidth;
-        pixelImageHeight = newHeight;
-        resolution = new Vector2dInt(getPhysicalSize());
+        pixelWidth = newWidth;
+        pixelHeight = newHeight;
         this.dateTime = new ImmutableDateTime(new Date().getTime());
     }
 
     public GL3DQuatd getLocalRotation() {
         return localRotation;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Vector2dInt getResolution() {
-        return resolution;
     }
 
     /**
@@ -69,12 +58,12 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
 
     @Override
     public int getPixelHeight() {
-        return pixelImageHeight;
+        return pixelHeight;
     }
 
     @Override
     public int getPixelWidth() {
-        return pixelImageWidth;
+        return pixelWidth;
     }
 
     /**
@@ -85,8 +74,8 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
      *            The region which this image should cover
      */
     public void updatePhysicalRegion(Region region) {
-        double unitsPerPixelX = region.getWidth() / getResolution().getX();
-        double unitsPerPixelY = region.getHeight() / getResolution().getY();
+        double unitsPerPixelX = region.getWidth() / pixelWidth;
+        double unitsPerPixelY = region.getHeight() / pixelHeight;
         double newUnitsPerPixel = Math.max(unitsPerPixelX, unitsPerPixelY);
 
         setPhysicalSize(GL3DVec2d.scale(getPhysicalSize(), newUnitsPerPixel / unitsPerPixel));
