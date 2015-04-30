@@ -10,7 +10,6 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -41,12 +40,10 @@ public class ZoomFitAction extends AbstractAction {
         GL3DCamera camera = Displayer.getActiveCamera();
 
         if (view != null) {
-            Region region = view.getMetaData().getPhysicalRegion();
-            if (region != null) {
-                double fov = 2. * Math.atan(-region.getHeight() / 2. / camera.getTranslation().z);
-                camera.setCameraFOV(fov);
-                Displayer.display();
-            }
+            double fov = 2. * Math.atan(-view.getMetaData().getPhysicalHeight() / 2. / camera.getTranslation().z);
+
+            camera.setCameraFOV(fov);
+            Displayer.display();
         }
     }
 

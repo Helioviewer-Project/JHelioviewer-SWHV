@@ -1,8 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
@@ -99,8 +97,8 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public Region getPhysicalRegion() {
-        return StaticRegion.createAdaptedRegion(lowerLeftCorner, sizeVector);
+    public GL3DVec2d getPhysicalSize() {
+        return sizeVector;
     }
 
     /**
