@@ -1,14 +1,9 @@
 package org.helioviewer.viewmodel.view.jp2view.kakadu;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_locator;
@@ -18,10 +13,9 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.MetaDataContainer;
+import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
@@ -29,10 +23,6 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPQuery;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPRequest;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * A collection of useful static methods.
@@ -421,110 +411,8 @@ public class KakaduUtils {
         return true;
     }
 
-    private static NodeList parseXML(String xml) throws JHV_KduException {
-        if (xml == null)
-            throw new JHV_KduException("No XML data present");
-        else if (!xml.contains("</meta>")) {
-            throw new JHV_KduException("XML data incomplete");
-        }
-
-        try {
-            InputStream in = new ByteArrayInputStream(xml.trim().replace("&", "&amp;").getBytes("UTF-8"));
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            return builder.parse(in).getElementsByTagName("meta");
-
-        } catch (Exception e) {
-            throw new JHV_KduException("Failed parsing XML data", e);
-        }
-    }
-
-    private static class hvXMLMetaData implements MetaDataContainer {
-
-        private NodeList nodeList;
-
-        public void setNode(NodeList nodeList) {
-            this.nodeList = nodeList;
-        }
-
-        private String getValueFromXML(String _keyword) throws JHV_KduException {
-            try {
-                NodeList value = ((Element) this.nodeList.item(0)).getElementsByTagName(_keyword);
-                Element line = (Element) value.item(0);
-
-                if (line == null)
-                    return null;
-
-                Node child = line.getFirstChild();
-                if (child instanceof CharacterData) {
-                    CharacterData cd = (CharacterData) child;
-                    return cd.getData();
-                }
-                return null;
-            } catch (Exception e) {
-                throw new JHV_KduException("Failed parsing XML data", e);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String get(String key) {
-            try {
-                return getValueFromXML(key);
-            } catch (JHV_KduException e) {
-                if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e1) {
-                    }
-
-                    get(key);
-                } else if (e.getMessage() != "No XML data present") {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double tryGetDouble(String key) {
-            String string = get(key);
-            if (string != null) {
-                try {
-                    return Double.parseDouble(string);
-                } catch (NumberFormatException e) {
-                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                    return 0.0;
-                }
-            }
-            return 0.0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int tryGetInt(String key) {
-            String string = get(key);
-            if (string != null) {
-                try {
-                    return Integer.parseInt(string);
-                } catch (NumberFormatException e) {
-                    Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                    return 0;
-                }
-            }
-            return 0;
-        }
-
-    }
-
-    public static void cacheMetaData(Jp2_threadsafe_family_src _familySrc, MetaData[] metaDataList) throws JHV_KduException {
-        hvXMLMetaData hvMetaData = new hvXMLMetaData();
+    public static void cacheMetaData(Jp2_threadsafe_family_src _familySrc, MetaData[] metaDataList) throws JHV_KduException, Exception {
+        XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
         int num = metaDataList.length;
 
         Jp2_input_box findBoxResult[], assocBox;
@@ -536,9 +424,9 @@ public class KakaduUtils {
             for (int i = 0; i < num; i++) {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
-                        hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
+                        hvMetaData.parseXML(xmlBox2xml(xmlBox));
                         metaDataList[i] = new HelioviewerMetaData(hvMetaData);
-                        hvMetaData.setNode(null);
+                        hvMetaData.destroyXML();
                     }
 
                     xmlBox.Close();
@@ -552,9 +440,9 @@ public class KakaduUtils {
             findBoxResult = KakaduUtils.findBox(_familySrc, Kdu_global.jp2_xml_4cc, 1);
             xmlBox = findBoxResult[0];
             if (xmlBox != null) {
-                hvMetaData.setNode(parseXML(xmlBox2xml(xmlBox)));
+                hvMetaData.parseXML(xmlBox2xml(xmlBox));
                 metaDataList[0] = new HelioviewerMetaData(hvMetaData);
-                hvMetaData.setNode(null);
+                hvMetaData.destroyXML();
             }
         }
 
@@ -567,7 +455,6 @@ public class KakaduUtils {
         if (findBoxResult[0] != null) {
             findBoxResult[0].Native_destroy();
         }
-        hvMetaData = null;
     }
 
     /**
