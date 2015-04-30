@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData, ImageSizeMetaData {
 
     private double dobs;
-    private final boolean carringtonAvailable = false;
 
     private double refb0;
     private double refl0;
@@ -41,13 +40,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
-    private Vector2dInt pixelImageSize = new Vector2dInt();
+    private GL3DQuatd localRotation;
 
     private double meterPerPixel;
-    private GL3DQuatd localRotation;
-    private GL3DVec2d sunPixelPositionImage = new GL3DVec2d();
-    private int pixelImageWidth;
-    private int pixelImageHeight;
+
+    private GL3DVec2d sunPixelPosition = new GL3DVec2d();
+    private int pixelWidth;
+    private int pixelHeight;
+    private Vector2dInt pixelSize = new Vector2dInt();
 
     /**
      * Default constructor.
@@ -187,8 +187,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        pixelImageWidth = m.tryGetInt("NAXIS1");
-        pixelImageHeight = m.tryGetInt("NAXIS2");
+        pixelWidth = m.tryGetInt("NAXIS1");
+        pixelHeight = m.tryGetInt("NAXIS2");
 
         double newSolarPixelRadius = -1.0;
 
@@ -213,9 +213,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         } else if (instrument.equals("EIT")) {
             newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
             if (newSolarPixelRadius == 0) {
-                if (pixelImageWidth == 1024) {
+                if (pixelWidth == 1024) {
                     newSolarPixelRadius = 360;
-                } else if (pixelImageWidth == 512) {
+                } else if (pixelWidth == 512) {
                     newSolarPixelRadius = 180;
                 }
             }
@@ -246,17 +246,17 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         double sunX = m.tryGetDouble("CRPIX1") - 1;
         double sunY = m.tryGetDouble("CRPIX2") - 1;
 
-        this.pixelImageSize = new Vector2dInt(pixelImageWidth, pixelImageHeight);
-        this.sunPixelPositionImage = new GL3DVec2d(sunX, pixelImageHeight - 1 - sunY);
+        pixelSize = new Vector2dInt(pixelWidth, pixelHeight);
+        sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
         GL3DVec2d sunPixelPosition = new GL3DVec2d(sunX, sunY);
         meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
         setPhysicalLowerLeftCorner(GL3DVec2d.scale(sunPixelPosition, -meterPerPixel));
-        setPhysicalImageSize(new GL3DVec2d(pixelImageWidth * meterPerPixel, pixelImageHeight * meterPerPixel));
+        setPhysicalSize(new GL3DVec2d(pixelWidth * meterPerPixel, pixelHeight * meterPerPixel));
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPositionImage.x) * meterPerPixel, (roi.y / zoompercent - sunPixelPositionImage.y) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
+        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.x) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.y) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
     }
 
     /**
@@ -301,7 +301,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
      */
     @Override
     public Vector2dInt getResolution() {
-        return pixelImageSize;
+        return pixelSize;
     }
 
     /**
@@ -319,12 +319,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     @Override
     public int getPixelHeight() {
-        return pixelImageHeight;
+        return pixelHeight;
     }
 
     @Override
     public int getPixelWidth() {
-        return pixelImageWidth;
+        return pixelWidth;
     }
 
     public double getDobs() {

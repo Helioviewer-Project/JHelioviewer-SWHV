@@ -122,10 +122,10 @@ public class JHVSimpleImageView extends AbstractView {
      *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData() {
-        int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalImageSize().x);
-        int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalImageSize().y);
-        int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().x) / pixelBasedMetaData.getPhysicalImageWidth() * bufferedImage.getWidth());
-        int y = (int) ((region.getCornerY() - pixelBasedMetaData.getPhysicalLowerLeft().y) / pixelBasedMetaData.getPhysicalImageHeight() * bufferedImage.getHeight());
+        int width = (int) (bufferedImage.getWidth() * region.getWidth() / pixelBasedMetaData.getPhysicalSize().x);
+        int height = (int) (bufferedImage.getHeight() * region.getHeight() / pixelBasedMetaData.getPhysicalSize().y);
+        int x = (int) ((region.getCornerX() - pixelBasedMetaData.getPhysicalLowerLeft().x) / pixelBasedMetaData.getPhysicalWidth() * bufferedImage.getWidth());
+        int y = (int) ((region.getCornerY() - pixelBasedMetaData.getPhysicalLowerLeft().y) / pixelBasedMetaData.getPhysicalHeight() * bufferedImage.getHeight());
         if (width > 0 && height > 0) {
             BufferedImage bI = new BufferedImage(width, height, bufferedImage.getType());
             bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);

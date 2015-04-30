@@ -131,7 +131,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalImageSize());
+                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
             }
             if (viewport == null) {
                 viewport = StaticViewport.createAdaptedViewport(100, 100);
@@ -480,12 +480,12 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int h = (int) (r.getHeight() * m);
         int w = (int) (r.getWidth() * m);
 
-        m = metaData.getPhysicalImageWidth() / (double) r.getWidth();
+        m = metaData.getPhysicalWidth() / (double) r.getWidth();
         int totalHeight = (int) (h * m);
         int totalWidth = (int) (w * m);
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
-        double imageMeterPerPixel = metaData.getPhysicalImageWidth() / (double) res.getResolutionBounds().getWidth();
+        double imageMeterPerPixel = metaData.getPhysicalWidth() / (double) res.getResolutionBounds().getWidth();
         int imageWidth = (int) Math.round(r.getWidth() / imageMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / imageMeterPerPixel);
 

@@ -117,7 +117,7 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public GL3DVec2d getPhysicalImageSize() {
+    public GL3DVec2d getPhysicalSize() {
         return sizeVector;
     }
 
@@ -133,7 +133,7 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public double getPhysicalImageHeight() {
+    public double getPhysicalHeight() {
         return sizeVector.y;
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractMetaData implements MetaData {
      * {@inheritDoc}
      */
     @Override
-    public double getPhysicalImageWidth() {
+    public double getPhysicalWidth() {
         return sizeVector.x;
     }
 
@@ -191,7 +191,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newImageSize
      *            Physical size of the corresponding image
      */
-    protected void setPhysicalImageSize(GL3DVec2d newImageSize) {
+    protected void setPhysicalSize(GL3DVec2d newImageSize) {
         sizeVector = newImageSize;
     }
 

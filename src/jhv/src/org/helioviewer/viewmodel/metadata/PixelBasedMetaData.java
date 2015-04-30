@@ -43,7 +43,7 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
 
         pixelImageWidth = newWidth;
         pixelImageHeight = newHeight;
-        resolution = new Vector2dInt(getPhysicalImageSize());
+        resolution = new Vector2dInt(getPhysicalSize());
         this.dateTime = new ImmutableDateTime(new Date().getTime());
     }
 
@@ -88,9 +88,10 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
         double unitsPerPixelX = region.getWidth() / getResolution().getX();
         double unitsPerPixelY = region.getHeight() / getResolution().getY();
         double newUnitsPerPixel = Math.max(unitsPerPixelX, unitsPerPixelY);
-        setPhysicalImageSize(GL3DVec2d.scale(getPhysicalImageSize(), newUnitsPerPixel / unitsPerPixel));
-        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getCornerX(), region.getCornerY() - getPhysicalImageHeight() + region.getHeight()));
-        this.unitsPerPixel = newUnitsPerPixel;
+
+        setPhysicalSize(GL3DVec2d.scale(getPhysicalSize(), newUnitsPerPixel / unitsPerPixel));
+        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getCornerX(), region.getCornerY() - getPhysicalHeight() + region.getHeight()));
+        unitsPerPixel = newUnitsPerPixel;
     }
 
 }
