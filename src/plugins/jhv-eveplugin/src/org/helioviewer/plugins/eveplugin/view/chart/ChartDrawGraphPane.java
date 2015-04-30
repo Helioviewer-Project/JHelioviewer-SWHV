@@ -106,15 +106,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
+    protected void paintComponent(Graphics g1) {
+        super.paintComponent(g1);
 
-        super.paintComponent(g2);
+        Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-            g2.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
-            drawMovieLine(g2);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), 0, 0, screenImage.getWidth(), screenImage.getHeight(), null);
+            drawMovieLine(g);
         }
         if (reschedule && !TimeIntervalLockModel.getInstance().isLocked()) {
             reschedule = false;
@@ -312,7 +311,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         return orderedList;
     }
 
-    private void drawVerticalLabels(Graphics g, YAxisElement yAxisElement, int leftSide) {
+    private void drawVerticalLabels(Graphics2D g, YAxisElement yAxisElement, int leftSide) {
         // draw rectangle hiding to big radio image
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
@@ -421,7 +420,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    private void drawMovieLine(final Graphics g) {
+    private void drawMovieLine(final Graphics2D g) {
         if (movieLinePosition < 0 || !drawController.getIntervalAvailable() || graphArea.height < 0) {
             return;
         }

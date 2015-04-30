@@ -1,6 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public class PlotConfig {
@@ -19,7 +19,7 @@ public class PlotConfig {
         imageId = imageID;
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
         if (visible) {
             // Thread.dumpStack();
             // Log.trace("Draw image on : " + map);

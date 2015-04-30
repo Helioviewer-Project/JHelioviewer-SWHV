@@ -1,7 +1,7 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.Date;
 
 import org.helioviewer.base.interval.Interval;
@@ -131,7 +131,7 @@ public class NoDataConfig {
      *            The Graphics on which the no data configuration should be
      *            drawn
      */
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
         if (visible) {
             // Log.trace("Visible and drawable area map : " +
             // drawableAreaMap.toString());
