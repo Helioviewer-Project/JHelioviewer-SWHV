@@ -99,7 +99,7 @@ public class JP2Image {
     /** cache path */
     private static File cachePath;
 
-    public MetaData[] metaDataList;
+    protected MetaData[] metaDataList;
 
     private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
@@ -127,7 +127,7 @@ public class JP2Image {
      * @throws IOException
      * @throws JHV_KduException
      */
-    public JP2Image(URI newUri) throws IOException, JHV_KduException {
+    public JP2Image(URI newUri) throws IOException, JHV_KduException, Exception {
         this(newUri, newUri);
     }
 
@@ -148,7 +148,7 @@ public class JP2Image {
      * @throws IOException
      * @throws JHV_KduException
      */
-    public JP2Image(URI newUri, URI downloadURI) throws IOException, JHV_KduException {
+    public JP2Image(URI newUri, URI downloadURI) throws IOException, JHV_KduException, Exception {
         numJP2Images++;
 
         uri = newUri;
