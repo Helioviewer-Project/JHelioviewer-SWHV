@@ -37,6 +37,7 @@ import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.InputController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
@@ -70,6 +71,7 @@ public class ImageViewerGui {
     private static SideContentPane leftPane;
     private static MoviePanel moviePanel;
     private static ControlPanelContainer moviePanelContainer;
+    private static FiltersPanel filtersPanel;
 
     private static ComponentView componentView;
     private static InputController inputController;
@@ -145,6 +147,8 @@ public class ImageViewerGui {
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
+        filtersPanel = new FiltersPanel();
+
     }
 
     private static JFrame createMainFrame() {
@@ -362,4 +366,7 @@ public class ImageViewerGui {
         return inputController;
     }
 
+    public static FiltersPanel getFiltersPanel() {
+        return filtersPanel;
+    }
 }
