@@ -90,6 +90,20 @@ public interface MetaData {
      */
     public Region getPhysicalRegion();
 
+    /**
+     * Returns the width of the image in pixels.
+     *.
+     * @return width of the image in pixels
+     */
+    public int getPixelWidth();
+
+    /**
+     * Returns the height of the image in pixels.
+     *.
+     * @return height of the image in pixels
+     */
+    public int getPixelHeight();
+
     public ImmutableDateTime getDateTime();
 
     public GL3DQuatd getLocalRotation();

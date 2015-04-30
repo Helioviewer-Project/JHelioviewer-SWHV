@@ -187,8 +187,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
-        pixelImageWidth = m.getPixelWidth();
-        pixelImageHeight = m.getPixelHeight();
+        pixelImageWidth = m.tryGetInt("NAXIS1");
+        pixelImageHeight = m.tryGetInt("NAXIS2");
 
         double newSolarPixelRadius = -1.0;
 
@@ -314,33 +314,29 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     @Override
     public GL3DQuatd getLocalRotation() {
-        return this.localRotation;
+        return localRotation;
+    }
+
+    @Override
+    public int getPixelHeight() {
+        return pixelImageHeight;
+    }
+
+    @Override
+    public int getPixelWidth() {
+        return pixelImageWidth;
     }
 
     public double getDobs() {
         return dobs;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public double getInnerPhysicalOcculterRadius() {
         return innerRadius;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public double getOuterPhysicalOcculterRadius() {
         return outerRadius;
-    }
-
-    public int pixelImageWidth() {
-        return pixelImageWidth;
-    }
-
-    public int pixelImageHeight() {
-        return pixelImageHeight;
     }
 
 }

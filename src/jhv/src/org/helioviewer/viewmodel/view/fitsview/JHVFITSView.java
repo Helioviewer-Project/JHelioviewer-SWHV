@@ -81,7 +81,7 @@ public class JHVFITSView extends AbstractView {
     private void initFITSImageView() {
         m = new HelioviewerMetaData(fits);
 
-        BufferedImage bi = fits.getImage(0, 0, fits.getPixelHeight(), fits.getPixelWidth());
+        BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(bi, new ColorMask());
         } else if (bi.getColorModel().getPixelSize() <= 16) {
