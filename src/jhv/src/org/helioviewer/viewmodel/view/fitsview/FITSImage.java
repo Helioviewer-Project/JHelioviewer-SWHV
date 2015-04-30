@@ -265,24 +265,4 @@ public class FITSImage implements MetaDataContainer {
         return header.getIntValue(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getPixelHeight() {
-        if (image == null)
-            return 0;
-        return image.getHeight();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getPixelWidth() {
-        if (image == null)
-            return 0;
-        return image.getWidth();
-    }
-
 }

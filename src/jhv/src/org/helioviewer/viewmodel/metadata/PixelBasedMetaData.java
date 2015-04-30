@@ -27,6 +27,9 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
     private final Vector2dInt resolution;
     private final GL3DQuatd localRotation = new GL3DQuatd();
 
+    private final int pixelImageWidth;
+    private final int pixelImageHeight;
+
     /**
      * Constructor, setting the size. The position is set to (0,0) by default.
      *
@@ -37,6 +40,9 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
      */
     public PixelBasedMetaData(int newWidth, int newHeight) {
         super(0, 0, newWidth, newHeight);
+
+        pixelImageWidth = newWidth;
+        pixelImageHeight = newHeight;
         resolution = new Vector2dInt(getPhysicalImageSize());
         this.dateTime = new ImmutableDateTime(new Date().getTime());
     }
@@ -59,6 +65,16 @@ public class PixelBasedMetaData extends AbstractMetaData implements ImageSizeMet
     @Override
     public double getUnitsPerPixel() {
         return unitsPerPixel;
+    }
+
+    @Override
+    public int getPixelHeight() {
+        return pixelImageHeight;
+    }
+
+    @Override
+    public int getPixelWidth() {
+        return pixelImageWidth;
     }
 
     /**

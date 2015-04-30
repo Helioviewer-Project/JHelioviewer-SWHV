@@ -51,18 +51,4 @@ public interface MetaDataContainer {
      */
     public double tryGetDouble(String key);
 
-    /**
-     * Returns the width of the image in pixels.
-     * 
-     * @return width of the image in pixels
-     */
-    public int getPixelWidth();
-
-    /**
-     * Returns the height of the image in pixels.
-     * 
-     * @return height of the image in pixels
-     */
-    public int getPixelHeight();
-
 }

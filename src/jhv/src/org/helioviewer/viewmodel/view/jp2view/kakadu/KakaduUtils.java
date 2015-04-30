@@ -521,22 +521,6 @@ public class KakaduUtils {
             return 0;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPixelHeight() {
-            return tryGetInt("NAXIS2");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPixelWidth() {
-            return tryGetInt("NAXIS1");
-        }
-
     }
 
     public static void cacheMetaData(Jp2_threadsafe_family_src _familySrc, MetaData[] metaDataList) throws JHV_KduException {
