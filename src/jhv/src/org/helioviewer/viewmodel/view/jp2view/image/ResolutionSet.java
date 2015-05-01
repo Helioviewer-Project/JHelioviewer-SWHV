@@ -189,5 +189,6 @@ public class ResolutionSet {
             ret += "]";
             return ret;
         }
-    };
-};
+    }
+
+}

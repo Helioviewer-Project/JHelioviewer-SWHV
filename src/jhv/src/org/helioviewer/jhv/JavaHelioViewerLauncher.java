@@ -237,7 +237,7 @@ public class JavaHelioViewerLauncher {
                         jvmArgs += " \"" + tokenizer.sval + "\"";
                     }
                 }
-                loadLibs();
+                // loadLibs();
 
                 System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:" + jvmArgs);
                 // Pass arguments to process
