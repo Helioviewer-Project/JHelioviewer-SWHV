@@ -32,6 +32,7 @@ import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -46,7 +47,6 @@ import org.helioviewer.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
@@ -224,9 +224,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         for (YAxisElement yAxisElement : orderedList) {
             if (!(yAxisElement.getAvailableRange().max == Double.MIN_VALUE && yAxisElement.getAvailableRange().min == Double.MAX_VALUE)) {
-
                 drawVerticalLabels(g, yAxisElement, counter == 0 ? 0 : 1);
-
                 if (counter > 1) {
                     break;
                 }

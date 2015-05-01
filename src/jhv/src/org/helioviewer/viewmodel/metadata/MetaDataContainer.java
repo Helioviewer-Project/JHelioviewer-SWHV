@@ -7,15 +7,10 @@ package org.helioviewer.viewmodel.metadata;
  * Usually, this is the image itself. This interface provides the capability to
  * read the meta data, assuming it is given as pairs of key and value.
  * 
- * <p>
- * Apart from that, a MetaDataContainer provides access to its dimensions in
- * pixel.
- * 
  * @author Ludwig Schmidt
  * 
  */
 public interface MetaDataContainer {
-
     /**
      * Gets the value for a given key as a string.
      * 
@@ -26,7 +21,6 @@ public interface MetaDataContainer {
      * @return value corresponding to the key, null if the key does not exist
      */
     public String get(String key);
-
     /**
      * Gets the value for a given key as an integer value.
      * 
@@ -38,7 +32,6 @@ public interface MetaDataContainer {
      *         otherwise
      */
     public int tryGetInt(String key);
-
     /**
      * Gets the value for a given key as a double value.
      * 

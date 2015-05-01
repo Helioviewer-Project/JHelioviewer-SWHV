@@ -1,6 +1,6 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 
 /**
  * View to interact with time stamp providing image series.
@@ -28,7 +28,6 @@ import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
  * @author Markus Langenberg
  */
 public interface TimedMovieView extends MovieView {
-
     /**
      * Sets the frame currently shown.
      * 
@@ -43,7 +42,6 @@ public interface TimedMovieView extends MovieView {
      * @see #getMaximumFrameNumber
      */
     public void setCurrentFrame(ImmutableDateTime time);
-
     /**
      * Sets the frame currently shown.
      * 
@@ -61,14 +59,12 @@ public interface TimedMovieView extends MovieView {
      * @see #getMaximumFrameNumber
      */
     public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal);
-
     /**
      * Returns time stamp of the current frame.
      * 
      * @return time stamp of the current frame
      */
     public ImmutableDateTime getCurrentFrameDateTime();
-
     /**
      * Returns time stamp of any frame specified.
      * 
@@ -76,7 +72,6 @@ public interface TimedMovieView extends MovieView {
      * @return time stamp of the requested frame
      */
     public ImmutableDateTime getFrameDateTime(int frameNumber);
-
     /**
      * Sets the desired absolute speed.
      * 
@@ -88,7 +83,6 @@ public interface TimedMovieView extends MovieView {
      * @see MovieView#setDesiredRelativeSpeed
      */
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
-
     /**
      * Puts the movie view to the set of movies, which are playing
      * simultaneously.
@@ -96,7 +90,6 @@ public interface TimedMovieView extends MovieView {
      * @see #unlinkMovie()
      */
     public void linkMovie();
-
     /**
      * Removes the movie view from the set of movies, which are playing
      * simultaneously.

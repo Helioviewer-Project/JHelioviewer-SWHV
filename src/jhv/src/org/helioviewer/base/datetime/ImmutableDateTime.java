@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view.jp2view.datetime;
+package org.helioviewer.base.datetime;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -7,6 +7,7 @@ import java.net.URI;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
@@ -24,7 +25,6 @@ import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -123,7 +123,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) {
-
         if (jp2Image != null && reader != null) {
             abolish();
         }
@@ -275,7 +274,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         if (imageData != null) {
             frameNumber = imageData.getFrameNumber();
         }
-
         return jp2Image.metaDataList[frameNumber];
     }
 
@@ -312,13 +310,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     public Region getRegion() {
         Region result = lastRegion;
         return result;
-    }
-
-    /**
-     * @return newest region, even if no new data has been retrieved, yet
-     */
-    public Region getNewestRegion() {
-        return region;
     }
 
     /**
@@ -386,7 +377,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         if (reader != null) {
             return reader.isConnected();
         }
-
         return false;
     }
 
@@ -753,4 +743,5 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         // no LUT found, try gray as last resort
         lut = gray;
     }
+
 }

@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Abstract base class implementing MetaData.

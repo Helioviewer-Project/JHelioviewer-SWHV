@@ -155,7 +155,6 @@ public abstract class AbstractView implements View {
     }
 
     public void setStartLUT() {
-
         lut = gray;
     }
 

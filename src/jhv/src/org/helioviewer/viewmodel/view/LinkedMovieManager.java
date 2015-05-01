@@ -2,7 +2,7 @@ package org.helioviewer.viewmodel.view;
 
 import java.util.LinkedList;
 
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 
 /**
  * Class managing all linked movies.
@@ -125,7 +125,6 @@ public class LinkedMovieManager {
             return;
 
         ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
-
         for (TimedMovieView movieView : linkedMovies) {
             if (movieView != masterView) {
                 movieView.setCurrentFrame(masterTime);
