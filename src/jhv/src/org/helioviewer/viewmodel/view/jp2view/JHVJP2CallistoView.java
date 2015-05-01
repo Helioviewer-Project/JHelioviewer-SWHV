@@ -3,11 +3,11 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;

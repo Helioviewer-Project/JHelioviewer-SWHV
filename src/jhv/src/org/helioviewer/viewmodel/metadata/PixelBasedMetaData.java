@@ -1,11 +1,9 @@
 package org.helioviewer.viewmodel.metadata;
 
-import java.util.Date;
-
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 
 /**
  * Implementation of MetaData representing images without information about
@@ -41,7 +39,7 @@ public class PixelBasedMetaData extends AbstractMetaData {
 
         pixelWidth = newWidth;
         pixelHeight = newHeight;
-        this.dateTime = new ImmutableDateTime(new Date().getTime());
+        this.dateTime = ImmutableDateTime.parseDateTime("2000-01-01T00:00:00");
     }
 
     public GL3DQuatd getLocalRotation() {

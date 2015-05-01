@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
@@ -10,7 +11,6 @@ import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
@@ -323,10 +323,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
     @Override
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         fullyLoaded = this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
-        setSubimageDataHelper(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
-    }
-
-    private void setSubimageDataHelper(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
     }
 

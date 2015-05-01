@@ -167,4 +167,5 @@ public class RenderableContainer implements TableModel, Reorderable {
     public int getRowIndex(Renderable renderable) {
         return this.renderables.indexOf(renderable);
     }
+
 }

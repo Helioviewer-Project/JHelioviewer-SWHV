@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
@@ -26,7 +27,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
