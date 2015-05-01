@@ -70,6 +70,10 @@ public class StatusPanel extends JPanel {
     public void addPlugin(JLabel newPlugin, Alignment alignment) {
         if (alignment == Alignment.LEFT) {
             leftPanel.add(newPlugin);
+
+            JPanel spacer = new JPanel();
+            spacer.setPreferredSize(new Dimension(10, 1));
+            leftPanel.add(spacer);
         } else {
             rightPanel.add(newPlugin, 0);
         }
