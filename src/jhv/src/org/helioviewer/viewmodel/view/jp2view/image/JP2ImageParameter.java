@@ -87,4 +87,5 @@ public class JP2ImageParameter {
         else
             return !_param1.subImage.equals(_param2.subImage);
     }
-};
+
+}
