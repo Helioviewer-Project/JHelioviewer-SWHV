@@ -25,19 +25,22 @@ public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();
 
-    private final JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
-    private final JPanel pluginContainer = new JPanel();
-    private final CollapsiblePane collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
+    private static JSplitPane splitpane;
+    private static JPanel pluginContainer;
+    private static CollapsiblePane collapsiblePane;
 
     public MainContentPanel(Component mainComponent) {
-        collapsiblePane.toggleButton.addActionListener(this);
-
+        pluginContainer = new JPanel();
         pluginContainer.setLayout(new BorderLayout());
+
+        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
+        collapsiblePane.toggleButton.addActionListener(this);
 
         // this is needed to avoid crash of JOGL components inside JSplitPane
         JPanel pane = new JPanel(new BorderLayout(0, 0));
         pane.add(mainComponent, BorderLayout.CENTER);
 
+        splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
         splitpane.setTopComponent(pane);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
