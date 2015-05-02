@@ -15,6 +15,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 public class RenderableGridOptionsPanel extends JPanel {
+
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
     RenderableGrid grid;
@@ -65,4 +66,5 @@ public class RenderableGridOptionsPanel extends JPanel {
         });
         WheelSupport.installMouseWheelSupport(gridResolutionYSpinner);
     }
+
 }
