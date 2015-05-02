@@ -22,9 +22,29 @@ import org.helioviewer.viewmodel.view.AbstractView;
 public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private JPanel optionsPanel;
-    private final GL3DCameraOptionsAttributeManager cameraOptionsAttributeManager = GL3DCameraOptionsAttributeManager.getSingletonInstance();
     private JTabbedPane tab;
     private GL3DCamera previousCamera;
+
+    private static GL3DEarthCameraOptionPanel earthCameraOptionPanel;
+    private static GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
+    private static GL3DObserverCameraOptionPanel observerCameraOptionPanel;
+
+    private GL3DCameraOptionPanel getCameraOptionsPanel(GL3DCamera camera) {
+        if (camera instanceof GL3DEarthCamera) {
+            if (earthCameraOptionPanel == null)
+                earthCameraOptionPanel = new GL3DEarthCameraOptionPanel((GL3DEarthCamera) camera);
+            return earthCameraOptionPanel;
+        } else if (camera instanceof GL3DFollowObjectCamera) {
+            if (followObjectCameraOptionPanel == null)
+                followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel((GL3DFollowObjectCamera) camera);
+            return followObjectCameraOptionPanel;
+        } else if (camera instanceof GL3DObserverCamera) {
+            if (observerCameraOptionPanel == null)
+                observerCameraOptionPanel = new GL3DObserverCameraOptionPanel((GL3DObserverCamera) camera);
+            return observerCameraOptionPanel;
+        }
+        return null;
+    }
 
     public GL3DCameraOptionsPanel(GL3DCamera newCamera) {
         Displayer.getLayersModel().addLayersListener(this);
@@ -66,7 +86,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
 
     private void initCamera(GL3DCamera newCamera) {
         changeCamera(newCamera);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
+        optionsPanel = getCameraOptionsPanel(newCamera);
         Displayer.display();
         tab.setComponentAt(0, optionsPanel);
         tab.setSelectedIndex(0);
@@ -75,7 +95,7 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
     private void changeCamera(GL3DCamera newCamera) {
         boolean trackingMode = previousCamera.getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
-        optionsPanel = cameraOptionsAttributeManager.getCameraOptionAttributePanel(newCamera);
+        optionsPanel = getCameraOptionsPanel(newCamera);
 
         Displayer.setActiveCamera(newCamera);
         Displayer.display();
