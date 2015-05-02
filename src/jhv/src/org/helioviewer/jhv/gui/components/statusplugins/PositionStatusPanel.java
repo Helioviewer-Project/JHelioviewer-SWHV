@@ -16,17 +16,11 @@ import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
  */
 public class PositionStatusPanel extends JLabel implements MouseMotionListener, InputControllerPlugin {
 
-    private static final PositionStatusPanel instance = new PositionStatusPanel();
-
     private static Component component;
     private Point lastPosition;
 
-    private PositionStatusPanel() {
+    public PositionStatusPanel() {
         setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
-    }
-
-    public static PositionStatusPanel getSingletonInstance() {
-        return instance;
     }
 
     /**

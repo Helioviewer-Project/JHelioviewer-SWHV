@@ -80,6 +80,9 @@ public class ImageViewerGui {
     private static ImageDataPanel imageObservationPanel;
     private static ObservationDialog observationDialog;
 
+    private static ZoomStatusPanel zoomStatus;
+    private static FramerateStatusPanel framerateStatus;
+
     private ImageViewerGui() {
     }
 
@@ -132,15 +135,16 @@ public class ImageViewerGui {
         midSplitPane.setRightComponent(mainContentPanel);
 
         // STATUS PANEL
-        ZoomStatusPanel zoomStatusPanel = ZoomStatusPanel.getSingletonInstance();
-        FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
-        PositionStatusPanel positionStatusPanel = PositionStatusPanel.getSingletonInstance();
-        inputController.addPlugin(positionStatusPanel);
+        zoomStatus = new ZoomStatusPanel();
+        framerateStatus = new FramerateStatusPanel();
+
+        PositionStatusPanel positionStatus = new PositionStatusPanel();
+        inputController.addPlugin(positionStatus);
 
         StatusPanel statusPanel = new StatusPanel(SIDE_PANEL_WIDTH + 20, 5);
-        statusPanel.addPlugin(zoomStatusPanel, StatusPanel.Alignment.LEFT);
+        statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
-        statusPanel.addPlugin(positionStatusPanel, StatusPanel.Alignment.RIGHT);
+        statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
@@ -372,6 +376,14 @@ public class ImageViewerGui {
 
     public static FiltersPanel getFiltersPanel() {
         return filtersPanel;
+    }
+
+    public static ZoomStatusPanel getZoomStatusPanel() {
+        return zoomStatus;
+    }
+
+    public static FramerateStatusPanel getFramerateStatusPanel() {
+        return framerateStatus;
     }
 
 }

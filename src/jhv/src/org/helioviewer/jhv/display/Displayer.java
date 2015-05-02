@@ -12,8 +12,8 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
@@ -58,8 +58,6 @@ public class Displayer implements JHVEventHighlightListener {
     private static boolean todisplay = false;
 
     private final Timer timer = new Timer(1000 / 20, new MyListener());
-
-    private static final FramerateStatusPanel framerateStatus = FramerateStatusPanel.getSingletonInstance();
 
     private Displayer() {
         timer.start();
@@ -138,7 +136,7 @@ public class Displayer implements JHVEventHighlightListener {
             renderableContainer.fireTimeUpdated(view.getImageLayer());
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
-                framerateStatus.updateFramerate(layersModel.getFPS(view));
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(layersModel.getFPS(view));
                 MoviePanel.setFrameSlider(view);
 
                 lastTimestamp = dateTime.getTime();
