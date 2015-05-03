@@ -56,7 +56,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public static final int NUMBEROFCOLUMNS = 4;
 
     private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
-
         {
             putValue(SHORT_DESCRIPTION, "Add a new layer");
         }
@@ -102,9 +101,10 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             ImageViewerGui.getObservationDialog().showDialog();
         }
     };
+
     public final JTable grid;
     private Component optionsPanel = new JPanel();
-    GridBagConstraints gc = new GridBagConstraints();
+    private GridBagConstraints gc = new GridBagConstraints();
     private final JPanel optionsPanelWrapper;
 
     public RenderableContainerPanel(final RenderableContainer renderableContainer) {
@@ -178,7 +178,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             public void mouseClicked(MouseEvent e) {
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
-                Renderable renderable = (Renderable) Displayer.getRenderableContainer().getValueAt(row, col);
+                Renderable renderable = (Renderable) renderableContainer.getValueAt(row, col);
 
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
@@ -242,7 +242,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public void activeLayerChanged(AbstractView view) {
         if (view != null) {
             setOptionsPanel(view.getImageLayer());
-            int index = Displayer.getRenderableContainer().getRowIndex(view.getImageLayer());
+            int index = ImageViewerGui.getRenderableContainer().getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
         } else {
             JPanel jpl = new JPanel();
@@ -250,4 +250,5 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             setOptionsPanel(jpl);
         }
     }
+
 }

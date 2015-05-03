@@ -80,7 +80,7 @@ public class RenderableImageLayer implements Renderable {
             }
         }
 
-        Displayer.getRenderableContainer().addBeforeRenderable(this);
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
         float opacity = (float) (1. / (1. + Displayer.getLayersModel().getNumLayers()));
         if (mainLayerView instanceof JHVJP2View) {

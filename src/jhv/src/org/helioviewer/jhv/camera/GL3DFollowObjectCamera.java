@@ -11,6 +11,7 @@ import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -82,10 +83,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
             cameraDate = new Date(currentCameraTime);
 
-            RenderableCamera renderableCamera = Displayer.getRenderableCamera();
+            RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
             if (renderableCamera != null) {
                 renderableCamera.setTimeString(cameraDate);
-                Displayer.getRenderableContainer().fireTimeUpdated(renderableCamera);
+                ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
             }
 
             GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);

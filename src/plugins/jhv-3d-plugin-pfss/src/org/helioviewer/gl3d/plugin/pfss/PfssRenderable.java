@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssData;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssNewDataLoader;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
@@ -35,7 +36,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     public PfssRenderable() {
         type = new RenderableType("PFSS plugin");
         this.optionsPanel = new PfssPluginPanel();
-        Displayer.getRenderableContainer().addRenderable(this);
+        ImageViewerGui.getRenderableContainer().addRenderable(this);
         Displayer.getLayersModel().addLayersListener(this);
     }
 
@@ -54,7 +55,7 @@ public class PfssRenderable implements Renderable, LayersListener {
                 if (pfssData.isInit()) {
                     pfssData.display(gl);
                     datetime = pfssData.getDateString();
-                    Displayer.getRenderableContainer().fireTimeUpdated(this);
+                    ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
                 }
             }
         }

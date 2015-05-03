@@ -42,6 +42,13 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
+import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
+import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
+import org.helioviewer.jhv.renderable.RenderableCamera;
+import org.helioviewer.jhv.renderable.RenderableGrid;
+import org.helioviewer.jhv.renderable.RenderableGridType;
+import org.helioviewer.jhv.renderable.RenderableSolarAxes;
+import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -83,6 +90,9 @@ public class ImageViewerGui {
     private static ZoomStatusPanel zoomStatus;
     private static FramerateStatusPanel framerateStatus;
 
+    private static RenderableContainer renderableContainer;
+    private static RenderableCamera renderableCamera;
+
     private ImageViewerGui() {
     }
 
@@ -119,10 +129,20 @@ public class ImageViewerGui {
         moviePanel = new MoviePanel();
         moviePanelContainer.setDefaultPanel(moviePanel);
         leftPane.add("Movie Controls", moviePanelContainer, true);
+
         // Layer control
         imageObservationPanel = new ImageDataPanel();
         observationDialog.addUserInterface("Image data", imageObservationPanel);
-        leftPane.add("Image Layers", Displayer.getRenderableContainerPanel(), true);
+
+        renderableContainer = new RenderableContainer();
+        RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
+
+        renderableContainer.addRenderable(new RenderableSolarAxes(new RenderableSolarAxesType("Solar Axes")));
+        renderableContainer.addRenderable(new RenderableGrid(new RenderableGridType("Grids"), false));
+        renderableCamera = new RenderableCamera();
+        renderableContainer.addRenderable(renderableCamera);
+
+        leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
@@ -385,6 +405,14 @@ public class ImageViewerGui {
 
     public static FramerateStatusPanel getFramerateStatusPanel() {
         return framerateStatus;
+    }
+
+    public static RenderableCamera getRenderableCamera() {
+        return renderableCamera;
+    }
+
+    public static RenderableContainer getRenderableContainer() {
+        return renderableContainer;
     }
 
 }
