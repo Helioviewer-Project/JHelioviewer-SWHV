@@ -6,10 +6,7 @@ import java.net.URI;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -18,8 +15,6 @@ import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 
 /**
  * Collection of useful functions for use within the view chain.
@@ -36,32 +31,6 @@ import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSize;
 public final class ViewHelper {
 
     /**
-     * Calculates the final size of a given region within the viewport.
-     *
-     * <p>
-     * The resulting size is smaller or equal to the size of the viewport. It is
-     * equal if and only if the aspect ratio of the region is equal to the
-     * aspect ratio of the viewport. Otherwise, the image size is cropped to
-     * keep the regions aspect ratio and not deform the image.
-     *
-     * @param v
-     *            viewport, in which the image will be displayed
-     * @param r
-     *            visible region of the image
-     * @return resulting image size of the region within the viewport
-     */
-    public static ViewportImageSize calculateViewportImageSize(Region r) {
-        int viewportheight = Displayer.getViewportHeight();
-
-        // fit region of interest into viewport
-        double screenMeterPerPixel = r.getHeight() / viewportheight;
-        double screenSubImageHeight = viewportheight;
-        double screenSubImageWidth = r.getWidth() / screenMeterPerPixel;
-
-        return StaticViewportImageSize.createAdaptedViewportImageSize((int) Math.round(screenSubImageWidth), (int) Math.round(screenSubImageHeight));
-    }
-
-    /**
      * Converts a given displacement on the screen to image coordinates.
      *
      * @param screenDisplacement
@@ -72,8 +41,8 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in image coordinates
      */
-    public static GL3DVec2d convertScreenToImageDisplacement(Vector2dInt screenDisplacement, Region r, ViewportImageSize v) {
-        return convertScreenToImageDisplacement(screenDisplacement.getX(), screenDisplacement.getY(), r, v);
+    public static GL3DVec2d convertScreenToImageDisplacement(Vector2dInt screenDisplacement, Region r, Vector2dInt viewportImageSize) {
+        return convertScreenToImageDisplacement(screenDisplacement.getX(), screenDisplacement.getY(), r, viewportImageSize);
     }
 
     /**
@@ -89,8 +58,8 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in image coordinates
      */
-    public static GL3DVec2d convertScreenToImageDisplacement(int screenDisplacementX, int screenDisplacementY, Region r, ViewportImageSize v) {
-        return new GL3DVec2d(r.getWidth() / (v.getWidth()) * screenDisplacementX, -r.getHeight() / (v.getHeight()) * screenDisplacementY);
+    public static GL3DVec2d convertScreenToImageDisplacement(int screenDisplacementX, int screenDisplacementY, Region r, Vector2dInt viewportImageSize) {
+        return new GL3DVec2d(r.getWidth() / viewportImageSize.getX() * screenDisplacementX, -r.getHeight() / viewportImageSize.getY() * screenDisplacementY);
     }
 
     /**
@@ -104,8 +73,8 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in screen coordinates
      */
-    public static Vector2dInt convertImageToScreenDisplacement(GL3DVec2d imageDisplacement, Region r, ViewportImageSize v) {
-        return convertImageToScreenDisplacement(imageDisplacement.x, imageDisplacement.y, r, v);
+    public static Vector2dInt convertImageToScreenDisplacement(GL3DVec2d imageDisplacement, Region r, Vector2dInt viewportImageSize) {
+        return convertImageToScreenDisplacement(imageDisplacement.x, imageDisplacement.y, r, viewportImageSize);
     }
 
     /**
@@ -121,8 +90,8 @@ public final class ViewHelper {
      *            ViewportImageSize of the image within the current viewport
      * @return Displacement in screen coordinates
      */
-    public static Vector2dInt convertImageToScreenDisplacement(double imageDisplacementX, double imageDisplacementY, Region r, ViewportImageSize v) {
-        return new Vector2dInt((int) Math.round(imageDisplacementX / r.getWidth() * v.getWidth()), (int) Math.round(imageDisplacementY / r.getHeight() * v.getHeight()));
+    public static Vector2dInt convertImageToScreenDisplacement(double imageDisplacementX, double imageDisplacementY, Region r, Vector2dInt viewportImageSize) {
+        return new Vector2dInt((int) Math.round(imageDisplacementX / r.getWidth() * viewportImageSize.getX()), (int) Math.round(imageDisplacementY / r.getHeight() * viewportImageSize.getY()));
     }
 
     /**
@@ -142,9 +111,9 @@ public final class ViewHelper {
      *         region and viewport image size
      * @see #calculateInnerViewportOffset
      */
-    public static Viewport calculateInnerViewport(Region innerRegion, Region outerRegion, ViewportImageSize outerViewportImageSize) {
-        double newWidth = outerViewportImageSize.getWidth() * innerRegion.getWidth() / outerRegion.getWidth();
-        double newHeight = outerViewportImageSize.getHeight() * innerRegion.getHeight() / outerRegion.getHeight();
+    public static Viewport calculateInnerViewport(Region innerRegion, Region outerRegion, Vector2dInt outerViewportImageSize) {
+        double newWidth = outerViewportImageSize.getX() * innerRegion.getWidth() / outerRegion.getWidth();
+        double newHeight = outerViewportImageSize.getY() * innerRegion.getHeight() / outerRegion.getHeight();
         return StaticViewport.createAdaptedViewport((int) Math.round(newWidth), (int) Math.round(newHeight));
     }
 
@@ -165,7 +134,7 @@ public final class ViewHelper {
      *         viewport image size
      * @see #calculateInnerViewport
      */
-    public static Vector2dInt calculateInnerViewportOffset(Region innerRegion, Region outerRegion, ViewportImageSize outerViewportImageSize) {
+    public static Vector2dInt calculateInnerViewportOffset(Region innerRegion, Region outerRegion, Vector2dInt outerViewportImageSize) {
         return ViewHelper.convertImageToScreenDisplacement(GL3DVec2d.subtract(innerRegion.getUpperLeftCorner(), outerRegion.getUpperLeftCorner()), outerRegion, outerViewportImageSize).negateY();
     }
 
