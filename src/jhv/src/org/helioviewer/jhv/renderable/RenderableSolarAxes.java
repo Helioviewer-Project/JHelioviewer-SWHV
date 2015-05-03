@@ -32,12 +32,12 @@ public class RenderableSolarAxes implements Renderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINES);
         {
-            gl.glColor4d(0., 0., 1., 1.);
-            gl.glVertex3d(0, -1.2, 0);
-            gl.glVertex3d(0, -1., 0);
-            gl.glColor4d(1., 0., 0., 1.);
-            gl.glVertex3d(0, 1.2, 0);
-            gl.glVertex3d(0, 1., 0);
+            gl.glColor4f(0, 0, 1, 1);
+            gl.glVertex3f(0, -1.2f, 0);
+            gl.glVertex3f(0, -1, 0);
+            gl.glColor4f(1, 0, 0, 1);
+            gl.glVertex3f(0, 1.2f, 0);
+            gl.glVertex3f(0, 1, 0);
         }
         gl.glEnd();
         gl.glEnable(GL2.GL_TEXTURE_2D);

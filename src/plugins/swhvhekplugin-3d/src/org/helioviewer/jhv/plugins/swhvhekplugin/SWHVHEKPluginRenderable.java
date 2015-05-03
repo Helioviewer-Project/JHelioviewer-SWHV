@@ -81,7 +81,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double phi = -Math.PI / 2. - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double lineResolution = 10;
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
-        gl.glColor3d(eventColor.getRed() / 255., eventColor.getGreen() / 255., eventColor.getBlue() / 255.);
+        gl.glColor3f(eventColor.getRed() / 255f, eventColor.getGreen() / 255f, eventColor.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
             gl.glLineWidth(1.6f);
@@ -103,7 +103,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             double xrot = x;
 
-            gl.glVertex3d(xrot, yrot, zrot);
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         for (int i = 0; i <= arcResolution; i++) {
             double alpha = 1. - 1. * i / arcResolution;
@@ -116,7 +116,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             double xrot = x;
 
-            gl.glVertex3d(xrot, yrot, zrot);
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         for (int i = 0; i <= lineResolution; i++) {
             double alpha = 1. - 1. * i / arcResolution;
@@ -130,7 +130,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             double xrot = x;
 
-            gl.glVertex3d(xrot, yrot, zrot);
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         gl.glEnd();
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -166,9 +166,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         JHVPoint oldBoundaryPoint3d = null;
         if (evt.getEventRelationShip().getRelationshipColor() != null) {
             Color evtColor = evt.getEventRelationShip().getRelationshipColor();
-            gl.glColor3d(evtColor.getRed() / 255., evtColor.getGreen() / 255., evtColor.getBlue() / 255.);
+            gl.glColor3f(evtColor.getRed() / 255f, evtColor.getGreen() / 255f, evtColor.getBlue() / 255f);
         } else {
-            gl.glColor3d(evt.getColor().getRed() / 255., evt.getColor().getGreen() / 255., evt.getColor().getBlue() / 255.);
+            gl.glColor3f(evt.getColor().getRed() / 255f, evt.getColor().getGreen() / 255f, evt.getColor().getBlue() / 255f);
         }
 
         if (evt.isHighlighted()) {

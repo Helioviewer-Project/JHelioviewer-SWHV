@@ -18,8 +18,17 @@ public class RenderableCamera implements Renderable {
     private final Component optionsPanel;
     private final RenderableType type = new RenderableType("Camera");
     private static final double epsilon = 0.01;
+
     private static final Color firstcolor = Color.BLUE;
+    private static final float oneRed = firstcolor.getRed() / 255f;
+    private static final float oneGreen = firstcolor.getGreen() / 255f;
+    private static final float oneBlue = firstcolor.getBlue() / 255f;
+
     private static final Color secondcolor = Color.WHITE;
+    private static final float twoRed = secondcolor.getRed() / 255f;
+    private static final float twoGreen = secondcolor.getGreen() / 255f;
+    private static final float twoBlue = secondcolor.getBlue() / 255f;
+
     private boolean isVisible = false;
     private String timeString = "N/A";
 
@@ -54,9 +63,9 @@ public class RenderableCamera implements Renderable {
             int subdivisions = 10;
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3d(firstcolor.getRed() / 255., firstcolor.getGreen() / 255., firstcolor.getBlue() / 255.);
+                    gl.glColor3f(oneRed, oneGreen, oneBlue);
                 } else {
-                    gl.glColor3d(secondcolor.getRed() / 255., secondcolor.getGreen() / 255., secondcolor.getBlue() / 255.);
+                    gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
                 double x = -bw + 2 * bw / subdivisions * i;
                 double y = bh;
@@ -64,13 +73,13 @@ public class RenderableCamera implements Renderable {
                 if (x * x + y * y < 1) {
                     z += Math.sqrt(1 - x * x - y * y);
                 }
-                gl.glVertex3d(x, y, z);
+                gl.glVertex3f((float) x, (float) y, (float) z);
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3d(firstcolor.getRed() / 255., firstcolor.getGreen() / 255., firstcolor.getBlue() / 255.);
+                    gl.glColor3f(oneRed, oneGreen, oneBlue);
                 } else {
-                    gl.glColor3d(secondcolor.getRed() / 255., secondcolor.getGreen() / 255., secondcolor.getBlue() / 255.);
+                    gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
                 double x = bw;
                 double y = bh - 2 * bh / subdivisions * i;
@@ -78,13 +87,13 @@ public class RenderableCamera implements Renderable {
                 if (x * x + y * y < 1) {
                     z += Math.sqrt(1 - x * x - y * y);
                 }
-                gl.glVertex3d(x, y, z);
+                gl.glVertex3f((float) x, (float) y, (float) z);
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3d(firstcolor.getRed() / 255., firstcolor.getGreen() / 255., firstcolor.getBlue() / 255.);
+                    gl.glColor3f(oneRed, oneGreen, oneBlue);
                 } else {
-                    gl.glColor3d(secondcolor.getRed() / 255., secondcolor.getGreen() / 255., secondcolor.getBlue() / 255.);
+                    gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
                 double x = bw - 2 * bw / subdivisions * i;
                 double y = -bh;
@@ -92,13 +101,13 @@ public class RenderableCamera implements Renderable {
                 if (x * x + y * y < 1) {
                     z += Math.sqrt(1 - x * x - y * y);
                 }
-                gl.glVertex3d(x, y, z);
+                gl.glVertex3f((float) x, (float) y, (float) z);
             }
             for (int i = 0; i <= subdivisions; i++) {
                 if (i % 2 == 0) {
-                    gl.glColor3d(firstcolor.getRed() / 255., firstcolor.getGreen() / 255., firstcolor.getBlue() / 255.);
+                    gl.glColor3f(oneRed, oneGreen, oneBlue);
                 } else {
-                    gl.glColor3d(secondcolor.getRed() / 255., secondcolor.getGreen() / 255., secondcolor.getBlue() / 255.);
+                    gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
                 double x = -bw;
                 double y = -bh + 2 * bh / subdivisions * i;
@@ -106,7 +115,7 @@ public class RenderableCamera implements Renderable {
                 if (x * x + y * y < 1) {
                     z += Math.sqrt(1 - x * x - y * y);
                 }
-                gl.glVertex3d(x, y, z);
+                gl.glVertex3f((float) x, (float) y, (float) z);
             }
             gl.glEnd();
             gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -148,7 +157,7 @@ public class RenderableCamera implements Renderable {
         return this.timeString;
     }
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public void setTimeString(Date date) {
         this.timeString = dateFormat.format(date);
