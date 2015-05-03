@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Markus Langenberg
  */
 public abstract class ExtensionFileFilter extends FileFilter {
+
     protected String[] extensions = {};
 
     /**
@@ -45,4 +46,5 @@ public abstract class ExtensionFileFilter extends FileFilter {
 
         return null;
     }
+
 }

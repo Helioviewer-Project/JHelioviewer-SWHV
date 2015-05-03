@@ -24,7 +24,7 @@ import kdu_jni.Kdu_tile;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.viewmodel.io.APIResponseDump;
+import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;

@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.io;
+package org.helioviewer.jhv.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -155,4 +155,5 @@ public class APIResponse {
     public boolean hasData() {
         return data != null;
     }
+
 }

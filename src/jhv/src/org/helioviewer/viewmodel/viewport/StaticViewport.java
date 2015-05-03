@@ -69,4 +69,5 @@ public class StaticViewport implements BasicViewport {
     public String toString() {
         return "[Viewport: Size: " + sizeVector + "]";
     }
+
 }
