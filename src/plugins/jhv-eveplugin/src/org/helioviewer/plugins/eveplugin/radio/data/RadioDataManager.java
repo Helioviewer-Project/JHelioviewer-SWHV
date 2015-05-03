@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
@@ -22,8 +23,6 @@ import org.helioviewer.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.viewmodel.region.RegionAdapter;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
@@ -543,7 +542,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jp2View.setViewport(new Viewport(viewport.width, viewport.height));
 
                         Rectangle roi = ri.getROI();
-                        if (!jp2View.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new GL3DVec2d(roi.getWidth(), roi.getHeight()))))) {
+                        if (!jp2View.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()))) {
                             if (ri.getLastDataSize() != null) {
                                 fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
                             }
@@ -656,13 +655,12 @@ public class RadioDataManager implements RadioDownloaderListener {
                                 lastUsedResolutionSetting = rst;
                             }
                         }
-
                         jp2CallistoView.setViewport(new Viewport(lastUsedResolutionSetting.getVec2dIntRepresentation()));
 
                         RadioImage tempRs = new RadioImage(downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jp2CallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new GL3DVec2d(roi.getWidth(), roi.getHeight()))));
+                        jp2CallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
@@ -728,7 +726,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jpxCallistoView.setRegion(new RegionAdapter(new StaticRegion(roi.getX(), roi.getY(), new GL3DVec2d(roi.getWidth(), roi.getHeight()))));
+                        jpxCallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");

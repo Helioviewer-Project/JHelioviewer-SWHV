@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.helioviewer.base.Pair;
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
@@ -20,8 +21,6 @@ import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
@@ -165,9 +164,9 @@ public class RenderableImageLayer implements Renderable {
         double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
         if (regionWidth > 0 && regionHeight > 0) {
-            newRegion = StaticRegion.createAdaptedRegion(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+            newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            newRegion = StaticRegion.createAdaptedRegion(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
+            newRegion = new Region(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
         mainLayerView.setRegion(newRegion);
 

@@ -19,4 +19,5 @@ public class JHV_Kdu_message extends Kdu_message {
         if (endOfMessage && raiseException)
             throw new KduException("Kakadu message error");
     }
+
 }

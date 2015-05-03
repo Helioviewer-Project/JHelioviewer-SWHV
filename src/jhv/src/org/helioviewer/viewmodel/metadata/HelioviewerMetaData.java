@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DQuatd;
@@ -8,8 +9,6 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
@@ -251,7 +250,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return StaticRegion.createAdaptedRegion((roi.x / zoompercent - sunPixelPosition.x) * meterPerPixel, (roi.y / zoompercent - sunPixelPosition.y) * meterPerPixel, roi.width * meterPerPixel / zoompercent, roi.height * meterPerPixel / zoompercent);
+        return new Region((roi.x / zoompercent - sunPixelPosition.x) * meterPerPixel,
+                          (roi.y / zoompercent - sunPixelPosition.y) * meterPerPixel,
+                          roi.width * meterPerPixel / zoompercent,
+                          roi.height * meterPerPixel / zoompercent);
     }
 
     /**

@@ -7,8 +7,8 @@ package org.helioviewer.viewmodel.view.jp2view.io.jpip;
  * 
  */
 public enum JPIPRequestField {
-    CNEW("cnew"), CCLOSE("cclose"), TYPE("type"), TID("tid"), STREAM("stream"), LEN("len"), CID("cid"), METAREQ("metareq"), ROFF("roff"), RSIZ("rsiz"), FSIZ("fsiz"), MODEL("model"), CONTEXT("context"), LAYERS("layers");
 
+    CNEW("cnew"), CCLOSE("cclose"), TYPE("type"), TID("tid"), STREAM("stream"), LEN("len"), CID("cid"), METAREQ("metareq"), ROFF("roff"), RSIZ("rsiz"), FSIZ("fsiz"), MODEL("model"), CONTEXT("context"), LAYERS("layers");
     private final String str;
 
     private JPIPRequestField(final String _str) {
@@ -18,4 +18,5 @@ public enum JPIPRequestField {
     public String toString() {
         return str;
     }
-};
+
+}

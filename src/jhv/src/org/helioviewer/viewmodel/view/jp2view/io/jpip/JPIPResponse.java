@@ -78,4 +78,4 @@ public class JPIPResponse extends HTTPResponse {
         return (status == JPIPConstants.EOR_WINDOW_DONE || status == JPIPConstants.EOR_IMAGE_DONE);
     }
 
-};
+}

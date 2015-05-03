@@ -82,4 +82,5 @@ public class JPIPDataSegment implements Cloneable {
         res += "]";
         return res;
     }
-};
+
+}

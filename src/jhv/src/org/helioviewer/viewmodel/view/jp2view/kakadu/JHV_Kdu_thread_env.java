@@ -12,7 +12,6 @@ import org.helioviewer.base.math.MathUtils;
  */
 final public class JHV_Kdu_thread_env extends Kdu_thread_env {
 
-    // Singleton pattern crap
     private static final JHV_Kdu_thread_env singletonInstance = new JHV_Kdu_thread_env();
 
     public static JHV_Kdu_thread_env getSingletonInstance() {
@@ -48,4 +47,5 @@ final public class JHV_Kdu_thread_env extends Kdu_thread_env {
             ex.printStackTrace();
         }
     }
+
 }
