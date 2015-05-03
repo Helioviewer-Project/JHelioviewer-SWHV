@@ -24,7 +24,8 @@ public class LineColorOptionPanel extends JPanel {
 
     private void initVisualComponents() {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        JButton pickColor = new JButton("Change Line Color");
+
+        JButton pickColor = new JButton("Line color");
         pickColor.setMargin(new Insets(0, 0, 0, 0));
         pickColor.setToolTipText("Change the color of the current line");
         pickColor.addActionListener(new ActionListener() {
