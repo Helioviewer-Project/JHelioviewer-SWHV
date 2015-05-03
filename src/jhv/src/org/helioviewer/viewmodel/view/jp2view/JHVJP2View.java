@@ -30,8 +30,6 @@ import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLeve
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.viewport.StaticViewport;
 import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewportimagesize.StaticViewportImageSize;
-import org.helioviewer.viewmodel.viewportimagesize.ViewportImageSizeAdapter;
 
 /**
  * Implementation of View for JPG2000 images.
@@ -480,7 +478,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int imageHeight = (int) Math.round(r.getHeight() / currentMeterPerPixel);
 
         Region mr = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
-        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new ViewportImageSizeAdapter(new StaticViewportImageSize(res.getResolutionBounds().width, res.getResolutionBounds().height)));
+        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new Vector2dInt(res.getResolutionBounds().width, res.getResolutionBounds().height));
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
