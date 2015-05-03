@@ -7,6 +7,7 @@ import java.net.URI;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.Vector2dInt;
@@ -19,8 +20,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
@@ -127,7 +126,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
             if (!(metaData instanceof PixelBasedMetaData)) {
-                region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+                region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
             }
             if (viewport == null) {
                 viewport = new Viewport(100, 100);
@@ -476,7 +475,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int imageWidth = (int) Math.round(r.getWidth() / currentMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / currentMeterPerPixel);
 
-        Region mr = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+        Region mr = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new Vector2dInt(res.getResolutionBounds().width, res.getResolutionBounds().height));
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 

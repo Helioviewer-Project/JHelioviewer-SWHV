@@ -1,9 +1,9 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.viewmodel.region.Region;
 
 /**
  * Implementation of MetaData representing images without information about
@@ -77,7 +77,7 @@ public class PixelBasedMetaData extends AbstractMetaData {
         double newUnitsPerPixel = Math.max(unitsPerPixelX, unitsPerPixelY);
 
         setPhysicalSize(GL3DVec2d.scale(getPhysicalSize(), newUnitsPerPixel / unitsPerPixel));
-        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getCornerX(), region.getCornerY() - getPhysicalSize().y + region.getHeight()));
+        setPhysicalLowerLeftCorner(new GL3DVec2d(region.getLowerLeftCorner().x, region.getLowerLeftCorner().y - getPhysicalSize().y + region.getHeight()));
         unitsPerPixel = newUnitsPerPixel;
     }
 

@@ -2,8 +2,8 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**

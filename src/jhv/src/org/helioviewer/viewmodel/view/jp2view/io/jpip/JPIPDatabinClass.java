@@ -70,4 +70,4 @@ public enum JPIPDatabinClass {
         return jpipString;
     }
 
-};
+}

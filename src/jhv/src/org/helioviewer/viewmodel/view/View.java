@@ -2,34 +2,23 @@ package org.helioviewer.viewmodel.view;
 
 import java.net.URI;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.region.Region;
 
 /**
  * View to manage an image data source.
  *
- * <p>
- * This view represents undermost view within the view chain. It should not be
- * possible to use another view as an input for this view.
- *
- * <p>
- * Usually, it is expected to have at least one {@link RegionView} per path
- * within the view chain, so it might be a good idea to always implement them
- * together with the View, since every path starts at an View.
- *
  * @author Ludwig Schmidt
  */
 public interface View {
-
     /**
      * Returns the URI representing the location of the image.
      *
      * @return URI representing the location of the image.
      */
     public URI getUri();
-
     /**
      * Returns the name the image.
      *
@@ -39,14 +28,12 @@ public interface View {
      * @return Name of the image
      */
     public String getName();
-
     /**
      * Returns, whether the image is a remote image (e.g. jpip).
      *
      * @return true, if the image is accessed remotely, false otherwise
      */
     public boolean isRemote();
-
     /**
      * Returns the download uri the image.
      *

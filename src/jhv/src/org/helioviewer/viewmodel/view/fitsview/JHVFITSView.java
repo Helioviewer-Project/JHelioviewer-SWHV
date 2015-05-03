@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -14,8 +15,6 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
 
@@ -90,7 +89,7 @@ public class JHVFITSView extends AbstractView {
         }
         imageData.setMETADATA(m);
 
-        region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft(), m.getPhysicalSize());
+        region = new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
         imageData.setMETADATA(this.m);
         viewport = new Viewport(100, 100);
@@ -112,7 +111,7 @@ public class JHVFITSView extends AbstractView {
     @Override
     public boolean setViewport(Viewport v) {
         // check if viewport has changed
-        if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
+        if (viewport != null && viewport.equals(v))
             return false;
 
         viewport = v;
@@ -133,7 +132,7 @@ public class JHVFITSView extends AbstractView {
     @Override
     public boolean setRegion(Region r) {
         // check if region has changed
-        if ((region == r) || (region != null && r != null && region.getCornerX() == r.getCornerX() && region.getCornerY() == r.getCornerY() && region.getWidth() == r.getWidth() && region.getHeight() == r.getHeight()))
+        if (region != null && region.equals(r))
             return false;
 
         region = r;

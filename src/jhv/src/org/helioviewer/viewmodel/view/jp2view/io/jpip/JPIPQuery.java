@@ -89,4 +89,5 @@ public class JPIPQuery implements Cloneable {
             ret = ret.substring(0, ret.length() - 1);
         return ret;
     }
+
 }

@@ -546,4 +546,5 @@ public class JHV_Kdu_cache extends Kdu_cache {
             list[i].delete();
         }
     }
-};
+
+}

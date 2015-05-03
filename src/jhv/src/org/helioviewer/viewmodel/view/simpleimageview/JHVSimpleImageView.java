@@ -7,6 +7,7 @@ import java.net.URI;
 
 import javax.imageio.ImageIO;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -16,8 +17,6 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
-import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -85,7 +84,7 @@ public class JHVSimpleImageView extends AbstractView {
         }
 
         m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
-        region = StaticRegion.createAdaptedRegion(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+        region = new Region(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
         viewport = new Viewport(100, 100);
 
         updateImageData();
@@ -124,8 +123,8 @@ public class JHVSimpleImageView extends AbstractView {
     protected void updateImageData() {
         int width = (int) (bufferedImage.getWidth() * region.getWidth() / m.getPhysicalSize().x);
         int height = (int) (bufferedImage.getHeight() * region.getHeight() / m.getPhysicalSize().y);
-        int x = (int) ((region.getCornerX() - m.getPhysicalLowerLeft().x) / m.getPhysicalSize().x * bufferedImage.getWidth());
-        int y = (int) ((region.getCornerY() - m.getPhysicalLowerLeft().y) / m.getPhysicalSize().y * bufferedImage.getHeight());
+        int x = (int) ((region.getLowerLeftCorner().x - m.getPhysicalLowerLeft().x) / m.getPhysicalSize().x * bufferedImage.getWidth());
+        int y = (int) ((region.getLowerLeftCorner().y - m.getPhysicalLowerLeft().y) / m.getPhysicalSize().y * bufferedImage.getHeight());
         if (width > 0 && height > 0) {
             BufferedImage bI = new BufferedImage(width, height, bufferedImage.getType());
             bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
@@ -137,7 +136,7 @@ public class JHVSimpleImageView extends AbstractView {
             } else {
                 subImageData = new ARGBInt32ImageData(bI, new ColorMask());
             }
-            region = StaticRegion.createAdaptedRegion(-1.5, -1.5, 3., 3.);
+            region = new Region(-1.5, -1.5, 3., 3.);
             subImageData.setRegion(region);
             subImageData.setMETADATA(this.m);
         } else {

@@ -19,4 +19,4 @@ public final class KakaduConstants {
     /** Kakadu constant */
     public static final int KDU_WANT_CODESTREAM_COMPONENTS = 1;
 
-};
+}
