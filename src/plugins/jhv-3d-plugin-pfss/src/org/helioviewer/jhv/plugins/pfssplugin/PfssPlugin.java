@@ -4,7 +4,7 @@ import java.net.URL;
 
 import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
 import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
@@ -47,7 +47,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void uninstallPlugin() {
-        Displayer.getRenderableContainer().removeRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         pfssCache = null;
     }
 

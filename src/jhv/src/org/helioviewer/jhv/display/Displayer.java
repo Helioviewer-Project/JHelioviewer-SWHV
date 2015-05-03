@@ -15,9 +15,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
-import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
-import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Displayer implements JHVEventHighlightListener {
@@ -124,16 +121,12 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static final LayersModel layersModel = new LayersModel();
-    private static final RenderableCamera renderableCamera = new RenderableCamera();
-
-    private static final RenderableContainer renderableContainer = new RenderableContainer();
-    private static final RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = layersModel.findView(view);
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
             // update timestamp labels
-            renderableContainer.fireTimeUpdated(view.getImageLayer());
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
             if (idx == layersModel.getActiveLayer() && dateTime != null) {
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(layersModel.getFPS(view));
@@ -165,18 +158,6 @@ public class Displayer implements JHVEventHighlightListener {
     @Override
     public void eventHightChanged(JHVEvent event) {
         Displayer.display();
-    }
-
-    public static RenderableCamera getRenderableCamera() {
-        return renderableCamera;
-    }
-
-    public static RenderableContainer getRenderableContainer() {
-        return renderableContainer;
-    }
-
-    public static RenderableContainerPanel getRenderableContainerPanel() {
-        return renderableContainerPanel;
     }
 
     public static LayersModel getLayersModel() {

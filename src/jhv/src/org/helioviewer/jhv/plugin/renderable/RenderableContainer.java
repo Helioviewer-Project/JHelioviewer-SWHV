@@ -32,8 +32,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
         renderables.add(lastImagelayerIndex + 1, renderable);
         newRenderables.add(renderable);
-
-        Displayer.getRenderableContainerPanel().setOptionsPanel(renderable);
         fireListeners();
     }
 

@@ -8,6 +8,7 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 
 /**
@@ -54,10 +55,10 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
 
-            RenderableCamera renderableCamera = Displayer.getRenderableCamera();
+            RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
             if (renderableCamera != null) {
                 renderableCamera.setTimeString(date);
-                Displayer.getRenderableContainer().fireTimeUpdated(renderableCamera);
+                ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
             }
         }
     }

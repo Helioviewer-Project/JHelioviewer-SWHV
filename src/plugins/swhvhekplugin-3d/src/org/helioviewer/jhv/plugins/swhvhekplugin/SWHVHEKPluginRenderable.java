@@ -20,7 +20,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -40,7 +40,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     public SWHVHEKPluginRenderable() {
         this.type = new RenderableType("HEK plugin");
-        Displayer.getRenderableContainer().addRenderable(this);
+        ImageViewerGui.getRenderableContainer().addRenderable(this);
     }
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {

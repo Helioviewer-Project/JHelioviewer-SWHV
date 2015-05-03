@@ -16,10 +16,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.io.MovieExport;
-import org.helioviewer.jhv.renderable.RenderableGrid;
-import org.helioviewer.jhv.renderable.RenderableGridType;
-import org.helioviewer.jhv.renderable.RenderableSolarAxes;
-import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -50,12 +46,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private File outputFile;
 
     public ComponentView() {
-        RenderableSolarAxesType solarAxesType = new RenderableSolarAxesType("Solar Axes");
-        Displayer.getRenderableContainer().addRenderable(new RenderableSolarAxes(solarAxesType));
-        RenderableGridType gridType = new RenderableGridType("Grids");
-        Displayer.getRenderableContainer().addRenderable(new RenderableGrid(gridType, false));
-        Displayer.getRenderableContainer().addRenderable(Displayer.getRenderableCamera());
-
         GLProfile glp = GLProfile.getDefault();
         GLCapabilities caps = new GLCapabilities(glp);
 
@@ -121,7 +111,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GL3DCamera camera = Displayer.getActiveCamera();
         camera.applyPerspective(gl);
         camera.applyCamera(gl);
-        Displayer.getRenderableContainer().render(gl);
+        ImageViewerGui.getRenderableContainer().render(gl);
         camera.drawCamera(gl);
         camera.resumePerspective(gl);
 

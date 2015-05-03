@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.net.URL;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
@@ -48,7 +47,7 @@ public class SWHVHEKPlugin implements Plugin {
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getInputController().removePlugin(controller);
-        Displayer.getRenderableContainer().removeRenderable(renderable);
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         controller = null;
     }
 
