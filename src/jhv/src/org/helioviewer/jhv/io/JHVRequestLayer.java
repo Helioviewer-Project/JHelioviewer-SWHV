@@ -7,6 +7,7 @@ package org.helioviewer.jhv.io;
  * 
  */
 public class JHVRequestLayer {
+
     public static final int numFields = 6;
 
     public static final int OBSERVATORY_INDEX = 0;
@@ -22,4 +23,5 @@ public class JHVRequestLayer {
     public String measurement;
     public boolean visibility;
     public int opacity;
+
 }

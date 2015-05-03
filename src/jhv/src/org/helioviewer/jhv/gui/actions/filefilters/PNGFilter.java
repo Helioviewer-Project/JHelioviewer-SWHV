@@ -6,18 +6,17 @@ package org.helioviewer.jhv.gui.actions.filefilters;
  * @author Markus Langenberg
  */
 public class PNGFilter extends ExtensionFileFilter {
-
     /**
      * Default Constructor.
      */
     public PNGFilter() {
         extensions = new String[] { "png" };
     }
-
     /**
      * {@inheritDoc}
      */
     public String getDescription() {
         return "PNG files (\".png\")";
     }
+
 }

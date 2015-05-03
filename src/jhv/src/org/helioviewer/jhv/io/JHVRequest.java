@@ -7,10 +7,12 @@ package org.helioviewer.jhv.io;
  * 
  */
 public class JHVRequest {
+
     public String startTime = null;
     public String endTime = null;
     public double imageScale = -1;
     public JHVRequestLayer[] imageLayers = null;
     public String cadence = null;
     public boolean linked = false;
+
 }

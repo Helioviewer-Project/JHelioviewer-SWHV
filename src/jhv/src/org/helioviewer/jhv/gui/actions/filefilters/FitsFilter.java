@@ -20,4 +20,5 @@ public class FitsFilter extends ExtensionFileFilter {
     public String getDescription() {
         return "FITS files (\".fts\", \".fits\")";
     }
+
 }

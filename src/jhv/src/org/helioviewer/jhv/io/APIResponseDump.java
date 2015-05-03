@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.io;
+package org.helioviewer.jhv.io;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -77,4 +77,5 @@ public class APIResponseDump {
     public void removeResponse(URI uri) {
         dump.remove(uri);
     }
+
 }
