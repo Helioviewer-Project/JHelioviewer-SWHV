@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -27,31 +26,15 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
     }
 
     private void initVisualComponents() {
+        setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-        setLayout(new GridBagLayout());
-
+        color = new JLabel("Color", JLabel.RIGHT);
         lut = new JComboBox(lutMap.keySet().toArray());
         lut.setSelectedItem("Rainbow 2");
         lut.addActionListener(this);
-        color = new JLabel("Color");
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0;
-        gc.gridy = 0;
-
-        panel.add(color, gc);
-
-        gc.gridx = 1;
-        gc.weightx = 1;
-        panel.add(lut, gc);
-
-        gc.gridx = 0;
-        gc.gridy = 0;
-        gc.fill = GridBagConstraints.BOTH;
-        add(panel, gc);
+        add(color);
+        add(lut);
     }
 
     @Override
