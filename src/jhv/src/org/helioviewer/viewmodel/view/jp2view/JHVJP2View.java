@@ -7,6 +7,7 @@ import java.net.URI;
 import kdu_jni.Jp2_palette;
 import kdu_jni.KduException;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
@@ -28,8 +29,6 @@ import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Implementation of View for JPG2000 images.
@@ -131,7 +130,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
                 region = StaticRegion.createAdaptedRegion(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
             }
             if (viewport == null) {
-                viewport = StaticViewport.createAdaptedViewport(100, 100);
+                viewport = new Viewport(100, 100);
             }
         }
         jp2Image = newJP2Image;

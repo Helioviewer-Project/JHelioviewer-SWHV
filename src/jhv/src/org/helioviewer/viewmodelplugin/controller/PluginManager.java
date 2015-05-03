@@ -346,18 +346,17 @@ public class PluginManager {
         PluginManager.getSingletonInstance().removePluginContainer(container);
 
         // delete corresponding JAR file
-        final File file = new File(container.getPluginLocation());
-
+        File file = new File(container.getPluginLocation());
         if (!file.delete()) {
             // when JAR file cannot be deleted note file by using a temporary
             // file
             // in order to delete it when restarting JHV
             try {
-                final FileWriter tempFileWriter = new FileWriter(tempFile, true);
+                FileWriter tempFileWriter = new FileWriter(tempFile, true);
                 tempFileWriter.write(container.getPluginLocation().getPath() + ";");
                 tempFileWriter.flush();
                 tempFileWriter.close();
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 return false;
             }
         }
