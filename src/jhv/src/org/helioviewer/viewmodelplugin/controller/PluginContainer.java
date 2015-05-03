@@ -29,7 +29,6 @@ public class PluginContainer implements Container {
      *            Status if plug-in is already activated (installed) or not.
      */
     public PluginContainer(ClassLoader classLoader, Plugin plugin, URI pluginLocation, boolean active) {
-
         this.classLoader = classLoader;
         this.plugin = plugin;
         this.pluginLocation = pluginLocation;
@@ -65,12 +64,10 @@ public class PluginContainer implements Container {
      * true or uninstalls the plug-in if the new status is false.
      */
     public void setActive(boolean active) {
-
         if (this.pluginActive == active)
             return;
 
         this.pluginActive = active;
-
         if (active)
             plugin.installPlugin();
         else

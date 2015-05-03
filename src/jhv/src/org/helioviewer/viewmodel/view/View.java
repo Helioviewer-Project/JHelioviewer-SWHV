@@ -2,10 +2,10 @@ package org.helioviewer.viewmodel.view;
 
 import java.net.URI;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.region.Region;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * View to manage an image data source.

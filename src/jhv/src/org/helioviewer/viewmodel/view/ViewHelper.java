@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.io.IOException;
 import java.net.URI;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
@@ -13,8 +14,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Collection of useful functions for use within the view chain.
@@ -114,7 +113,7 @@ public final class ViewHelper {
     public static Viewport calculateInnerViewport(Region innerRegion, Region outerRegion, Vector2dInt outerViewportImageSize) {
         double newWidth = outerViewportImageSize.getX() * innerRegion.getWidth() / outerRegion.getWidth();
         double newHeight = outerViewportImageSize.getY() * innerRegion.getHeight() / outerRegion.getHeight();
-        return StaticViewport.createAdaptedViewport((int) Math.round(newWidth), (int) Math.round(newHeight));
+        return new Viewport((int) Math.round(newWidth), (int) Math.round(newHeight));
     }
 
     /**

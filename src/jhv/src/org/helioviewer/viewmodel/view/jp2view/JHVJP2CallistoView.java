@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.RegionAdapter;
@@ -11,9 +12,6 @@ import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
 public class JHVJP2CallistoView extends JHVJP2View {
 
@@ -24,7 +22,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     public JHVJP2CallistoView(boolean isMainView) {
         super(isMainView);
         region = new RegionAdapter(new StaticRegion(0, 0, 86400, 380));
-        viewport = new ViewportAdapter(new StaticViewport(2700, 12));
+        viewport = new Viewport(2700, 12);
         viewportSet = false;
         regionSet = false;
     }

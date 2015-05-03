@@ -7,6 +7,7 @@ import java.net.URI;
 
 import javax.imageio.ImageIO;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -18,8 +19,6 @@ import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 /**
  * Implementation of ImageInfoView for simple image formats.
@@ -87,7 +86,8 @@ public class JHVSimpleImageView extends AbstractView {
 
         m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
         region = StaticRegion.createAdaptedRegion(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-        viewport = StaticViewport.createAdaptedViewport(100, 100);
+        viewport = new Viewport(100, 100);
+
         updateImageData();
     }
 

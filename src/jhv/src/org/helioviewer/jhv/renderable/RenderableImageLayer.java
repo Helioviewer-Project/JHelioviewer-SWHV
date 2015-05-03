@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.helioviewer.base.Pair;
+import org.helioviewer.base.Viewport;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
@@ -25,9 +26,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
-import org.helioviewer.viewmodel.viewport.ViewportAdapter;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -173,7 +171,7 @@ public class RenderableImageLayer implements Renderable {
         }
         mainLayerView.setRegion(newRegion);
 
-        Viewport layerViewport = new ViewportAdapter(new StaticViewport(Displayer.getViewportWidth(), Displayer.getViewportHeight()));
+        Viewport layerViewport = new Viewport(Displayer.getViewportWidth(), Displayer.getViewportHeight());
         mainLayerView.setViewport(layerViewport);
     }
 

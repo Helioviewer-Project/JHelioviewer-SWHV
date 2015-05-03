@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 
+import org.helioviewer.base.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -17,8 +18,6 @@ import org.helioviewer.viewmodel.region.Region;
 import org.helioviewer.viewmodel.region.StaticRegion;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.viewport.StaticViewport;
-import org.helioviewer.viewmodel.viewport.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -94,7 +93,7 @@ public class JHVFITSView extends AbstractView {
         region = StaticRegion.createAdaptedRegion(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
         imageData.setMETADATA(this.m);
-        viewport = StaticViewport.createAdaptedViewport(100, 100);
+        viewport = new Viewport(100, 100);
     }
 
     /**
@@ -104,7 +103,6 @@ public class JHVFITSView extends AbstractView {
      *            Event that belongs to the request.
      * */
     private void updateImageData() {
-
         Displayer.display();
     }
 

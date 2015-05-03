@@ -151,7 +151,6 @@ public class PluginSettings {
      */
     public void removePluginFromXML(PluginContainer pluginContainer) {
         Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginContainer.getPluginLocation().getPath());
-
         if (pluginNode != null) {
             pluginsRootNode.removeChild(pluginNode);
         }
@@ -169,7 +168,6 @@ public class PluginSettings {
      */
     public void pluginSettingsToXML(PluginContainer pluginContainer) {
         Node pluginNode = findNode(pluginsRootNode, "PluginLocation", pluginContainer.getPluginLocation().getPath());
-
         if (pluginNode == null) {
             addPluginToXML(pluginContainer);
         } else {
@@ -208,9 +206,7 @@ public class PluginSettings {
      *            internal XML document.
      */
     private void editPluginInXML(Node pluginNode, PluginContainer pluginContainer) {
-
         NodeList list = ((Element) pluginNode).getElementsByTagName(NODES_PLUGINACTIVATED);
-
         if (list.getLength() == 1) {
             Node textNode = list.item(0).getFirstChild();
             textNode.setNodeValue(Boolean.toString(pluginContainer.isActive()));
@@ -267,7 +263,6 @@ public class PluginSettings {
         }
 
         Node pluginNode = findNode(pluginsRootNode, NODES_PLUGINLOCATION, pluginLocation.getPath());
-
         if (pluginNode != null)
             return isActivated(pluginNode, NODES_PLUGINACTIVATED);
 
