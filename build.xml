@@ -19,12 +19,6 @@
         </classpath>
     </taskdef>
 
-    <!--
-    <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler">
-        <classpath path="${build.resources}/mac/lib/jarbundler.jar"/>
-    </taskdef>
-    -->
-
     <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask">
         <classpath path="${build.resources}/mac/lib/appbundler-1.0.jar"/>
     </taskdef>
@@ -88,15 +82,6 @@
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>
-            <exclude name="**/JavaHelioViewerLauncher.java"/>
-        </javac>
-        <!-- Copy, remove the suppress warning and compile-->
-        <mkdir dir="${temp}/src/org/helioviewer/jhv"/>
-        <copy file="${src.base}/jhv/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" tofile="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java"/>
-        <replace file="${temp}/src/org/helioviewer/jhv/JavaHelioViewerLauncher.java" token="@SuppressWarnings(&quot;all&quot;)"/>
-        <javac destdir="${bin.jhv}" target="1.6" source="1.6" debug="true" debuglevel="source,lines,vars" includeantruntime="false">
-            <src path="${temp}/src/org/helioviewer/jhv/"/>
-            <include name="JavaHelioViewerLauncher.java"/>
         </javac>
     </target>
 
@@ -104,7 +89,7 @@
         <!-- JAR File -->
         <jar destfile="JHelioviewer.jar" compress="true" update="yes">
             <manifest>
-                <attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewerLauncher"/>
+                <attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewer"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Implementation-Version" value="v${jhv.version}r${jhv.revision}"/>
                 <attribute name="version" value="${jhv.version}"/>
@@ -128,7 +113,6 @@
 
             <zipgroupfileset dir="${lib}" excludes="*natives*.jar" />
         </jar>
-        <copy file="JHelioviewer.jar" tofile="${build}/JHelioviewer.jar"/>
     </target>
 
     <target name="sign" depends="jar-bundle" if="sign.jar">
@@ -158,22 +142,9 @@
                     <arg value="bundle.sh"/>
                 </exec>
                 <mkdir dir="${temp}/build/mac/"/>
-                <!--
-                <jarbundler dir="${temp}/build/mac/"
-                    jvmversion="1.6+"
-                    name="JHelioviewer"
-                    mainclass="org.helioviewer.jhv.JavaHelioViewerLauncher"
-                    jar="${build}/JHelioviewer.jar"
-                    version="${jhv.version}"
-                    build="${jhv.revision}"
-                    bundleid="org.helioviewer.jhv"
-                    copyright="©2014, European Space Agency"
-                    icon="${build.resources}/mac/JHV_icon.icns">
-                    <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
-                </jarbundler>
-                -->
-                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JavaHelioViewerLauncher" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2014, European Space Agency">
-                    <classpath file="${build}/JHelioviewer.jar"/>
+
+                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JavaHelioViewer" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2014, European Space Agency">
+                    <classpath file="JHelioviewer.jar"/>
                     <option value="-Dapple.laf.useScreenMenuBar=true"/>
                 </bundleapp>
                 <exec executable="${build.resources}/mac/bundle.sh">
@@ -245,6 +216,7 @@
 
     <target name="release-windows" depends="sign,bundle-windows"/>
     <target name="bundle-windows" depends="init-nsis">
+        <copy file="JHelioviewer.jar" tofile="${build}/JHelioviewer.jar"/>
         <exec executable="${nsis.path}/${makensis.executable}" dir="${nsis.path}">
             <arg value="${nsis.argument.prefix}DJHV_VERSION=${jhv.version}"/>
             <arg value="${nsis.argument.prefix}DJHV_REVISION=${jhv.revision}"/>
