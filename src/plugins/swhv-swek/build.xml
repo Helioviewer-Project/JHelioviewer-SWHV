@@ -213,6 +213,7 @@
 
     <target name="install-plugin" depends="jar-bundle">
         <copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}"/>
+        <copy file="${build}/${plugin.name}.jar" todir="${jhv.root}/plugins"/>
         <subant target="install-source">
             <fileset dir="./sources/" includes="*/build.xml"/>
         </subant>
