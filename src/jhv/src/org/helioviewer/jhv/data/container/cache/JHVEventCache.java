@@ -191,21 +191,6 @@ public class JHVEventCache {
      */
     public void removeEventType(JHVEventType eventType) {
         activeEventTypes.remove(eventType);
-        /*
-         * for (Map<Date, List<JHVEvent>> endDateEvents : events.values()) { for
-         * (List<JHVEvent> eventList : endDateEvents.values()) { List<JHVEvent>
-         * deleteList = new ArrayList<JHVEvent>(); for (JHVEvent event :
-         * eventList) { if (event.getJHVEventType().equals(eventType)) {
-         * deleteList.add(event); eventIDs.remove(event.getUniqueID());
-         * allEvents.remove(event.getUniqueID());
-         * missingEventsInEventRelations.remove(event.getUniqueID());
-         * eventsWithRelationRules.remove(event); for (JHVEventRelation relation
-         * : event.getEventRelationShip().getRelatedEventsByRule().values()) {
-         * if (relation.getTheEvent() != null) {
-         * relation.getTheEvent().getEventRelationShip
-         * ().getRelatedEventsByRule().remove(event.getUniqueID()); } } } }
-         * eventList.removeAll(deleteList); } }
-         */
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
