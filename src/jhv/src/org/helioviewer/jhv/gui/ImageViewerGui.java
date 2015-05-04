@@ -210,6 +210,7 @@ public class ImageViewerGui {
                 Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
                 Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
             } catch (Exception e) {
                 throw new RuntimeException("FullScreen utilities not available", e);
             }
