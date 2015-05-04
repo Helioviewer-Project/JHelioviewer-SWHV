@@ -157,7 +157,8 @@ public class EVEDrawableElement implements DrawableElement {
 
             for (int j = 0; j < line.warnLevels.length; j++) {
                 g.drawLine(graphArea.x, line.warnLevels[j], graphArea.x + graphArea.width, line.warnLevels[j]);
-                g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j]);
+                g.drawString(line.warnLabels[j], graphArea.x, line.warnLevels[j] - 2);
+                // TODO draw label under line if it will be cut off.
             }
         }
     }
