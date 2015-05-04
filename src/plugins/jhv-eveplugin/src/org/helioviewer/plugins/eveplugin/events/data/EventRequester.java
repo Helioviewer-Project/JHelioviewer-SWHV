@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.events.data;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -83,32 +81,17 @@ public class EventRequester implements TimingListener, JHVEventHandler {
 
     @Override
     public void selectedIntervalChanged() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         JHVEventContainer.getSingletonInstance().requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 
     @Override
     public void newEventsReceived(final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         fireNewEventsReceived(eventList);
     }
 
     @Override
     public void cacheUpdated() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
