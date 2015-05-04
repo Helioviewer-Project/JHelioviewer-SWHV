@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.util.Arrays;
 
 import org.helioviewer.jhv.JavaHelioViewer;
-import org.helioviewer.jhv.JavaHelioViewerLauncher;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
@@ -22,8 +21,6 @@ public class SWHVLauncher {
         System.out.println("================================================================");
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
         System.out.println("================================================================\n\n");
-
-        JavaHelioViewerLauncher.loadLibs();
 
         String[] args2 = Arrays.copyOf(args, args.length + 4);
 
