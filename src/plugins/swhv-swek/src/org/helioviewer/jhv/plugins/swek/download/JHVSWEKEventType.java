@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.plugins.swek.download;
 
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.AbstractJHVEventType;
 
 /**
  * JHV event type implementation for the swek.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-public class JHVSWEKEventType implements JHVEventType {
+public class JHVSWEKEventType extends AbstractJHVEventType {
 
     /** The event type */
     private final String eventType;
@@ -21,7 +21,7 @@ public class JHVSWEKEventType implements JHVEventType {
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public JHVSWEKEventType() {
         eventType = "";
@@ -32,7 +32,7 @@ public class JHVSWEKEventType implements JHVEventType {
     /**
      * Creates a JHVSWEK event type from the given event type, event source,
      * event provider.
-     * 
+     *
      * @param eventType
      *            the event type
      * @param eventSource
@@ -59,21 +59,6 @@ public class JHVSWEKEventType implements JHVEventType {
     @Override
     public String getEventProvider() {
         return eventProvider;
-    }
-
-    @Override
-    public boolean equals(Object otherEventType) {
-        if (otherEventType instanceof JHVEventType) {
-            JHVEventType otherJHVEventType = (JHVEventType) otherEventType;
-            return otherJHVEventType.getEventType().equals(eventType) && otherJHVEventType.getEventSource().equals(eventSource) && otherJHVEventType.getEventProvider().equals(eventProvider);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return ("" + eventType + eventSource + eventProvider).hashCode();
     }
 
 }

@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.AbstractJHVEventType;
 
 /**
  * Defines an event type coming from the comesep source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-public class ComesepEventType implements JHVEventType {
+public class ComesepEventType extends AbstractJHVEventType {
 
     /** The event type */
     private final String eventType;
@@ -21,7 +21,7 @@ public class ComesepEventType implements JHVEventType {
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public ComesepEventType() {
         eventType = "";
@@ -32,7 +32,7 @@ public class ComesepEventType implements JHVEventType {
     /**
      * Creates a comesep event type with a given event type, event source, event
      * provider.
-     * 
+     *
      * @param eventType
      *            the event type
      * @param eventSource
@@ -60,20 +60,4 @@ public class ComesepEventType implements JHVEventType {
     public String getEventProvider() {
         return eventProvider;
     }
-
-    @Override
-    public boolean equals(Object eventType) {
-        if (eventType instanceof JHVEventType) {
-            JHVEventType otherComesepEvent = (JHVEventType) eventType;
-            return otherComesepEvent.getEventType().equals(this.eventType) && otherComesepEvent.getEventProvider().equals(eventProvider) && otherComesepEvent.getEventSource().equals(eventSource);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return ("" + eventType + eventSource + eventProvider).hashCode();
-    }
-
 }

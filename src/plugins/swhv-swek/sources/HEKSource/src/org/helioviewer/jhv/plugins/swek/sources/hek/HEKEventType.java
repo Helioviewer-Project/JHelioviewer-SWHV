@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.AbstractJHVEventType;
 
 /**
  * Defines an event type coming from the hek source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-public class HEKEventType implements JHVEventType {
+public class HEKEventType extends AbstractJHVEventType {
 
     /** The event type */
     private final String eventType;
@@ -31,7 +31,7 @@ public class HEKEventType implements JHVEventType {
     /**
      * Creates a HEK event type with a given event type, event source, event
      * provider.
-     * 
+     *
      * @param eventType
      *            the event type
      * @param eventSource
@@ -58,21 +58,6 @@ public class HEKEventType implements JHVEventType {
     @Override
     public String getEventProvider() {
         return eventProvider;
-    }
-
-    @Override
-    public boolean equals(Object otherEventType) {
-        if (otherEventType instanceof JHVEventType) {
-            JHVEventType otherHekEvent = (JHVEventType) otherEventType;
-            return otherHekEvent.getEventType().equals(eventType) && otherHekEvent.getEventSource().equals(eventSource) && otherHekEvent.getEventProvider().equals(eventProvider);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return ("" + eventType + eventSource + "" + eventProvider).hashCode();
     }
 
 }
