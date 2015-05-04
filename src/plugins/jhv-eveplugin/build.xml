@@ -186,6 +186,7 @@
     <!-- Install the plugins -->
     <target name="install-plugin" depends="jar-bundle">
         <copy file="${build}/${plugin.name}.jar" todir="${plugins.dir}"/>
+        <copy file="${build}/${plugin.name}.jar" todir="${jhv.root}/plugins"/>
     </target>
 
 </project>
