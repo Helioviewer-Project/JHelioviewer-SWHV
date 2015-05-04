@@ -1,12 +1,10 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
-import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
 public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListener {
@@ -109,11 +107,6 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(400);
-        }
         requestData();
 
     }

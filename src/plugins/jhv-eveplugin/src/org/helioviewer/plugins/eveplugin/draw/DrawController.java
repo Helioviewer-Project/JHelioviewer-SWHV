@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.draw;
 
-import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.display.Displayer;
@@ -195,11 +193,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public final Interval<Date> getAvailableInterval() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         return availableInterval;
     }
 
@@ -334,11 +327,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean updatePlotAreaSpace) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         keepFullValueRange = useFullValueSpace;
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             selectedInterval = new Interval<Date>(null, null);
@@ -368,11 +356,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Interval<Date> getSelectedInterval() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         return selectedInterval;
     }
 
@@ -400,11 +383,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffTime = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
             double scaleDiff = scaledMaxTime - scaledMinTime;
@@ -422,11 +400,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
             double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
             double startDifference = oldMinTime - newMinTime;

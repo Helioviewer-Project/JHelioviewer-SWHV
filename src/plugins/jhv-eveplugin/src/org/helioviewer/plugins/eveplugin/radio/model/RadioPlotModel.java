@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -270,11 +269,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID) {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Called by other thread than event queue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(666);
-        }
         List<Long> idList = new ArrayList<Long>();
         idList.add(ID);
         radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList);
