@@ -255,6 +255,7 @@ public class JavaHelioViewer {
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
 
         /* ----------Setup FFmpeg ----------- */
+        /*
         splash.nextStep();
         splash.setProgressText("Initialize FFmpeg...");
         // Load/download ffmpeg
@@ -276,6 +277,7 @@ public class JavaHelioViewer {
         } else {
             Log.info("Successfully installed MP4Box tool");
         }
+        */
 
         // Check for updates in parallel, if newer version is available a small
         // message is displayed
