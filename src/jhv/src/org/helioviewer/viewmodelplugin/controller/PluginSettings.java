@@ -258,7 +258,7 @@ public class PluginSettings {
     public boolean isPluginActivated(URI pluginLocation) {
         // This is to activate plugins automatically during the debugging phase
         // in eclipse
-        if (pluginLocation == null) {
+        if (pluginLocation == null || pluginsRootNode == null) {
             return true;
         }
 
