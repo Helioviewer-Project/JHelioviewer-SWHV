@@ -102,7 +102,7 @@
 
     <target name="jar-bundle" depends="compile">
         <!-- JAR File -->
-        <jar destfile="JHelioviewer.jar">
+        <jar destfile="JHelioviewer.jar" compress="true" update="yes">
             <manifest>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewerLauncher"/>
                 <attribute name="Class-Path" value="."/>

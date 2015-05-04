@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
@@ -171,6 +172,7 @@ public class JavaHelioViewer {
         }
 
         // Determine glibc version
+        /*
         if (System.getProperty("jhv.os").equals("linux")) {
             splash.setProgressText("Determining glibc version...");
             Log.info("Try to install glibc-version tool");
@@ -192,14 +194,17 @@ public class JavaHelioViewer {
                 }
             }
         }
+        */
+
 
         /* ----------Setup kakadu ----------- */
         Log.debug("Instantiate Kakadu engine");
         KakaduEngine engine = new KakaduEngine();
 
+        Log.info("Try to load Kakadu libraries");
+        /*
         splash.nextStep();
         splash.setProgressText("Initializing Kakadu libraries...");
-        Log.info("Try to load Kakadu libraries");
         if (null == ResourceLoader.getSingletonInstance().loadResource("kakadu", libsRemote, libs, libs, libsBackup, System.getProperties())) {
             Log.fatal("Could not load Kakadu libraries");
             Message.err("Error loading Kakadu libraries", "Fatal error! The kakadu libraries could not be loaded. The log output may contain additional information.", true);
@@ -207,10 +212,33 @@ public class JavaHelioViewer {
         } else {
             Log.info("Successfully loaded Kakadu libraries");
         }
+        */
+
+        ArrayList<String> kduLibs = new ArrayList<String>();
+        if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
+            kduLibs.add("libkdu_jni-mac-x86-64.jnilib");
+        } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
+            kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
+        } else if (System.getProperty("jhv.os").equals("windows")) {
+            kduLibs.add("msvcr100.dll");
+            kduLibs.add("kdu_v63R.dll");
+            kduLibs.add("kdu_a63R.dll");
+            kduLibs.add("kdu_jni.dll");
+        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
+            kduLibs.add("libkdu_jni-linux-x86-64-glibc-2-7.so");
+        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
+            kduLibs.add("libkdu_jni-linux-x86-32-glibc-2-7.so");
+        }
+
+        String libPath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
+        for (String kduLib : kduLibs) {
+            File kduLibFile = new File(libPath + kduLib);
+            System.load(kduLibFile.getAbsolutePath());
+        }
 
         // The following code-block attempts to start the native message
         // handling
-        splash.nextStep();
+        // splash.nextStep();
         try {
             Log.debug("Setup Kakadu message handlers.");
             engine.startKduMessageSystem();

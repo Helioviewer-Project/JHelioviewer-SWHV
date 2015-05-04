@@ -14,6 +14,7 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class JavaHelioViewerLauncher {
         start(JavaHelioViewer.class, args);
     }
 
-    public static void loadLibs() {
+    public static void loadKDULibs() {
         SystemProperties.setPlatform();
         String libpath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
         File directory = new File(libpath);
@@ -86,46 +87,40 @@ public class JavaHelioViewerLauncher {
                 System.out.println("Failed to create directory " + libpath);
             }
         }
-        String libs[] = new String[4];
+
         String pathlib = "";
-        if (System.getProperty("jhv.os").equals("mac")) {
-            libs[0] = "libgluegen-rt.jnilib";
-            libs[1] = "libnativewindow_awt.jnilib";
-            libs[2] = "libnativewindow_macosx.jnilib";
-            libs[3] = "libjogl_desktop.jnilib";
+        ArrayList<String> kduLibs = new ArrayList<String>();
+
+        if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
+            kduLibs.add("libkdu_jni-mac-x86-64.jnilib");
+            pathlib = "macosx-universal/";
+        } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
+            kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
             pathlib = "macosx-universal/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
-            libs[0] = "gluegen-rt.dll";
-            libs[1] = "nativewindow_awt.dll";
-            libs[2] = "nativewindow_win32.dll";
-            libs[3] = "jogl_desktop.dll";
+            kduLibs.add("msvcr100.dll");
+            kduLibs.add("kdu_v63R.dll");
+            kduLibs.add("kdu_a63R.dll");
+            kduLibs.add("kdu_jni.dll");
             pathlib = "windows-amd64/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-32")) {
-            libs[0] = "gluegen-rt.dll";
-            libs[1] = "nativewindow_awt.dll";
-            libs[2] = "nativewindow_win32.dll";
-            libs[3] = "jogl_desktop.dll";
+            kduLibs.add("msvcr100.dll");
+            kduLibs.add("kdu_v63R.dll");
+            kduLibs.add("kdu_a63R.dll");
+            kduLibs.add("kdu_jni.dll");
             pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
-            libs[0] = "libgluegen-rt.so";
-            libs[1] = "libnativewindow_awt.so";
-            libs[2] = "libnativewindow_x11.so";
-            libs[3] = "libjogl_desktop.so";
+            kduLibs.add("libkdu_jni-linux-x86-64-glibc-2-7.so");
             pathlib = "linux-amd64/";
-        }
-        // if (System.getProperty("jhv.os").equals("linux") &&
-        // System.getProperty("jhv.arch").equals("x86-32")) {
-        else {
-            libs[0] = "libgluegen-rt.so";
-            libs[1] = "libnativewindow_awt.so";
-            libs[2] = "libnativewindow_x11.so";
-            libs[3] = "libjogl_desktop.so";
+        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
+            kduLibs.add("libkdu_jni-linux-x86-32-glibc-2-7.so");
             pathlib = "linux-i586/";
         }
-        for (int i = 0; i < libs.length; i++) {
+
+        for (String kduLib : kduLibs) {
             try {
-                InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/nativelib/jogl/" + pathlib + libs[i]);
-                File fileOut = new File(libpath + libs[i]);
+                InputStream in = JavaHelioViewerLauncher.class.getResourceAsStream("/natives/" + pathlib + kduLib);
+                File fileOut = new File(libpath + kduLib);
                 OutputStream out = new FileOutputStream(fileOut);
                 FileUtils.copy(in, out);
                 in.close();
@@ -237,7 +232,7 @@ public class JavaHelioViewerLauncher {
                         jvmArgs += " \"" + tokenizer.sval + "\"";
                     }
                 }
-                // loadLibs();
+                loadKDULibs();
 
                 System.out.println("JavaHelioviewerLauncher > Start JHelioviewer with the following java virtual machine parameters:" + jvmArgs);
                 // Pass arguments to process
