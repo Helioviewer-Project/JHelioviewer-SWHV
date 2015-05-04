@@ -5,17 +5,20 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.jhv.io.MovieExport;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -30,8 +33,13 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
 
+import com.xuggle.mediatool.IMediaWriter;
+import com.xuggle.mediatool.ToolFactory;
+import com.xuggle.xuggler.ICodec;
+import com.xuggle.xuggler.video.ConverterFactory;
+
 /**
- * A ComponentView is responsible for rendering the actual image to a Component.
+ * The ComponentView is responsible for rendering the actual image to a Component.
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
@@ -39,7 +47,11 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     // screenshot & movie
     private ExportMovieDialog exportMovieDialog;
-    private MovieExport export;
+
+    private String moviePath;
+    private IMediaWriter movieWriter;
+    private double framerate;
+
     private boolean exportMode = false;
     private boolean screenshotMode = false;
     private int previousScreenshot = -1;
@@ -148,7 +160,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
-                export.writeImage(screenshot);
+                BufferedImage xugScreenshot = ConverterFactory.convertToType(screenshot, BufferedImage.TYPE_3BYTE_BGR);
+                movieWriter.encodeVideo(0, xugScreenshot, (int) (1000 / framerate * currentScreenshot), TimeUnit.MILLISECONDS);
             }
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
 
@@ -175,11 +188,20 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         AbstractView mv = Displayer.getLayersModel().getActiveView();
         if (mv instanceof JHVJPXView) {
-            export = new MovieExport(canvas.getWidth(), canvas.getHeight());
-            export.createProcess();
             exportMode = true;
 
             JHVJPXView jpxView = (JHVJPXView) mv;
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
+            String dateString = format.format(new Date(System.currentTimeMillis()));
+            moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + dateString + ".mp4";
+
+            framerate = jpxView.getDesiredRelativeSpeed();
+            if (framerate <= 0 || framerate > 60)
+                framerate = 20;
+
+            movieWriter = ToolFactory.makeWriter(moviePath);
+            movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, canvas.getWidth(), canvas.getHeight());
+
             jpxView.pauseMovie();
             jpxView.setCurrentFrame(0);
             jpxView.playMovie();
@@ -190,19 +212,18 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     private void stopExport() {
-        AbstractView mv = Displayer.getLayersModel().getActiveView();
-
         exportMode = false;
         previousScreenshot = -1;
-        export.finishProcess();
+        movieWriter.close();
+        movieWriter = null;
 
-        JTextArea text = new JTextArea("Exported movie at: " + export.getFileName());
+        JTextArea text = new JTextArea("Exported movie at: " + moviePath);
+        moviePath = null;
         text.setBackground(null);
-        JOptionPane.showMessageDialog(canvas, text);
+        JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), text);
 
         ImageViewerGui.getLeftContentPane().setEnabled(true);
 
-        ((JHVJPXView) mv).pauseMovie();
         exportMovieDialog.reset();
         exportMovieDialog = null;
     }
