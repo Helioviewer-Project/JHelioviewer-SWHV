@@ -1,17 +1,14 @@
 /**
- * 
+ *
  */
 package org.helioviewer.plugins.eveplugin.radio.model;
 
-import java.awt.EventQueue;
-
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
 /**
  * Keeps the y value information for one plot identifier.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
  */
 public class YValueModel implements PlotAreaSpaceListener {
@@ -49,7 +46,7 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Gives the available minimum y-value.
-     * 
+     *
      * @return The available minimum y-value
      */
     public double getAvailableYMin() {
@@ -58,7 +55,7 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Sets the available minimum y-value.
-     * 
+     *
      * @param availableYMin
      *            The new available minimum y-value
      */
@@ -69,7 +66,7 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Gives the available maximum y-value.
-     * 
+     *
      * @return The new available maximum y-value
      */
     public double getAvailableYMax() {
@@ -78,7 +75,7 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Sets the available maximum y-value
-     * 
+     *
      * @param availableYMax
      */
     public void setAvailableYMax(double availableYMax) {
@@ -88,21 +85,16 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Gets the selected minimum y-value.
-     * 
+     *
      * @return The selected minimum y-value
      */
     public double getSelectedYMin() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(444);
-        }
         return selectedYMin;
     }
 
     /**
      * Sets the selected minimum y-value.
-     * 
+     *
      * @param selectedYMin
      *            The new selected minimum y-value
      */
@@ -112,21 +104,16 @@ public class YValueModel implements PlotAreaSpaceListener {
 
     /**
      * Gets the selected maximum y-value.
-     * 
+     *
      * @return The selected maximum y-value
      */
     public double getSelectedYMax() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(3333);
-        }
         return selectedYMax;
     }
 
     /**
      * Sets the selected maximum y-value.
-     * 
+     *
      * @param selectedYMax
      *            The new selected maximum y-value
      */

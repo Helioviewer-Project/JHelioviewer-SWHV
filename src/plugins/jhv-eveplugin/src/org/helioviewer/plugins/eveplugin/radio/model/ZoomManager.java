@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.radio.model;
 
-import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
@@ -188,11 +186,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener, Graph
 
     @Override
     public void selectedIntervalChanged() {
-        if (!EventQueue.isDispatchThread()) {
-            Log.error("Function called by other thread than eventqueue : " + Thread.currentThread().getName());
-            Thread.dumpStack();
-            System.exit(433);
-        }
         Interval<Date> newInterval = drawController.getSelectedInterval();
 
         for (ZoomDataConfig zdc : zoomDataConfigMap.values()) {
