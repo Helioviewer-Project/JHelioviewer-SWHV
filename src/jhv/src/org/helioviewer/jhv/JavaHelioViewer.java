@@ -1,19 +1,9 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import javax.swing.plaf.FontUIResource;
@@ -25,15 +15,10 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.resourceloader.ResourceLoader;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
-
-import com.jogamp.common.jvm.JNILibLoaderBase;
 
 /**
  * This class starts the applications.
@@ -47,27 +32,8 @@ import com.jogamp.common.jvm.JNILibLoaderBase;
  *
  */
 public class JavaHelioViewer {
-    static class JoglLoaderDummy implements JNILibLoaderBase.LoaderAction {
-
-        @Override
-        public boolean loadLibrary(String arg0, boolean arg1, ClassLoader arg2) {
-            return true;
-        }
-
-        @Override
-        public void loadLibrary(String arg0, String[] arg1, boolean arg2, ClassLoader arg3) {
-        }
-    }
 
     public static void main(String[] args) {
-        main(args, (Plugin[]) null);
-    }
-
-    public static void main(String[] args, Plugin builtinPlugin) {
-        main(args, new Plugin[] { builtinPlugin });
-    }
-
-    public static void main(String[] args, Plugin[] builtinPlugins) {
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLineProcessor.getUsageMessage());
@@ -109,7 +75,7 @@ public class JavaHelioViewer {
         LogSettings.getSingletonInstance().update();
 
         // Read the version and revision from the JAR metafile
-        JHVGlobals.determineVersionAndRevision();
+        //JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
 
@@ -144,81 +110,16 @@ public class JavaHelioViewer {
             }
         }
 
-        // Directories where to search for lib config files
-        URI libs = JHVDirectory.LIBS.getFile().toURI();
-        URI defaultPlugins = JHVDirectory.PLUGINS.getFile().toURI();
-        URI defaultPluginsBackup = JHVDirectory.PLUGINS_LAST_CONFIG.getFile().toURI();
-        URI libsBackup = JHVDirectory.LIBS_LAST_CONFIG.getFile().toURI();
-        URI libsRemote = null;
-        try {
-            Log.warn(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
-            libsRemote = new URI(Settings.getSingletonInstance().getProperty("default.remote.lib.path"));
-        } catch (URISyntaxException e1) {
-            Log.error("Invalid uri for remote library server");
-        }
-
-        // Determine glibc version
-        /*
-        if (System.getProperty("jhv.os").equals("linux")) {
-            Log.info("Try to install glibc-version tool");
-            if (null == ResourceLoader.getSingletonInstance().loadResource("glibc-version", libsRemote, libs, libs, libsBackup, System.getProperties())) {
-                Log.error(">> JavaHelioViewer > Could not load glibc-version tool");
-                Message.err("Error loading glibc-version tool", "Error! The glibc-version tool could not be loaded. This may slow down the loading process and increase the network load.", false);
-            } else {
-                Log.info("Successfully installed glibc version tool");
-                try {
-                    if (SystemProperties.setGLibcVersion() != null) {
-                        Log.info("Successfully determined glibc version: " + System.getProperty("glibc.version"));
-                    } else {
-                        Log.error(">> JavaHelioViewer > Could not determine glibc version");
-                        Message.err("Error detecting glibc version", "Error! The glibc version could not be detected. This may slow down the loading process and increase the network load.", false);
-                    }
-                } catch (Throwable t) {
-                    Log.error(">> JavaHelioViewer > Could not determine glibc version", t);
-                    Message.err("Error detecting glibc version", "Error! The glibc version could not be detected. This may slow down the loading process and increase the network load.", false);
-                }
-            }
-        }
-        */
-
-
         /* ----------Setup kakadu ----------- */
         Log.debug("Instantiate Kakadu engine");
         KakaduEngine engine = new KakaduEngine();
 
         Log.info("Try to load Kakadu libraries");
-        /*
-        if (null == ResourceLoader.getSingletonInstance().loadResource("kakadu", libsRemote, libs, libs, libsBackup, System.getProperties())) {
-            Log.fatal("Could not load Kakadu libraries");
-            Message.err("Error loading Kakadu libraries", "Fatal error! The kakadu libraries could not be loaded. The log output may contain additional information.", true);
-            return;
-        } else {
-            Log.info("Successfully loaded Kakadu libraries");
+        try {
+            JHVLoader.copyKDULibs();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        */
-
-        ArrayList<String> kduLibs = new ArrayList<String>();
-        if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
-            kduLibs.add("libkdu_jni-mac-x86-64.jnilib");
-        } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
-            kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
-        } else if (System.getProperty("jhv.os").equals("windows")) {
-            kduLibs.add("msvcr100.dll");
-            kduLibs.add("kdu_v63R.dll");
-            kduLibs.add("kdu_a63R.dll");
-            kduLibs.add("kdu_jni.dll");
-        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
-            kduLibs.add("libkdu_jni-linux-x86-64-glibc-2-7.so");
-        } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
-            kduLibs.add("libkdu_jni-linux-x86-32-glibc-2-7.so");
-        }
-
-        String libPath = JHVDirectory.LIBS.getPath().substring(0, JHVDirectory.LIBS.getPath().length() - 1) + File.separator;
-        for (String kduLib : kduLibs) {
-            File kduLibFile = new File(libPath + kduLib);
-            System.load(kduLibFile.getAbsolutePath());
-        }
-
         // The following code-block attempts to start the native message
         // handling
         try {
@@ -235,35 +136,6 @@ public class JavaHelioViewer {
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
 
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
-
-        /* ----------Setup FFmpeg ----------- */
-        /*
-        // Load/download ffmpeg
-        Log.info("Install FFmpeg");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("ffmpeg-2-1", libsRemote, libs, libs, libsBackup, System.getProperties())) {
-            Log.error("Error installing FFmpeg");
-            Message.err("Error installing FFmpeg", "Could not install FFmpeg tool. Movie export will not work.", false);
-        } else {
-            Log.info("Successfully installed FFmpeg tool");
-        }
-
-        // Load/download mp4box
-        Log.info("Install MP4Box");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("mp4box", libsRemote, libs, libs, libsBackup, System.getProperties())) {
-            Log.error("Error installing MP4Box");
-            Message.err("Error installing MP4Box", "Could not install MP4Box tool. Exported movies will not contain timestamps in subtitles.", false);
-        } else {
-            Log.info("Successfully installed MP4Box tool");
-        }
-        */
-
-        // Check for updates in parallel, if newer version is available a small
-        // message is displayed
-        /*
-         * try { JHVUpdate update = new JHVUpdate(); update.check(); } catch
-         * (MalformedURLException e) { // Should never happen
-         * Log.error("Error retrieving internal update URL", e); }
-         */
 
         Log.info("Start main window");
         try {
@@ -282,71 +154,18 @@ public class JavaHelioViewer {
         }
 
         /* ----------Setup Plug-ins ----------- */
+        JHVLoader.loadRemotePlugins(args);
 
-        Log.info("Loading plugins");
-        // check if plug-ins have to be deleted
-        final File tmpFile = new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES);
-
-        if (tmpFile.exists()) {
-            try {
-                final BufferedReader in = new BufferedReader(new FileReader(tmpFile));
-
-                String line = null;
-                String content = "";
-
-                while ((line = in.readLine()) != null) {
-                    content += line;
-                }
-
-                in.close();
-
-                final StringTokenizer st = new StringTokenizer(content, ";");
-
-                while (st.hasMoreElements()) {
-                    final File delFile = new File(st.nextToken());
-                    delFile.delete();
-                }
-
-                tmpFile.delete();
-            } catch (final Exception e) {
-            }
-        }
-
-        // Load Plug ins at the very last point
-        Log.info("Load plugin settings");
-        PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
-
-        if (builtinPlugins != null) {
-            for (int i = 0; i < builtinPlugins.length; ++i) {
-                PluginManager.getSingletonInstance().addPlugin(builtinPlugins[i].getClass().getClassLoader(), builtinPlugins[i], null);
-            }
-        }
-
-        Set<String> deactivedPlugins = new HashSet<String>();
-
-        for (int i = 0; i < args.length - 1; ++i) {
-            if (args[i].equals("--deactivate-plugin")) {
-                deactivedPlugins.add(args[i + 1]);
-            }
-        }
-
-        Log.info("Download default plugins");
-        if (null == ResourceLoader.getSingletonInstance().loadResource("default-plugins", libsRemote, defaultPlugins, defaultPlugins, defaultPluginsBackup, System.getProperties())) {
-            Log.error("Error fetching default plugins");
-            Message.err("Error fetching default plugins", "Could not download default plugins. You can try to download them from their respective website.", false);
-        } else {
-            Log.info("Successfully downloaded default plugins.");
-        }
-
+        /*
         try {
-            Log.info("Search for plugins in " + JHVDirectory.PLUGINS.getPath());
-            PluginManager.getSingletonInstance().searchForPlugins(JHVDirectory.PLUGINS.getFile(), true, deactivedPlugins);
-        } catch (IOException e) {
-            String title = "An error occured while loading the plugin files. At least one plugin file is corrupt!";
-            String message = "The following files are affected:\n" + e.getMessage();
-            Log.error(title + " " + message, e);
-            Message.warn(title, message);
+            JHVLoader.loadJarPlugin("EVEPlugin.jar");
+            JHVLoader.loadJarPlugin("PfssPlugin.jar");
+            JHVLoader.loadJarPlugin("SWEKPlugin.jar");
+            JHVLoader.loadJarPlugin("SWHVHEKPlugin.jar");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        */
     }
 
     private static void setUIFont(FontUIResource f) {
