@@ -112,21 +112,10 @@ public class JavaHelioViewer {
         JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
-        // display the splash screen
-        Log.debug("Create splash screen");
-        JHVSplashScreen splash = JHVSplashScreen.getSingletonInstance();
-
-        int numProgressSteps = 10;
-        Log.debug("Number of progress steps: " + numProgressSteps);
-        splash.setProgressSteps(numProgressSteps);
-
-        splash.setProgressText("Initializing JHelioviewer...");
 
         // Load settings from file but do not apply them yet
         // The settings must not be applied before the kakadu engine has been
         // initialized
-        splash.setProgressText("Loading settings...");
-        splash.nextStep();
         Log.info("Load settings");
         Settings.getSingletonInstance().load();
 
@@ -139,9 +128,6 @@ public class JavaHelioViewer {
         Settings.getSingletonInstance().save();
 
         // Set the platform system properties
-        splash.nextStep();
-        splash.setProgressText("Determining platform...");
-
         SystemProperties.setPlatform();
         Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
 
@@ -174,7 +160,6 @@ public class JavaHelioViewer {
         // Determine glibc version
         /*
         if (System.getProperty("jhv.os").equals("linux")) {
-            splash.setProgressText("Determining glibc version...");
             Log.info("Try to install glibc-version tool");
             if (null == ResourceLoader.getSingletonInstance().loadResource("glibc-version", libsRemote, libs, libs, libsBackup, System.getProperties())) {
                 Log.error(">> JavaHelioViewer > Could not load glibc-version tool");
@@ -203,8 +188,6 @@ public class JavaHelioViewer {
 
         Log.info("Try to load Kakadu libraries");
         /*
-        splash.nextStep();
-        splash.setProgressText("Initializing Kakadu libraries...");
         if (null == ResourceLoader.getSingletonInstance().loadResource("kakadu", libsRemote, libs, libs, libsBackup, System.getProperties())) {
             Log.fatal("Could not load Kakadu libraries");
             Message.err("Error loading Kakadu libraries", "Fatal error! The kakadu libraries could not be loaded. The log output may contain additional information.", true);
@@ -238,7 +221,6 @@ public class JavaHelioViewer {
 
         // The following code-block attempts to start the native message
         // handling
-        // splash.nextStep();
         try {
             Log.debug("Setup Kakadu message handlers.");
             engine.startKduMessageSystem();
@@ -256,8 +238,6 @@ public class JavaHelioViewer {
 
         /* ----------Setup FFmpeg ----------- */
         /*
-        splash.nextStep();
-        splash.setProgressText("Initialize FFmpeg...");
         // Load/download ffmpeg
         Log.info("Install FFmpeg");
         if (null == ResourceLoader.getSingletonInstance().loadResource("ffmpeg-2-1", libsRemote, libs, libs, libsBackup, System.getProperties())) {
@@ -267,8 +247,6 @@ public class JavaHelioViewer {
             Log.info("Successfully installed FFmpeg tool");
         }
 
-        splash.nextStep();
-        splash.setProgressText("Initialize MP4Box...");
         // Load/download mp4box
         Log.info("Install MP4Box");
         if (null == ResourceLoader.getSingletonInstance().loadResource("mp4box", libsRemote, libs, libs, libsBackup, System.getProperties())) {
@@ -287,11 +265,7 @@ public class JavaHelioViewer {
          * Log.error("Error retrieving internal update URL", e); }
          */
 
-        splash.setProgressText("Start main window...");
-        splash.nextStep();
-        // Create main view chain and display main window
         Log.info("Start main window");
-
         try {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
@@ -309,9 +283,7 @@ public class JavaHelioViewer {
 
         /* ----------Setup Plug-ins ----------- */
 
-        splash.setProgressText("Loading Plugins...");
-        splash.nextStep();
-
+        Log.info("Loading plugins");
         // check if plug-ins have to be deleted
         final File tmpFile = new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES);
 
@@ -375,9 +347,6 @@ public class JavaHelioViewer {
             Log.error(title + " " + message, e);
             Message.warn(title, message);
         }
-
-        splash.dispose();
-        splash.destroy();
     }
 
     private static void setUIFont(FontUIResource f) {
