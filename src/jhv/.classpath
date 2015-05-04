@@ -13,7 +13,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="../resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="../lib/jogl.jar">
+	<classpathentry kind="lib" path="../lib/jogl-all.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
 		</attributes>

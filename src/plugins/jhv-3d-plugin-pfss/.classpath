@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
-	<classpathentry kind="lib" path="../lib/jogl.jar"/>
+	<classpathentry kind="lib" path="../lib/jogl-all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
