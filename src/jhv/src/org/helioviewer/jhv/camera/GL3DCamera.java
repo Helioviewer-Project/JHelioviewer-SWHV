@@ -49,7 +49,6 @@ public abstract class GL3DCamera {
     private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
-    private final RayTracer rayTracer;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -58,7 +57,6 @@ public abstract class GL3DCamera {
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
         this.resetFOV();
-        rayTracer = new RayTracer(this);
     }
 
     public void reset() {
@@ -205,8 +203,17 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        GL3DVec3d hp = rayTracer.cast(viewportCoordinates.getX(), viewportCoordinates.getY()).getHitpoint();
-        return hp;
+        GL3DVec2d normalizedScreenpos = new GL3DVec2d(2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5));
+        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
+        GL3DVec3d hitPoint;
+        double radius2 = up1x * up1x + up1y * up1y;
+        if (radius2 <= 1.) {
+            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
+            hitPoint = this.localRotation.rotateInverseVector(hitPoint);
+            return hitPoint;
+        }
+        return null;
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
