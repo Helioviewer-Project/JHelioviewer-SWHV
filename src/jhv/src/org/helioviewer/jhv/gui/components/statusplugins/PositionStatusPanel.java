@@ -37,12 +37,13 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
             return;
 
         GL3DVec3d computedposition = Displayer.getActiveCamera().getVectorFromSphereAlt(position);
-        double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
-        double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
-        if (computedposition.x * computedposition.x + computedposition.y * computedposition.y > 1.) {
+
+        if (computedposition == null) {
             //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");
             setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
         } else {
+            double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
+            double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
             setText("(\u03B8, \u03C6) = " + "(" + String.format("%.2f\u00B0", theta) + "," + String.format("%.2f\u00B0", phi) + ")");
         }
         lastPosition = position;
