@@ -3,6 +3,10 @@ package org.helioviewer.jhv.launcher;
 import java.awt.EventQueue;
 
 import org.helioviewer.jhv.JavaHelioViewer;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
+import org.helioviewer.plugins.eveplugin.EVEPlugin;
+import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Class for launching jhv with several plugins added.
@@ -17,19 +21,24 @@ public class SWHVLauncher {
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
         System.out.println("================================================================\n\n");
 
-        //String[] args2 = Arrays.copyOf(args, args.length + 4);
-        /*
-         * args2[args2.length - 2] = "--deactivate-plugin"; args2[args2.length -
-         * 1] = "SWEKPlugin.jar"; args2[args2.length - 4] =
-         * "--deactivate-plugin"; args2[args2.length - 3] = "EVEPlugin.jar";
-         */
-        JavaHelioViewer.main(args);//, new SWEKPlugin(false));
+        String[] args2 = new String[7];
+
+        args2[0] = "--remote-plugins";
+        args2[1] = "--deactivate-plugin";
+        args2[2] = "SWEKPlugin.jar";
+        args2[3] = "--deactivate-plugin";
+        args2[4] = "EVEPlugin.jar";
+        args2[5] = "--deactivate-plugin";
+        args2[6] = "SWHVHEKPlugin.jar";
+
+        JavaHelioViewer.main(args);
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                //PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
-                //PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(SWEKPlugin.class.getClassLoader(), new SWEKPlugin(false), null);
+                PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
             }
         });
     }
