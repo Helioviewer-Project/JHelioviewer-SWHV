@@ -22,9 +22,9 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Manages all the downloaders and downloads of the SWEK plugin.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKSourceManager {
     /** Singleton instance of the swek download manager */
@@ -57,7 +57,7 @@ public class SWEKSourceManager {
 
     /**
      * Gets the singleton instance of the SWEK source manager.
-     * 
+     *
      * @return the instance of the SWEK source manager
      */
     public static SWEKSourceManager getSingletonInstance() {
@@ -75,10 +75,16 @@ public class SWEKSourceManager {
      * Loads the SWEK sources. If the download source is remote, the jar are
      * downloaded to the home directory of the swekplugin and loaded from there.
      * Local plugins will be loaded from disc.
-     * 
+     *
      * @return true if all the source were loaded, false if not.
      */
     public boolean loadSources() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if (!sourcesLoaded) {
             // Check the sweksettings file for the downloaders
             if (checkAndDownloadJars()) {
@@ -97,7 +103,7 @@ public class SWEKSourceManager {
      * expects the loadSources is already called. A new call of loadSources is
      * not done in order to avoid an infinite amount of calls to the loadSource
      * function.
-     * 
+     *
      * @param swekSource
      *            the swek source for which the downloader was requested
      * @return the downloader or null if the sources were not loaded correctly
@@ -112,7 +118,7 @@ public class SWEKSourceManager {
      * the loadSources is already called. A new call of loadSources is not done
      * in order to avoid an inifinite amount of calls to the loadSource
      * function.
-     * 
+     *
      * @param swekSource
      *            the swek source for which the parser was requested
      * @return the parser or null if the sources were not loaded correctly or an
@@ -129,7 +135,7 @@ public class SWEKSourceManager {
     /**
      * Generic method that loads a class with the given name of the given
      * classType.
-     * 
+     *
      * @param className
      *            The name of the class to load
      * @param classType
@@ -144,8 +150,7 @@ public class SWEKSourceManager {
                     if (classType.isInstance(object)) {
                         return classType.cast(object);
                     } else {
-                        Log.error("The class with name:" + className + " does not return a class of type " + classType.getName()
-                                + ". null returned");
+                        Log.error("The class with name:" + className + " does not return a class of type " + classType.getName() + ". null returned");
                     }
                 } catch (ClassNotFoundException e) {
                     Log.error("The class with name:" + className + " could not be loaded. Resulting error: " + e + ". null returned");
@@ -179,7 +184,7 @@ public class SWEKSourceManager {
      * Checks the swek configuration file for defined sources. It downloads the
      * jars to the home directory of the swek plugin if the location of the jar
      * is external. It builds up a list of URIs with the location of the jars.
-     * 
+     *
      * @return True if all the sources were downloaded and added to the list.
      */
     private boolean checkAndDownloadJars() {
@@ -194,27 +199,15 @@ public class SWEKSourceManager {
                     if (downloadJar(sourceURI)) {
                         downloadJarOK = downloadJarOK && true;
                     } else {
-                        Log.error("Source with name "
-                                + source.getSourceName()
-                                + " is not loaded. Promblem downloading jar on location: "
-                                + source.getJarLocation()
-                                + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                        Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                         downloadJarOK = false;
                     }
                 }
             } catch (URISyntaxException e) {
-                Log.error("Source with name "
-                        + source.getSourceName()
-                        + " is not loaded. Promblem downloading jar on location: "
-                        + source.getJarLocation()
-                        + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                 downloadJarOK = false;
             } catch (MalformedURLException e) {
-                Log.error("Source with name "
-                        + source.getSourceName()
-                        + " is not loaded. Promblem downloading jar on location: "
-                        + source.getJarLocation()
-                        + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                 downloadJarOK = false;
             }
         }
@@ -225,7 +218,7 @@ public class SWEKSourceManager {
      * Downloads the jar from the network and saves them in the home directory
      * of the swek plugin. The URI of the local file is added in the list of
      * jarURIs.
-     * 
+     *
      * @param sourceURI
      *            The URI describing the location of the jar
      * @return True if the jar was downloaded and added to the list of URIs.
@@ -251,7 +244,7 @@ public class SWEKSourceManager {
 
     /**
      * Extracts the name of the file from the URI.
-     * 
+     *
      * @param sourceURI
      *            The URI from which to extract the file name.
      * @return The name of the file.
@@ -263,15 +256,14 @@ public class SWEKSourceManager {
 
     /**
      * Creates a class loader from the given jars
-     * 
+     *
      * @return True if the classloader was created, false if the classloader was
      *         not created.
      */
     private boolean prepareDownloadersClassLoader() {
         URL[] urls = jarURLList.toArray(new URL[0]);
         if (loadExternalJars) {
-            urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingletonInstance().getPluginContainer(swekplugin)
-                    .getClassLoader());
+            urlClassLoader = URLClassLoader.newInstance(urls, PluginManager.getSingletonInstance().getPluginContainer(swekplugin).getClassLoader());
         } else {
             urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
         }

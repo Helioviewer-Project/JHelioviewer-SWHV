@@ -36,7 +36,7 @@ import org.json.JSONObject;
 
 /**
  * @author Bram.Bourgognie@oma.be
- * 
+ *
  */
 public class SWEKConfigurationManager {
 
@@ -80,7 +80,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Gives access to the singleton instance
-     * 
+     *
      * @return the singleton instance
      */
     public static SWEKConfigurationManager getSingletonInstance() {
@@ -92,13 +92,19 @@ public class SWEKConfigurationManager {
 
     /**
      * Loads the configuration.
-     * 
+     *
      * If no configuration file is set by the user, the program downloads the
      * configuration file online and saves it the
      * JHelioviewer/Plugins/swek-plugin folder.
-     * 
+     *
      */
     public void loadConfiguration() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if (!configLoaded) {
             Log.debug("search and open the configuration file");
             boolean isConfigParsed;
@@ -133,7 +139,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Checks if the configuration file was manually changed.
-     * 
+     *
      * @return true if the configuration file was initially changed, false if
      *         not
      */
@@ -163,7 +169,7 @@ public class SWEKConfigurationManager {
     /**
      * Gives a map with all the event types. The event type name is the key and
      * the event type is the value.
-     * 
+     *
      * @return map containing the event types found in the configuration file
      */
     public Map<String, SWEKEventType> getEventTypes() {
@@ -173,7 +179,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Gives an configuration ordered list with all the event types.
-     * 
+     *
      * @return map containing the event types found in the configuration file
      */
     public List<SWEKEventType> getOrderedEventTypes() {
@@ -184,7 +190,7 @@ public class SWEKConfigurationManager {
     /**
      * Gives a map with all the event sources. The source name is the key and
      * the source is the value.
-     * 
+     *
      * @return map containing the sources found in the configuration file
      */
     public Map<String, SWEKSource> getSources() {
@@ -194,7 +200,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Gets the related event rules.
-     * 
+     *
      * @return the related event rules.
      */
     public List<SWEKRelatedEvents> getSWEKRelatedEvents() {
@@ -205,7 +211,7 @@ public class SWEKConfigurationManager {
     /**
      * Downloads the SWEK configuration from the Internet and saves it in the
      * plugin home directory.
-     * 
+     *
      * @return true if the the file was found and copied to the home directory,
      *         false if the file could not be found, copied or something else
      *         went wrong.
@@ -234,7 +240,7 @@ public class SWEKConfigurationManager {
      * Checks the home directory of the plugin (normally
      * ~/JHelioviewer/Plugins/swek-plugin/) for the existence of the
      * SWEKSettings.json file.
-     * 
+     *
      * @return true if the file was found and useful, false if the file was not
      *         found.
      */
@@ -256,7 +262,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Checks the jhelioviewer settings file for a swek configuration file.
-     * 
+     *
      * @return true if the file as found and useful, false if the file was not
      *         found.
      */
@@ -306,7 +312,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the JSON from start
-     * 
+     *
      * @param configJSON
      *            The JSON to parse
      * @return true if the JSON configuration could be parsed, false if not.
@@ -329,7 +335,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a if the configuration was manually changed from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the manually changed indication
      * @return the parsed manually changed indication
@@ -342,7 +348,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the configuration version from the big json.
-     * 
+     *
      * @param configJSON
      *            The JSON from which to parse
      * @return The parsed configuration version
@@ -356,7 +362,7 @@ public class SWEKConfigurationManager {
     /**
      * Parses the list of sources from a json and adds the sources to a map
      * indexed on the name of the source.
-     * 
+     *
      * @param configJSON
      *            the JSON from which to parse the sources
      * @return a list of sources parsed from the JSON
@@ -376,7 +382,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a source from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the source
      * @return the parsed source
@@ -397,7 +403,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the source from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the source
      * @return the parsed source
@@ -410,7 +416,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the provider name from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the provider name
      * @return the parsed provider name
@@ -423,7 +429,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the downloader description from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the downloader description
      * @return the parsed downloader description
@@ -437,7 +443,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the event parser from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the event parser
      * @return the parsed event parser
@@ -450,7 +456,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the jar location from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the jar location
      * @return the parsed jar location
@@ -464,7 +470,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the base url from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the base url
      * @return the parsed base url
@@ -477,7 +483,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the general parameters from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the general parameters
      * @return the parsed general parameters
@@ -497,7 +503,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the list of event types from a json.
-     * 
+     *
      * @param configJSON
      *            the JSON from which to parse the event types
      * @return a list of event types parsed from the JSON
@@ -518,7 +524,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses an event type from a json.
-     * 
+     *
      * @param object
      *            The event type to parse
      * @return The parsed event type
@@ -541,7 +547,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the color from the json.
-     * 
+     *
      * @param object
      *            the json to parse from
      * @return the color of the event type or black if something went wrong.
@@ -570,7 +576,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a hexadecimal or octal string to a color.
-     * 
+     *
      * @param colorCode
      *            the code to parse into a color
      * @return the color represented by the hex st ring or black if something
@@ -587,7 +593,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a color name into a color.
-     * 
+     *
      * @param colorName
      *            the name to parse into a color
      * @return the color represented by the color name or black if something
@@ -606,7 +612,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the event icon settings.
-     * 
+     *
      * @param object
      *            the JSON object from where to parse the icon object.
      * @return the icon defined in the configuration
@@ -634,7 +640,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the event name from a json.
-     * 
+     *
      * @param object
      *            the json from which the event name is parsed
      * @return the event name
@@ -647,7 +653,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the suppliers from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which the suppliers are parsed
      * @return the suppliers list
@@ -665,7 +671,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a supplier from a json.
-     * 
+     *
      * @param object
      *            the json from which the supplier is parsed
      * @return the supplier
@@ -682,7 +688,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the supplier name from a json.
-     * 
+     *
      * @param object
      *            the json from which the supplier name is parsed
      * @return the supplier name
@@ -695,7 +701,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the supplier display name from a json
-     * 
+     *
      * @param object
      *            the JSON from which to parse the supplier display name
      * @return the supplier display name
@@ -708,7 +714,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a supplier source from a json.
-     * 
+     *
      * @param object
      *            the json from which the supplier source is parsed
      * @return the supplier source
@@ -721,7 +727,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the parameter list from the given JSON.
-     * 
+     *
      * @param object
      *            the json from which to parse the parameter list
      * @return the parameter list
@@ -741,7 +747,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a parameter from json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse
      * @return the parsed parameter
@@ -760,7 +766,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the source from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which the source is parsed
      * @return the source
@@ -773,7 +779,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the parameter name from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which the parameter name is parsed
      * @return the parameter name
@@ -786,7 +792,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the parameter display name from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which the parameter display name is parsed
      * @return the parameter display name
@@ -799,7 +805,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the parameter filter from a given json.
-     * 
+     *
      * @param jsonObject
      *            the json to parse from
      * @return the parsed filter
@@ -824,7 +830,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the filter units from the json.
-     * 
+     *
      * @param filterobject
      * @return
      * @throws JSONException
@@ -835,7 +841,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the filter type from a json.
-     * 
+     *
      * @param object
      *            the json from which the filter type is parsed
      * @return the filter type
@@ -848,7 +854,7 @@ public class SWEKConfigurationManager {
 
     /**
      * parses the minimum filter value from a json.
-     * 
+     *
      * @param object
      *            the json from which to filter the minimum value
      * @return the minimum filter value
@@ -861,7 +867,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the maximum filter value from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the maximum filter value
      * @return the maximum filter value
@@ -874,7 +880,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the step size from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the step size
      * @return the step size
@@ -887,7 +893,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the start value from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the start value
      * @return the start value
@@ -900,7 +906,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the default visible from the given json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse
      * @return the parsed default visible
@@ -913,7 +919,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the request interval extension from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the request interval extension
      * @return the parsed request interval extension
@@ -926,7 +932,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the standard selected from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the standard selected
      * @return true if standard selected is true in json, false if standard
@@ -940,7 +946,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the "group on" from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the "group on"
      * @return the group on parameter
@@ -953,7 +959,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the "coordinate_system" from the json.
-     * 
+     *
      * @param object
      *            the json from which to parse the "coordinate_system"
      * @return the coordinate system
@@ -966,7 +972,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the "spacial_region" from the json.
-     * 
+     *
      * @param object
      *            the object from which to parse the "spatial_region"
      * @return the spatial region
@@ -984,7 +990,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the x1 coordinate of the spatial region from the json.
-     * 
+     *
      * @param jsonObject
      *            the object from which to parse the x1-coordinate
      * @return the x1 coordinate
@@ -997,7 +1003,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the y1 coordinate of the spatial region from the json.
-     * 
+     *
      * @param jsonObject
      *            the object from which to parse the y1-coordinate
      * @return the y1 coordinate
@@ -1010,7 +1016,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the x2 coordinate of the spatial region from the json.
-     * 
+     *
      * @param jsonObject
      *            the object from which to parse the x2-coordinate
      * @return the x2 coordinate
@@ -1023,7 +1029,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the y2 coordinate of the spatial region from the json.
-     * 
+     *
      * @param jsonObject
      *            the object from which to parse the y2 coordinate
      * @return the y2 coordinate
@@ -1036,7 +1042,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses the list of related events from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the list of related events
      * @return the parsed list of related events
@@ -1054,7 +1060,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses related events from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse related events
      * @return the parsed related events
@@ -1071,7 +1077,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a related event name from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the related event name
      * @return the parsed related event type
@@ -1084,7 +1090,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "related with" from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the "related with"
      * @return the parsed "related with" event type
@@ -1097,7 +1103,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a list of "related on" from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the "related on" list
      * @return the parsed "related on" list
@@ -1115,7 +1121,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "related on" from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the "related on"
      * @return the parsed "related on"
@@ -1131,7 +1137,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "parameter from" from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the "parameter from"
      * @return the parsed "parameter from"
@@ -1145,7 +1151,7 @@ public class SWEKConfigurationManager {
 
     /**
      * Parses a "parameter with" from a json.
-     * 
+     *
      * @param jsonObject
      *            the json from which to parse the "parameter with"
      * @return the parsed "parameter with"
