@@ -210,6 +210,13 @@ public class ImageViewerGui {
                 Class<?> fullScreenUtilities = Class.forName("com.apple.eawt.FullScreenUtilities");
                 Method setWindowCanFullScreen = fullScreenUtilities.getMethod("setWindowCanFullScreen", Window.class, boolean.class);
                 setWindowCanFullScreen.invoke(fullScreenUtilities, window, true);
+
+                Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+                Method getSingletonApplication = applicationClass.getMethod("getApplication", (Class<?>[]) null);
+                Object application = getSingletonApplication.invoke(applicationClass.newInstance());
+                Method removeAboutMenuItem = applicationClass.getMethod("removeAboutMenuItem", (Class<?>[]) null);
+                removeAboutMenuItem.invoke(application);
+
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
             } catch (Exception e) {
                 throw new RuntimeException("FullScreen utilities not available", e);
