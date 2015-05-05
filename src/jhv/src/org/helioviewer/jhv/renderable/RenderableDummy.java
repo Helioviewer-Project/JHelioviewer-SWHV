@@ -10,6 +10,7 @@ import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import com.jogamp.opengl.GL2;
 
 public class RenderableDummy implements Renderable {
+
     private final RenderableType type;
 
     public RenderableDummy() {
