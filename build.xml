@@ -182,6 +182,7 @@
                 <mkdir dir="${temp}/build/mac/"/>
                 <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2015, European Space Agency">
                     <classpath file="JHelioviewer.jar"/>
+                    <option value="-Xdock:name=JHelioviewer"/>
                 </bundleapp>
                 <exec executable="${build.resources}/mac/bundle.sh">
                     <env key="TEMP" value="${temp}/build/mac"/>
