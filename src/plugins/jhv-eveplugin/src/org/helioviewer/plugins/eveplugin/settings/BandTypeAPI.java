@@ -23,7 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BandTypeAPI extends APIAbstract {
-    private static final BandTypeAPI singletonInstance = new BandTypeAPI();
+    private static BandTypeAPI singletonInstance;
     private BandType[] bandtypes;
     private Boolean isUpdated = Boolean.FALSE;
     private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
@@ -32,13 +32,15 @@ public class BandTypeAPI extends APIAbstract {
     private final Properties defaultProperties = new Properties();
 
     public static BandTypeAPI getSingletonInstance() {
+        if (singletonInstance == null) {
+            singletonInstance = new BandTypeAPI();
+        }
         return singletonInstance;
     }
 
-    public BandTypeAPI() {
+    private BandTypeAPI() {
         super();
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties",
-                JHVDirectory.LOGS.getPath(), false);
+        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
         this.loadSettings();
         this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
         this.updateDatasets();
@@ -54,7 +56,7 @@ public class BandTypeAPI extends APIAbstract {
 
     }
 
-    public String getDatasetUrl() {
+    private String getDatasetUrl() {
         return this.getBaseUrl() + "/datasets/index.php";
     }
 
@@ -63,7 +65,7 @@ public class BandTypeAPI extends APIAbstract {
         return this.getBaseUrl();
     }
 
-    public String readJSON() {
+    private String readJSON() {
         String string = null;
         URI url = null;
         try {
@@ -90,7 +92,7 @@ public class BandTypeAPI extends APIAbstract {
         return string;
     }
 
-    public void updateBandTypes(JSONArray jsonObjectArray) {
+    private void updateBandTypes(JSONArray jsonObjectArray) {
         bandtypes = new BandType[jsonObjectArray.length()];
         try {
             for (int i = 0; i < jsonObjectArray.length(); i++) {
@@ -136,7 +138,7 @@ public class BandTypeAPI extends APIAbstract {
         }
     }
 
-    public void updateBandGroups(JSONArray jsonGroupArray) {
+    private void updateBandGroups(JSONArray jsonGroupArray) {
         bandtypes = new BandType[jsonGroupArray.length()];
         try {
             for (int i = 0; i < jsonGroupArray.length(); i++) {
@@ -156,7 +158,7 @@ public class BandTypeAPI extends APIAbstract {
         }
     }
 
-    public String updateDatasets_old() {
+    public void updateDatasets() {
         try {
             String jsonString = readJSON();
             JSONObject jsonmain = new JSONObject(jsonString);
@@ -168,33 +170,6 @@ public class BandTypeAPI extends APIAbstract {
             Log.error("JSON parsing error", e1);
         }
         isUpdated = true;
-        return null;
-    }
-
-    public void updateDatasets() {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String jsonString = readJSON();
-                    JSONObject jsonmain = new JSONObject(jsonString);
-                    JSONArray jsonGroupArray = (JSONArray) jsonmain.get("groups");
-                    updateBandGroups(jsonGroupArray);
-                    JSONArray jsonObjectArray = (JSONArray) jsonmain.get("objects");
-                    updateBandTypes(jsonObjectArray);
-                } catch (JSONException e1) {
-                    Log.error("JSON parsing error", e1);
-                }
-            }
-        }, "UPDATEDATASETS");
-        t.start();
-        try {
-            t.join();
-            Log.warn("Thread is dead");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        BandTypeAPI.this.isUpdated = true;
     }
 
     public BandType[] getDatasets() {

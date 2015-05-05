@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -15,6 +16,7 @@ import org.helioviewer.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.plugins.eveplugin.radio.model.RadioPlotModel;
+import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.plugins.eveplugin.view.RadioObservationDialogUIPanel;
@@ -35,25 +37,39 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        EventRequester eventRequester = EventRequester.getSingletonInstance();
-        DrawController.getSingletonInstance().addTimingListener(eventRequester);
-        eventRequester.addListener(EventModel.getSingletonInstance());
-        DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
-        DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
-        // Create an instance of eveDrawController and leave it here.
-        EVEDrawController.getSingletonInstance();
-        // Avoid concurrent modification error.
-        TimeIntervalLockModel.getInstance();
-        pluginPanes.add(plotOne);
+        SwingWorker<Void, Void> installPlugin = new SwingWorker<Void, Void>() {
 
-        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+            @Override
+            protected Void doInBackground() throws Exception {
+                // call BandType API in background => loads the datasets.
+                BandTypeAPI.getSingletonInstance();
+                return null;
+            }
 
-        ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+            @Override
+            public void done() {
+                EventRequester eventRequester = EventRequester.getSingletonInstance();
+                DrawController.getSingletonInstance().addTimingListener(eventRequester);
+                eventRequester.addListener(EventModel.getSingletonInstance());
+                DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
+                DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
+                // Create an instance of eveDrawController and leave it here.
+                EVEDrawController.getSingletonInstance();
+                // Avoid concurrent modification error.
+                TimeIntervalLockModel.getInstance();
+                pluginPanes.add(plotOne);
 
-        RadioPlotModel.getSingletonInstance();
-        EventModel.getSingletonInstance().activateEvents();
+                ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+
+                ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
+                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+
+                RadioPlotModel.getSingletonInstance();
+                EventModel.getSingletonInstance().activateEvents();
+            }
+        };
+        installPlugin.execute();
     }
 
     @Override
