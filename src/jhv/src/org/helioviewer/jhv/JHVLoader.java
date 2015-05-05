@@ -37,9 +37,10 @@ public class JHVLoader {
         if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
             kduLibs.add("libkdu_jni-mac-x86-64.jnilib");
             pathlib = "macosx-universal/";
+        /* obsolete computer
         } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {
             kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
-            pathlib = "macosx-universal/";
+            pathlib = "macosx-universal/"; */
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
             kduLibs.add("msvcr100.dll");
             kduLibs.add("kdu_v63R.dll");
@@ -61,7 +62,7 @@ public class JHVLoader {
         }
 
         for (String kduLib : kduLibs) {
-            InputStream is = JavaHelioViewer.class.getResourceAsStream("/natives/" + pathlib + kduLib);
+            InputStream is = JavaHelioViewer.class.getResourceAsStream("/nativelibs/" + pathlib + kduLib);
             String path = JHVDirectory.LIBS.getPath() + kduLib;
             File f = new File(path);
 
