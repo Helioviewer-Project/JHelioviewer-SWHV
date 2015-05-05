@@ -1,13 +1,8 @@
 package org.helioviewer.jhv.launcher;
 
 import java.awt.EventQueue;
-import java.util.Arrays;
 
 import org.helioviewer.jhv.JavaHelioViewer;
-import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
-import org.helioviewer.plugins.eveplugin.EVEPlugin;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Class for launching jhv with several plugins added.
@@ -22,20 +17,19 @@ public class SWHVLauncher {
         System.out.println("JHelioviewer developer version with external plugin compiled-in.");
         System.out.println("================================================================\n\n");
 
-        String[] args2 = Arrays.copyOf(args, args.length + 4);
-
-        args2[args2.length - 2] = "--deactivate-plugin";
-        args2[args2.length - 1] = "SWEKPlugin.jar";
-        args2[args2.length - 4] = "--deactivate-plugin";
-        args2[args2.length - 3] = "EVEPlugin.jar";
-
-        JavaHelioViewer.main(args2, new SWEKPlugin(false));
+        //String[] args2 = Arrays.copyOf(args, args.length + 4);
+        /*
+         * args2[args2.length - 2] = "--deactivate-plugin"; args2[args2.length -
+         * 1] = "SWEKPlugin.jar"; args2[args2.length - 4] =
+         * "--deactivate-plugin"; args2[args2.length - 3] = "EVEPlugin.jar";
+         */
+        JavaHelioViewer.main(args);//, new SWEKPlugin(false));
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
-                PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+                //PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
+                //PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
             }
         });
     }
