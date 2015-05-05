@@ -381,7 +381,7 @@ public class APIRequestManager {
      * @throws IOException
      */
     public static AbstractView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
-        RenderableDummy renderableDummy = new RenderableDummy();
+        final RenderableDummy renderableDummy = new RenderableDummy();
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
