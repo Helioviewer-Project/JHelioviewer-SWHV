@@ -236,10 +236,10 @@ public abstract class GL3DCamera {
         double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= Constants.SunRadius * 0.70710678118654752440) {
+        if (radius2 <= Constants.SunRadius2 / 2.) {
             hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(Constants.SunRadius2 - radius2));
         } else {
-            hitPoint = new GL3DVec3d(up1x, up1y, Constants.SunRadius / (2. * Math.sqrt(radius2)));
+            hitPoint = new GL3DVec3d(up1x, up1y, Constants.SunRadius2 / (2. * Math.sqrt(radius2)));
         }
         GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
         hitPoint = roti.multiply(hitPoint);
