@@ -24,7 +24,12 @@ import org.helioviewer.jhv.renderable.RenderableDummy;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
 
 /**
  * This class provides methods to download files from a server.
@@ -287,8 +292,7 @@ public class APIRequestManager {
         if (uri == null) {
             return null;
         }
-        // Load new view and assign it to view chain of Main Image
-        AbstractView view = LoadView.loadView(uri);
+        AbstractView view = loadView(uri, uri, true);
         if (addToViewChain) {
             addToViewchain(view);
         }
@@ -314,8 +318,7 @@ public class APIRequestManager {
         if (uri == null) {
             return null;
         }
-        // Load new view and assign it to view chain of Main Image
-        AbstractView view = LoadView.loadView(uri, downloadURI);
+        AbstractView view = loadView(uri, downloadURI, true);
         if (addToViewChain) {
             addToViewchain(view);
         }
@@ -392,6 +395,79 @@ public class APIRequestManager {
             }
         });
         return view;
+    }
+
+    /**
+     * Loads a new image located at the given URI.
+     *
+     * <p>
+     * Depending on the file type, a different implementation of the View is
+     * chosen. If there is no implementation available for the given type, an
+     * exception is thrown.
+     *
+     * @param uri
+     *            URI representing the location of the image
+     * @param downloadURI
+     *            URI from which the whole file can be downloaded
+     * @param isMainView
+     *            Whether the view is used as a main view or not
+     * @return View containing the image
+     * @throws IOException
+     *             if anything went wrong (e.g. type not supported, image not
+     *             found, etc.)
+     */
+    private static AbstractView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
+        if (uri == null || uri.getScheme() == null || uri.toString() == null) {
+            throw new IOException("Invalid URI");
+        }
+
+        if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
+            try {
+                JHVFITSView fitsView = new JHVFITSView(uri);
+
+                return fitsView;
+            } catch (Exception e) {
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
+            try {
+                JHVSimpleImageView imView = new JHVSimpleImageView(uri);
+
+                return imView;
+            } catch (Exception e) {
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
+            try {
+                JP2Image jp2Image = new JP2Image(uri, downloadURI);
+                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView);
+
+                jp2CallistoView.setJP2Image(jp2Image);
+                return jp2CallistoView;
+            } catch (Exception e) {
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        } else {
+            try {
+                JP2Image jp2Image = new JP2Image(uri, downloadURI);
+
+                if (jp2Image.isMultiFrame()) {
+                    JHVJPXView jpxView = new JHVJPXView(isMainView);
+                    jpxView.setJP2Image(jp2Image);
+                    return jpxView;
+                } else {
+                    JHVJP2View jp2View = new JHVJP2View(isMainView);
+                    jp2View.setJP2Image(jp2Image);
+                    return jp2View;
+                }
+            } catch (Exception e) {
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                throw new IOException(e.getMessage());
+            }
+        }
     }
 
 }
