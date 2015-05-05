@@ -10,7 +10,6 @@ import com.jogamp.opengl.GL2;
 public class RenderableSolarAxes implements Renderable {
 
     private final RenderableType renderableType;
-    private final Component optionsPanel = new RenderableSolarAxesOptionsPanel();
     private final String name = "Solar axes";
     private boolean isVisible = true;
 
@@ -54,7 +53,7 @@ public class RenderableSolarAxes implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override

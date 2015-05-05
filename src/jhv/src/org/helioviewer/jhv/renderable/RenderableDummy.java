@@ -2,8 +2,6 @@ package org.helioviewer.jhv.renderable;
 
 import java.awt.Component;
 
-import javax.swing.JPanel;
-
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 
@@ -36,7 +34,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        return new JPanel();
+        return null;
     }
 
     @Override
