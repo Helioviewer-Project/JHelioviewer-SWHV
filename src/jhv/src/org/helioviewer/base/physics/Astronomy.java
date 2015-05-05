@@ -9,7 +9,12 @@ import org.helioviewer.base.math.MathUtils;
 public class Astronomy {
     private static final Calendar calendar = new GregorianCalendar();
 
-    public static double getB0InRadians(Date date) {
+    public static double getB0Degree(Date date) {
+        calendar.setTime(date);
+        return (getB0InRadians(calendar)) * MathUtils.radeg;
+    }
+
+    public static double getB0Radians(Date date) {
         calendar.setTime(date);
         return getB0InRadians(calendar);
     }

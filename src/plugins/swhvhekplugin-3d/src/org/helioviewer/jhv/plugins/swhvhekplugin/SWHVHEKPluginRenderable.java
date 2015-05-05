@@ -75,7 +75,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             }
         }
         double arcResolution = 100;
-        double thetaDelta = Astronomy.getB0InRadians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        double thetaDelta = Astronomy.getB0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double thetaStart = principleAngle - angularWidth / 2.;
         double thetaEnd = principleAngle + angularWidth / 2.;
         double phi = -Math.PI / 2. - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));

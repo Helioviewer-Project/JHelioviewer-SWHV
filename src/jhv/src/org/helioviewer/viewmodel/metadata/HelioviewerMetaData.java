@@ -174,7 +174,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             stonyhurstLongitude = 0.0;
         }
 
-        double theta = -Astronomy.getB0InRadians(this.getDateTime().getTime());
+        double theta = -Astronomy.getB0Radians(this.getDateTime().getTime());
         double phi = Astronomy.getL0Radians(this.getDateTime().getTime());
         phi -= stonyhurstLongitude / MathUtils.radeg;
         theta = stonyhurstLatitude / MathUtils.radeg;
