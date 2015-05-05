@@ -99,12 +99,6 @@ public class SWEKConfigurationManager {
      *
      */
     public void loadConfiguration() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         if (!configLoaded) {
             Log.debug("search and open the configuration file");
             boolean isConfigParsed;
