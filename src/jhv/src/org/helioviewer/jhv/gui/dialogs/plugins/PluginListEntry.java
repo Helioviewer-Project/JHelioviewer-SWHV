@@ -285,14 +285,14 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
      * {@inheritDoc}
      * */
     public void componentResized(final ComponentEvent e) {
-        updateDescriptionTextToDisplay(e.getComponent().getGraphics());
+        // updateDescriptionTextToDisplay(e.getComponent().getGraphics());
     }
 
     /**
      * {@inheritDoc}
      * */
     public void componentShown(final ComponentEvent e) {
-        updateDescriptionTextToDisplay(e.getComponent().getGraphics());
+        // updateDescriptionTextToDisplay(e.getComponent().getGraphics());
     }
 
     // Link Label
