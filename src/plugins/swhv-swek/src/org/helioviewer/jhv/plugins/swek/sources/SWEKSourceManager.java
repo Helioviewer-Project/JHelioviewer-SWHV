@@ -79,12 +79,6 @@ public class SWEKSourceManager {
      * @return true if all the source were loaded, false if not.
      */
     public boolean loadSources() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         if (!sourcesLoaded) {
             // Check the sweksettings file for the downloaders
             if (checkAndDownloadJars()) {
