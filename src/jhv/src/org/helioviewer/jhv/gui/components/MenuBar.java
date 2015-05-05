@@ -90,7 +90,7 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new OpenURLinBrowserAction("Report a Bug", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
         helpMenu.add(new OpenURLinBrowserAction("Submit a Feature Request", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
         helpMenu.addSeparator();
-        helpMenu.add(new CheckUpdateAction());
+        // helpMenu.add(new CheckUpdateAction());
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         add(helpMenu);
     }
