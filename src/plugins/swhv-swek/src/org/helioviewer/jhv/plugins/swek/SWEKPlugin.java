@@ -2,6 +2,8 @@ package org.helioviewer.jhv.plugins.swek;
 
 import java.io.File;
 
+import javax.swing.SwingWorker;
+
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -15,9 +17,9 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  * Part of these developments are based on the work done in the HEKPlugin
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin) and HEKPlugin 3d
  * (lp:~jhelioviewer-dev/jhelioviewer/hekplugin-3d).
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
- * 
+ *
  */
 public class SWEKPlugin implements Plugin {
 
@@ -48,7 +50,7 @@ public class SWEKPlugin implements Plugin {
 
     /**
      * Creates a SWEKPlugin that loads or doesn't load the external jars
-     * 
+     *
      * @param loadExternalJars
      *            true is the source jar should be loaded, false if the source
      *            jars should not be loaded.
@@ -66,7 +68,23 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void installPlugin() {
         createPluginDirectoryStructure();
-        configurePlugin();
+        SwingWorker<Void, Void> loadPlugin = new SwingWorker<Void, Void>() {
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                SWEKConfig.loadConfiguration();
+                SWEKSources.loadSources();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                eventContainer.registerHandler(incomingRequestManager);
+                ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
+                ImageViewerGui.getLeftContentPane().revalidate();
+            }
+        };
+        loadPlugin.execute();
     }
 
     /*
@@ -110,17 +128,6 @@ public class SWEKPlugin implements Plugin {
         if (!swekSourceJarDirectory.isDirectory()) {
             swekSourceJarDirectory.mkdirs();
         }
-    }
-
-    /**
-     * Configures the SWEK plugin.
-     */
-    private void configurePlugin() {
-        SWEKConfig.loadConfiguration();
-        SWEKSources.loadSources();
-        eventContainer.registerHandler(incomingRequestManager);
-        ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
-        ImageViewerGui.getLeftContentPane().revalidate();
     }
 
     @Override
