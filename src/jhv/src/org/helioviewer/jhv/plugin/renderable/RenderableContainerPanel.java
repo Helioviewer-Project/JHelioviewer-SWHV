@@ -103,8 +103,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     };
 
     public final JTable grid;
-    private Component optionsPanel = new JPanel();
-    private GridBagConstraints gc = new GridBagConstraints();
+    private Component optionsPanel = null;
+    private final GridBagConstraints gc = new GridBagConstraints();
     private final JPanel optionsPanelWrapper;
 
     public RenderableContainerPanel(final RenderableContainer renderableContainer) {
@@ -203,7 +203,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         optionsPanelWrapper = new JPanel(new BorderLayout());
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
-        optionsPanelWrapper.add(optionsPanel);
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton(addLayerAction);
         addLayerButton.setText("");
@@ -223,9 +222,11 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     }
 
     private void setOptionsPanel(Component cmp) {
-        optionsPanelWrapper.remove(optionsPanel);
+        if (optionsPanel != null)
+            optionsPanelWrapper.remove(optionsPanel);
         optionsPanel = cmp;
-        optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        if (optionsPanel != null)
+            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         this.getParent().revalidate();
         this.getParent().repaint();
     }
