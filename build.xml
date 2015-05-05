@@ -87,10 +87,34 @@
 
     <target name="jar-bundle" depends="compile">
         <!-- JAR File -->
-        <jar destfile="JHelioviewer.jar" compress="true" update="yes">
+        <jar destfile="JHelioviewer.jar">
             <manifest>
-                <attribute name="Main-Class" value="org.helioviewer.jhv.JavaHelioViewer"/>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="org.helioviewer.jhv.JavaHelioViewer"/>
                 <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="
+                        ./
+                        bzip2.jar
+                        fits.jar
+                        gluegen-rt-natives-linux-amd64.jar
+                        gluegen-rt-natives-linux-i586.jar
+                        gluegen-rt-natives-macosx-universal.jar
+                        gluegen-rt-natives-windows-amd64.jar
+                        gluegen-rt-natives-windows-i586.jar
+                        gluegen-rt.jar
+                        jogl-all-natives-linux-amd64.jar
+                        jogl-all-natives-linux-i586.jar
+                        jogl-all-natives-macosx-universal.jar
+                        jogl-all-natives-windows-amd64.jar
+                        jogl-all-natives-windows-i586.jar
+                        jogl-all.jar
+                        json.jar
+                        kdu_jni.jar
+                        log4j-1.2.16.jar
+                        slf4j-api-1.7.12.jar
+                        slf4j-nop-1.7.12.jar
+                        xuggle-xuggler-5.4.jar
+                "/>
                 <attribute name="Implementation-Version" value="v${jhv.version}r${jhv.revision}"/>
                 <attribute name="version" value="${jhv.version}"/>
                 <attribute name="revision" value="${jhv.revision}"/>
@@ -100,18 +124,32 @@
             <fileset file="README"/>
             <fileset file="COPYING"/>
 
-            <zipfileset src="${lib}/gluegen-rt-natives-windows-i586.jar"     includes="*.dll"    prefix="natives/windows-i586"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-windows-amd64.jar"    includes="*.dll"    prefix="natives/windows-amd64"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-linux-i586.jar"       includes="*.so"     prefix="natives/linux-i586"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-linux-amd64.jar"      includes="*.so"     prefix="natives/linux-amd64"/>
-            <zipfileset src="${lib}/gluegen-rt-natives-macosx-universal.jar" includes="*.jnilib" prefix="natives/macosx-universal"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-i586.jar"       includes="*.dll"    prefix="natives/windows-i586"/>
-            <zipfileset src="${lib}/jogl-all-natives-windows-amd64.jar"      includes="*.dll"    prefix="natives/windows-amd64"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-i586.jar"         includes="*.so"     prefix="natives/linux-i586"/>
-            <zipfileset src="${lib}/jogl-all-natives-linux-amd64.jar"        includes="*.so"     prefix="natives/linux-amd64"/>
-            <zipfileset src="${lib}/jogl-all-natives-macosx-universal.jar"   includes="*.jnilib" prefix="natives/macosx-universal"/>
+            <zipfileset src="jar-in-jar-loader.zip"/>
 
-            <zipgroupfileset dir="${lib}" excludes="*natives*.jar" />
+            <zipfileset dir="${lib}" includes="bzip2.jar"/>
+            <zipfileset dir="${lib}" includes="fits.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt-natives-linux-amd64.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt-natives-linux-i586.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt-natives-macosx-universal.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt-natives-windows-amd64.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt-natives-windows-i586.jar"/>
+            <zipfileset dir="${lib}" includes="gluegen-rt.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all-natives-linux-amd64.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all-natives-linux-i586.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all-natives-macosx-universal.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all-natives-windows-amd64.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all-natives-windows-i586.jar"/>
+            <zipfileset dir="${lib}" includes="jogl-all.jar"/>
+            <zipfileset dir="${lib}" includes="json.jar"/>
+            <zipfileset dir="${lib}" includes="kdu_jni.jar"/>
+            <zipfileset dir="${lib}" includes="log4j-1.2.16.jar"/>
+            <zipfileset dir="${lib}" includes="slf4j-api-1.7.12.jar"/>
+            <zipfileset dir="${lib}" includes="slf4j-nop-1.7.12.jar"/>
+            <zipfileset dir="${lib}" includes="xuggle-xuggler-5.4.jar"/>
+            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="EVEPlugin.jar"/>
+            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="PfssPlugin.jar"/>
+            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="SWEKPlugin.jar"/>
+            <zipfileset dir="${basedir}/plugins/" prefix="plugins" includes="SWHVHEKPlugin.jar"/>
         </jar>
     </target>
 
@@ -142,10 +180,8 @@
                     <arg value="bundle.sh"/>
                 </exec>
                 <mkdir dir="${temp}/build/mac/"/>
-
-                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.helioviewer.jhv.JavaHelioViewer" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2014, European Space Agency">
+                <bundleapp outputdirectory="${temp}/build/mac/" name="JHelioviewer" displayname="JHelioviewer" identifier="org.helioviewer.jhv" mainclassname="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" icon="${build.resources}/mac/JHV_icon.icns" shortversion="${jhv.version}" copyright="©2015, European Space Agency">
                     <classpath file="JHelioviewer.jar"/>
-                    <option value="-Dapple.laf.useScreenMenuBar=true"/>
                 </bundleapp>
                 <exec executable="${build.resources}/mac/bundle.sh">
                     <env key="TEMP" value="${temp}/build/mac"/>
