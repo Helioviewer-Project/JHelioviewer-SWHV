@@ -7,9 +7,11 @@ import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
+import java.util.Date;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
@@ -94,10 +96,38 @@ public class RenderableGrid implements Renderable {
             gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
+        gl.glPushMatrix();
+        //gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
+        drawEarthCircle(gl);
+        gl.glPopMatrix();
+    }
+
+    private void drawEarthCircle(GL2 gl) {
+        Date timestamp = Displayer.getLastUpdatedTimestamp();
+        if (timestamp == null)
+            return;
+        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+        gl.glLineWidth(1f);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        {
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+            gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+
+            gl.glRotatef(90f + (float) Astronomy.getL0Degree(timestamp), 0f, 1f, 0f);
+            gl.glRotatef((float) Astronomy.getB0Degree(timestamp), 0f, 0f, 1f);
+            gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+            gl.glRotatef(90f, 1f, 0f, 0f);
+
+            gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+
+        }
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
     private void drawCircles(GL2 gl) {
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
         gl.glLineWidth(1f);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
