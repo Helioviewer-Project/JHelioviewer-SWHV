@@ -24,7 +24,6 @@ import org.helioviewer.jhv.renderable.RenderableDummy;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
@@ -56,7 +55,6 @@ public class APIRequestManager {
      * @throws MalformedURLException
      */
     public static Date getLatestImageDate(String observatory, String instrument, String detector, String measurement, boolean message) {
-
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
@@ -289,11 +287,8 @@ public class APIRequestManager {
         if (uri == null) {
             return null;
         }
-
         // Load new view and assign it to view chain of Main Image
-
-        AbstractView view = ViewHelper.loadView(uri);
-
+        AbstractView view = LoadView.loadView(uri);
         if (addToViewChain) {
             addToViewchain(view);
         }
@@ -319,15 +314,11 @@ public class APIRequestManager {
         if (uri == null) {
             return null;
         }
-
         // Load new view and assign it to view chain of Main Image
-
-        AbstractView view = ViewHelper.loadView(uri, downloadURI);
-
+        AbstractView view = LoadView.loadView(uri, downloadURI);
         if (addToViewChain) {
             addToViewchain(view);
         }
-
         return view;
     }
 
@@ -402,4 +393,5 @@ public class APIRequestManager {
         });
         return view;
     }
+
 }

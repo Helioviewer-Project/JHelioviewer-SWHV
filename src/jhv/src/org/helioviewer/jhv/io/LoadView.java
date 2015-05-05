@@ -1,13 +1,10 @@
-package org.helioviewer.viewmodel.view;
+package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 import java.net.URI;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -15,127 +12,8 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
 
-/**
- * Collection of useful functions for use within the view chain.
- *
- * <p>
- * This class provides many different helpful functions, covering topics such as
- * scaling and alignment of regions, navigation within the view chain and
- * loading new images
- *
- * @author Ludwig Schmidt
- * @author Markus Langenberg
- *
- */
-public final class ViewHelper {
-
-    /**
-     * Converts a given displacement on the screen to image coordinates.
-     *
-     * @param screenDisplacement
-     *            Displacement on the screen to convert
-     * @param r
-     *            Region of the image currently visible on the screen
-     * @param v
-     *            ViewportImageSize of the image within the current viewport
-     * @return Displacement in image coordinates
-     */
-    public static GL3DVec2d convertScreenToImageDisplacement(Vector2dInt screenDisplacement, Region r, Vector2dInt viewportImageSize) {
-        return convertScreenToImageDisplacement(screenDisplacement.getX(), screenDisplacement.getY(), r, viewportImageSize);
-    }
-
-    /**
-     * Converts a given displacement on the screen to image coordinates.
-     *
-     * @param screenDisplacementX
-     *            X-coordinate of the displacement on the screen to convert
-     * @param screenDisplacementY
-     *            Y-coordinate of the displacement on the screen to convert
-     * @param r
-     *            Region of the image currently visible on the screen
-     * @param v
-     *            ViewportImageSize of the image within the current viewport
-     * @return Displacement in image coordinates
-     */
-    public static GL3DVec2d convertScreenToImageDisplacement(int screenDisplacementX, int screenDisplacementY, Region r, Vector2dInt viewportImageSize) {
-        return new GL3DVec2d(r.getWidth() / viewportImageSize.getX() * screenDisplacementX, -r.getHeight() / viewportImageSize.getY() * screenDisplacementY);
-    }
-
-    /**
-     * Converts a given displacement on the image to screen coordinates.
-     *
-     * @param imageDisplacement
-     *            Displacement on the image to convert
-     * @param r
-     *            Region of the image currently visible on the screen
-     * @param v
-     *            ViewportImageSize of the image within the current viewport
-     * @return Displacement in screen coordinates
-     */
-    public static Vector2dInt convertImageToScreenDisplacement(GL3DVec2d imageDisplacement, Region r, Vector2dInt viewportImageSize) {
-        return convertImageToScreenDisplacement(imageDisplacement.x, imageDisplacement.y, r, viewportImageSize);
-    }
-
-    /**
-     * Converts a given displacement on the image to screen coordinates.
-     *
-     * @param imageDisplacementX
-     *            X-coordinate of the displacement on the image to convert
-     * @param imageDisplacementY
-     *            Y-coordinate of the displacement on the image to convert
-     * @param r
-     *            Region of the image currently visible on the screen
-     * @param v
-     *            ViewportImageSize of the image within the current viewport
-     * @return Displacement in screen coordinates
-     */
-    public static Vector2dInt convertImageToScreenDisplacement(double imageDisplacementX, double imageDisplacementY, Region r, Vector2dInt viewportImageSize) {
-        return new Vector2dInt((int) Math.round(imageDisplacementX / r.getWidth() * viewportImageSize.getX()), (int) Math.round(imageDisplacementY / r.getHeight() * viewportImageSize.getY()));
-    }
-
-    /**
-     * Calculates the inner viewport to the corresponding inner region.
-     *
-     * Given the outer region and the outer viewport image size, this function
-     * calculates the part of the outer viewport image size, that is occupied by
-     * the inner region.
-     *
-     * @param innerRegion
-     *            inner region, whose inner viewport is requested
-     * @param outerRegion
-     *            outer region, as a reference
-     * @param outerViewportImageSize
-     *            outer viewport image size, as a reference
-     * @return viewport corresponding to the inner region based on the outer
-     *         region and viewport image size
-     * @see #calculateInnerViewportOffset
-     */
-    public static Viewport calculateInnerViewport(Region innerRegion, Region outerRegion, Vector2dInt outerViewportImageSize) {
-        double newWidth = outerViewportImageSize.getX() * innerRegion.getWidth() / outerRegion.getWidth();
-        double newHeight = outerViewportImageSize.getY() * innerRegion.getHeight() / outerRegion.getHeight();
-        return new Viewport((int) Math.round(newWidth), (int) Math.round(newHeight));
-    }
-
-    /**
-     * Calculates the offset of the inner viewport relative to the outer
-     * viewport image size.
-     *
-     * Given the outer region and viewport image size, calculates the offset of
-     * the inner viewport corresponding to the given inner region.
-     *
-     * @param innerRegion
-     *            inner region, whose inner viewport offset is requested
-     * @param outerRegion
-     *            outer region, as a reference
-     * @param outerViewportImageSize
-     *            outer viewport image size, as a reference
-     * @return offset of the inner viewport based on the outer region and
-     *         viewport image size
-     * @see #calculateInnerViewport
-     */
-    public static Vector2dInt calculateInnerViewportOffset(Region innerRegion, Region outerRegion, Vector2dInt outerViewportImageSize) {
-        return ViewHelper.convertImageToScreenDisplacement(GL3DVec2d.subtract(innerRegion.getUpperLeftCorner(), outerRegion.getUpperLeftCorner()), outerRegion, outerViewportImageSize).negateY();
-    }
+// package visibility
+final class LoadView {
 
     /**
      * Loads a new image located at the given URI.
