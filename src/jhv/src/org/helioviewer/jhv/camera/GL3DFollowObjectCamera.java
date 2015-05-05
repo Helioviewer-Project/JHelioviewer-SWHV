@@ -10,8 +10,8 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -126,6 +126,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
             listener.fireLoaded(state);
         }
+        Displayer.render();
     }
 
     public void setBeginDate(Date date, boolean applyChanges) {
