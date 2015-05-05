@@ -436,7 +436,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter(int numQualityLayers, int frameNumber) {
-        return calculateParameter(viewport, region, numQualityLayers, frameNumber);
+        return calculateParameter(region, numQualityLayers, frameNumber);
     }
 
     /**
@@ -459,7 +459,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      *            Frame number to show (has to be 0 for single images)
      * @return Set of parameters used within the jp2-package
      */
-    protected JP2ImageParameter calculateParameter(Viewport v, Region r, int numQualityLayers, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(Region r, int numQualityLayers, int frameNumber) {
         MetaData metaData = jp2Image.metaDataList[frameNumber];
 
         double m = Displayer.getViewportHeight() / Displayer.getActiveCamera().getCameraWidth();
@@ -471,7 +471,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int totalWidth = (int) (w * m);
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
 
-        double currentMeterPerPixel = metaData.getPhysicalSize().x / (double) res.getResolutionBounds().getWidth();
+        double currentMeterPerPixel = metaData.getPhysicalSize().x / res.getResolutionBounds().getWidth();
         int imageWidth = (int) Math.round(r.getWidth() / currentMeterPerPixel);
         int imageHeight = (int) Math.round(r.getHeight() / currentMeterPerPixel);
 
