@@ -66,12 +66,6 @@ public class BandTypeAPI extends APIAbstract {
     }
 
     private String readJSON() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e3) {
-            // TODO Auto-generated catch block
-            e3.printStackTrace();
-        }
         String string = null;
         URI url = null;
         try {
