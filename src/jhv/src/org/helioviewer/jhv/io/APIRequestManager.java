@@ -19,6 +19,8 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.renderable.RenderableDummy;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -379,11 +381,25 @@ public class APIRequestManager {
      * @throws IOException
      */
     public static AbstractView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+        RenderableDummy renderableDummy = new RenderableDummy();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
+            }
+        });
+        AbstractView view;
         if (endTime.equals("")) {
-            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
+            view = loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
         } else {
-            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
+            view = loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+            }
+        });
+        return view;
     }
-
 }
