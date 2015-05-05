@@ -1,7 +1,6 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -75,7 +74,7 @@ public class JavaHelioViewer {
         LogSettings.getSingletonInstance().update();
 
         // Read the version and revision from the JAR metafile
-        //JHVGlobals.determineVersionAndRevision();
+        // JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
 
@@ -97,19 +96,6 @@ public class JavaHelioViewer {
         SystemProperties.setPlatform();
         Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
 
-        // Remove about menu on mac
-        if (System.getProperty("jhv.os").equals("mac")) {
-            try {
-                Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
-                Method getSingletonApplication = applicationClass.getMethod("getApplication", (Class<?>[]) null);
-                Object application = getSingletonApplication.invoke(applicationClass.newInstance());
-                Method removeAboutMenuItem = applicationClass.getMethod("removeAboutMenuItem", (Class<?>[]) null);
-                removeAboutMenuItem.invoke(application);
-            } catch (Exception e) {
-                Log.warn(">> JavaHelioViewer.main(String[]) > Failed to disable native Mac OS about menu. Probably not running on Mac OS", e);
-            }
-        }
-
         /* ----------Setup kakadu ----------- */
         Log.debug("Instantiate Kakadu engine");
         KakaduEngine engine = new KakaduEngine();
@@ -120,8 +106,7 @@ public class JavaHelioViewer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // The following code-block attempts to start the native message
-        // handling
+
         try {
             Log.debug("Setup Kakadu message handlers.");
             engine.startKduMessageSystem();
@@ -154,9 +139,11 @@ public class JavaHelioViewer {
         }
 
         /* ----------Setup Plug-ins ----------- */
+        Log.info("Load remote plugins");
         JHVLoader.loadRemotePlugins(args);
 
         /*
+        Log.info("Load bundled plugins");
         try {
             JHVLoader.loadJarPlugin("EVEPlugin.jar");
             JHVLoader.loadJarPlugin("PfssPlugin.jar");
