@@ -138,8 +138,8 @@ public class RenderableImageLayer implements Renderable {
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.0);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.0);
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.025);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.025);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
