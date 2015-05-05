@@ -478,7 +478,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         Region mr = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         GL3DVec2d displacement = GL3DVec2d.subtract(r.getUpperLeftCorner(), mr.getUpperLeftCorner());
         Vector2dInt viewportImageSize = new Vector2dInt(res.getResolutionBounds().width, res.getResolutionBounds().height);
-        Vector2dInt imagePosition = new Vector2dInt((int) Math.round(displacement.x / mr.getWidth() * viewportImageSize.getX()), (int) Math.round(displacement.y / mr.getHeight() * viewportImageSize.getY())).negateY();
+        Vector2dInt imagePosition = new Vector2dInt((int) Math.round(displacement.x / mr.getWidth() * viewportImageSize.getX()), -(int) Math.round(displacement.y / mr.getHeight() * viewportImageSize.getY()));
 
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
