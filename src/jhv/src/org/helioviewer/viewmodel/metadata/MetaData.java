@@ -33,6 +33,8 @@ public interface MetaData {
      * @return Physical position of the lower left corner
      */
     public GL3DVec2d getPhysicalLowerLeft();
+
+    public GL3DVec2d getPhysicalUpperLeft();
     /**
      * Returns the width of the image in pixels.
      *
