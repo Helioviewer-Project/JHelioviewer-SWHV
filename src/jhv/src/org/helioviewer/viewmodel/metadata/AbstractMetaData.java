@@ -53,6 +53,11 @@ public abstract class AbstractMetaData implements MetaData {
         return lowerLeftCorner;
     }
 
+    @Override
+    public GL3DVec2d getPhysicalUpperLeft() {
+        return new GL3DVec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    }
+
     /**
      * {@inheritDoc}
      */
