@@ -31,8 +31,10 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         this.fovPanel = new JPanel();
         this.fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         this.fovPanel.add(new JLabel("FOV angle"));
-        this.fovSpinner = new JSpinner();
-        this.fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
+        fovSpinner = new JSpinner();
+        fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(fovSpinner, "0\u00B0");
+        fovSpinner.setEditor(editor);
         Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
         this.fovSpinner.addChangeListener(new ChangeListener() {
@@ -44,7 +46,6 @@ public abstract class GL3DCameraOptionPanel extends JPanel {
         });
         WheelSupport.installMouseWheelSupport(this.fovSpinner);
         this.fovPanel.add(this.fovSpinner);
-        this.fovPanel.add(new JLabel("degree"));
 
         this.fovSpinner.setMaximumSize(new Dimension(6, 22));
         this.fovPanel.add(Box.createHorizontalGlue());
