@@ -115,7 +115,7 @@ public class RenderableGrid implements Renderable {
             gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
 
             gl.glRotatef(90f + (float) Astronomy.getL0Degree(timestamp), 0f, 1f, 0f);
-            gl.glRotatef((float) Astronomy.getB0Degree(timestamp), 0f, 0f, 1f);
+            gl.glRotatef((float) -Astronomy.getB0Degree(timestamp), 0f, 0f, 1f);
             gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
             gl.glRotatef(90f, 1f, 0f, 0f);
 
