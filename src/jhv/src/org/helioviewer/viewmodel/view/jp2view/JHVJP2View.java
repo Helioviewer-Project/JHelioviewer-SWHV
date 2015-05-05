@@ -10,6 +10,7 @@ import kdu_jni.KduException;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.Vector2dInt;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
@@ -21,7 +22,6 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.ViewHelper;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
@@ -476,7 +476,10 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         int imageHeight = (int) Math.round(r.getHeight() / currentMeterPerPixel);
 
         Region mr = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
-        Vector2dInt imagePosition = ViewHelper.calculateInnerViewportOffset(r, mr, new Vector2dInt(res.getResolutionBounds().width, res.getResolutionBounds().height));
+        GL3DVec2d displacement = GL3DVec2d.subtract(r.getUpperLeftCorner(), mr.getUpperLeftCorner());
+        Vector2dInt viewportImageSize = new Vector2dInt(res.getResolutionBounds().width, res.getResolutionBounds().height);
+        Vector2dInt imagePosition = new Vector2dInt((int) Math.round(displacement.x / mr.getWidth() * viewportImageSize.getX()), (int) Math.round(displacement.y / mr.getHeight() * viewportImageSize.getY())).negateY();
+
         SubImage subImage = new SubImage(imagePosition.getX(), imagePosition.getY(), imageWidth, imageHeight);
 
         return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
