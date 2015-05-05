@@ -96,10 +96,8 @@ public class JavaHelioViewer {
         SystemProperties.setPlatform();
         Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
 
-        /* ----------Setup kakadu ----------- */
         Log.debug("Instantiate Kakadu engine");
         KakaduEngine engine = new KakaduEngine();
-
         Log.info("Try to load Kakadu libraries");
         try {
             JHVLoader.copyKDULibs();
@@ -138,21 +136,20 @@ public class JavaHelioViewer {
             ex.printStackTrace();
         }
 
-        /* ----------Setup Plug-ins ----------- */
-        Log.info("Load remote plugins");
-        JHVLoader.loadRemotePlugins(args);
-
-        /*
-        Log.info("Load bundled plugins");
         try {
-            JHVLoader.loadJarPlugin("EVEPlugin.jar");
-            JHVLoader.loadJarPlugin("PfssPlugin.jar");
-            JHVLoader.loadJarPlugin("SWEKPlugin.jar");
-            JHVLoader.loadJarPlugin("SWHVHEKPlugin.jar");
+            if (args.length != 0 && args[0].equals("--remote-plugins")) {
+                Log.info("Load remote plugins");
+                JHVLoader.loadRemotePlugins(args);
+            } else {
+                Log.info("Load bundled plugins");
+                JHVLoader.loadBundledPlugin("EVEPlugin.jar");
+                JHVLoader.loadBundledPlugin("PfssPlugin.jar");
+                JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
+                JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        */
     }
 
     private static void setUIFont(FontUIResource f) {

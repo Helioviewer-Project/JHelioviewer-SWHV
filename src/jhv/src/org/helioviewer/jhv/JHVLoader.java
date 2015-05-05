@@ -21,7 +21,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 public class JHVLoader {
 
-    public static void loadJarPlugin(String name) throws IOException, InterruptedException, InvocationTargetException {
+    public static void loadBundledPlugin(String name) throws IOException, InterruptedException, InvocationTargetException {
         InputStream is = JavaHelioViewer.class.getResourceAsStream("/plugins/" + name);
         String path = JHVDirectory.PLUGINS.getPath() + name;
         File f = new File(path);
