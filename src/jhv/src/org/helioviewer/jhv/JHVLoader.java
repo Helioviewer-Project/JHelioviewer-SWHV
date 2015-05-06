@@ -62,7 +62,7 @@ public class JHVLoader {
         }
 
         for (String kduLib : kduLibs) {
-            InputStream is = JavaHelioViewer.class.getResourceAsStream("/nativelibs/" + pathlib + kduLib);
+            InputStream is = JavaHelioViewer.class.getResourceAsStream("/natives/" + pathlib + kduLib);
             String path = JHVDirectory.LIBS.getPath() + kduLib;
             File f = new File(path);
 
