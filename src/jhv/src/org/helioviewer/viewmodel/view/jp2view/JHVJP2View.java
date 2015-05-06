@@ -717,10 +717,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         this.previousImageData = previousImageData;
     }
 
-    public void refresh() {
-        readerSignal.signal();
-    }
-
     @Override
     public void render() {
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
