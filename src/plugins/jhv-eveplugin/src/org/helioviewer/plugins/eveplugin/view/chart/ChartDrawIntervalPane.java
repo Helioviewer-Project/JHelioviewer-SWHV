@@ -257,7 +257,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final long diffMillis = availableInterval.getEnd().getTime() - calendar.getTimeInMillis();
         final int numberOfDays = (int) Math.round(diffMillis / (1000. * 60. * 60. * 24.));
         final int tickCount = Math.min(numberOfDays, maxTicks);
-        final double ratioDays = (double) numberOfDays / (double) tickCount;
+        final double ratioDays = Math.ceil((double) numberOfDays / (double) tickCount);
         for (int i = 0; i < maxTicks; ++i) {
             calendar.clear();
             calendar.set(startYear, startMonth, startDay);
@@ -298,7 +298,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final int monthDifference = endMonth - startMonth;
         final int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference + 1;
         final int tickCount = Math.min(numberOfMonths, maxTicks);
-        final double ratioMonth = (double) numberOfMonths / (double) tickCount;
+        final double ratioMonth = Math.ceil((double) numberOfMonths / (double) tickCount);
 
         for (int i = 0; i < maxTicks; ++i) {
             calendar.clear();
@@ -344,7 +344,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void drawLabel(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         final int x = ChartConstants.getGraphLeftSpace() + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
-
         if (selectedInterval.containsPointInclusive(date)) {
             g.setColor(ChartConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -353,7 +352,9 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         g.drawLine(x, 2, x, getHeight() - 1);
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
         if (x + textWidth > ChartConstants.getGraphLeftSpace() + availableIntervalWidth) {
-            g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
+            if ((x - 2) < ChartConstants.getGraphLeftSpace() + availableIntervalWidth) {
+                g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
+            }
         } else {
             g.drawString(tickText, x + 2, getHeight() - 5);
         }
