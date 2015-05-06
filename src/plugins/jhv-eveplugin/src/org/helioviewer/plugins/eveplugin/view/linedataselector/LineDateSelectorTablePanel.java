@@ -28,12 +28,12 @@ import javax.swing.event.TableModelListener;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugin.renderable.RenderableRemoveCellRenderer;
 import org.helioviewer.jhv.plugin.renderable.TableRowTransferHandler;
 import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
 
 public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
@@ -99,7 +99,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         grid.getColumnModel().getColumn(LOADING_ROW).setPreferredWidth(20);
         grid.getColumnModel().getColumn(LOADING_ROW).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RenderableRemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH);
         grid.getColumnModel().getColumn(REMOVE_ROW).setMaxWidth(ICON_WIDTH);
 
