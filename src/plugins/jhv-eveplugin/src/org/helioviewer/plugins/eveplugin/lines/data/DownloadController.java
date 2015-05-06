@@ -13,7 +13,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.interval.Interval;
@@ -33,36 +34,17 @@ import org.json.JSONObject;
  * */
 public class DownloadController {
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private enum DownloadPriority {
-        LOW, HIGH
-    }
-
     private static final DownloadController singletonInstance = new DownloadController();
 
     private final LinkedList<DownloadControllerListener> listeners = new LinkedList<DownloadControllerListener>();
 
-    private final LinkedList<DownloadJob> highPriorityDownloadQueue = new LinkedList<DownloadJob>();
-    private final LinkedList<DownloadJob> lowPriorityDownloadQueue = new LinkedList<DownloadJob>();
     private final HashMap<Band, LinkedList<Interval<Date>>> downloadMap = new HashMap<Band, LinkedList<Interval<Date>>>();
 
-    private final Object lock = new Object();
-
-    private final DownloadManager downloadManager = new DownloadManager();
-
     private final LineDataSelectorModel selectorModel;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
+    private final static ExecutorService downloadPool = Executors.newFixedThreadPool(5);
 
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();
-        new Thread(downloadManager, "EVEDownloadManager").start();
-
     }
 
     public static final DownloadController getSingletonInstance() {
@@ -100,7 +82,6 @@ public class DownloadController {
 
         List<Interval<Date>> missingIntervalsNoExtend = EVECacheController.getSingletonInstance().getMissingDaysInInterval(band, queryInterval);
         if (!missingIntervalsNoExtend.isEmpty()) {
-            // Interval<Date> realQueryInterval =
             Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
 
             // get all intervals within query interval where data is missing
@@ -117,18 +98,16 @@ public class DownloadController {
             }
 
             // create download jobs and allocate priorities
-            final DownloadJob[] jobs = new DownloadJob[intervals.size()];
-            final DownloadPriority[] priorities = new DownloadPriority[intervals.size()];
+            final DownloadThread[] jobs = new DownloadThread[intervals.size()];
 
             int i = 0;
             for (final Interval<Date> interval : intervals) {
-                jobs[i] = new DownloadJob(band, interval);
-                priorities[i] = getPriority(interval, priorityInterval);
+                jobs[i] = new DownloadThread(band, interval);
                 ++i;
             }
 
             // add download jobs
-            addDownloads(jobs, priorities);
+            addDownloads(jobs);
 
             // inform listeners
             fireDownloadStarted(band, queryInterval);
@@ -163,72 +142,32 @@ public class DownloadController {
         return intervals;
     }
 
-    public void stopAllDownloads() {
-        Band[] bands = null;
-
-        synchronized (lock) {
-            bands = downloadMap.keySet().toArray(new Band[0]);
-        }
-
-        if (bands != null) {
-            for (final Band band : bands) {
-                stopDownloads(band);
-            }
-        }
-    }
-
     public void stopDownloads(final Band band) {
-        synchronized (lock) {
-            final LinkedList<Interval<Date>> list = downloadMap.get(band);
+        final LinkedList<Interval<Date>> list = downloadMap.get(band);
 
-            if (list == null) {
-                return;
-            }
+        if (list == null) {
+            return;
+        }
 
-            for (int i = highPriorityDownloadQueue.size() - 1; i >= 0; --i) {
-                final DownloadJob job = highPriorityDownloadQueue.get(i);
-
-                if (job.getBand().equals(band)) {
-                    list.remove(job.getInterval());
-                }
-
-                highPriorityDownloadQueue.remove(i);
-            }
-
-            for (int i = lowPriorityDownloadQueue.size() - 1; i >= 0; --i) {
-                final DownloadJob job = lowPriorityDownloadQueue.get(i);
-
-                if (job.getBand().equals(band)) {
-                    list.remove(job.getInterval());
-                }
-
-                lowPriorityDownloadQueue.remove(i);
-            }
-
-            if (list.size() == 0) {
-                downloadMap.remove(band);
-            }
+        if (list.size() == 0) {
+            downloadMap.remove(band);
         }
 
         fireDownloadFinished(band, null, 0);
     }
 
     public boolean isDownloadActive() {
-        synchronized (lock) {
-            return !downloadMap.isEmpty();
-        }
+        return !downloadMap.isEmpty();
     }
 
     public boolean isDownloadActive(final Band band) {
-        synchronized (lock) {
-            final LinkedList<Interval<Date>> list = downloadMap.get(band);
+        final LinkedList<Interval<Date>> list = downloadMap.get(band);
 
-            if (list == null) {
-                return false;
-            }
-
-            return list.size() > 0;
+        if (list == null) {
+            return false;
         }
+
+        return list.size() > 0;
     }
 
     private void fireDownloadStarted(final Band band, final Interval<Date> interval) {
@@ -276,154 +215,50 @@ public class DownloadController {
         return intervals;
     }
 
-    private DownloadPriority getPriority(final Interval<Date> interval, final Interval<Date> priorityInterval) {
-        if (priorityInterval == null || priorityInterval.getStart() == null || priorityInterval.getEnd() == null) {
-            return DownloadPriority.LOW;
-        }
+    private void addDownloads(final DownloadThread[] jobs) {
+        for (int i = 0; i < jobs.length; ++i) {
+            // add to download map
+            final Band band = jobs[i].getBand();
+            final Interval<Date> interval = jobs[i].getInterval();
 
-        if (priorityInterval.overlapsInclusive(interval)) {
-            return DownloadPriority.HIGH;
-        }
+            LinkedList<Interval<Date>> list = downloadMap.get(band);
 
-        return DownloadPriority.LOW;
-    }
-
-    private void addDownloads(final DownloadJob[] jobs, final DownloadPriority[] priorities) {
-        synchronized (lock) {
-            for (int i = 0; i < jobs.length; ++i) {
-                // add to download map
-                final Band band = jobs[i].getBand();
-                final Interval<Date> interval = jobs[i].getInterval();
-
-                LinkedList<Interval<Date>> list = downloadMap.get(band);
-
-                if (list == null) {
-                    list = new LinkedList<Interval<Date>>();
-                }
-
-                list.add(interval);
-
-                downloadMap.put(band, list);
-
-                // add to download queue
-                switch (priorities[i]) {
-                case LOW:
-                    lowPriorityDownloadQueue.add(jobs[i]);
-                    break;
-                case HIGH:
-                    highPriorityDownloadQueue.add(jobs[i]);
-                    break;
-                }
+            if (list == null) {
+                list = new LinkedList<Interval<Date>>();
             }
+
+            list.add(interval);
+
+            downloadMap.put(band, list);
+
+            downloadPool.submit(jobs[i]);
         }
     }
 
     private void downloadFinished(final Band band, final Interval<Date> interval) {
-        int numberOfDownloads = 0;
 
-        synchronized (lock) {
-            final LinkedList<Interval<Date>> list = downloadMap.get(band);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int numberOfDownloads = 0;
 
-            if (list != null) {
-                list.remove(interval);
-                numberOfDownloads = list.size();
+                final LinkedList<Interval<Date>> list = downloadMap.get(band);
 
-                if (numberOfDownloads == 0) {
-                    downloadMap.remove(band);
-                }
-            }
-        }
+                if (list != null) {
+                    list.remove(interval);
+                    numberOfDownloads = list.size();
 
-        fireDownloadFinished(band, interval, numberOfDownloads);
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Download Job
-    // //////////////////////////////////////////////////////////////////////////////
-
-    private class DownloadJob {
-
-        private final Band band;
-        private final Interval<Date> interval;
-
-        public DownloadJob(final Band band, final Interval<Date> interval) {
-            this.band = band;
-            this.interval = interval;
-        }
-
-        public Band getBand() {
-            return band;
-        }
-
-        public Interval<Date> getInterval() {
-            return interval;
-        }
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Download Manager
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @author Stephan Pagel
-     * */
-    private class DownloadManager implements Runnable {
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
-        private final Semaphore finishSemaphore = new Semaphore(EVESettings.DOWNLOADER_MAX_THREADS);
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    finishSemaphore.acquire();
-                    final DownloadJob job = getNextDownloadJob();
-
-                    if (job != null) {
-                        final DownloadThread thread = new DownloadThread(job, finishSemaphore);
-                        new Thread(thread, "EVEDownload").start();
-                    } else {
-                        finishSemaphore.release();
-                        Thread.sleep(100);
+                    if (numberOfDownloads == 0) {
+                        downloadMap.remove(band);
                     }
-                } catch (final InterruptedException e) {
                 }
+                fireDownloadFinished(band, interval, numberOfDownloads);
+
             }
-        }
+        });
 
-        private DownloadJob getNextDownloadJob() {
-            synchronized (lock) {
-                // try to find a download job within the high priority list
-                if (!highPriorityDownloadQueue.isEmpty()) {
-                    return highPriorityDownloadQueue.removeFirst();
-                }
-
-                // if no high priority job is available try to find a download
-                // job within the low priority list
-                if (!lowPriorityDownloadQueue.isEmpty()) {
-                    return lowPriorityDownloadQueue.removeFirst();
-                }
-
-                // there is no job available
-                return null;
-            }
-        }
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
-    // Download Thread
-    // //////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @author Stephan Pagel
-     * */
     private class DownloadThread implements Runnable {
 
         // //////////////////////////////////////////////////////////////////////////
@@ -432,16 +267,22 @@ public class DownloadController {
 
         private final Interval<Date> interval;
         private final Band band;
-        private final Semaphore semaphore;
 
         // //////////////////////////////////////////////////////////////////////////
         // Methods
         // //////////////////////////////////////////////////////////////////////////
 
-        public DownloadThread(final DownloadJob job, final Semaphore semaphore) {
-            interval = job.getInterval();
-            band = job.getBand();
-            this.semaphore = semaphore;
+        public DownloadThread(final Band band, final Interval<Date> interval) {
+            this.interval = interval;
+            this.band = band;
+        }
+
+        public Interval<Date> getInterval() {
+            return interval;
+        }
+
+        public Band getBand() {
+            return band;
         }
 
         @Override
@@ -451,7 +292,6 @@ public class DownloadController {
                     requestData();
                 }
             } finally {
-                semaphore.release();
                 downloadFinished(band, interval);
             }
         }
@@ -525,10 +365,7 @@ public class DownloadController {
 
                 for (int i = 0; i < data.length(); i++) {
                     final JSONArray entry = data.getJSONArray(i);
-
-                    // used time system in data is TAI -> compute to UTC
-                    final long millis = ((long) entry.getDouble(0)) * 1000;// -
-                    // 378691234000L;
+                    final long millis = ((long) entry.getDouble(0)) * 1000;
                     values[i] = entry.getDouble(1) * multiplier;
                     dates[i] = millis;
                 }
