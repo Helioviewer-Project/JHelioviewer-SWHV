@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -152,8 +153,16 @@ public class GL3DPositionLoading {
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
             Iterator<String> iteratorKeys = jsonResult.keys();
             int i = 0;
+            String strings[] = new String[jsonResult.length()];
+
             while (iteratorKeys.hasNext()) {
-                String dateString = iteratorKeys.next();
+                strings[i] = iteratorKeys.next();
+                i++;
+            }
+            Arrays.sort(strings);
+
+            for (int j = 0; j < strings.length; j++) {
+                String dateString = strings[j];
                 JSONArray positionArray = (JSONArray) jsonResult.get(dateString);
 
                 Date date = format.parse(dateString);
@@ -164,7 +173,7 @@ public class GL3DPositionLoading {
                     y = -Math.PI + positionArray.getDouble(1);
                 }
                 double z = -positionArray.getDouble(2);
-                positionDateTimehelper[i] = new GL3DPositionDateTime(calendar.getTimeInMillis(), x, y, z);
+                positionDateTimehelper[j] = new GL3DPositionDateTime(calendar.getTimeInMillis(), x, y, z);
                 i++;
             }
             this.positionDateTime = positionDateTimehelper;
@@ -260,11 +269,10 @@ public class GL3DPositionLoading {
                     i = 0;
                 }
                 int inext = Math.min(i + 1, this.positionDateTime.length - 1);
-
                 double alpha = 1. - interpolatedIndex % 1.;
-                double hgln = alpha * this.positionDateTime[i].y + (1 - alpha) * this.positionDateTime[inext].y;
-                double hglt = alpha * this.positionDateTime[i].z + (1 - alpha) * this.positionDateTime[inext].z;
-                double dist = alpha * this.positionDateTime[i].x + (1 - alpha) * this.positionDateTime[inext].x;
+                double hgln = alpha * this.positionDateTime[i].y + (1. - alpha) * this.positionDateTime[inext].y;
+                double hglt = alpha * this.positionDateTime[i].z + (1. - alpha) * this.positionDateTime[inext].z;
+                double dist = alpha * this.positionDateTime[i].x + (1. - alpha) * this.positionDateTime[inext].x;
                 dist = dist * 1000 / Constants.SunRadiusInMeter;
                 return new GL3DVec3d(dist, hgln, hglt);
             }
