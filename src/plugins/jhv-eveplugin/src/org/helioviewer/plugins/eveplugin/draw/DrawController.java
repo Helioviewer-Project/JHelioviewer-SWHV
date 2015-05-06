@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.display.Displayer;
@@ -332,26 +333,31 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             selectedInterval = new Interval<Date>(null, null);
         } else if (newSelectedInterval.getStart() == null || newSelectedInterval.getEnd() == null) {
             selectedInterval = availableInterval;
-        } else if (availableInterval.containsInclusive(newSelectedInterval)) {
-            selectedInterval = newSelectedInterval;
-        } else {
-            Date start = newSelectedInterval.getStart();
-            Date end = newSelectedInterval.getEnd();
-
-            start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
-            end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
-
-            if (start.equals(end)) {
-                selectedInterval = availableInterval;
+        } else if (newSelectedInterval.getStart().before(newSelectedInterval.getEnd())) {
+            if (availableInterval.containsInclusive(newSelectedInterval)) {
+                selectedInterval = newSelectedInterval;
             } else {
-                selectedInterval = new Interval<Date>(start, end);
+                Date start = newSelectedInterval.getStart();
+                Date end = newSelectedInterval.getEnd();
+
+                start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
+                end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
+
+                if (start.equals(end)) {
+                    selectedInterval = availableInterval;
+                } else {
+                    selectedInterval = new Interval<Date>(start, end);
+                }
             }
+            if (updatePlotAreaSpace) {
+                updatePlotAreaSpace(selectedInterval);
+            }
+            fireSelectedIntervalChanged();
+            fireRedrawRequest();
+        } else {
+            Log.debug("Start was after end. Set by: ");
+            Thread.dumpStack();
         }
-        if (updatePlotAreaSpace) {
-            updatePlotAreaSpace(selectedInterval);
-        }
-        fireSelectedIntervalChanged();
-        fireRedrawRequest();
         return selectedInterval;
     }
 
