@@ -156,10 +156,6 @@ public class DownloadController {
         fireDownloadFinished(band, null, 0);
     }
 
-    public boolean isDownloadActive() {
-        return !downloadMap.isEmpty();
-    }
-
     public boolean isDownloadActive(final Band band) {
         final LinkedList<Interval<Date>> list = downloadMap.get(band);
 

@@ -56,4 +56,8 @@ public class RenderableDummy implements Renderable {
         return "N/A";
     }
 
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
 }

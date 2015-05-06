@@ -359,4 +359,8 @@ public class RenderableGrid implements Renderable {
         return "";
     }
 
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
 }

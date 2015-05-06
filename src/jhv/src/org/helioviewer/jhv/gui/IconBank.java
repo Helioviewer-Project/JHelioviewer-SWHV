@@ -16,7 +16,7 @@ import org.helioviewer.base.FileUtils;
 /**
  * This class provides access to all images, icons and cursors which are used by
  * the program.
- * 
+ *
  * @author caplins
  * @author dmueller
  * @author Stephan Pagel
@@ -24,10 +24,10 @@ import org.helioviewer.base.FileUtils;
 public class IconBank {
     /**
      * The enum has all the icons, you supply these enums to the getIcon method.
-     * 
+     *
      * @author caplins cleaned up unused icons
      * @author dmueller
-     * 
+     *
      */
     public static enum JHVIcon {
         // The formatter will not merge together multiple lines, if at least one
@@ -64,7 +64,7 @@ public class IconBank {
 
         VISIBLE("layer_visible_dm.png"), HIDDEN("layer_invisible_dm.png"),
 
-        REMOVE_LAYER("button_cancel.png"), INFO("info.png"),
+        REMOVE_LAYER_GRAY("button_cancel_gray.png"), REMOVE_LAYER("button_cancel.png"), INFO("info.png"),
 
         CHECK("button_ok.png"), EX("button_cancel.png"), RUBBERBAND("rubberband.gif"), NOIMAGE("NoImageLoaded_256x256.png"),
 
@@ -108,7 +108,7 @@ public class IconBank {
 
     /**
      * Returns the ImageIcon associated with the given enum
-     * 
+     *
      * @param _icon
      *            enum which represents the image
      * @return the image icon of the given enum
@@ -120,7 +120,7 @@ public class IconBank {
 
     /**
      * Returns the Image with the given enum.
-     * 
+     *
      * @param icon
      *            Name of the image which should be loaded
      * @return Image for the given name or null if it fails to load the image.
@@ -159,9 +159,9 @@ public class IconBank {
         }
 
         int totalPixels = bufImg.getWidth() * bufImg.getHeight();
-        float red = ((float) (sumRed / totalPixels)) / 255.0f;
-        float green = ((float) (sumGreen / totalPixels)) / 255.0f;
-        float blue = ((float) (sumBlue / totalPixels)) / 255.0f;
+        float red = (sumRed / totalPixels) / 255.0f;
+        float green = (sumGreen / totalPixels) / 255.0f;
+        float blue = (sumBlue / totalPixels) / 255.0f;
 
         return new Color(red, green, blue);
     }
@@ -189,12 +189,11 @@ public class IconBank {
         for (int i = 1; i < bufImgs.length; i++) {
             BufferedImage currentImg = bufImgs[i];
 
-            int offsetX = (int) (horizontal * (double) (width - currentImg.getWidth()));
-            int offsetY = (int) (vertical * (double) (height - currentImg.getHeight()));
+            int offsetX = (int) (horizontal * (width - currentImg.getWidth()));
+            int offsetY = (int) (vertical * (height - currentImg.getHeight()));
             gbi.drawImage(currentImg, null, offsetX, offsetY);
         }
 
         return result;
     }
-
 }

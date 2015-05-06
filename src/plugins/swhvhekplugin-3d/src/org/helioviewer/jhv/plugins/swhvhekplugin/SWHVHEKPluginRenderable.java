@@ -237,7 +237,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
         GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), GL3DVec3d.YAxis);
         r.rotate(-Math.asin(y / targetDir.length()), GL3DVec3d.XAxis);
 
-
         GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
         GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
         GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
@@ -327,6 +326,11 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public String getTimeString() {
         return "";
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return false;
     }
 
 }
