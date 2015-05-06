@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
@@ -67,9 +68,10 @@ public class RenderableGrid implements Renderable {
             return;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
+        GL3DMat4d cameraMatrix = activeCamera.getLocalRotation().toMatrix();
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             gl.glColor3f(1, 1, 0);
 
@@ -78,7 +80,7 @@ public class RenderableGrid implements Renderable {
                 oldrelhi = relhi;
 
                 float cfontsize = this.fontsize * relhi;
-                cfontsize = cfontsize < 10.f ? 10.f : cfontsize;
+                cfontsize = cfontsize < 10 ? 10 : cfontsize;
                 font = font.deriveFont(cfontsize);
 
                 renderer = new TextRenderer(font, true, false);
@@ -92,59 +94,31 @@ public class RenderableGrid implements Renderable {
             }
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
-            drawCircles(gl);
+            drawCircles(gl, cameraMatrix);
             gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
-        gl.glPushMatrix();
-        //gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
-        drawEarthCircle(gl);
-        gl.glPopMatrix();
     }
 
-    private void drawEarthCircle(GL2 gl) {
-        Date timestamp = Displayer.getLastUpdatedTimestamp();
-        if (timestamp == null)
-            return;
-        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-        gl.glLineWidth(1f);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        {
-            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-            gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
-
-            gl.glRotatef(90f + (float) Astronomy.getL0Degree(timestamp), 0f, 1f, 0f);
-            gl.glRotatef((float) -Astronomy.getB0Degree(timestamp), 0f, 0f, 1f);
-            gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-            gl.glRotatef(90f, 1f, 0f, 0f);
-
-            gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-
-        }
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-    }
-
-    private void drawCircles(GL2 gl) {
+    private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {
         gl.glLineWidth(1f);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
         {
-            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-            gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+            gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
             gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);
 
-            gl.glRotatef(90f, 0f, 1f, 0f);
+            gl.glRotatef(90, 0, 1, 0);
+
             gl.glPushMatrix();
             {
-                float rotation = 0f;
-                while (rotation <= 90f) {
+                float rotation = 0;
+                while (rotation <= 90) {
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-                    gl.glRotatef(lonstepDegrees, 0f, 1f, 0f);
+                    gl.glRotatef(lonstepDegrees, 0, 1, 0);
                     rotation += lonstepDegrees;
                 }
             }
@@ -152,13 +126,13 @@ public class RenderableGrid implements Renderable {
 
             gl.glPushMatrix();
             {
-                float rotation = 0f;
+                float rotation = 0;
                 rotation -= lonstepDegrees;
-                gl.glRotatef(-lonstepDegrees, 0f, 1f, 0f);
+                gl.glRotatef(-lonstepDegrees, 0, 1, 0);
 
-                while (rotation >= -90f) {
+                while (rotation >= -90) {
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-                    gl.glRotatef(-lonstepDegrees, 0f, 1f, 0f);
+                    gl.glRotatef(-lonstepDegrees, 0, 1, 0);
                     rotation -= lonstepDegrees;
                 }
             }
@@ -166,14 +140,14 @@ public class RenderableGrid implements Renderable {
 
             gl.glPushMatrix();
             {
-                float rotation = 0f;
-                gl.glRotatef(90.f, 1f, 0f, 0f);
+                float rotation = 0;
+                gl.glRotatef(90, 1, 0, 0);
 
                 gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-                while (rotation < 90.) {
+                while (rotation < 90) {
                     gl.glPushMatrix();
                     {
-                        gl.glTranslatef(0f, 0f, (float) Math.sin(Math.PI / 180. * rotation));
+                        gl.glTranslatef(0, 0, (float) Math.sin(Math.PI / 180. * rotation));
                         float scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
@@ -183,10 +157,10 @@ public class RenderableGrid implements Renderable {
                 }
 
                 rotation = latstepDegrees;
-                while (rotation < 90.) {
+                while (rotation < 90) {
                     gl.glPushMatrix();
                     {
-                        gl.glTranslatef(0f, 0f, -(float) Math.sin(Math.PI / 180. * rotation));
+                        gl.glTranslatef(0, 0, -(float) Math.sin(Math.PI / 180. * rotation));
                         float scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
@@ -197,9 +171,29 @@ public class RenderableGrid implements Renderable {
                 gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
             }
             gl.glPopMatrix();
+
+            gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+
+            // last: Earth circles - static color, undo rotation
+            Date timestamp = Displayer.getLastUpdatedTimestamp();
+            if (timestamp != null) {
+                gl.glColor4f(1, 1, 0, 1);
+
+                gl.glPushMatrix();
+                gl.glRotatef(-90, 0, 1, 0);
+                gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+                {
+                    gl.glRotatef(90 + (float) Astronomy.getL0Degree(timestamp), 0, 1, 0);
+                    gl.glRotatef((float) -Astronomy.getB0Degree(timestamp), 0, 0, 1);
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+
+                    gl.glRotatef(90, 1, 0, 0);
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                }
+                gl.glPopMatrix();
+            }
         }
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
@@ -245,10 +239,10 @@ public class RenderableGrid implements Renderable {
             gl.glPushMatrix();
             {
                 gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
-                gl.glRotated(theta, 0.f, 1.f, 0.f);
+                gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();
-                renderer.draw3D(txt, 0.f, 0f, 0.f, textScale);
+                renderer.draw3D(txt, 0, 0, 0, textScale);
                 renderer.end3DRendering();
             }
             gl.glPopMatrix();
@@ -264,10 +258,10 @@ public class RenderableGrid implements Renderable {
             gl.glPushMatrix();
             {
                 gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
-                gl.glRotated(theta, 0.f, 1.f, 0.f);
+                gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();
-                renderer.draw3D(txt, 0.f, 0f, 0.f, textScale);
+                renderer.draw3D(txt, 0, 0, 0, textScale);
                 renderer.end3DRendering();
             }
             gl.glPopMatrix();
