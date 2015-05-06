@@ -34,7 +34,6 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.IconBank;
@@ -797,12 +796,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
-                    Log.debug("start time : " + startTime + " end time : " + endTime);
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
