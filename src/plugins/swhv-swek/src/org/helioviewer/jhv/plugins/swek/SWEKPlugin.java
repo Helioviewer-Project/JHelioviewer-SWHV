@@ -4,7 +4,6 @@ import java.io.File;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
@@ -73,24 +72,16 @@ public class SWEKPlugin implements Plugin {
 
             @Override
             protected Void doInBackground() throws Exception {
-                Log.debug("Do in background");
-                Long start = System.currentTimeMillis();
                 SWEKConfig.loadConfiguration();
-                Log.debug("Load config took " + (System.currentTimeMillis() - start) + " ms");
-                start = System.currentTimeMillis();
                 SWEKSources.loadSources();
-                Log.debug("Load sources took " + (System.currentTimeMillis() - start) + " ms");
-                Log.debug("Finished do in background");
                 return null;
             }
 
             @Override
             protected void done() {
-                Log.debug("Handle done");
                 eventContainer.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
                 ImageViewerGui.getLeftContentPane().revalidate();
-                Log.debug("Finished handling done");
             }
         };
         loadPlugin.execute();
