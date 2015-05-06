@@ -74,7 +74,7 @@ public class JavaHelioViewer {
         LogSettings.getSingletonInstance().update();
 
         // Read the version and revision from the JAR metafile
-        // JHVGlobals.determineVersionAndRevision();
+        JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
 
