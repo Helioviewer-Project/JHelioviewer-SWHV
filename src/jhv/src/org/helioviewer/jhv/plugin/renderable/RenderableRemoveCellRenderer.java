@@ -15,14 +15,15 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         Renderable renderable = (Renderable) value;
-        if (renderable.isDeletable())
+        if (renderable.isDeletable()) {
             label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        else {
+            label.setToolTipText("Click to remove");
+        } else {
             label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER_GRAY));
+            label.setToolTipText("Cannot be removed");
         }
         label.setBorder(RenderableContainerPanel.commonRightBorder);
         label.setText("");
-        label.setToolTipText("Click to remove");
 
         return label;
 
