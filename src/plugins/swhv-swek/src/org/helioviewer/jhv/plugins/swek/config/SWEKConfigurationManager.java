@@ -110,7 +110,9 @@ public class SWEKConfigurationManager {
                     // check if the file is manually changed if not we download
                     // the latest version anyway.
                     if (checkAndOpenOnlineFile()) {
+                        Long start = System.currentTimeMillis();
                         isConfigParsed = parseConfigFile();
+                        Log.debug("Parsing the settingsfile took " + (System.currentTimeMillis() - start) + " ms");
                     } else {
                         isConfigParsed = false;
                     }
@@ -217,9 +219,11 @@ public class SWEKConfigurationManager {
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
             Log.debug("saveFile : " + saveFile);
+            Long start = System.currentTimeMillis();
             FileOutputStream fos = new FileOutputStream(saveFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
+            Log.debug("Saving the config file took " + (System.currentTimeMillis() - start) + " ms");
             configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
         } catch (MalformedURLException e) {
@@ -287,6 +291,7 @@ public class SWEKConfigurationManager {
      */
     private boolean parseConfigFile() {
         try {
+            Long start = System.currentTimeMillis();
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
             BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
@@ -295,6 +300,7 @@ public class SWEKConfigurationManager {
                 sb.append(line);
             }
             JSONObject configJSON = new JSONObject(sb.toString());
+            Log.debug("Reading and creating json file took " + (System.currentTimeMillis() - start) + " ms");
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
             Log.debug("The configuration file could not be parsed : " + e);
@@ -312,6 +318,7 @@ public class SWEKConfigurationManager {
      * @return true if the JSON configuration could be parsed, false if not.
      */
     private boolean parseJSONConfig(JSONObject configJSON) {
+        Long start = System.currentTimeMillis();
         configuration = new SWEKConfiguration();
         try {
             configuration.setManuallyChanged(parseManuallyChanged(configJSON));
@@ -319,6 +326,7 @@ public class SWEKConfigurationManager {
             configuration.setSources(parseSources(configJSON));
             configuration.setEventTypes(parseEventTypes(configJSON));
             configuration.setRelatedEvents(parseRelatedEvents(configJSON));
+            Log.debug("Parsing file took " + (System.currentTimeMillis() - start) + " ms");
             return true;
         } catch (JSONException e) {
             Log.error("Could not parse config json");
