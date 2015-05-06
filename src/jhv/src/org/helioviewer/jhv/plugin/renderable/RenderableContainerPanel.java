@@ -190,7 +190,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     }
                     setOptionsPanel(renderable);
                 }
-                if (col == REMOVEROW) {
+                if (col == REMOVEROW && renderable.isDeletable()) {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
                     Displayer.display();
                 }

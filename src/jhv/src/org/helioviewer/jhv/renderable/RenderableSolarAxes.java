@@ -76,4 +76,8 @@ public class RenderableSolarAxes implements Renderable {
         return "";
     }
 
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
 }

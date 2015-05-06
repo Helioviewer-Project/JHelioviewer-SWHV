@@ -432,4 +432,8 @@ public class RenderableImageLayer implements Renderable {
         return mainLayerView;
     }
 
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
 }

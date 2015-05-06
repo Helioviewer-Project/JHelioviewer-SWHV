@@ -24,4 +24,6 @@ public interface Renderable {
 
     public String getTimeString();
 
+    public boolean isDeletable();
+
 }

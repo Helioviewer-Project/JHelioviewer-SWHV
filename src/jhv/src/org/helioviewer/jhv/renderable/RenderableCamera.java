@@ -163,4 +163,9 @@ public class RenderableCamera implements Renderable {
         this.timeString = dateFormat.format(date);
     }
 
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
+
 }
