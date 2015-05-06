@@ -181,7 +181,7 @@ public class ImageViewerGui {
     }
 
     private static JFrame createMainFrame() {
-        JFrame frame = new JFrame("ESA JHelioviewer NT");
+        JFrame frame = new JFrame("ESA JHelioviewer SWHV");
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {

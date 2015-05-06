@@ -46,6 +46,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private static GLCanvas canvas;
 
     // screenshot & movie
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
+    private AWTGLReadBufferUtil rbu;
+
     private ExportMovieDialog exportMovieDialog;
 
     private String moviePath;
@@ -63,6 +66,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(glp).createDummyAutoDrawable(null, true, caps, null);
         sharedDrawable.display();
+
+        rbu = new AWTGLReadBufferUtil(glp, false);
 
         canvas = new GLCanvas(caps);
         // GUI events can lead to context destruction and invalidation of GL objects and state
@@ -144,11 +149,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
             return;
         }
 
-        AWTGLReadBufferUtil rbu = new AWTGLReadBufferUtil(canvas.getGLProfile(), false);
+        BufferedImage screenshot;
         GL2 gl = (GL2) canvas.getGL();
         int width = canvas.getWidth();
-
-        BufferedImage screenshot;
 
         if (exportMode) {
             int currentScreenshot = 1;
