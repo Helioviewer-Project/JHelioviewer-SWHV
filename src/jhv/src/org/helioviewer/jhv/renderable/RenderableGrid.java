@@ -75,7 +75,7 @@ public class RenderableGrid implements Renderable {
         {
             gl.glColor3f(1, 1, 0);
 
-            float relhi = (float) (GL3DCamera.INITFOV / activeCamera.getCameraFOV()) * scale;
+            float relhi = (float) (1. / activeCamera.getCameraWidth()) * scale;
             if (relhi != oldrelhi) {
                 oldrelhi = relhi;
 
