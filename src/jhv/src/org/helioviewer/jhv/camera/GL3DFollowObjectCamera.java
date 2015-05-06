@@ -33,7 +33,6 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         positionLoading.addListener(this);
         Displayer.getLayersModel().addLayersListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        Displayer.addTimeListener(this);
     }
 
     @Override
