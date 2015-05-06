@@ -29,9 +29,6 @@ public class JHVGlobals {
     /** The the maximum amount of memory the BufferManager object will use. */
     public static final long MAX_BUFFER_MANAGER_SIZE = (MAX_JVM_HEAP_SIZE * 8) / 10;
 
-    public static final String GLibVersionTool = "glibc-version";
-    public static final String ffmpeg = "ffmpeg";
-
     private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
     public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";

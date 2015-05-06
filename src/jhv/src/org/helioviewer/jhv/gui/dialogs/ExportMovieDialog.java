@@ -11,21 +11,12 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
- * Dialog o export movies to standard video formats.
- *
- * <p>
- * This class includes everything needed to export movies to an external format.
- * Therefore, it copies the existing view chain and performs all its operations
- * on this copy. The movie is produced by invoking the ffmpeg exectuable and
- * piping bmp images to the ffmpeg process.
+ * Dialog to export movies to standard video formats.
  *
  * @author Markus Langenberg
  * @author Andre Dau
@@ -89,17 +80,6 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
      */
     @Override
     public void showDialog() {
-        if (!FileUtils.isExecutableRegistered("mp4box")) {
-            Message.err("Could not find MP4Box tool", "The MP4Box tool could not be found. Exported movie will not contain subtitles.", false);
-            Log.error(">> ExportMovieDialog > The MP4Box tool could not be found. Exported movie will not contain subtitles.");
-        }
-
-        if (!FileUtils.isExecutableRegistered("ffmpeg")) {
-            Message.err("Could not find FFmpeg executable", "Movie export will not work. However, you can try to export image series.", false);
-            Log.error(">> ExportMovieDialog > Could not find FFmpeg executable");
-        }
-
-        pack();
         setSize(new Dimension(180, 60));
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());

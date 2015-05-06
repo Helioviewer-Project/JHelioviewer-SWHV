@@ -1,13 +1,6 @@
 package org.helioviewer.jhv.resourceloader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.JHVGlobals;
 
 /**
  * Helper class to set platform dependent system properties for example in order
@@ -71,44 +64,4 @@ public class SystemProperties {
         }
     }
 
-    /**
-     * Determine the glibc version if possible and store the version in the
-     * system properties.
-     * 
-     * @return The glibc version or null if it could not be determined
-     */
-    public static String setGLibcVersion() {
-        BufferedReader in = null;
-        InputStream err = null;
-        try {
-            if (System.getProperty("jhv.os").equals("linux")) {
-                Process p = FileUtils.invokeExecutable(JHVGlobals.GLibVersionTool, null);
-                in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                err = p.getErrorStream();
-                String version = in.readLine();
-                System.setProperty("glibc.version", version);
-                in.close();
-                err.close();
-                return version;
-            }
-        } catch (IOException e) {
-            Log.error(">> SystemProperties.setGLibcVersion() > Could not determine glibc version", e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    Log.error(">> SystemProperties.setGLibcVersion() > Could not close stdout of glibc-version tool", e);
-                }
-            }
-            if (err != null) {
-                try {
-                    err.close();
-                } catch (IOException e) {
-                    Log.error(">> SystemProperties.setGLibcVersion() > Could not close stderr of glibc-version tool", e);
-                }
-            }
-        }
-        return null;
-    }
 }
