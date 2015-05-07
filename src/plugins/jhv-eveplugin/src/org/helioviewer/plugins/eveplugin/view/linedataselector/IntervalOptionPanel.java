@@ -122,11 +122,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void setDateRange() {
-        AbstractView activeView = Displayer.getLayersModel().getActiveView();
-        if (activeView instanceof JHVJPXView) {
-            JHVJPXView jpxView = (JHVJPXView) activeView;
-            Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
-            Date end = Displayer.getLayersModel().getEndDate(jpxView).getTime();
+        AbstractView view = Displayer.getLayersModel().getActiveView();
+        if (view instanceof JHVJPXView) {
+            Date start = Displayer.getLayersModel().getStartDate(view);
+            Date end = Displayer.getLayersModel().getEndDate(view);
 
             Interval<Date> interval = new Interval<Date>(start, end);
             DrawController.getSingletonInstance().setSelectedInterval(interval, true);
@@ -216,9 +215,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
             setDefaultPeriod = false;
             if (view instanceof JHVJPXView) {
-                JHVJPXView jpxView = (JHVJPXView) view;
-                Date start = Displayer.getLayersModel().getStartDate(jpxView).getTime();
-                Date end = Displayer.getLayersModel().getEndDate(jpxView).getTime();
+                Date start = Displayer.getLayersModel().getStartDate(view);
+                Date end = Displayer.getLayersModel().getEndDate(view);
 
                 Interval<Date> interval = new Interval<Date>(start, end);
                 // ZoomController.getSingletonInstance().setAvailableInterval(interval);

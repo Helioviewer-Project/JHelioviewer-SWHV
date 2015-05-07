@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
@@ -66,8 +65,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             if (interpolation) {
                 // Active layer times
                 AbstractView view = Displayer.getLayersModel().getActiveView();
-                long t1 = Displayer.getLayersModel().getStartDate(view).getTime().getTime();
-                long t2 = Displayer.getLayersModel().getEndDate(view).getTime().getTime();
+                long t1 = Displayer.getLayersModel().getStartDate(view).getTime();
+                long t2 = Displayer.getLayersModel().getEndDate(view).getTime();
                 //Camera times
                 long t3 = this.positionLoading.getBeginDate().getTime();
                 long t4 = this.positionLoading.getEndDate().getTime();
@@ -155,17 +154,9 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        if (!interpolation) {
-            ImmutableDateTime date;
-
-            date = Displayer.getLayersModel().getStartDate(view);
-            if (date != null) {
-                positionLoading.setBeginDate(date.getTime(), true);
-            }
-            date = Displayer.getLayersModel().getEndDate(view);
-            if (date != null) {
-                positionLoading.setEndDate(date.getTime(), true);
-            }
+        if (!interpolation && view instanceof JHVJPXView) {
+            positionLoading.setBeginDate(Displayer.getLayersModel().getStartDate(view), true);
+            positionLoading.setEndDate(Displayer.getLayersModel().getEndDate(view), true);
         }
     }
 
