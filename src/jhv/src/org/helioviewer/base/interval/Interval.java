@@ -161,7 +161,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         } else if (value.compareTo(this.getEnd()) > 0) {
             return this.getEnd();
         }
-
         // this case should never occur
         assert false;
         return value;
@@ -215,24 +214,19 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      */
     public Interval<TimeFormat> expand(Interval<TimeFormat> other) {
         Interval<TimeFormat> result = new Interval<TimeFormat>(this);
-
         // copy other if null
         if (!this.isValid()) {
             result = new Interval<TimeFormat>(other);
         } else if (this.overlapsInclusive(other)) {
-
             if (other.start.compareTo(this.start) < 0) {
                 result.start = other.start;
                 result.end = this.end;
             }
-
             if (other.end.compareTo(this.end) > 0) {
                 result.start = this.start;
                 result.end = other.end;
             }
-
         }
-
         return result;
     }
 
@@ -249,20 +243,16 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * */
     public Interval<TimeFormat> intersectInterval(Interval<TimeFormat> other) {
         Interval<TimeFormat> result = new Interval<TimeFormat>(this);
-
         if (!this.isValid()) {
             result = new Interval<TimeFormat>(other);
         } else if (this.overlaps(other)) {
-
             if (this.start.compareTo(other.start) < 0) {
                 result.start = other.start;
             }
-
             if (this.end.compareTo(other.end) > 0) {
                 result.end = other.end;
             }
         }
-
         return result;
     }
 
@@ -289,7 +279,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      */
     public Vector<Interval<TimeFormat>> exclude(Interval<TimeFormat> other) {
         Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
-
         if (this.equals(other))
             return result;
 
@@ -298,7 +287,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         if (other.contains(this)) {
             return result;
         }
-
         // the interval to be excluded is included in this interval: this
         // results in two smaller intervals
         if (this.contains(other)) {
@@ -307,7 +295,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
             removeDegenerated(result);
             return result;
         }
-
         // this interval only overlaps the interval to be excluded: make this
         // interval smaller
         if (this.overlaps(other)) {
@@ -332,7 +319,6 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * @param toClean
      */
     private void removeDegenerated(Vector<Interval<TimeFormat>> toClean) {
-
         Iterator<Interval<TimeFormat>> intIterator = toClean.iterator();
         while (intIterator.hasNext()) {
             Interval<TimeFormat> curInterval = intIterator.next();

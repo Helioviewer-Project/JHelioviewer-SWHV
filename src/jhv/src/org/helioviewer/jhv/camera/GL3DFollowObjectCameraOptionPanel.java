@@ -58,26 +58,18 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         super();
         this.camera = camera;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        this.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-        add(new JSeparator(SwingConstants.HORIZONTAL));
 
         add(new JSeparator(SwingConstants.HORIZONTAL));
+
         JPanel loadedLabelPanel = new JPanel();
-        loadedLabelPanel.setMaximumSize(new Dimension(338, 40));
-
         loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
 
         loadedLabel = new JLabel("Status: Not loaded");
-        //loadedLabel.setEditable(false);
-        //loadedLabel.setLineWrap(true);
-        loadedLabel.setOpaque(false);
-        //loadedLabel.setEditable(false);
-
         loadedLabelPanel.add(loadedLabel);
-        loadedLabelPanel.add(Box.createHorizontalGlue());
         add(loadedLabelPanel);
 
         add(new JSeparator(SwingConstants.HORIZONTAL));
+
         addObjectCombobox();
         exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
         JPanel checkboxPanel = new JPanel();

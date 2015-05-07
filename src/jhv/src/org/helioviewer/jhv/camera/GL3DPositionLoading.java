@@ -23,7 +23,6 @@ import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.jhv.display.Displayer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +33,7 @@ public class GL3DPositionLoading {
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";
-    boolean running = false;
+    private boolean running = false;
 
     private boolean isLoaded = false;
     private URL url;
@@ -97,7 +96,6 @@ public class GL3DPositionLoading {
                             report = "Invalid network response.";
                         }
                     }
-
                 } catch (UnknownHostException e) {
                     Log.debug("Unknown host, network down?", e);
                 } catch (final IOException e1) {
@@ -146,15 +144,13 @@ public class GL3DPositionLoading {
     }
 
     private void parseData() {
-        GregorianCalendar calendar = new GregorianCalendar();
-
-        calendar.clear();
         try {
+            GregorianCalendar calendar = new GregorianCalendar();
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
-            Iterator<String> iteratorKeys = jsonResult.keys();
-            int i = 0;
-            String strings[] = new String[jsonResult.length()];
 
+            Iterator<String> iteratorKeys = jsonResult.keys();
+            String strings[] = new String[jsonResult.length()];
+            int i = 0;
             while (iteratorKeys.hasNext()) {
                 strings[i] = iteratorKeys.next();
                 i++;
@@ -167,17 +163,16 @@ public class GL3DPositionLoading {
 
                 Date date = format.parse(dateString);
                 calendar.setTime(date);
-                double x = positionArray.getDouble(0);
-                double y = Math.PI + positionArray.getDouble(1);
-                if (positionArray.getDouble(1) > 0) {
-                    y = -Math.PI + positionArray.getDouble(1);
-                }
-                double z = -positionArray.getDouble(2);
+
+                double x, y, z, jy;
+                x = positionArray.getDouble(0);
+                jy = positionArray.getDouble(1);
+                y = jy + (jy > 0 ? -Math.PI : Math.PI);
+                z = -positionArray.getDouble(2);
+
                 positionDateTimehelper[j] = new GL3DPositionDateTime(calendar.getTimeInMillis(), x, y, z);
-                i++;
             }
             this.positionDateTime = positionDateTimehelper;
-            Displayer.display();
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
             Log.warn("Problem Parsing the JSON Response.", e);
@@ -259,7 +254,7 @@ public class GL3DPositionLoading {
                 double hgln = this.positionDateTime[0].y;
                 double hglt = this.positionDateTime[0].z;
                 double dist = this.positionDateTime[0].x;
-                dist = dist * 1000 / Constants.SunRadiusInMeter;
+                dist *= 1000. / Constants.SunRadiusInMeter;
                 return new GL3DVec3d(dist, hgln, hglt);
             } else {
                 double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
@@ -273,7 +268,7 @@ public class GL3DPositionLoading {
                 double hgln = alpha * this.positionDateTime[i].y + (1. - alpha) * this.positionDateTime[inext].y;
                 double hglt = alpha * this.positionDateTime[i].z + (1. - alpha) * this.positionDateTime[inext].z;
                 double dist = alpha * this.positionDateTime[i].x + (1. - alpha) * this.positionDateTime[inext].x;
-                dist = dist * 1000 / Constants.SunRadiusInMeter;
+                dist *= 1000. / Constants.SunRadiusInMeter;
                 return new GL3DVec3d(dist, hgln, hglt);
             }
         } else {
