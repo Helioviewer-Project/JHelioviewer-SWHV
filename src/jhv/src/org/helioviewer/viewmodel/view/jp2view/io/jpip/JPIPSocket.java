@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.viewmodel.view.jp2view.io.ChunkedInputStreamAlt;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPHeaderKey;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -145,7 +146,7 @@ public class JPIPSocket extends HTTPSocket {
 
         // Adds some default headers if they were not already added.
         if (!_req.headerExists(HTTPHeaderKey.USER_AGENT.toString()))
-            _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), "JHelioviewer-SWHV");
+            _req.setHeader(HTTPHeaderKey.USER_AGENT.toString(), JHVGlobals.getUserAgent());
         if (!_req.headerExists(HTTPHeaderKey.ACCEPT_ENCODING.toString()))
             _req.setHeader(HTTPHeaderKey.ACCEPT_ENCODING.toString(), "gzip");
         if (!_req.headerExists(HTTPHeaderKey.CACHE_CONTROL.toString()))
