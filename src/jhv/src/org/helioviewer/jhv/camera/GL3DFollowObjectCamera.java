@@ -13,6 +13,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
 
@@ -63,16 +64,19 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
+                long t1 = 0, t2 = 0;
                 // Active layer times
                 AbstractView view = Displayer.getLayersModel().getActiveView();
-                long t1 = Displayer.getLayersModel().getStartDate(view).getTime();
-                long t2 = Displayer.getLayersModel().getEndDate(view).getTime();
+                if (view instanceof JHVJPXView) {
+                    t1 = Displayer.getLayersModel().getStartDate(view).getTime();
+                    t2 = Displayer.getLayersModel().getEndDate(view).getTime();
+                }
                 //Camera times
                 long t3 = this.positionLoading.getBeginDate().getTime();
                 long t4 = this.positionLoading.getEndDate().getTime();
 
-                if (t4 != t3) {
-                    currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (dateTime - t1) / (t2 - t1)));
+                if (t2 != t1) {
+                    currentCameraTime = (long) (t3 + (t4 - t3) * (dateTime - t1) / (double) (t2 - t1));
                 } else {
                     currentCameraTime = t4;
                 }
