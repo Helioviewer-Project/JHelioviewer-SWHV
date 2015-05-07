@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
@@ -305,7 +304,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public Component getOptionsPanel() {
-        return new JPanel();
+        return null;
     }
 
     @Override

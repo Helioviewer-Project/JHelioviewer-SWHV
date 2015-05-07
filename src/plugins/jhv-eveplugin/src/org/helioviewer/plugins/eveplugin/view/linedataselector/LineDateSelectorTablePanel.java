@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -73,6 +72,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 5 + 2));
+
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.setBorder(BorderFactory.createTitledBorder(""));
         jspContainer.add(jsp, BorderLayout.NORTH);
@@ -156,13 +156,11 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         optionsPanelWrapper = new JPanel();
-        optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         optionsPanelWrapper.setLayout(new BorderLayout());
 
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         optionsPanelWrapper.add(intervalOptionPanel, BorderLayout.PAGE_END);
 
-        JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         JButton addLayerButton = new JButton();
         addLayerButton.addActionListener(new ActionListener() {
             @Override
@@ -173,10 +171,15 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
         addLayerButton.setBorder(null);
         addLayerButton.setText(null);
+        addLayerButton.setBorderPainted(false);
+        addLayerButton.setFocusPainted(false);
+        addLayerButton.setContentAreaFilled(false);
+
         addLayerButton.setToolTipText("Click to add extra layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
 
-        addLayerButtonWrapper.add(addLayerButton);
+        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
 
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 
