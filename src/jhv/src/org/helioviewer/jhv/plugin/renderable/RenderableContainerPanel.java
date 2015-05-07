@@ -199,11 +199,13 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         optionsPanelWrapper = new JPanel(new BorderLayout());
         optionsPanelWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
         JPanel addLayerButtonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+
         JButton addLayerButton = new JButton(addLayerAction);
-        addLayerButton.setText("");
+        addLayerButton.setBorder(null);
+        addLayerButton.setText(null);
         addLayerButton.setToolTipText("Click to add extra layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.setBorder(null);
+
         addLayerButtonWrapper.add(addLayerButton);
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 

@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -50,7 +49,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void initVisualComponents() {
-        zoomComboBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         fillZoomComboBox();
         zoomComboBox.addActionListener(this);
         zoomComboBox.setEnabled(false);
@@ -181,22 +179,22 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
             switch (zoom) {
             case All:
-                return "Maximum Interval";
+                return "Maximum interval";
             case Hour:
-                return Integer.toString(number) + " Hour" + plural;
+                return Integer.toString(number) + " hour" + plural;
             case Day:
-                return Integer.toString(number) + " Day" + plural;
+                return Integer.toString(number) + " day" + plural;
             case Month:
-                return Integer.toString(number) + " Month" + plural;
+                return Integer.toString(number) + " month" + plural;
             case Year:
-                return Integer.toString(number) + " Year" + plural;
+                return Integer.toString(number) + " year" + plural;
             case Carrington:
-                return "Carrington Rotation" + plural;
+                return "Carrington rotation" + plural;
             default:
                 break;
             }
 
-            return "Custom Interval";
+            return "Custom interval";
         }
     }
 

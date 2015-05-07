@@ -50,9 +50,6 @@ public class GL3DPositionLoading {
     private Date endDatems = new Date();
     private SwingWorker<Integer, Integer> worker;
 
-    public GL3DPositionLoading() {
-    }
-
     private void buildRequestURL() {
         try {
             url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
@@ -184,7 +181,7 @@ public class GL3DPositionLoading {
         return this.isLoaded;
     }
 
-    public void applyChanges() {
+    private void applyChanges() {
         this.setLoaded(false);
         this.positionDateTime = null;
         this.requestData();
