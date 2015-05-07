@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -37,7 +36,7 @@ public class GL3DPositionLoading {
 
     private boolean isLoaded = false;
     private URL url;
-    private JSONObject jsonResult;
+    private JSONArray jsonResult;
     private GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private String beginDate = "2014-05-28T00:00:00";
@@ -86,7 +85,7 @@ public class GL3DPositionLoading {
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
-                        jsonResult = new JSONObject(new JSONTokener(reader));
+                        jsonResult = new JSONArray(new JSONTokener(reader));
                     } else {
                         JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                         if (jsonObject.has("faultstring")) {
@@ -148,18 +147,14 @@ public class GL3DPositionLoading {
             GregorianCalendar calendar = new GregorianCalendar();
             GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
 
-            Iterator<String> iteratorKeys = jsonResult.keys();
-            String strings[] = new String[jsonResult.length()];
-            int i = 0;
-            while (iteratorKeys.hasNext()) {
-                strings[i] = iteratorKeys.next();
-                i++;
-            }
-            Arrays.sort(strings);
+            for (int j = 0; j < jsonResult.length(); j++) {
+                JSONObject positionObject = jsonResult.getJSONObject(j);
+                Iterator<String> iteratorKeys = positionObject.keys();
+                if (!iteratorKeys.hasNext())
+                    continue;
 
-            for (int j = 0; j < strings.length; j++) {
-                String dateString = strings[j];
-                JSONArray positionArray = (JSONArray) jsonResult.get(dateString);
+                String dateString = iteratorKeys.next();
+                JSONArray positionArray = positionObject.getJSONArray(dateString);
 
                 Date date = format.parse(dateString);
                 calendar.setTime(date);

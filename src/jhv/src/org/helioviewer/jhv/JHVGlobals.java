@@ -29,6 +29,7 @@ public class JHVGlobals {
 
     private static String version = "";
     private static String revision = "";
+    private static String agent = "JHV/";
 
     /** Constructor is private to prevent instantiation. */
     private JHVGlobals() {
@@ -68,8 +69,11 @@ public class JHVGlobals {
                 jarFile = new JarFile(jarPath);
                 Manifest manifest = jarFile.getManifest();
                 Attributes mainAttributes = manifest.getMainAttributes();
+
                 version = mainAttributes.getValue("version");
                 revision = mainAttributes.getValue("revision");
+                agent += version + "." + revision;
+
                 System.setProperty("jhv.version", version);
                 System.setProperty("jhv.revision", revision);
             } catch (IOException e) {
@@ -111,7 +115,7 @@ public class JHVGlobals {
     }
 
     public static String getUserAgent() {
-        return "JHV/" + version + "." + revision;
+        return agent;
     }
 
     /**
