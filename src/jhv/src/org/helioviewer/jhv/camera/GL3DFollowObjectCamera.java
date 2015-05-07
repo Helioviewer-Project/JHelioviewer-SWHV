@@ -159,7 +159,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activeLayerChanged(AbstractView view) {
         if (!interpolation && view instanceof JHVJPXView) {
-            positionLoading.setBeginDate(Displayer.getLayersModel().getStartDate(view), true);
+            positionLoading.setBeginDate(Displayer.getLayersModel().getStartDate(view), false);
             positionLoading.setEndDate(Displayer.getLayersModel().getEndDate(view), true);
         }
     }

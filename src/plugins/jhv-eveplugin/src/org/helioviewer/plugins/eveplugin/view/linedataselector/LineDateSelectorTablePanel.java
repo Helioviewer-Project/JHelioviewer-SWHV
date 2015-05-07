@@ -170,10 +170,11 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
                 ImageViewerGui.getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
             }
         });
-        addLayerButton.setText("");
+
+        addLayerButton.setBorder(null);
+        addLayerButton.setText(null);
         addLayerButton.setToolTipText("Click to add extra layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.setBorder(null);
 
         addLayerButtonWrapper.add(addLayerButton);
 

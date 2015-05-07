@@ -207,7 +207,7 @@ public class RenderableGrid implements Renderable {
         float verticalAdjustment = this.textScale / 3f;
 
         renderer.begin3DRendering();
-        for (double phi = 0; phi <= 90; phi += getLatstepDegrees()) {
+        for (double phi = 0; phi <= 90; phi += latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -218,7 +218,7 @@ public class RenderableGrid implements Renderable {
                 renderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             }
         }
-        for (double phi = -getLatstepDegrees(); phi >= -90; phi -= getLatstepDegrees()) {
+        for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
@@ -233,7 +233,7 @@ public class RenderableGrid implements Renderable {
 
         size = Constants.SunRadius * 1.02;
 
-        for (double theta = 0; theta <= 180.; theta += getLonstepDegrees()) {
+        for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -241,7 +241,7 @@ public class RenderableGrid implements Renderable {
             double angle = (90 - theta) * Math.PI / 180.;
             gl.glPushMatrix();
             {
-                gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
+                gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
                 gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();
@@ -251,7 +251,7 @@ public class RenderableGrid implements Renderable {
             gl.glPopMatrix();
         }
 
-        for (double theta = -getLonstepDegrees(); theta > -180.; theta -= getLonstepDegrees()) {
+        for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             String txt = String.format("%.1f", theta);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
@@ -260,7 +260,7 @@ public class RenderableGrid implements Renderable {
 
             gl.glPushMatrix();
             {
-                gl.glTranslatef((float) (Math.cos(angle) * size), 0f, (float) (Math.sin(angle) * size));
+                gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
                 gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();

@@ -98,7 +98,7 @@ public class JavaHelioViewer {
 
         Log.debug("Instantiate Kakadu engine");
         KakaduEngine engine = new KakaduEngine();
-        Log.info("Try to load Kakadu libraries");
+
         try {
             JHVLoader.copyKDULibs();
         } catch (Exception e) {
@@ -106,7 +106,6 @@ public class JavaHelioViewer {
         }
 
         try {
-            Log.debug("Setup Kakadu message handlers.");
             engine.startKduMessageSystem();
         } catch (JHV_KduException e) {
             Log.fatal("Failed to setup Kakadu message handlers.", e);
@@ -130,6 +129,10 @@ public class JavaHelioViewer {
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.getSingletonInstance().loadAtStart();
                     Settings.getSingletonInstance().update();
+
+                    ImageViewerGui.getMainFrame().pack();
+                    ImageViewerGui.getMainFrame().setLocationRelativeTo(null);
+                    ImageViewerGui.getMainFrame().setVisible(true);
                 }
             });
         } catch (Exception ex) {

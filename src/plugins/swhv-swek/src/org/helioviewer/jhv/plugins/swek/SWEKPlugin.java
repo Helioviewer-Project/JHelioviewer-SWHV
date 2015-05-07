@@ -81,7 +81,6 @@ public class SWEKPlugin implements Plugin {
             protected void done() {
                 eventContainer.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
-                ImageViewerGui.getLeftContentPane().revalidate();
             }
         };
         loadPlugin.execute();
