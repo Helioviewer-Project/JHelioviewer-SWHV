@@ -189,18 +189,18 @@ public class GL3DPositionLoading {
         return this.isLoaded;
     }
 
+    public void applyChanges() {
+        this.setLoaded(false);
+        this.positionDateTime = null;
+        this.requestData();
+    }
+
     public void setBeginDate(Date beginDate, boolean applyChanges) {
         this.beginDate = this.format.format(beginDate);
         this.beginDatems = beginDate;
         if (applyChanges) {
             applyChanges();
         }
-    }
-
-    public void applyChanges() {
-        this.setLoaded(false);
-        this.positionDateTime = null;
-        this.requestData();
     }
 
     public void setEndDate(Date endDate, boolean applyChanges) {

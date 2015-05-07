@@ -27,7 +27,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
@@ -71,29 +70,25 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             if (activeView instanceof JHVJPXView) {
                 JHVJPXView jpxView = (JHVJPXView) activeView;
                 if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
-                    ImmutableDateTime start = Displayer.getLayersModel().getStartDate(activeView);
-                    ImmutableDateTime end = Displayer.getLayersModel().getEndDate(activeView);
-                    if (start != null && end != null) {
-                        try {
-                            Date startDate = start.getTime();
-                            Date endDate = end.getTime();
-                            Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                            Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
-                            // only updates if its really necessary with a
-                            // tolerance of an hour
-                            final int tolerance = 60 * 60 * 1000;
-                            if (Math.abs(startDate.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(endDate.getTime() - obsEndDate.getTime()) > tolerance) {
-                                if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                                    ObservationDialogDateModel.getInstance().setStartDate(startDate, false);
-                                }
-                                if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                                    ObservationDialogDateModel.getInstance().setEndDate(endDate, false);
-                                }
+                    Date start = Displayer.getLayersModel().getStartDate(activeView);
+                    Date end = Displayer.getLayersModel().getEndDate(activeView);
+                    try {
+                        Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
+                        Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
+                        // only updates if its really necessary with a
+                        // tolerance of an hour
+                        final int tolerance = 60 * 60 * 1000;
+                        if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
+                            if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                                ObservationDialogDateModel.getInstance().setStartDate(start, false);
                             }
-                        } catch (ParseException e) {
-                            // Should not happen
-                            Log.error("Cannot update observation dialog", e);
+                            if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                                ObservationDialogDateModel.getInstance().setEndDate(end, false);
+                            }
                         }
+                    } catch (ParseException e) {
+                        // Should not happen
+                        Log.error("Cannot update observation dialog", e);
                     }
                 }
             }

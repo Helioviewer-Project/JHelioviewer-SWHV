@@ -77,16 +77,7 @@ public class LayersModel {
         setActiveLayer(findView(view));
     }
 
-    /**
-     * Return the timestamp of the first available image data of the layer in
-     * question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return timestamp of the first available image data, null if no
-     *         information available
-     */
-    public ImmutableDateTime getStartDate(AbstractView view) {
+    private ImmutableDateTime getStartDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
@@ -97,16 +88,7 @@ public class LayersModel {
         return result;
     }
 
-    /**
-     * Return the timestamp of the last available image data of the layer in
-     * question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return timestamp of the last available image data, null if no
-     *         information available
-     */
-    public ImmutableDateTime getEndDate(AbstractView view) {
+    private ImmutableDateTime getEndDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
@@ -119,30 +101,48 @@ public class LayersModel {
         return result;
     }
 
+    private ImmutableDateTime getStartDateImmutable(int idx) {
+        return getStartDateImmutable(getLayer(idx));
+    }
+
+    private ImmutableDateTime getEndDateImmutable(int idx) {
+        return getEndDateImmutable(getLayer(idx));
+    }
+
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
      *
-     * @param idx
-     *            - index of the layer in question
+     * @param view
+     *            - View that can be associated with the layer in question
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getStartDate(int idx) {
-        return getStartDate(getLayer(idx));
+    public Date getStartDate(AbstractView view) {
+        Date result = null;
+        ImmutableDateTime date = getStartDateImmutable(view);
+
+        if (date != null)
+            result = date.getTime();
+        return result;
     }
 
     /**
      * Return the timestamp of the last available image data of the layer in
      * question
      *
-     * @param idx
-     *            - index of the layer in question
+     * @param view
+     *            - View that can be associated with the layer in question
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public ImmutableDateTime getEndDate(int idx) {
-        return getEndDate(getLayer(idx));
+    public Date getEndDate(AbstractView view) {
+        Date result = null;
+        ImmutableDateTime date = getEndDateImmutable(view);
+
+        if (date != null)
+            result = date.getTime();
+        return result;
     }
 
     /**
@@ -155,7 +155,7 @@ public class LayersModel {
         ImmutableDateTime earliest = null;
 
         for (int idx = 0; idx < getNumLayers(); idx++) {
-            ImmutableDateTime start = getStartDate(idx);
+            ImmutableDateTime start = getStartDateImmutable(idx);
             if (start == null) {
                 continue;
             }
@@ -176,7 +176,7 @@ public class LayersModel {
         ImmutableDateTime latest = null;
 
         for (int idx = 0; idx < getNumLayers(); idx++) {
-            ImmutableDateTime end = getEndDate(idx);
+            ImmutableDateTime end = getEndDateImmutable(idx);
             if (end == null) {
                 continue;
             }
