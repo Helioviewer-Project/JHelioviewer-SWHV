@@ -22,7 +22,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      * Empty Constructor
      */
     public IntervalStore() {
-
     }
 
     public IntervalStore(Interval<TimeFormat> interval) {
@@ -34,7 +33,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      * 
      * @param intervals
      */
-
     // TODO: Malte Nuhn - For completeness implement constructor adding all of
     // the array's intervals
 
@@ -43,7 +41,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      * 
      * @param intervals
      */
-
     // TODO: Malte Nuhn - For completeness implement copyconstructor deepcopying
     // the contained intervals, too
 
@@ -54,16 +51,11 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      *            - intervals to be added/merged
      */
     public void add(HashMap<Interval<TimeFormat>, IntervalContainer<TimeFormat, ItemFormat>> data) {
-
         Iterator<Interval<TimeFormat>> iter = data.keySet().iterator();
-
         while (iter.hasNext()) {
-
             Interval<TimeFormat> curInterval = iter.next();
             this.add(curInterval, data.get(curInterval));
-
         }
-
     }
 
     /**
@@ -78,7 +70,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
 
         // TODO WORK ON PARAMETERS OF THIS METHOD
         Vector<Interval<TimeFormat>> overlappingIntervals = this.getOverlappingIntervals(newInterval);
-
         // Melt new interval with all existing ones
         for (Interval<TimeFormat> overlappingInterval : overlappingIntervals) {
             newInterval = newInterval.expand(overlappingInterval);
@@ -87,7 +78,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
             // move items from old interval to the expanded one
             IntervalContainer<TimeFormat, ItemFormat> toAdd = this.data.get(overlappingInterval);
             newIntervalContainer.downloadableEvents += toAdd.getDownloadableEvents();
-
             for (ItemFormat item : toAdd.getItems()) {
                 if (!newIntervalContainer.getItems().contains(item)) {
                     newIntervalContainer.getItems().add(item);
@@ -95,16 +85,12 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
                     // already contains
                 }
             }
-
             // move over downloadable events
-
             this.data.remove(overlappingInterval);
         }
-
         // Log.info("Added "+ newItems + " new Items to container with " +
         // newIntervalContainer.downloadableEvents);
         newIntervalContainer.downloadableEvents -= newItems;
-
         // if we have no more downloadable events, the interval is not partial
         // anymore
         if (newItems > 0 && newIntervalContainer.downloadableEvents == 0) {
@@ -116,37 +102,24 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
         // TODO GETTERSETTER, COMMENT THAT DOWNLOADABLE ARE DECREASED
         // and finally store the new interval
         data.put(newInterval, newIntervalContainer);
-
         // loop to make sure that all events are registered to all possible
         // buckets
         Iterator<Interval<TimeFormat>> iter = this.data.keySet().iterator();
-
         while (iter.hasNext()) {
-
             Interval<TimeFormat> curInterval = iter.next();
             IntervalContainer<TimeFormat, ItemFormat> curContainer = this.data.get(curInterval);
-
             // this is currently not the interval we just created
             if (!curInterval.equals(newInterval)) {
-
                 // loop over all items
-
                 for (ItemFormat curItem : curContainer.getItems()) {
-
                     // if it overlaps the newInterval, add the item there, too
                     if (curItem.overlaps(newInterval) && !newIntervalContainer.getItems().contains(curItem)) {
-
                         newIntervalContainer.getItems().add(curItem);
-
                     }
                 }
-
             }
-
         }
-
         return merged;
-
     }
 
     /**
@@ -157,7 +130,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      */
     public Vector<Interval<TimeFormat>> getOverlappingIntervals(Interval<TimeFormat> interval) {
         Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
-
         Iterator<Interval<TimeFormat>> iter = this.data.keySet().iterator();
         while (iter.hasNext()) {
             Interval<TimeFormat> key = iter.next();
@@ -165,7 +137,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
                 result.add(key);
             }
         }
-
         return result;
     }
 
@@ -177,7 +148,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      */
     public Vector<Interval<TimeFormat>> getCoveringIntervals(Interval<TimeFormat> interval) {
         Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
-
         Iterator<Interval<TimeFormat>> iter = this.data.keySet().iterator();
         while (iter.hasNext()) {
             Interval<TimeFormat> key = iter.next();
@@ -185,7 +155,6 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
                 result.add(key);
             }
         }
-
         return result;
     }
 
@@ -197,10 +166,8 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      * @return intervals needed
      */
     public Vector<Interval<TimeFormat>> needed(Interval<TimeFormat> interval) {
-
         // linked list needed
         LinkedList<Interval<TimeFormat>> result = new LinkedList<Interval<TimeFormat>>();
-
         result.add(interval);
 
         // loop over the intervals in this cache
@@ -208,23 +175,18 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
         while (storeIntervalsIterator.hasNext()) {
             Interval<TimeFormat> curStoreInterval = storeIntervalsIterator.next();
             IntervalContainer<TimeFormat, ItemFormat> curStoreContainer = this.data.get(curStoreInterval);
-
             // partially downloaded containers do not count
             if (curStoreContainer.isPartial()) {
                 continue;
             }
-
             // loop over the intervals in the current result set
-
             // T O D O ? Iterator<SimpleInterval<TimeFormat>> checkIter =
             // checkInter.iterator();
 
             // iterate over the list -
             ListIterator<Interval<TimeFormat>> resultIntervalsIterator = result.listIterator();
-
             while (resultIntervalsIterator.hasNext()) {
                 Interval<TimeFormat> curResultInterval = resultIntervalsIterator.next();
-
                 // replace currently stored (overlapping) result interval by an
                 // excluded one
                 // we only remove those intervals that have already been loaded
@@ -235,11 +197,8 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
                         resultIntervalsIterator.add(add);
                     }
                 }
-
             }
-
         }
-
         // convert to vector
         Vector<Interval<TimeFormat>> resultVector = new Vector<Interval<TimeFormat>>();
         resultVector.addAll(result);
@@ -284,9 +243,7 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
 
         if (added)
             result.delete(result.length() - 1, result.length());
-
         result.append("]");
-
         return result.toString();
     }
 
@@ -338,12 +295,10 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
         }
 
         IntervalContainer<TimeFormat, ItemFormat> curContainer = this.data.get(interval);
-
         // do not add the event if it is already in there
         if (newEvent != null && !curContainer.getItems().contains(newEvent)) {
             curContainer.getItems().add(newEvent);
         }
-
     }
 
     /**
@@ -394,19 +349,14 @@ public class IntervalStore<TimeFormat extends Comparable<TimeFormat>, ItemFormat
      */
     public Vector<Interval<TimeFormat>> findItem(ItemFormat item) {
         Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
-
         Iterator<Interval<TimeFormat>> iter = this.data.keySet().iterator();
         while (iter.hasNext()) {
             Interval<TimeFormat> interval = iter.next();
-
             if (this.data.get(interval).getItems().contains(item)) {
                 result.add(interval);
             }
-
         }
-
         return result;
-
     }
 
     /**
