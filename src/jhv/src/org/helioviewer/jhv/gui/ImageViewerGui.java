@@ -169,6 +169,10 @@ public class ImageViewerGui {
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
         prepareGuiExtra();
+
+        mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
     }
 
     private static void prepareGuiExtra() {

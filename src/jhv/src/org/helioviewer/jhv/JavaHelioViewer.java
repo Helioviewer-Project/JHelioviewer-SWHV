@@ -117,6 +117,7 @@ public class JavaHelioViewer {
         Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
 
+        Settings.getSingletonInstance().update();
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
 
         Log.info("Start main window");
@@ -124,15 +125,12 @@ public class JavaHelioViewer {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
+                    Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
                     UIGlobals.getSingletonInstance(); // initialize
                     setUIFont(new FontUIResource(UIGlobals.UIFont));
+
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.getSingletonInstance().loadAtStart();
-                    Settings.getSingletonInstance().update();
-
-                    ImageViewerGui.getMainFrame().pack();
-                    ImageViewerGui.getMainFrame().setLocationRelativeTo(null);
-                    ImageViewerGui.getMainFrame().setVisible(true);
                 }
             });
         } catch (Exception ex) {
@@ -161,7 +159,7 @@ public class JavaHelioViewer {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
             if (value != null && value instanceof FontUIResource)
-                UIManager.put (key, f);
+                UIManager.put(key, f);
         }
     }
 

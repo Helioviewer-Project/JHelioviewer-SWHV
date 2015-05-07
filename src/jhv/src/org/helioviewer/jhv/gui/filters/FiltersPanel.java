@@ -20,13 +20,13 @@ import org.helioviewer.viewmodel.view.AbstractView;
  */
 public class FiltersPanel extends JPanel {
 
-    private final RunningDifferencePanel runningDifferencePanel = new RunningDifferencePanel();
-    private final OpacityPanel opacityPanel = new OpacityPanel();
-    private final ChannelMixerPanel channelMixerPanel = new ChannelMixerPanel();
-    private final SOHOLUTPanel lUTPanel = new SOHOLUTPanel();
-    private final GammaCorrectionPanel gammaCorrectionPanel = new GammaCorrectionPanel();
-    private final ContrastPanel contrastPanel = new ContrastPanel();
-    private final SharpenPanel sharpenPanel = new SharpenPanel();
+    private static RunningDifferencePanel runningDifferencePanel;
+    private static OpacityPanel opacityPanel;
+    private static ChannelMixerPanel channelMixerPanel;
+    private static SOHOLUTPanel lutPanel;
+    private static GammaCorrectionPanel gammaCorrectionPanel;
+    private static ContrastPanel contrastPanel;
+    private static SharpenPanel sharpenPanel;
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -36,6 +36,14 @@ public class FiltersPanel extends JPanel {
     }
 
     public FiltersPanel() {
+        runningDifferencePanel = new RunningDifferencePanel();
+        opacityPanel = new OpacityPanel();
+        channelMixerPanel = new ChannelMixerPanel();
+        lutPanel = new SOHOLUTPanel();
+        gammaCorrectionPanel = new GammaCorrectionPanel();
+        contrastPanel = new ContrastPanel();
+        sharpenPanel = new SharpenPanel();
+
         this.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
@@ -60,7 +68,7 @@ public class FiltersPanel extends JPanel {
         c.gridy++;
         this.addToGridBag(c, contrastPanel);
         c.gridy++;
-        this.addToGridBag(c, lUTPanel);
+        this.addToGridBag(c, lutPanel);
         c.gridy++;
         this.addToGridBag(c, channelMixerPanel);
         c.gridy++;
@@ -96,15 +104,14 @@ public class FiltersPanel extends JPanel {
         opacityPanel.setJP2View(jp2view);
         channelMixerPanel.setEnabled(true);
         channelMixerPanel.setJP2View(jp2view);
-        lUTPanel.setEnabled(true);
-        lUTPanel.setJP2View(jp2view);
+        lutPanel.setEnabled(true);
+        lutPanel.setJP2View(jp2view);
         gammaCorrectionPanel.setEnabled(true);
         gammaCorrectionPanel.setJP2View(jp2view);
         contrastPanel.setEnabled(true);
         contrastPanel.setJP2View(jp2view);
         sharpenPanel.setEnabled(true);
         sharpenPanel.setJP2View(jp2view);
-        GridBagConstraints c = new GridBagConstraints();
     }
 
 }

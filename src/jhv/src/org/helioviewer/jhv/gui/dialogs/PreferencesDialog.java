@@ -265,7 +265,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 break;
             }
         }
-        Settings.getSingletonInstance().setLookAndFeelEverywhere(lafClassName);
+        Settings.getSingletonInstance().setLookAndFeelEverywhere(ImageViewerGui.getMainFrame(), lafClassName);
     }
 
     /**
@@ -462,7 +462,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 UIManager.LookAndFeelInfo[] lafs = getAllowedLookAndFeels();
                 UIManager.LookAndFeelInfo selectedLaf = lafs[source.getSelectedIndex()];
 
-                Settings.getSingletonInstance().setLookAndFeelEverywhere(selectedLaf.getClassName());
+                Settings.getSingletonInstance().setLookAndFeelEverywhere(ImageViewerGui.getMainFrame(), selectedLaf.getClassName());
                 SwingUtilities.updateComponentTreeUI(parent);
             }
         });
