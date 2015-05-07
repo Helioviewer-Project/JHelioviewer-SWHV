@@ -1,5 +1,7 @@
 package org.helioviewer.jhv;
 
+import java.awt.Component;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +14,6 @@ import javax.swing.UIManager;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
@@ -95,11 +96,8 @@ public class Settings {
      */
     public void update() {
         try {
-            String val = getProperty("display.laf");
-            setLookAndFeelEverywhere(val);
-
             double size = 0;
-            val = getProperty("jpip.cache.size");
+            String val = getProperty("jpip.cache.size");
             if (val != null) {
                 try {
                     size = Double.valueOf(val);
@@ -160,11 +158,15 @@ public class Settings {
      * @param lookAndFeel
      *            name of the lookandfeel.
      */
-    public void setLookAndFeelEverywhere(String lookAndFeel) {
+    public void setLookAndFeelEverywhere(Component c, String lookAndFeel) {
+        if (lookAndFeel == null)
+           lookAndFeel = getProperty("display.laf");
+
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
             try {
                 UIManager.setLookAndFeel(lookAndFeel);
-                SwingUtilities.updateComponentTreeUI(ImageViewerGui.getMainFrame());
+                if (c != null)
+                    SwingUtilities.updateComponentTreeUI(c);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
