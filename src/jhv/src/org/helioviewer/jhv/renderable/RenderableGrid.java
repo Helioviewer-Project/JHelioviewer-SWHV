@@ -31,7 +31,8 @@ public class RenderableGrid implements Renderable {
     private final float scale = 0.8f;
     private Font font;
     private TextRenderer renderer;
-    private final int fontsize = 20;
+    //The height of the text in solar radii
+    private final float textScale = 0.07f;
     private final boolean followCamera;
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
@@ -49,16 +50,16 @@ public class RenderableGrid implements Renderable {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException e) {
             Log.warn("Font Not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, fontsize);
+            font = new Font("SansSerif", Font.PLAIN, 20);
         } catch (IOException e) {
             Log.warn("Font Not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, fontsize);
+            font = new Font("SansSerif", Font.PLAIN, 20);
         }
 
         optionsPanel = new RenderableGridOptionsPanel(this);
     }
 
-    private float oldrelhi = -1;
+    private float oldPixelsPerSolarRadiusDoubled = -1;
     private int positionBufferID;
     private int colorBufferID;
 
@@ -74,12 +75,11 @@ public class RenderableGrid implements Renderable {
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             gl.glColor3f(1, 1, 0);
+            float pixelsPerSolarRadiusDoubled = (float) (textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
+            if (pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
+                oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
 
-            float relhi = (float) (1. / activeCamera.getCameraWidth()) * scale;
-            if (relhi != oldrelhi) {
-                oldrelhi = relhi;
-
-                float cfontsize = this.fontsize * relhi;
+                float cfontsize = pixelsPerSolarRadiusDoubled;
                 cfontsize = cfontsize < 10 ? 10 : cfontsize;
                 font = font.deriveFont(cfontsize);
 
@@ -198,10 +198,14 @@ public class RenderableGrid implements Renderable {
     }
 
     private void drawText(GL2 gl) {
-        float textScale = scale * 0.08f / font.getSize();
         float zdist = 0f;
 
         double size = Constants.SunRadius * 1.06;
+        //The scale factor has to be divided by the current font size
+        float textScaleFactor = this.textScale / font.getSize();
+        //Adjust for font size in horizontal and vertical direction (centering the text approximately)
+        float horizontalAdjustment = this.textScale / 2f;
+        float verticalAdjustment = this.textScale / 3f;
 
         renderer.begin3DRendering();
         for (double phi = 0; phi <= 90; phi += getLatstepDegrees()) {
@@ -210,9 +214,9 @@ public class RenderableGrid implements Renderable {
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != 90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             }
         }
         for (double phi = -getLatstepDegrees(); phi >= -90; phi -= getLatstepDegrees()) {
@@ -221,9 +225,9 @@ public class RenderableGrid implements Renderable {
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
+            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != -90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - scale * 0.03f * txt.length() * 20. / font.getSize()), (float) (Math.cos(angle) * size - scale * 0.02f * 20. / font.getSize()), zdist, textScale);
+                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             }
         }
         renderer.end3DRendering();
@@ -242,7 +246,7 @@ public class RenderableGrid implements Renderable {
                 gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();
-                renderer.draw3D(txt, 0, 0, 0, textScale);
+                renderer.draw3D(txt, 0, 0, 0, textScaleFactor);
                 renderer.end3DRendering();
             }
             gl.glPopMatrix();
@@ -261,7 +265,7 @@ public class RenderableGrid implements Renderable {
                 gl.glRotatef((float) theta, 0, 1, 0);
 
                 renderer.begin3DRendering();
-                renderer.draw3D(txt, 0, 0, 0, textScale);
+                renderer.draw3D(txt, 0, 0, 0, textScaleFactor);
                 renderer.end3DRendering();
             }
             gl.glPopMatrix();
