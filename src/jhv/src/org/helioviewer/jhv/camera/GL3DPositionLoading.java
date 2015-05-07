@@ -101,7 +101,7 @@ public class GL3DPositionLoading {
                 } catch (final IOException e1) {
                     report = FAILEDSTATE + ": server problem";
                 } catch (JSONException e2) {
-                    report = FAILEDSTATE + ": json parse problem";
+                    report = FAILEDSTATE + ": JSON parse problem";
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
@@ -175,13 +175,13 @@ public class GL3DPositionLoading {
             this.positionDateTime = positionDateTimehelper;
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
-            Log.warn("Problem Parsing the JSON Response.", e);
+            Log.warn("JSON response parse failure", e);
         } catch (ParseException e) {
             this.fireLoaded(this.PARTIALSTATE);
-            Log.warn("Problem Parsing the date in JSON Response.", e);
+            Log.warn("JSON response parse failure", e);
         } catch (NumberFormatException e) {
             this.fireLoaded(this.PARTIALSTATE);
-            Log.warn("Problem Parsing the date in JSON Response.", e);
+            Log.warn("JSON response parse failure", e);
         }
     }
 
@@ -203,14 +203,6 @@ public class GL3DPositionLoading {
         this.requestData();
     }
 
-    public void setBeginDate(long beginDate, boolean applyChanges) {
-        this.beginDate = this.format.format(new Date(beginDate));
-        this.beginDatems = new Date(beginDate);
-        if (applyChanges) {
-            applyChanges();
-        }
-    }
-
     public void setEndDate(Date endDate, boolean applyChanges) {
         this.endDate = this.format.format(endDate);
         this.endDatems = endDate;
@@ -219,17 +211,8 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void setEndDate(long endDate, boolean applyChanges) {
-        this.endDate = this.format.format(new Date(endDate));
-        this.endDatems = new Date(endDate);
-        if (applyChanges) {
-            applyChanges();
-        }
-    }
-
     public void addListener(GL3DPositionLoadingListener listener) {
         listeners.add(listener);
-
     }
 
     public void fireLoaded(final String state) {
@@ -247,27 +230,27 @@ public class GL3DPositionLoading {
     }
 
     public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
-        if (this.isLoaded && this.positionDateTime.length > 0) {
+        if (this.isLoaded && positionDateTime.length > 0) {
             long t3 = this.getBeginDate().getTime();
             long t4 = this.getEndDate().getTime();
             if (t3 == t4) {
-                double hgln = this.positionDateTime[0].y;
-                double hglt = this.positionDateTime[0].z;
-                double dist = this.positionDateTime[0].x;
+                double hgln = positionDateTime[0].y;
+                double hglt = positionDateTime[0].z;
+                double dist = positionDateTime[0].x;
                 dist *= 1000. / Constants.SunRadiusInMeter;
                 return new GL3DVec3d(dist, hgln, hglt);
             } else {
-                double interpolatedIndex = (1. * (currentCameraTime - t3) / (t4 - t3) * this.positionDateTime.length);
+                double interpolatedIndex = (currentCameraTime - t3) / (double) (t4 - t3) * positionDateTime.length;
                 int i = (int) interpolatedIndex;
-                i = Math.min(i, this.positionDateTime.length - 1);
+                i = Math.min(i, positionDateTime.length - 1);
                 if (i < 0) {
                     i = 0;
                 }
-                int inext = Math.min(i + 1, this.positionDateTime.length - 1);
+                int inext = Math.min(i + 1, positionDateTime.length - 1);
                 double alpha = 1. - interpolatedIndex % 1.;
-                double hgln = alpha * this.positionDateTime[i].y + (1. - alpha) * this.positionDateTime[inext].y;
-                double hglt = alpha * this.positionDateTime[i].z + (1. - alpha) * this.positionDateTime[inext].z;
-                double dist = alpha * this.positionDateTime[i].x + (1. - alpha) * this.positionDateTime[inext].x;
+                double hgln = alpha * positionDateTime[i].y + (1. - alpha) * positionDateTime[inext].y;
+                double hglt = alpha * positionDateTime[i].z + (1. - alpha) * positionDateTime[inext].z;
+                double dist = alpha * positionDateTime[i].x + (1. - alpha) * positionDateTime[inext].x;
                 dist *= 1000. / Constants.SunRadiusInMeter;
                 return new GL3DVec3d(dist, hgln, hglt);
             }

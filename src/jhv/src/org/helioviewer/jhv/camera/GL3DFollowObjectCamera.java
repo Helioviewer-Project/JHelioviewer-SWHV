@@ -62,15 +62,17 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void timeChanged(Date date) {
         if (date != null && this.positionLoading.isLoaded() && !this.getTrackingMode()) {
-            //Layer times
-            long t1 = Displayer.getLayersModel().getFirstDate().getTime();
-            long t2 = Displayer.getLayersModel().getLastDate().getTime();
-            //Camera times
-            long t3 = this.positionLoading.getBeginDate().getTime();
-            long t4 = this.positionLoading.getEndDate().getTime();
 
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
+                // Active layer times
+                AbstractView view = Displayer.getLayersModel().getActiveView();
+                long t1 = Displayer.getLayersModel().getStartDate(view).getTime().getTime();
+                long t2 = Displayer.getLayersModel().getEndDate(view).getTime().getTime();
+                //Camera times
+                long t3 = this.positionLoading.getBeginDate().getTime();
+                long t4 = this.positionLoading.getEndDate().getTime();
+
                 if (t4 != t3) {
                     currentCameraTime = (long) ((t3 + 1. * (t4 - t3) * (dateTime - t1) / (t2 - t1)));
                 } else {
@@ -154,21 +156,17 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        if (!interpolation && view instanceof JHVJPXView) {
-            JHVJPXView jpxView = (JHVJPXView) view;
-            Date beginDate = null, endDate = null;
+        if (!interpolation) {
+            ImmutableDateTime date;
 
-            for (int frame = 0; frame <= jpxView.getMaximumFrameNumber(); frame++) {
-                ImmutableDateTime date = jpxView.getFrameDateTime(frame);
-                if (beginDate == null || date.getTime().getTime() < beginDate.getTime()) {
-                    beginDate = date.getTime();
-                }
-                if (endDate == null || date.getTime().getTime() > endDate.getTime()) {
-                    endDate = date.getTime();
-                }
+            date = Displayer.getLayersModel().getStartDate(view);
+            if (date != null) {
+                positionLoading.setBeginDate(date.getTime(), true);
             }
-            positionLoading.setBeginDate(beginDate, false);
-            positionLoading.setEndDate(endDate, true);
+            date = Displayer.getLayersModel().getEndDate(view);
+            if (date != null) {
+                positionLoading.setEndDate(date.getTime(), true);
+            }
         }
     }
 

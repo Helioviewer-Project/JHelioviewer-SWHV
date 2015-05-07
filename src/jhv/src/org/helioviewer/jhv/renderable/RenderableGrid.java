@@ -82,7 +82,7 @@ public class RenderableGrid implements Renderable {
                 cfontsize = cfontsize < 10 ? 10 : cfontsize;
                 font = font.deriveFont(cfontsize);
 
-                renderer = new TextRenderer(font, true, false);
+                renderer = new TextRenderer(font, true, true);
                 renderer.setUseVertexArrays(true);
                 //renderer.setSmoothing(true);
                 renderer.setColor(Color.WHITE);

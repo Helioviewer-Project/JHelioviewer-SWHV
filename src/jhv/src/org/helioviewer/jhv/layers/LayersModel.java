@@ -91,46 +91,10 @@ public class LayersModel {
 
         if (view instanceof JHVJPXView) {
             result = ((JHVJPXView) view).getFrameDateTime(0);
-        } else {
+        } else if (view != null) {
             result = view.getMetaData().getDateTime();
         }
-
         return result;
-    }
-
-    /**
-     * Return the timestamp of the first available image data of the layer in
-     * question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return timestamp of the first available image data, null if no
-     *         information available
-     */
-    public ImmutableDateTime getStartDate(int idx) {
-        return getStartDate(getLayer(idx));
-    }
-
-    /**
-     * Return the timestamp of the first available image data
-     *
-     * @return timestamp of the first available image data, null if no
-     *         information available
-     */
-    public Date getFirstDate() {
-        ImmutableDateTime earliest = null;
-
-        for (int idx = 0; idx < getNumLayers(); idx++) {
-            ImmutableDateTime start = getStartDate(idx);
-            if (start == null) {
-                continue;
-            }
-
-            if (earliest == null || start.compareTo(earliest) < 0) {
-                earliest = start;
-            }
-        }
-        return earliest == null ? null : earliest.getTime();
     }
 
     /**
@@ -149,10 +113,57 @@ public class LayersModel {
             JHVJPXView tmv = (JHVJPXView) view;
             int lastFrame = tmv.getMaximumFrameNumber();
             result = tmv.getFrameDateTime(lastFrame);
-        } else {
+        } else if (view != null) {
             result = view.getMetaData().getDateTime();
         }
         return result;
+    }
+
+    /**
+     * Return the timestamp of the first available image data of the layer in
+     * question
+     *
+     * @param idx
+     *            - index of the layer in question
+     * @return timestamp of the first available image data, null if no
+     *         information available
+     */
+    public ImmutableDateTime getStartDate(int idx) {
+        return getStartDate(getLayer(idx));
+    }
+
+    /**
+     * Return the timestamp of the last available image data of the layer in
+     * question
+     *
+     * @param idx
+     *            - index of the layer in question
+     * @return timestamp of the last available image data, null if no
+     *         information available
+     */
+    public ImmutableDateTime getEndDate(int idx) {
+        return getEndDate(getLayer(idx));
+    }
+
+    /**
+     * Return the timestamp of the first available image data
+     *
+     * @return timestamp of the first available image data, null if no
+     *         information available
+     */
+    public Date getFirstDate() {
+        ImmutableDateTime earliest = null;
+
+        for (int idx = 0; idx < getNumLayers(); idx++) {
+            ImmutableDateTime start = getStartDate(idx);
+            if (start == null) {
+                continue;
+            }
+            if (earliest == null || start.compareTo(earliest) < 0) {
+                earliest = start;
+            }
+        }
+        return earliest == null ? null : earliest.getTime();
     }
 
     /**
@@ -169,25 +180,11 @@ public class LayersModel {
             if (end == null) {
                 continue;
             }
-
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
         }
         return latest == null ? null : latest.getTime();
-    }
-
-    /**
-     * Return the timestamp of the last available image data of the layer in
-     * question
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return timestamp of the last available image data, null if no
-     *         information available
-     */
-    public ImmutableDateTime getEndDate(int idx) {
-        return getEndDate(getLayer(idx));
     }
 
     /**
