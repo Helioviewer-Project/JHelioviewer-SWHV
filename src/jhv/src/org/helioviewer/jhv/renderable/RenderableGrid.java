@@ -28,7 +28,6 @@ public class RenderableGrid implements Renderable {
 
     private float lonstepDegrees = 13.2f;
     private float latstepDegrees = 20.f;
-    private final float scale = 0.8f;
     private Font font;
     private TextRenderer renderer;
     //The height of the text in solar radii
