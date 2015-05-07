@@ -15,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.JHVGlobals;
 
 /**
  * General connection class which gives to a given URL a proper InputStream with
@@ -132,7 +133,7 @@ public class DownloadStream {
             HttpURLConnection httpC = (HttpURLConnection) connection;
             // get compression if supported
             httpC.setRequestProperty("Accept-Encoding", "gzip, deflate");
-            httpC.setRequestProperty("User-Agent", "JHelioviewer-SWHV");
+            httpC.setRequestProperty("User-Agent", JHVGlobals.getUserAgent());
 
             // Write post data if necessary
             if (output != null) {

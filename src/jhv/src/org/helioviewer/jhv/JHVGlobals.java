@@ -23,19 +23,12 @@ import org.helioviewer.base.logging.Log;
  */
 public class JHVGlobals {
 
-    /** The maximum amount of memory the JVM will use for the heap. */
-    public static final long MAX_JVM_HEAP_SIZE = Runtime.getRuntime().maxMemory();
-
-    /** The the maximum amount of memory the BufferManager object will use. */
-    public static final long MAX_BUFFER_MANAGER_SIZE = (MAX_JVM_HEAP_SIZE * 8) / 10;
-
     private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
     public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
 
-    private static String version = null;
-
-    private static String revision = null;
+    private static String version = "";
+    private static String revision = "";
 
     /** Constructor is private to prevent instantiation. */
     private JHVGlobals() {
@@ -99,7 +92,7 @@ public class JHVGlobals {
      * Returns the version of JHelioviewer as found in the manifest file of the
      * jar archive
      *
-     * @return the version or null if the classes are not within a jar archive
+     * @return the version or empty string if the classes are not within a jar archive
      *         or the manifest does not contain the version
      */
     public static String getJhvVersion() {
@@ -110,11 +103,15 @@ public class JHVGlobals {
      * Returns the revision of JHelioviewer as found in the manifest file of the
      * jar archive
      *
-     * @return the revision or null if the classes are not within a jar archive
+     * @return the revision or empty string if the classes are not within a jar archive
      *         or the manifest does not contain the revision
      */
     public static String getJhvRevision() {
         return revision;
+    }
+
+    public static String getUserAgent() {
+        return "JHV/" + version + "." + revision;
     }
 
     /**
