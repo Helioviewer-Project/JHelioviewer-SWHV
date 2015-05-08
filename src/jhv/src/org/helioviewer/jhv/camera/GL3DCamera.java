@@ -210,7 +210,7 @@ public abstract class GL3DCamera {
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
             hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
-            hitPoint = this.localRotation.rotateInverseVector(hitPoint);
+            hitPoint = this.localRotation.rotateInverseVector(this.currentDragRotation.rotateInverseVector(hitPoint));
             return hitPoint;
         }
         return null;
