@@ -33,7 +33,7 @@ public class SWHVLauncher {
         args2[6] = "SWHVHEKPlugin.jar";
         args2[5] = "--deactivate-plugin";
         args2[6] = "PfssPlugin.jar";
-        JavaHelioViewer.main(args);
+        JavaHelioViewer.main(args2);
 
         EventQueue.invokeLater(new Runnable() {
             @Override
