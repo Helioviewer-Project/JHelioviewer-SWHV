@@ -42,7 +42,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      * Controlled filter by this panel
      */
     private final JSpinner truncateSpinner;
-    private final JLabel truncationLabel;
+    private final JLabel truncateLabel;
     private final JPanel diffPanel = new JPanel();
 
     private JCheckBox diffRot;
@@ -68,15 +68,18 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         showMetaButton.setContentAreaFilled(false);
 
         diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.PAGE_AXIS));
+
+        truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
+
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
-        truncationLabel = new JLabel("Contrast boost:");
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
+
         addRadioButtons();
     }
 
@@ -156,6 +159,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         gc.gridx = 0;
         radPanel.add(diffRot, gc);
         gc.gridx = 1;
+        radPanel.add(truncateLabel, gc);
+        gc.gridx = 2;
         radPanel.add(truncateSpinner, gc);
     }
 
@@ -178,7 +183,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
         downloadLayerAction = new AbstractAction() {
             {
-                putValue(SHORT_DESCRIPTION, "Download the selected layer");
+                putValue(SHORT_DESCRIPTION, "Download selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
             }
 
@@ -190,7 +195,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         downloadLayerButton.setAction(downloadLayerAction);
         showMetaAction = new AbstractAction() {
             {
-                putValue(SHORT_DESCRIPTION, "Show metadata of the selected layer");
+                putValue(SHORT_DESCRIPTION, "Show metadata of selected layer");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
             }
 
