@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
 public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
@@ -17,6 +18,7 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
         label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
         label.setText("");
         label.setToolTipText("Click to remove");
+        label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
         return label;
     }
 }
