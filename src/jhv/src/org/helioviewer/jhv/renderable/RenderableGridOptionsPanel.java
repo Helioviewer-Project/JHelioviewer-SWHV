@@ -1,9 +1,10 @@
 package org.helioviewer.jhv.renderable;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,9 +24,18 @@ public class RenderableGridOptionsPanel extends JPanel {
     RenderableGrid grid;
 
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        setLayout(gridBagLayout);
+
+        GridBagConstraints c0 = new GridBagConstraints();
+        c0.anchor = GridBagConstraints.EAST;
+        c0.insets = new Insets(0, 0, 0, 0);
+        c0.weightx = 1.;
+        c0.weighty = 1.;
+        c0.gridx = 0;
+        c0.gridy = 0;
         grid = renderableGrid;
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        add(new JLabel("Longitude "));
+        add(new JLabel("Longitude "), c0);
         createGridResolutionX(renderableGrid);
         createGridResolutionY(renderableGrid);
 
@@ -34,16 +44,23 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
         fx.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
-        add(gridResolutionXSpinner);
-        add(Box.createRigidArea(new Dimension(5, 0)));
-        add(new JLabel("Latitude "));
+        c0.anchor = GridBagConstraints.WEST;
+        c0.gridx = 1;
+
+        add(gridResolutionXSpinner, c0);
+        c0.anchor = GridBagConstraints.EAST;
+        c0.gridx = 2;
+
+        add(new JLabel("Latitude "), c0);
         gridResolutionYSpinner.setMinimumSize(new Dimension(42, 20));
         gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
         fy.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
-        add(gridResolutionYSpinner);
-        add(Box.createHorizontalGlue());
+        c0.anchor = GridBagConstraints.WEST;
+        c0.gridx = 3;
+
+        add(gridResolutionYSpinner, c0);
     }
 
     public void createGridResolutionX(RenderableGrid renderableGrid) {
