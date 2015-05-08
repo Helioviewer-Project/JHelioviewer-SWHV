@@ -131,7 +131,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the current URL extended with the event type
      */
     private StringBuilder appendEventType(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbriviation());
+        return baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation());
     }
 
     /**

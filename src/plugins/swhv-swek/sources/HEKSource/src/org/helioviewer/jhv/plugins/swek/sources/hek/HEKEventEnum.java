@@ -39,7 +39,7 @@ public enum HEKEventEnum {
      * 
      * @return the abbreviation
      */
-    public String getAbbriviation() {
+    public String getAbbreviation() {
         return eventAbbreviation;
     }
 
