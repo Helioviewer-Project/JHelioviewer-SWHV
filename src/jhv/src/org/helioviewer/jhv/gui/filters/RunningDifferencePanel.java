@@ -169,7 +169,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
         jp2view.setTruncation(1 - value);
         Displayer.display();
-
     }
 
     public void setEnabled(boolean enabled) {

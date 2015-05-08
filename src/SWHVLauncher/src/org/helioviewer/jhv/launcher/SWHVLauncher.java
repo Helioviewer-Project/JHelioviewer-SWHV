@@ -18,9 +18,9 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
 public class SWHVLauncher {
 
     public static void main(String[] args) {
-        System.out.println("================================================================");
-        System.out.println("JHelioviewer developer version with external plugin compiled-in.");
-        System.out.println("================================================================\n\n");
+        System.out.println("=================================================================");
+        System.out.println("JHelioviewer developer version with external plugins compiled-in.");
+        System.out.println("=================================================================\n\n");
 
         String[] args2 = new String[7];
 
@@ -41,7 +41,7 @@ public class SWHVLauncher {
                 PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
                 PluginManager.getSingletonInstance().addPlugin(SWEKPlugin.class.getClassLoader(), new SWEKPlugin(false), null);
                 PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
-                PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new PfssPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(PfssPlugin.class.getClassLoader(), new PfssPlugin(), null);
             }
         });
     }
