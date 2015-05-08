@@ -36,7 +36,7 @@ public class GL3DPositionLoading {
 
     private boolean isLoaded = false;
     private URL url;
-    private JSONArray jsonResult;
+    private JSONObject jsonResult;
     private GL3DPositionDateTime[] positionDateTime;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private String beginDate = "2014-05-28T00:00:00";
@@ -82,21 +82,21 @@ public class GL3DPositionLoading {
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
-                        jsonResult = new JSONArray(new JSONTokener(reader));
+                        jsonResult = new JSONObject(new JSONTokener(reader));
                     } else {
                         JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                         if (jsonObject.has("faultstring")) {
                             String faultstring = jsonObject.getString("faultstring");
                             report = faultstring;
                         } else {
-                            report = "Invalid network response.";
+                            report = "Invalid network response";
                         }
                     }
                 } catch (UnknownHostException e) {
                     Log.debug("Unknown host, network down?", e);
-                } catch (final IOException e1) {
+                } catch (IOException e) {
                     report = FAILEDSTATE + ": server problem";
-                } catch (JSONException e2) {
+                } catch (JSONException e) {
                     report = FAILEDSTATE + ": JSON parse problem";
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
@@ -142,25 +142,26 @@ public class GL3DPositionLoading {
     private void parseData() {
         try {
             GregorianCalendar calendar = new GregorianCalendar();
-            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[jsonResult.length()];
+            JSONArray resArray = jsonResult.getJSONArray("result");
+            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[resArray.length()];
 
-            for (int j = 0; j < jsonResult.length(); j++) {
-                JSONObject positionObject = jsonResult.getJSONObject(j);
-                Iterator<String> iteratorKeys = positionObject.keys();
-                if (!iteratorKeys.hasNext())
-                    continue;
+            for (int j = 0; j < resArray.length(); j++) {
+                JSONObject posObject = resArray.getJSONObject(j);
+                Iterator<String> iterKeys = posObject.keys();
+                if (!iterKeys.hasNext())
+                    throw new JSONException("unexpected format");
 
-                String dateString = iteratorKeys.next();
-                JSONArray positionArray = positionObject.getJSONArray(dateString);
+                String dateString = iterKeys.next();
+                JSONArray posArray = posObject.getJSONArray(dateString);
 
                 Date date = format.parse(dateString);
                 calendar.setTime(date);
 
                 double x, y, z, jy;
-                x = positionArray.getDouble(0);
-                jy = positionArray.getDouble(1);
+                x = posArray.getDouble(0);
+                jy = posArray.getDouble(1);
                 y = jy + (jy > 0 ? -Math.PI : Math.PI);
-                z = -positionArray.getDouble(2);
+                z = -posArray.getDouble(2);
 
                 positionDateTimehelper[j] = new GL3DPositionDateTime(calendar.getTimeInMillis(), x, y, z);
             }
