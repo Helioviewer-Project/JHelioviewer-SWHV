@@ -27,7 +27,6 @@ public class LineColorOptionPanel extends JPanel {
         // setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
         c.gridy = 0;
