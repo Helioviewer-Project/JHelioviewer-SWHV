@@ -136,7 +136,7 @@ public class NoDataConfig {
             // drawableAreaMap.toString());
             int spaceWidth = drawableAreaMap.getDestinationX1() - drawableAreaMap.getDestinationX0();
             int spaceHeight = drawableAreaMap.getDestinationY1() - drawableAreaMap.getDestinationY0();
-            g.setColor(new Color(247, 62, 62));
+            g.setColor(Color.GRAY);
             g.fillRect(drawableAreaMap.getDestinationX0(), drawableAreaMap.getDestinationY0(), spaceWidth, spaceHeight);
             g.setColor(Color.white);
             String text = "No data available";
