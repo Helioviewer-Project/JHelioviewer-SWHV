@@ -49,10 +49,24 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private final static String[] combolist = { "No differences", "Running difference", "Base difference" };
     private Action downloadLayerAction;
     private Action showMetaAction;
-    private final JButton downloadLayerButton = new JButton();
-    private final JButton showMetaButton = new JButton();
+    private final JButton downloadLayerButton;
+    private final JButton showMetaButton;
 
     public RunningDifferencePanel() {
+        downloadLayerButton = new JButton();
+        downloadLayerButton.setBorder(null);
+        downloadLayerButton.setText(null);
+        downloadLayerButton.setBorderPainted(false);
+        downloadLayerButton.setFocusPainted(false);
+        downloadLayerButton.setContentAreaFilled(false);
+
+        showMetaButton = new JButton();
+        showMetaButton.setBorder(null);
+        showMetaButton.setText(null);
+        showMetaButton.setBorderPainted(false);
+        showMetaButton.setFocusPainted(false);
+        showMetaButton.setContentAreaFilled(false);
+
         diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.PAGE_AXIS));
         truncateSpinner = new JSpinner();
         truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
@@ -86,7 +100,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         c.gridx = 0;
         topPanel.add(comboBox, c);
         c.gridx = 1;
-        c.weightx = 0.1;
+        c.weightx = 0;
         topPanel.add(downloadLayerButton, c);
         c.gridx = 2;
         topPanel.add(showMetaButton, c);
@@ -94,6 +108,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         c.gridy = 1;
         c.gridx = 0;
         c.gridwidth = 3;
+
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

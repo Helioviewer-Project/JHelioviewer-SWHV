@@ -20,13 +20,13 @@ import org.helioviewer.viewmodel.view.AbstractView;
  */
 public class FiltersPanel extends JPanel {
 
-    private static RunningDifferencePanel runningDifferencePanel;
-    private static OpacityPanel opacityPanel;
-    private static ChannelMixerPanel channelMixerPanel;
-    private static SOHOLUTPanel lutPanel;
-    private static GammaCorrectionPanel gammaCorrectionPanel;
-    private static ContrastPanel contrastPanel;
-    private static SharpenPanel sharpenPanel;
+    private final RunningDifferencePanel runningDifferencePanel;
+    private final OpacityPanel opacityPanel;
+    private final ChannelMixerPanel channelMixerPanel;
+    private final SOHOLUTPanel lutPanel;
+    private final GammaCorrectionPanel gammaCorrectionPanel;
+    private final ContrastPanel contrastPanel;
+    private final SharpenPanel sharpenPanel;
 
     @Override
     public void setEnabled(boolean enabled) {

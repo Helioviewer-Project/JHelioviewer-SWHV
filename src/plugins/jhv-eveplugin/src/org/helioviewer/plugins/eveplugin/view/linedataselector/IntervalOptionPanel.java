@@ -2,18 +2,19 @@ package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.border.BevelBorder;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.display.Displayer;
@@ -28,9 +29,8 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener, LineDataSelectorModelListener {
 
-    private final JComboBox zoomComboBox = new JComboBox(new DefaultComboBoxModel());
-    private final ImageIcon movietimeIcon = IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME);
-    private final JToggleButton periodFromLayersButton = new JToggleButton(movietimeIcon);
+    private final JComboBox zoomComboBox;
+    private final JToggleButton periodFromLayersButton;
     private boolean setDefaultPeriod = true;
     private boolean selectedIndexSetByProgram;
     private Interval<Date> selectedIntervalByZoombox = null;
@@ -45,23 +45,20 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        initVisualComponents();
-    }
 
-    private void initVisualComponents() {
+        zoomComboBox = new JComboBox(new DefaultComboBoxModel());
         fillZoomComboBox();
         zoomComboBox.addActionListener(this);
         zoomComboBox.setEnabled(false);
 
+        periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
         periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
-        periodFromLayersButton.setPreferredSize(new Dimension(movietimeIcon.getIconWidth() + 14, periodFromLayersButton.getPreferredSize().height));
+        periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         periodFromLayersButton.addActionListener(this);
-        periodFromLayersButton.setMargin(new Insets(0, 0, 0, 0));
         setEnabledStateOfPeriodMovieButton();
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
-
         add(periodFromLayersButton);
     }
 
@@ -71,7 +68,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
             if (periodFromLayersButton.isSelected()) {
                 setDateRange();
-            }
+                periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            } else
+                periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         } else if (e.getSource().equals(zoomComboBox)) {
             final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
