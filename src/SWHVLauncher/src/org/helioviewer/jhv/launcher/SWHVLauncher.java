@@ -3,6 +3,7 @@ package org.helioviewer.jhv.launcher;
 import java.awt.EventQueue;
 
 import org.helioviewer.jhv.JavaHelioViewer;
+import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
 import org.helioviewer.plugins.eveplugin.EVEPlugin;
@@ -30,7 +31,8 @@ public class SWHVLauncher {
         args2[4] = "EVEPlugin.jar";
         args2[5] = "--deactivate-plugin";
         args2[6] = "SWHVHEKPlugin.jar";
-
+        args2[5] = "--deactivate-plugin";
+        args2[6] = "PfssPlugin.jar";
         JavaHelioViewer.main(args);
 
         EventQueue.invokeLater(new Runnable() {
@@ -39,6 +41,7 @@ public class SWHVLauncher {
                 PluginManager.getSingletonInstance().addPlugin(EVEPlugin.class.getClassLoader(), new EVEPlugin(), null);
                 PluginManager.getSingletonInstance().addPlugin(SWEKPlugin.class.getClassLoader(), new SWEKPlugin(false), null);
                 PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new SWHVHEKPlugin(), null);
+                PluginManager.getSingletonInstance().addPlugin(SWHVHEKPlugin.class.getClassLoader(), new PfssPlugin(), null);
             }
         });
     }
