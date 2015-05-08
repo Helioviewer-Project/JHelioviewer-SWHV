@@ -1,19 +1,23 @@
 package org.helioviewer.jhv;
 
 import java.awt.Component;
+import java.awt.Font;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
@@ -159,8 +163,13 @@ public class Settings {
      *            name of the lookandfeel.
      */
     public void setLookAndFeelEverywhere(Component c, String lookAndFeel) {
-        if (lookAndFeel == null)
+        if (lookAndFeel == null) {
            lookAndFeel = getProperty("display.laf");
+           if (lookAndFeel == null) {
+                lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+                setProperty("display.laf", lookAndFeel);
+           }
+        }
 
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
             try {
@@ -172,6 +181,21 @@ public class Settings {
             }
         }
 
+        UIGlobals.getSingletonInstance(); // initialize
+        setUIFont(UIGlobals.UIFont);
+        // ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+        // JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    }
+
+    private static void setUIFont(Font font) {
+        FontUIResource f = new FontUIResource(font);
+        Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value != null && value instanceof FontUIResource)
+                UIManager.put(key, f);
+        }
     }
 
     /**
