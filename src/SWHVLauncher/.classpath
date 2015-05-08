@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/swhv-swek"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/swhvhekplugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EVEPlugin"/>
+	<classpathentry kind="src" path="/jhv-3d-plugin-pfss"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
