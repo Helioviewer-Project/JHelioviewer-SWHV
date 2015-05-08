@@ -4,6 +4,7 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -12,6 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 public class RenderableGridOptionsPanel extends JPanel {
@@ -23,20 +25,23 @@ public class RenderableGridOptionsPanel extends JPanel {
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
         grid = renderableGrid;
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        add(new JLabel("Grid "));
+        add(new JLabel("Longitude "));
         createGridResolutionX(renderableGrid);
         createGridResolutionY(renderableGrid);
 
         gridResolutionXSpinner.setMinimumSize(new Dimension(42, 20));
         gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
-
+        JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
+        fx.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
         add(gridResolutionXSpinner);
         add(Box.createRigidArea(new Dimension(5, 0)));
+        add(new JLabel("Latitude "));
         gridResolutionYSpinner.setMinimumSize(new Dimension(42, 20));
         gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
-
+        JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
+        fy.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
         add(gridResolutionYSpinner);
         add(Box.createHorizontalGlue());
     }
