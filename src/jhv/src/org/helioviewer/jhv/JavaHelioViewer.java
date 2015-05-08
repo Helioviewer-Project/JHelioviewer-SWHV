@@ -1,18 +1,13 @@
 package org.helioviewer.jhv;
 
 import java.awt.EventQueue;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import javax.swing.plaf.FontUIResource;
-import javax.swing.UIManager;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
@@ -77,20 +72,11 @@ public class JavaHelioViewer {
         JHVGlobals.determineVersionAndRevision();
 
         Log.info("Initializing JHelioviewer");
-
         // Load settings from file but do not apply them yet
         // The settings must not be applied before the kakadu engine has been
         // initialized
         Log.info("Load settings");
         Settings.getSingletonInstance().load();
-
-        // If the user has not specified any desired look and feel yet, the
-        // system default theme will be used
-        if (Settings.getSingletonInstance().getProperty("display.laf") == null || Settings.getSingletonInstance().getProperty("display.laf").length() <= 0) {
-            Log.info("Use default look and feel");
-            Settings.getSingletonInstance().setProperty("display.laf", UIManager.getSystemLookAndFeelClassName());
-        }
-        Settings.getSingletonInstance().save();
 
         // Set the platform system properties
         SystemProperties.setPlatform();
@@ -116,7 +102,6 @@ public class JavaHelioViewer {
         // Apply settings after kakadu engine has been initialized
         Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
-
         Settings.getSingletonInstance().update();
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
 
@@ -126,9 +111,6 @@ public class JavaHelioViewer {
                 @Override
                 public void run() {
                     Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
-                    UIGlobals.getSingletonInstance(); // initialize
-                    setUIFont(new FontUIResource(UIGlobals.UIFont));
-
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.getSingletonInstance().loadAtStart();
                 }
@@ -150,16 +132,6 @@ public class JavaHelioViewer {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void setUIFont(FontUIResource f) {
-        Enumeration keys = UIManager.getDefaults().keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            Object value = UIManager.get(key);
-            if (value != null && value instanceof FontUIResource)
-                UIManager.put(key, f);
         }
     }
 
