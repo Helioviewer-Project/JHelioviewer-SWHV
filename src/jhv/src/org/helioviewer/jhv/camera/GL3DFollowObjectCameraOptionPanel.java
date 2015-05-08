@@ -71,7 +71,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(new JSeparator(SwingConstants.HORIZONTAL));
 
         addObjectCombobox();
-        exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
+        exactDateCheckBox = new JCheckBox("Use selected layer timestamps", true);
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.add(exactDateCheckBox);
         add(checkboxPanel);
@@ -100,7 +100,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     public void addSyncButtons() {
         this.synchronizeWithLayersButton = new JButton("Sync");
-        this.synchronizeWithLayersButton.setToolTipText("Fill the dates based on the current active layer.");
+        this.synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         this.synchronizeWithLayersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +108,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             }
         });
         this.synchronizeWithNowButton = new JButton("Now");
-        this.synchronizeWithNowButton.setToolTipText("Fill twice now.");
+        this.synchronizeWithNowButton.setToolTipText("Fill twice current time");
         this.synchronizeWithNowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,7 +116,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             }
         });
         this.synchronizeWithCurrentButton = new JButton("Current");
-        this.synchronizeWithCurrentButton.setToolTipText("Fill twice current layer time.");
+        this.synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
         this.synchronizeWithCurrentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
