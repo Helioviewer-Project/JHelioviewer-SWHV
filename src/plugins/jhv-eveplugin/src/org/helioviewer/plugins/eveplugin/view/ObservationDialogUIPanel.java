@@ -126,19 +126,19 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * private boolean isStartDateBeforeOrEqualEndDate() { final
      * GregorianCalendar calendar = new GregorianCalendar();
      * calendar.setTime(getStartDate());
-     * 
+     *
      * final GregorianCalendar calendar2 = new
      * GregorianCalendar(calendar.get(Calendar.YEAR),
      * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
      * long start = calendar2.getTimeInMillis();
-     * 
+     *
      * calendar.clear(); calendar2.clear();
-     * 
+     *
      * calendar.setTime(getEndDate());
      * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
      * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
      * calendar2.getTimeInMillis();
-     * 
+     *
      * return start <= end; }
      */
 
@@ -158,7 +158,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         if (yAxisElements.size() >= 2) {
             boolean present = false;
             for (YAxisElement el : yAxisElements) {
-                if (el.getOriginalLabel().equals(bandType.getLabel())) {
+                if (el.getOriginalLabel().equals(bandType.getUnitLabel())) {
                     present = true;
                     break;
                 }
