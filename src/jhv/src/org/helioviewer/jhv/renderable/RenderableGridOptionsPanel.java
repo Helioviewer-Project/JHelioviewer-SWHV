@@ -35,7 +35,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.gridx = 0;
         c0.gridy = 0;
         grid = renderableGrid;
-        add(new JLabel("Longitude "), c0);
+        add(new JLabel("Longitude", JLabel.RIGHT), c0);
         createGridResolutionX(renderableGrid);
         createGridResolutionY(renderableGrid);
 
@@ -51,7 +51,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         c0.gridx = 2;
 
-        add(new JLabel("Latitude "), c0);
+        add(new JLabel("Latitude", JLabel.RIGHT), c0);
         gridResolutionYSpinner.setMinimumSize(new Dimension(42, 20));
         gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));

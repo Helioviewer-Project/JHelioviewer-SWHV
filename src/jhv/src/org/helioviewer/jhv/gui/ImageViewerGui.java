@@ -22,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
@@ -180,7 +181,7 @@ public class ImageViewerGui {
     }
 
     private static JFrame createMainFrame() {
-        JFrame frame = new JFrame("ESA JHelioviewer SWHV");
+        JFrame frame = new JFrame(JHVGlobals.getProgramName());
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {

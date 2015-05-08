@@ -6,6 +6,7 @@ import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
 
 public class DegreeFormatterFactory extends AbstractFormatterFactory {
+
     private final String format;
 
     public DegreeFormatterFactory(String format) {
@@ -35,4 +36,5 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
             }
         };
     }
+
 }
