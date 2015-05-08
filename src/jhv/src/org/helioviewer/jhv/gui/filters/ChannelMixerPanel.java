@@ -33,17 +33,17 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
         boxPanel = new JPanel(new GridLayout(1, 3));
 
         redCheckBox = new JCheckBox("Red", true);
-        redCheckBox.setToolTipText("Unchecked to omit the red color channel when drawing this layer");
+        redCheckBox.setToolTipText("Toggle red channel");
         redCheckBox.addItemListener(this);
         boxPanel.add(redCheckBox, BorderLayout.WEST);
 
         greenCheckBox = new JCheckBox("Green", true);
-        greenCheckBox.setToolTipText("Unchecked to omit the green color channel when drawing this layer");
+        greenCheckBox.setToolTipText("Toggle green channel");
         greenCheckBox.addItemListener(this);
         boxPanel.add(greenCheckBox, BorderLayout.CENTER);
 
         blueCheckBox = new JCheckBox("Blue", true);
-        blueCheckBox.setToolTipText("Unchecked to omit the blue color channel when drawing this layer");
+        blueCheckBox.setToolTipText("Toggle blue channel");
         blueCheckBox.addItemListener(this);
         boxPanel.add(blueCheckBox, BorderLayout.EAST);
     }
