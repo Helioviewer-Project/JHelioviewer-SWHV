@@ -286,12 +286,10 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
     /**
      * {@inheritDoc}
      */
+    /* accessed from reader thread */
     @Override
     public boolean isMoviePlaying() {
-        if (render != null) {
-            return render.isMovieMode() || (this != linkedMovieManager.getMasterMovie() && linkedMovieManager.isPlaying());
-        }
-        return false;
+        return render != null && render.isMovieMode();
     }
 
     /**

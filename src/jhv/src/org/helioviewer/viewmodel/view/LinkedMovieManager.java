@@ -33,7 +33,6 @@ public class LinkedMovieManager {
 
     private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
     private TimedMovieView masterView;
-    private final Object lock = new Object();
 
     /**
      * Adds the given movie view to the set of linked movies.
@@ -87,17 +86,6 @@ public class LinkedMovieManager {
      */
     public TimedMovieView getMasterMovie() {
         return masterView;
-    }
-
-    /**
-     * Returns whether the set of linked movies is playing.
-     *
-     * @return True if the set of linked movies is playing, false otherwise.
-     */
-    public boolean isPlaying() {
-        synchronized (lock) {
-            return masterView != null && masterView.isMoviePlaying();
-        }
     }
 
     /**
