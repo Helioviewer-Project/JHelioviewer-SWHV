@@ -2,9 +2,8 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.net.URL;
 
-import org.helioviewer.gl3d.plugin.pfss.PfssRenderable;
-import org.helioviewer.gl3d.plugin.pfss.data.PfssCache;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
 import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
