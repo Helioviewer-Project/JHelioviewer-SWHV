@@ -347,7 +347,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param frame
      *            the number of the frame
      */
-    public void jumpToFrameNumber(int frame) {
+    private void jumpToFrameNumber(int frame) {
         frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
         view.setCurrentFrame(frame);
@@ -356,11 +356,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Toggles between playing and not playing the animation.
      */
-    public void togglePlayPause() {
+    private void togglePlayPause() {
         setPlaying(!isPlaying, false);
     }
 
-    public void setPlaying(boolean playing, boolean onlyGUI) {
+    private void setPlaying(boolean playing, boolean onlyGUI) {
         isPlaying = playing;
 
         if (!isPlaying) {
@@ -538,6 +538,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void remove() {
         moviePanelManager.unlinkMoviePanel(this);
         panelList.remove(this);
+    }
+
+    public void playStateChanged(boolean playing) {
+        if (playing != isPlaying && !moviePanelManager.someoneIsDragging) {
+            setPlaying(playing, true);
+        }
     }
 
     @Override
