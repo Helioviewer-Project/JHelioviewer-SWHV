@@ -7,7 +7,6 @@ import java.net.SocketException;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
@@ -335,7 +334,7 @@ class J2KReader implements Runnable {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
                             } else if (!((MovieView) parentViewRef).isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                            } else if (parentViewRef.getMetaData() instanceof HelioviewerMetaData && parentViewRef instanceof MovieView && ((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() < num_layers - 1) {
+                            } else if (((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
                             } else {
                                 strategy = CacheStrategy.ALLFRAMESEQUALLY;
