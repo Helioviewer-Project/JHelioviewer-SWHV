@@ -5,7 +5,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
@@ -28,7 +28,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  *
  * @author Markus Langenberg
  */
-public class JHVJPXView extends JHVJP2View implements TimedMovieView {
+public class JHVJPXView extends JHVJP2View implements MovieView {
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;
@@ -378,12 +378,6 @@ public class JHVJPXView extends JHVJP2View implements TimedMovieView {
     @Override
     public boolean isReuseBuffer() {
         return render.isReuseBuffer();
-    }
-
-    @Override
-    public long getCurrentDateMillis() {
-        HelioviewerMetaData metadata = (HelioviewerMetaData) jp2Image.metaDataList[getCurrentFrameNumber()];
-        return metadata.getDateTime().getMillis();
     }
 
     @Override

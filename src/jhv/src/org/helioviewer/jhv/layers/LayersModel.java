@@ -17,8 +17,6 @@ import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -310,8 +308,6 @@ public class LayersModel {
     }
 
     public void addLayer(AbstractView view) {
-        movieManager.pauseLinkedMovies();
-
         RenderableImageLayer imageLayer = new RenderableImageLayer("", view);
         view.setImageLayer(imageLayer);
         layers.add(view);
@@ -427,12 +423,6 @@ public class LayersModel {
     public void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
     }
-
-    public LinkedList<TimedMovieView> getLayers() {
-        return null;
-    }
-
-    private final LinkedMovieManager movieManager = LinkedMovieManager.getSingletonInstance();
 
     private final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
 
