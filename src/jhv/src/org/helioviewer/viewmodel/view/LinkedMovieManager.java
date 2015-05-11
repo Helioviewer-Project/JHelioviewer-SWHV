@@ -80,15 +80,6 @@ public class LinkedMovieManager {
     }
 
     /**
-     * Returns the current master movie
-     *
-     * @return current master movie
-     */
-    public TimedMovieView getMasterMovie() {
-        return masterView;
-    }
-
-    /**
      * Plays the set of linked movies.
      */
     public void playLinkedMovies() {

@@ -14,8 +14,6 @@ import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
 
 import com.jogamp.opengl.GL2;
 
@@ -46,10 +44,12 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void render(GL2 gl) {
-        if (isVisible) {
+        AbstractView view;
+        if (isVisible && (view = Displayer.getLayersModel().getActiveView()) != null) {
             PfssData pfssData;
-            TimedMovieView movie = LinkedMovieManager.getSingletonInstance().getMasterMovie();
-            if (movie != null && (pfssData = PfssPlugin.getPfsscache().getData(movie.getCurrentDateMillis())) != null) {
+
+            long millis = view.getMetaData().getDateTime().getMillis();
+            if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 pfssData.setInit(false);
                 pfssData.init(gl);
                 if (pfssData.isInit()) {
