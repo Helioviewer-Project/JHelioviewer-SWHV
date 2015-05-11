@@ -16,6 +16,8 @@ import java.util.TimeZone;
  */
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
+    public static final ImmutableDateTime epochDateTime = parseDateTime("2000-01-01T00:00:00");
+
     /** Default DateFormat used to format the date. */
     protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
