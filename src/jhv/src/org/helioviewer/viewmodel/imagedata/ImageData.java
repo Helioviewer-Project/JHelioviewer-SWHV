@@ -6,7 +6,6 @@ import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Basic representation of an image handled by the view chain.
@@ -46,28 +45,10 @@ public interface ImageData {
      * @return object containing informations about the image format
      */
     public ImageFormat getImageFormat();
-    /**
-     * Returns the color mask which should be used when drawing the image.
-     *
-     * @return the color mask which should be used when drawing the image.
-     */
-    public ColorMask getColorMask();
-
-    public long getDateMillis();
-
-    public void setDateMillis(long dateMillis);
 
     public void setFrameNumber(int framenumber);
 
     public int getFrameNumber();
-
-    public void setZoomPercent(double percent);
-
-    public double getZoomPercent();
-
-    public void setSubImage(SubImage subImage);
-
-    public SubImage getSubImage();
 
     public Region getRegion();
 
@@ -76,10 +57,6 @@ public interface ImageData {
     public MetaData getMETADATA();
 
     public void setMETADATA(MetaData r);
-
-    boolean getFullyLoaded();
-
-    void setFullyLoaded(boolean fullyLoaded);
 
     public BufferedImage getBufferedImage();
 

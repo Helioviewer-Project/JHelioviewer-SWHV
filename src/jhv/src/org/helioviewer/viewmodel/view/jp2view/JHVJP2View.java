@@ -633,9 +633,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
             newImageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
-            newImageData.setDateMillis(hvmd.getDateTime().getMillis());
         }
-        newImageData.setFullyLoaded(fullyLoaded);
 
         if (imageData != null && compositionLayer == imageData.getFrameNumber() + 1) {
             previousImageData = imageData;
