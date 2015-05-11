@@ -540,12 +540,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         panelList.remove(this);
     }
 
-    public void playStateChanged(boolean playing) {
-        if (playing != isPlaying && !moviePanelManager.someoneIsDragging) {
-            setPlaying(playing, true);
-        }
-    }
-
     @Override
     public void UIviewChanged(View sender, ChangeEvent aEvent) {
         CacheStatusChangedReason cacheReason = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
