@@ -45,11 +45,9 @@ public class ARGBInt32ImageData extends AbstractImageData {
      *            height of the image
      * @param newPixelData
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, int[] newPixelData, ColorMask newColorMask) {
-        super(newWidth, newHeight, newColorMask);
+    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, int[] newPixelData) {
+        super(newWidth, newHeight);
         format.setSingleChannel(true);
         imageTransport = new Int32ImageTransport(newPixelData);
     }
@@ -84,11 +82,9 @@ public class ARGBInt32ImageData extends AbstractImageData {
      * 
      * @param newImage
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public ARGBInt32ImageData(BufferedImage newImage, ColorMask newColorMask) {
-        super(newImage.getWidth(), newImage.getHeight(), newColorMask);
+    public ARGBInt32ImageData(BufferedImage newImage) {
+        super(newImage.getWidth(), newImage.getHeight());
         readImageTransportFromBufferedImage(newImage);
     }
 

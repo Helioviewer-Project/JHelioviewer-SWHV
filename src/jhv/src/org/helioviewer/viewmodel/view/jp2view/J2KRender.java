@@ -11,7 +11,6 @@ import kdu_jni.Kdu_region_compositor;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -449,7 +448,7 @@ class J2KRender implements Runnable {
 
                 if (parentImageRef.getNumComponents() < 2) {
                     if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer], new ColorMask());
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
@@ -461,7 +460,7 @@ class J2KRender implements Runnable {
                             singleChannel = true;
                         }
 
-                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer], new ColorMask());
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
                         parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");

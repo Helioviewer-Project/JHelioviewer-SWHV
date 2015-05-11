@@ -39,11 +39,9 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
      *            height of the image
      * @param newPixelData
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public SingleChannelByte8ImageData(int newWidth, int newHeight, byte[] newPixelData, ColorMask newColorMask) {
-        super(newWidth, newHeight, newColorMask);
+    public SingleChannelByte8ImageData(int newWidth, int newHeight, byte[] newPixelData) {
+        super(newWidth, newHeight);
         imageTransport = new Byte8ImageTransport(newPixelData);
     }
 
@@ -77,11 +75,9 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
      * 
      * @param newImage
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public SingleChannelByte8ImageData(BufferedImage newImage, ColorMask newColorMask) {
-        super(newImage.getWidth(), newImage.getHeight(), newColorMask);
+    public SingleChannelByte8ImageData(BufferedImage newImage) {
+        super(newImage.getWidth(), newImage.getHeight());
         image = newImage;
         imageTransport = new Byte8ImageTransport(((DataBufferByte) newImage.getRaster().getDataBuffer()).getData());
     }
