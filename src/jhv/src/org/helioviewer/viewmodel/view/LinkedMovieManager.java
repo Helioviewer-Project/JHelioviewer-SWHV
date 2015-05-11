@@ -31,8 +31,8 @@ public class LinkedMovieManager {
     private LinkedMovieManager() {
     }
 
-    private final LinkedList<TimedMovieView> linkedMovies = new LinkedList<TimedMovieView>();
-    private TimedMovieView masterView;
+    private final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
+    private MovieView masterView;
 
     /**
      * Adds the given movie view to the set of linked movies.
@@ -40,7 +40,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to add to the set of linked movies.
      */
-    public void linkMovie(TimedMovieView movieView) {
+    public void linkMovie(MovieView movieView) {
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
             updateMaster();
@@ -53,7 +53,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to remove from the set of linked movies.
      */
-    public void unlinkMovie(TimedMovieView movieView) {
+    public void unlinkMovie(MovieView movieView) {
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
             updateMaster();
@@ -71,7 +71,7 @@ public class LinkedMovieManager {
      *            View to test
      * @return True if the given view is the master view, false otherwise.
      */
-    public boolean isMaster(TimedMovieView movieView) {
+    public boolean isMaster(MovieView movieView) {
         if (movieView == null) {
             return false;
         } else {
@@ -104,7 +104,7 @@ public class LinkedMovieManager {
             return;
 
         ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
-        for (TimedMovieView movieView : linkedMovies) {
+        for (MovieView movieView : linkedMovies) {
             if (movieView != masterView) {
                 movieView.setCurrentFrame(masterTime);
             }
@@ -121,7 +121,7 @@ public class LinkedMovieManager {
      *            render signal regardless whether the frame changed
      */
     public void setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
-        for (TimedMovieView movieView : linkedMovies) {
+        for (MovieView movieView : linkedMovies) {
             movieView.setCurrentFrame(dateTime, forceSignal);
         }
     }
@@ -144,9 +144,9 @@ public class LinkedMovieManager {
         }
 
         long minimalInterval = Long.MAX_VALUE;
-        TimedMovieView minimalIntervalView = null;
+        MovieView minimalIntervalView = null;
 
-        for (TimedMovieView movie : linkedMovies) {
+        for (MovieView movie : linkedMovies) {
             int lastAvailableFrame = movie.getMaximumFrameNumber();
             long interval = movie.getFrameDateTime(lastAvailableFrame).getMillis() - movie.getFrameDateTime(0).getMillis();
             interval /= (lastAvailableFrame + 1);
