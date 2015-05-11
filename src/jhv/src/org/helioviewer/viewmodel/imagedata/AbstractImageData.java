@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Abstract ImageData object to provide some common functionalities.
@@ -19,15 +18,11 @@ public abstract class AbstractImageData implements ImageData {
     protected int width, height;
     protected BufferedImage image = null;
     protected ColorMask colorMask;
-    private long dateMillis;
 
     private Region region;
-    private SubImage subImage;
     private MetaData metadata;
 
     private int frameNumber;
-    private double zoomPercent;
-    private boolean fullyLoaded;
 
     /**
      * Default constructor.
@@ -79,14 +74,6 @@ public abstract class AbstractImageData implements ImageData {
      * {@inheritDoc}
      */
     @Override
-    public ColorMask getColorMask() {
-        return colorMask;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public BufferedImage getBufferedImage() {
         if (image == null) {
             image = createBufferedImageFromImageTransport();
@@ -106,16 +93,6 @@ public abstract class AbstractImageData implements ImageData {
     protected abstract BufferedImage createBufferedImageFromImageTransport();
 
     @Override
-    public long getDateMillis() {
-        return dateMillis;
-    }
-
-    @Override
-    public void setDateMillis(long dateMillis) {
-        this.dateMillis = dateMillis;
-    }
-
-    @Override
     public void setFrameNumber(int frameNumber) {
         this.frameNumber = frameNumber;
     }
@@ -123,26 +100,6 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public int getFrameNumber() {
         return this.frameNumber;
-    }
-
-    @Override
-    public void setZoomPercent(double percent) {
-        this.zoomPercent = percent;
-    }
-
-    @Override
-    public double getZoomPercent() {
-        return this.zoomPercent;
-    }
-
-    @Override
-    public void setSubImage(SubImage subImage) {
-        this.subImage = subImage;
-    }
-
-    @Override
-    public SubImage getSubImage() {
-        return this.subImage;
     }
 
     @Override
@@ -163,16 +120,6 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public void setMETADATA(MetaData m) {
         this.metadata = m;
-    }
-
-    @Override
-    public void setFullyLoaded(boolean fullyLoaded) {
-        this.fullyLoaded = fullyLoaded;
-    }
-
-    @Override
-    public boolean getFullyLoaded() {
-        return fullyLoaded;
     }
 
 }
