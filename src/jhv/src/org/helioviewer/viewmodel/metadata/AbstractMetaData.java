@@ -18,7 +18,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     private GL3DVec2d lowerLeftCorner;
     private GL3DVec2d sizeVector;
-    protected ImmutableDateTime dateTime = null;
+    protected ImmutableDateTime dateTime = ImmutableDateTime.epochDateTime;
 
     /**
      * Default constructor, does not set size or position.
@@ -88,7 +88,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     @Override
     public ImmutableDateTime getDateTime() {
-        return this.dateTime;
+        return dateTime;
     }
 
 }
