@@ -14,8 +14,8 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  */
 public class ResetCameraAction extends AbstractAction {
 
-    public ResetCameraAction(boolean small) {
-        super("Reset Camera", IconBank.getIcon(JHVIcon.RESET));
+    public ResetCameraAction(boolean small, boolean useIcon) {
+        super("Reset Camera", useIcon ? (IconBank.getIcon(JHVIcon.RESET)) : null);
         putValue(SHORT_DESCRIPTION, "Reset camera position to default");
         // putValue(MNEMONIC_KEY, KeyEvent.VK_R);
         // putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA,

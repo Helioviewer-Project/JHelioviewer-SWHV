@@ -56,11 +56,11 @@ public class MenuBar extends JMenuBar {
         viewMenu.setMnemonic(KeyEvent.VK_V);
         viewMenu.add(new ToggleFullscreenAction());
         viewMenu.addSeparator();
-        viewMenu.add(new ZoomInAction(true));
-        viewMenu.add(new ZoomOutAction(true));
-        viewMenu.add(new ZoomFitAction(true));
-        viewMenu.add(new ZoomOneToOneAction(true));
-        viewMenu.add(new ResetCameraAction(true));
+        viewMenu.add(new ZoomInAction(true, false));
+        viewMenu.add(new ZoomOutAction(true, false));
+        viewMenu.add(new ZoomFitAction(true, false));
+        viewMenu.add(new ZoomOneToOneAction(true, false));
+        viewMenu.add(new ResetCameraAction(true, false));
         add(viewMenu);
 
         JMenu movieMenu = new JMenu("Movie");

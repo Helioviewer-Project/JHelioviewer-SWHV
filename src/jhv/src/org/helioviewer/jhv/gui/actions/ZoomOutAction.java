@@ -19,8 +19,8 @@ public class ZoomOutAction extends AbstractAction {
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
      */
-    public ZoomOutAction(boolean small) {
-        super("Zoom out", small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT));
+    public ZoomOutAction(boolean small, boolean useIcon) {
+        super("Zoom out", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_OUT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_OUT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom out");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_PERIOD, KeyEvent.ALT_MASK));

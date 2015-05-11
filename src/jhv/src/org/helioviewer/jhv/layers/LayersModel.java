@@ -316,15 +316,14 @@ public class LayersModel {
         view.setImageLayer(imageLayer);
         layers.add(view);
 
+        MoviePanel moviePanel;
         if (view instanceof JHVJPXView) {
-            MoviePanel moviePanel = new MoviePanel((JHVJPXView) view);
+            moviePanel = new MoviePanel((JHVJPXView) view);
             setLink(view, true);
-
-            ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
         } else {
-            MoviePanel moviePanel = new MoviePanel(null);
-            ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
+            moviePanel = new MoviePanel(null);
         }
+        ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
         int newIndex = layers.size() - 1;
         fireLayerAdded(newIndex);
