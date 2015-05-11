@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.plugin.pfss.data;
+package org.helioviewer.jhv.plugins.pfssplugin.data;
 
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
