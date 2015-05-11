@@ -45,11 +45,9 @@ public class SingleChannelShortImageData extends AbstractImageData {
      *            number of bits per pixel
      * @param newPixelData
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, short[] newPixelData, ColorMask newColorMask) {
-        super(newWidth, newHeight, newColorMask);
+    public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, short[] newPixelData) {
+        super(newWidth, newHeight);
         imageTransport = new Short16ImageTransport(newPixelData);
         format = new SingleChannelImageFormat(newBitDepth);
     }
@@ -87,11 +85,9 @@ public class SingleChannelShortImageData extends AbstractImageData {
      *            number of bits per pixel
      * @param newImage
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public SingleChannelShortImageData(int newBitDepth, BufferedImage newImage, ColorMask newColorMask) {
-        super(newImage.getWidth(), newImage.getHeight(), newColorMask);
+    public SingleChannelShortImageData(int newBitDepth, BufferedImage newImage) {
+        super(newImage.getWidth(), newImage.getHeight());
         image = newImage;
         imageTransport = new Short16ImageTransport(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
         format = new SingleChannelImageFormat(newBitDepth);

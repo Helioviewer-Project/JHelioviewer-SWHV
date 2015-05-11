@@ -40,11 +40,9 @@ public class RGBInt24ImageData extends AbstractImageData {
      *            height of the image
      * @param newPixelData
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public RGBInt24ImageData(int newWidth, int newHeight, int[] newPixelData, ColorMask newColorMask) {
-        super(newWidth, newHeight, newColorMask);
+    public RGBInt24ImageData(int newWidth, int newHeight, int[] newPixelData) {
+        super(newWidth, newHeight);
         imageTransport = new Int32ImageTransport(newPixelData);
     }
 
@@ -78,11 +76,9 @@ public class RGBInt24ImageData extends AbstractImageData {
      * 
      * @param newImage
      *            pixel data
-     * @param newColorMask
-     *            color mask of the image
      */
-    public RGBInt24ImageData(BufferedImage newImage, ColorMask newColorMask) {
-        super(newImage.getWidth(), newImage.getHeight(), newColorMask);
+    public RGBInt24ImageData(BufferedImage newImage) {
+        super(newImage.getWidth(), newImage.getHeight());
         image = newImage;
         imageTransport = new Int32ImageTransport(((DataBufferInt) newImage.getRaster().getDataBuffer()).getData());
     }

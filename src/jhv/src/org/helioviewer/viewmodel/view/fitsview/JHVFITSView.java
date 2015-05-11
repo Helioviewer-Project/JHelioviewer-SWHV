@@ -8,7 +8,6 @@ import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
@@ -81,11 +80,11 @@ public class JHVFITSView extends AbstractView {
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
-            imageData = new SingleChannelByte8ImageData(bi, new ColorMask());
+            imageData = new SingleChannelByte8ImageData(bi);
         } else if (bi.getColorModel().getPixelSize() <= 16) {
-            imageData = new SingleChannelShortImageData(bi.getColorModel().getPixelSize(), bi, new ColorMask());
+            imageData = new SingleChannelShortImageData(bi.getColorModel().getPixelSize(), bi);
         } else {
-            imageData = new ARGBInt32ImageData(bi, new ColorMask());
+            imageData = new ARGBInt32ImageData(bi);
         }
         imageData.setMETADATA(m);
 

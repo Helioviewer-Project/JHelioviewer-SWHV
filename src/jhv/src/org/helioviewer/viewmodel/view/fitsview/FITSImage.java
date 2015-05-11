@@ -9,7 +9,6 @@ import nom.tam.fits.HeaderCard;
 import nom.tam.util.Cursor;
 
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
@@ -64,7 +63,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            SingleChannelByte8ImageData imageData = new SingleChannelByte8ImageData(width, height, data, new ColorMask());
+            SingleChannelByte8ImageData imageData = new SingleChannelByte8ImageData(width, height, data);
             image = imageData.getBufferedImage();
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
 
@@ -107,7 +106,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, data, new ColorMask());
+            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, data);
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
@@ -128,7 +127,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            ImageData imageData = new ARGBInt32ImageData(false, width, height, data, new ColorMask());
+            ImageData imageData = new ARGBInt32ImageData(false, width, height, data);
             image = imageData.getBufferedImage();
 
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
@@ -186,7 +185,7 @@ public class FITSImage implements MetaDataContainer {
             }
 
             // create buffered image from row data
-            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, 16, data, new ColorMask());
+            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, 16, data);
             image = imageData.getBufferedImage();
         }
     }

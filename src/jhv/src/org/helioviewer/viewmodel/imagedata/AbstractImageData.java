@@ -17,7 +17,6 @@ public abstract class AbstractImageData implements ImageData {
 
     protected int width, height;
     protected BufferedImage image = null;
-    protected ColorMask colorMask;
 
     private Region region;
     private MetaData metadata;
@@ -31,13 +30,10 @@ public abstract class AbstractImageData implements ImageData {
      *            width of the image
      * @param newHeight
      *            height of the image
-     * @param newColorMask
-     *            color mask of the image
      */
-    protected AbstractImageData(int newWidth, int newHeight, ColorMask newColorMask) {
+    protected AbstractImageData(int newWidth, int newHeight) {
         width = newWidth;
         height = newHeight;
-        colorMask = newColorMask;
     }
 
     /**
@@ -48,10 +44,8 @@ public abstract class AbstractImageData implements ImageData {
      */
     protected AbstractImageData(ImageData copyFrom) {
         AbstractImageData base = (AbstractImageData) copyFrom;
-
         width = base.width;
         height = base.height;
-        colorMask = base.colorMask;
     }
 
     /**

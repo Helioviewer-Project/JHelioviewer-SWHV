@@ -11,7 +11,6 @@ import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
@@ -76,11 +75,11 @@ public class JHVSimpleImageView extends AbstractView {
      */
     private void initSimpleImageView() {
         if (bufferedImage.getColorModel().getPixelSize() <= 8) {
-            subImageData = new SingleChannelByte8ImageData(bufferedImage, new ColorMask());
+            subImageData = new SingleChannelByte8ImageData(bufferedImage);
         } else if (bufferedImage.getColorModel().getPixelSize() <= 16) {
-            subImageData = new SingleChannelShortImageData(bufferedImage.getColorModel().getPixelSize(), bufferedImage, new ColorMask());
+            subImageData = new SingleChannelShortImageData(bufferedImage.getColorModel().getPixelSize(), bufferedImage);
         } else {
-            subImageData = new ARGBInt32ImageData(bufferedImage, new ColorMask());
+            subImageData = new ARGBInt32ImageData(bufferedImage);
         }
 
         m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -130,11 +129,11 @@ public class JHVSimpleImageView extends AbstractView {
             bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
 
             if (bI.getColorModel().getPixelSize() <= 8) {
-                subImageData = new SingleChannelByte8ImageData(bI, new ColorMask());
+                subImageData = new SingleChannelByte8ImageData(bI);
             } else if (bI.getColorModel().getPixelSize() <= 16) {
-                subImageData = new SingleChannelShortImageData(bI.getColorModel().getPixelSize(), bI, new ColorMask());
+                subImageData = new SingleChannelShortImageData(bI.getColorModel().getPixelSize(), bI);
             } else {
-                subImageData = new ARGBInt32ImageData(bI, new ColorMask());
+                subImageData = new ARGBInt32ImageData(bI);
             }
             region = new Region(-1.5, -1.5, 3., 3.);
             subImageData.setRegion(region);
