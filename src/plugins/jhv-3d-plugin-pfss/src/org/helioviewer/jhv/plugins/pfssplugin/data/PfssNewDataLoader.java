@@ -1,4 +1,4 @@
-package org.helioviewer.gl3d.plugin.pfss.data;
+package org.helioviewer.jhv.plugins.pfssplugin.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
