@@ -19,11 +19,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.TimedMovieView;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
 import org.helioviewer.viewmodel.view.opengl.GLTextureHelper.GLTexture;
 
@@ -272,21 +272,16 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void render(GL2 gl) {
-        if (isVisible) {
-            TimedMovieView masterView = LinkedMovieManager.getSingletonInstance().getMasterMovie();
-            if (masterView != null && masterView.getCurrentFrameDateTime() != null) {
-                Date currentDate = masterView.getCurrentFrameDateTime().getTime();
-
-                if (currentDate != null) {
-                    ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
-                    for (JHVEvent evt : toDraw) {
-                        if (evt.getName().equals("Coronal Mass Ejection")) {
-                            drawCactusArc(gl, evt, currentDate);
-                        } else {
-                            drawPolygon(gl, evt, currentDate);
-                            drawIcon(gl, evt, currentDate);
-                        }
-                    }
+        AbstractView view;
+        if (isVisible && (view = Displayer.getLayersModel().getActiveView()) != null) {
+            Date currentDate = view.getMetaData().getDateTime().getTime();
+            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
+            for (JHVEvent evt : toDraw) {
+                if (evt.getName().equals("Coronal Mass Ejection")) {
+                    drawCactusArc(gl, evt, currentDate);
+                } else {
+                    drawPolygon(gl, evt, currentDate);
+                    drawIcon(gl, evt, currentDate);
                 }
             }
             SWHVHEKSettings.resetCactusColor();
