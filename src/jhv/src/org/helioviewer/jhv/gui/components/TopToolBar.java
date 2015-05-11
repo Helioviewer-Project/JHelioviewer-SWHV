@@ -148,11 +148,11 @@ public class TopToolBar extends JToolBar implements MouseListener {
         removeAll();
 
         // Zoom
-        addButton(new JButton(new ZoomInAction(false)));
-        addButton(new JButton(new ZoomOutAction(false)));
-        addButton(new JButton(new ZoomFitAction(false)));
-        addButton(new JButton(new ZoomOneToOneAction(false)));
-        addButton(new JButton(new ResetCameraAction(false)));
+        addButton(new JButton(new ZoomInAction(false,true)));
+        addButton(new JButton(new ZoomOutAction(false, true)));
+        addButton(new JButton(new ZoomFitAction(false, true)));
+        addButton(new JButton(new ZoomOneToOneAction(false, true)));
+        addButton(new JButton(new ResetCameraAction(false, true)));
 
         addSeparator();
 

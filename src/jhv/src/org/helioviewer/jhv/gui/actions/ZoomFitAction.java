@@ -24,8 +24,8 @@ public class ZoomFitAction extends AbstractAction {
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
      */
-    public ZoomFitAction(boolean small) {
-        super("Zoom to fit", small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT));
+    public ZoomFitAction(boolean small, boolean useIcon) {
+        super("Zoom to fit", useIcon ? (small ? IconBank.getIcon(JHVIcon.ZOOM_FIT_SMALL) : IconBank.getIcon(JHVIcon.ZOOM_FIT)) : null);
         putValue(SHORT_DESCRIPTION, "Zoom to fit");
         putValue(MNEMONIC_KEY, KeyEvent.VK_F);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
