@@ -113,6 +113,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
+        GL2 gl = (GL2) drawable.getGL();
+        GLSLShader.destroy(gl);
+        ImageViewerGui.getRenderableContainer().destroy(gl);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class RenderableSolarAxes implements Renderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void initialize(GL2 gl) {
     }
 
     @Override
@@ -87,6 +87,10 @@ public class RenderableSolarAxes implements Renderable {
     }
 
     @Override
-    public void reInit(GL2 gl) {
+    public void init(GL2 gl) {
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
     }
 }

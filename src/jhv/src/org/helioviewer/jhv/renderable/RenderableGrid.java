@@ -272,7 +272,7 @@ public class RenderableGrid implements Renderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void initialize(GL2 gl) {
         FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
         FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
@@ -312,6 +312,7 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
+        renderer.dispose();
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
     }
@@ -373,8 +374,13 @@ public class RenderableGrid implements Renderable {
     }
 
     @Override
-    public void reInit(GL2 gl) {
-        init(gl);
+    public void init(GL2 gl) {
+        initialize(gl);
         oldPixelsPerSolarRadiusDoubled = -1;
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        this.remove(gl);
     }
 }
