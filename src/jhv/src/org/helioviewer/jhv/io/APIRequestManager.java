@@ -382,7 +382,7 @@ public class APIRequestManager {
                 ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
             }
         });
-        AbstractView view;
+        final AbstractView view;
         if (endTime.equals("")) {
             view = loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
         } else {
@@ -392,6 +392,9 @@ public class APIRequestManager {
             @Override
             public void run() {
                 ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+                if (view != null)
+                    Displayer.getLayersModel().setActiveLayer(view);
+
             }
         });
         return view;
