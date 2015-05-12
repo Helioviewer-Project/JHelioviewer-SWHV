@@ -56,6 +56,7 @@ public class GLTexture {
             gl.glDeleteTextures(1, new int[] { texID }, 0);
             texID = -1;
         }
+        prev_width = -1;
     }
 
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
@@ -66,7 +67,7 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height) {
+    public void copyImageDataToTexture2D(GL2 gl, ImageData source, int x, int y, int width, int height) {
         if (width > GLInfo.maxTextureSize || height > GLInfo.maxTextureSize)
             return;
 
@@ -111,7 +112,7 @@ public class GLTexture {
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
     }
 
-    public void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source) {
+    public void copyBufferedImageToTexture2D(GL2 gl, BufferedImage source) {
         int width, height;
         if ((width = source.getWidth()) > GLInfo.maxTextureSize || (height = source.getHeight()) > GLInfo.maxTextureSize)
             return;

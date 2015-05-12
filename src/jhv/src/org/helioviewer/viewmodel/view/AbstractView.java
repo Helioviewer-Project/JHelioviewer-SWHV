@@ -91,7 +91,7 @@ public abstract class AbstractView implements View {
         GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 1f);
         applyGLLUT(gl);
 
-        tex.moveImageDataToGLTexture(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
+        tex.copyImageDataToTexture2D(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
     }
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
@@ -175,7 +175,7 @@ public abstract class AbstractView implements View {
             if (this.differenceMode && this.imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                diffTex.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight());
+                diffTex.copyImageDataToTexture2D(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight());
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
