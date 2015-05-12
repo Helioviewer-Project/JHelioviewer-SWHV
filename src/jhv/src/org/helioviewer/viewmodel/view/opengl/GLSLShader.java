@@ -52,39 +52,36 @@ public class GLSLShader {
     public static boolean init = false;
 
     public static void initShader(GL2 gl) {
-        if (!init) {
-            init = true;
+        InputStream fragmentStream = FileUtils.getResourceInputStream("/data/fragment3d.glsl");
+        String fragmentText = FileUtils.convertStreamToString(fragmentStream);
+        InputStream vertexStream = FileUtils.getResourceInputStream("/data/vertex3d.glsl");
+        String vertexText = FileUtils.convertStreamToString(vertexStream);
 
-            InputStream fragmentStream = FileUtils.getResourceInputStream("/data/fragment3d.glsl");
-            String fragmentText = FileUtils.convertStreamToString(fragmentStream);
-            InputStream vertexStream = FileUtils.getResourceInputStream("/data/vertex3d.glsl");
-            String vertexText = FileUtils.convertStreamToString(vertexStream);
+        attachVertexShader(gl, vertexText);
+        attachFragmentShader(gl, fragmentText);
 
-            attachVertexShader(gl, vertexText);
-            attachFragmentShader(gl, fragmentText);
+        initializeProgram(gl, true);
+        truncationValueRef = gl.glGetUniformLocation(progID, "truncationValue");
+        isDifferenceValueRef = gl.glGetUniformLocation(progID, "isdifference");
+        isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
 
-            initializeProgram(gl, true);
-            truncationValueRef = gl.glGetUniformLocation(progID, "truncationValue");
-            isDifferenceValueRef = gl.glGetUniformLocation(progID, "isdifference");
-            isDiscRef = gl.glGetUniformLocation(progID, "isdisc");
+        pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
+        gammaParamRef = gl.glGetUniformLocation(progID, "gamma");
+        contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
+        alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
+        cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
+        outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
 
-            pixelSizeWeightingRef = gl.glGetUniformLocation(progID, "pixelSizeWeighting");
-            gammaParamRef = gl.glGetUniformLocation(progID, "gamma");
-            contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
-            alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
-            cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
-            outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
+        rectRef = gl.glGetUniformLocation(progID, "rect");
+        differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
+        viewportRef = gl.glGetUniformLocation(progID, "viewport");
 
-            rectRef = gl.glGetUniformLocation(progID, "rect");
-            differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
-            viewportRef = gl.glGetUniformLocation(progID, "viewport");
+        bind(gl);
+        setTextureUnit(gl, "image", 0);
+        setTextureUnit(gl, "lut", 1);
+        setTextureUnit(gl, "differenceImage", 2);
+        unbind(gl);
 
-            bind(gl);
-            setTextureUnit(gl, "image", 0);
-            setTextureUnit(gl, "lut", 1);
-            setTextureUnit(gl, "differenceImage", 2);
-            unbind(gl);
-        }
     }
 
     public static void destroy(GL2 gl) {
