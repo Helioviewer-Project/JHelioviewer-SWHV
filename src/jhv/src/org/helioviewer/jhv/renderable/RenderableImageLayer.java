@@ -437,4 +437,5 @@ public class RenderableImageLayer implements Renderable {
     public boolean isActiveImageLayer() {
         return Displayer.getLayersModel().getActiveView() == this.mainLayerView;
     }
+
 }

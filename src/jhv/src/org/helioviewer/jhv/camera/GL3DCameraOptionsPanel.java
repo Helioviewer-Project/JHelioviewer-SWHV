@@ -108,13 +108,13 @@ public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
         infoExplainPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
 
         String explanation = "Observer camera: view from observer.\n";
-        explanation += "Camera time defined by the timestamp of selected layer.\n\n";
+        explanation += "Camera time defined by timestamps of the active layer.\n\n";
         explanation += "Earth camera: view from Earth.\n";
-        explanation += "Camera time defined by the timestamp of selected layer.\n\n";
+        explanation += "Camera time defined by timestamps of the active layer.\n\n";
         explanation += "Expert camera: view from selected object.\n";
-        explanation += "Camera time defined by the the timestamp of selected layer, ";
-        explanation += "unless \"Use selected layer timestamps\" is off. ";
-        explanation += "In that case, camera time is interpolated in the time interval set.";
+        explanation += "Camera time defined by timestamps of the active layer, ";
+        explanation += "unless \"Use active layer timestamps\" is off. ";
+        explanation += "In that case, camera time is interpolated in the configured time interval.";
 
         JTextArea infoText = new JTextArea(explanation);
         infoText.setEditable(false);

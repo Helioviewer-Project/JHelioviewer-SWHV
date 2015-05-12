@@ -394,7 +394,6 @@ public class APIRequestManager {
                 ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
                 if (view != null)
                     Displayer.getLayersModel().setActiveLayer(view);
-
             }
         });
         return view;

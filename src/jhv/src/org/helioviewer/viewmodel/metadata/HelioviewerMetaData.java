@@ -203,17 +203,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
             double arcsecPerPixelY = m.tryGetDouble("CDELT2");
-            if (Double.isNaN(arcsecPerPixelX)) {
-                if (Double.isNaN(arcsecPerPixelY)) {
-                    Log.warn(">> HelioviewerMetaData.readPixelParameters() > Both CDELT1 and CDELT2 are NaN. Use 0.6 as default value.");
-                    arcsecPerPixelX = 0.6;
-                } else {
-                    Log.warn(">> HelioviewerMetaData.readPixelParameters() > CDELT1 is NaN. CDELT2 is used.");
-                    arcsecPerPixelX = arcsecPerPixelY;
-                }
+            if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
+                Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 or CDELT2 are NaN. Use 0.6 as default value.");
+                arcsecPerPixelX = arcsecPerPixelY = 0.6;
             }
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
-                Log.warn(">> HelioviewerMetaData.readPixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
+                Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
             // distance to sun in meters
             double radiusSunInArcsec = Math.atan(Constants.SunRadiusInMeter / this.dobs) * MathUtils.radeg * 3600;
@@ -245,7 +240,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double arcSecPerPixel = m.tryGetDouble("CDELT1");
             double arcSecPerPixel2 = m.tryGetDouble("CDELT2");
             if (arcSecPerPixel != arcSecPerPixel2) {
-                Log.warn("HelioviewerMetaData: STEREO Meta Data inconsistent! Resolution not the same in x and y direction! (1: " + arcSecPerPixel + ", 2: " + arcSecPerPixel2 + ")");
+                Log.warn("HelioviewerMetaData.retrievePixelParameters(): Inconsistent STEREO metadata: resolution not the same in x and y direction (1: " + arcSecPerPixel + ", 2: " + arcSecPerPixel2 + ")");
             }
             double solarRadiusPixel = solarRadiusArcSec / arcSecPerPixel;
             newSolarPixelRadius = solarRadiusPixel;

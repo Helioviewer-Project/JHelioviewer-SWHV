@@ -175,7 +175,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
-        addLayerButton.setToolTipText("Click to add extra layers");
+        addLayerButton.setToolTipText("Add extra data layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());

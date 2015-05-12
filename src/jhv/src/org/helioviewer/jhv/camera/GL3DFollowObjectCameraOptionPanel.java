@@ -71,7 +71,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(new JSeparator(SwingConstants.HORIZONTAL));
 
         addObjectCombobox();
-        exactDateCheckBox = new JCheckBox("Use selected layer timestamps", true);
+        exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.add(exactDateCheckBox);
         add(checkboxPanel);
