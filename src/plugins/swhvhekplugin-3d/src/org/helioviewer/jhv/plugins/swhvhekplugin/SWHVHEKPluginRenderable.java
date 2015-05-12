@@ -24,8 +24,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper.GLTexture;
+import org.helioviewer.viewmodel.view.opengl.GLTexture;
 
 import com.jogamp.opengl.GL2;
 
@@ -45,12 +44,12 @@ public class SWHVHEKPluginRenderable implements Renderable {
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            tex = new GLTextureHelper.GLTexture();
+            tex = new GLTexture();
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics graph = bi.createGraphics();
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
-            GLTextureHelper.moveBufferedImageToGLTexture(gl, bi, tex);
+            tex.moveBufferedImageToGLTexture(gl, bi);
             iconCacheId.put(key, tex);
         }
 
