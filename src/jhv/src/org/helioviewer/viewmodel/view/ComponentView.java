@@ -90,8 +90,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         GLInfo.update(gl);
         GLInfo.updatePixelScale(canvas);
 
-        GLSLShader.initShader(gl);
-
         gl.glEnable(GL2.GL_TEXTURE_1D);
         gl.glEnable(GL2.GL_TEXTURE_2D);
 
@@ -108,14 +106,16 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        ImageViewerGui.getRenderableContainer().reInit(gl);
+
+        GLSLShader.init(gl);
+        ImageViewerGui.getRenderableContainer().init(gl);
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        GLSLShader.destroy(gl);
-        ImageViewerGui.getRenderableContainer().destroy(gl);
+        ImageViewerGui.getRenderableContainer().dispose(gl);
+        GLSLShader.dispose(gl);
     }
 
     @Override

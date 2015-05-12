@@ -49,9 +49,8 @@ public class GLSLShader {
     public static final float[] viewport = new float[2];
 
     public static ColorMask colorMask = new ColorMask();
-    public static boolean init = false;
 
-    public static void initShader(GL2 gl) {
+    public static void init(GL2 gl) {
         InputStream fragmentStream = FileUtils.getResourceInputStream("/data/fragment3d.glsl");
         String fragmentText = FileUtils.convertStreamToString(fragmentStream);
         InputStream vertexStream = FileUtils.getResourceInputStream("/data/vertex3d.glsl");
@@ -84,7 +83,7 @@ public class GLSLShader {
 
     }
 
-    public static void destroy(GL2 gl) {
+    public static void dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
