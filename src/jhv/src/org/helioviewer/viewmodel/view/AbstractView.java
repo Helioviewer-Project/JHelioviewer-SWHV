@@ -55,6 +55,9 @@ public abstract class AbstractView implements View {
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
 
+    int previousWidth = -1;
+    int previousHeight = -1;
+
     public void setContrast(float contrast) {
         this.contrast = contrast;
     }
@@ -146,9 +149,6 @@ public abstract class AbstractView implements View {
             }
         }
     }
-
-    private int previousWidth = -1;
-    private int previousHeight = -1;
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
         colorMask = new ColorMask(redColormask, greenColormask, blueColormask);
@@ -352,5 +352,9 @@ public abstract class AbstractView implements View {
         tex = new GLTextureHelper.GLTexture();
         lutTex = new GLTextureHelper.GLTexture();
         diffTex = new GLTextureHelper.GLTexture();
+
+        previousWidth = -1;
+        previousHeight = -1;
+        lutChanged = true;
     }
 }
