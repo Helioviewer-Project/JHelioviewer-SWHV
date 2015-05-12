@@ -692,10 +692,10 @@ public class RadioDataManager implements RadioDownloaderListener {
      *
      */
     private void handleAdditionalJPXData(DownloadedJPXData djd, double ratioX, double ratioY, Long downloadID, DownloadRequestData drd, SimpleDateFormat sdf) {
-        JHVJP2CallistoView jpxCallistoView = (JHVJP2CallistoView) djd.getView();
-        if (jpxCallistoView != null) {
-            jpxCallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
-            JP2Image image = jpxCallistoView.getJP2Image();
+        JHVJP2CallistoView jp2CallistoView = (JHVJP2CallistoView) djd.getView();
+        if (jp2CallistoView != null) {
+            jp2CallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+            JP2Image image = jp2CallistoView.getJP2Image();
             ResolutionSet rs = image.getResolutionSet();
             Interval<Integer> interval = image.getCompositionLayerRange();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
@@ -722,11 +722,11 @@ public class RadioDataManager implements RadioDownloaderListener {
                         RadioImage tempRs = new RadioImage(downloadID, djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
                         ResolutionSetting lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
 
-                        jpxCallistoView.setViewport(new Viewport(lastUsedResolutionSetting.getVec2dIntRepresentation()));
+                        jp2CallistoView.setViewport(new Viewport(lastUsedResolutionSetting.getVec2dIntRepresentation()));
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jpxCallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
+                        jp2CallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
