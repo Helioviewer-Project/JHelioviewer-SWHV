@@ -26,4 +26,6 @@ public interface Renderable {
 
     public boolean isDeletable();
 
+    public boolean isActiveImageLayer();
+
 }

@@ -168,4 +168,9 @@ public class RenderableCamera implements Renderable {
         return false;
     }
 
+    @Override
+    public boolean isActiveImageLayer() {
+        return false;
+    }
+
 }

@@ -118,4 +118,9 @@ public class PfssRenderable implements Renderable, LayersListener {
         return false;
     }
 
+    @Override
+    public boolean isActiveImageLayer() {
+        return false;
+    }
+
 }

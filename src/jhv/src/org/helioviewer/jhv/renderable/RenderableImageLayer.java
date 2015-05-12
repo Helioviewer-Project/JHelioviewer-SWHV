@@ -432,4 +432,9 @@ public class RenderableImageLayer implements Renderable {
     public boolean isDeletable() {
         return true;
     }
+
+    @Override
+    public boolean isActiveImageLayer() {
+        return Displayer.getLayersModel().getActiveView() == this.mainLayerView;
+    }
 }
