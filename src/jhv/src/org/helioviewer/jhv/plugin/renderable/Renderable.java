@@ -6,7 +6,7 @@ import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    public void init(GL2 gl);
+    public void initialize(GL2 gl);
 
     public void render(GL2 gl);
 
@@ -28,6 +28,8 @@ public interface Renderable {
 
     public boolean isActiveImageLayer();
 
-    public void reInit(GL2 gl);
+    public void init(GL2 gl);
+
+    public void dispose(GL2 gl);
 
 }

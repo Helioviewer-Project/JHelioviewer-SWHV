@@ -59,7 +59,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     private void initRenderables(GL2 gl) {
         for (Renderable renderable : newRenderables) {
-            renderable.init(gl);
+            renderable.initialize(gl);
         }
         newRenderables.clear();
     }
@@ -168,7 +168,13 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     public void reInit(GL2 gl) {
         for (Renderable renderable : this.renderables) {
-            renderable.reInit(gl);
+            renderable.init(gl);
+        }
+    }
+
+    public void destroy(GL2 gl) {
+        for (Renderable renderable : this.renderables) {
+            renderable.dispose(gl);
         }
     }
 }

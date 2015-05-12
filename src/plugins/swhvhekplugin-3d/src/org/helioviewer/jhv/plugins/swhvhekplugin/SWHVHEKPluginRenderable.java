@@ -267,7 +267,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void initialize(GL2 gl) {
     }
 
     @Override
@@ -333,7 +333,14 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public void reInit(GL2 gl) {
+    public void init(GL2 gl) {
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        for (GLTexture el : iconCacheId.values()) {
+            el.delete(gl);
+        }
         iconCacheId.clear();
     }
 

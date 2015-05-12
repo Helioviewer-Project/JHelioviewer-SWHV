@@ -357,4 +357,10 @@ public abstract class AbstractView implements View {
         previousHeight = -1;
         lutChanged = true;
     }
+
+    public void destroy(GL2 gl) {
+        tex.delete(gl);
+        lutTex.delete(gl);
+        diffTex.delete(gl);
+    }
 }

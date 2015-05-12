@@ -93,7 +93,7 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void initialize(GL2 gl) {
         mainLayerView.initTextures(gl);
         Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
         FloatBuffer positionBuffer = bufferPair.a;
@@ -268,12 +268,16 @@ public class RenderableImageLayer implements Renderable {
         gl.glDeleteBuffers(1, new int[] { this.indexBufferID }, 0);
     }
 
-    @Override
-    public void remove(GL2 gl) {
+    public void removeResources(GL2 gl) {
         disablePositionVBO(gl);
         disableIndexVBO(gl);
         deletePositionVBO(gl);
         deleteIndexVBO(gl);
+    }
+
+    @Override
+    public void remove(GL2 gl) {
+        removeResources(gl);
         Displayer.getLayersModel().removeLayer(mainLayerView);
     }
 
@@ -440,7 +444,13 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
-    public void reInit(GL2 gl) {
-        init(gl);
+    public void init(GL2 gl) {
+        initialize(gl);
+    }
+
+    @Override
+    public void dispose(GL2 gl) {
+        removeResources(gl);
+        mainLayerView.destroy(gl);
     }
 }
