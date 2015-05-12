@@ -60,4 +60,9 @@ public class RenderableDummy implements Renderable {
     public boolean isDeletable() {
         return false;
     }
+
+    @Override
+    public boolean isActiveImageLayer() {
+        return false;
+    }
 }

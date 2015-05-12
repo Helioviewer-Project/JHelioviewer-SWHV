@@ -32,22 +32,22 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
-
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.video.ConverterFactory;
 
 /**
- * The ComponentView is responsible for rendering the actual image to a Component.
+ * The ComponentView is responsible for rendering the actual image to a
+ * Component.
  */
 public class ComponentView implements GLEventListener, DisplayListener {
 
     private static GLCanvas canvas;
 
     // screenshot & movie
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
-    private AWTGLReadBufferUtil rbu;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
+    private final AWTGLReadBufferUtil rbu;
 
     private ExportMovieDialog exportMovieDialog;
 

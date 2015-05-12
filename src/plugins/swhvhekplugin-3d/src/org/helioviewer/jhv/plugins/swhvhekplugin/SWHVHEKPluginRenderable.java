@@ -327,4 +327,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         return false;
     }
 
+    @Override
+    public boolean isActiveImageLayer() {
+        return false;
+    }
+
 }
