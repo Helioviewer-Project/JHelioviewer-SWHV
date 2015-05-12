@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.metadata;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DVec2d;
 
@@ -18,7 +19,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     private GL3DVec2d lowerLeftCorner;
     private GL3DVec2d sizeVector;
-    protected ImmutableDateTime dateTime = ImmutableDateTime.epochDateTime;
+    protected ImmutableDateTime dateTime = Displayer.epochDateTime;
 
     /**
      * Default constructor, does not set size or position.
