@@ -241,7 +241,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
                     // set the export file name for
                     // MetaDataDialog
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss'Z'");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                     outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + " " + dateFormat.format(m.getDateTime().getTime()) + ".fits.xml";
 

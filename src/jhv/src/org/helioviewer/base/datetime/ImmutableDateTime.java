@@ -16,7 +16,7 @@ import java.util.TimeZone;
  */
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
-    public static final ImmutableDateTime epochDateTime = parseDateTime("2000-01-01T00:00:00");
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /** Default DateFormat used to format the date. */
     protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
@@ -37,11 +37,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         if ((_year | _month | _day | _hour | _minute | _second) < 0)
             throw new IllegalArgumentException("Arguments cannot be negative!");
         try {
-            calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+00:00"));
+            calendar = Calendar.getInstance(UTC);
             calendar.clear();
             calendar.set(_year, _month, _day, _hour, _minute, _second);
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
-            timeFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
+            dateFormat.setTimeZone(UTC);
+            timeFormat.setTimeZone(UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,11 +53,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         }
 
         try {
-            calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+00:00"));
+            calendar = Calendar.getInstance(UTC);
             calendar.clear();
             calendar.setTimeInMillis(seconds * 1000);
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
-            timeFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
+            dateFormat.setTimeZone(UTC);
+            timeFormat.setTimeZone(UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,11 +69,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         }
 
         try {
-            calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+00:00"));
+            calendar = Calendar.getInstance(UTC);
             calendar.clear();
             calendar.setTimeInMillis(original.getMillis());
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
-            timeFormat.setTimeZone(TimeZone.getTimeZone("GMT+0000"));
+            dateFormat.setTimeZone(UTC);
+            timeFormat.setTimeZone(UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
