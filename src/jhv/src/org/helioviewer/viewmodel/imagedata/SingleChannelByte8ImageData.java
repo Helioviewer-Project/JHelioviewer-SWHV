@@ -104,6 +104,7 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageFormat getImageFormat() {
         return format;
     }
@@ -111,6 +112,7 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageTransport getImageTransport() {
         return imageTransport;
     }
@@ -118,6 +120,7 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
         DataBufferByte dataBuffer = new DataBufferByte(imageTransport.getByte8PixelData(), width * height);
@@ -125,4 +128,5 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
         newImage.setData(raster);
         return newImage;
     }
+
 }

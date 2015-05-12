@@ -45,13 +45,15 @@ public class FITSImage implements MetaDataContainer {
         int bitsPerPixel = hdu.getBitPix();
         header = hdu.getHeader();
 
+        ImageData imageData = null;
+
         if (bitsPerPixel == BasicHDU.BITPIX_BYTE) {
-            // get image row data
+            // get image raw data
             byte[][] data2D = (byte[][]) ((hdu).getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image row data into 1D image row data
+            // transform image raw data into 1D image
             byte[] data = new byte[width * height];
 
             int counter = 0;
@@ -61,20 +63,16 @@ public class FITSImage implements MetaDataContainer {
                     counter++;
                 }
             }
-
-            // create buffered image from row data
-            SingleChannelByte8ImageData imageData = new SingleChannelByte8ImageData(width, height, data);
-            image = imageData.getBufferedImage();
+            imageData = new SingleChannelByte8ImageData(width, height, data);
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
-
-            // get image row data
+            // get image raw data
             short[][] data2D = (short[][]) ((hdu).getKernel());
 
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
 
-            // transform image row data into 1D image row data and
+            // transform image raw data into 1D image and
             // analyze the highest value when transfering the data
             short[] data = new short[width * height];
 
@@ -104,18 +102,14 @@ public class FITSImage implements MetaDataContainer {
                     data[i] = (short) (data[i] << shiftBits);
                 }
             }
-
-            // create buffered image from row data
-            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, data);
-            image = imageData.getBufferedImage();
-
+            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, data);
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
-            // get image row data
+            // get image raw data
             int[][] data2D = (int[][]) ((hdu).getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image row data into 1D image row data
+            // transform image raw data into 1D image
             int[] data = new int[width * height];
 
             int counter = 0;
@@ -125,18 +119,14 @@ public class FITSImage implements MetaDataContainer {
                     counter++;
                 }
             }
-
-            // create buffered image from row data
-            ImageData imageData = new ARGBInt32ImageData(false, width, height, data);
-            image = imageData.getBufferedImage();
-
+            imageData = new ARGBInt32ImageData(false, width, height, data);
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
-            // get image row data
+            // get image raw data
             float[][] data2D = (float[][]) ((hdu).getKernel());
             // get width and height of image
             int width = data2D[0].length;
             int height = data2D.length;
-            // transform image row data into 1D image row data
+            // transform image raw data into 1D image
             short[] data = new short[width * height];
 
             // if it is an MDI magnetogram image use threshold when converting
@@ -159,7 +149,6 @@ public class FITSImage implements MetaDataContainer {
                         counter++;
                     }
                 }
-
             } else {
                 // get the minimum and maximum value from current data
                 float minValue = Float.MAX_VALUE;
@@ -172,7 +161,7 @@ public class FITSImage implements MetaDataContainer {
                     }
                 }
 
-                // transform image row data into 1D image row data
+                // transform image raw data into 1D image
                 int counter = 0;
                 float difference = maxValue - minValue;
 
@@ -183,11 +172,9 @@ public class FITSImage implements MetaDataContainer {
                     }
                 }
             }
-
-            // create buffered image from row data
-            SingleChannelShortImageData imageData = new SingleChannelShortImageData(width, height, 16, data);
-            image = imageData.getBufferedImage();
+            imageData = new SingleChannelShortImageData(width, height, 16, data);
         }
+        image = imageData.getBufferedImage();
     }
 
     /**

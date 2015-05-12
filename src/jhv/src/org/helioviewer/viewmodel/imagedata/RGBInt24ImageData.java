@@ -105,6 +105,7 @@ public class RGBInt24ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageFormat getImageFormat() {
         return format;
     }
@@ -112,6 +113,7 @@ public class RGBInt24ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageTransport getImageTransport() {
         return imageTransport;
     }
@@ -119,9 +121,11 @@ public class RGBInt24ImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         newImage.setRGB(0, 0, width, height, imageTransport.getInt32PixelData(), 0, width);
         return newImage;
     }
+
 }

@@ -116,6 +116,7 @@ public class SingleChannelShortImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageFormat getImageFormat() {
         return format;
     }
@@ -123,6 +124,7 @@ public class SingleChannelShortImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageTransport getImageTransport() {
         return imageTransport;
     }
@@ -130,6 +132,7 @@ public class SingleChannelShortImageData extends AbstractImageData {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
         DataBufferUShort dataBuffer = new DataBufferUShort(imageTransport.getShort16PixelData(), width * height);
@@ -142,4 +145,5 @@ public class SingleChannelShortImageData extends AbstractImageData {
         newImage.setData(raster);
         return newImage;
     }
+
 }

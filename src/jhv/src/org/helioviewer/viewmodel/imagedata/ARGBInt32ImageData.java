@@ -172,4 +172,5 @@ public class ARGBInt32ImageData extends AbstractImageData {
         newImage.setRGB(0, 0, width, height, imageTransport.getInt32PixelData(), 0, width);
         return newImage;
     }
+
 }
