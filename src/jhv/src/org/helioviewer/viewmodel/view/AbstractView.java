@@ -1,25 +1,17 @@
 package org.helioviewer.viewmodel.view;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
-import org.helioviewer.viewmodel.view.opengl.GLTextureHelper;
+import org.helioviewer.viewmodel.view.opengl.GLTexture;
 
 import com.jogamp.opengl.GL2;
 
@@ -28,7 +20,10 @@ public abstract class AbstractView implements View {
     private RenderableImageLayer imageLayer;
 
     protected ImageData imageData;
-    public GLTextureHelper.GLTexture tex = new GLTextureHelper.GLTexture();
+    private ColorMask colorMask = new ColorMask(true, true, true);
+    private GLTexture tex;
+    private GLTexture lutTex;
+    private GLTexture diffTex;
 
     private float contrast = 0f;
     private float gamma = 1f;
@@ -45,18 +40,11 @@ public abstract class AbstractView implements View {
 
     private boolean lutChanged = true;
 
-    private ColorMask colorMask = new ColorMask(true, true, true);
-    private GLTextureHelper.GLTexture lutTex = new GLTextureHelper.GLTexture();
-    private GLTextureHelper.GLTexture diffTex = new GLTextureHelper.GLTexture();
-
     private boolean differenceMode = false;
     private boolean baseDifferenceMode = false;
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
-
-    int previousWidth = -1;
-    int previousHeight = -1;
 
     public void setContrast(float contrast) {
         this.contrast = contrast;
@@ -80,7 +68,7 @@ public abstract class AbstractView implements View {
         }
         lut = newLUT;
         invertLUT = invert;
-        this.lutChanged = true;
+        lutChanged = true;
     }
 
     public void applyFilters(GL2 gl) {
@@ -103,51 +91,7 @@ public abstract class AbstractView implements View {
         GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 1f);
         applyGLLUT(gl);
 
-        if (imageData != null) {
-            int width = imageData.getWidth();
-            int height = imageData.getHeight();
-            if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
-                int bitsPerPixel = imageData.getImageTransport().getNumBitsPerPixel();
-                Buffer buffer;
-
-                switch (bitsPerPixel) {
-                case 8:
-                    buffer = ByteBuffer.wrap(((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData());
-                    break;
-                case 16:
-                    buffer = ShortBuffer.wrap(((Short16ImageTransport) imageData.getImageTransport()).getShort16PixelData());
-                    break;
-                case 32:
-                    buffer = IntBuffer.wrap(((Int32ImageTransport) imageData.getImageTransport()).getInt32PixelData());
-                    break;
-                default:
-                    buffer = null;
-                }
-
-                gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-                gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-                gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, width);
-                gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
-
-                ImageFormat imageFormat = imageData.getImageFormat();
-                int inputGLFormat = GLTextureHelper.mapImageFormatToInputGLFormat(imageFormat);
-                int bppGLType = GLTextureHelper.mapBitsPerPixelToGLType(bitsPerPixel);
-
-                gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
-
-                if (width != previousWidth || height != previousHeight) {
-                    int internalGLFormat = GLTextureHelper.mapImageFormatToInternalGLFormat(imageFormat);
-                    gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalGLFormat, width, height, 0, inputGLFormat, bppGLType, null);
-                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-                    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-                    previousWidth = width;
-                    previousHeight = height;
-                }
-                gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
-            }
-        }
+        tex.moveImageDataToGLTexture(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
     }
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
@@ -171,7 +115,7 @@ public abstract class AbstractView implements View {
 
         gl.glBindTexture(GL2.GL_TEXTURE_1D, lutTex.get(gl));
 
-        if (this.lutChanged || lastLut != currlut || invertLUT != lastInverted) {
+        if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
 
             if (invertLUT) {
@@ -201,7 +145,7 @@ public abstract class AbstractView implements View {
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
             gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
         }
-        this.lutChanged = false;
+        lutChanged = false;
 
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
@@ -231,7 +175,7 @@ public abstract class AbstractView implements View {
             if (this.differenceMode && this.imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                GLTextureHelper.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight(), diffTex);
+                diffTex.moveImageDataToGLTexture(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight());
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
@@ -349,12 +293,10 @@ public abstract class AbstractView implements View {
     }
 
     public void init(GL2 gl) {
-        tex = new GLTextureHelper.GLTexture();
-        lutTex = new GLTextureHelper.GLTexture();
-        diffTex = new GLTextureHelper.GLTexture();
+        tex = new GLTexture();
+        lutTex = new GLTexture();
+        diffTex = new GLTexture();
 
-        previousWidth = -1;
-        previousHeight = -1;
         lutChanged = true;
     }
 

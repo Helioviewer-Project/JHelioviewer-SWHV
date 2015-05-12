@@ -11,7 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -32,75 +31,43 @@ import com.jogamp.opengl.GL2;
  *
  * @author Markus Langenberg
  */
-public class GLTextureHelper {
+public class GLTexture {
 
     private final static int[] formatMap = { GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE4, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE8, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE12, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16, GL2.GL_LUMINANCE16 };
 
-    private static void genTexture2D(GL2 gl, int texID, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, texID);
-        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
+    private int texID = -1;
 
+    private int prev_width = -1;
+    private int prev_height = -1;
+    private int prev_inputGLFormat = -1;
+    private int prev_bppGLType = -1;
+
+    public int get(GL2 gl) {
+        if (texID == -1) {
+            int[] tmp = new int[1];
+            gl.glGenTextures(1, tmp, 0);
+            texID = tmp[0];
+        }
+        return texID;
+    }
+
+    public void dispose(GL2 gl) {
+        if (texID != -1) {
+            gl.glDeleteTextures(1, new int[] { texID }, 0);
+            texID = -1;
+        }
+    }
+
+    private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    /**
-     * Renders the content of the given image data object to the screen.
-     *
-     * The image data is moved to a temporary texture and it is drawn onto a
-     * surface using the position and size of the given region. That way, OpenGL
-     * handles the scaling and positioning of different layers automatically.
-     *
-     * <p>
-     * If the given ImageData is bigger than the maximal texture size, multiple
-     * tiles are drawn.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param region
-     *            Position and size to draw the image
-     * @param source
-     *            Image data to draw to the screen
-     */
-    public static void renderImageDataToScreen(GL2 gl, ImageData source, GLTexture tex) {
-        if (source == null)
-            return;
-
-        int width = source.getWidth();
-        int height = source.getHeight();
-
-        if (width <= GLInfo.maxTextureSize && height <= GLInfo.maxTextureSize) {
-            moveImageDataToGLTexture(gl, source, 0, 0, width, height, tex);
-        } else {
-            Log.error(">> GLTextureHelper.renderImageDataToScreen(GL) > Image data too big: [" + width + "," + height + "]");
-        }
-    }
-
-    /**
-     * Saves a given image data object to a given texture.
-     *
-     * This version of the function provides the capabilities to specify a sub
-     * region of the image data object, which is moved to the given texture.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param source
-     *            Image data to copy to the texture
-     * @param x
-     *            x-offset of the sub region
-     * @param y
-     *            y-offset of the sub region
-     * @param width
-     *            width of the sub region
-     * @param height
-     *            height of the sub region
-     * @param target
-     *            Valid texture id
-     */
-    public static void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height, GLTexture tex) {
-        if (source == null)
+    public void moveImageDataToGLTexture(GL2 gl, ImageData source, int x, int y, int width, int height) {
+        if (width > GLInfo.maxTextureSize || height > GLInfo.maxTextureSize)
             return;
 
         int bitsPerPixel = source.getImageTransport().getNumBitsPerPixel();
@@ -126,26 +93,27 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
         ImageFormat imageFormat = source.getImageFormat();
-        genTexture2D(gl, tex.get(gl), mapImageFormatToInternalGLFormat(imageFormat), width, height, mapImageFormatToInputGLFormat(imageFormat), mapBitsPerPixelToGLType(bitsPerPixel), buffer);
+        int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
+        int bppGLType = mapBitsPerPixelToGLType(bitsPerPixel);
+
+        // force generate
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, get(gl));
+
+        if (width != prev_width || height != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
+            int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
+            genTexture2D(gl, internalGLFormat, width, height, inputGLFormat, bppGLType, null);
+
+            prev_width = width;
+            prev_height = height;
+            prev_inputGLFormat = inputGLFormat;
+            prev_bppGLType = bppGLType;
+        }
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
     }
 
-    /**
-     * Saves a given BufferedImage to a given texture.
-     *
-     * If it is possible to use
-     * {@link #moveImageDataToGLTexture(GL2, ImageData, int)}, that function
-     * should be preferred because the it is faster.
-     *
-     * @param gl
-     *            Valid reference to the current gl object
-     * @param source
-     *            BufferedImage to copy to the texture
-     * @param target
-     *            Valid texture id
-     * @see #moveImageDataToGLTexture(GL2, ImageData, int)
-     */
-    public static void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source, GLTexture tex) {
-        if (source == null)
+    public void moveBufferedImageToGLTexture(GL2 gl, BufferedImage source) {
+        int width, height;
+        if ((width = source.getWidth()) > GLInfo.maxTextureSize || (height = source.getHeight()) > GLInfo.maxTextureSize)
             return;
 
         DataBuffer rawBuffer = source.getRaster().getDataBuffer();
@@ -173,7 +141,9 @@ public class GLTextureHelper {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        genTexture2D(gl, tex.get(gl), mapTypeToInternalGLFormat(source.getType()), source.getWidth(), source.getHeight(), mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        // force generate
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, get(gl));
+        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), width, height, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
     /**
@@ -184,7 +154,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL memory image format
      */
-    public static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
+    private static int mapImageFormatToInternalGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return formatMap[((SingleChannelImageFormat) imageFormat).getBitDepth() - 1];
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -201,7 +171,7 @@ public class GLTextureHelper {
      *            Application internal image format
      * @return OpenGL input image format
      */
-    public static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
+    private static int mapImageFormatToInputGLFormat(ImageFormat imageFormat) {
         if (imageFormat instanceof SingleChannelImageFormat)
             return GL2.GL_LUMINANCE;
         else if (imageFormat instanceof ARGB32ImageFormat || imageFormat instanceof RGB24ImageFormat)
@@ -250,7 +220,7 @@ public class GLTextureHelper {
      *            Bits per pixel of the input data
      * @return OpenGL type to use
      */
-    public static int mapBitsPerPixelToGLType(int bitsPerPixel) {
+    private static int mapBitsPerPixelToGLType(int bitsPerPixel) {
         switch (bitsPerPixel) {
         case 8:
             return GL2.GL_UNSIGNED_BYTE;
@@ -306,26 +276,6 @@ public class GLTextureHelper {
             return 4;
         default:
             return 0;
-        }
-    }
-
-    public static class GLTexture {
-        private int texID = -1;
-
-        public int get(GL2 gl) {
-            if (texID == -1) {
-                int[] tmp = new int[1];
-                gl.glGenTextures(1, tmp, 0);
-                texID = tmp[0];
-            }
-            return texID;
-        }
-
-        public void dispose(GL2 gl) {
-            if (texID != -1) {
-                gl.glDeleteTextures(1, new int[] { texID }, 0);
-                texID = -1;
-            }
         }
     }
 
