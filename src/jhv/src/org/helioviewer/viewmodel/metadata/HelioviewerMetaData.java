@@ -180,10 +180,15 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             stonyhurstLongitude = 0;
         }
 
-        double theta = -Astronomy.getB0Radians(dateObs);
         double phi = Astronomy.getL0Radians(dateObs);
         phi -= stonyhurstLongitude / MathUtils.radeg;
-        theta = stonyhurstLatitude / MathUtils.radeg;
+
+        double theta;
+        if (stonyhurstLatitude != 0) {
+            theta = stonyhurstLatitude / MathUtils.radeg;
+        } else {
+            theta = Astronomy.getB0Radians(dateObs);
+        }
 
         localRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
         localRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
