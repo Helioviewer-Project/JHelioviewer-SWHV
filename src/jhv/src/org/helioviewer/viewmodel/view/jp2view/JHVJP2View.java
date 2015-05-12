@@ -620,21 +620,17 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
-        ImmutableDateTime dtc = null;
-        if (metaData instanceof ObserverMetaData) {
-            dtc = metaData.getDateTime();
-        }
-
-        if (compositionLayer == 0) {
-            baseDifferenceImageData = newImageData;
-        }
         newImageData.setFrameNumber(compositionLayer);
+        newImageData.setLocalRotation(metaData.getLocalRotation());
 
         if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
             newImageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
         }
 
+        if (compositionLayer == 0) {
+            baseDifferenceImageData = newImageData;
+        }
         if (imageData != null && compositionLayer == imageData.getFrameNumber() + 1) {
             previousImageData = imageData;
         } else if (previousImageData != null && previousImageData.getFrameNumber() - compositionLayer > 2) {
@@ -642,11 +638,10 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         } else if (imageData != null && compositionLayer == imageData.getFrameNumber() - 1) {
             previousImageData = imageData;
         }
-        newImageData.setMETADATA(metaData);
 
         imageData = newImageData;
 
-        fireFrameChanged(this, dtc);
+        fireFrameChanged(this, metaData.getDateTime());
     }
 
     protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {

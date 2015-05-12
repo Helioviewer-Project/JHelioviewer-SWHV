@@ -115,10 +115,6 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private void updateROI() {
-        MetaData metaData = mainLayerView.getMetaData();
-        if (metaData == null)
-            return;
-
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
@@ -145,6 +141,7 @@ public class RenderableImageLayer implements Renderable {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
+        MetaData metaData = mainLayerView.getMetaData();
         GL3DVec2d metPhysicalSize = metaData.getPhysicalSize();
         double metLLX = metaData.getPhysicalLowerLeft().x;
         double metLLY = metaData.getPhysicalLowerLeft().y;
@@ -177,10 +174,9 @@ public class RenderableImageLayer implements Renderable {
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
         if (imageData == null)
             return new GL3DQuatd();
-        MetaData md = imageData.getMETADATA();
 
         GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
-        cameraDifferenceRotation.rotateWithConjugate(md.getLocalRotation());
+        cameraDifferenceRotation.rotateWithConjugate(imageData.getLocalRotation());
 
         return cameraDifferenceRotation;
     }

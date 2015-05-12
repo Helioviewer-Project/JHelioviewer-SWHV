@@ -3,9 +3,9 @@ package org.helioviewer.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
-import org.helioviewer.viewmodel.metadata.MetaData;
 
 /**
  * Basic representation of an image handled by the view chain.
@@ -54,10 +54,10 @@ public interface ImageData {
 
     public void setRegion(Region r);
 
-    public MetaData getMETADATA();
-
-    public void setMETADATA(MetaData r);
-
     public BufferedImage getBufferedImage();
+
+    public GL3DQuatd getLocalRotation();
+
+    public void setLocalRotation(GL3DQuatd q);
 
 }
