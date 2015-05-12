@@ -76,14 +76,14 @@ public class PfssCache {
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            long midVal = data[mid].getTime();
+                    long midVal = data[mid].getTime();
 
-            if (midVal < timestamp)
-                low = mid + 1;
-            else if (midVal > timestamp)
-                high = mid - 1;
-            else
-                return mid;
+                    if (midVal < timestamp)
+                        low = mid + 1;
+                    else if (midVal > timestamp)
+                        high = mid - 1;
+                    else
+                        return mid;
         }
         return -(low + 1);
     }
@@ -96,7 +96,8 @@ public class PfssCache {
     }
 
     public void unInit() {
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < numberOfElementsInCache; i++) {
+
             data[i].setInit(false);
         }
     }
