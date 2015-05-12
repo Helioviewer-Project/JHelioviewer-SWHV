@@ -232,6 +232,7 @@ public class PfssData {
     public void clear(GL2 gl) {
         if (init) {
             gl.glDeleteBuffers(1, buffer, 0);
+            init = false;
         }
     }
 

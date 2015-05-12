@@ -173,4 +173,8 @@ public class RenderableCamera implements Renderable {
         return false;
     }
 
+    @Override
+    public void reInit(GL2 gl) {
+    }
+
 }

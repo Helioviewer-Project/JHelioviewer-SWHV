@@ -46,8 +46,8 @@ public abstract class AbstractView implements View {
     private boolean lutChanged = true;
 
     private ColorMask colorMask = new ColorMask(true, true, true);
-    private final GLTextureHelper.GLTexture lutTex = new GLTextureHelper.GLTexture();
-    private final GLTextureHelper.GLTexture diffTex = new GLTextureHelper.GLTexture();
+    private GLTextureHelper.GLTexture lutTex = new GLTextureHelper.GLTexture();
+    private GLTextureHelper.GLTexture diffTex = new GLTextureHelper.GLTexture();
 
     private boolean differenceMode = false;
     private boolean baseDifferenceMode = false;
@@ -348,4 +348,9 @@ public abstract class AbstractView implements View {
         return imageLayer;
     }
 
+    public void initTextures(GL2 gl) {
+        tex = new GLTextureHelper.GLTexture();
+        lutTex = new GLTextureHelper.GLTexture();
+        diffTex = new GLTextureHelper.GLTexture();
+    }
 }

@@ -166,4 +166,9 @@ public class RenderableContainer implements TableModel, Reorderable {
         return this.renderables.indexOf(renderable);
     }
 
+    public void reInit(GL2 gl) {
+        for (Renderable renderable : this.renderables) {
+            renderable.reInit(gl);
+        }
+    }
 }

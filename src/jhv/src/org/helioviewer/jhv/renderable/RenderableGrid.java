@@ -371,4 +371,9 @@ public class RenderableGrid implements Renderable {
     public boolean isActiveImageLayer() {
         return false;
     }
+
+    @Override
+    public void reInit(GL2 gl) {
+        init(gl);
+    }
 }

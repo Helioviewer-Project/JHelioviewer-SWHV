@@ -28,4 +28,6 @@ public interface Renderable {
 
     public boolean isActiveImageLayer();
 
+    public void reInit(GL2 gl);
+
 }

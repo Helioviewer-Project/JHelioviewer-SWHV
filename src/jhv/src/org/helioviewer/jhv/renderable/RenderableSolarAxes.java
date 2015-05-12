@@ -85,4 +85,8 @@ public class RenderableSolarAxes implements Renderable {
     public boolean isActiveImageLayer() {
         return false;
     }
+
+    @Override
+    public void reInit(GL2 gl) {
+    }
 }
