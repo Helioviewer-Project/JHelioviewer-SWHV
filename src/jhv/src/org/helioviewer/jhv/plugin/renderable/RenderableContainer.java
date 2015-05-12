@@ -59,7 +59,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     private void initRenderables(GL2 gl) {
         for (Renderable renderable : newRenderables) {
-            renderable.initialize(gl);
+            renderable.init(gl);
         }
         newRenderables.clear();
     }

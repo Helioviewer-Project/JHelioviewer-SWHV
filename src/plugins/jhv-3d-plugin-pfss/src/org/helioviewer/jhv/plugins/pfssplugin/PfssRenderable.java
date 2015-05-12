@@ -39,10 +39,6 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void initialize(GL2 gl) {
-    }
-
-    @Override
     public void render(GL2 gl) {
         AbstractView view;
         if (isVisible && (view = Displayer.getLayersModel().getActiveView()) != null) {

@@ -272,7 +272,7 @@ public class RenderableGrid implements Renderable {
     }
 
     @Override
-    public void initialize(GL2 gl) {
+    public void init(GL2 gl) {
         FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
         FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
@@ -371,11 +371,6 @@ public class RenderableGrid implements Renderable {
     @Override
     public boolean isActiveImageLayer() {
         return false;
-    }
-
-    @Override
-    public void init(GL2 gl) {
-        initialize(gl);
     }
 
     @Override

@@ -16,10 +16,6 @@ public class RenderableDummy implements Renderable {
     }
 
     @Override
-    public void initialize(GL2 gl) {
-    }
-
-    @Override
     public void render(GL2 gl) {
     }
 
