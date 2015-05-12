@@ -63,6 +63,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void remove(GL2 gl) {
+        dispose(gl);
     }
 
     @Override

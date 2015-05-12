@@ -348,7 +348,7 @@ public abstract class AbstractView implements View {
         return imageLayer;
     }
 
-    public void initTextures(GL2 gl) {
+    public void init(GL2 gl) {
         tex = new GLTextureHelper.GLTexture();
         lutTex = new GLTextureHelper.GLTexture();
         diffTex = new GLTextureHelper.GLTexture();
@@ -358,9 +358,10 @@ public abstract class AbstractView implements View {
         lutChanged = true;
     }
 
-    public void destroy(GL2 gl) {
-        tex.delete(gl);
-        lutTex.delete(gl);
-        diffTex.delete(gl);
+    public void dispose(GL2 gl) {
+        tex.dispose(gl);
+        lutTex.dispose(gl);
+        diffTex.dispose(gl);
     }
+
 }

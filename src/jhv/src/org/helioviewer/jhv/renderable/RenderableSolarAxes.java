@@ -40,6 +40,7 @@ public class RenderableSolarAxes implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
+        dispose(gl);
     }
 
     @Override
@@ -89,4 +90,5 @@ public class RenderableSolarAxes implements Renderable {
     @Override
     public void dispose(GL2 gl) {
     }
+
 }

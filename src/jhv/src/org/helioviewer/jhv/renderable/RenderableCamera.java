@@ -121,6 +121,7 @@ public class RenderableCamera implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
+        dispose(gl);
     }
 
     @Override

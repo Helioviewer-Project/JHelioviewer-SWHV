@@ -286,6 +286,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
+        dispose(gl);
     }
 
     @Override
@@ -335,7 +336,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void dispose(GL2 gl) {
         for (GLTexture el : iconCacheId.values()) {
-            el.delete(gl);
+            el.dispose(gl);
         }
         iconCacheId.clear();
     }

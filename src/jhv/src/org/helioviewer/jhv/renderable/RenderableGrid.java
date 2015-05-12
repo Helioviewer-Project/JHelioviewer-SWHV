@@ -312,9 +312,7 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
-        renderer.dispose();
-        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
-        gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
+        dispose(gl);
     }
 
     @Override
@@ -375,7 +373,10 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void dispose(GL2 gl) {
-        this.remove(gl);
+        renderer.dispose();
+        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
+        gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
         oldPixelsPerSolarRadiusDoubled = -1;
     }
+
 }
