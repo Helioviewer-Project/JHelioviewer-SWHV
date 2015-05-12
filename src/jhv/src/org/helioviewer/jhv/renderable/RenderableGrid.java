@@ -376,11 +376,11 @@ public class RenderableGrid implements Renderable {
     @Override
     public void init(GL2 gl) {
         initialize(gl);
-        oldPixelsPerSolarRadiusDoubled = -1;
     }
 
     @Override
     public void dispose(GL2 gl) {
         this.remove(gl);
+        oldPixelsPerSolarRadiusDoubled = -1;
     }
 }
