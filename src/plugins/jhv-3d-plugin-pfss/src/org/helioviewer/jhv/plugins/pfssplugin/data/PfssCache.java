@@ -95,4 +95,9 @@ public class PfssCache {
         }
     }
 
+    public void unInit() {
+        for (int i = 0; i < data.length; i++) {
+            data[i].setInit(false);
+        }
+    }
 }

@@ -311,12 +311,9 @@ public class GLTextureHelper {
 
     public static class GLTexture {
         private int texID = -1;
-        private GL2 gl;
 
-        public int get(GL2 _gl) {
+        public int get(GL2 gl) {
             if (texID == -1) {
-                gl = _gl;
-
                 int[] tmp = new int[1];
                 gl.glGenTextures(1, tmp, 0);
                 texID = tmp[0];
@@ -324,12 +321,6 @@ public class GLTextureHelper {
             return texID;
         }
 
-        @Override
-        protected void finalize() {
-            if (texID != -1) {
-                gl.glDeleteTextures(1, new int[] { texID }, 0);
-            }
-        }
     }
 
 }

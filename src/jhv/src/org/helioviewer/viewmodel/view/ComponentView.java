@@ -108,6 +108,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        ImageViewerGui.getRenderableContainer().reInit(gl);
     }
 
     @Override

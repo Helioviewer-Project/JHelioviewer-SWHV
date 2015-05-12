@@ -94,6 +94,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void init(GL2 gl) {
+        mainLayerView.initTextures(gl);
         Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
@@ -438,4 +439,8 @@ public class RenderableImageLayer implements Renderable {
         return Displayer.getLayersModel().getActiveView() == this.mainLayerView;
     }
 
+    @Override
+    public void reInit(GL2 gl) {
+        init(gl);
+    }
 }

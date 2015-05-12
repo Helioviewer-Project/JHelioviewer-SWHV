@@ -332,4 +332,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         return false;
     }
 
+    @Override
+    public void reInit(GL2 gl) {
+        iconCacheId.clear();
+    }
+
 }

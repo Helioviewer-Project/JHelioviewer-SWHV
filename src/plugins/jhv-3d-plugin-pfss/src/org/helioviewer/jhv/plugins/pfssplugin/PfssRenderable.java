@@ -26,6 +26,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     private boolean isVisible = false;
     private final RenderableType type;
     private final PfssPluginPanel optionsPanel;
+    private PfssData previousPfssData = null;
 
     /**
      * Default constructor.
@@ -49,13 +50,17 @@ public class PfssRenderable implements Renderable, LayersListener {
 
             long millis = view.getMetaData().getDateTime().getMillis();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
-                pfssData.setInit(false);
-                pfssData.init(gl);
+                if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
+                    previousPfssData.clear(gl);
+                }
+                if (!pfssData.isInit())
+                    pfssData.init(gl);
                 if (pfssData.isInit()) {
                     pfssData.display(gl);
                     datetime = pfssData.getDateString();
                     ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
                 }
+                previousPfssData = pfssData;
             }
         }
     }
@@ -121,6 +126,11 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public boolean isActiveImageLayer() {
         return false;
+    }
+
+    @Override
+    public void reInit(GL2 gl) {
+        PfssPlugin.getPfsscache().unInit();
     }
 
 }
