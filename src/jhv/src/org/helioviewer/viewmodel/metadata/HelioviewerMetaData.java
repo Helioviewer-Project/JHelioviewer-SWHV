@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.metadata;
 
+import java.util.Date;
+
 import org.helioviewer.base.Region;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
@@ -66,29 +68,30 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         innerRadius = m.tryGetDouble("HV_ROCC_INNER") * Constants.SunRadius;
         outerRadius = m.tryGetDouble("HV_ROCC_OUTER") * Constants.SunRadius;
 
-        if (innerRadius == 0.0 && getDetector() != null) {
-            if (getDetector().equalsIgnoreCase("C2")) {
+        if (innerRadius == 0) {
+            if (detector.equalsIgnoreCase("C2")) {
                 innerRadius = 2.3 * Constants.SunRadius;
                 outerRadius = 8.0 * Constants.SunRadius;
-            } else if (getDetector().equalsIgnoreCase("C3")) {
+            } else if (detector.equalsIgnoreCase("C3")) {
                 innerRadius = 4.4 * Constants.SunRadius;
                 outerRadius = 31.5 * Constants.SunRadius;
-            } else if (getObservatory().equalsIgnoreCase("STEREO_A") && getDetector().equalsIgnoreCase("COR1")) {
+            } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR1")) {
                 innerRadius = 1.36 * Constants.SunRadius;
                 outerRadius = 4.5 * Constants.SunRadius;
-            } else if (getObservatory().equalsIgnoreCase("STEREO_A") && getDetector().equalsIgnoreCase("COR2")) {
+            } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR2")) {
                 innerRadius = 2.4 * Constants.SunRadius;
                 outerRadius = 15.6 * Constants.SunRadius;
-            } else if (getObservatory().equalsIgnoreCase("STEREO_B") && getDetector().equalsIgnoreCase("COR1")) {
+            } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR1")) {
                 innerRadius = 1.5 * Constants.SunRadius;
                 outerRadius = 4.9 * Constants.SunRadius;
-            } else if (getObservatory().equalsIgnoreCase("STEREO_B") && getDetector().equalsIgnoreCase("COR2")) {
+            } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR2")) {
                 innerRadius = 3.25 * Constants.SunRadius;
                 outerRadius = 17 * Constants.SunRadius;
             }
         }
-        if (outerRadius == 0.)
+        if (outerRadius == 0) {
             outerRadius = Double.MAX_VALUE;
+        }
     }
 
     private void identifyObservation(MetaDataContainer m) {
@@ -152,32 +155,33 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePosition(MetaDataContainer m) {
-        this.dobs = m.tryGetDouble("DSUN_OBS");
-        if (this.dobs == 0.) {
-            this.dobs = Astronomy.getDistanceMeters(this.getDateTime().getTime());
+        Date dateObs = dateTime.getTime();
+
+        if ((dobs = m.tryGetDouble("DSUN_OBS")) == 0) {
+            dobs = Astronomy.getDistanceMeters(dateObs);
         }
 
-        this.refb0 = m.tryGetDouble("REF_B0");
-        this.refl0 = m.tryGetDouble("REF_L0");
+        refb0 = m.tryGetDouble("REF_B0");
+        refl0 = m.tryGetDouble("REF_L0");
 
         double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
         if (stonyhurstLatitude == 0) {
             stonyhurstLatitude = m.tryGetDouble("CRLT_OBS");
             if (stonyhurstLatitude == 0) {
-                stonyhurstLatitude = this.refb0;
+                stonyhurstLatitude = refb0;
             }
         }
         double stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
-        if (this.refl0 != 0.) {
-            stonyhurstLongitude = this.refl0 - Astronomy.getL0Degree(this.getDateTime().getTime());
+        if (refl0 != 0) {
+            stonyhurstLongitude = refl0 - Astronomy.getL0Degree(dateObs);
         }
 
-        if (this.getInstrument().contains("GONG") || this.getObservatory().contains("USET") || this.getObservatory().contains("SOLIS")) {
-            stonyhurstLongitude = 0.0;
+        if (instrument.contains("GONG") || observatory.contains("USET") || observatory.contains("SOLIS")) {
+            stonyhurstLongitude = 0;
         }
 
-        double theta = -Astronomy.getB0Radians(this.getDateTime().getTime());
-        double phi = Astronomy.getL0Radians(this.getDateTime().getTime());
+        double theta = -Astronomy.getB0Radians(dateObs);
+        double phi = Astronomy.getL0Radians(dateObs);
         phi -= stonyhurstLongitude / MathUtils.radeg;
         theta = stonyhurstLatitude / MathUtils.radeg;
 
