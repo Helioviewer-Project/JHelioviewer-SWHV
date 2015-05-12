@@ -41,7 +41,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private GL3DQuatd localRotation;
 
     private double meterPerPixel;
-    private GL3DVec2d sunPixelPosition = new GL3DVec2d();
+    private GL3DVec2d sunPixelPosition;
 
     private int pixelWidth;
     private int pixelHeight;
@@ -146,7 +146,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 observedDate += "T" + m.get("TIME_OBS");
             }
         }
-        dateTime = ImmutableDateTime.parseDateTime(observedDate);
+        // otherwise default epoch
+        if (observedDate != null)
+            dateTime = ImmutableDateTime.parseDateTime(observedDate);
     }
 
     private void retrievePosition(MetaDataContainer m) {
