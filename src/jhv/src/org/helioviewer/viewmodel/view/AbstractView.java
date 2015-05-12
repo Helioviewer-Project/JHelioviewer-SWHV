@@ -306,8 +306,6 @@ public abstract class AbstractView implements View {
         double xScale = 1. / region.getWidth();
         double yScale = 1. / region.getHeight();
 
-        MetaData metadata = image.getMETADATA();
-
         GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
 
         boolean diffMode = false;
@@ -332,6 +330,7 @@ public abstract class AbstractView implements View {
 
         double innerCutOff = 0;
         double outerCutOff = 40;
+        MetaData metadata = getMetaData();
         if (metadata instanceof HelioviewerMetaData) {
             HelioviewerMetaData md = (HelioviewerMetaData) metadata;
             innerCutOff = md.getInnerPhysicalOcculterRadius();
