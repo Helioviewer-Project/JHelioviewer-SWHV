@@ -6,8 +6,6 @@ import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    public void initialize(GL2 gl);
-
     public void render(GL2 gl);
 
     public void remove(GL2 gl);
