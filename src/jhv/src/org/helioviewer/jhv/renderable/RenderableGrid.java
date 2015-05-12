@@ -375,5 +375,6 @@ public class RenderableGrid implements Renderable {
     @Override
     public void reInit(GL2 gl) {
         init(gl);
+        oldPixelsPerSolarRadiusDoubled = -1;
     }
 }
