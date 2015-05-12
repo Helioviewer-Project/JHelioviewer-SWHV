@@ -321,6 +321,11 @@ public class GLTextureHelper {
             return texID;
         }
 
+        public void delete(GL2 gl) {
+            if (texID != -1) {
+                gl.glDeleteTextures(1, new int[] { texID }, 0);
+            }
+        }
     }
 
 }
