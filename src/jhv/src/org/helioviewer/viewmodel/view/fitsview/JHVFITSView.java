@@ -86,11 +86,11 @@ public class JHVFITSView extends AbstractView {
         } else {
             imageData = new ARGBInt32ImageData(bi);
         }
-        imageData.setMETADATA(m);
+        imageData.setLocalRotation(m.getLocalRotation());
 
         region = new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
-        imageData.setMETADATA(this.m);
+
         viewport = new Viewport(100, 100);
     }
 

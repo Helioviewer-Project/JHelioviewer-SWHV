@@ -3,7 +3,7 @@ package org.helioviewer.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.base.math.GL3DQuatd;
 
 /**
  * Abstract ImageData object to provide some common functionalities.
@@ -18,8 +18,8 @@ public abstract class AbstractImageData implements ImageData {
     protected int width, height;
     protected BufferedImage image = null;
 
+    private GL3DQuatd quat;
     private Region region;
-    private MetaData metadata;
 
     private int frameNumber;
 
@@ -107,13 +107,13 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
-    public MetaData getMETADATA() {
-        return this.metadata;
+    public GL3DQuatd getLocalRotation() {
+        return this.quat;
     }
 
     @Override
-    public void setMETADATA(MetaData m) {
-        this.metadata = m;
+    public void setLocalRotation(GL3DQuatd q) {
+        this.quat = q;
     }
 
 }

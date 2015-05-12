@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -96,20 +95,12 @@ public class JHVSimpleImageView extends AbstractView {
     /**
      * {@inheritDoc}
      */
-    public Viewport getViewport() {
-        return viewport;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean setViewport(Viewport v, ChangeEvent event) {
-        // check if viewport has changed
-        if (viewport != null && v != null && viewport.getWidth() == v.getWidth() && viewport.getHeight() == v.getHeight())
-            return false;
-
+    @Override
+    public boolean setViewport(Viewport v) {
+        boolean changed = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
-        return true;
+
+        return changed;
     }
 
     /**
@@ -137,7 +128,7 @@ public class JHVSimpleImageView extends AbstractView {
             }
             region = new Region(-1.5, -1.5, 3., 3.);
             subImageData.setRegion(region);
-            subImageData.setMETADATA(this.m);
+            subImageData.setLocalRotation(m.getLocalRotation());
         } else {
             subImageData = null;
         }
@@ -154,9 +145,11 @@ public class JHVSimpleImageView extends AbstractView {
     /**
      * {@inheritDoc}
      */
-    public boolean setRegion(Region r, ChangeEvent event) {
+    @Override
+    public boolean setRegion(Region r) {
+        boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        return true;
+        return changed;
     }
 
     /**
@@ -218,16 +211,6 @@ public class JHVSimpleImageView extends AbstractView {
     @Override
     public ImageData getImageData() {
         return subImageData;
-    }
-
-    @Override
-    public boolean setRegion(Region r) {
-        return true;
-    }
-
-    @Override
-    public boolean setViewport(Viewport v) {
-        return true;
     }
 
 }
