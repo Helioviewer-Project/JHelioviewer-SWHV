@@ -49,7 +49,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             Graphics graph = bi.createGraphics();
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
-            tex.moveBufferedImageToGLTexture(gl, bi);
+            tex.copyBufferedImageToTexture2D(gl, bi);
             iconCacheId.put(key, tex);
         }
 
