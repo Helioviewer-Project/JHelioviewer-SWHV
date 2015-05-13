@@ -76,7 +76,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         canvas.setMinimumSize(new Dimension(1, 1));
         canvas.addGLEventListener(this);
 
-        Displayer.addListener(this);
+        Displayer.setDisplayListener(this);
     }
 
     public final Component getComponent() {
