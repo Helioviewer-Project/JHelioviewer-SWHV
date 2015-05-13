@@ -33,6 +33,9 @@ public class GLSLShader {
     public static int rectRef;
     public static int differenceRectRef;
     public static int viewportRef;
+    private static int cameraTransformationInverseRef;
+    private static int cameraDifferenceRotationQuatRef;
+    private static int diffCameraDifferenceRotationQuatRef;
 
     public static final int[] isDifferenceValue = new int[1];
     public static final int[] isDiscValue = new int[1];
@@ -74,8 +77,14 @@ public class GLSLShader {
         rectRef = gl.glGetUniformLocation(progID, "rect");
         differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
         viewportRef = gl.glGetUniformLocation(progID, "viewport");
+        cameraTransformationInverseRef = gl.glGetUniformLocation(progID, "cameraTransformationInverse");
+        cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "cameraDifferenceRotationQuat");
+        diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
+        int unsharpMaskingKernelRef = gl.glGetUniformLocation(progID, "unsharpMaskingKernel");
 
         bind(gl);
+        gl.glUniform1fv(unsharpMaskingKernelRef, 9, new float[] { 1f, 2f, 1f, 2f, 4f, 2f, 1f, 2f, 1f }, 0);
+
         setTextureUnit(gl, "image", 0);
         setTextureUnit(gl, "lut", 1);
         setTextureUnit(gl, "differenceImage", 2);
@@ -93,12 +102,16 @@ public class GLSLShader {
         gl.glUseProgram(progID);
     }
 
-    public static void bindMatrix(GL2 gl, float[] matrix, String name) {
-        gl.glUniformMatrix4fv(gl.glGetUniformLocation(progID, name), 1, false, matrix, 0);
+    public static void bindMatrix(GL2 gl, float[] matrix) {
+        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
-    public static void bindQuat(GL2 gl, GL3DQuatd quat, String name) {
-        gl.glUniform4fv(gl.glGetUniformLocation(progID, name), 1, quat.getFloatArray(), 0);
+    public static void bindCameraDifferenceRotationQuat(GL2 gl, GL3DQuatd quat) {
+        gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
+    }
+
+    public static void bindDiffCameraDifferenceRotationQuat(GL2 gl, GL3DQuatd quat) {
+        gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
     public static void unbind(GL2 gl) {
