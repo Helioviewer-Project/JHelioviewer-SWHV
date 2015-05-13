@@ -342,85 +342,83 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             minValue = yAxisElement.getMinValue();
             maxValue = yAxisElement.getMaxValue();
         }
-
+        double signFactor = 1;
+        double useMax = 1;
         if (maxValue < minValue) {
-            final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
-            int verticalTicks = 2;
-            if (sizeSteps >= 4) {
-                verticalTicks = 5;
-            } else if (verticalTicks >= 2) {
-                verticalTicks = 3;
-            }
-            if (verticalTicks == 0) {
-                final int y = graphArea.y + graphArea.height;
-
-                g.setColor(ChartConstants.TICK_LINE_COLOR);
-                g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-            } else {
-                final double tickDifferenceVertical = (minValue - maxValue) / (verticalTicks - 1);
-
-                for (int i = 0; i < verticalTicks; i++) {
-                    final double tickValue = maxValue + i * tickDifferenceVertical;
-                    String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
-                    Double yAxisRatio = yRatios.get(yAxisElement);
-                    if (yAxisRatio == null) {
-                        continue;
-                    }
-                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (minValue - tickValue));
-
-                    g.setColor(ChartConstants.TICK_LINE_COLOR);
-                    if (leftSide == 0) {
-                        g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-                    }
-
-                    final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                    final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
-                    g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-                    g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
-                }
-            }
-        } else {
-            final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
-            int verticalTicks = 2;
-            if (sizeSteps >= 4) {
-                verticalTicks = 5;
-            } else if (verticalTicks >= 2) {
-                verticalTicks = 3;
-            }
-            if (verticalTicks == 0) {
-                final int y = graphArea.y + graphArea.height;
-
-                g.setColor(ChartConstants.TICK_LINE_COLOR);
-                g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-            } else {
-                final double tickDifferenceVertical = (maxValue - minValue) / (verticalTicks - 1);
-
-                for (int i = 0; i < verticalTicks; i++) {
-                    final double tickValue = minValue + i * tickDifferenceVertical;
-                    String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
-
-                    Double yAxisRatio = yRatios.get(yAxisElement);
-                    if (yAxisRatio == null) {
-                        continue;
-                    }
-                    final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (tickValue - minValue));
-
-                    g.setColor(ChartConstants.TICK_LINE_COLOR);
-                    if (leftSide == 0) {
-                        g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-                    }
-
-                    final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                    final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
-                    g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-                    g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
-                    // tickValue += tickDifferenceVertical;
-
-                }
-            }
-
+            // signFactor = -1;
+            double temp = maxValue;
+            maxValue = minValue;
+            minValue = temp;
         }
-    }
+        /*
+         * if (maxValue < minValue) { final int sizeSteps = graphArea.height /
+         * ChartConstants.getMinVerticalTickSpace(); int verticalTicks = 2; if
+         * (sizeSteps >= 4) { verticalTicks = 5; } else if (verticalTicks >= 2)
+         * { verticalTicks = 3; } if (verticalTicks == 0) { final int y =
+         * graphArea.y + graphArea.height;
+         * 
+         * g.setColor(ChartConstants.TICK_LINE_COLOR); g.drawLine(graphArea.x -
+         * 3, y, graphArea.x + graphArea.width, y); } else { final double
+         * tickDifferenceVertical = (minValue - maxValue) / (verticalTicks - 1);
+         * 
+         * for (int i = 0; i < verticalTicks; i++) { final double tickValue =
+         * maxValue + i * tickDifferenceVertical; String tickText =
+         * ChartConstants.DECIMAL_FORMAT.format(tickValue); Double yAxisRatio =
+         * yRatios.get(yAxisElement); if (yAxisRatio == null) { continue; }
+         * final int y = graphArea.y + graphArea.height - (int) (yAxisRatio *
+         * (minValue - tickValue));
+         * 
+         * g.setColor(ChartConstants.TICK_LINE_COLOR); if (leftSide == 0) {
+         * g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y); }
+         * 
+         * final Rectangle2D bounds =
+         * g.getFontMetrics().getStringBounds(tickText, g); final int x =
+         * graphArea.x - 6 - (int) bounds.getWidth() + leftSide *
+         * (graphArea.width + (int) bounds.getWidth() + 6);
+         * g.setColor(ChartConstants.LABEL_TEXT_COLOR); g.drawString(tickText,
+         * x, y + (int) (bounds.getHeight() / 2)); } } } else {
+         */
+        final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
+        int verticalTicks = 2;
+        if (sizeSteps >= 4) {
+            verticalTicks = 5;
+        } else if (verticalTicks >= 2) {
+            verticalTicks = 3;
+        }
+        if (verticalTicks == 0) {
+            final int y = graphArea.y + graphArea.height;
+
+            g.setColor(ChartConstants.TICK_LINE_COLOR);
+            g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
+        } else {
+            final double tickDifferenceVertical = (maxValue - minValue) / (verticalTicks - 1);
+
+            for (int i = 0; i < verticalTicks; i++) {
+                final double tickValue = minValue + i * tickDifferenceVertical;
+                String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
+
+                Double yAxisRatio = yRatios.get(yAxisElement);
+                if (yAxisRatio == null) {
+                    continue;
+                }
+                final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (tickValue - minValue));
+
+                g.setColor(ChartConstants.TICK_LINE_COLOR);
+                if (leftSide == 0) {
+                    g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
+                }
+
+                final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+                final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
+                g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+                g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
+                // tickValue += tickDifferenceVertical;
+
+            }
+        }
+
+        // }
+}
 
     private void drawMovieLine(final Graphics2D g) {
         if (movieLinePosition < 0 || !drawController.getIntervalAvailable() || graphArea.height < 0) {
@@ -796,11 +794,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
