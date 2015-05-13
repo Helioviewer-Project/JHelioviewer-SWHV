@@ -91,7 +91,8 @@ public abstract class AbstractView implements View {
         GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 1f);
         applyGLLUT(gl);
 
-        tex.copyImageDataToTexture2D(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
+        tex.bind(gl, GL2.GL_TEXTURE_2D);
+        tex.copyImageData2D(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
     }
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
@@ -113,7 +114,7 @@ public abstract class AbstractView implements View {
             currlut = lut;
         }
 
-        gl.glBindTexture(GL2.GL_TEXTURE_1D, lutTex.get(gl));
+        lutTex.bind(gl, GL2.GL_TEXTURE_1D);
 
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
@@ -135,15 +136,7 @@ public abstract class AbstractView implements View {
             lastLut = currlut;
             lastInverted = invertLUT;
 
-            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
-            gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-
-            gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, lutBuffer.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, lutBuffer);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-            gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+            lutTex.copyBuffer1D(gl, lutBuffer);
         }
         lutChanged = false;
 
@@ -174,8 +167,10 @@ public abstract class AbstractView implements View {
             }
             if (this.differenceMode && this.imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
+
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
-                diffTex.copyImageDataToTexture2D(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight());
+                diffTex.bind(gl, GL2.GL_TEXTURE_2D);
+                diffTex.copyImageData2D(gl, previousFrame, 0, 0, previousFrame.getWidth(), previousFrame.getHeight());
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
@@ -280,7 +275,6 @@ public abstract class AbstractView implements View {
             innerCutOff = md.getInnerPhysicalOcculterRadius();
             outerCutOff = md.getOuterPhysicalOcculterRadius();
         }
-
         GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
     }
 
@@ -293,17 +287,17 @@ public abstract class AbstractView implements View {
     }
 
     public void init(GL2 gl) {
-        tex = new GLTexture();
-        lutTex = new GLTexture();
-        diffTex = new GLTexture();
+        tex = new GLTexture(gl);
+        lutTex = new GLTexture(gl);
+        diffTex = new GLTexture(gl);
 
         lutChanged = true;
     }
 
     public void dispose(GL2 gl) {
-        tex.dispose(gl);
-        lutTex.dispose(gl);
-        diffTex.dispose(gl);
+        tex.delete(gl);
+        lutTex.delete(gl);
+        diffTex.delete(gl);
     }
 
 }

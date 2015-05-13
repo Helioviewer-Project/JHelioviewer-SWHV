@@ -42,21 +42,19 @@ public class GLTexture {
     private int prev_inputGLFormat = -1;
     private int prev_bppGLType = -1;
 
-    public int get(GL2 gl) {
-        if (texID == -1) {
-            int[] tmp = new int[1];
-            gl.glGenTextures(1, tmp, 0);
-            texID = tmp[0];
-        }
-        return texID;
+    public GLTexture(GL2 gl) {
+        int[] tmp = new int[1];
+        gl.glGenTextures(1, tmp, 0);
+        texID = tmp[0];
     }
 
-    public void dispose(GL2 gl) {
-        if (texID != -1) {
-            gl.glDeleteTextures(1, new int[] { texID }, 0);
-            texID = -1;
-        }
-        prev_width = -1;
+    public void bind(GL2 gl, int target) {
+        gl.glBindTexture(target, texID);
+    }
+
+    public void delete(GL2 gl) {
+        gl.glDeleteTextures(1, new int[] { texID }, 0);
+        texID = prev_width = -1;
     }
 
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
@@ -67,7 +65,7 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageDataToTexture2D(GL2 gl, ImageData source, int x, int y, int width, int height) {
+    public void copyImageData2D(GL2 gl, ImageData source, int x, int y, int width, int height) {
         if (width > GLInfo.maxTextureSize || height > GLInfo.maxTextureSize)
             return;
 
@@ -97,9 +95,6 @@ public class GLTexture {
         int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
         int bppGLType = mapBitsPerPixelToGLType(bitsPerPixel);
 
-        // force generate
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, get(gl));
-
         if (width != prev_width || height != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
             genTexture2D(gl, internalGLFormat, width, height, inputGLFormat, bppGLType, null);
@@ -112,7 +107,7 @@ public class GLTexture {
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
     }
 
-    public void copyBufferedImageToTexture2D(GL2 gl, BufferedImage source) {
+    public void copyBufferedImage2D(GL2 gl, BufferedImage source) {
         int width, height;
         if ((width = source.getWidth()) > GLInfo.maxTextureSize || (height = source.getHeight()) > GLInfo.maxTextureSize)
             return;
@@ -142,9 +137,19 @@ public class GLTexture {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        // force generate
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, get(gl));
         genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), width, height, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+    }
+
+    public void copyBuffer1D(GL2 gl, IntBuffer source) {
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
+
+        gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, source.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, source);
+        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
     }
 
     /**

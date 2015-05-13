@@ -44,16 +44,18 @@ public class SWHVHEKPluginRenderable implements Renderable {
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            tex = new GLTexture();
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics graph = bi.createGraphics();
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
-            tex.copyBufferedImageToTexture2D(gl, bi);
+
+            tex = new GLTexture(gl);
+            tex.bind(gl, GL2.GL_TEXTURE_2D);
+            tex.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
 
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, tex.get(gl));
+        tex.bind(gl, GL2.GL_TEXTURE_2D);
     }
 
     public void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
@@ -335,7 +337,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void dispose(GL2 gl) {
         for (GLTexture el : iconCacheId.values()) {
-            el.dispose(gl);
+            el.delete(gl);
         }
         iconCacheId.clear();
     }
