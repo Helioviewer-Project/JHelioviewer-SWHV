@@ -203,13 +203,12 @@ public class RenderableImageLayer implements Renderable {
             GL3DCamera camera = Displayer.getActiveCamera();
             GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
-            GLSLShader.bindMatrix(gl, vpmi.getFloatArray(), "cameraTransformationInverse");
-            GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getImageData()), "cameraDifferenceRotationQuat");
-
+            GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getImageData()));
             if (this.mainLayerView.getBaseDifferenceMode()) {
-                GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getBaseDifferenceImageData()), "diffcameraDifferenceRotationQuat");
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getBaseDifferenceImageData()));
             } else if (this.mainLayerView.getDifferenceMode()) {
-                GLSLShader.bindQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()), "diffcameraDifferenceRotationQuat");
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()));
             }
 
             enablePositionVBO(gl);

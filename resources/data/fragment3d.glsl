@@ -20,6 +20,7 @@ uniform float cutOffRadius;
 uniform float outerCutOffRadius;
 uniform float phi;
 uniform float theta;
+uniform float unsharpMaskingKernel[9];
 uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
@@ -54,17 +55,6 @@ float intersectPlanediff(vec4 vecin)
 
 void main(void)
 {  
-    float unsharpMaskingKernel[9];
-    unsharpMaskingKernel[0] = 1.;
-    unsharpMaskingKernel[1] = 2.;
-    unsharpMaskingKernel[2] = 1.;
-    unsharpMaskingKernel[3] = 2.;
-    unsharpMaskingKernel[4] = 4.;
-    unsharpMaskingKernel[5] = 2.;
-    unsharpMaskingKernel[6] = 1.;
-    unsharpMaskingKernel[7] = 2.;
-    unsharpMaskingKernel[8] = 1.;
-
     float tmpConvolutionSum = 0.;
     vec2 normalizedScreenpos = 2.*((gl_FragCoord.xy/viewport)-0.5);
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
@@ -87,6 +77,7 @@ void main(void)
     }
 
     color = texture2D(image, texcoord);
+    
     if(isdifference == BASEDIFFERENCE_NO_ROT || isdifference == RUNNINGDIFFERENCE_NO_ROT) {
         difftexcoord = vec2((rotatedHitPoint.x*differencerect.z - differencerect.x*differencerect.z), (-rotatedHitPoint.y*differencerect.w*1.0-differencerect.y*differencerect.w));
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
@@ -126,7 +117,7 @@ void main(void)
             }
         }
     }
-
+    
     color.r = (1. + pixelSizeWeighting.z) * color.r - pixelSizeWeighting.z * tmpConvolutionSum / 16.0;
     color.r = pow(color.r, gamma);
     color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
