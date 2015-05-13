@@ -19,8 +19,6 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.renderable.RenderableDummy;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -339,6 +337,7 @@ public class APIRequestManager {
             @Override
             public void run() {
                 Displayer.getLayersModel().addLayer(theView);
+                Displayer.getLayersModel().setActiveLayer(theView);
             }
 
             public Runnable init(AbstractView theView) {
@@ -375,28 +374,11 @@ public class APIRequestManager {
      * @throws IOException
      */
     public static AbstractView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
-        final RenderableDummy renderableDummy = new RenderableDummy();
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
-            }
-        });
-        final AbstractView view;
         if (endTime.equals("")) {
-            view = loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
+            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
         } else {
-            view = loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
+            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
-                if (view != null)
-                    Displayer.getLayersModel().setActiveLayer(view);
-            }
-        });
-        return view;
     }
 
     /**
