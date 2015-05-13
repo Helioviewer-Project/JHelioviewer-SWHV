@@ -8,9 +8,9 @@ import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPResponse;
 /**
  * A response to a JPIPRequest. Encapsulates both the HTTPResponse headers and
  * the JPIPDataSegments.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class JPIPResponse extends HTTPResponse {
 
@@ -18,11 +18,12 @@ public class JPIPResponse extends HTTPResponse {
     private long status;
 
     /** A list of the data segments. */
-    private LinkedList<JPIPDataSegment> jpipDataList;
+    private final LinkedList<JPIPDataSegment> jpipDataList;
+    private long size = 0;
 
     /**
      * Used to form responses.
-     * 
+     *
      * @param res
      * @throws IOException
      */
@@ -38,7 +39,7 @@ public class JPIPResponse extends HTTPResponse {
 
     /**
      * Adds the data segment to this object.
-     * 
+     *
      * @param data
      */
     public void addJpipDataSegment(JPIPDataSegment data) {
@@ -46,32 +47,35 @@ public class JPIPResponse extends HTTPResponse {
             status = data.binID;
         }
         jpipDataList.add(data);
+        size += data.length;
     }
 
     /**
      * Removes a data segment from this object.
-     * 
+     *
      * @return The removed data segment, null if the list was empty
      */
     public JPIPDataSegment removeJpipDataSegment() {
-        return (jpipDataList.isEmpty() ? null : jpipDataList.remove());
+        if (!jpipDataList.isEmpty()) {
+            JPIPDataSegment jpr = jpipDataList.remove();
+            size -= jpr.length;
+            return jpr;
+        }
+        return null;
     }
 
     /**
      * Determines the response size.
-     * 
+     *
      * @return Response size
      */
     public long getResponseSize() {
-        long size = 0;
-        for (int i = 0; i < jpipDataList.size(); i++)
-            size += jpipDataList.get(i).length;
         return size;
     }
 
     /**
      * Tells if the response completes the last request.
-     * 
+     *
      * @return True, if the response is complete
      */
     public boolean isResponseComplete() {
