@@ -150,7 +150,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     @Override
     public void eventHightChanged(JHVEvent event) {
-        Displayer.display();
+        display();
     }
 
     public static LayersModel getLayersModel() {
