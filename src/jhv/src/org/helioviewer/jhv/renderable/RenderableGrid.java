@@ -100,7 +100,7 @@ public class RenderableGrid implements Renderable {
     }
 
     private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {
-        gl.glLineWidth(1f);
+        gl.glLineWidth(0.5f);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);

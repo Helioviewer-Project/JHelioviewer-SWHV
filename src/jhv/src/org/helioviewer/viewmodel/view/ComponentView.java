@@ -126,6 +126,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(canvas);
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
