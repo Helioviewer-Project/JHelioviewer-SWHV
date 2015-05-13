@@ -21,9 +21,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static final ImmutableDateTime epochDateTime = ImmutableDateTime.parseDateTime("2000-01-01T00:00:00");
 
-    private static final ArrayList<DisplayListener> listeners = new ArrayList<DisplayListener>();
+    private static DisplayListener displayListener;
     private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
     private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+
     private static GL3DCamera activeCamera = new GL3DObserverCamera(true);
     private static int viewportWidth;
     private static int viewportHeight;
@@ -76,9 +77,7 @@ public class Displayer implements JHVEventHighlightListener {
         public void actionPerformed(ActionEvent e) {
             if (todisplay == true) {
                 todisplay = false;
-                for (final DisplayListener listener : listeners) {
-                    listener.display();
-                }
+                displayListener.display();
             }
 
             if (torender == true) {
@@ -90,16 +89,8 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static void addListener(final DisplayListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void removeListener(final DisplayListener listener) {
-        listeners.remove(listener);
-    }
-
-    public static void removeListeners() {
-        listeners.clear();
+    public static void setDisplayListener(DisplayListener listener) {
+        displayListener = listener;
     }
 
     public static void addRenderListener(final RenderListener renderListener) {
