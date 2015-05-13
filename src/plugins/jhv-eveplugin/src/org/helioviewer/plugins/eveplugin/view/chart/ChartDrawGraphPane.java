@@ -343,41 +343,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             maxValue = yAxisElement.getMaxValue();
         }
         double signFactor = 1;
-        double useMax = 1;
+        double useMax = 0;
         if (maxValue < minValue) {
-            // signFactor = -1;
+            signFactor = -1;
             double temp = maxValue;
             maxValue = minValue;
             minValue = temp;
+            useMax = 1;
         }
-        /*
-         * if (maxValue < minValue) { final int sizeSteps = graphArea.height /
-         * ChartConstants.getMinVerticalTickSpace(); int verticalTicks = 2; if
-         * (sizeSteps >= 4) { verticalTicks = 5; } else if (verticalTicks >= 2)
-         * { verticalTicks = 3; } if (verticalTicks == 0) { final int y =
-         * graphArea.y + graphArea.height;
-         * 
-         * g.setColor(ChartConstants.TICK_LINE_COLOR); g.drawLine(graphArea.x -
-         * 3, y, graphArea.x + graphArea.width, y); } else { final double
-         * tickDifferenceVertical = (minValue - maxValue) / (verticalTicks - 1);
-         * 
-         * for (int i = 0; i < verticalTicks; i++) { final double tickValue =
-         * maxValue + i * tickDifferenceVertical; String tickText =
-         * ChartConstants.DECIMAL_FORMAT.format(tickValue); Double yAxisRatio =
-         * yRatios.get(yAxisElement); if (yAxisRatio == null) { continue; }
-         * final int y = graphArea.y + graphArea.height - (int) (yAxisRatio *
-         * (minValue - tickValue));
-         * 
-         * g.setColor(ChartConstants.TICK_LINE_COLOR); if (leftSide == 0) {
-         * g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y); }
-         * 
-         * final Rectangle2D bounds =
-         * g.getFontMetrics().getStringBounds(tickText, g); final int x =
-         * graphArea.x - 6 - (int) bounds.getWidth() + leftSide *
-         * (graphArea.width + (int) bounds.getWidth() + 6);
-         * g.setColor(ChartConstants.LABEL_TEXT_COLOR); g.drawString(tickText,
-         * x, y + (int) (bounds.getHeight() / 2)); } } } else {
-         */
         final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
         int verticalTicks = 2;
         if (sizeSteps >= 4) {
@@ -401,7 +374,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 if (yAxisRatio == null) {
                     continue;
                 }
-                final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * (tickValue - minValue));
+                final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * signFactor * (tickValue - (1 - useMax) * minValue - useMax * maxValue));
 
                 g.setColor(ChartConstants.TICK_LINE_COLOR);
                 if (leftSide == 0) {
@@ -412,13 +385,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
                 g.setColor(ChartConstants.LABEL_TEXT_COLOR);
                 g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
-                // tickValue += tickDifferenceVertical;
-
             }
         }
-
-        // }
-}
+    }
 
     private void drawMovieLine(final Graphics2D g) {
         if (movieLinePosition < 0 || !drawController.getIntervalAvailable() || graphArea.height < 0) {
