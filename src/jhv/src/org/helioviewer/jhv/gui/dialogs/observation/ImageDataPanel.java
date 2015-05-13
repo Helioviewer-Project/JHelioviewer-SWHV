@@ -35,6 +35,7 @@ import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -46,6 +47,8 @@ import org.helioviewer.jhv.io.DataSourceServerListener;
 import org.helioviewer.jhv.io.DataSourceServers;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
+import org.helioviewer.jhv.renderable.RenderableDummy;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -251,12 +254,28 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                final RenderableDummy renderableDummy = new RenderableDummy();
+
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
+                    }
+                });
+
                 try {
                     APIRequestManager.requestAndOpenRemoteFile(true, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
+
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+                    }
+                });
             }
         }, "LoadNewMovie");
         thread.start();
