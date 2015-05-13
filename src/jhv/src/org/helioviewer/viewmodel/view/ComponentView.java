@@ -28,6 +28,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -84,8 +85,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     @Override
-    public void init(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+    public void init(GLAutoDrawable drawable) throws GLException {
+        GL2 gl = drawable.getGL().getGL2(); // try to force an exception
 
         GLInfo.update(gl);
         GLInfo.updatePixelScale(canvas);
