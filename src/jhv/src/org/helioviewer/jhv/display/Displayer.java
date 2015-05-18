@@ -116,12 +116,12 @@ public class Displayer implements JHVEventHighlightListener {
     private static final LayersModel layersModel = new LayersModel();
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
-        int idx = layersModel.findView(view);
+        int idx = LayersModel.findView(view);
         if (idx != -1 /* layersModel.isValidIndex(idx) */) {
             // update timestamp labels
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
-            if (idx == layersModel.getActiveLayer() && dateTime != null) {
+            if (idx == LayersModel.getActiveLayer() && dateTime != null) {
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(layersModel.getFPS(view));
                 MoviePanel.setFrameSlider(view);
 
@@ -137,9 +137,9 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static Date getLastUpdatedTimestamp() {
         if (lastTimestamp == null) {
-            Date lastDate = layersModel.getLastDate();
+            Date lastDate = LayersModel.getLastDate();
             if (lastDate != null) {
-                lastTimestamp = layersModel.getLastDate();
+                lastTimestamp = LayersModel.getLastDate();
                 return lastTimestamp;
             }
             return null;

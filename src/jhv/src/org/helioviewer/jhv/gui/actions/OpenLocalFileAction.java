@@ -13,7 +13,6 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilter;
 import org.helioviewer.jhv.gui.actions.filefilters.FitsFilter;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.gui.actions.filefilters.JP2Filter;
 import org.helioviewer.jhv.gui.actions.filefilters.JPGFilter;
 import org.helioviewer.jhv.gui.actions.filefilters.PNGFilter;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -76,7 +76,7 @@ public class OpenLocalFileAction extends AbstractAction {
                     public void run() {
                         try {
                             AbstractView view = APIRequestManager.newLoad(uri, uri);
-                            Displayer.getLayersModel().addToViewchain(view);
+                            LayersModel.addToViewchain(view);
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         }
