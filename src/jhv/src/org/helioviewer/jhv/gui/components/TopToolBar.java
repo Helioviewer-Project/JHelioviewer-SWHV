@@ -59,7 +59,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
-    private JButton resetCamera;
 
     protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
 
@@ -148,7 +147,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         removeAll();
 
         // Zoom
-        addButton(new JButton(new ZoomInAction(false,true)));
+        addButton(new JButton(new ZoomInAction(false, true)));
         addButton(new JButton(new ZoomOutAction(false, true)));
         addButton(new JButton(new ZoomFitAction(false, true)));
         addButton(new JButton(new ZoomOneToOneAction(false, true)));

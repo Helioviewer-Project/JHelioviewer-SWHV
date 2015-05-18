@@ -26,7 +26,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public RenderableType getType() {
-        return null;
+        return type;
     }
 
     @Override

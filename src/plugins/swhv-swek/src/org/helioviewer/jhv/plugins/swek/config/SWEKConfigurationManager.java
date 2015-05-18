@@ -110,7 +110,6 @@ public class SWEKConfigurationManager {
                     // check if the file is manually changed if not we download
                     // the latest version anyway.
                     if (checkAndOpenOnlineFile()) {
-                        Long start = System.currentTimeMillis();
                         isConfigParsed = parseConfigFile();
                     } else {
                         isConfigParsed = false;
