@@ -5,12 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilter;
@@ -19,6 +21,7 @@ import org.helioviewer.jhv.gui.actions.filefilters.JP2Filter;
 import org.helioviewer.jhv.gui.actions.filefilters.JPGFilter;
 import org.helioviewer.jhv.gui.actions.filefilters.PNGFilter;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Action to open a local file.
@@ -46,8 +49,7 @@ public class OpenLocalFileAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        final JFileChooser fileChooser = new JFileChooser(Settings.getSingletonInstance().getProperty("default.local.path"));
+        JFileChooser fileChooser = new JFileChooser(Settings.getSingletonInstance().getProperty("default.local.path"));
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.addChoosableFileFilter(new JP2Filter());
@@ -64,15 +66,17 @@ public class OpenLocalFileAction extends AbstractAction {
 
             if (selectedFile.exists() && selectedFile.isFile()) {
                 // remember the current directory for future
-                Settings.getSingletonInstance().setProperty("default.local.path", fileChooser.getSelectedFile().getParent());
+                Settings.getSingletonInstance().setProperty("default.local.path", selectedFile.getParent());
                 Settings.getSingletonInstance().save();
 
+                final URI uri = selectedFile.toURI();
                 // Load image in new thread
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            APIRequestManager.newLoad(fileChooser.getSelectedFile().toURI(), true);
+                            AbstractView view = APIRequestManager.newLoad(uri, uri);
+                            Displayer.getLayersModel().addToViewchain(view);
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         }

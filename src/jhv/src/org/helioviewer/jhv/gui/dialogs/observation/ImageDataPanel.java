@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
@@ -234,7 +235,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             @Override
             public void run() {
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true, null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    Displayer.getLayersModel().addToViewchain(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -264,7 +266,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 });
 
                 try {
-                    APIRequestManager.requestAndOpenRemoteFile(true, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    Displayer.getLayersModel().addToViewchain(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);

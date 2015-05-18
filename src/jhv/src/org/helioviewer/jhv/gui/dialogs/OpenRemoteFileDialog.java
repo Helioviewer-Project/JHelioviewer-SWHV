@@ -27,12 +27,14 @@ import javax.swing.text.BadLocationException;
 import javax.swing.tree.TreePath;
 
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.DynamicModel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Dialog that is used to open user defined JPIP images.
@@ -360,7 +362,9 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     URI newUri = filedownloader.downloadFromHTTP(uri, true);
 
                     try {
-                        APIRequestManager.newLoad(newUri, uri, true);
+                        AbstractView view = APIRequestManager.newLoad(newUri, uri);
+                        Displayer.getLayersModel().addToViewchain(view);
+
                         dispose();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -425,7 +429,8 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 @Override
                 public void run() {
                     try {
-                        APIRequestManager.newLoad(uri, new URI(httpPath), true);
+                        AbstractView view = APIRequestManager.newLoad(uri, new URI(httpPath));
+                        Displayer.getLayersModel().addToViewchain(view);
 
                         if (advancedOptions == false) {
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());

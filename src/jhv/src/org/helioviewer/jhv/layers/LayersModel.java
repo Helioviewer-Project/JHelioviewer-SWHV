@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -288,7 +289,7 @@ public class LayersModel {
         dialog.showDialog();
     }
 
-    public static void addLayer(AbstractView view) {
+    private static void addLayer(AbstractView view) {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
 
@@ -308,6 +309,29 @@ public class LayersModel {
         int newIndex = layers.size() - 1;
         fireLayerAdded(newIndex);
         setActiveLayer(newIndex);
+    }
+
+    public static void addToViewchain(AbstractView view) {
+        while (view.getSubimageData() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        EventQueue.invokeLater(new Runnable() {
+            private AbstractView theView;
+
+            @Override
+            public void run() {
+                addLayer(theView);
+            }
+
+            public Runnable init(AbstractView theView) {
+                this.theView = theView;
+                return this;
+            }
+        }.init(view));
     }
 
     /**

@@ -241,7 +241,7 @@ public class ImageViewerGui {
      * tries to load this images. Otherwise it tries to load a default image
      * which is defined by the default entries of the observation panel.
      * */
-    public void loadImagesAtStartup() {
+    private void loadImagesAtStartup() {
         // get values for different command line options
         AbstractList<JHVRequest> jhvRequests = CommandLineProcessor.getJHVOptionValues();
         AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
@@ -259,7 +259,9 @@ public class ImageViewerGui {
             try {
                 for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
                     // load image and memorize corresponding view
-                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(true, jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
+                    Displayer.getLayersModel().addToViewchain(view);
+
                     if (view != null) {
                         // get the layered view
 
@@ -302,9 +304,10 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    AbstractView view = APIRequestManager.newLoad(jpxUrl, true);
-                    if (view != null) {
+                    AbstractView view = APIRequestManager.newLoad(jpxUrl, jpxUrl);
+                    Displayer.getLayersModel().addToViewchain(view);
 
+                    if (view != null) {
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
@@ -335,7 +338,8 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
-                    APIRequestManager.newLoad(jpipUri, true);
+                    AbstractView view = APIRequestManager.newLoad(jpipUri, jpipUri);
+                    Displayer.getLayersModel().addToViewchain(view);
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -349,7 +353,10 @@ public class ImageViewerGui {
                     FileDownloader fileDownloader = new FileDownloader();
                     File downloadFile = fileDownloader.getDefaultDownloadLocation(downloadAddress);
                     fileDownloader.get(downloadAddress, downloadFile);
-                    APIRequestManager.newLoad(downloadFile.toURI(), true);
+                    URI uri = downloadFile.toURI();
+
+                    AbstractView view = APIRequestManager.newLoad(uri, uri);
+                    Displayer.getLayersModel().addToViewchain(view);
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
