@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -273,15 +274,8 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static AbstractView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
-        if (uri == null) {
-            return null;
-        }
-        AbstractView view = loadView(uri, downloadURI, true);
-        if (addToViewChain) {
-            addToViewchain(view);
-        }
-        return view;
+    public static AbstractView newLoad(URI uri, URI downloadURI) throws IOException {
+        return loadView(uri, downloadURI, true);
     }
 
     private static void addToViewchain(AbstractView view) {
@@ -306,7 +300,6 @@ public class APIRequestManager {
                 return this;
             }
         }.init(view));
->>>>>>> do not make intermediate call
     }
 
     /**
