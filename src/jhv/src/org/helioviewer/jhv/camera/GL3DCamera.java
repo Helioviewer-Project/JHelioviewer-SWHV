@@ -41,7 +41,7 @@ public abstract class GL3DCamera {
 
     private boolean trackingMode;
 
-    public GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
+    private GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
 
     private double cameraWidth = 1.;
     private double previousCameraWidth = -1;
@@ -181,6 +181,10 @@ public abstract class GL3DCamera {
         previousAspect = aspect;
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+    }
+
+    public GL3DMat4d getOrthoMatrixInverse() {
+        return orthoMatrixInverse.copy();
     }
 
     public void resumePerspective(GL2 gl) {
