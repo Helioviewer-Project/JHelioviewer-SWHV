@@ -138,7 +138,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = 2;
-
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 2;
         this.add(newOptionPanel, c);
