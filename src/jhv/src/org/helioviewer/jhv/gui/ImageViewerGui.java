@@ -11,7 +11,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.AbstractList;
 
@@ -41,7 +40,6 @@ import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.io.JHVRequest;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
@@ -50,9 +48,7 @@ import org.helioviewer.jhv.renderable.RenderableGrid;
 import org.helioviewer.jhv.renderable.RenderableGridType;
 import org.helioviewer.jhv.renderable.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.RenderableSolarAxesType;
-import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ComponentView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * A class that sets up the graphical user interface.
@@ -243,93 +239,22 @@ public class ImageViewerGui {
      * */
     private static void loadImagesAtStartup() {
         // get values for different command line options
-        AbstractList<JHVRequest> jhvRequests = CommandLineProcessor.getJHVOptionValues();
         AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
         AbstractList<URI> downloadAddresses = CommandLineProcessor.getDownloadOptionValues();
         AbstractList<URI> jpxUrls = CommandLineProcessor.getJPXOptionValues();
 
         // Do nothing if no resource is specified
-        if (jhvRequests.isEmpty() && jpipUris.isEmpty() && downloadAddresses.isEmpty() && jpxUrls.isEmpty()) {
+        if (jpipUris.isEmpty() && downloadAddresses.isEmpty() && jpxUrls.isEmpty()) {
             return;
-        }
-
-        // -jhv
-        // go through all jhv values
-        for (JHVRequest jhvRequest : jhvRequests) {
-            try {
-                for (int layer = 0; layer < jhvRequest.imageLayers.length; ++layer) {
-                    // load image and memorize corresponding view
-                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(jhvRequest.cadence, jhvRequest.startTime, jhvRequest.endTime, jhvRequest.imageLayers[layer].observatory, jhvRequest.imageLayers[layer].instrument, jhvRequest.imageLayers[layer].detector, jhvRequest.imageLayers[layer].measurement, true);
-                    LayersModel.addView(view);
-
-                    if (view != null) {
-                        // get the layered view
-
-                        // go through all sub view chains of the layered
-                        // view and try to find the
-                        // view chain of the corresponding image info view
-                        for (int i = 0; i < LayersModel.getNumLayers(); i++) {
-                            AbstractView subView = LayersModel.getLayer(i);
-
-                            // if view has been found
-                            if (view.equals(subView)) {
-                                // Lock movie
-                                if (jhvRequest.linked) {
-                                    if (subView instanceof JHVJPXView && ((JHVJPXView) subView).getMaximumFrameNumber() > 0) {
-                                        MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) subView);
-                                        if (moviePanel == null) {
-                                            throw new Exception();
-                                        }
-                                        moviePanel.setMovieLink(true);
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         // -jpx
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    AbstractView view = APIRequestManager.loadView(jpxUrl, jpxUrl, true);
-                    LayersModel.addView(view);
-
-                    if (view != null) {
-                        // go through all sub view chains of the layered
-                        // view and try to find the
-                        // view chain of the corresponding image info view
-                        for (int i = 0; i < LayersModel.getNumLayers(); i++) {
-                            AbstractView subView = LayersModel.getLayer(i);
-
-                            // if view has been found
-                            if (view.equals(subView) && subView instanceof JHVJPXView) {
-                                JHVJPXView movieView = (JHVJPXView) subView;
-                                MoviePanel moviePanel = MoviePanel.getMoviePanel(movieView);
-                                if (moviePanel == null) {
-                                    throw new Exception();
-                                }
-                                moviePanel.setMovieLink(true);
-                                break;
-                            }
-                        }
-                    }
+                    LayersModel.addView(APIRequestManager.loadView(jpxUrl, jpxUrl));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -338,8 +263,7 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
-                    AbstractView view = APIRequestManager.loadView(jpipUri, jpipUri, true);
-                    LayersModel.addView(view);
+                    LayersModel.addView(APIRequestManager.loadView(jpipUri, jpipUri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -355,8 +279,7 @@ public class ImageViewerGui {
                     fileDownloader.get(downloadAddress, downloadFile);
                     URI uri = downloadFile.toURI();
 
-                    AbstractView view = APIRequestManager.loadView(uri, uri, true);
-                    LayersModel.addView(view);
+                    LayersModel.addView(APIRequestManager.loadView(uri, uri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
