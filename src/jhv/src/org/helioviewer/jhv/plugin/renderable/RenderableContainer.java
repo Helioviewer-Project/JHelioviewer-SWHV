@@ -177,4 +177,5 @@ public class RenderableContainer implements TableModel, Reorderable {
             renderable.dispose(gl);
         }
     }
+
 }

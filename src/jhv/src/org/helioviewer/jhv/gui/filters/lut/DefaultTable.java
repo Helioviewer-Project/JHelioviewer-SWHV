@@ -69,7 +69,9 @@ public class DefaultTable {
         // Only if the config is fine
         if (colorRules == null)
             return null;
-        for (int i = 0; i < colorRules.length(); ++i) {
+
+        int length = colorRules.length();
+        for (int i = 0; i < length; ++i) {
             try {
                 JSONObject rule = colorRules.getJSONObject(i);
                 if (rule.has("observatory")) {

@@ -351,15 +351,16 @@ public class DownloadController {
                 }
                 final JSONArray data = json.getJSONArray("data");
 
-                if (data.length() == 0) {
+                int length = data.length();
+                if (length == 0) {
                     return;
                 }
 
                 // Log.warn(data.toString());
-                final double[] values = new double[data.length()];
-                final long[] dates = new long[data.length()];
+                final double[] values = new double[length];
+                final long[] dates = new long[length];
 
-                for (int i = 0; i < data.length(); i++) {
+                for (int i = 0; i < length; i++) {
                     final JSONArray entry = data.getJSONArray(i);
                     final long millis = ((long) entry.getDouble(0)) * 1000;
                     values[i] = entry.getDouble(1) * multiplier;

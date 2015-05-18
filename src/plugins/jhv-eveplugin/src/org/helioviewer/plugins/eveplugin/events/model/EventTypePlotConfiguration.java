@@ -122,4 +122,5 @@ public class EventTypePlotConfiguration {
     public Date getLastDateWithData() {
         return lastDateWithData;
     }
+
 }

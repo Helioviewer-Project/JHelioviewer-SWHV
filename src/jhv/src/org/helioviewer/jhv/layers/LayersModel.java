@@ -141,7 +141,8 @@ public class LayersModel {
     public static Date getFirstDate() {
         ImmutableDateTime earliest = null;
 
-        for (int idx = 0; idx < layers.size(); idx++) {
+        int size = layers.size();
+        for (int idx = 0; idx < size; idx++) {
             ImmutableDateTime start = getStartDateImmutable(idx);
             if (start == null) {
                 continue;
@@ -162,7 +163,8 @@ public class LayersModel {
     public static Date getLastDate() {
         ImmutableDateTime latest = null;
 
-        for (int idx = 0; idx < layers.size(); idx++) {
+        int size = layers.size();
+        for (int idx = 0; idx < size; idx++) {
             ImmutableDateTime end = getEndDateImmutable(idx);
             if (end == null) {
                 continue;
@@ -356,7 +358,6 @@ public class LayersModel {
         layers.remove(view);
         if (view instanceof JHVJPXView) {
             ((JHVJPXView) view).abolish();
-            ((JHVJPXView) view).removeRenderListener();
         }
         fireLayerRemoved(index);
 

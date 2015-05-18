@@ -474,4 +474,5 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         yAxisSet = tempSet;
     }
+
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 
 public class DataCollapsiblePanelModel {
+
     private final Set<DataCollapsiblePanelModelListener> listeners;
 
     public DataCollapsiblePanelModel() {
@@ -25,4 +26,5 @@ public class DataCollapsiblePanelModel {
     public void removeListener(DataCollapsiblePanelModelListener listener) {
         listeners.remove(listener);
     }
+
 }

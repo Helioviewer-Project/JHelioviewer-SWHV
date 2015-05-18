@@ -83,4 +83,5 @@ public class EventPanel implements DrawableElement {
     public Date getLastDateWithData() {
         return EventModel.getSingletonInstance().getEventTypePlotConfiguration().getLastDateWithData();
     }
+
 }

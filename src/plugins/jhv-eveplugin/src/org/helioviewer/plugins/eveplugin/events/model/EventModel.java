@@ -352,4 +352,5 @@ public class EventModel implements TimingListener, EventRequesterListener {
         }
         return !tempPrevZero || !eventPlotConfiguration.getEventPlotConfigurations().isEmpty();
     }
+
 }

@@ -144,9 +144,11 @@ public class GL3DPositionLoading {
         try {
             GregorianCalendar calendar = new GregorianCalendar();
             JSONArray resArray = jsonResult.getJSONArray("result");
-            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[resArray.length()];
+            int resLength = resArray.length();
 
-            for (int j = 0; j < resArray.length(); j++) {
+            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[resLength];
+
+            for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
                 Iterator<String> iterKeys = posObject.keys();
                 if (!iterKeys.hasNext())
