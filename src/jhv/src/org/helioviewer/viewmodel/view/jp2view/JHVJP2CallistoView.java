@@ -54,6 +54,10 @@ public class JHVJP2CallistoView extends JHVJP2View {
         return changed;
     }
 
+    @Override
+    public void render() {
+    }
+
     public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler dataHandler) {
         this.dataHandler = dataHandler;
     }
