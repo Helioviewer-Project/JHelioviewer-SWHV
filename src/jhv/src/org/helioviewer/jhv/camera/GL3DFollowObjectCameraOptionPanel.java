@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -10,7 +13,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Date;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -57,29 +59,43 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         super();
         this.camera = camera;
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        add(new JSeparator(SwingConstants.HORIZONTAL));
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(0, 0, 0, 0);
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(new JSeparator(SwingConstants.HORIZONTAL), c);
 
         JPanel loadedLabelPanel = new JPanel();
         loadedLabelPanel.setLayout(new BoxLayout(loadedLabelPanel, BoxLayout.LINE_AXIS));
 
         loadedLabel = new JLabel("Status: Not loaded");
         loadedLabelPanel.add(loadedLabel);
-        add(loadedLabelPanel);
+        c.gridy = 1;
+        add(loadedLabelPanel, c);
+        c.gridy = 2;
+        add(new JSeparator(SwingConstants.HORIZONTAL), c);
+        c.gridy = 3;
 
-        add(new JSeparator(SwingConstants.HORIZONTAL));
-
-        addObjectCombobox();
+        addObjectCombobox(c);
         exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.add(exactDateCheckBox);
-        add(checkboxPanel);
-        addBeginDatePanel();
-        addEndDatePanel();
+        c.gridy = 4;
+        add(checkboxPanel, c);
+        c.gridy = 5;
+        addBeginDatePanel(c);
+        c.gridy = 6;
+        addEndDatePanel(c);
         addBeginDatePanel.setVisible(false);
         addEndDatePanel.setVisible(false);
-        addSyncButtons();
+        c.gridy = 7;
+
+        addSyncButtons(c);
         buttonPanel.setVisible(false);
         camera.setInterpolation(false);
         exactDateCheckBox.addActionListener(new ActionListener() {
@@ -98,7 +114,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.syncWithLayerEndTime(true);
     }
 
-    public void addSyncButtons() {
+    public void addSyncButtons(GridBagConstraints c) {
         this.synchronizeWithLayersButton = new JButton("Sync");
         this.synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         this.synchronizeWithLayersButton.addActionListener(new ActionListener() {
@@ -135,7 +151,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.synchronizeWithNowButton.getMaximumSize().width = 15;
         buttonPanel.add(this.synchronizeWithNowButton);
 
-        add(buttonPanel);
+        add(buttonPanel, c);
     }
 
     @Override
@@ -143,7 +159,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         this.camera.removeFollowObjectCameraListener(this);
     }
 
-    private void addObjectCombobox() {
+    private void addObjectCombobox(GridBagConstraints c) {
         objectCombobox = new JSeparatorComboBox();
         GL3DSpaceObject[] objectList = GL3DSpaceObject.getObjectList();
         for (int i = 0; i < objectList.length; i++) {
@@ -167,11 +183,11 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
                 }
             }
         });
-        add(objectCombobox);
+        add(objectCombobox, c);
         objectCombobox.setSelectedItem(GL3DSpaceObject.earth);
     }
 
-    private void addBeginDatePanel() {
+    private void addBeginDatePanel(GridBagConstraints c) {
         beginDateLabel = new JLabel("Begin");
         beginDatePicker = new JHVCalendarDatePicker();
         beginDatePicker.getTextField().addFocusListener(new FocusListener() {
@@ -211,7 +227,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         addBeginDatePanel.add(beginDatePicker);
         addBeginDatePanel.add(beginTimePicker);
         addBeginDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
-        add(addBeginDatePanel);
+        add(addBeginDatePanel, c);
     }
 
     private void setEndTime(boolean applyChanges) {
@@ -280,7 +296,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         setEndTime(applyChanges);
     }
 
-    private void addEndDatePanel() {
+    private void addEndDatePanel(GridBagConstraints c) {
         endDateLabel = new JLabel("End");
         endDatePicker = new JHVCalendarDatePicker();
         endDatePicker.getTextField().addFocusListener(new FocusListener() {
@@ -320,7 +336,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         addEndDatePanel.add(endTimePicker);
         addEndDatePanel.add(Box.createRigidArea(new Dimension(40, 0)));
 
-        add(addEndDatePanel);
+        add(addEndDatePanel, c);
     }
 
     @Override
