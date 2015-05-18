@@ -32,19 +32,18 @@ import org.helioviewer.jhv.layers.LayersModel;
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;
-    private JLabel beginDateLabel;
-    private JPanel beginDatetimePanel;
-    JHVCalendarDatePicker beginDatePicker;
-    TimeTextField beginTimePicker;
 
-    private JLabel endDateLabel;
-    private JPanel endDatetimePanel;
-    JHVCalendarDatePicker endDatePicker;
-    TimeTextField endTimePicker;
-    JSeparatorComboBox objectCombobox;
-    private final GL3DFollowObjectCamera camera;
     private JPanel addBeginDatePanel;
+    private JHVCalendarDatePicker beginDatePicker;
+    private TimeTextField beginTimePicker;
+
     private JPanel addEndDatePanel;
+    private JHVCalendarDatePicker endDatePicker;
+    private TimeTextField endTimePicker;
+
+    private JSeparatorComboBox objectCombobox;
+
+    private final GL3DFollowObjectCamera camera;
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
@@ -53,9 +52,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JCheckBox exactDateCheckBox;
 
-    protected boolean firstComboChanged = false;
-
-    protected boolean fovVisible = true;
+    private boolean firstComboChanged = false;
 
     public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
         super();
@@ -182,7 +179,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     private void addBeginDatePanel(GridBagConstraints c) {
-        beginDateLabel = new JLabel("Begin");
         beginDatePicker = new JHVCalendarDatePicker();
         beginDatePicker.getTextField().addFocusListener(new FocusListener() {
             @Override
@@ -199,10 +195,13 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         beginTimePicker = new TimeTextField();
         addBeginDatePanel = new JPanel();
         addBeginDatePanel.setLayout(new BoxLayout(addBeginDatePanel, BoxLayout.LINE_AXIS));
+
+        JLabel beginDateLabel = new JLabel("Begin", JLabel.RIGHT);
         beginDateLabel.setPreferredSize(new Dimension(40, 0));
 
         addBeginDatePanel.add(beginDateLabel);
-        beginDatetimePanel = new JPanel();
+
+        JPanel beginDatetimePanel = new JPanel();
         beginDatetimePanel.setLayout(new GridLayout(0, 2));
         beginDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
@@ -291,7 +290,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     private void addEndDatePanel(GridBagConstraints c) {
-        endDateLabel = new JLabel("End");
         endDatePicker = new JHVCalendarDatePicker();
         endDatePicker.getTextField().addFocusListener(new FocusListener() {
             @Override
@@ -308,9 +306,12 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         endTimePicker = new TimeTextField();
         addEndDatePanel = new JPanel();
         addEndDatePanel.setLayout(new BoxLayout(addEndDatePanel, BoxLayout.LINE_AXIS));
+
+        JLabel endDateLabel = new JLabel("End", JLabel.RIGHT);
         endDateLabel.setPreferredSize(new Dimension(40, 0));
         addEndDatePanel.add(endDateLabel);
-        endDatetimePanel = new JPanel();
+
+        JPanel endDatetimePanel = new JPanel();
         endDatetimePanel.setLayout(new GridLayout(0, 2));
         endDatePicker.addJHVCalendarListener(new JHVCalendarListener() {
             @Override
