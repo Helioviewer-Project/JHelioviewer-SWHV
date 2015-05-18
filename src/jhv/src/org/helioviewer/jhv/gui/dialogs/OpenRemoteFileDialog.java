@@ -27,8 +27,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.tree.TreePath;
 
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.DynamicModel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;

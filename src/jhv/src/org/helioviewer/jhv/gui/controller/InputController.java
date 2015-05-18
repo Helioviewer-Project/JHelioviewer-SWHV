@@ -13,9 +13,9 @@ import java.util.LinkedList;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
 
