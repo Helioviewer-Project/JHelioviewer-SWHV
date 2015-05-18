@@ -10,7 +10,7 @@ import org.helioviewer.base.physics.Constants;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
+public abstract class GL3DSolarRotationTrackingTrackballCamera extends GL3DCamera {
 
     protected static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
 

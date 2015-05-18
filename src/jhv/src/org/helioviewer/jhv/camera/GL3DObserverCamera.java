@@ -25,12 +25,18 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  */
 public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
+    private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;
 
     public GL3DObserverCamera(boolean init) {
         super();
+        observerCameraOptionPanel = new GL3DObserverCameraOptionPanel(this);
         if (init) {
             Displayer.addFirstTimeListener(this);
         }
+    }
+
+    public GL3DObserverCamera() {
+        this(false);
     }
 
     @Override
@@ -91,6 +97,11 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
             this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation - addl0, GL3DVec3d.YAxis));
         }
         this.updateCameraTransformation();
+    }
+
+    @Override
+    public GL3DCameraOptionPanel getOptionPanel() {
+        return observerCameraOptionPanel;
     }
 
 }

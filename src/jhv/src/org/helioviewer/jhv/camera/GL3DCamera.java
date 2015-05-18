@@ -353,4 +353,6 @@ public abstract class GL3DCamera {
         this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
     }
 
+    public abstract GL3DCameraOptionPanel getOptionPanel();
+
 }
