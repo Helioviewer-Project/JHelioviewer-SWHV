@@ -16,7 +16,6 @@ import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
  */
 public class PositionStatusPanel extends JLabel implements MouseMotionListener, InputControllerPlugin {
 
-    private static Component component;
     private Point lastPosition;
 
     public PositionStatusPanel() {
@@ -54,7 +53,6 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
      */
     @Override
     public void setComponent(Component _component) {
-        component = _component; // may be null
     }
 
     /**
