@@ -49,6 +49,13 @@ public abstract class GL3DCamera {
     private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
+    protected static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
+
+    private final GL3DTrackballRotationInteraction rotationInteraction;
+    private final GL3DPanInteraction panInteraction;
+    private final GL3DZoomBoxInteraction zoomBoxInteraction;
+
+    protected GL3DInteraction currentInteraction;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -57,11 +64,17 @@ public abstract class GL3DCamera {
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
         this.resetFOV();
+        this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
+        this.panInteraction = new GL3DPanInteraction(this);
+        this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
+        this.currentInteraction = this.rotationInteraction;
     }
 
     public void reset() {
         this.resetFOV();
         this.translation = new GL3DVec3d(0, 0, this.translation.z);
+        this.currentDragRotation.clear();
+        this.currentInteraction.reset(this);
     }
 
     private void resetFOV() {
@@ -265,18 +278,6 @@ public abstract class GL3DCamera {
         gl.glMultMatrixd(cameraTransformation.m, 0);
     }
 
-    public abstract GL3DInteraction getPanInteraction();
-
-    public abstract GL3DInteraction getRotateInteraction();
-
-    public abstract GL3DInteraction getZoomInteraction();
-
-    public abstract GL3DInteraction getCurrentInteraction();
-
-    public abstract void setCurrentInteraction(GL3DInteraction currentInteraction);
-
-    public abstract String getName();
-
     public void drawCamera(GL2 gl) {
         getCurrentInteraction().drawInteractionFeedback(gl, this);
     }
@@ -355,4 +356,27 @@ public abstract class GL3DCamera {
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
+    public GL3DInteraction getPanInteraction() {
+        return this.panInteraction;
+    }
+
+    public GL3DInteraction getRotateInteraction() {
+        return this.rotationInteraction;
+    }
+
+    public GL3DInteraction getCurrentInteraction() {
+        return this.currentInteraction;
+    }
+
+    public void setCurrentInteraction(GL3DInteraction currentInteraction) {
+        this.currentInteraction = currentInteraction;
+    }
+
+    public GL3DInteraction getZoomInteraction() {
+        return this.zoomBoxInteraction;
+    }
+
+    public String getName() {
+        return "Solar Rotation Tracking Camera";
+    }
 }

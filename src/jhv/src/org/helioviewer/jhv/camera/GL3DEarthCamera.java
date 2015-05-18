@@ -20,7 +20,7 @@ import org.helioviewer.jhv.renderable.RenderableCamera;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
+public class GL3DEarthCamera extends GL3DCamera implements TimeListener {
 
     private final GL3DEarthCameraOptionPanel earthCameraOptionPanel;
 

@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
  *
  */
-public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
+public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
     private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;
 
     public GL3DObserverCamera(boolean init) {
