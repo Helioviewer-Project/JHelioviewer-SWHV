@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
@@ -289,7 +288,7 @@ public class LayersModel {
         dialog.showDialog();
     }
 
-    private static void addLayer(AbstractView view) {
+    public static void addLayer(AbstractView view) {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
 
