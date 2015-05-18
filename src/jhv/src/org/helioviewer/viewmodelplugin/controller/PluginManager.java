@@ -252,8 +252,13 @@ public class PluginManager {
 
             if (o instanceof Plugin) {
                 addPlugin(classLoader, (Plugin) o, pluginLocation);
+                classLoader.close();
                 return true;
+            } else {
+                Log.debug("Failed trying to load something that is not a plugin " + className);
+                classLoader.close();
             }
+
         } catch (InstantiationException e) {
             Log.error(">> PluginManager.loadPlugin(" + pluginLocation + ") > Error loading plugin:", e);
         } catch (IllegalAccessException e) {
