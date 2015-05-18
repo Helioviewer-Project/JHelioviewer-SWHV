@@ -343,6 +343,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * Destroy the resources associated with this object.
      */
     public void abolish() {
+        Displayer.removeRenderListener(this);
+
         if (reader != null) {
             reader.abolish();
             reader = null;
@@ -558,15 +560,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     }
 
     /**
-     * Returns the current internal region (before decoding).
-     *
-     * @return current internal region
-     */
-    Region getRegionPrelook() {
-        return region;
-    }
-
-    /**
      * Sets the new image data for the given region.
      *
      * <p>
@@ -658,10 +651,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     @Override
     public void render() {
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
-    }
-
-    public void removeRenderListener() {
-        Displayer.removeRenderListener(this);
     }
 
     @Override
