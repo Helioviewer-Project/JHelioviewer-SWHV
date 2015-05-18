@@ -48,7 +48,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private static GLCanvas canvas;
 
     // screenshot & movie
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
     private final AWTGLReadBufferUtil rbu;
 
     private ExportMovieDialog exportMovieDialog;
