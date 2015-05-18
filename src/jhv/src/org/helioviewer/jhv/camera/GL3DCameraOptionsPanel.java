@@ -1,197 +1,174 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
-public class GL3DCameraOptionsPanel extends JPanel implements LayersListener {
+public class GL3DCameraOptionsPanel extends JPanel {
 
-    private JPanel optionsPanel;
-    private JTabbedPane tab;
     private GL3DCamera previousCamera;
+    private final JComboBox comboBox;
+    private final static String[] combolist = { "Observer Camera", "Earth Camera", "Expert Camera" };
+    private final static Class<?>[] combolistClass = { GL3DObserverCamera.class, GL3DEarthCamera.class, GL3DFollowObjectCamera.class };
+    private final String[] explanation = { "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n", "Earth camera: view from Earth.\nCamera time defined by timestamps of the active layer.\n\n", "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless \"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval." };
+    private GL3DCameraOptionPanel currentOptionPanel;
 
-    private static GL3DEarthCameraOptionPanel earthCameraOptionPanel;
-    private static GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
-    private static GL3DObserverCameraOptionPanel observerCameraOptionPanel;
-
-    private GL3DCameraOptionPanel getCameraOptionsPanel(GL3DCamera camera) {
-        if (camera instanceof GL3DEarthCamera) {
-            if (earthCameraOptionPanel == null)
-                earthCameraOptionPanel = new GL3DEarthCameraOptionPanel((GL3DEarthCamera) camera);
-            return earthCameraOptionPanel;
-        } else if (camera instanceof GL3DFollowObjectCamera) {
-            if (followObjectCameraOptionPanel == null)
-                followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel((GL3DFollowObjectCamera) camera);
-            return followObjectCameraOptionPanel;
-        } else if (camera instanceof GL3DObserverCamera) {
-            if (observerCameraOptionPanel == null)
-                observerCameraOptionPanel = new GL3DObserverCameraOptionPanel((GL3DObserverCamera) camera);
-            return observerCameraOptionPanel;
-        }
-        return null;
-    }
+    private JPanel fovPanel;
+    private JSpinner fovSpinner;
 
     public GL3DCameraOptionsPanel(GL3DCamera newCamera) {
-        Displayer.getLayersModel().addLayersListener(this);
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        addCameraTabs();
+        setLayout(new GridBagLayout());
+        Displayer.setActiveCamera(newCamera);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(0, 0, 0, 0);
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        comboBox = new JComboBox(combolist);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int i = 0;
+                Object selectedItem = comboBox.getSelectedItem();
+                while (selectedItem != combolist[i] && i < combolist.length) {
+                    i++;
+                }
+                if (i != combolist.length) {
+                    Class<?> cls = combolistClass[i];
+                    GL3DCamera camera;
+                    try {
+                        camera = (GL3DCamera) cls.newInstance();
+                        changeCamera(camera);
+                    } catch (InstantiationException e1) {
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                Displayer.display();
+
+            }
+        });
+
+        add(comboBox, c);
+        c.gridx = 1;
+        c.weightx = 0;
+
+        AbstractAction showInfoAction = new AbstractAction() {
+            {
+                putValue(SHORT_DESCRIPTION, "Show camera info");
+                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                TextDialog td = new TextDialog("Camera options information", getExplanation());
+                td.showDialog();
+            }
+        };
+        JButton infoButton = new JButton(showInfoAction);
+        infoButton.setBorder(null);
+        infoButton.setText(null);
+        infoButton.setBorderPainted(false);
+        infoButton.setFocusPainted(false);
+        infoButton.setContentAreaFilled(false);
+        add(infoButton, c);
+        c.weightx = 1;
+
+        c.gridwidth = 2;
+        c.gridx = 0;
+        c.gridy = 1;
+        createFOV(c);
         previousCamera = newCamera;
         changeCamera(newCamera);
     }
 
-    private void addCameraTabs() {
-        tab = new JTabbedPane();
-        tab.add("Observer", new GL3DObserverCameraOptionPanel((GL3DObserverCamera) Displayer.getActiveCamera()));
-        tab.add("Earth", new JPanel(new BorderLayout()));
-        tab.add("Expert", new JPanel(new BorderLayout()));
-        tab.add(new JPanel());
-        tab.setTabComponentAt(3, new JLabel(IconBank.getIcon(JHVIcon.INFO)));
-        add(tab);
+    private void switchOptionsPanel(GL3DCameraOptionPanel newOptionPanel) {
+        if (currentOptionPanel != null) {
+            remove(currentOptionPanel);
+        }
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(0, 0, 0, 0);
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = 2;
 
-        tab.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int index = tab.getSelectedIndex();
-                if (index == 0) {
-                    changeCamera(new GL3DObserverCamera(false));
-                }
-                if (index == 1) {
-                    changeCamera(new GL3DEarthCamera());
-                }
-                if (index == 2) {
-                    changeCamera(new GL3DFollowObjectCamera());
-                }
-                if (index == 3) {
-                    optionsPanel = infoPanel();
-                }
-                tab.setComponentAt(index, optionsPanel);
-            }
-        });
-    }
-
-    private void initCamera(GL3DCamera newCamera) {
-        changeCamera(newCamera);
-        optionsPanel = getCameraOptionsPanel(newCamera);
-        Displayer.display();
-        tab.setComponentAt(0, optionsPanel);
-        tab.setSelectedIndex(0);
+        c.gridx = 0;
+        c.gridy = 2;
+        this.add(newOptionPanel, c);
+        currentOptionPanel = newOptionPanel;
+        revalidate();
     }
 
     private void changeCamera(GL3DCamera newCamera) {
         boolean trackingMode = previousCamera.getTrackingMode();
         newCamera.setTrackingMode(trackingMode);
-        optionsPanel = getCameraOptionsPanel(newCamera);
+        this.switchOptionsPanel(newCamera.getOptionPanel());
 
         Displayer.setActiveCamera(newCamera);
         Displayer.display();
         previousCamera = newCamera;
     }
 
-    private JPanel infoPanel() {
-        JPanel infoExplainPanel = new JPanel();
-        infoExplainPanel.setLayout(new BoxLayout(infoExplainPanel, BoxLayout.PAGE_AXIS));
-        infoExplainPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-
-        String explanation = "Observer camera: view from observer.\n";
-        explanation += "Camera time defined by timestamps of the active layer.\n\n";
-        explanation += "Earth camera: view from Earth.\n";
-        explanation += "Camera time defined by timestamps of the active layer.\n\n";
-        explanation += "Expert camera: view from selected object.\n";
-        explanation += "Camera time defined by timestamps of the active layer, ";
-        explanation += "unless \"Use active layer timestamps\" is off. ";
-        explanation += "In that case, camera time is interpolated in the configured time interval.";
-
-        JTextArea infoText = new JTextArea(explanation);
-        infoText.setEditable(false);
-        infoText.setLineWrap(true);
-        infoText.setWrapStyleWord(true);
-        infoText.setOpaque(false);
-        infoExplainPanel.add(infoText);
-        return infoExplainPanel;
-    }
-
-    public void fireInit() {
-        this.initCamera(new GL3DObserverCamera(false));
-        if (Displayer.getLayersModel().getNumLayers() > 0) {
-            visactivate();
-        } else {
-            visdeactivate();
+    private String getExplanation() {
+        String full = "";
+        for (String expl : explanation) {
+            full += expl;
         }
+        return full;
     }
 
-    public void enableComponents(Container container, boolean enable) {
-        Component[] components = container.getComponents();
-        for (Component component : components) {
-            component.setEnabled(enable);
-            if (component instanceof Container) {
-                enableComponents((Container) component, enable);
+    private void createFOV(GridBagConstraints c) {
+        fovPanel = new JPanel();
+        fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
+        fovPanel.add(new JLabel("FOV angle"));
+        fovSpinner = new JSpinner();
+        fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
+        JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
+        f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0"));
+
+        if (Displayer.getActiveCamera() != null)
+            Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+
+        this.fovSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+                Displayer.display();
             }
-        }
-    }
+        });
+        WheelSupport.installMouseWheelSupport(this.fovSpinner);
+        fovPanel.add(this.fovSpinner);
 
-    void visactivate() {
-        /*
-         * GL3DCameraOptionPanel optionsPanel; enableComponents(tab, true);
-         * optionsPanel =
-         * cameraOptionsAttributeManager.getCameraOptionAttributePanel
-         * (cameraSelectorModel.getObserverCamera());
-         * enableComponents(optionsPanel, true); optionsPanel =
-         * cameraOptionsAttributeManager
-         * .getCameraOptionAttributePanel(cameraSelectorModel.getEarthCamera());
-         * enableComponents(optionsPanel, true); optionsPanel =
-         * cameraOptionsAttributeManager
-         * .getCameraOptionAttributePanel(cameraSelectorModel
-         * .getFollowObjectCamera()); enableComponents(optionsPanel, true);
-         */
+        fovSpinner.setMaximumSize(new Dimension(6, 22));
+        fovPanel.add(Box.createHorizontalGlue());
+        add(fovPanel, c);
     }
-
-    void visdeactivate() {
-        /*
-         * enableComponents(tab, false); optionsPanel =
-         * cameraOptionsAttributeManager
-         * .getCameraOptionAttributePanel(cameraSelectorModel
-         * .getObserverCamera()); enableComponents(optionsPanel, false);
-         * optionsPanel =
-         * cameraOptionsAttributeManager.getCameraOptionAttributePanel
-         * (cameraSelectorModel.getEarthCamera());
-         * enableComponents(optionsPanel, false); optionsPanel =
-         * cameraOptionsAttributeManager
-         * .getCameraOptionAttributePanel(cameraSelectorModel
-         * .getFollowObjectCamera()); enableComponents(optionsPanel, false);
-         */
-    }
-
-    @Override
-    public void layerAdded(int idx) {
-        if (Displayer.getLayersModel().getNumLayers() > 0) {
-            this.visactivate();
-        }
-    }
-
-    @Override
-    public void layerRemoved(int oldIdx) {
-        if (Displayer.getLayersModel().getNumLayers() == 0) {
-            this.visdeactivate();
-        }
-    }
-
-    @Override
-    public void activeLayerChanged(AbstractView view) {
-    }
-
 }

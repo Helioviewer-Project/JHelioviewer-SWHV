@@ -22,8 +22,11 @@ import org.helioviewer.jhv.renderable.RenderableCamera;
  */
 public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera implements TimeListener {
 
+    private final GL3DEarthCameraOptionPanel earthCameraOptionPanel;
+
     public GL3DEarthCamera() {
         super();
+        earthCameraOptionPanel = new GL3DEarthCameraOptionPanel(this);
     }
 
     @Override
@@ -72,6 +75,11 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
         this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
 
         this.updateCameraTransformation();
+    }
+
+    @Override
+    public GL3DCameraOptionPanel getOptionPanel() {
+        return earthCameraOptionPanel;
     }
 
 }
