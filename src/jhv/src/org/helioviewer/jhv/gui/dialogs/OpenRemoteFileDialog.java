@@ -362,8 +362,8 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     URI newUri = filedownloader.downloadFromHTTP(uri, true);
 
                     try {
-                        AbstractView view = APIRequestManager.newLoad(newUri, uri);
-                        LayersModel.addToViewchain(view);
+                        AbstractView view = APIRequestManager.loadView(newUri, uri, true);
+                        LayersModel.addView(view);
 
                         dispose();
                     } catch (IOException e) {
@@ -429,8 +429,8 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 @Override
                 public void run() {
                     try {
-                        AbstractView view = APIRequestManager.newLoad(uri, new URI(httpPath));
-                        LayersModel.addToViewchain(view);
+                        AbstractView view = APIRequestManager.loadView(uri, new URI(httpPath), true);
+                        LayersModel.addView(view);
 
                         if (advancedOptions == false) {
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());

@@ -17,7 +17,6 @@ public class GL3DSpaceObject {
         return objectList;
     }
 
-
     private static void createObjectList() {
         objectList = new GL3DSpaceObject[18];
 
