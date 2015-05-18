@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
