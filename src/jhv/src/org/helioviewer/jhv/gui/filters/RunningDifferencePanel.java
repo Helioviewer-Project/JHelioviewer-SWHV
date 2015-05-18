@@ -51,6 +51,9 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private Action showMetaAction;
     private final JButton downloadLayerButton;
     private final JButton showMetaButton;
+    private final JPanel topPanel;
+    private final JPanel radPanel;
+    private final JComboBox comboBox;
 
     public RunningDifferencePanel() {
         downloadLayerButton = new JButton();
@@ -79,17 +82,53 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
+        comboBox = new JComboBox(combolist);
 
+        topPanel = new JPanel(new GridBagLayout());
+        radPanel = new JPanel(new FlowLayout());
         addRadioButtons();
     }
 
+    private void setDifferenceMode(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+        if (showExtraPanel) {
+            final GridBagConstraints c = new GridBagConstraints();
+            c.insets = new Insets(0, 0, 0, 0);
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridwidth = 1;
+            c.anchor = GridBagConstraints.CENTER;
+            c.fill = GridBagConstraints.HORIZONTAL;
+
+            c.gridx = 0;
+            c.gridwidth = 3;
+            topPanel.add(radPanel, c);
+            jp2view.setRunDiffNoRot(!diffRot.isSelected());
+        } else
+            topPanel.remove(radPanel);
+
+    }
+
+    private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+        setDifferenceMode(showExtraPanel, differenceMode, baseDifferenceMode);
+        jp2view.setDifferenceMode(differenceMode);
+        jp2view.setBaseDifferenceMode(baseDifferenceMode);
+    }
+
+    private void setDifferenceModetoChangeCombobox(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+        if (!differenceMode) {
+            comboBox.setSelectedItem(combolist[0]);
+        } else if (!baseDifferenceMode) {
+            comboBox.setSelectedItem(combolist[1]);
+        } else {
+            comboBox.setSelectedItem(combolist[2]);
+        }
+
+    }
+
     private void addRadioButtons() {
-        final JComboBox comboBox = new JComboBox(combolist);
         comboBox.setSelectedItem("No differences");
         diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
-        final JPanel radPanel = new JPanel(new FlowLayout());
-        final JPanel topPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
@@ -116,19 +155,11 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (comboBox.getSelectedItem() == combolist[0]) {
-                    topPanel.remove(radPanel);
-                    jp2view.setDifferenceMode(false);
-                    jp2view.setBaseDifferenceMode(false);
+                    setDifferenceModetoJP2View(false, false, false);
                 } else if (comboBox.getSelectedItem() == combolist[1]) {
-                    topPanel.add(radPanel, c);
-                    jp2view.setDifferenceMode(true);
-                    jp2view.setBaseDifferenceMode(false);
-                    jp2view.setRunDiffNoRot(!diffRot.isSelected());
+                    setDifferenceModetoJP2View(true, true, false);
                 } else if (comboBox.getSelectedItem() == combolist[2]) {
-                    topPanel.add(radPanel, c);
-                    jp2view.setDifferenceMode(true);
-                    jp2view.setBaseDifferenceMode(true);
-                    jp2view.setBaseDifferenceNoRot(!diffRot.isSelected());
+                    setDifferenceModetoJP2View(true, true, true);
                 }
                 Displayer.display();
                 topPanel.revalidate();
@@ -178,6 +209,14 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     @Override
     public void setJP2View(final AbstractView jp2view) {
         super.setJP2View(jp2view);
+        boolean differenceMode = jp2view.getDifferenceMode();
+        if (differenceMode) {
+            boolean baseDifferenceMode = jp2view.getBaseDifferenceMode();
+            setDifferenceModetoChangeCombobox(false, differenceMode, baseDifferenceMode);
+        } else {
+            setDifferenceModetoChangeCombobox(false, false, false);
+        }
+
         truncateSpinner.setValue(1.f - jp2view.getTruncation());
 
         downloadLayerAction = new AbstractAction() {
@@ -210,7 +249,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         } else {
             this.downloadLayerButton.setEnabled(false);
         }
-
     }
 
     public Component getPanel() {
