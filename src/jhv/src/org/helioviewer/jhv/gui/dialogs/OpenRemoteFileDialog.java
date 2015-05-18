@@ -28,12 +28,12 @@ import javax.swing.tree.TreePath;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.DynamicModel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -363,7 +363,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
                     try {
                         AbstractView view = APIRequestManager.newLoad(newUri, uri);
-                        Displayer.getLayersModel().addToViewchain(view);
+                        LayersModel.addToViewchain(view);
 
                         dispose();
                     } catch (IOException e) {
@@ -430,7 +430,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 public void run() {
                     try {
                         AbstractView view = APIRequestManager.newLoad(uri, new URI(httpPath));
-                        Displayer.getLayersModel().addToViewchain(view);
+                        LayersModel.addToViewchain(view);
 
                         if (advancedOptions == false) {
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());

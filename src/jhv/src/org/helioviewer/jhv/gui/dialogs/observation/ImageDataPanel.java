@@ -35,7 +35,6 @@ import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -48,6 +47,7 @@ import org.helioviewer.jhv.io.DataSourceServerListener;
 import org.helioviewer.jhv.io.DataSourceServers;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.RenderableDummy;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -129,7 +129,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     Log.error("Could not setup observation dialog", e);
                     Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
-             }
+            }
         }, "ObservationSetup");
         t.start();
     }
@@ -236,7 +236,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             public void run() {
                 try {
                     AbstractView view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    Displayer.getLayersModel().addToViewchain(view);
+                    LayersModel.addToViewchain(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -267,7 +267,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
                 try {
                     AbstractView view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    Displayer.getLayersModel().addToViewchain(view);
+                    LayersModel.addToViewchain(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
