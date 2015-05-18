@@ -36,33 +36,10 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     private final LinkedMovieManager linkedMovieManager = LinkedMovieManager.getSingletonInstance();
 
     /**
-     * Default constructor.
-     *
-     * <p>
-     * When the view is not marked as a main view, it is assumed, that the view
-     * will only serve one single image and will not have to perform any kind of
-     * update any more. The effect of this assumption is, that the view will not
-     * try to reconnect to the JPIP server when the connection breaks and that
-     * there will be no other timestamps used than the first one.
-     *
-     * @param isMainView
-     *            Whether the view is a main view or not
-     */
-    public JHVJPXView(boolean isMainView) {
-        super(isMainView);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void setJP2Image(JP2Image newJP2Image) {
-        if (!isMainView) {
-            super.setJP2Image(newJP2Image);
-            imageCacheStatus = ((JHVJPXView) jp2Image.getParentView()).getImageCacheStatus();
-            return;
-        }
-
         if (jp2Image != null) {
             abolish(false);
         }

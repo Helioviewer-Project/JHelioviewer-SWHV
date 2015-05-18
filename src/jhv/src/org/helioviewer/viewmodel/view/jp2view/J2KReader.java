@@ -226,11 +226,8 @@ class J2KReader implements Runnable {
         boolean viewChanged = false;
         boolean downgradeNecessary = false;
 
-        int prevCompositionLayer = -1;
         JP2ImageParameter prevParams = null;
         JP2ImageParameter currParams = null;
-
-        // iamPersistent = parentViewRef.isMainView();
 
         while (!stop) {
             // Wait for signal
@@ -252,10 +249,6 @@ class J2KReader implements Runnable {
                 currParams = parentViewRef.getImageViewParams();
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution) && currParams.qualityLayers == prevParams.qualityLayers);
 
-                if (!parentViewRef.isMainView) {
-                    viewChanged = viewChanged || currParams.compositionLayer != prevCompositionLayer;
-                    prevCompositionLayer = currParams.compositionLayer;
-                }
                 // if view has changed downgrade caching status
                 if (viewChanged) {
                     complete = false;
@@ -263,7 +256,7 @@ class J2KReader implements Runnable {
                 }
 
                 // if socket is closed, but communication is necessary, open it
-                if (socket != null && socket.isClosed() && (parentViewRef.isPersistent() || viewChanged)) {
+                if (socket != null && socket.isClosed() && viewChanged) {
                     try {
                         socket = new JPIPSocket();
                         socket.connect(parentImageRef.getURI());
@@ -294,15 +287,12 @@ class J2KReader implements Runnable {
                         // queries left
                         // (actually, I do not know when this might happen...)
                         if (complete) {
-                            if (parentViewRef.isPersistent() && req != null && req.getQuery() != null) {
+                            if (req != null && req.getQuery() != null) {
                                 socket.send(req);
                                 socket.receive();
                             }
+                            socket.close();
 
-                            // Close socket if nothing to do and this is not the main view
-                            if (!parentViewRef.isPersistent()) {
-                                socket.close();
-                            }
                             // requesting data
                         } else {
                             JPIPResponse res = null;
@@ -330,7 +320,7 @@ class J2KReader implements Runnable {
                             // - In any other case, choose ALLFRAMESEQUALLY
                             CacheStrategy strategy;
 
-                            if (!parentViewRef.isMainView || !parentImageRef.isMultiFrame()) {
+                            if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
                             } else if (!((MovieView) parentViewRef).isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
@@ -419,7 +409,7 @@ class J2KReader implements Runnable {
                                     flowControl();
 
                                     // Downgrade, if necessary
-                                    if (downgradeNecessary && res.getResponseSize() > 0 && parentViewRef.isMainView() && parentViewRef instanceof MovieView) {
+                                    if (downgradeNecessary && res.getResponseSize() > 0 && parentViewRef instanceof MovieView) {
                                         ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
 
                                         switch (strategy) {
@@ -452,7 +442,7 @@ class J2KReader implements Runnable {
                                         stepQuerys[current_step] = null;
 
                                         // tell the cache status
-                                        if (parentViewRef.isMainView() && parentViewRef instanceof MovieView) {
+                                        if (parentViewRef instanceof MovieView) {
                                             ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
 
                                             switch (strategy) {

@@ -55,8 +55,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     protected Region region, lastRegion;
 
     // Member related to JP2
-    protected boolean isMainView;
-    protected boolean isPersistent;
     protected JP2Image jp2Image;
     public volatile JP2ImageParameter imageViewParams;
 
@@ -76,25 +74,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     private ImageData previousImageData;
     private ImageData baseDifferenceImageData;
 
-    /**
-     * Default constructor.
-     *
-     * <p>
-     * When the view is not marked as a main view, it is assumed, that the view
-     * will only serve one single image and will not have to perform any kind of
-     * update any more. The effect of this assumption is, that the view will not
-     * try to reconnect to the JPIP server when the connection breaks and that
-     * there will be no other timestamps used than the first one.
-     *
-     * @param isMainView
-     *            Whether the view is a main view or not
-     */
-    public JHVJP2View(boolean isMainView) {
-        this.isMainView = isMainView;
-        if (isMainView) {
-            Displayer.addRenderListener(this);
-        }
-        isPersistent = isMainView;
+    public JHVJP2View() {
+        Displayer.addRenderListener(this);
     }
 
     /**
@@ -135,9 +116,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
 
         imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
 
-        if (isMainView) {
-            jp2Image.setParentView(this);
-        }
+        jp2Image.setParentView(this);
         jp2Image.addReference();
         try {
             reader = new J2KReader(this);
@@ -178,21 +157,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      */
     public ReaderMode getReaderMode() {
         return readerMode;
-    }
-
-    /**
-     * Sets, whether this view is persistent.
-     *
-     * This value only has effect, when the image is a remote image. A
-     * persistent view will close its socket after receiving the first frame. By
-     * default, main views are not persistent.
-     *
-     * @param isPersistent
-     *            True, if this view is persistent
-     * @see #isPersistent
-     */
-    public void setPersistent(boolean isPersistent) {
-        this.isPersistent = isPersistent;
     }
 
     /**
@@ -660,25 +624,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
                 return this;
             }
         }.init(aView, aDateTime));
-    }
-
-    /**
-     * Returns whether this view is used as a main view.
-     *
-     * @return Whether this view is used as a main view
-     */
-    boolean isMainView() {
-        return isMainView;
-    }
-
-    /**
-     * Returns, whether this view is persistent.
-     *
-     * @return True, if this view is persistent, false otherwise.
-     * @see #setPersistent(boolean)
-     */
-    boolean isPersistent() {
-        return isPersistent;
     }
 
     /**

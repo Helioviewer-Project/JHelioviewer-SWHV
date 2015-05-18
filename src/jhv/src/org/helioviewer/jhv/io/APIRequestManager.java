@@ -236,7 +236,7 @@ public class APIRequestManager {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
-                return loadView(response.getURI(), downloadUri, true);
+                return loadView(response.getURI(), downloadUri);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -303,14 +303,12 @@ public class APIRequestManager {
      *            URI representing the location of the image
      * @param downloadURI
      *            URI from which the whole file can be downloaded
-     * @param isMainView
-     *            Whether the view is used as a main view or not
      * @return View containing the image
      * @throws IOException
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
+    public static AbstractView loadView(URI uri, URI downloadURI) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI");
         }
@@ -321,7 +319,7 @@ public class APIRequestManager {
 
                 return fitsView;
             } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
             }
         } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
@@ -330,18 +328,18 @@ public class APIRequestManager {
 
                 return imView;
             } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
             }
         } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView(isMainView);
+                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
 
                 jp2CallistoView.setJP2Image(jp2Image);
                 return jp2CallistoView;
             } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
             }
         } else {
@@ -349,16 +347,16 @@ public class APIRequestManager {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
 
                 if (jp2Image.isMultiFrame()) {
-                    JHVJPXView jpxView = new JHVJPXView(isMainView);
+                    JHVJPXView jpxView = new JHVJPXView();
                     jpxView.setJP2Image(jp2Image);
                     return jpxView;
                 } else {
-                    JHVJP2View jp2View = new JHVJP2View(isMainView);
+                    JHVJP2View jp2View = new JHVJP2View();
                     jp2View.setJP2Image(jp2Image);
                     return jp2View;
                 }
             } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\", \"" + isMainView + "\") ", e);
+                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
             }
         }
