@@ -107,9 +107,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
                 camera.setInterpolation(selected);
             }
         });
-
-        this.syncWithLayerBeginTime(false);
-        this.syncWithLayerEndTime(true);
     }
 
     public void addSyncButtons(GridBagConstraints c) {
@@ -244,7 +241,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         syncWithLayerEndTime(true);
     }
 
-    private void syncWithLayerBeginTime(boolean applyChanges) {
+    void syncWithLayerBeginTime(boolean applyChanges) {
         Date startDate = null;
         startDate = LayersModel.getFirstDate();
         if (startDate == null) {
@@ -282,7 +279,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
         setEndTime(true);
     }
 
-    private void syncWithLayerEndTime(boolean applyChanges) {
+    void syncWithLayerEndTime(boolean applyChanges) {
         Date endDate = null;
         endDate = LayersModel.getLastDate();
         if (endDate == null) {
