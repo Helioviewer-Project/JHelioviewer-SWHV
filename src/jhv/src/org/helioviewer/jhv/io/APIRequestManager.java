@@ -111,7 +111,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static AbstractView loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    private static AbstractView loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -205,7 +205,7 @@ public class APIRequestManager {
      * @return The View corresponding to the file whose location was returned by
      *         the server
      */
-    public static AbstractView requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+    private static AbstractView requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));

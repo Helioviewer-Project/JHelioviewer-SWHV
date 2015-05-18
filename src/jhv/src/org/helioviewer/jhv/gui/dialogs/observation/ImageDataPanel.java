@@ -117,7 +117,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                             timeSelectionPanel.setupTime();
                         }
                         if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            loadMovie();
+                            loadRemote(false);
                         }
                     } else {
                         Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
@@ -225,32 +225,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     }
 
     /**
-     * Loads an image from the Helioviewer server and adds a new layer to the
-     * GUI which represents the image.
-     * */
-    private void loadImage() {
-        // download and open the requested image in a separated thread and hide
-        // loading animation when finished
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    LayersModel.addView(view);
-                } catch (IOException e) {
-                    Log.error("An error occured while opening the remote file!", e);
-                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                }
-            }
-        }, "LoadNewImage");
-        thread.start();
-    }
-
-    /**
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    private void loadMovie() {
+    private void loadRemote(final boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
         Thread thread = new Thread(new Runnable() {
@@ -266,7 +244,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 });
 
                 try {
-                    AbstractView view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    AbstractView view;
+                    if (isImage)
+                        view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
+                    else
+                        view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                     LayersModel.addView(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
@@ -280,7 +262,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     }
                 });
             }
-        }, "LoadNewMovie");
+        }, "LoadRemote");
         thread.start();
     }
 
@@ -319,18 +301,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
-        if (timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime())) {
-            // load image
-            loadImage();
-        } else {
-            // check if start date is before end date -> if not show message
-            if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
-                JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            loadMovie();
+
+        // check if start date is before end date -> if not show message
+        if (!timeSelectionPanel.isStartDateBeforeEndDate()) {
+            JOptionPane.showMessageDialog(null, "End date is before start date", "", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
 
+        loadRemote(timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime()));
         return true;
     }
 
@@ -361,7 +339,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                             timeSelectionPanel.setupTime();
                         }
                         if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            loadMovie();
+                            loadRemote(false);
                         }
                     } else {
                         Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
