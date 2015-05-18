@@ -22,38 +22,26 @@ import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-/**
- * This class is a (redundant) representation of the ViewChain state, and, in
- * addition to this, introduces the concept of an "activeLayer", which is the
- * Layer that is currently operated on by the user/GUI.
- *
- * This class is mainly used by the LayerTable(Model) as an abstraction to the
- * ViewChain.
- *
- * Future development plans still have to show if it is worth to keep this
- * class, or if the abstraction should be avoided and direct access to the
- * viewChain should be used in all GUI classes.
- *
- * @author Malte Nuhn
- */
 public class LayersModel {
 
-    private int activeLayer = -1;
-    private final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
+    private static int activeLayer = -1;
+    private static final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
+
+    private static final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
 
     /**
      * Return the view associated with the active Layer
      *
      * @return View associated with the active Layer
      */
-    public AbstractView getActiveView() {
+    public static AbstractView getActiveView() {
         return getLayer(activeLayer);
     }
 
     /**
      * @return Index of the currently active Layer
      */
-    public int getActiveLayer() {
+    public static int getActiveLayer() {
         return activeLayer;
     }
 
@@ -63,7 +51,7 @@ public class LayersModel {
      * @param idx
      *            - index of the layer to be set as active Layer
      */
-    public void setActiveLayer(int idx) {
+    public static void setActiveLayer(int idx) {
         AbstractView view = getLayer(idx);
         if (view == null && idx != -1) {
             return;
@@ -72,39 +60,39 @@ public class LayersModel {
         fireActiveLayerChanged(view);
     }
 
-    public void setActiveLayer(AbstractView view) {
+    public static void setActiveLayer(AbstractView view) {
         setActiveLayer(findView(view));
     }
 
-    private ImmutableDateTime getStartDateImmutable(AbstractView view) {
+    private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
             result = ((JHVJPXView) view).getFrameDateTime(0);
-        } else if (view != null) {
+        } else {
             result = view.getMetaData().getDateTime();
         }
         return result;
     }
 
-    private ImmutableDateTime getEndDateImmutable(AbstractView view) {
+    private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
         if (view instanceof JHVJPXView) {
             JHVJPXView tmv = (JHVJPXView) view;
             int lastFrame = tmv.getMaximumFrameNumber();
             result = tmv.getFrameDateTime(lastFrame);
-        } else if (view != null) {
+        } else {
             result = view.getMetaData().getDateTime();
         }
         return result;
     }
 
-    private ImmutableDateTime getStartDateImmutable(int idx) {
+    private static ImmutableDateTime getStartDateImmutable(int idx) {
         return getStartDateImmutable(getLayer(idx));
     }
 
-    private ImmutableDateTime getEndDateImmutable(int idx) {
+    private static ImmutableDateTime getEndDateImmutable(int idx) {
         return getEndDateImmutable(getLayer(idx));
     }
 
@@ -117,7 +105,7 @@ public class LayersModel {
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public Date getStartDate(AbstractView view) {
+    public static Date getStartDate(AbstractView view) {
         Date result = null;
         ImmutableDateTime date = getStartDateImmutable(view);
 
@@ -135,7 +123,7 @@ public class LayersModel {
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public Date getEndDate(AbstractView view) {
+    public static Date getEndDate(AbstractView view) {
         Date result = null;
         ImmutableDateTime date = getEndDateImmutable(view);
 
@@ -150,10 +138,10 @@ public class LayersModel {
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public Date getFirstDate() {
+    public static Date getFirstDate() {
         ImmutableDateTime earliest = null;
 
-        for (int idx = 0; idx < getNumLayers(); idx++) {
+        for (int idx = 0; idx < layers.size(); idx++) {
             ImmutableDateTime start = getStartDateImmutable(idx);
             if (start == null) {
                 continue;
@@ -171,10 +159,10 @@ public class LayersModel {
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public Date getLastDate() {
+    public static Date getLastDate() {
         ImmutableDateTime latest = null;
 
-        for (int idx = 0; idx < getNumLayers(); idx++) {
+        for (int idx = 0; idx < layers.size(); idx++) {
             ImmutableDateTime end = getEndDateImmutable(idx);
             if (end == null) {
                 continue;
@@ -193,12 +181,8 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      * @return index of the layer that can be associated with the given view
      */
-    public int findView(AbstractView view) {
-        int idx = -1;
-        if (view != null) {
-            idx = this.getLayerLevel(view);
-        }
-        return idx;
+    public static int findView(AbstractView view) {
+        return layers.indexOf(view);
     }
 
     /**
@@ -209,8 +193,8 @@ public class LayersModel {
      *            - index of the layer in question
      * @return true if the index is valid
      */
-    private boolean isValidIndex(int idx) {
-        if (idx >= 0 && idx < getNumLayers()) {
+    private static boolean isValidIndex(int idx) {
+        if (idx >= 0 && idx < layers.size()) {
             return true;
         }
         return false;
@@ -224,10 +208,10 @@ public class LayersModel {
      * @return the index of the new active layer to choose, or -1 if no suitable
      *         new layer can be found
      */
-    private int determineNewActiveLayer(int oldActiveLayerIdx) {
+    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
         int candidate = oldActiveLayerIdx;
         if (!isValidIndex(candidate)) {
-            candidate = getNumLayers() - 1;
+            candidate = layers.size() - 1;
         }
 
         return candidate;
@@ -239,11 +223,7 @@ public class LayersModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void downloadLayer(JHVJP2View view) {
-        if (view == null) {
-            return;
-        }
-
+    public static void downloadLayer(JHVJP2View view) {
         Thread downloadThread = new Thread(new Runnable() {
             private JHVJP2View theView;
 
@@ -266,7 +246,7 @@ public class LayersModel {
      * Changes the source of the View afterwards, since a local file is always
      * faster.
      */
-    private void downloadFromJPIP(JHVJP2View v) {
+    private static void downloadFromJPIP(JHVJP2View v) {
         FileDownloader fileDownloader = new FileDownloader();
         URI downloadUri = v.getDownloadURI();
         URI uri = v.getUri();
@@ -302,13 +282,13 @@ public class LayersModel {
      *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
-    public void showMetaInfo(AbstractView view) {
+    public static void showMetaInfo(AbstractView view) {
         MetaDataDialog dialog = new MetaDataDialog();
         dialog.setMetaData(view);
         dialog.showDialog();
     }
 
-    public void addLayer(AbstractView view) {
+    public static void addLayer(AbstractView view) {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
 
@@ -336,10 +316,7 @@ public class LayersModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public void removeLayer(View view) {
-        if (view == null)
-            return;
-
+    public static void removeLayer(View view) {
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
@@ -361,7 +338,7 @@ public class LayersModel {
         setActiveLayer(newIndex);
     }
 
-    public void removeLayer(int idx) {
+    public static void removeLayer(int idx) {
         removeLayer(getLayer(idx));
     }
 
@@ -373,11 +350,7 @@ public class LayersModel {
      * @param link
      *            - true if the layer in question should be linked
      */
-    private void setLink(AbstractView view, boolean link) {
-        if (view == null) {
-            return;
-        }
-
+    private static void setLink(AbstractView view, boolean link) {
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
@@ -394,7 +367,7 @@ public class LayersModel {
      * @return the current framerate or 0 if the movie is not playing, or if an
      *         error occurs
      */
-    public int getFPS(JHVJP2View view) {
+    public static int getFPS(JHVJP2View view) {
         int result = 0;
         if (view instanceof JHVJPXView) {
             result = Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100;
@@ -402,33 +375,31 @@ public class LayersModel {
         return result;
     }
 
-    private void fireLayerRemoved(int oldIndex) {
+    private static void fireLayerRemoved(int oldIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerRemoved(oldIndex);
         }
     }
 
-    private void fireLayerAdded(int newIndex) {
+    private static void fireLayerAdded(int newIndex) {
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(newIndex);
         }
     }
 
-    private void fireActiveLayerChanged(AbstractView view) {
+    private static void fireActiveLayerChanged(AbstractView view) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(view);
         }
     }
 
-    public void addLayersListener(LayersListener layerListener) {
+    public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);
     }
 
-    public void removeLayersListener(LayersListener layerListener) {
+    public static void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
     }
-
-    private final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -437,7 +408,7 @@ public class LayersModel {
      *            Position within the stack of layers
      * @return View at given position
      */
-    public AbstractView getLayer(int index) {
+    public static AbstractView getLayer(int index) {
         try {
             return layers.get(index);
         } catch (Exception e) {
@@ -451,23 +422,8 @@ public class LayersModel {
      * @return Number of layers
      * @see #getNumberOfVisibleLayer
      */
-    public int getNumLayers() {
+    public static int getNumLayers() {
         return layers.size();
-    }
-
-    /**
-     * Returns the position of the view within the stack of layers.
-     *
-     * Zero indicates the most bottom view. If the given view is not a direct
-     * child, the function returns -1.
-     *
-     * @param view
-     *            View to search for within the stack of layers
-     * @return Position of the view within stack
-     * @see #moveView
-     */
-    public int getLayerLevel(AbstractView view) {
-        return layers.indexOf(view);
     }
 
 }
