@@ -292,7 +292,7 @@ public class LayersModel {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
 
-        RenderableImageLayer imageLayer = new RenderableImageLayer("", view);
+        RenderableImageLayer imageLayer = new RenderableImageLayer(view);
         view.setImageLayer(imageLayer);
         layers.add(view);
 

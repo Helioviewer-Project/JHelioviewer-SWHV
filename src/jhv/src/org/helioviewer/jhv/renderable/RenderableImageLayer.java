@@ -62,7 +62,7 @@ public class RenderableImageLayer implements Renderable {
     private final RenderableType type;
     private boolean isVisible = true;
 
-    public RenderableImageLayer(String name, AbstractView view) {
+    public RenderableImageLayer(AbstractView view) {
         this.type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         this.mainLayerView = view;
@@ -270,8 +270,8 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
-        dispose(gl);
         LayersModel.removeLayer(mainLayerView);
+        dispose(gl);
     }
 
     private static Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
