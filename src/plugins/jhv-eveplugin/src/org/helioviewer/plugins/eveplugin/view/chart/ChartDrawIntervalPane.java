@@ -24,10 +24,10 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.EVEState;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.PlotAreaSpace;
@@ -62,7 +62,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         addMouseListener(this);
         addMouseMotionListener(this);
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
         DrawController.getSingletonInstance().addTimingListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
@@ -592,8 +592,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     public void activeLayerChanged(AbstractView view) {
         if (view instanceof JHVJPXView) {
-            Date start = Displayer.getLayersModel().getStartDate(view);
-            Date end = Displayer.getLayersModel().getEndDate(view);
+            Date start = LayersModel.getStartDate(view);
+            Date end = LayersModel.getEndDate(view);
 
             movieInterval = new Interval<Date>(start, end);
             repaint();

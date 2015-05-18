@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
+import org.helioviewer.jhv.layers.LayersModel;
 
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
 
@@ -247,7 +248,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     private void syncWithLayerBeginTime(boolean applyChanges) {
         Date startDate = null;
-        startDate = Displayer.getLayersModel().getFirstDate();
+        startDate = LayersModel.getFirstDate();
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
         }
@@ -285,7 +286,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     private void syncWithLayerEndTime(boolean applyChanges) {
         Date endDate = null;
-        endDate = Displayer.getLayersModel().getLastDate();
+        endDate = LayersModel.getLastDate();
         if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
         }

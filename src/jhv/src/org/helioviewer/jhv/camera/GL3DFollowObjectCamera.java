@@ -46,7 +46,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        this.activeLayerChanged(Displayer.getLayersModel().getActiveView());
+        this.activeLayerChanged(LayersModel.getActiveView());
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
         Displayer.addFirstTimeListener(this);
     }
@@ -76,10 +76,10 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
             if (interpolation) {
                 long t1 = 0, t2 = 0;
                 // Active layer times
-                AbstractView view = Displayer.getLayersModel().getActiveView();
+                AbstractView view = LayersModel.getActiveView();
                 if (view instanceof JHVJPXView) {
-                    t1 = Displayer.getLayersModel().getStartDate(view).getTime();
-                    t2 = Displayer.getLayersModel().getEndDate(view).getTime();
+                    t1 = LayersModel.getStartDate(view).getTime();
+                    t2 = LayersModel.getEndDate(view).getTime();
                 }
                 //Camera times
                 long t3 = this.positionLoading.getBeginDate().getTime();
@@ -169,8 +169,8 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
     @Override
     public void activeLayerChanged(AbstractView view) {
         if (!interpolation && view instanceof JHVJPXView) {
-            positionLoading.setBeginDate(Displayer.getLayersModel().getStartDate(view), false);
-            positionLoading.setEndDate(Displayer.getLayersModel().getEndDate(view), true);
+            positionLoading.setBeginDate(LayersModel.getStartDate(view), false);
+            positionLoading.setEndDate(LayersModel.getEndDate(view), true);
         }
     }
 

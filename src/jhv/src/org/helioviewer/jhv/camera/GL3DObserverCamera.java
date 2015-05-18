@@ -10,6 +10,7 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -89,8 +90,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     private void updateRotation(Date date) {
         double addl0 = 0.;
         double addb0 = 0.;
-
-        AbstractView mdv = Displayer.getLayersModel().getActiveView();
+        AbstractView mdv = LayersModel.getActiveView();
         if (mdv != null) {
             MetaData metadata = mdv.getMetaData();
             HelioviewerMetaData hvMetadata = (HelioviewerMetaData) metadata;

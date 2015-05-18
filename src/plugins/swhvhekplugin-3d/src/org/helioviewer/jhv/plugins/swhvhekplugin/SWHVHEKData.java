@@ -14,6 +14,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -38,7 +39,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
      * private constructor
      */
     private SWHVHEKData() {
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
     }
 
     /**
@@ -56,8 +57,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     @Override
     public void layerAdded(int idx) {
         boolean request = false;
-        Date first = Displayer.getLayersModel().getFirstDate();
-        Date last = Displayer.getLayersModel().getLastDate();
+        Date first = LayersModel.getFirstDate();
+        Date last = LayersModel.getLastDate();
         if (beginDate == null || first.getTime() < beginDate.getTime()) {
             beginDate = first;
             request = true;

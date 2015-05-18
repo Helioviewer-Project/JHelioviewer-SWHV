@@ -17,6 +17,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -82,7 +83,7 @@ public class RenderableImageLayer implements Renderable {
 
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
-        float opacity = (float) (1. / (1. + Displayer.getLayersModel().getNumLayers()));
+        float opacity = (float) (1. / (1. + LayersModel.getNumLayers()));
         if (mainLayerView instanceof JHVJP2View) {
             JHVJP2View jp2v = ((JHVJP2View) mainLayerView);
             if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
@@ -270,7 +271,7 @@ public class RenderableImageLayer implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-        Displayer.getLayersModel().removeLayer(mainLayerView);
+        LayersModel.removeLayer(mainLayerView);
     }
 
     private static Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
@@ -432,7 +433,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public boolean isActiveImageLayer() {
-        return Displayer.getLayersModel().getActiveView() == this.mainLayerView;
+        return LayersModel.getActiveView() == this.mainLayerView;
     }
 
     @Override

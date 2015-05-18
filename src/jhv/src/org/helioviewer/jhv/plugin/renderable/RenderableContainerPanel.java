@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -64,13 +65,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
-            AbstractView activeView = Displayer.getLayersModel().getActiveView();
-
+            AbstractView activeView = LayersModel.getActiveView();
             if (activeView instanceof JHVJPXView) {
                 JHVJPXView jpxView = (JHVJPXView) activeView;
                 if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
-                    Date start = Displayer.getLayersModel().getStartDate(activeView);
-                    Date end = Displayer.getLayersModel().getEndDate(activeView);
+                    Date start = LayersModel.getStartDate(activeView);
+                    Date end = LayersModel.getEndDate(activeView);
                     try {
                         Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
                         Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
@@ -182,7 +182,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
                     if (renderable instanceof RenderableImageLayer) {
-                        Displayer.getLayersModel().setActiveLayer(((RenderableImageLayer) renderable).getMainLayerView());
+                        LayersModel.setActiveLayer(((RenderableImageLayer) renderable).getMainLayerView());
                     }
                     setOptionsPanel(renderable);
                 }
@@ -215,7 +215,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
     }
 
     void setOptionsPanel(Renderable renderable) {

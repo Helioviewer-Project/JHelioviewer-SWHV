@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.Renderable;
 import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
@@ -35,13 +35,13 @@ public class PfssRenderable implements Renderable, LayersListener {
         type = new RenderableType("PFSS plugin");
         this.optionsPanel = new PfssPluginPanel();
         ImageViewerGui.getRenderableContainer().addRenderable(this);
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
     }
 
     @Override
     public void render(GL2 gl) {
         AbstractView view;
-        if (isVisible && (view = Displayer.getLayersModel().getActiveView()) != null) {
+        if (isVisible && (view = LayersModel.getActiveView()) != null) {
             PfssData pfssData;
 
             long millis = view.getMetaData().getDateTime().getMillis();
@@ -101,8 +101,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void layerAdded(int idx) {
         PfssPlugin.getPfsscache().clear();
-        Date start = Displayer.getLayersModel().getFirstDate();
-        Date end = Displayer.getLayersModel().getLastDate();
+        Date start = LayersModel.getFirstDate();
+        Date end = LayersModel.getLastDate();
         Thread t = new Thread(new PfssNewDataLoader(start, end), "PFFSLoader");
         pfssNewLoadPool.submit(t);
     }
