@@ -344,6 +344,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             transformer = transformerFactory.newTransformer();
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();
+            try {
+                fos.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             return false;
         }
 
