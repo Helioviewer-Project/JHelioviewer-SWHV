@@ -50,7 +50,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public String getTimeString() {
-        return "N/A";
+        return null;
     }
 
     @Override

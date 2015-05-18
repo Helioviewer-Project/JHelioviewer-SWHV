@@ -358,7 +358,7 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public String getTimeString() {
-        return "";
+        return null;
     }
 
     @Override

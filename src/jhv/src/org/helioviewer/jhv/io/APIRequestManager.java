@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -276,30 +275,6 @@ public class APIRequestManager {
      */
     public static AbstractView newLoad(URI uri, URI downloadURI) throws IOException {
         return loadView(uri, downloadURI, true);
-    }
-
-    private static void addToViewchain(AbstractView view) {
-        while (view.getSubimageData() == null) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        EventQueue.invokeLater(new Runnable() {
-            private AbstractView theView;
-
-            @Override
-            public void run() {
-                LayersModel.addLayer(theView);
-                LayersModel.setActiveLayer(theView);
-            }
-
-            public Runnable init(AbstractView theView) {
-                this.theView = theView;
-                return this;
-            }
-        }.init(view));
     }
 
     /**

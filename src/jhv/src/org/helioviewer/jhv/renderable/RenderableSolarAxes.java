@@ -70,7 +70,7 @@ public class RenderableSolarAxes implements Renderable {
 
     @Override
     public String getTimeString() {
-        return "";
+        return null;
     }
 
     @Override

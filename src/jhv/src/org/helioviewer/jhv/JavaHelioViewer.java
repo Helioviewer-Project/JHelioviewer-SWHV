@@ -112,7 +112,7 @@ public class JavaHelioViewer {
                 public void run() {
                     Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
                     ImageViewerGui.getSingletonInstance(); // build UI
-                    ImageViewerGui.getSingletonInstance().loadAtStart();
+                    ImageViewerGui.loadAtStart();
                 }
             });
         } catch (Exception ex) {

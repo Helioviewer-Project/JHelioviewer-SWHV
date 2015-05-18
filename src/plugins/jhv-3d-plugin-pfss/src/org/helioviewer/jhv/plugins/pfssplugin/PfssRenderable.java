@@ -91,7 +91,7 @@ public class PfssRenderable implements Renderable, LayersListener {
         this.isVisible = isVisible;
     }
 
-    String datetime = "";
+    private String datetime = null;
 
     @Override
     public String getTimeString() {
