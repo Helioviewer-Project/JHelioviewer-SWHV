@@ -178,10 +178,6 @@ public class HEKParser implements SWEKParser {
             currentAssociation.setAssociationType(parseAssociationType(associations.getJSONObject(i)));
             currentAssociation.setAssociationIvorn1(parseFirstIvorn(associations.getJSONObject(i)));
             currentAssociation.setAssociationIvorn2(parseSecondIvorn(associations.getJSONObject(i)));
-            currentAssociation.setEventType1(parseEventType1(associations.getJSONObject(i)));
-            currentAssociation.setEventType2(parseEventType2(associations.getJSONObject(i)));
-            currentAssociation.setId1(parseId1(associations.getJSONObject(i)));
-            currentAssociation.setId2(parseId2(associations.getJSONObject(i)));
             // AssociationsPrinter.printAssociation(currentAssociation.associationIvorn1,
             // currentAssociation.associationIvorn2);
             // Log.debug("************************************************************************************************");
@@ -946,19 +942,11 @@ public class HEKParser implements SWEKParser {
         private String associationType;
         private String associationIvorn1;
         private String associationIvorn2;
-        private String id1;
-        private String id2;
-        private String eventType1;
-        private String eventType2;
 
         public Association() {
             associationType = "";
             associationIvorn1 = "";
             associationIvorn2 = "";
-            id1 = "";
-            id2 = "";
-            eventType1 = "";
-            eventType2 = "";
         }
 
         /**
@@ -1005,39 +993,6 @@ public class HEKParser implements SWEKParser {
         public void setAssociationIvorn2(String associationIvorn2) {
             this.associationIvorn2 = associationIvorn2;
         }
-
-        /**
-         * @param id1
-         *            the id1 to set
-         */
-        public void setId1(String id1) {
-            this.id1 = id1;
-        }
-
-        /**
-         * @param id2
-         *            the id2 to set
-         */
-        public void setId2(String id2) {
-            this.id2 = id2;
-        }
-
-        /**
-         * @param eventType1
-         *            the eventType1 to set
-         */
-        public void setEventType1(String eventType1) {
-            this.eventType1 = eventType1;
-        }
-
-        /**
-         * @param eventType2
-         *            the eventType2 to set
-         */
-        public void setEventType2(String eventType2) {
-            this.eventType2 = eventType2;
-        }
-
     }
 
 }
