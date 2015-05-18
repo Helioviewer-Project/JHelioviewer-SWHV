@@ -291,10 +291,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             Message.err("Data is not selected", "There is no information on what to add", false);
             return false;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
         try {
-            ObservationDialogDateModel.getInstance().setStartDate(sdf.parse(timeSelectionPanel.getStartTime()), true);
-            ObservationDialogDateModel.getInstance().setEndDate(sdf.parse(timeSelectionPanel.getEndTime()), true);
+            ObservationDialogDateModel.getInstance().setStartDate(apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
+            ObservationDialogDateModel.getInstance().setEndDate(apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
@@ -481,11 +481,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             if (e.getSource() == calendarStartDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(sdf.parse(getStartTime()));
+                    calendar.setTime(apiDateFormat.parse(getStartTime()));
                     setStartDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
@@ -495,7 +494,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(sdf.parse(getEndTime()));
+                    calendar.setTime(apiDateFormat.parse(getEndTime()));
                     setEndDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse end date " + getEndTime());
