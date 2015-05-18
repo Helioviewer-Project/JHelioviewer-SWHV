@@ -73,6 +73,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
     private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
+    private static final double MIN_LOG_VALUE = 10e-50;
     private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
@@ -334,7 +335,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         double minValue = 0.0;
         double maxValue = 0.0;
         if (yAxisElement.isLogScale()) {
-            if (yAxisElement.getMinValue() > 10e-50 && yAxisElement.getMaxValue() > 10e-50) {
+            if (yAxisElement.getMinValue() > MIN_LOG_VALUE && yAxisElement.getMaxValue() > MIN_LOG_VALUE) {
                 minValue = Math.log10(yAxisElement.getMinValue());
                 maxValue = Math.log10(yAxisElement.getMaxValue());
             }
@@ -342,51 +343,41 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             minValue = yAxisElement.getMinValue();
             maxValue = yAxisElement.getMaxValue();
         }
-        double signFactor = 1;
-        double useMax = 0;
-        if (maxValue < minValue) {
-            signFactor = -1;
-            double temp = maxValue;
-            maxValue = minValue;
-            minValue = temp;
-            useMax = 1;
-        }
+
         final int sizeSteps = graphArea.height / ChartConstants.getMinVerticalTickSpace();
-        int verticalTicks = 2;
+        int verticalTicks = 3;
         if (sizeSteps >= 4) {
             verticalTicks = 5;
-        } else if (verticalTicks >= 2) {
-            verticalTicks = 3;
         }
-        if (verticalTicks == 0) {
-            final int y = graphArea.y + graphArea.height;
+        final double tickDifferenceVertical = (maxValue - minValue) / (verticalTicks - 1);
+
+        double startValue = minValue;
+        double sign = 1;
+        if (maxValue < minValue) {
+            startValue = maxValue;
+            sign = -1;
+        }
+        for (int i = 0; i < verticalTicks; i++) {
+            final double tickValue = startValue + i * tickDifferenceVertical;
+            String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
+
+            Double yAxisRatio = yRatios.get(yAxisElement);
+            if (yAxisRatio == null) {
+                continue;
+            }
+            final int y = graphArea.y + graphArea.height - (int) (sign * yAxisRatio * (tickValue - startValue));
 
             g.setColor(ChartConstants.TICK_LINE_COLOR);
-            g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-        } else {
-            final double tickDifferenceVertical = (maxValue - minValue) / (verticalTicks - 1);
-
-            for (int i = 0; i < verticalTicks; i++) {
-                final double tickValue = minValue + i * tickDifferenceVertical;
-                String tickText = ChartConstants.DECIMAL_FORMAT.format(tickValue);
-
-                Double yAxisRatio = yRatios.get(yAxisElement);
-                if (yAxisRatio == null) {
-                    continue;
-                }
-                final int y = graphArea.y + graphArea.height - (int) (yAxisRatio * signFactor * (tickValue - (1 - useMax) * minValue - useMax * maxValue));
-
-                g.setColor(ChartConstants.TICK_LINE_COLOR);
-                if (leftSide == 0) {
-                    g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
-                }
-
-                final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-                final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
-                g.setColor(ChartConstants.LABEL_TEXT_COLOR);
-                g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
+            if (leftSide == 0) {
+                g.drawLine(graphArea.x - 3, y, graphArea.x + graphArea.width, y);
             }
+
+            final Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
+            final int x = graphArea.x - 6 - (int) bounds.getWidth() + leftSide * (graphArea.width + (int) bounds.getWidth() + 6);
+            g.setColor(ChartConstants.LABEL_TEXT_COLOR);
+            g.drawString(tickText, x, y + (int) (bounds.getHeight() / 2));
         }
+
     }
 
     private void drawMovieLine(final Graphics2D g) {
@@ -763,11 +754,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
