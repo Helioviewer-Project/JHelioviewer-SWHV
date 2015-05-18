@@ -42,7 +42,7 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
     @Override
     public void reset() {
         super.reset();
-        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        this.forceTimeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override
@@ -69,7 +69,13 @@ public class GL3DObserverCamera extends GL3DSolarRotationTrackingTrackballCamera
 
     @Override
     public void timeChanged(Date date) {
-        if (date != null && !this.getTrackingMode()) {
+        if (!this.getTrackingMode()) {
+            forceTimeChanged(date);
+        }
+    }
+
+    private void forceTimeChanged(Date date) {
+        if (date != null) {
             updateRotation(date);
 
             RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();

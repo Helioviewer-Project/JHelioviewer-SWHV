@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -30,7 +31,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         super();
         positionLoading = new GL3DPositionLoading();
         positionLoading.addListener(this);
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
         followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel(this);
 
@@ -38,6 +39,7 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void reset() {
+        forceTimeChanged(cameraDate);
         super.reset();
     }
 
@@ -62,7 +64,13 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
 
     @Override
     public void timeChanged(Date date) {
-        if (date != null && this.positionLoading.isLoaded() && !this.getTrackingMode()) {
+        if (!this.getTrackingMode()) {
+            forceTimeChanged(date);
+        }
+    }
+
+    public void forceTimeChanged(Date date) {
+        if (date != null && this.positionLoading.isLoaded()) {
 
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
