@@ -48,6 +48,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private static GLCanvas canvas;
 
     // screenshot & movie
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
     private final AWTGLReadBufferUtil rbu;
 
     private ExportMovieDialog exportMovieDialog;
@@ -199,8 +200,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
             exportMode = true;
 
             JHVJPXView jpxView = (JHVJPXView) mv;
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
-            String dateString = format.format(new Date(System.currentTimeMillis()));
+            String dateString = dateFormat.format(new Date(System.currentTimeMillis()));
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + dateString + ".mp4";
 
             framerate = jpxView.getDesiredRelativeSpeed();
