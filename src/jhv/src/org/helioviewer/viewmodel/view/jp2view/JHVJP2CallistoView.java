@@ -17,8 +17,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     private boolean regionSet;
     private JHVJP2CallistoViewDataHandler dataHandler;
 
-    public JHVJP2CallistoView(boolean isMainView) {
-        super(isMainView);
+    public JHVJP2CallistoView() {
         region = new Region(0, 0, 86400, 380);
         viewport = new Viewport(2700, 12);
         viewportSet = false;
