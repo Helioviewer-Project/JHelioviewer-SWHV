@@ -113,16 +113,14 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.remove(timeListener);
     }
 
-    private static final LayersModel layersModel = new LayersModel();
-
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         int idx = LayersModel.findView(view);
-        if (idx != -1 /* layersModel.isValidIndex(idx) */) {
+        if (idx != -1 /* LayersModel.isValidIndex(idx) */) {
             // update timestamp labels
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
             if (idx == LayersModel.getActiveLayer() && dateTime != null) {
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(layersModel.getFPS(view));
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(LayersModel.getFPS(view));
                 MoviePanel.setFrameSlider(view);
 
                 lastTimestamp = dateTime.getTime();
@@ -137,24 +135,14 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static Date getLastUpdatedTimestamp() {
         if (lastTimestamp == null) {
-            Date lastDate = LayersModel.getLastDate();
-            if (lastDate != null) {
-                lastTimestamp = LayersModel.getLastDate();
-                return lastTimestamp;
-            }
-            return null;
-        } else {
-            return lastTimestamp;
+            lastTimestamp = LayersModel.getLastDate();
         }
+        return lastTimestamp;
     }
 
     @Override
     public void eventHightChanged(JHVEvent event) {
         display();
-    }
-
-    public static LayersModel getLayersModel() {
-        return layersModel;
     }
 
     private static final Displayer instance = new Displayer();
