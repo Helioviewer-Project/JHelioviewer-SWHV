@@ -202,7 +202,7 @@ public class RenderableImageLayer implements Renderable {
             GLSLShader.filter(gl);
 
             GL3DCamera camera = Displayer.getActiveCamera();
-            GL3DMat4d vpmi = camera.orthoMatrixInverse.copy();
+            GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getImageData()));
