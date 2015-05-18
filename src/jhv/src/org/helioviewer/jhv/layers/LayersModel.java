@@ -311,6 +311,9 @@ public class LayersModel {
     }
 
     public static void addView(AbstractView view) {
+        if (view == null)
+            return;
+
         while (view.getSubimageData() == null) {
             try {
                 Thread.sleep(100);

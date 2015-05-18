@@ -76,7 +76,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         instrumentsPanel = new InstrumentsPanel(this);
         DataSourceServers.getSingletonInstance().addListener(this);
         initVisualComponents();
-        initDataSources(false);
+        serverChanged(false);
     }
 
     /**
@@ -101,14 +101,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     /**
      * Adds available data to the displayed components
      * */
-    private void initDataSources(final boolean donotloadStartup) {
-        // Start the longer taking setups of the data sources and the time a new
-        // thread
+    @Override
+    public void serverChanged(final boolean donotloadStartup) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                DataSources.getSingletonInstance().reload();
-
                 try {
                     instrumentsPanel.setupSources();
                     // Check if we were able to set it up
@@ -324,36 +321,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     @Override
     public void dialogOpened() {
-    }
-
-    @Override
-    public void serverChanged(final boolean donotloadStartup) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    instrumentsPanel.setupSources();
-                    // Check if we were able to set it up
-                    if (instrumentsPanel.validSelection()) {
-                        if (!donotloadStartup) {
-                            timeSelectionPanel.setupTime();
-                        }
-                        if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            loadRemote(false);
-                        }
-                    } else {
-                        Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                    }
-                } catch (InterruptedException e) {
-                    Log.error("Could not setup observation dialog", e);
-                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                } catch (InvocationTargetException e) {
-                    Log.error("Could not setup observation dialog", e);
-                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                }
-            }
-        }, "ObservationSetup");
-        t.start();
     }
 
     // Time Selection Panel

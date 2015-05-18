@@ -402,4 +402,5 @@ public class CommandLineProcessor {
     public static void setUsageMessage(String string) {
         usageMessage = string;
     }
+
 }
