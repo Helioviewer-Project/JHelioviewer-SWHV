@@ -354,8 +354,6 @@ public abstract class GL3DCamera {
         this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
     }
 
-    public abstract GL3DCameraOptionPanel getOptionPanel();
-
     public GL3DInteraction getPanInteraction() {
         return this.panInteraction;
     }
@@ -379,4 +377,7 @@ public abstract class GL3DCamera {
     public String getName() {
         return "Solar Rotation Tracking Camera";
     }
+
+    public abstract GL3DCameraOptionPanel getOptionPanel();
+
 }
