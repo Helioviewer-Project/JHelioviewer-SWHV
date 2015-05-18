@@ -332,11 +332,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     private class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
-        private final JLabel labelStartDate = new JLabel("Start date");
-        private final JLabel labelStartTime = new JLabel("Start time");
-        private final JLabel labelEndDate = new JLabel("End date");
-        private final JLabel labelEndTime = new JLabel("End time");
-
         private TimeTextField textStartTime;
         private TimeTextField textEndTime;
         private JHVCalendarDatePicker calendarStartDate;
@@ -347,14 +342,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public TimeSelectionPanel() {
             // set up the visual components (GUI)
             ObservationDialogDateModel.getInstance().addListener(this);
-            initVisualComponents();
-        }
 
-        /**
-         * Sets up the visual sub components and the component itself.
-         * */
-        private void initVisualComponents() {
-            // set basic layout
             setLayout(new GridLayout(2, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             // create end date picker
@@ -381,35 +369,26 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             updateDateFormat();
 
             // add components to panel
-            final JPanel startDatePane = new JPanel(new BorderLayout());
-            startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
+            JPanel startDatePane = new JPanel(new BorderLayout());
+            startDatePane.add(new JLabel("Start date"), BorderLayout.PAGE_START);
             startDatePane.add(calendarStartDate, BorderLayout.CENTER);
 
-            final JPanel startTimePane = new JPanel(new BorderLayout());
-            startTimePane.add(labelStartTime, BorderLayout.PAGE_START);
+            JPanel startTimePane = new JPanel(new BorderLayout());
+            startTimePane.add(new JLabel("Start time"), BorderLayout.PAGE_START);
             startTimePane.add(textStartTime, BorderLayout.CENTER);
 
-            final JPanel endDatePane = new JPanel(new BorderLayout());
-            endDatePane.add(labelEndDate, BorderLayout.PAGE_START);
+            JPanel endDatePane = new JPanel(new BorderLayout());
+            endDatePane.add(new JLabel("End date"), BorderLayout.PAGE_START);
             endDatePane.add(calendarEndDate, BorderLayout.CENTER);
 
-            final JPanel endTimePane = new JPanel(new BorderLayout());
-            endTimePane.add(labelEndTime, BorderLayout.PAGE_START);
+            JPanel endTimePane = new JPanel(new BorderLayout());
+            endTimePane.add(new JLabel("End time"), BorderLayout.PAGE_START);
             endTimePane.add(textEndTime, BorderLayout.CENTER);
 
             add(startDatePane);
             add(startTimePane);
             add(endDatePane);
             add(endTimePane);
-
-            // add(labelStartDate);
-            // add(labelStartTime);
-            // add(calendarStartDate);
-            // add(textStartTime);
-            // add(labelEndDate);
-            // add(labelEndTime);
-            // add(calendarEndDate);
-            // add(textEndTime);
         }
 
         private class LatestImageDateCall implements Callable<Date> {
@@ -511,13 +490,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
                 }
-
-                /*
-                 * if (!isStartDateBeforeEndDate()) {
-                 * calendar.add(Calendar.DATE, 1); //
-                 * calendarEndDate.setDate(calendar.getTime());
-                 * setEndDate(calendar.getTime()); }
-                 */
             }
 
             if (e.getSource() == calendarEndDate) {
@@ -528,13 +500,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 } catch (ParseException e1) {
                     Log.error("Could not parse end date " + getEndTime());
                 }
-
-                /*
-                 * if (!isStartDateBeforeEndDate()) {
-                 * calendar.add(Calendar.DATE, -1); //
-                 * calendarStartDate.setDate(calendar.getTime());
-                 * setStartDate(calendar.getTime()); }
-                 */
             }
         }
 
@@ -610,14 +575,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          * */
         public CadencePanel() {
             // set up the visual components (GUI)
-            initVisualComponents();
-        }
-
-        /**
-         * Sets up the visual sub components and the component itself.
-         * */
-        private void initVisualComponents() {
-            // set basic layout
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
             setBorder(new EmptyBorder(3, 0, 0, 0));
 
