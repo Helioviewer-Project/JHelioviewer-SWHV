@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +17,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -64,7 +62,7 @@ public class APIRequestManager {
         AbstractView view = null;
 
         try {
-            view = loadImage(false, observatory, instrument, detector, measurement, formatter.format(date), message);
+            view = loadImage(observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
                 MetaData metaData = view.getMetaData();
                 if (metaData instanceof HelioviewerMetaData) {
@@ -97,9 +95,6 @@ public class APIRequestManager {
      * Sends an request to the server to compute where the nearest image is
      * located on the server. The address of the file will be returned.
      *
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
      * @param observatory
      *            observatory of the requested image.
      * @param instrument
@@ -116,19 +111,19 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    public static AbstractView loadImage(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    public static AbstractView loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), message);
+            return requestData(new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
-                Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
+                Log.debug(">> APIRequestManager.loadImage()  > Error will be thrown", e);
                 throw new IOException("Unknown Host: " + e.getMessage());
             } else {
-                Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
+                Log.debug(">> APIRequestManager.loadImage()  > Error will be thrown", e);
                 throw new IOException("Error in the server communication:" + e.getMessage());
             }
         } catch (URISyntaxException e) {
@@ -141,9 +136,6 @@ public class APIRequestManager {
      * Sends an request to the server to compute where the image series is
      * located on the server. The address of the file will be returned.
      *
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
      * @param observatory
      *            observatory of the requested image series.
      * @param instrument
@@ -164,27 +156,25 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static AbstractView loadImageSeries(boolean addToViewChain, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
+    private static AbstractView loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
-
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
         }
-
         String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
 
-        Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String) > jpip request url: " + jpipRequest);
-        Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String) > http request url: " + fileRequest);
+        Log.debug(">> APIRequestManager.loadImageSeries() > jpip request url: " + jpipRequest);
+        Log.debug(">> APIRequestManager.loadImageSeries() > http request url: " + fileRequest);
 
         // get URL from server where file with image series is located
         try {
-            return requestData(addToViewChain, new URL(jpipRequest), new URI(fileRequest), message);
+            return requestData(new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
-                Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
+                Log.debug(">> APIRequestManager.loadImageSeries()  > Error will be thrown", e);
                 throw new IOException("Unknown Host: " + e.getMessage());
             } else {
-                Log.debug(">> APIRequestManager.loadImageSeries(boolean,String,String,String,String,String,String,String)  > Error will be throw", e);
+                Log.debug(">> APIRequestManager.loadImageSeries()  > Error will be thrown", e);
                 throw new IOException("Error in the server communication:" + e.getMessage());
             }
         } catch (URISyntaxException e) {
@@ -206,9 +196,6 @@ public class APIRequestManager {
      * <p>
      * Returns the corresponding View for the file.
      *
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
      * @param jpipRequest
      *            The http request url which is sent to the server
      * @param downloadUri
@@ -218,7 +205,7 @@ public class APIRequestManager {
      * @return The View corresponding to the file whose location was returned by
      *         the server
      */
-    public static AbstractView requestData(boolean addToViewChain, URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+    public static AbstractView requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
@@ -249,7 +236,7 @@ public class APIRequestManager {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
-                return newLoad(response.getURI(), downloadUri, addToViewChain);
+                return newLoad(response.getURI(), downloadUri);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -279,81 +266,20 @@ public class APIRequestManager {
      *
      * @param uri
      *            specifies the location of the file.
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
-     * @return associated image info view of the given image or image series
-     *         file.
-     * @throws IOException
-     */
-    public static AbstractView newLoad(URI uri, boolean addToViewChain) throws IOException {
-        if (uri == null) {
-            return null;
-        }
-        AbstractView view = loadView(uri, uri, true);
-        if (addToViewChain) {
-            addToViewchain(view);
-        }
-        return view;
-    }
-
-    /**
-     * Loads the image or image series from the given URI, creates a new image
-     * info view and adds it as a new layer to the view chain of the main image.
-     *
-     * @param uri
-     *            specifies the location of the file.
      * @param downloadURI
      *            the http uri from which the whole file can be downloaded
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
      * @return associated image info view of the given image or image series
      *         file.
      * @throws IOException
      */
-    public static AbstractView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
-        if (uri == null) {
-            return null;
-        }
-        AbstractView view = loadView(uri, downloadURI, true);
-        if (addToViewChain) {
-            addToViewchain(view);
-        }
-        return view;
-    }
-
-    private static void addToViewchain(AbstractView view) {
-        while (view.getSubimageData() == null) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        EventQueue.invokeLater(new Runnable() {
-            private AbstractView theView;
-
-            @Override
-            public void run() {
-                Displayer.getLayersModel().addLayer(theView);
-                Displayer.getLayersModel().setActiveLayer(theView);
-            }
-
-            public Runnable init(AbstractView theView) {
-                this.theView = theView;
-                return this;
-            }
-        }.init(view));
+    public static AbstractView newLoad(URI uri, URI downloadURI) throws IOException {
+        return loadView(uri, downloadURI, true);
     }
 
     /**
      * Method does remote opening. If image series, file is downloaded. If
      * single frame, file is opened via JPIP on delphi.nascom.nasa.gov:8090.
      *
-     * @param addToViewChain
-     *            specifies whether the generated View should be added to the
-     *            view chain of the main image
      * @param cadence
      *            cadence between two frames (null for single images).
      * @param startTime
@@ -373,11 +299,11 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static AbstractView requestAndOpenRemoteFile(boolean addToViewChain, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static AbstractView requestAndOpenRemoteFile(String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
         if (endTime.equals("")) {
-            return loadImage(addToViewChain, observatory, instrument, detector, measurement, startTime, message);
+            return loadImage(observatory, instrument, detector, measurement, startTime, message);
         } else {
-            return loadImageSeries(addToViewChain, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
+            return loadImageSeries(observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
     }
 
