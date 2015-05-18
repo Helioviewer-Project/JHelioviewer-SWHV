@@ -29,7 +29,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
 
-public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel implements GL3DFollowObjectCameraListener {
+public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;
     private JLabel beginDateLabel;
@@ -108,7 +108,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
             }
         });
 
-        this.camera.addFollowObjectCameraListener(this);
         this.syncWithLayerBeginTime(false);
         this.syncWithLayerEndTime(true);
     }
@@ -155,7 +154,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
 
     @Override
     public void deactivate() {
-        this.camera.removeFollowObjectCameraListener(this);
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
@@ -338,7 +336,6 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel imp
         add(addEndDatePanel, c);
     }
 
-    @Override
     public void fireLoaded(String state) {
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";

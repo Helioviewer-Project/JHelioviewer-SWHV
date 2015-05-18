@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import org.helioviewer.base.math.GL3DQuatd;
@@ -18,7 +17,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
     private final GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
-    private final ArrayList<GL3DFollowObjectCameraListener> followObjectCameraListeners = new ArrayList<GL3DFollowObjectCameraListener>();
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
@@ -126,19 +124,9 @@ public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCa
         }
     }
 
-    public void addFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
-        this.followObjectCameraListeners.add(listener);
-    }
-
-    public void removeFollowObjectCameraListener(GL3DFollowObjectCameraListener listener) {
-        this.followObjectCameraListeners.remove(listener);
-    }
-
     @Override
     public void fireNewLoaded(String state) {
-        for (GL3DFollowObjectCameraListener listener : followObjectCameraListeners) {
-            listener.fireLoaded(state);
-        }
+        followObjectCameraOptionPanel.fireLoaded(state);
         Displayer.render();
     }
 
