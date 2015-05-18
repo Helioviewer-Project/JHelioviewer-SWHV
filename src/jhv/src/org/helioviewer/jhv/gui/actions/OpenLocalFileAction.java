@@ -12,8 +12,8 @@ import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilter;
 import org.helioviewer.jhv.gui.actions.filefilters.FitsFilter;

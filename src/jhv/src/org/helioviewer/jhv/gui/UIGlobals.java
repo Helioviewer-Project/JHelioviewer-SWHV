@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Font;
 import java.awt.font.TextAttribute;
-
 import java.util.Hashtable;
 
 public class UIGlobals {
