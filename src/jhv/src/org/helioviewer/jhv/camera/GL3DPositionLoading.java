@@ -32,7 +32,6 @@ public class GL3DPositionLoading {
     private final String LOADEDSTATE = "Loaded";
     private final String FAILEDSTATE = "Failed";
     private final String PARTIALSTATE = "Partial";
-    private boolean running = false;
 
     private boolean isLoaded = false;
     private URL url;
@@ -70,7 +69,6 @@ public class GL3DPositionLoading {
             @Override
             protected Integer doInBackground() throws Exception {
                 Thread.currentThread().setName("GL3DPositionLoading--Main");
-                running = true;
                 try {
                     if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
                         deltat = 60 * 60 / 64;
