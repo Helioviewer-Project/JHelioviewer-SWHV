@@ -272,10 +272,6 @@ public abstract class GL3DCamera {
         gl.glMultMatrixd(cameraTransformation.m, 0);
     }
 
-    public void drawCamera(GL2 gl) {
-        getCurrentInteraction().drawInteractionFeedback(gl, this);
-    }
-
     public double getCameraFOV() {
         return this.fov;
     }

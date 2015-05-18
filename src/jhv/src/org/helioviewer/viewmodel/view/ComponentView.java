@@ -136,7 +136,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
         camera.applyPerspective(gl);
         camera.applyCamera(gl);
         ImageViewerGui.getRenderableContainer().render(gl);
-        camera.drawCamera(gl);
         camera.resumePerspective(gl);
 
         if (exportMode || screenshotMode) {
