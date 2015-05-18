@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -44,10 +43,14 @@ public class GL3DPositionLoading {
     private String observer = "Earth";
     private final String baseUrl = "http://swhv.oma.be/position?";
     private int deltat = 45;
-    private final ArrayList<GL3DPositionLoadingListener> listeners = new ArrayList<GL3DPositionLoadingListener>();
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
     private SwingWorker<Integer, Integer> worker;
+    private final GL3DFollowObjectCamera camera;
+
+    public GL3DPositionLoading(GL3DFollowObjectCamera camera) {
+        this.camera = camera;
+    }
 
     private void buildRequestURL() {
         try {
@@ -202,14 +205,8 @@ public class GL3DPositionLoading {
         }
     }
 
-    public void addListener(GL3DPositionLoadingListener listener) {
-        listeners.add(listener);
-    }
-
     public void fireLoaded(final String state) {
-        for (GL3DPositionLoadingListener listener : listeners) {
-            listener.fireNewLoaded(state);
-        }
+        camera.fireNewLoaded(state);
     }
 
     public Date getBeginDate() {

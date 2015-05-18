@@ -15,7 +15,7 @@ import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class GL3DFollowObjectCamera extends GL3DCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
+public class GL3DFollowObjectCamera extends GL3DCamera implements LayersListener, TimeListener {
     private final GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
@@ -27,11 +27,12 @@ public class GL3DFollowObjectCamera extends GL3DCamera implements GL3DPositionLo
 
     public GL3DFollowObjectCamera() {
         super();
-        positionLoading = new GL3DPositionLoading();
+        followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel(this);
+        positionLoading = new GL3DPositionLoading(this);
         LayersModel.addLayersListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel(this);
-        positionLoading.addListener(this);
+        followObjectCameraOptionPanel.syncWithLayerBeginTime(false);
+        followObjectCameraOptionPanel.syncWithLayerEndTime(true);
     }
 
     @Override
@@ -123,7 +124,6 @@ public class GL3DFollowObjectCamera extends GL3DCamera implements GL3DPositionLo
         }
     }
 
-    @Override
     public void fireNewLoaded(String state) {
         followObjectCameraOptionPanel.fireLoaded(state);
         Displayer.render();
