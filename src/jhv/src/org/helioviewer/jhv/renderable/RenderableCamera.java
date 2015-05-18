@@ -30,7 +30,7 @@ public class RenderableCamera implements Renderable {
     private static final float twoBlue = secondcolor.getBlue() / 255f;
 
     private boolean isVisible = false;
-    private String timeString = "N/A";
+    private String timeString = null;
 
     public RenderableCamera() {
         this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getActiveCamera());
@@ -151,13 +151,13 @@ public class RenderableCamera implements Renderable {
 
     @Override
     public String getTimeString() {
-        return this.timeString;
+        return timeString;
     }
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public void setTimeString(Date date) {
-        this.timeString = dateFormat.format(date);
+        timeString = dateFormat.format(date);
     }
 
     @Override

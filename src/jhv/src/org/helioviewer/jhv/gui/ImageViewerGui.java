@@ -224,7 +224,7 @@ public class ImageViewerGui {
         }
     }
 
-    public void loadAtStart() {
+    public static void loadAtStart() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -241,7 +241,7 @@ public class ImageViewerGui {
      * tries to load this images. Otherwise it tries to load a default image
      * which is defined by the default entries of the observation panel.
      * */
-    private void loadImagesAtStartup() {
+    private static void loadImagesAtStartup() {
         // get values for different command line options
         AbstractList<JHVRequest> jhvRequests = CommandLineProcessor.getJHVOptionValues();
         AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
