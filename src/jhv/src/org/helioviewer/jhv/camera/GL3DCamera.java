@@ -268,10 +268,6 @@ public abstract class GL3DCamera {
         cameraTransformation = this.rotation.toMatrix().translate(this.translation);
     }
 
-    public GL3DMat4d getRotationMatrix() {
-        return this.getRotation().toMatrix();
-    }
-
     public void applyCamera(GL2 gl) {
         gl.glMultMatrixd(cameraTransformation.m, 0);
     }
