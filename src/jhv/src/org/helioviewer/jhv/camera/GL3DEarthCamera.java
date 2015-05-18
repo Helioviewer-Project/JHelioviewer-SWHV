@@ -33,6 +33,7 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
     public void reset() {
         this.resetCurrentDragRotation();
         super.reset();
+        this.forceTimeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override
@@ -55,6 +56,12 @@ public class GL3DEarthCamera extends GL3DSolarRotationTrackingTrackballCamera im
 
     @Override
     public void timeChanged(Date date) {
+        if (!this.getTrackingMode()) {
+            forceTimeChanged(date);
+        }
+    }
+
+    public void forceTimeChanged(Date date) {
         if (date != null && !this.getTrackingMode()) {
             updateRotation(date);
 
