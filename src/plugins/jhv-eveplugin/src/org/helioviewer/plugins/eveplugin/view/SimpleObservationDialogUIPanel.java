@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -27,6 +26,7 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.plugins.eveplugin.radio.data.RadioDownloader;
@@ -72,7 +72,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         this.add(timePane);
         this.add(plotPane);
 
-        Displayer.getLayersModel().addLayersListener(SimpleObservationDialogUIPanel.this);
+        LayersModel.addLayersListener(SimpleObservationDialogUIPanel.this);
     }
 
     public void setDate(final Date start) {
@@ -90,7 +90,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        Interval<Date> movieInterval = new Interval<Date>(Displayer.getLayersModel().getFirstDate(), Displayer.getLayersModel().getLastDate());
+        Interval<Date> movieInterval = new Interval<Date>(LayersModel.getFirstDate(), LayersModel.getLastDate());
         if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
             return movieInterval;
         } else {
@@ -225,9 +225,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(int idx) {
-        AbstractView view = Displayer.getLayersModel().getLayer(idx);
+        AbstractView view = LayersModel.getLayer(idx);
         if (view instanceof JHVJPXView) {
-            Date start = Displayer.getLayersModel().getStartDate(view);
+            Date start = LayersModel.getStartDate(view);
             calendarStartDate.setDate(start);
             ObservationDialogDateModel.getInstance().setStartDate(start, false);
         }

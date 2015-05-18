@@ -19,6 +19,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.base.Range;
 import org.helioviewer.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.plugins.eveplugin.lines.data.DownloadController;
@@ -58,7 +59,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         // drawControllerData = new DrawControllerData();
         tListeners = new ArrayList<TimingListener>();
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
         Displayer.addTimeListener(this);
         keepFullValueRange = false;
         pas = PlotAreaSpace.getSingletonInstance();
@@ -257,7 +258,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(int idx) {
-        final Interval<Date> interval = new Interval<Date>(Displayer.getLayersModel().getFirstDate(), Displayer.getLayersModel().getLastDate());
+        final Interval<Date> interval = new Interval<Date>(LayersModel.getFirstDate(), LayersModel.getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
         } else {
@@ -275,7 +276,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerRemoved(int oldIdx) {
-        if (Displayer.getLayersModel().getNumLayers() == 0) {
+        if (LayersModel.getNumLayers() == 0) {
             fireRedrawRequestMovieFrameChanged(null);
         }
     }

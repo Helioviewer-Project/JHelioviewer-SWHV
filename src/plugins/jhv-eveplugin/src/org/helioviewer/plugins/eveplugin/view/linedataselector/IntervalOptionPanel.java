@@ -1,6 +1,5 @@
 package org.helioviewer.plugins.eveplugin.view.linedataselector;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +9,6 @@ import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -21,6 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.plugins.eveplugin.draw.TimingListener;
@@ -41,7 +40,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     };
 
     public IntervalOptionPanel() {
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
@@ -119,10 +118,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void setDateRange() {
-        AbstractView view = Displayer.getLayersModel().getActiveView();
+        AbstractView view = LayersModel.getActiveView();
         if (view instanceof JHVJPXView) {
-            Date start = Displayer.getLayersModel().getStartDate(view);
-            Date end = Displayer.getLayersModel().getEndDate(view);
+            Date start = LayersModel.getStartDate(view);
+            Date end = LayersModel.getEndDate(view);
 
             Interval<Date> interval = new Interval<Date>(start, end);
             DrawController.getSingletonInstance().setSelectedInterval(interval, true);
@@ -130,8 +129,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void setEnabledStateOfPeriodMovieButton() {
-        Date start = Displayer.getLayersModel().getFirstDate();
-        Date end = Displayer.getLayersModel().getLastDate();
+        Date start = LayersModel.getFirstDate();
+        Date end = LayersModel.getLastDate();
 
         periodFromLayersButton.setEnabled(start != null && end != null);
     }
@@ -212,8 +211,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
             setDefaultPeriod = false;
             if (view instanceof JHVJPXView) {
-                Date start = Displayer.getLayersModel().getStartDate(view);
-                Date end = Displayer.getLayersModel().getEndDate(view);
+                Date start = LayersModel.getStartDate(view);
+                Date end = LayersModel.getEndDate(view);
 
                 Interval<Date> interval = new Interval<Date>(start, end);
                 // ZoomController.getSingletonInstance().setAvailableInterval(interval);

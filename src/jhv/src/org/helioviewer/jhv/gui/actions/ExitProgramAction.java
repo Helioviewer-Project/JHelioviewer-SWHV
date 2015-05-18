@@ -17,8 +17,8 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersModel;
 
 /**
  * Action to terminate the application.
@@ -38,7 +38,7 @@ public class ExitProgramAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (Displayer.getLayersModel().getNumLayers() > 0) {
+        if (LayersModel.getNumLayers() > 0) {
             int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.CANCEL_OPTION) {
                 return;

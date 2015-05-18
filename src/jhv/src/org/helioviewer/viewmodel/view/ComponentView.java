@@ -19,6 +19,7 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -149,7 +150,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     private void exportFrame() {
-        AbstractView mv = Displayer.getLayersModel().getActiveView();
+        AbstractView mv = LayersModel.getActiveView();
         if (mv == null) {
             stopExport();
             return;
@@ -195,7 +196,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getLeftContentPane().setEnabled(false);
 
-        AbstractView mv = Displayer.getLayersModel().getActiveView();
+        AbstractView mv = LayersModel.getActiveView();
         if (mv instanceof JHVJPXView) {
             exportMode = true;
 

@@ -28,6 +28,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -227,7 +228,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                Displayer.getLayersModel().downloadLayer((JHVJP2View) jp2view);
+                LayersModel.downloadLayer((JHVJP2View) jp2view);
             }
         };
         downloadLayerButton.setAction(downloadLayerAction);
@@ -239,7 +240,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                Displayer.getLayersModel().showMetaInfo(jp2view);
+                LayersModel.showMetaInfo(jp2view);
             }
         };
         showMetaButton.setAction(showMetaAction);

@@ -6,8 +6,8 @@ import java.util.HashMap;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
 
@@ -17,7 +17,7 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
 
     public ControlPanelContainer() {
         this.setLayout(new CardLayout());
-        Displayer.getLayersModel().addLayersListener(this);
+        LayersModel.addLayersListener(this);
     }
 
     public void addLayer(View v, Component controlPanel) {

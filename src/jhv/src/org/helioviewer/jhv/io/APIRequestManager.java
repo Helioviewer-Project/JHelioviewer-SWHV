@@ -17,6 +17,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -272,8 +273,40 @@ public class APIRequestManager {
      *         file.
      * @throws IOException
      */
-    public static AbstractView newLoad(URI uri, URI downloadURI) throws IOException {
-        return loadView(uri, downloadURI, true);
+    public static AbstractView newLoad(URI uri, URI downloadURI, boolean addToViewChain) throws IOException {
+        if (uri == null) {
+            return null;
+        }
+        AbstractView view = loadView(uri, downloadURI, true);
+        if (addToViewChain) {
+            addToViewchain(view);
+        }
+        return view;
+    }
+
+    private static void addToViewchain(AbstractView view) {
+        while (view.getSubimageData() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        EventQueue.invokeLater(new Runnable() {
+            private AbstractView theView;
+
+            @Override
+            public void run() {
+                LayersModel.addLayer(theView);
+                LayersModel.setActiveLayer(theView);
+            }
+
+            public Runnable init(AbstractView theView) {
+                this.theView = theView;
+                return this;
+            }
+        }.init(view));
+>>>>>>> do not make intermediate call
     }
 
     /**

@@ -23,7 +23,6 @@ import javax.swing.JSplitPane;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.ControlPanelContainer;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
@@ -43,6 +42,7 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.io.JHVRequest;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainer;
 import org.helioviewer.jhv.plugin.renderable.RenderableContainerPanel;
 import org.helioviewer.jhv.renderable.RenderableCamera;
@@ -268,8 +268,8 @@ public class ImageViewerGui {
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
-                        for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            AbstractView subView = Displayer.getLayersModel().getLayer(i);
+                        for (int i = 0; i < LayersModel.getNumLayers(); i++) {
+                            AbstractView subView = LayersModel.getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView)) {
@@ -311,8 +311,8 @@ public class ImageViewerGui {
                         // go through all sub view chains of the layered
                         // view and try to find the
                         // view chain of the corresponding image info view
-                        for (int i = 0; i < Displayer.getLayersModel().getNumLayers(); i++) {
-                            AbstractView subView = Displayer.getLayersModel().getLayer(i);
+                        for (int i = 0; i < LayersModel.getNumLayers(); i++) {
+                            AbstractView subView = LayersModel.getLayer(i);
 
                             // if view has been found
                             if (view.equals(subView) && subView instanceof JHVJPXView) {
