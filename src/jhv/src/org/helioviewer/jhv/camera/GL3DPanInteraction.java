@@ -16,7 +16,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
     private Point lastMousePoint;
 
-    protected GL3DPanInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+    protected GL3DPanInteraction(GL3DCamera camera) {
         super(camera);
     }
 
@@ -30,7 +30,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         Point p = e.getPoint();
         int x = p.x - this.lastMousePoint.x;
         int y = p.y - this.lastMousePoint.y;
-        double m = 2. * camera.getCameraWidth() / (double) Displayer.getViewportHeight();
+        double m = 2. * camera.getCameraWidth() / Displayer.getViewportHeight();
 
         camera.translation.x += x * m;
         camera.translation.y -= y * m;

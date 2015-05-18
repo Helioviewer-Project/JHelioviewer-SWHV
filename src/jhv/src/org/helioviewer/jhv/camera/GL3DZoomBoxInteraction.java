@@ -23,7 +23,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
 
-    public GL3DZoomBoxInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+    public GL3DZoomBoxInteraction(GL3DCamera camera) {
         super(camera);
     }
 

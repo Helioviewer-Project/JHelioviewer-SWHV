@@ -15,7 +15,7 @@ import org.helioviewer.jhv.renderable.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class GL3DFollowObjectCamera extends GL3DSolarRotationTrackingTrackballCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
+public class GL3DFollowObjectCamera extends GL3DCamera implements GL3DPositionLoadingListener, LayersListener, TimeListener {
     private final GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;

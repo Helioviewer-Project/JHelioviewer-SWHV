@@ -21,7 +21,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d currentRotationEndPoint;
     private GL3DQuatd currentDragRotation;
 
-    protected GL3DTrackballRotationInteraction(GL3DSolarRotationTrackingTrackballCamera camera) {
+    protected GL3DTrackballRotationInteraction(GL3DCamera camera) {
         super(camera);
     }
 
