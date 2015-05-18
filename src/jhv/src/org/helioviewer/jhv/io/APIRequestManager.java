@@ -236,7 +236,7 @@ public class APIRequestManager {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
-                return newLoad(response.getURI(), downloadUri);
+                return loadView(response.getURI(), downloadUri, true);
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
@@ -258,22 +258,6 @@ public class APIRequestManager {
             Message.err("Socket timeout", "Socket timeout while requesting jpip url", false);
         }
         return null;
-    }
-
-    /**
-     * Loads the image or image series from the given URI, creates a new image
-     * info view and adds it as a new layer to the view chain of the main image.
-     *
-     * @param uri
-     *            specifies the location of the file.
-     * @param downloadURI
-     *            the http uri from which the whole file can be downloaded
-     * @return associated image info view of the given image or image series
-     *         file.
-     * @throws IOException
-     */
-    public static AbstractView newLoad(URI uri, URI downloadURI) throws IOException {
-        return loadView(uri, downloadURI, true);
     }
 
     /**
@@ -326,7 +310,7 @@ public class APIRequestManager {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    private static AbstractView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
+    public static AbstractView loadView(URI uri, URI downloadURI, boolean isMainView) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI");
         }

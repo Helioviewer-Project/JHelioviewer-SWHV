@@ -236,7 +236,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             public void run() {
                 try {
                     AbstractView view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    LayersModel.addToViewchain(view);
+                    LayersModel.addView(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -267,7 +267,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
                 try {
                     AbstractView view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    LayersModel.addToViewchain(view);
+                    LayersModel.addView(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);

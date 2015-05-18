@@ -310,7 +310,7 @@ public class LayersModel {
         setActiveLayer(newIndex);
     }
 
-    public static void addToViewchain(AbstractView view) {
+    public static void addView(AbstractView view) {
         while (view.getSubimageData() == null) {
             try {
                 Thread.sleep(100);
