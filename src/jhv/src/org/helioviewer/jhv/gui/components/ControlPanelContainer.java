@@ -11,6 +11,7 @@ import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View;
 
+@SuppressWarnings({"serial"})
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
     HashMap<View, Component> controlMap = new HashMap<View, Component>();

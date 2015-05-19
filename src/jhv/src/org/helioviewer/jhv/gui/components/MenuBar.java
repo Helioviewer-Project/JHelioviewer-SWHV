@@ -33,6 +33,7 @@ import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
  * @author Markus Langenberg
  *
  */
+@SuppressWarnings({"serial"})
 public class MenuBar extends JMenuBar {
 
     public MenuBar() {

@@ -21,6 +21,7 @@ import javax.swing.JPanel;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class StatusPanel extends JPanel {
 
     private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

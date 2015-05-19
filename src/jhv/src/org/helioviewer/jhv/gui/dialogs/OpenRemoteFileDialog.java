@@ -41,6 +41,7 @@ import org.helioviewer.jhv.layers.LayersModel;
  * @author Stephan Pagel
  * @author Andreas Hoelzl
  */
+@SuppressWarnings({"serial"})
 public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, ActionListener {
 
     // whether the advanced or the normal options are currently displayed
