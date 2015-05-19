@@ -201,12 +201,10 @@ class J2KReader implements Runnable {
 
     private JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
         JPIPQuery query = new JPIPQuery();
-
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
         query.setField(JPIPRequestField.LAYERS.toString(), String.valueOf(currParams.qualityLayers));
 
         Rectangle resDims = currParams.resolution.getResolutionBounds();
-
         query.setField(JPIPRequestField.FSIZ.toString(), String.valueOf(resDims.width) + "," + String.valueOf(resDims.height) + "," + "closest");
         query.setField(JPIPRequestField.ROFF.toString(), String.valueOf(currParams.subImage.x) + "," + String.valueOf(currParams.subImage.y));
         query.setField(JPIPRequestField.RSIZ.toString(), String.valueOf(currParams.subImage.width) + "," + String.valueOf(currParams.subImage.height));
@@ -287,10 +285,14 @@ class J2KReader implements Runnable {
                         // queries left
                         // (actually, I do not know when this might happen...)
                         if (complete) {
+                            // contrary to the above comment, last query was spuriously resent
+                            req = null;
+                            /*
                             if (req != null && req.getQuery() != null) {
                                 socket.send(req);
                                 socket.receive();
                             }
+                            */
                             socket.close();
 
                             // requesting data
@@ -386,9 +388,11 @@ class J2KReader implements Runnable {
                                 // Update requested package size
                                 stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(JpipRequestLen));
 
-                                req.setQuery(stepQuerys[current_step].toString());
+                                req.setQuery(stepQuerys[current_step]);
                                 // Log.debug(stepQuerys[current_step].toString());
                                 socket.send(req);
+
+                                /*
                                 if (Boolean.parseBoolean(System.getProperty("export.movie.debug.on"))) {
                                     try {
                                         Thread.sleep(5000);
@@ -397,9 +401,10 @@ class J2KReader implements Runnable {
                                     }
                                     throw new IOException();
                                 }
+                                */
+
                                 // long start = System.currentTimeMillis();
                                 res = socket.receive();
-                                // if(iamPersistent)
                                 // System.out.println(res.getResponseSize() /
                                 // (System.currentTimeMillis() - start));
 
