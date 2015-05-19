@@ -39,6 +39,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
  * @author Markus Langenberg
  * @author Andre Dau
  */
+@SuppressWarnings({"serial"})
 public class TopToolBar extends JToolBar implements MouseListener {
 
     private enum InteractionMode {

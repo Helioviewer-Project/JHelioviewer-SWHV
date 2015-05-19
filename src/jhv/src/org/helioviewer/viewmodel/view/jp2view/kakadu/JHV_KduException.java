@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view.kakadu;
 
+@SuppressWarnings({"serial"})
 public class JHV_KduException extends Exception {
 
     public JHV_KduException(String arg0) {

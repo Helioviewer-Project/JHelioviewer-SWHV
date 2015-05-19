@@ -17,6 +17,7 @@ import javax.swing.JPanel;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class SideContentPane extends JComponent {
 
     private final HashMap<Component, CollapsiblePane> map = new HashMap<Component, CollapsiblePane>();

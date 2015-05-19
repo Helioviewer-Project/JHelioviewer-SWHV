@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
+@SuppressWarnings({"serial"})
 public class TextDialog extends JDialog implements ActionListener, ShowableDialog {
 
     public TextDialog(String title, URL textFile) {

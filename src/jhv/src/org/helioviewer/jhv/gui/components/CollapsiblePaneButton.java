@@ -9,6 +9,7 @@ import java.awt.Point;
 import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 
+@SuppressWarnings({"serial"})
 public class CollapsiblePaneButton extends JToggleButton {
     public CollapsiblePaneButton(String title) {
         super(title);

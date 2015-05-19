@@ -21,6 +21,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class DateFormatInfoDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JButton closeButton = new JButton("Close");

@@ -26,6 +26,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class CollapsiblePane extends JComponent implements ActionListener {
 
     private static final ImageIcon expandedIcon = IconBank.getIcon(JHVIcon.DOWN2);

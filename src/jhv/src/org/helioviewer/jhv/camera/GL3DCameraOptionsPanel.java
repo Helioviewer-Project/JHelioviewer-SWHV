@@ -269,4 +269,5 @@ public class GL3DCameraOptionsPanel extends JPanel {
             return full;
         }
     }
+
 }
