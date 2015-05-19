@@ -188,7 +188,7 @@ public class Settings {
 
     private static void setUIFont(Font font) {
         FontUIResource f = new FontUIResource(font);
-        Enumeration keys = UIManager.getDefaults().keys();
+        Enumeration<?> keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
