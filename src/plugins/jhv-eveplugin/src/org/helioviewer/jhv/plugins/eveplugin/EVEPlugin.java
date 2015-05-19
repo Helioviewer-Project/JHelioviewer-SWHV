@@ -10,6 +10,7 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequester;
@@ -22,7 +23,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
  *

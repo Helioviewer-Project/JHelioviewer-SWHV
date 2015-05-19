@@ -31,8 +31,8 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodelplugin.controller.PluginContainer;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
+import org.helioviewer.jhv.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.plugin.controller.PluginManager;
 
 /**
  * The Plug-in Dialog allows to manage all available plug-ins. Plug-ins can be

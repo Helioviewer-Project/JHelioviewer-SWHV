@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodelplugin.interfaces;
+package org.helioviewer.jhv.plugin.interfaces;
 
 /**
  * A container gives the possibility to add additional information to its

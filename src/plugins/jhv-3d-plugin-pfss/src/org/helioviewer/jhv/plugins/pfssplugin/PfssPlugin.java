@@ -3,8 +3,8 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
