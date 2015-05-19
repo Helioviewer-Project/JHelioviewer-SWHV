@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -18,6 +17,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
@@ -36,7 +36,6 @@ public class GL3DPositionLoading {
     private URL url;
     private JSONObject jsonResult;
     private GL3DPositionDateTime[] positionDateTime;
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
     private final String target = "SUN";
@@ -157,7 +156,7 @@ public class GL3DPositionLoading {
                 String dateString = iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
-                Date date = format.parse(dateString);
+                Date date = ImmutableDateTime.utcFullDateFormat.parse(dateString);
                 calendar.setTime(date);
 
                 double x, y, z, jy;
@@ -192,7 +191,7 @@ public class GL3DPositionLoading {
     }
 
     public void setBeginDate(Date beginDate, boolean applyChanges) {
-        this.beginDate = this.format.format(beginDate);
+        this.beginDate = ImmutableDateTime.utcFullDateFormat.format(beginDate);
         this.beginDatems = beginDate;
         if (applyChanges) {
             applyChanges();
@@ -200,7 +199,7 @@ public class GL3DPositionLoading {
     }
 
     public void setEndDate(Date endDate, boolean applyChanges) {
-        this.endDate = this.format.format(endDate);
+        this.endDate = ImmutableDateTime.utcFullDateFormat.format(endDate);
         this.endDatems = endDate;
         if (applyChanges) {
             applyChanges();

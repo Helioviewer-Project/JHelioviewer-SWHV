@@ -26,13 +26,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
-import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.RenderableImageLayer;
@@ -72,8 +72,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     Date start = LayersModel.getStartDate(activeView);
                     Date end = LayersModel.getEndDate(activeView);
                     try {
-                        Date obsStartDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                        Date obsEndDate = ImageDataPanel.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
+                        Date obsStartDate = ImmutableDateTime.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
+                        Date obsEndDate = ImmutableDateTime.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
                         // only updates if its really necessary with a
                         // tolerance of an hour
                         final int tolerance = 60 * 60 * 1000;
