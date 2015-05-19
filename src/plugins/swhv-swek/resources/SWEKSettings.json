@@ -243,7 +243,7 @@
             "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader", 
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser",
             "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/comesepsource.jar",
-	        "jar_location_file"          : "file:///Users/bramb/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
+	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
             "jar_location" : "jar:///sources/comesepsource.jar",
             "base_url"              : "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php",
             "general_parameters"    : [
