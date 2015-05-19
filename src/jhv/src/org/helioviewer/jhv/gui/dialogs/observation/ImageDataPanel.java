@@ -32,6 +32,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.base.EventDispatchQueue;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
@@ -69,7 +70,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     /**
      * Used format for the API of the data and time
      */
-    public static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public ImageDataPanel() {
         super();
@@ -293,8 +293,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         }
 
         try {
-            ObservationDialogDateModel.getInstance().setStartDate(apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
-            ObservationDialogDateModel.getInstance().setEndDate(apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
+            ObservationDialogDateModel.getInstance().setStartDate(ImmutableDateTime.apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
+            ObservationDialogDateModel.getInstance().setEndDate(ImmutableDateTime.apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
@@ -332,10 +332,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     private class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
-        private TimeTextField textStartTime;
-        private TimeTextField textEndTime;
-        private JHVCalendarDatePicker calendarStartDate;
-        private JHVCalendarDatePicker calendarEndDate;
+        private final TimeTextField textStartTime;
+        private final TimeTextField textEndTime;
+        private final JHVCalendarDatePicker calendarStartDate;
+        private final JHVCalendarDatePicker calendarEndDate;
 
         private boolean setFromOutside = false;
 
@@ -484,7 +484,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (e.getSource() == calendarStartDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(apiDateFormat.parse(getStartTime()));
+                    calendar.setTime(ImmutableDateTime.apiDateFormat.parse(getStartTime()));
                     setStartDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
@@ -494,7 +494,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(apiDateFormat.parse(getEndTime()));
+                    calendar.setTime(ImmutableDateTime.apiDateFormat.parse(getEndTime()));
                     setEndDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse end date " + getEndTime());

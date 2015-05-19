@@ -27,15 +27,14 @@
  */
 package org.helioviewer.base.physics;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 
 /***
@@ -75,8 +74,7 @@ public final class JulianDay implements Cloneable {
     public final static String[] TIME_UNIT = { "unk", "yr", "mo", "unk", "unk", "day", "unk", "unk", "unk", "unk", "unk", "hr", "min", "sec" };
     public final static double EPOCH_1970 = 2440587.5;
     public final static double EPOCH_0 = 1721057.5;
-    public final static String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private DateFormat dateFormat = new SimpleDateFormat(SQL_DATE_FORMAT);
+
     private Integer year = new Integer(0);
     private Integer month = new Integer(0);
     private Integer date = new Integer(0);
@@ -650,8 +648,7 @@ public final class JulianDay implements Cloneable {
 
         String retStr = "";
         if (getJDN() > EPOCH_0) {
-            dateFormat.setTimeZone(tz);
-            retStr = dateFormat.format(getTime());
+            retStr = ImmutableDateTime.sqlDateFormat.format(getTime());
         } else {
             StringBuffer strBuf = new StringBuffer(fmt4Dig.format(get(JulianDay.YEAR)));
             strBuf.append("-");
@@ -1140,28 +1137,6 @@ public final class JulianDay implements Cloneable {
             e.printStackTrace();
         }
         return clone;
-    }
-
-    /***
-     * Set SimpleDateFormat string ISSUE - only valid after Jan 1, 1970
-     *
-     * @param formatStr
-     *            Date formatting string
-     */
-    public void setDateFormat(java.lang.String formatStr) {
-        if ((formatStr != null) && (formatStr.length() > 0)) {
-            dateFormat = new SimpleDateFormat(formatStr);
-        }
-    }
-
-    /***
-     * Set SimpleDateFormat for displaying date/time string
-     *
-     * @param dateFormat
-     *            Date formatter
-     */
-    public void setDateFormat(SimpleDateFormat dateFormat) {
-        this.dateFormat = dateFormat;
     }
 
     /***
