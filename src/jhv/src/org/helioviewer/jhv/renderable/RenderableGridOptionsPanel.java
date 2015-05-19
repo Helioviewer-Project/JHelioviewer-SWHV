@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
+@SuppressWarnings({"serial"})
 public class RenderableGridOptionsPanel extends JPanel {
 
     private JSpinner gridResolutionXSpinner;

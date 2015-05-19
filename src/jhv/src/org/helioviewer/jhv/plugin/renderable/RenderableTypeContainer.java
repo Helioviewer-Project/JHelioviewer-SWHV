@@ -16,4 +16,5 @@ public class RenderableTypeContainer {
     public void removeType(RenderableType type) {
         renderableTypes.remove(type);
     }
+
 }

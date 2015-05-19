@@ -25,6 +25,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  * 
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
     private static final Dimension DIALOG_SIZE = new Dimension(500, 350);

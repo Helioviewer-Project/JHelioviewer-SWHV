@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugin.renderable;
 
 public class RenderableType {
+
     private final String typeName;
 
     public RenderableType(String typeName) {
@@ -10,4 +11,5 @@ public class RenderableType {
     public String getTypeName() {
         return typeName;
     }
+
 }

@@ -9,7 +9,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
+@SuppressWarnings({"serial"})
 public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Renderable renderable = (Renderable) value;
@@ -22,8 +24,9 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
             label.setToolTipText("Click to show");
         }
         label.setBorder(RenderableContainerPanel.commonLeftBorder);
-        label.setText("");
+        label.setText(null);
         return label;
 
     }
+
 }
