@@ -3,10 +3,11 @@ package org.helioviewer.jhv.gui.components.base;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JTextField;
+
+import org.helioviewer.base.datetime.ImmutableDateTime;
 
 /**
  * This offers a text field to edit the time at a day. A normal
@@ -18,7 +19,7 @@ import javax.swing.JTextField;
  * <p>
  * It will validates when the focus leaves, and defaults to 00:00:00; like
  * before maybe worth changing later
- * 
+ *
  * @author Helge Dietert
  */
 public class TimeTextField extends JTextField {
@@ -26,10 +27,10 @@ public class TimeTextField extends JTextField {
      * Default value used to set
      */
     private static final String defaultTime = "00:00:00";
+
     /**
      * Used time formatter
      */
-    public static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
     /**
      * Creates a new time text field
@@ -39,17 +40,19 @@ public class TimeTextField extends JTextField {
         addFocusListener(new FocusListener() {
             /**
              * Nothing to do
-             * 
+             *
              * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
              */
+            @Override
             public void focusGained(FocusEvent arg0) {
             }
 
             /**
              * Validate the input
-             * 
+             *
              * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
              */
+            @Override
             public void focusLost(FocusEvent arg0) {
                 validateInput();
             }
@@ -58,12 +61,12 @@ public class TimeTextField extends JTextField {
 
     /**
      * Gives the formatted input (normalized, e.g. 0:61 becomes 1:01)
-     * 
+     *
      * @return formatted input or default time if its not valid
      */
     public String getFormattedInput() {
         try {
-            return formatter.format(formatter.parse(getText()));
+            return ImmutableDateTime.timeDateFormat.format(ImmutableDateTime.timeDateFormat.parse(getText()));
         } catch (ParseException e) {
             return defaultTime;
         }
@@ -71,15 +74,15 @@ public class TimeTextField extends JTextField {
 
     /**
      * Gives a date object with the selected time
-     * 
+     *
      * @return Date with selected time (or defaultTime if invalid)
      */
     public Date getValue() {
         try {
-            return formatter.parse(getText());
+            return ImmutableDateTime.timeDateFormat.parse(getText());
         } catch (ParseException e) {
             try {
-                return formatter.parse(defaultTime);
+                return ImmutableDateTime.timeDateFormat.parse(defaultTime);
             } catch (ParseException e1) {
                 // The default time should always parseable
                 return null;
@@ -96,12 +99,12 @@ public class TimeTextField extends JTextField {
 
     /**
      * Sets the time to the time given in the date
-     * 
+     *
      * @param time
      *            new time to set
      */
     public void setValue(Date time) {
-        setText(formatter.format(time));
+        setText(ImmutableDateTime.timeDateFormat.format(time));
     }
 
 }
