@@ -758,9 +758,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
                 // move frame
                 int maxFrame = newPanel.view.getMaximumAccessibleFrameNumber();
-                if (maxFrame > -1 &&
-                    newPanel.view.getFrameDateTime(maxFrame).getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis()) {
-                    newPanel.view.setCurrentFrame(copyFrom.view.getCurrentFrameDateTime());
+                if (maxFrame > -1) {
+                    if (newPanel.view.getFrameDateTime(maxFrame).getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis())
+                        newPanel.view.setCurrentFrame(copyFrom.view.getCurrentFrameDateTime());
+                    else
+                        newPanel.view.setCurrentFrame(maxFrame);
                 }
             }
 
