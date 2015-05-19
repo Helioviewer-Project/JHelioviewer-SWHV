@@ -26,9 +26,9 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodelplugin.controller.PluginContainer;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
+import org.helioviewer.jhv.plugin.controller.PluginContainer;
+import org.helioviewer.jhv.plugin.controller.PluginManager;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 /**
  * Dialog that is used to display information about the program.

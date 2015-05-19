@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Manages all the downloaders and downloads of the SWEK plugin.

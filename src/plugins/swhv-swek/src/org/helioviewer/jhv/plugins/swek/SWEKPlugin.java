@@ -6,12 +6,12 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
 
 /**
  * Part of these developments are based on the work done in the HEKPlugin

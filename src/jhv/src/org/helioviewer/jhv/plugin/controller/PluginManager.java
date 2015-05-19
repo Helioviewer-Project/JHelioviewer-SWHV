@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodelplugin.controller;
+package org.helioviewer.jhv.plugin.controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,7 +22,7 @@ import java.util.jar.Manifest;
 
 import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 /**
  * This class is responsible to manage all plug-ins for JHV. It loads available

@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodelplugin.interfaces;
+package org.helioviewer.jhv.plugin.interfaces;
 
 /**
  * This interface holds the basic methods of every JHV plug-in. JHV identifies a

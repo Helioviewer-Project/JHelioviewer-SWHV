@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.viewmodelplugin.interfaces.Plugin;
+import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 /**
  * @author Malte Nuhn
