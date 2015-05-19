@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.plugins.eveplugin.lines.data.Band;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings({ "serial" })
 public class LineColorOptionPanel extends JPanel {
 
     private final Band band;

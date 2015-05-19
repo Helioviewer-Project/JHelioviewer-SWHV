@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
 
     @Override
