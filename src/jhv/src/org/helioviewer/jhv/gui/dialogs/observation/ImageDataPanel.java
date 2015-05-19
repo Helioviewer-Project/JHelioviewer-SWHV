@@ -438,7 +438,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         public void setEndDate(Date newEnd, boolean byUser) {
             calendarEndDate.setDate(newEnd);
-            textEndTime.setText(TimeTextField.formatter.format(newEnd));
+            textEndTime.setText(ImmutableDateTime.timeDateFormat.format(newEnd));
             if (!setFromOutside) {
                 ObservationDialogDateModel.getInstance().setEndDate(newEnd, byUser);
             } else {
@@ -454,7 +454,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         public void setStartDate(Date newStart, boolean byUser) {
             calendarStartDate.setDate(newStart);
-            textStartTime.setText(TimeTextField.formatter.format(newStart));
+            textStartTime.setText(ImmutableDateTime.timeDateFormat.format(newStart));
             if (!setFromOutside) {
                 ObservationDialogDateModel.getInstance().setStartDate(newStart, byUser);
             } else {

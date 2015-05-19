@@ -23,6 +23,8 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
     public static final FastDateFormat sqlDateFormat = FastDateFormat.getInstance(SQL_DATE_FORMAT, UTC);
     public static final FastDateFormat utcFullDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS", UTC);
     public static final FastDateFormat apiDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
+    public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
 
     /** Default DateFormat used to format the date. */
     protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
