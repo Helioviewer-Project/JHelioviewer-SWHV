@@ -189,23 +189,46 @@ public class SWEKSourceManager {
                 sourceURI = new URI(source.getJarLocation());
                 if (sourceURI.getScheme().equals("file")) {
                     jarURLList.add(sourceURI.toURL());
+                } else if (sourceURI.getScheme().equals("jar")) {
+                    copyJarFromJar(sourceURI);
                 } else {
                     if (downloadJar(sourceURI)) {
                         downloadJarOK = downloadJarOK && true;
                     } else {
-                        Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                        Log.error("Source with name " + source.getSourceName() + " is not loaded. Problem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                         downloadJarOK = false;
                     }
                 }
             } catch (URISyntaxException e) {
-                Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                Log.error("Source with name " + source.getSourceName() + " is not loaded. Problem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                 downloadJarOK = false;
             } catch (MalformedURLException e) {
-                Log.error("Source with name " + source.getSourceName() + " is not loaded. Promblem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
+                Log.error("Source with name " + source.getSourceName() + " is not loaded. Problem downloading jar on location: " + source.getJarLocation() + ". This will probably cause the programm not being able to check for events deliverd by this source. Check your configuration file and restart.");
                 downloadJarOK = false;
             }
         }
         return downloadJarOK;
+    }
+
+    private void copyJarFromJar(URI sourceURI) {
+        String fileName = extractFileName(sourceURI);
+        copyToSourcesLocation(SWEKPlugin.class.getResource(sourceURI.getPath()), fileName);
+    }
+
+    private boolean copyToSourcesLocation(URL source, String fileName) {
+        try {
+            ReadableByteChannel rbc = Channels.newChannel(source.openStream());
+            File dest = new File(SWEKSettings.SWEK_SOURCES + fileName);
+            FileOutputStream fos = new FileOutputStream(dest);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
+            jarURLList.add(dest.toURI().toURL());
+            return true;
+        } catch (IOException e) {
+            Log.error("IO exception received for source " + source.toString() + ". Given error was " + e);
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -219,18 +242,10 @@ public class SWEKSourceManager {
      */
     private boolean downloadJar(URI sourceURI) {
         try {
-            ReadableByteChannel rbc = Channels.newChannel(sourceURI.toURL().openStream());
-            String filename = extractFileName(sourceURI);
-            File dest = new File(SWEKSettings.SWEK_SOURCES + filename);
-            FileOutputStream fos = new FileOutputStream(dest);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-            jarURLList.add(dest.toURI().toURL());
-            return true;
+            String fileName = extractFileName(sourceURI);
+            return copyToSourcesLocation(sourceURI.toURL(), fileName);
         } catch (MalformedURLException e) {
-            Log.error("The URL was malformed for source " + sourceURI + ". Given error was " + e);
-        } catch (IOException e) {
-            Log.error("IO exception received for source " + sourceURI + ". Given error was " + e);
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return false;
