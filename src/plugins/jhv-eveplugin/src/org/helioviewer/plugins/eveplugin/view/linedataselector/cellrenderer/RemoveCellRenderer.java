@@ -10,6 +10,8 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
     @Override

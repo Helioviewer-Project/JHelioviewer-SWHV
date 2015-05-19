@@ -11,6 +11,10 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.plugins.eveplugin.radio.model.ColorLookupModel;
 
+//Java 6 does not support generics for JComboBox and DefaultComboBoxModel
+//Should be removed if support for Java 6 is not needed anymore
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class RadioOptionsPanel extends JPanel implements ActionListener {
 
     private JComboBox lut;

@@ -29,7 +29,11 @@ import org.helioviewer.plugins.eveplugin.settings.BandTypeAPI;
 
 /**
  * @author Stephan Pagel
- * */
+ */
+// Java 6 does not support generics for JComboBox and DefaultComboBoxModel
+// Should be removed if support for Java 6 is not needed anymore
+// Class will not be serialized so we suppress the warnings
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
     private final JComboBox comboBoxGroup;
@@ -126,19 +130,19 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
      * private boolean isStartDateBeforeOrEqualEndDate() { final
      * GregorianCalendar calendar = new GregorianCalendar();
      * calendar.setTime(getStartDate());
-     *
+     * 
      * final GregorianCalendar calendar2 = new
      * GregorianCalendar(calendar.get(Calendar.YEAR),
      * calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)); final
      * long start = calendar2.getTimeInMillis();
-     *
+     * 
      * calendar.clear(); calendar2.clear();
-     *
+     * 
      * calendar.setTime(getEndDate());
      * calendar2.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
      * calendar.get(Calendar.DAY_OF_MONTH)); final long end =
      * calendar2.getTimeInMillis();
-     *
+     * 
      * return start <= end; }
      */
 

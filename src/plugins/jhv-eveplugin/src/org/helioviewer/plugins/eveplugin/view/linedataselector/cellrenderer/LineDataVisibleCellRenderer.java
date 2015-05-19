@@ -11,6 +11,8 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class PlotPanel extends JPanel {
 
     public PlotPanel() {

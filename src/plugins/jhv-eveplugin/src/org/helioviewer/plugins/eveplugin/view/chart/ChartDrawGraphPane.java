@@ -52,7 +52,9 @@ import org.helioviewer.viewmodel.view.opengl.GLInfo;
 /**
  *
  * @author Stephan Pagel
- * */
+ */
+// Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
 
     private final DrawController drawController;
@@ -763,11 +765,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }

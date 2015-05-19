@@ -38,7 +38,9 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 /**
  *
  * @author Stephan Pagel
- * */
+ */
+// Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class ChartDrawIntervalPane extends JComponent implements TimingListener, MouseInputListener, LayersListener {
 
     private Interval<Date> movieInterval = new Interval<Date>(null, null);

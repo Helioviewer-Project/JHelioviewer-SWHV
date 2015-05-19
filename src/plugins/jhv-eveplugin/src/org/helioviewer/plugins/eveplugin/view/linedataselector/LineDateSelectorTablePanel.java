@@ -34,6 +34,8 @@ import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.Line
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
 
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings("serial")
 public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);

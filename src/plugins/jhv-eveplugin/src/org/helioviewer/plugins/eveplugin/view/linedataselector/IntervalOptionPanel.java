@@ -25,6 +25,10 @@ import org.helioviewer.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
+//Java 6 does not support generics for JComboBox and DefaultComboBoxModel
+//Should be removed if support for Java 6 is not needed anymore
+//Class will not be serialized so we suppress the warnings
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener, LineDataSelectorModelListener {
 
     private final JComboBox zoomComboBox;
@@ -67,8 +71,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             if (periodFromLayersButton.isSelected()) {
                 setDateRange();
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            } else
+            } else {
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            }
         } else if (e.getSource().equals(zoomComboBox)) {
             final ZoomComboboxItem item = (ZoomComboboxItem) zoomComboBox.getSelectedItem();
             selectedIntervalByZoombox = null;
