@@ -120,10 +120,10 @@ public class APIRequestManager {
             return requestData(new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
-                Log.debug(">> APIRequestManager.loadImage()  > Error will be thrown", e);
+                Log.debug(">> APIRequestManager.loadImage() > Error will be thrown", e);
                 throw new IOException("Unknown Host: " + e.getMessage());
             } else {
-                Log.debug(">> APIRequestManager.loadImage()  > Error will be thrown", e);
+                Log.debug(">> APIRequestManager.loadImage() > Error will be thrown", e);
                 throw new IOException("Error in the server communication:" + e.getMessage());
             }
         } catch (URISyntaxException e) {
@@ -162,19 +162,17 @@ public class APIRequestManager {
             fileRequest += "&cadence=" + cadence;
         }
         String jpipRequest = fileRequest + "&jpip=true&verbose=true&linked=true";
-
-        Log.debug(">> APIRequestManager.loadImageSeries() > jpip request url: " + jpipRequest);
-        Log.debug(">> APIRequestManager.loadImageSeries() > http request url: " + fileRequest);
+        // Log.debug(">> APIRequestManager.loadImageSeries() > request url: " + jpipRequest);
 
         // get URL from server where file with image series is located
         try {
             return requestData(new URL(jpipRequest), new URI(fileRequest), message);
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
-                Log.debug(">> APIRequestManager.loadImageSeries()  > Error will be thrown", e);
+                Log.debug(">> APIRequestManager.loadImageSeries() > Error will be thrown", e);
                 throw new IOException("Unknown Host: " + e.getMessage());
             } else {
-                Log.debug(">> APIRequestManager.loadImageSeries()  > Error will be thrown", e);
+                Log.debug(">> APIRequestManager.loadImageSeries() > Error will be thrown", e);
                 throw new IOException("Error in the server communication:" + e.getMessage());
             }
         } catch (URISyntaxException e) {
