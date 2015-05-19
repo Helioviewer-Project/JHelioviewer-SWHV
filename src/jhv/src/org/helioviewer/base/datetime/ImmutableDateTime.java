@@ -1,10 +1,11 @@
 package org.helioviewer.base.datetime;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
  * Class that holds Date and Time information. The data is stored in a Calendar
@@ -17,6 +18,7 @@ import java.util.TimeZone;
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    public static FastDateFormat utcDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss", UTC);
 
     /** Default DateFormat used to format the date. */
     protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
@@ -137,8 +139,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     public String getCachedDate() {
         if (this.cachedDate == null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            this.cachedDate = dateFormat.format(calendar.getTime());
+            this.cachedDate = utcDateFormat.format(calendar.getTime());
         }
         return this.cachedDate;
     }

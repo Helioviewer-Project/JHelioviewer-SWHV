@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="../lib/slf4j-log4j12-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-nop-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/xuggle-xuggler-5.4.jar"/>
+	<classpathentry kind="lib" path="../lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

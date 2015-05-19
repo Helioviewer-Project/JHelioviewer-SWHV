@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
@@ -519,9 +519,8 @@ public class HEKParser implements SWEKParser {
      * @return the parsed date
      */
     private Date parseDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         try {
-            return sdf.parse(date);
+            return ImmutableDateTime.utcDateFormat.parse(date);
         } catch (ParseException e) {
             Log.error("The date " + date + " could not be parsed.");
             return null;

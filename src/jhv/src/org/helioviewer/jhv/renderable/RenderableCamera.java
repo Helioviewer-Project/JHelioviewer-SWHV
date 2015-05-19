@@ -2,9 +2,9 @@ package org.helioviewer.jhv.renderable;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
@@ -154,10 +154,8 @@ public class RenderableCamera implements Renderable {
         return timeString;
     }
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
     public void setTimeString(Date date) {
-        timeString = dateFormat.format(date);
+        timeString = ImmutableDateTime.utcDateFormat.format(date);
     }
 
     @Override

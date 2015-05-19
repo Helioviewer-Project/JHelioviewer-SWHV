@@ -4,13 +4,13 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
@@ -121,15 +121,14 @@ public class EventDescriptionPanel extends JPanel {
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        textStartTime = new JTextArea(sdf.format(event.getStartDate()));
+        textStartTime = new JTextArea(ImmutableDateTime.utcDateFormat.format(event.getStartDate()));
         textStartTime.setBackground(this.getBackground());
         textStartTime.setLineWrap(true);
         textStartTime.setWrapStyleWord(true);
         textStartTime.setFont(labelIcon.getFont());
         textStartTime.setMargin(new Insets(0, 0, 0, 0));
 
-        textEndTime = new JTextArea(sdf.format(event.getEndDate()));
+        textEndTime = new JTextArea(ImmutableDateTime.utcDateFormat.format(event.getEndDate()));
         textEndTime.setBackground(this.getBackground());
         textEndTime.setLineWrap(true);
         textEndTime.setWrapStyleWord(true);
