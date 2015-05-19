@@ -611,7 +611,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download identifier for which the data was downloaded
      */
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, Long downloadID, double ratioX, double ratioY) {
-        JHVJP2CallistoView jp2CallistoView = (JHVJP2CallistoView) djd.getView();
+        JHVJP2CallistoView jp2CallistoView = djd.getView();
         if (jp2CallistoView != null) {
             jp2CallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             JP2Image image = jp2CallistoView.getJP2Image();
