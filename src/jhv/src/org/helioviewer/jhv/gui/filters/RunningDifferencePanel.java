@@ -38,6 +38,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Helge Dietert
  *
  */
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
     /**
      * Controlled filter by this panel
