@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * 
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class ToggleFullscreenAction extends AbstractAction {
 
     public ToggleFullscreenAction() {

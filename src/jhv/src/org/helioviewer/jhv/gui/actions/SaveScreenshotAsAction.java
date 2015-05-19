@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.actions.filefilters.PNGFilter;
  * 
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class SaveScreenshotAsAction extends AbstractAction {
 
     /**

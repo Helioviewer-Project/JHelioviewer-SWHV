@@ -14,6 +14,7 @@ import org.helioviewer.jhv.JHVGlobals;
  * 
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class OpenURLinBrowserAction extends AbstractAction {
 
     private String urlToOpen;

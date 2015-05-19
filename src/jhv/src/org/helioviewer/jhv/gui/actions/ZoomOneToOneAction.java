@@ -17,6 +17,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 /**
  * Action to zoom such that the active layer fits completely in the viewport.
  */
+@SuppressWarnings({"serial"})
 public class ZoomOneToOneAction extends AbstractAction {
 
     /**

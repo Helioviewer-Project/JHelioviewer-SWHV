@@ -42,6 +42,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
+@SuppressWarnings({"serial"})
 public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
 
     private JPanel allTablePanel;

@@ -21,6 +21,7 @@ import org.helioviewer.viewmodel.view.ComponentView;
  * @author Markus Langenberg
  * @author Andre Dau
  */
+@SuppressWarnings({"serial"})
 public class ExportMovieDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JLabel movieLabel = new JLabel("", SwingConstants.CENTER);

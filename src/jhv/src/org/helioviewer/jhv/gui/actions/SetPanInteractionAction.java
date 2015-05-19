@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Panning (Camera Translation).
  */
+@SuppressWarnings({"serial"})
 public class SetPanInteractionAction extends AbstractAction {
 
     /**

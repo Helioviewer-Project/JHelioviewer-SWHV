@@ -14,7 +14,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Markus Langenberg
  */
-
+@SuppressWarnings({"serial"})
 public class ShowDialogAction extends AbstractAction {
 
     private final Class<ShowableDialog> dialogToShow;

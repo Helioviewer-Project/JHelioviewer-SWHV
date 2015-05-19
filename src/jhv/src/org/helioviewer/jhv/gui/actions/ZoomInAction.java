@@ -10,6 +10,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
+@SuppressWarnings({"serial"})
 public class ZoomInAction extends AbstractAction {
 
     /**

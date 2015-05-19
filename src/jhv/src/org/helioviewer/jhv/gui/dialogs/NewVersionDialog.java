@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Helge Dietert
  */
+@SuppressWarnings({"serial"})
 public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
     /**
      * New setting for check.update.next

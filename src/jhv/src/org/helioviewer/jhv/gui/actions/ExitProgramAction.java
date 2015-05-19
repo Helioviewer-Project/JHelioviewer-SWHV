@@ -25,6 +25,7 @@ import org.helioviewer.jhv.layers.LayersModel;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class ExitProgramAction extends AbstractAction {
 
     public ExitProgramAction() {
