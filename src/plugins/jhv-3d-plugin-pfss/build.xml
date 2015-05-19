@@ -91,6 +91,7 @@
     <!-- Compile sources -->
     <target name="compile" depends="jhv.compile, init">
         <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source" encoding="utf-8">
+            <compilerarg value="-Xlint:all"/>
             <classpath>
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
