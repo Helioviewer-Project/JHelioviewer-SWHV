@@ -36,7 +36,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 //Java 6 does not support generics for JComboBox and DefaultComboBoxModel
 //Should be removed if support for Java 6 is not needed anymore
 //Class will not be serialized so we suppress the warnings
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
     protected boolean enableLoadButton = true;

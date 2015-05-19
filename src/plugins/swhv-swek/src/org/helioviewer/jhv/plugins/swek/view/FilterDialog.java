@@ -25,6 +25,7 @@ import org.helioviewer.jhv.plugins.swek.view.filter.FilterPanelFactory;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
     /** The event type */

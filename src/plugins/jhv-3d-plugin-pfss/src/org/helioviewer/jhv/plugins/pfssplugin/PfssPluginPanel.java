@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
  *
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
+@SuppressWarnings({"serial"})
 public class PfssPluginPanel extends JPanel {
 
     private JSpinner qualitySpinner;
