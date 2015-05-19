@@ -107,7 +107,7 @@
         <!-- JAR File -->
         <jar destfile="${build}/${plugin.name}.jar">
             <manifest>
-                <attribute name="Main-Class" value="org.helioviewer.plugins.${plugin.package}.${plugin.name}"/>
+                <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.package}.${plugin.name}"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Implementation-Version" value="v${version}r${revision}"/>
                 <attribute name="version" value="${version}"/>
