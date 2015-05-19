@@ -19,6 +19,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
+@SuppressWarnings({"serial"})
 public class EventDescriptionPanel extends JPanel {
 
     /** The event */

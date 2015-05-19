@@ -11,6 +11,7 @@ import java.util.EventObject;
  * 
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class JHVCalendarEvent extends EventObject {
     /**
      * @param source

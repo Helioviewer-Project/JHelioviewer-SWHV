@@ -22,6 +22,7 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
  *
  * @author Helge Dietert
  */
+@SuppressWarnings({"serial"})
 public class TimeTextField extends JTextField {
     /**
      * Default value used to set

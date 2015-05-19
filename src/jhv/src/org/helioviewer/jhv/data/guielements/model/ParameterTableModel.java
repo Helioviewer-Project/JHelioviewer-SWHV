@@ -12,6 +12,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class ParameterTableModel extends AbstractTableModel {
 
     /** The parameters in this model */

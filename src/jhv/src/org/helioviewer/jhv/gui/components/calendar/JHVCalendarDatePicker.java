@@ -45,6 +45,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * @see JHVCalendar
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
 
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();

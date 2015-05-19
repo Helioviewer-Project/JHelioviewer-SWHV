@@ -18,6 +18,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class FiltersPanel extends JPanel {
 
     private final RunningDifferencePanel runningDifferencePanel;
