@@ -316,6 +316,7 @@ public class LayersModel {
         if (view == null)
             return;
 
+        /*
         while (view.getImageData() == null) {
             try {
                 Thread.sleep(100);
@@ -323,6 +324,7 @@ public class LayersModel {
                 e.printStackTrace();
             }
         }
+        */
 
         EventQueue.invokeLater(new Runnable() {
             private AbstractView theView;

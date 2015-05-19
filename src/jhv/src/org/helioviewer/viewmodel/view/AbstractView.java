@@ -72,6 +72,9 @@ public abstract class AbstractView implements View {
     }
 
     public void applyFilters(GL2 gl) {
+        if (imageData == null)
+            return;
+
         copyScreenToTexture(gl);
         applyRunningDifferenceGL(gl);
 
@@ -80,15 +83,7 @@ public abstract class AbstractView implements View {
         GLSLShader.setGamma(gamma);
         GLSLShader.setAlpha(opacity);
 
-        float pixelWidth, pixelHeight;
-        if (imageData != null) {
-            pixelWidth = 1.0f / imageData.getWidth();
-            pixelHeight = 1.0f / imageData.getHeight();
-        } else {
-            pixelWidth = 1.0f / 512;
-            pixelHeight = 1.0f / 512;
-        }
-        GLSLShader.setFactors(sharpenWeighting, pixelWidth, pixelHeight, 1f);
+        GLSLShader.setFactors(sharpenWeighting, 1.0f / imageData.getWidth(), 1.0f / imageData.getHeight(), 1f);
         applyGLLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D);
@@ -237,8 +232,7 @@ public abstract class AbstractView implements View {
     }
 
     private void copyScreenToTexture(GL2 gl) {
-        ImageData image = getImageData();
-        Region region = image.getRegion();
+        Region region = imageData.getRegion();
 
         double xOffset = region.getLowerLeftCorner().x;
         double yOffset = region.getLowerLeftCorner().y;
