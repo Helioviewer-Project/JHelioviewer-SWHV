@@ -50,9 +50,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     };
 
-    // Member related to the view chain
     protected Viewport viewport;
-    protected Region region, lastRegion;
+    protected Region region;
 
     // Member related to JP2
     protected JP2Image jp2Image;
@@ -220,14 +219,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * {@inheritDoc}
      */
     @Override
-    public ImageData getSubimageData() {
-        return imageData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public MetaData getMetaData() {
         int frameNumber = 0;
         if (imageData != null) {
@@ -260,15 +251,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         if (newNumQualityLayers >= 1 && newNumQualityLayers <= getMaximumNumQualityLayers()) {
             setImageViewParams(null, null, newNumQualityLayers, null);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Region getRegion() {
-        Region result = lastRegion;
-        return result;
     }
 
     /**

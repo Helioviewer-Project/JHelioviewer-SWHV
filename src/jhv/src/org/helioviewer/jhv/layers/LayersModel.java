@@ -316,13 +316,14 @@ public class LayersModel {
         if (view == null)
             return;
 
-        while (view.getSubimageData() == null) {
+        while (view.getImageData() == null) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
         EventQueue.invokeLater(new Runnable() {
             private AbstractView theView;
 

@@ -121,14 +121,6 @@ public class JHVFITSView extends AbstractView {
      * {@inheritDoc}
      * */
     @Override
-    public Region getRegion() {
-        return region;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
     public boolean setRegion(Region r) {
         // check if region has changed
         if (region != null && region.equals(r))
@@ -154,14 +146,6 @@ public class JHVFITSView extends AbstractView {
     @Override
     public MetaData getMetaData() {
         return m;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public ImageData getSubimageData() {
-        return imageData;
     }
 
     /**

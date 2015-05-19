@@ -54,13 +54,9 @@ public interface View {
 
     public ImageData getImageData();
 
-    public ImageData getSubimageData();
-
     public MetaData getMetaData();
 
     public boolean setRegion(Region r);
-
-    public Region getRegion();
 
     public boolean setViewport(Viewport r);
 
