@@ -1,7 +1,6 @@
 package org.helioviewer.plugins.eveplugin.radio.data;
 
 import java.awt.Rectangle;
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.swing.SwingWorker;
@@ -80,19 +79,13 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
                     Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
 
                     int[] data = bytetrs.getInt32PixelData();
-                    int[] copyData = Arrays.copyOf(data, data.length);
-                    data = null;
-
-                    return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+                    return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
                 } else if (imData instanceof SingleChannelByte8ImageData) {
                     SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) imData;
                     Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
 
                     byte[] data = bytetrs.getByte8PixelData();
-                    byte[] copyData = Arrays.copyOf(data, data.length);
-                    data = null;
-
-                    return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+                    return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
                 }
             }
         }
