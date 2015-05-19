@@ -1,0 +1,72 @@
+package org.helioviewer.jhv.plugins.eveplugin.events.gui;
+
+import java.awt.Color;
+import java.awt.Component;
+
+import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
+
+public class EventsSelectorElement implements LineDataSelectorElement {
+
+    private final EventModel eventModel;
+
+    public EventsSelectorElement(EventModel eventModel) {
+        this.eventModel = eventModel;
+    }
+
+    @Override
+    public void removeLineData() {
+        eventModel.deactivateEvents();
+
+    }
+
+    @Override
+    public void setVisibility(boolean visible) {
+        eventModel.setEventsVisible(visible);
+
+    }
+
+    @Override
+    public boolean isVisible() {
+        return eventModel.isEventsVisible();
+    }
+
+    @Override
+    public String getName() {
+        return "Events";
+    }
+
+    @Override
+    public Color getDataColor() {
+        return Color.black;
+    }
+
+    @Override
+    public void setDataColor(Color c) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean isDownloading() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public String getUnitLabel() {
+        return "";
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+}
