@@ -112,8 +112,10 @@
 
     <!-- Jar bundle -->
     <target name="jar-bundle" depends="compile">
+        
         <!-- JAR File -->
         <jar destfile="${build}/${plugin.name}.jar">
+            
             <manifest>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.package}.${plugin.name}"/>
                 <attribute name="Class-Path" value="."/>
@@ -125,11 +127,16 @@
             <fileset dir="${resources}"/>
             <fileset file="README"/>
             <fileset file="COPYING"/>
-            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar" />
         </jar>
         <subant target="jar-bundle">
             <fileset dir="./sources/" includes="*/build.xml"/>
         </subant>
+        <jar destfile="${build}/${plugin.name}.jar" update="true" >
+            <zipfileset dir="${sweksources}/HEKSource/build/" includes="*.jar" prefix="sources" />
+            <zipfileset dir="${sweksources}/ComesepSource/build/" includes="*.jar" prefix="sources" />
+        </jar>
+        
     </target>
 
     <!-- Source bundle -->
