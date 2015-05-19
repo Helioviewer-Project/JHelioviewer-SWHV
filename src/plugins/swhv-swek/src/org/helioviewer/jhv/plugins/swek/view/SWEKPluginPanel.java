@@ -17,6 +17,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
 
     /** The singleton panel used */

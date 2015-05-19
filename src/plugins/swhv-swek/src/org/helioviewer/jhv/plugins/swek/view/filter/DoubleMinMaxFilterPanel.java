@@ -25,6 +25,7 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
  * @author Bram Bourgoignie (Bram.bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
 
     /** Minimum value spinner */

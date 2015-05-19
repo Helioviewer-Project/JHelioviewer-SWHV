@@ -39,6 +39,7 @@ import org.helioviewer.viewmodelplugin.interfaces.Plugin;
  * @author Markus Langenberg
  * @author Andre Dau
  */
+@SuppressWarnings({"serial"})
 public final class AboutDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
 
     private final JButton closeButton = new JButton("Close");

@@ -19,6 +19,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
+@SuppressWarnings({"serial"})
 public class DoubleValueFilterPanel extends AbstractFilterPanel {
 
     /** The value spinner */

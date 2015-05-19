@@ -28,6 +28,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelListener, ActionListener {
 
     /** The event type for which the event panel is created */
