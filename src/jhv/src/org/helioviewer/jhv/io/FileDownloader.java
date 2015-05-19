@@ -309,6 +309,7 @@ public class FileDownloader {
      * 
      * The download can be interrupted using the provided button.
      */
+    @SuppressWarnings({"serial"})
     private class StandAloneDialog extends JWindow implements ActionListener {
 
         private boolean wasInterrupted;

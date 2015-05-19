@@ -25,6 +25,7 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
+@SuppressWarnings({"serial"})
 public class ParameterTablePanel extends JPanel {
 
     /** the table */

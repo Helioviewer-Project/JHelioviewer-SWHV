@@ -5,6 +5,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
 
+@SuppressWarnings({"serial"})
 public class DegreeFormatterFactory extends AbstractFormatterFactory {
 
     private final String format;
