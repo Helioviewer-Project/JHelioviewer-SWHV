@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.view.SWEKIconBank;
@@ -109,7 +110,7 @@ public class SWEKConfigurationManager {
                 if (!manuallyChanged) {
                     // check if the file is manually changed if not we download
                     // the latest version anyway.
-                    if (checkAndOpenOnlineFile()) {
+                    if (checkAndOpenZippedFile()) {
                         isConfigParsed = parseConfigFile();
                     } else {
                         isConfigParsed = false;
@@ -225,6 +226,23 @@ public class SWEKConfigurationManager {
             Log.debug("Could not create a URL from the value found in the properties file: " + swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
         } catch (IOException e) {
             Log.debug("Something went wrong downloading the configuration file from the server or saving it to the local machine : " + e);
+        }
+        return false;
+    }
+
+    private boolean checkAndOpenZippedFile() {
+        URL url = SWEKPlugin.class.getResource("SWEKConfig.json");
+        ReadableByteChannel rbc;
+        try {
+            rbc = Channels.newChannel(url.openStream());
+            String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
+            FileOutputStream fos = new FileOutputStream(saveFile);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
+            configFileURL = (new File(saveFile)).toURI().toURL();
+            return true;
+        } catch (IOException e) {
+            Log.debug("Something went wrong extracting the configuration file from the jar bundle or saving it to the local machine : " + e);
         }
         return false;
     }
