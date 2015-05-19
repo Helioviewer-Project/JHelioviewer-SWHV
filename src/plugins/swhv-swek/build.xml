@@ -98,6 +98,7 @@
     <!-- Compile sources -->
     <target name="compile" depends="jhv.compile, init">
         <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="source,lines,vars" includeantruntime="false">
+            <compilerarg value="-Xlint:all"/>
             <classpath>
                 <fileset dir="${lib}">
                     <include name="**/*.jar"/>
@@ -112,10 +113,8 @@
 
     <!-- Jar bundle -->
     <target name="jar-bundle" depends="compile">
-        
         <!-- JAR File -->
         <jar destfile="${build}/${plugin.name}.jar">
-            
             <manifest>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.plugins.${plugin.package}.${plugin.name}"/>
                 <attribute name="Class-Path" value="."/>
@@ -136,7 +135,6 @@
             <zipfileset dir="${sweksources}/HEKSource/build/" includes="*.jar" prefix="sources" />
             <zipfileset dir="${sweksources}/ComesepSource/build/" includes="*.jar" prefix="sources" />
         </jar>
-        
     </target>
 
     <!-- Source bundle -->
