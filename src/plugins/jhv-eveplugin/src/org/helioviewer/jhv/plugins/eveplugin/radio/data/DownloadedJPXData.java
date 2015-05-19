@@ -8,7 +8,6 @@ import javax.swing.SwingWorker;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoViewDataHandler;
 
@@ -65,20 +64,12 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         this.endDate = endDate;
     }
 
-    private DownloadedJPXDataWorkerResult getJPXData(View view) {
-        if (view != null) {
-            JHVJP2CallistoView jp2CallistoView = (JHVJP2CallistoView) view;
-            if (jp2CallistoView != null) {
-                // ImageData imData =
-                // FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
-                ImageData imData = jp2CallistoView.getImageData();
-                if (imData instanceof SingleChannelByte8ImageData) {
-                    SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) imData;
-                    Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
-
-                    byte[] data = bytetrs.getByte8PixelData();
-                    return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-                }
+    private DownloadedJPXDataWorkerResult getJPXData(JHVJP2CallistoView callistoView) {
+        if (callistoView != null) {
+            ImageData imageData = callistoView.getImageData();
+            if (imageData instanceof SingleChannelByte8ImageData) {
+                byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
+                return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
             }
         }
         return null;
