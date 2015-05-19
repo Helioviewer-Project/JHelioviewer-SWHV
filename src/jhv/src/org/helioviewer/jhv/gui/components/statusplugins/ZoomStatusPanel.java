@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components.statusplugins;
 
 import javax.swing.JLabel;
 
+@SuppressWarnings({"serial"})
 public class ZoomStatusPanel extends JLabel {
 
     public ZoomStatusPanel() {

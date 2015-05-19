@@ -19,6 +19,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  * Dialog used to display basic usage tips for the program.
  * Basically, the dialog contains all shortcuts.
  */
+@SuppressWarnings({"serial"})
 public class HelpDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JButton closeButton = new JButton("Close");

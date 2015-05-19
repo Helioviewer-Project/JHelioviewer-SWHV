@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 /**
  * Status panel for displaying the current mouse position.
  */
+@SuppressWarnings({"serial"})
 public class PositionStatusPanel extends JLabel implements MouseMotionListener, InputControllerPlugin {
 
     private Point lastPosition;

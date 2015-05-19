@@ -24,6 +24,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class SaveScreenshotAction extends AbstractAction {
 
     /**

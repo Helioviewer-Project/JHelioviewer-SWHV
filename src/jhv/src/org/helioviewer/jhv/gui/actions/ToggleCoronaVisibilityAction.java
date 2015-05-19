@@ -10,6 +10,7 @@ import org.helioviewer.jhv.renderable.RenderableImageLayer;
 /**
  * Action that toggle visibility of off-limb corona.
  */
+@SuppressWarnings({"serial"})
 public class ToggleCoronaVisibilityAction extends AbstractAction {
 
     public ToggleCoronaVisibilityAction() {

@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
  * current {@link GL3DCamera} to the
  * {@link GL3DSolarRotationTrackingTrackballCamera}
  */
+@SuppressWarnings({"serial"})
 public class ToggleSolarRotationAction extends AbstractAction {
 
     public ToggleSolarRotationAction() {

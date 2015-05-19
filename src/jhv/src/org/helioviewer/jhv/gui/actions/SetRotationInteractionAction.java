@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Rotation.
  */
+@SuppressWarnings({"serial"})
 public class SetRotationInteractionAction extends AbstractAction {
 
     public SetRotationInteractionAction() {

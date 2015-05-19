@@ -12,6 +12,7 @@ import org.helioviewer.jhv.display.Displayer;
  * Sets the current {@link GL3DInteraction} of the current {@link GL3DCamera} to
  * Zoom Box Interaction.
  */
+@SuppressWarnings({"serial"})
 public class SetZoomBoxInteractionAction extends AbstractAction {
 
     public SetZoomBoxInteractionAction() {

@@ -32,6 +32,7 @@ import org.helioviewer.jhv.layers.LayersModel;
  *
  * @author Markus Langenberg
  */
+@SuppressWarnings({"serial"})
 public class OpenLocalFileAction extends AbstractAction {
 
     /**
