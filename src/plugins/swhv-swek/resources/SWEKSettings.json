@@ -1,0 +1,820 @@
+{
+    "manually_changed":false,
+    "config_version" : "v0.2",
+    "sources" : [
+        { 
+            "name"                  : "HEK",
+            "provider_name"         : "HEK",
+            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader", 
+            "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser",
+            "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/heksource.jar",
+	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/HEKSource.jar",
+	        "jar_location" : "jar:///sources/HEKSource.jar",
+            "base_url"              : "http://www.lmsal.com/hek/her",
+            "general_parameters"    : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Probability",
+                    "parameter_display_name"    : "Event Probability",
+                    "filter"                    : null,
+                    "default_visible"   : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_PeakTime",
+                    "parameter_display_name"    : "Event Peak Time",
+                    "filter"                    : null,
+                    "default_visible" : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_MeanWavel",
+                    "parameter_display_name"    : "Mean Wavelength",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_McIntoshCls",
+                    "parameter_display_name"    : "McIntosh classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_MtWilsonCls",
+                    "parameter_display_name"    : "Mount Wilson Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_ZurichCls",
+                    "parameter_display_name"    : "Zurich Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_CompactnessCls",
+                    "parameter_display_name"    : "Compactness Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA number",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NumSpot",
+                    "parameter_display_name"    : "Number of Sunspots",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Type",
+                    "parameter_display_name"    : "Event Type",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_CoordSys",
+                    "parameter_display_name"    : "Coordinate System",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_CoordUnit",
+                    "parameter_display_name"    : "Coordinate Unit",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord1",
+                    "parameter_display_name"    : "Coordinate 1",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord2",
+                    "parameter_display_name"    : "Coordinate 2",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord3",
+                    "parameter_display_name"    : "Coordinate 3",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_ClippedSpatial",
+                    "parameter_display_name"    : "Clipped Spatial",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_ClippedTemporal",
+                    "parameter_display_name"    : "Clipped Temporal",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_TestFlag",
+                    "parameter_display_name"    : "Test Flag",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FRM_Institute",
+                    "parameter_display_name"    : "Institute",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FRM_Name",
+                    "parameter_display_name"    : "From Name",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCNsteps",
+                    "parameter_display_name"    : "CCN steps",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCStartC1",
+                    "parameter_display_name"    : "CC Start C1",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_CCStartC2",
+                    "parameter_display_name"    : "CC Start C2",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound_ChainCode",
+                    "parameter_display_name"    : "Chain Code",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "BoundBox_C1LL",
+                    "parameter_display_name"    : "Bound Box C1LL",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "BoundBox_C2LL",
+                    "parameter_display_name"    : "Bound Bo C2LL",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Bound Box",
+                    "parameter_display_name"    : "Bound Box",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                }
+            ]
+        },{ 
+            "name"                  : "COMESEP",
+            "provider_name"         : "COMESEP",
+            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader", 
+            "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser",
+            "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/comesepsource.jar",
+	        "jar_location_file"          : "file:///Users/bramb/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
+            "jar_location" : "jar:///sources/comesepsource.jar",
+            "base_url"              : "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php",
+            "general_parameters"    : [
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atearliest",
+                    "parameter_display_name"    : "Event Time at Earliest",
+                    "filter"                    : null,
+                    "default_visible"   : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atstrongest",
+                    "parameter_display_name"    : "Event Time at Strongest",
+                    "filter"                    : null,
+                    "default_visible"       : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "atlatest",
+                    "parameter_display_name"    : "Event Time at Latest",
+                    "filter"                    : null,
+                    "default_visible" : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter",
+                    "parameter_display_name"    : "Emitter",
+                    "filter"                    : null,
+                    "default_visible" : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter_href",
+                    "parameter_display_name"    : "Emitter URL",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "emitter_verion",
+                    "parameter_display_name"    : "Emitter Version",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "subject",
+                    "parameter_display_name"    : "Subject",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "target",
+                    "parameter_display_name"    : "Target",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "action",
+                    "parameter_display_name"    : "Action",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "alertid",
+                    "parameter_display_name"    : "Alert ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "COMESEP",
+                    "parameter_name"            : "alert_version",
+                    "parameter_display_name"    : "Alert Version",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                }
+            ]
+        }
+    ],
+    "events_types" : [
+        {
+            "event_name"    : "Active Region",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "NOAA SWPC Observer",
+                    "supplier_display_name" : "NOAA SWPC",
+                    "source"        : "HEK"
+                },
+                {
+                    "supplier_name" : "SPoCA",
+                    "supplier_display_name" : "SPoCA",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_SpotAreaRepr",
+                    "parameter_display_name"    : "Sunspot area",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 86400000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://ActiveRegion",
+            "color" : "colorcode://0x5E5E5E"
+        },
+        {
+            "event_name"    : "Coronal Mass Ejection",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "CACTus (Computer Aided CME Tracking)",
+                    "supplier_display_name" : "CACTus",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVel",
+                    "parameter_display_name"    : "Radial Linear Velocity",
+                    "filter"                    :
+                        {
+                            "filter_type"   : "doubleminmaxfilter",
+                            "min"           : 0,
+                            "max"           : 3000,
+                            "start_value"   : 1000,
+                            "step_size"     : 1,
+                            "units"         : "m/s"
+                        },
+                    "default_visible"   : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelUncert",
+                    "parameter_display_name"    : "Radial Linear Velocity Uncertainty",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelMin",
+                    "parameter_display_name"    : "Minimum Radial Linear Velocity",
+                    "filter"                    : {
+                            "filter_type"   : "doubleminmaxfilter",
+                            "min"           : 0,
+                            "max"           : 3000,
+                            "start_value"   : 1000,
+                            "step_size"     : 1,
+                            "units"         : "m/s"
+                        },
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelMax",
+                    "parameter_display_name"    : "Maximum Radial Linear Velocity",
+                    "filter"                    : {
+                            "filter_type"   : "doubleminmaxfilter",
+                            "min"           : 0,
+                            "max"           : 3000,
+                            "start_value"   : 1000,
+                            "step_size"     : 1,
+                            "units"         : "m/s"
+                        },
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_RadialLinVelStddev",
+                    "parameter_display_name"    : "Radial Linear Velocity Standard Deviation",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_Accel",
+                    "parameter_display_name"    : "Acceleration",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_AccelUncert",
+                    "parameter_display_name"    : "Acceleration Uncertainty",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_Mass",
+                    "parameter_display_name"    : "Mass",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 43200000,
+            "standard_selected" : true,
+            "group_on"          : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -3600,
+                "y1" : -3600,
+                "x2" : 3600,
+                "y2" : 3600
+            },
+            "icon" : "iconbank://CME",
+            "color" : "colorname://orange"
+        },
+        {
+            "event_name"    : "Coronal Dimming",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "source"        : "HEK"
+                },
+                {
+                    "supplier_name" : "Coronal Dimming Module",
+                    "supplier_display_name" : "Coronal Dimming Module",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CD_Area",
+                    "parameter_display_name"    : "Area",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CD_Volume",
+                    "parameter_display_name"    : "Volume",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 3000,
+            "standard_selected" : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://CoronalDimming",
+            "color" : "colorname://cyan"
+        },
+        {
+            "event_name"    : "Coronal Hole",
+            "suppliers"     : [
+                {   
+                    "supplier_name" : "SPoCA",
+                    "supplier_display_name" : "SPoCA",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 86400000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://CoronalHole",
+            "color" : "colorname://green"
+        },
+        {
+            "event_name"    : "Coronal Wave",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 3000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://CoronalWave",
+            "color" : "colorname://red"
+        },
+        {
+            "event_name"    : "Filament",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "AAFDCC",
+                    "supplier_display_name" : "AAFDCC",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Length",
+                    "parameter_display_name"    : "Length",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Tilt",
+                    "parameter_display_name"    : "Tilt",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FI_Chirality",
+                    "parameter_display_name"    : "Chirality",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 3000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Filament",
+            "color" : "colorname://blue"
+        },
+        {
+            "event_name"    : "Filament Eruption",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "halocme",
+                    "supplier_display_name" : "Halo CME",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 3000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://FilamentEruption",
+            "color" : "colorname://pink"
+        },
+        {
+            "event_name"    : "Flare",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "SWPC",
+                    "supplier_display_name" : "NOAA SWPC",
+                    "source"        : "HEK"
+                },
+                {
+                    "supplier_name" : "Flare Detective - Trigger Module",
+                    "supplier_display_name" : "Flare Detective",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_GOESCLs",
+                    "parameter_display_name"    : "GOES Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "FL_PeakFlux",
+                    "parameter_display_name"    : "Peak Flux",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                }
+            ],
+            "request_interval_extension"    : 36000000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Flare",
+            "color" : "colorname://yellow"
+        },
+        {
+            "event_name"    : "Sunspot",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "EGSO_SFC",
+                    "supplier_display_name" : "EGSO_SFC",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 432000000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://SunSpot",
+            "color" : "colorname://magenta"
+        },
+        {
+            "event_name"    : "Emerging Flux",
+            "suppliers"     : [
+                {   
+                    "supplier_name" : "Emerging flux region module",
+                    "supplier_display_name" : "EFRM",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"                : [],
+            "request_interval_extension"    : 3000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://EmergingFlux",
+            "color" : "colorcode://0x68C3FC"
+        },
+        {
+            "event_name"                    : "Plage",
+            "suppliers"                     : [],
+            "parameter_list"                : [],
+            "request_interval_extension"    : 0,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Plage",
+            "color" : "colorcode://0xB468FC"
+        },
+        {
+            "event_name"    : "Eruption",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "EruptionPatrol",
+                    "supplier_display_name" : "Eruption Patrol",
+                    "source"        : "HEK"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 36000000,
+            "standard_selected"             : true,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Eruption",
+            "color" : "colorcode://0xB4FC68"
+        },{
+            "event_name"    : "COMESEP",
+            "suppliers"     : [
+                {
+                    "supplier_name" : "cactus",
+                    "supplier_display_name" : "CACTus",
+                    "source"        : "COMESEP"
+                },
+                {
+                    "supplier_name" : "flaremail",
+                    "supplier_display_name" : "Flaremail",
+                    "source"        : "COMESEP"
+                },
+                {
+                    "supplier_name" : "solardemon",
+                    "supplier_display_name" : "Solar Demon",
+                    "source"        : "COMESEP"
+                },{
+                    "supplier_name" : "dbm",
+                    "supplier_display_name" : "Drag Based Model",
+                    "source"        : "COMESEP"
+                },{
+                    "supplier_name" : "cgft",
+                    "supplier_display_name" : "cgft",
+                    "source"        : "COMESEP"
+                },{
+                    "supplier_name" : "sepforecast",
+                    "supplier_display_name" : "SEP Forecast",
+                    "source"        : "COMESEP"
+                },{
+                    "supplier_name" : "glealert",
+                    "supplier_display_name" : "GLE Alert",
+                    "source"        : "COMESEP"
+                },{
+                    "supplier_name" : "geomag24",
+                    "supplier_display_name" : "Geomag24",
+                    "source"        : "COMESEP"
+                }
+            ],
+            "parameter_list"        : [],
+            "request_interval_extension"    : 0,
+            "standard_selected"             : false,
+            "group_on"                      : null,
+            "coordinate_system"             : "helioprojective",
+            "spatial_region"                : {
+                "x1" : -1200,
+                "y1" : -1200,
+                "x2" : 1200,
+                "y2" : 1200
+            },
+            "icon" : "iconbank://Comesep",
+            "color" : "colorcode://0x5E5E5E"
+        }
+    ],
+    "related_events" : [
+        {
+            "event_name"    : "Active Region",
+            "related_with"  : "Flare",
+            "related_on"    : [
+                {
+                    "parameter_from" : "ar_noaanum",
+                    "parameter_with" : "ar_noaanum" 
+                }
+            ]
+        }
+    ]
+}
