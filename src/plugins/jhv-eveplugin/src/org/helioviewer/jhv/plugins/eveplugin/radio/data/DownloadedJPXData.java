@@ -5,11 +5,9 @@ import java.util.Date;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoViewDataHandler;
@@ -74,13 +72,7 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
                 // ImageData imData =
                 // FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
                 ImageData imData = jp2CallistoView.getImageData();
-                if (imData instanceof ARGBInt32ImageData) {
-                    ARGBInt32ImageData imageData = (ARGBInt32ImageData) imData;
-                    Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
-
-                    int[] data = bytetrs.getInt32PixelData();
-                    return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-                } else if (imData instanceof SingleChannelByte8ImageData) {
+                if (imData instanceof SingleChannelByte8ImageData) {
                     SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) imData;
                     Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
 
@@ -94,12 +86,12 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
 
     public void remove() {
         radioDataManager.finishedDownloadingID(imageID, downloadID);
+
         if (worker != null && !worker.isDone()) {
             worker.cancel(true);
-            worker = null;
-        } else {
-            worker = null;
         }
+        worker = null;
+
         if (view != null) {
             view.abolish();
         }
@@ -119,14 +111,6 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         private final long downloadID;
         private final Rectangle dataSize;
         private final byte[] byteData;
-
-        public DownloadedJPXDataWorkerResult(int[] data, long imageID, long downloadID, Rectangle dataSize) {
-            super();
-            this.imageID = imageID;
-            this.downloadID = downloadID;
-            this.dataSize = dataSize;
-            byteData = new byte[0];
-        }
 
         public DownloadedJPXDataWorkerResult(byte[] data, Long imageID, Long downloadID, Rectangle dataSize) {
             super();

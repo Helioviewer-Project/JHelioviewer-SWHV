@@ -10,7 +10,9 @@ import com.jogamp.opengl.glu.GLU;
 public class GLInfo {
 
     public static int maxTextureSize;
+
     public static int[] pixelScale = new int[] { 1, 1 };
+    public static float[] pixelScaleFloat = new float[] { 1f, 1f };
 
     public static void update(GL2 gl) throws GLException {
         String version = gl.glGetString(GL2.GL_VERSION);
@@ -33,11 +35,9 @@ public class GLInfo {
     }
 
     public static void updatePixelScale(ScalableSurface surface) {
-        float[] scale = new float[2];
-
-        surface.getCurrentSurfaceScale(scale);
-        pixelScale[0] = (int) scale[0];
-        pixelScale[1] = (int) scale[1];
+        surface.getCurrentSurfaceScale(pixelScaleFloat);
+        pixelScale[0] = (int) pixelScaleFloat[0];
+        pixelScale[1] = (int) pixelScaleFloat[1];
     }
 
     public static boolean checkGLErrors(GL2 gl, String message) {
