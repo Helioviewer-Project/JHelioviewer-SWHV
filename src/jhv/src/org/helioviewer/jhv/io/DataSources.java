@@ -247,9 +247,7 @@ public class DataSources {
     public Item[] getChildrenList(JSONObject root) {
         try {
             SortedSet<Item> children = new TreeSet<Item>();
-            // The JSON Library uses rawtypes
-            @SuppressWarnings("rawtypes")
-            Iterator iter = root.keys();
+            Iterator<?> iter = root.keys();
             while (iter.hasNext()) {
                 String key = new String(((String) iter.next()).getBytes(), "UTF-8");
                 JSONObject child = root.getJSONObject(key);

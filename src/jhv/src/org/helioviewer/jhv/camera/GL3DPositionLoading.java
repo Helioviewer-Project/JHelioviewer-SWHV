@@ -149,11 +149,11 @@ public class GL3DPositionLoading {
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
-                Iterator<String> iterKeys = posObject.keys();
+                Iterator<?> iterKeys = posObject.keys();
                 if (!iterKeys.hasNext())
                     throw new JSONException("unexpected format");
 
-                String dateString = iterKeys.next();
+                String dateString = (String) iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
                 Date date = ImmutableDateTime.utcFullDateFormat.parse(dateString);
