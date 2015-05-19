@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jhv"/>
 	<classpathentry kind="lib" path="../lib/bzip2.jar"/>
 	<classpathentry kind="lib" path="../lib/jogl-all.jar"/>
+	<classpathentry kind="lib" path="../lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

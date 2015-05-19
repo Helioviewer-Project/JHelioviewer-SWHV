@@ -3,17 +3,16 @@ package org.helioviewer.jhv.plugins.pfssplugin.data;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -118,10 +117,7 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             this.dateString = date.substring(11, 30);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-            Date dd = dateFormat.parse(dateString);
+            Date dd = ImmutableDateTime.utcDateFormat.parse(dateString);
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());

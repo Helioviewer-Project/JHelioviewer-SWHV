@@ -6,18 +6,17 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.helioviewer.base.Pair;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -48,9 +47,6 @@ public class PfssNewDataLoader implements Runnable {
             final int endYear = endCal.get(Calendar.YEAR);
             final int endMonth = endCal.get(Calendar.MONTH);
 
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
             do {
                 ArrayList<Pair<String, Long>> urls = null;
 
@@ -71,7 +67,7 @@ public class PfssNewDataLoader implements Runnable {
                         while ((inputLine = in.readLine()) != null) {
                             splitted = inputLine.split(" ");
                             url = splitted[1];
-                            Date dd = dateFormat.parse(splitted[0]);
+                            Date dd = ImmutableDateTime.utcDateFormat.parse(splitted[0]);
                             urls.add(new Pair(url, dd.getTime()));
                         }
                         in.close();
