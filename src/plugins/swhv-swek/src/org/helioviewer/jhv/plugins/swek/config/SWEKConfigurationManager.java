@@ -231,7 +231,7 @@ public class SWEKConfigurationManager {
     }
 
     private boolean checkAndOpenZippedFile() {
-        URL url = SWEKPlugin.class.getResource("SWEKConfig.json");
+        URL url = SWEKPlugin.class.getResource("/SWEKSettings.json");
         ReadableByteChannel rbc;
         try {
             rbc = Channels.newChannel(url.openStream());
