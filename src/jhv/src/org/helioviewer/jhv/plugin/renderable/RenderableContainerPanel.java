@@ -229,8 +229,11 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         optionsPanel = cmp;
         if (optionsPanel != null)
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
-        this.getParent().revalidate();
-        this.getParent().repaint();
+
+        // this.getParent().revalidate();
+        // this.getParent().repaint();
+        // java 6 compat
+        this.getRootPane().revalidate();
     }
 
     @Override
