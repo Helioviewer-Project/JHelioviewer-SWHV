@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
  * 
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"rawtypes","serial"})
 public class List extends JScrollPane {
 
     private final LinkedList<ListEntryChangeListener> listeners = new LinkedList<ListEntryChangeListener>();

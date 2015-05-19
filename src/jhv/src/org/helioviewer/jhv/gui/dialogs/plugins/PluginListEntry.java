@@ -34,6 +34,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  * 
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"serial"})
 public class PluginListEntry extends AbstractListEntry implements MouseListener, ComponentListener {
 
     private final PluginContainer plugin;
@@ -296,7 +297,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
     }
 
     // Link Label
-
     private class LinkLabel extends JLabel {
 
         public LinkLabel(final String text) {

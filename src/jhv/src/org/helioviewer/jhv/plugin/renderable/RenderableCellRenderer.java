@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+@SuppressWarnings({"serial"})
 public class RenderableCellRenderer extends DefaultTableCellRenderer {
 
     @Override
@@ -25,4 +26,5 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
         label.setToolTipText(tooltip);
         return label;
     }
+
 }

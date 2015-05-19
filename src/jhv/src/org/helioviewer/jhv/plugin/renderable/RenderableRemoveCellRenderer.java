@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
+@SuppressWarnings({"serial"})
 public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
 
     @Override
@@ -23,9 +24,10 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
             label.setToolTipText("Cannot be removed");
         }
         label.setBorder(RenderableContainerPanel.commonRightBorder);
-        label.setText("");
+        label.setText(null);
 
         return label;
 
     }
+
 }

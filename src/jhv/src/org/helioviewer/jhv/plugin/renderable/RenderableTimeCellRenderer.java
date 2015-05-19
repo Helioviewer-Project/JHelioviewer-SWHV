@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+@SuppressWarnings({"serial"})
 public class RenderableTimeCellRenderer extends DefaultTableCellRenderer {
 
     @Override
@@ -17,4 +18,5 @@ public class RenderableTimeCellRenderer extends DefaultTableCellRenderer {
 
         return label;
     }
+
 }

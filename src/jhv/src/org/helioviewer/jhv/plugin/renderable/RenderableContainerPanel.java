@@ -39,6 +39,7 @@ import org.helioviewer.jhv.renderable.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
+@SuppressWarnings({"serial"})
 public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);

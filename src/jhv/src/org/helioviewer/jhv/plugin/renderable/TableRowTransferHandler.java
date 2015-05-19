@@ -21,7 +21,9 @@ import org.helioviewer.jhv.display.Displayer;
 /**
  * Handles drag & drop row reordering
  */
+@SuppressWarnings({"serial"})
 public class TableRowTransferHandler extends TransferHandler {
+
     private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
     private JTable grid = null;
     BufferedImage image;

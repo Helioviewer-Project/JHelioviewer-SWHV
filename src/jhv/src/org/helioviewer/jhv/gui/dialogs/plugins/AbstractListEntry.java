@@ -7,6 +7,7 @@ import javax.swing.JPanel;
  * 
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"serial"})
 public abstract class AbstractListEntry extends JPanel {
 
 }

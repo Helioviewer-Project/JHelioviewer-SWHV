@@ -40,6 +40,7 @@ import org.helioviewer.viewmodelplugin.controller.PluginManager;
  *
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public class PluginsDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener, ListEntryChangeListener {
 
     private boolean changesMade = false;
