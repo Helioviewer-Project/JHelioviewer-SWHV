@@ -237,7 +237,7 @@ public abstract class AbstractView implements View {
     }
 
     private void copyScreenToTexture(GL2 gl) {
-        ImageData image = this.getSubimageData();
+        ImageData image = getImageData();
         Region region = image.getRegion();
 
         double xOffset = region.getLowerLeftCorner().x;

@@ -21,7 +21,6 @@ import org.helioviewer.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -531,7 +530,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
 
-                    JHVJP2View jp2View = jpxData.getView();
+                    JHVJP2CallistoView jp2View = jpxData.getView();
                     if (jp2View != null) {
                         jp2View.setViewport(new Viewport(viewport.width, viewport.height));
 

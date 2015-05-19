@@ -14,7 +14,6 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoViewDataHandler;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
 
@@ -37,7 +36,7 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         this.downloadID = downloadID;
     }
 
-    public JHVJP2View getView() {
+    public JHVJP2CallistoView getView() {
         return view;
     }
 
@@ -75,31 +74,25 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
             if (jp2CallistoView != null) {
                 // ImageData imData =
                 // FilterModel.getInstance().colorFilter(jp2CallistoView.getSubimageData());
-                ImageData imData = jp2CallistoView.getSubimageData();
+                ImageData imData = jp2CallistoView.getImageData();
                 if (imData instanceof ARGBInt32ImageData) {
-                    int[] data = new int[0];
-                    ARGBInt32ImageData imageData = (ARGBInt32ImageData) (imData);
-                    if (imageData != null) {
-                        Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
-                        data = bytetrs.getInt32PixelData();
-                        int[] copyData = Arrays.copyOf(data, data.length);
-                        data = new int[0];
-                        return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-                    }
+                    ARGBInt32ImageData imageData = (ARGBInt32ImageData) imData;
+                    Int32ImageTransport bytetrs = (Int32ImageTransport) imageData.getImageTransport();
+
+                    int[] data = bytetrs.getInt32PixelData();
+                    int[] copyData = Arrays.copyOf(data, data.length);
+                    data = null;
+
+                    return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
                 } else if (imData instanceof SingleChannelByte8ImageData) {
-                    byte[] data = new byte[0];
-                    SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) (jp2CallistoView.getSubimageData());
-                    if (imageData != null) {
-                        Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
-                        data = bytetrs.getByte8PixelData();
-                        // Log.debug("Data size : " + data.length +
-                        // " Image size: " + imageData.getHeight() + " x " +
-                        // imageData.getWidth());
-                        byte[] copyData = Arrays.copyOf(data, data.length);
-                        data = new byte[0];
-                        // Log.debug("dworker" + nr + ": new result");
-                        return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-                    }
+                    SingleChannelByte8ImageData imageData = (SingleChannelByte8ImageData) imData;
+                    Byte8ImageTransport bytetrs = (Byte8ImageTransport) imageData.getImageTransport();
+
+                    byte[] data = bytetrs.getByte8PixelData();
+                    byte[] copyData = Arrays.copyOf(data, data.length);
+                    data = null;
+
+                    return new DownloadedJPXDataWorkerResult(copyData, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
                 }
             }
         }

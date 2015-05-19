@@ -138,14 +138,6 @@ public class JHVSimpleImageView extends AbstractView {
      * {@inheritDoc}
      */
     @Override
-    public Region getRegion() {
-        return region;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
@@ -158,14 +150,6 @@ public class JHVSimpleImageView extends AbstractView {
     @Override
     public MetaData getMetaData() {
         return m;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageData getSubimageData() {
-        return subImageData;
     }
 
     /**
