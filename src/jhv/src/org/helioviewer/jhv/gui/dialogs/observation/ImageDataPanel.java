@@ -59,6 +59,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public class ImageDataPanel extends ObservationDialogPanel implements DataSourceServerListener {
 
     private boolean isSelected = false;

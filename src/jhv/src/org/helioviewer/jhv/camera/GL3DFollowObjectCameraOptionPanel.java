@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
 
+@SuppressWarnings({"unchecked","serial"})
 public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;

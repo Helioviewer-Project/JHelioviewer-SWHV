@@ -33,6 +33,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Stephan Pagel
  * */
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public class ObservationDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final HashMap<String, ObservationDialogPanel> uiMap = new HashMap<String, ObservationDialogPanel>();

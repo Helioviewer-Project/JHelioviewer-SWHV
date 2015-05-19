@@ -55,6 +55,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
  * @author Markus Langenberg
  * @author Andre Dau
  */
+@SuppressWarnings({"unchecked","rawtypes","serial"})
 public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private final String defaultDateFormat = "yyyy-MM-dd";

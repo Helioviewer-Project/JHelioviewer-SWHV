@@ -51,6 +51,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  *
  * @author Stephan Pagel
  */
+@SuppressWarnings({"serial"})
 public class JHVCalendar extends JPanel implements ComponentListener {
 
     private enum DisplayMode {
