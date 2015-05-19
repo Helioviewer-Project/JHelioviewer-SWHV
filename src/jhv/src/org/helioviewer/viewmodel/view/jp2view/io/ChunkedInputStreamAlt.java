@@ -225,6 +225,7 @@ public class ChunkedInputStreamAlt extends InputStream {
      * 
      * @throws IOException when the chunk size could not be parsed
      */
+    @SuppressWarnings({"fallthrough"})
     private static int getChunkSizeFromInputStream(final InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // States: 0=normal, 1=\r was scanned, 2=inside quoted string, -1=end

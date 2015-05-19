@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
@@ -48,7 +48,6 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private static GLCanvas canvas;
 
     // screenshot & movie
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
     private final AWTGLReadBufferUtil rbu;
 
     private ExportMovieDialog exportMovieDialog;
@@ -200,8 +199,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
             exportMode = true;
 
             JHVJPXView jpxView = (JHVJPXView) mv;
-            String dateString = dateFormat.format(new Date(System.currentTimeMillis()));
-            moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + dateString + ".mp4";
+            moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + ImmutableDateTime.filenameDateFormat.format(new Date()) + ".mp4";
 
             framerate = jpxView.getDesiredRelativeSpeed();
             if (framerate <= 0 || framerate > 60)
