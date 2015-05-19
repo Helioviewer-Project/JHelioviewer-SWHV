@@ -63,6 +63,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         try {
             return getValueFromXML(key);
         } catch (Exception e) {
+            /*
             if (e.getMessage() == "XML data incomplete" || e.getMessage().toLowerCase().contains("box not open")) {
                 try {
                     Thread.sleep(500);
@@ -73,6 +74,8 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             } else if (e.getMessage() != "No XML data present") {
                 e.printStackTrace();
             }
+            */
+            e.printStackTrace();
         }
         return null;
     }
