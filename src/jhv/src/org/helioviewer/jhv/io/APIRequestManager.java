@@ -313,18 +313,14 @@ public class APIRequestManager {
 
         if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
             try {
-                JHVFITSView fitsView = new JHVFITSView(uri);
-
-                return fitsView;
+                return new JHVFITSView(uri);
             } catch (Exception e) {
                 Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
             }
         } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
             try {
-                JHVSimpleImageView imView = new JHVSimpleImageView(uri);
-
-                return imView;
+                return new JHVSimpleImageView(uri);
             } catch (Exception e) {
                 Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
@@ -332,8 +328,8 @@ public class APIRequestManager {
         } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
 
+                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
                 jp2CallistoView.setJP2Image(jp2Image);
                 return jp2CallistoView;
             } catch (Exception e) {

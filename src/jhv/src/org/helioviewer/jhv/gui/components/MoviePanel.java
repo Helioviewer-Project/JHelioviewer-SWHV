@@ -33,7 +33,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -758,11 +757,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 newPanel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
 
                 // move frame
-                ImmutableDateTime maxAvailableDateTime = newPanel.view.getFrameDateTime(newPanel.view.getMaximumAccessibleFrameNumber());
-                if (maxAvailableDateTime.getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis()) {
+                int maxFrame = newPanel.view.getMaximumAccessibleFrameNumber();
+                if (maxFrame > -1 &&
+                    newPanel.view.getFrameDateTime(maxFrame).getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis()) {
                     newPanel.view.setCurrentFrame(copyFrom.view.getCurrentFrameDateTime());
-                } else {
-                    newPanel.view.setCurrentFrame(newPanel.view.getMaximumAccessibleFrameNumber());
                 }
             }
 
