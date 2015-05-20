@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.util.Date;
 
 import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
@@ -97,7 +96,7 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
             this.localRotation = metadata.getLocalRotation();
             d = ((HelioviewerMetaData) metadata).getDistanceSolarRadii();
         } else {
-            this.localRotation = GL3DQuatd.createRotation(Astronomy.getL0Radians(date), GL3DVec3d.YAxis);
+            this.localRotation = new GL3DQuatd(0, Astronomy.getL0Radians(date), 0);
             d = Astronomy.getDistanceSolarRadii(date);
         }
         this.setZTranslation(-d);
