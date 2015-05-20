@@ -241,8 +241,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     }
                 });
 
+                AbstractView view = null;
                 try {
-                    AbstractView view;
                     if (isImage)
                         view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                     else
@@ -254,11 +254,21 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 }
 
                 EventQueue.invokeLater(new Runnable() {
+                    private AbstractView theView;
+
                     @Override
                     public void run() {
                         ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+                        // tbd
+                        if (theView != null)
+                            LayersModel.setActiveLayer(theView);
                     }
-                });
+
+                    public Runnable init(AbstractView theView) {
+                        this.theView = theView;
+                        return this;
+                    }
+                }.init(view));
             }
         }, "LoadRemote");
         thread.start();

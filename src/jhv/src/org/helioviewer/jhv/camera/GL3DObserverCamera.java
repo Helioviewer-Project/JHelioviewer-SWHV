@@ -15,15 +15,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-/**
- * This camera is used when solar rotation tracking is enabled. It extends the
- * {@link GL3DObserverCamera} by automatically rotating the camera around the
- * Y-Axis (pointing to solar north) by an amount calculated through
- * {@link DifferentialRotation}.
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
 
     private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;

@@ -254,7 +254,7 @@ class J2KReader implements Runnable {
                 }
 
                 // if socket is closed, but communication is necessary, open it
-                if (socket != null && socket.isClosed() && viewChanged) {
+                if (socket != null && socket.isClosed()) {
                     try {
                         socket = new JPIPSocket();
                         socket.connect(parentImageRef.getURI());
@@ -293,7 +293,8 @@ class J2KReader implements Runnable {
                                 socket.receive();
                             }
                             */
-                            socket.close();
+                            // keep socket open as we may need more data
+                            //socket.close();
 
                             // requesting data
                         } else {

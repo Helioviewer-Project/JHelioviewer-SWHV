@@ -63,12 +63,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Log.debug("Do run");
                 if (dataHandler != null) {
-                    Log.debug("Handle data");
                     dataHandler.handleData(JHVJP2CallistoView.this);
-                } else {
-                    Log.debug("Data handle is null");
                 }
             }
         });
