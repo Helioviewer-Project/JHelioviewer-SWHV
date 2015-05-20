@@ -179,6 +179,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
+                    renderableContainer.fireListeners();
                     Displayer.display();
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
