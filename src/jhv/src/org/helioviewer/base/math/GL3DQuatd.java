@@ -1,6 +1,7 @@
 package org.helioviewer.base.math;
 
 public class GL3DQuatd {
+
     public static final double EPSILON = 0.000001;
 
     protected double a;
@@ -15,6 +16,21 @@ public class GL3DQuatd {
         axisCopy.normalize();
         axisCopy.multiply(Math.sin(halfAngle));
         return new GL3DQuatd(Math.cos(halfAngle), axisCopy);
+    }
+
+    public GL3DQuatd(double ax, double ay, double az) {
+        ax /= 2.;
+        ay /= 2.;
+        az /= 2.;
+        double sx = Math.sin(ax), cx = Math.cos(ax);
+        double sy = Math.sin(ay), cy = Math.cos(ay);
+        double sz = Math.sin(az), cz = Math.cos(az);
+
+        this.a = cx * cy * cz + sx * sy * sz;
+        this.u = new GL3DVec3d(
+                 sx * cy * cz - cx * sy * sz,
+                 cx * sy * cz + sx * cy * sz,
+                 sx * sy * cz - cx * cy * sz);
     }
 
     private GL3DQuatd(double a, double x, double y, double z) {
@@ -227,4 +243,5 @@ public class GL3DQuatd {
     public float[] getFloatArray() {
         return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
     }
+
 }

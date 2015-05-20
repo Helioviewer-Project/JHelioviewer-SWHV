@@ -190,8 +190,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             theta = Astronomy.getB0Radians(dateObs);
         }
 
-        localRotation = GL3DQuatd.createRotation(theta, GL3DVec3d.XAxis);
-        localRotation.rotate(GL3DQuatd.createRotation(phi, GL3DVec3d.YAxis));
+        localRotation = new GL3DQuatd(theta, phi, 0);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
