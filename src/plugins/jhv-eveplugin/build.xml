@@ -34,6 +34,7 @@
     <!-- build classes of main jhv project -->
     <target name="jhv.compile">
         <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml"/>
+        <ant inheritAll="false" target="compile_without" antfile="${jhv.root}/build.xml"/>
     </target>
 
     <!-- Create directory structure -->

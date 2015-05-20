@@ -39,6 +39,7 @@
         <echo message="basedir is ${basedir}"/>
         <echo message="jhv build is ${jhv.build}"/>
         <ant inheritAll="false" target="compile" antfile="${jhv.root}/build.xml" dir="${jhv.root}"/>
+        <ant inheritAll="false" target="compile_without" antfile="${jhv.root}/build.xml"/>
     </target>
 
     <!-- Create directory structure -->
