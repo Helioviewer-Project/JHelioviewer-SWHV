@@ -119,7 +119,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
     public void addInitialCameraTypes() {
         addCameraType("Observer Camera", GL3DObserverCamera.class, "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n");
         addCameraType("Earth Camera", GL3DEarthCamera.class, "Earth camera: view from Earth.\nCamera time defined by timestamps of the active layer.\n\n");
-        addCameraType("Expert Camera", GL3DFollowObjectCamera.class, "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless \"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.");
+        addCameraType("Expert Camera", GL3DExpertCamera.class, "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless \"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.");
     }
 
     public void addCameraType(String comboBoxTitle, Class<?> cls, String explanation) {
