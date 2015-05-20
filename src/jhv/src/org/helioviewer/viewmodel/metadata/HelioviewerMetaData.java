@@ -29,8 +29,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     private double dobsRadii;
 
-    private double refb0;
-    private double refl0;
     private double innerRadius = 0.;
     private double outerRadius = 40.;
 
@@ -161,34 +159,25 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             dobsRadii = Astronomy.getDistanceSolarRadii(dateObs);
         }
 
-        refb0 = m.tryGetDouble("REF_B0");
-        refl0 = m.tryGetDouble("REF_L0");
-
-        double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
-        if (stonyhurstLatitude == 0) {
-            stonyhurstLatitude = m.tryGetDouble("CRLT_OBS");
-            if (stonyhurstLatitude == 0) {
-                stonyhurstLatitude = refb0;
+        double stonyhurstLatitude, theta;
+        if ((stonyhurstLatitude = m.tryGetDouble("HGLT_OBS")) == 0) {
+            if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
+                if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
+                    // presumably not found
+                    stonyhurstLatitude = Astronomy.getB0Degree(dateObs);
+                }
             }
         }
-        double stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
-        if (refl0 != 0) {
-            stonyhurstLongitude = refl0 - Astronomy.getL0Degree(dateObs);
-        }
+        theta = stonyhurstLatitude / MathUtils.radeg;
 
-        if (instrument.contains("GONG") || observatory.contains("USET") || observatory.contains("SOLIS")) {
-            stonyhurstLongitude = 0;
+        double stonyhurstLongitude, phi;
+        if ((stonyhurstLongitude = m.tryGetDouble("HGLN_OBS")) == 0) {
+            stonyhurstLongitude = m.tryGetDouble("REF_L0");
+            if (stonyhurstLongitude != 0) {
+                stonyhurstLongitude -= Astronomy.getL0Degree(dateObs);
+            }
         }
-
-        double phi = Astronomy.getL0Radians(dateObs);
-        phi -= stonyhurstLongitude / MathUtils.radeg;
-
-        double theta;
-        if (stonyhurstLatitude != 0) {
-            theta = stonyhurstLatitude / MathUtils.radeg;
-        } else {
-            theta = Astronomy.getB0Radians(dateObs);
-        }
+        phi = Astronomy.getL0Radians(dateObs) - stonyhurstLongitude / MathUtils.radeg;
 
         localRotation = new GL3DQuatd(theta, phi);
     }
