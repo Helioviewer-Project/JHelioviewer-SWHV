@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable;
+package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -16,8 +16,8 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.plugin.renderable.Renderable;
-import org.helioviewer.jhv.plugin.renderable.RenderableType;
+import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.RenderableType;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;

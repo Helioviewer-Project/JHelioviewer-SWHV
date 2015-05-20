@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable;
+package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

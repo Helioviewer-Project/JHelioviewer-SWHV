@@ -49,7 +49,7 @@ import org.helioviewer.jhv.io.DataSourceServers;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.renderable.RenderableDummy;
+import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**

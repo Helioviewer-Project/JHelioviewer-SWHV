@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.renderable.RenderableImageLayer;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 /**
  * Action that toggle visibility of off-limb corona.

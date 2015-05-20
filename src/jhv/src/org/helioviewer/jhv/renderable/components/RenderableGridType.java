@@ -1,6 +1,6 @@
-package org.helioviewer.jhv.renderable;
+package org.helioviewer.jhv.renderable.components;
 
-import org.helioviewer.jhv.plugin.renderable.RenderableType;
+import org.helioviewer.jhv.renderable.gui.RenderableType;
 
 public class RenderableGridType extends RenderableType {
 

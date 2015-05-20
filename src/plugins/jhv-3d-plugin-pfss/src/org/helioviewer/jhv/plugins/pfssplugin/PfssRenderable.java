@@ -8,10 +8,10 @@ import java.util.concurrent.Executors;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugin.renderable.Renderable;
-import org.helioviewer.jhv.plugin.renderable.RenderableType;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
+import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 import com.jogamp.opengl.GL2;

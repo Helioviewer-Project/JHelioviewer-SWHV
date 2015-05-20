@@ -9,7 +9,7 @@ import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.renderable.RenderableCamera;
+import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 /**
  * This camera is used when solar rotation tracking is enabled. It extends the
