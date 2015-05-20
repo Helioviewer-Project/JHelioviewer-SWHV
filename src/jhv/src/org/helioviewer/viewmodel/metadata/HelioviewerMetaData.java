@@ -160,6 +160,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if ((dobs = m.tryGetDouble("DSUN_OBS")) == 0) {
             dobs = Astronomy.getDistanceMeters(dateObs);
         }
+        dobs /= Constants.SunRadiusInMeter;
 
         refb0 = m.tryGetDouble("REF_B0");
         refl0 = m.tryGetDouble("REF_L0");
@@ -210,8 +211,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            // distance to sun in meters
-            double radiusSunInArcsec = Math.atan(Constants.SunRadiusInMeter / this.dobs) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan(1 / dobs) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
         } else if (instrument.equals("EIT")) {
             newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
@@ -322,7 +322,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return pixelWidth;
     }
 
-    public double getDobs() {
+    public double getDistanceSolarRadii() {
         return dobs;
     }
 

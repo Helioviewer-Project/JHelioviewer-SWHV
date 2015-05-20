@@ -26,6 +26,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  */
 public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
+
     private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;
 
     public GL3DObserverCamera(boolean init) {
@@ -88,19 +89,15 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
     }
 
     private void updateRotation(Date date) {
-        double addl0 = 0.;
-        double addb0 = 0.;
-        AbstractView mdv = LayersModel.getActiveView();
-        if (mdv != null) {
-            MetaData metadata = mdv.getMetaData();
-            HelioviewerMetaData hvMetadata = (HelioviewerMetaData) metadata;
-            this.localRotation = hvMetadata.getLocalRotation();
-            this.setZTranslation(-hvMetadata.getDobs() / Constants.SunRadiusInMeter);
-        } else {
-            double currentRotation = Astronomy.getL0Radians(date);
+        AbstractView view = LayersModel.getActiveView();
+        MetaData metadata;
 
-            this.localRotation = GL3DQuatd.createRotation(addb0, GL3DVec3d.XAxis);
-            this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation - addl0, GL3DVec3d.YAxis));
+        if (view != null && (metadata = view.getMetaData()) instanceof HelioviewerMetaData) {
+            this.localRotation = metadata.getLocalRotation();
+            this.setZTranslation(-((HelioviewerMetaData) metadata).getDistanceSolarRadii());
+        } else {
+            this.localRotation = GL3DQuatd.createRotation(Astronomy.getL0Radians(date), GL3DVec3d.YAxis);
+            this.setZTranslation(-Astronomy.getDistanceSolarRadii(date));
         }
         this.updateCameraTransformation();
     }
