@@ -6,7 +6,6 @@ import java.awt.EventQueue;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
