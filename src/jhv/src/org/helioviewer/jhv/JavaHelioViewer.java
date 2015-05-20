@@ -120,7 +120,9 @@ public class JavaHelioViewer {
         }
 
         try {
-            if (args.length != 0 && args[0].equals("--remote-plugins")) {
+            if (args.length != 0 && args[0].equals("--exclude-plugins")) {
+                Log.info("Do not load plugins");
+            } else if (args.length != 0 && args[0].equals("--remote-plugins")) {
                 Log.info("Load remote plugins");
                 JHVLoader.loadRemotePlugins(args);
             } else {

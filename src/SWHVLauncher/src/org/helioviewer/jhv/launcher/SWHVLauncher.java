@@ -24,7 +24,7 @@ public class SWHVLauncher {
 
         String[] args2 = new String[7];
 
-        args2[0] = "--remote-plugins";
+        args2[0] = "--exclude-plugins";
         args2[1] = "--deactivate-plugin";
         args2[2] = "SWEKPlugin.jar";
         args2[3] = "--deactivate-plugin";
