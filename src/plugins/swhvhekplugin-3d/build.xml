@@ -96,7 +96,7 @@
     <!-- Compile sources -->
     <target name="compile" depends="jhv.compile, init, bootclasspath.check" if="bootclasspath.exists">
         <echo message="compile with bootclasspath"/>
-        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source">
+        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source" includeantruntime="false">
             <compilerarg value="-Xlint:all"/>
             <compilerarg value="-Xbootclasspath/p:${toString:lib.path.ref}"/>
             <classpath>
@@ -113,7 +113,7 @@
 
     <target name="compile_without" depends="jhv.compile, init, bootclasspath.check" unless="bootclasspath.exists">
         <echo message="compile without bootclasspath"/>
-        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source">
+        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source" includeantruntime="false">
             <compilerarg value="-Xlint:all"/>
             <classpath>
                 <fileset dir="${lib}">
