@@ -16,6 +16,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener, TimeListener {
+
     private final GL3DExpertCameraOptionPanel followObjectCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
