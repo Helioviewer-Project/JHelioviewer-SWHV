@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugin.controller;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -145,7 +144,7 @@ public class PluginManager {
      * @return a list with all loaded plug-ins.
      */
     public PluginContainer[] getAllPlugins() {
-        return this.plugins.values().toArray(new PluginContainer[0]);
+        return plugins.values().toArray(new PluginContainer[0]);
     }
 
     /**
@@ -173,40 +172,12 @@ public class PluginManager {
         AbstractList<PluginContainer> result = new LinkedList<PluginContainer>();
 
         for (PluginContainer container : plugins.values()) {
-            if (container.isActive() == activated)
+            if (container.isActive() == activated) {
                 result.add(container);
+            }
         }
 
         return result;
-    }
-
-    /**
-     * Returns an input stream to a resource within a plugin jar file. \n The
-     * path must begin with a slash and contain all subfolders, e.g.:\n
-     * /images/sample_image.png
-     *
-     * @param plugin
-     *            The plugin where the resources are stored
-     * @param resourcePath
-     *            The path to the resource
-     * @return An InputStream to the resource
-     */
-    public InputStream getResourceInputStream(Plugin plugin, String resourcePath) {
-        return plugins.get(plugin).getClassLoader().getResourceAsStream(resourcePath);
-    }
-
-    /**
-     * Returns an URL to a resource within a plugin jar.\n The path must begin
-     * with a slash and contain all subfolders, e.g.:\n /images/sample_image.png
-     *
-     * @param plugin
-     *            The plugin where the resources are stored
-     * @param resourcePath
-     *            The path to the resource
-     * @return An URL to the resource
-     */
-    public URL getResourceUrl(Plugin plugin, String resourcePath) {
-        return plugins.get(plugin).getClassLoader().getResource(resourcePath);
     }
 
     /**
@@ -274,12 +245,12 @@ public class PluginManager {
         final AtomicReference<URI> refURI = new AtomicReference<URI>();
 
         public LoadPluginCall(URI location) {
-            this.refURI.set(location);
+            refURI.set(location);
         }
 
         @Override
         public Boolean call() {
-            return loadPlugin_raw(this.refURI.get());
+            return loadPlugin_raw(refURI.get());
         }
     }
 
