@@ -189,7 +189,6 @@ public class DataSources {
      * Use singleton
      */
     private DataSources() {
-        reload();
     }
 
     public void reload() {
