@@ -62,7 +62,7 @@ public class GL3DEarthCamera extends GL3DCamera implements TimeListener {
     }
 
     public void forceTimeChanged(Date date) {
-        if (date != null && !this.getTrackingMode()) {
+        if (date != null) {
             updateRotation(date);
 
             RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
