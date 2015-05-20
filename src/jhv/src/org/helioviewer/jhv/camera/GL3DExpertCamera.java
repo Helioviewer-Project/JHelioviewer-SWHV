@@ -103,7 +103,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener, Time
             GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
             if (position != null) {
                 currentL = position.y;
-                currentB = -position.z;
+                currentB = position.z;
                 currentDistance = position.x;
 
                 updateRotation(date);
@@ -119,7 +119,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener, Time
     private void updateRotation(Date date) {
         double currentRotation = (-currentL + Astronomy.getL0Radians(date)) % (Math.PI * 2.0);
 
-        GL3DQuatd newRotation = GL3DQuatd.createRotation(-currentB, GL3DVec3d.XAxis);
+        GL3DQuatd newRotation = GL3DQuatd.createRotation(currentB, GL3DVec3d.XAxis);
         newRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
 
         this.setLocalRotation(newRotation);
