@@ -3,11 +3,11 @@ package org.helioviewer.jhv.launcher;
 import java.awt.EventQueue;
 
 import org.helioviewer.jhv.JavaHelioViewer;
+import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swhvhekplugin.SWHVHEKPlugin;
-import org.helioviewer.viewmodelplugin.controller.PluginManager;
 
 /**
  * Class for launching jhv with several plugins added.
