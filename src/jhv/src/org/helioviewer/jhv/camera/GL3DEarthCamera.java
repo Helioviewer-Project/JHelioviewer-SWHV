@@ -74,12 +74,13 @@ public class GL3DEarthCamera extends GL3DCamera implements TimeListener {
     }
 
     private void updateRotation(Date date) {
-        this.setZTranslation(-Astronomy.getDistanceSolarRadii(date));
-        double b0 = Astronomy.getB0Radians(date);
-        double currentRotation = Astronomy.getL0Radians(date);
+        double b = Astronomy.getB0Radians(date);
+        double l = Astronomy.getL0Radians(date);
+        double d = Astronomy.getDistanceSolarRadii(date);
 
-        this.localRotation = GL3DQuatd.createRotation(b0, GL3DVec3d.XAxis);
-        this.localRotation.rotate(GL3DQuatd.createRotation(currentRotation, GL3DVec3d.YAxis));
+        this.localRotation = GL3DQuatd.createRotation(b, GL3DVec3d.XAxis);
+        this.localRotation.rotate(GL3DQuatd.createRotation(l, GL3DVec3d.YAxis));
+        this.setZTranslation(-d);
 
         this.updateCameraTransformation();
     }

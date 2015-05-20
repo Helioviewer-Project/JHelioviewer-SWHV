@@ -89,16 +89,19 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
     }
 
     private void updateRotation(Date date) {
-        AbstractView view = LayersModel.getActiveView();
+        double d;
         MetaData metadata;
+        AbstractView view = LayersModel.getActiveView();
 
         if (view != null && (metadata = view.getMetaData()) instanceof HelioviewerMetaData) {
             this.localRotation = metadata.getLocalRotation();
-            this.setZTranslation(-((HelioviewerMetaData) metadata).getDistanceSolarRadii());
+            d = ((HelioviewerMetaData) metadata).getDistanceSolarRadii();
         } else {
             this.localRotation = GL3DQuatd.createRotation(Astronomy.getL0Radians(date), GL3DVec3d.YAxis);
-            this.setZTranslation(-Astronomy.getDistanceSolarRadii(date));
+            d = Astronomy.getDistanceSolarRadii(date);
         }
+        this.setZTranslation(-d);
+
         this.updateCameraTransformation();
     }
 
