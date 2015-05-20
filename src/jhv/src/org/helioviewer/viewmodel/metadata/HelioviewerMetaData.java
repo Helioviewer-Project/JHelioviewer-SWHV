@@ -27,7 +27,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  */
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
 
-    private double dobs;
+    private double dobsRadii;
 
     private double refb0;
     private double refl0;
@@ -157,10 +157,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private void retrievePosition(MetaDataContainer m) {
         Date dateObs = dateTime.getTime();
 
-        if ((dobs = m.tryGetDouble("DSUN_OBS")) == 0) {
-            dobs = Astronomy.getDistanceMeters(dateObs);
+        if ((dobsRadii = m.tryGetDouble("DSUN_OBS") / Constants.SunRadiusInMeter) == 0) {
+            dobsRadii = Astronomy.getDistanceSolarRadii(dateObs);
         }
-        dobs /= Constants.SunRadiusInMeter;
 
         refb0 = m.tryGetDouble("REF_B0");
         refl0 = m.tryGetDouble("REF_L0");
@@ -211,7 +210,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan(1 / dobs) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(1., dobsRadii) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
         } else if (instrument.equals("EIT")) {
             newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
@@ -323,7 +322,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     public double getDistanceSolarRadii() {
-        return dobs;
+        return dobsRadii;
     }
 
     public double getInnerPhysicalOcculterRadius() {
