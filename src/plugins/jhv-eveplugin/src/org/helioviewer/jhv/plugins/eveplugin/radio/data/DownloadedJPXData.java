@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
@@ -149,8 +148,6 @@ public class DownloadedJPXData implements JHVJP2CallistoViewDataHandler {
         if (result != null) {
             radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
             radioDataManager.finishedDownloadingID(imageID, downloadID);
-        } else {
-            Log.debug("Result is null");
         }
     }
 
