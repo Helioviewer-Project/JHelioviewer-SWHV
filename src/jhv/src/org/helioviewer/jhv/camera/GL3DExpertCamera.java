@@ -122,7 +122,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener, Time
         double l = (-currentL + Astronomy.getL0Radians(date)) % (Math.PI * 2.0);
         double d = currentDistance;
 
-        this.localRotation = new GL3DQuatd(b, l, 0);
+        this.localRotation = new GL3DQuatd(b, l);
         this.setZTranslation(-d);
 
         this.updateCameraTransformation();

@@ -2,10 +2,10 @@ package org.helioviewer.base.math;
 
 public class GL3DQuatd {
 
-    public static final double EPSILON = 0.000001;
+    private static final double EPSILON = 0.000001;
 
-    protected double a;
-    protected GL3DVec3d u;
+    private double a;
+    private GL3DVec3d u;
 
     public static GL3DQuatd createRotation(double angle, GL3DVec3d axis) {
         if (angle == 0.)
@@ -31,6 +31,19 @@ public class GL3DQuatd {
                  sx * cy * cz - cx * sy * sz,
                  cx * sy * cz + sx * cy * sz,
                  sx * sy * cz - cx * cy * sz);
+    }
+
+    public GL3DQuatd(double ax, double ay) {
+        ax /= 2.;
+        ay /= 2.;
+        double sx = Math.sin(ax), cx = Math.cos(ax);
+        double sy = Math.sin(ay), cy = Math.cos(ay);
+
+        this.a = cx * cy;
+        this.u = new GL3DVec3d(
+                 sx * cy,
+                 cx * sy,
+                 sx * sy);
     }
 
     private GL3DQuatd(double a, double x, double y, double z) {
@@ -95,12 +108,6 @@ public class GL3DQuatd {
     public GL3DVec3d getRotationAxis() {
         return this.u;
     }
-
-    // public GL3DQuatd interpolate(GL3DQuatd q) {
-    // double a = this.a + q.a/2;
-    // GL3DVec3d u = this.u.copy().add(q.u).divide(2);
-    // return new GL3DQuatd(a, u);
-    //
 
     public GL3DQuatd add(GL3DQuatd q) {
         this.u.add(q.u);
@@ -178,18 +185,10 @@ public class GL3DQuatd {
     }
 
     public GL3DQuatd normalize() {
-        double l = this.length();
+        double l = Math.sqrt(a * a + u.length2());
         a /= l;
         u.divide(l);
         return this;
-    }
-
-    public double length() {
-        return Math.sqrt(length2());
-    }
-
-    public double length2() {
-        return a * a + u.length2();
     }
 
     public double dot(GL3DQuatd q) {
