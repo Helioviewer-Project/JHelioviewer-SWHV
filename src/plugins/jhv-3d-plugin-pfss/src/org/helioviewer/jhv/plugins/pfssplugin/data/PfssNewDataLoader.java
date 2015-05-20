@@ -68,7 +68,7 @@ public class PfssNewDataLoader implements Runnable {
                             splitted = inputLine.split(" ");
                             url = splitted[1];
                             Date dd = ImmutableDateTime.utcDateFormat.parse(splitted[0]);
-                            urls.add(new Pair(url, dd.getTime()));
+                            urls.add(new Pair<String, Long>(url, dd.getTime()));
                         }
                         in.close();
                         synchronized (parsedCache) {
