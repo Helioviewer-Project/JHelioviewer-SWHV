@@ -135,7 +135,7 @@
 
 
     <!-- Jar bundle -->
-    <target name="jar-bundle" depends="compile">
+    <target name="jar-bundle" depends="compile, compile_without">
         <!-- JAR File -->
         <jar destfile="${build}/${plugin.name}.jar">
             <manifest>
