@@ -20,7 +20,10 @@
     <property name="swhv.bin" value="${swhvproject.location}/bin/jhv" />
     <property name="swhv.lib" value="${swhvproject.location}/lib" />
     <property name="swhv-swek.homedir.sources" value="${user.home}/JHelioviewer-SWHV/PluginResources/swek_plugin/sources" />
-    
+    <property environment="env"/>
+    <path id="lib.path.ref">
+        <fileset dir="${env.RT_PATH}" includes="classes.jar"/>
+    </path>
     <property name="revision" value="0" />
     <property name="version" value="0"/>
 
@@ -64,11 +67,12 @@
         <!--<ant antfile="build.xml" dir="${swhv-swek.location}" inheritAll="false" target="all"/>-->
     </target>
 
-    <target name="compile" depends="init" >
-        <echo message="${ant.project.name}: ${ant.file}"/>
-        <echo message="${swhv.bin}" />
+    <target name="compile" depends="init, bootclasspath.check" if="bootclasspath.exists" >
+        <echo message="compile with bootclasspath"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${heksource.bin}" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
+            <compilerarg value="-Xlint:all"/>
+            <compilerarg value="-Xbootclasspath/p:${toString:lib.path.ref}"/>
             <classpath>
                 <fileset dir="${swhv-swek.build}">
                     <include name="**/*.jar" />
@@ -79,6 +83,29 @@
                 <pathelement location="${swhv.bin}" />
             </classpath>
         </javac>
+    </target>
+
+    <target name="compile_without" depends="init, bootclasspath.check" unless="bootclasspath.exists" >
+        <echo message="compile without bootclasspath"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${heksource.bin}" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <compilerarg value="-Xlint:all"/>
+            <classpath>
+                <fileset dir="${swhv-swek.build}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${swhv.lib}" >
+                    <include name="**/*.jar" />
+                </fileset>
+                <pathelement location="${swhv.bin}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="bootclasspath.check">
+        <condition property="bootclasspath.exists">
+            <available file="${env.RT_PATH}" type="dir" />
+        </condition>
     </target>
 
     <target name="jar-bundle" depends="compile">

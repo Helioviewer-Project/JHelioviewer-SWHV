@@ -20,6 +20,10 @@
     <property name="temp" value="${basedir}/temp/"/>
     <property name="bzrpath" value="bzr"/>
     <property name="plugins.dir" value="${user.home}/JHelioviewer-SWHV/Plugins/"/>
+    <property environment="env"/>
+    <path id="lib.path.ref">
+        <fileset dir="${env.RT_PATH}" includes="classes.jar"/>
+    </path>
 
     <!-- Include ant-contrib -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -89,7 +93,25 @@
     </target>
 
     <!-- Compile sources -->
-    <target name="compile" depends="jhv.compile, init">
+    <target name="compile" depends="jhv.compile, init, bootclasspath.check" if="bootclasspath.exists">
+        <echo message="compile with bootclasspath"/>
+        <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source">
+            <compilerarg value="-Xlint:all"/>
+            <compilerarg value="-Xbootclasspath/p:${toString:lib.path.ref}"/>
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <fileset dir="${jhv.lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${jhv.bin}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compile_without" depends="jhv.compile, init, bootclasspath.check" unless="bootclasspath.exists">
+        <echo message="compile without bootclasspath"/>
         <javac srcdir="${src}" destdir="${bin}" target="1.6" source="1.6" debug="on" debuglevel="lines,vars,source">
             <compilerarg value="-Xlint:all"/>
             <classpath>
@@ -104,8 +126,14 @@
         </javac>
     </target>
 
+    <target name="bootclasspath.check">
+        <condition property="bootclasspath.exists">
+            <available file="${env.RT_PATH}" type="dir" />
+        </condition>
+    </target>
+
     <!-- Jar bundle -->
-    <target name="jar-bundle" depends="compile">
+    <target name="jar-bundle" depends="compile, compile_without">
         <!-- JAR File -->
         <jar destfile="${build}/${plugin.name}.jar">
             <manifest>
