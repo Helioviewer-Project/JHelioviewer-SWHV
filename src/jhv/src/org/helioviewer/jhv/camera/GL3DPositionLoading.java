@@ -45,9 +45,9 @@ public class GL3DPositionLoading {
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
     private SwingWorker<Integer, Integer> worker;
-    private final GL3DFollowObjectCamera camera;
+    private final GL3DExpertCamera camera;
 
-    public GL3DPositionLoading(GL3DFollowObjectCamera camera) {
+    public GL3DPositionLoading(GL3DExpertCamera camera) {
         this.camera = camera;
     }
 

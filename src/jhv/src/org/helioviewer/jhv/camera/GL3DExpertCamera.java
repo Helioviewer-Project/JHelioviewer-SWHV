@@ -15,8 +15,8 @@ import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class GL3DFollowObjectCamera extends GL3DCamera implements LayersListener, TimeListener {
-    private final GL3DFollowObjectCameraOptionPanel followObjectCameraOptionPanel;
+public class GL3DExpertCamera extends GL3DCamera implements LayersListener, TimeListener {
+    private final GL3DExpertCameraOptionPanel followObjectCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
@@ -25,9 +25,9 @@ public class GL3DFollowObjectCamera extends GL3DCamera implements LayersListener
     private Date cameraDate;
     private boolean interpolation;
 
-    public GL3DFollowObjectCamera() {
+    public GL3DExpertCamera() {
         super();
-        followObjectCameraOptionPanel = new GL3DFollowObjectCameraOptionPanel(this);
+        followObjectCameraOptionPanel = new GL3DExpertCameraOptionPanel(this);
         positionLoading = new GL3DPositionLoading(this);
         LayersModel.addLayersListener(this);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());

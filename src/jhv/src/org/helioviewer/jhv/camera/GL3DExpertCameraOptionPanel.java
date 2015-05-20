@@ -31,7 +31,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
 
 @SuppressWarnings({"unchecked","serial"})
-public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
+public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;
 
@@ -45,7 +45,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private JSeparatorComboBox objectCombobox;
 
-    private final GL3DFollowObjectCamera camera;
+    private final GL3DExpertCamera camera;
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
@@ -56,7 +56,7 @@ public class GL3DFollowObjectCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private boolean firstComboChanged = false;
 
-    public GL3DFollowObjectCameraOptionPanel(final GL3DFollowObjectCamera camera) {
+    public GL3DExpertCameraOptionPanel(final GL3DExpertCamera camera) {
         super();
         this.camera = camera;
         setLayout(new GridBagLayout());
