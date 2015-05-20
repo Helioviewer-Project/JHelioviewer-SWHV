@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable;
+package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 import java.nio.FloatBuffer;
@@ -18,8 +18,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.jhv.plugin.renderable.Renderable;
-import org.helioviewer.jhv.plugin.renderable.RenderableType;
+import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;

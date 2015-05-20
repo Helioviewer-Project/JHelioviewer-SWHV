@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugin.renderable;
+package org.helioviewer.jhv.renderable.gui;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.renderable.RenderableImageType;
+import org.helioviewer.jhv.renderable.components.RenderableImageType;
 
 import com.jogamp.opengl.GL2;
 

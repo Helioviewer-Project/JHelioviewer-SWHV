@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugin.renderable;
+package org.helioviewer.jhv.renderable.gui;
 
 import java.awt.AlphaComposite;
 import java.awt.Cursor;

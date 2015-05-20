@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.jhv.renderable.RenderableImageLayer;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugin.renderable;
+package org.helioviewer.jhv.renderable.gui;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
