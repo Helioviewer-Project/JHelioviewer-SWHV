@@ -39,7 +39,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -248,6 +248,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public void activeLayerChanged(AbstractView view) {
         if (view != null) {
             setOptionsPanel(view.getImageLayer());
+            ImageViewerGui.getRenderableContainer().fireListeners();
             int index = ImageViewerGui.getRenderableContainer().getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
         } else {
