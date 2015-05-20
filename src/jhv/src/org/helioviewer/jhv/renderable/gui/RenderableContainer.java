@@ -145,7 +145,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         this.removeRenderable(el);
     }
 
-    private void fireListeners() {
+    public void fireListeners() {
         for (TableModelListener listener : this.listeners) {
             TableModelEvent e = new TableModelEvent(this);
             listener.tableChanged(e);
