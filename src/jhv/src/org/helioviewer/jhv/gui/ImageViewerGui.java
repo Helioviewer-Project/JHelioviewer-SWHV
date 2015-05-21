@@ -170,6 +170,9 @@ public class ImageViewerGui {
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
+
+        // force GLCanvas initialisation for pixel scale
+        componentView.display();
     }
 
     private static void prepareGuiExtra() {
