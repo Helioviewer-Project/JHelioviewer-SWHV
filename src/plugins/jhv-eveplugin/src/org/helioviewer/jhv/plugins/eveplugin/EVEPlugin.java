@@ -78,8 +78,12 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
     public void uninstallPlugin() {
         ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
         ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+
         ImageViewerGui.getMainContentPanel().removePlugin(this);
+
         ImageViewerGui.getLeftContentPane().remove(timelinePluginPanel);
+        ImageViewerGui.getLeftContentPane().revalidate();
+        pluginPanes.remove(plotOne);
     }
 
     public static URL getResourceUrl(String name) {
