@@ -271,7 +271,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     public void render(GL2 gl) {
         AbstractView view;
         if (isVisible && (view = LayersModel.getActiveView()) != null) {
-            Date currentDate = view.getMetaData().getDateTime().getTime();
+            Date currentDate = view.getMetaData().getDateObs().getTime();
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
             for (JHVEvent evt : toDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {

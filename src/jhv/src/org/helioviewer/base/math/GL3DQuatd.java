@@ -4,6 +4,8 @@ public class GL3DQuatd {
 
     private static final double EPSILON = 0.000001;
 
+    public static final GL3DQuatd ZERO = new GL3DQuatd();
+
     private double a;
     private GL3DVec3d u;
 

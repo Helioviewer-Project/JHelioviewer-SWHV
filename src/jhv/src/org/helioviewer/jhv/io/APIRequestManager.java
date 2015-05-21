@@ -17,8 +17,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
@@ -64,14 +62,8 @@ public class APIRequestManager {
         try {
             view = loadImage(observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
-                MetaData metaData = view.getMetaData();
-                if (metaData instanceof HelioviewerMetaData) {
-                    HelioviewerMetaData helioviewerMetaData = (HelioviewerMetaData) metaData;
-                    date = helioviewerMetaData.getDateTime().getTime();
-                    readDate = true;
-                } else {
-                    Log.error(">> APIRequestManager.getLatestImageDate() > Could not find Helioviewer meta data in latest image. Use current date as initial end date.", new Exception());
-                }
+                date = view.getMetaData().getDateObs().getTime();
+                readDate = true;
                 if (view instanceof JHVJP2View) {
                     ((JHVJP2View) view).abolish();
                 }

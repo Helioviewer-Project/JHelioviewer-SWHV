@@ -111,10 +111,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            if (jp2Image.metaDataList[++frameNumber].getDateTime() == null) {
-                return;
-            }
-            currentDiff = jp2Image.metaDataList[frameNumber].getDateTime().getMillis() - timeMillis;
+            currentDiff = jp2Image.metaDataList[++frameNumber].getDateObs().getMillis() - timeMillis;
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
@@ -156,7 +153,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public ImmutableDateTime getCurrentFrameDateTime() {
-        return jp2Image.metaDataList[getCurrentFrameNumber()].getDateTime();
+        return jp2Image.metaDataList[getCurrentFrameNumber()].getDateObs();
     }
 
     /**
@@ -164,7 +161,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        return jp2Image.metaDataList[frameNumber].getDateTime();
+        return jp2Image.metaDataList[frameNumber].getDateObs();
     }
 
     /**

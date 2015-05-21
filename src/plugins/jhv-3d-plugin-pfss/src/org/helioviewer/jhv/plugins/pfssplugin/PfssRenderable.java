@@ -44,7 +44,7 @@ public class PfssRenderable implements Renderable, LayersListener {
         if (isVisible && (view = LayersModel.getActiveView()) != null) {
             PfssData pfssData;
 
-            long millis = view.getMetaData().getDateTime().getMillis();
+            long millis = view.getMetaData().getDateObs().getMillis();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);
