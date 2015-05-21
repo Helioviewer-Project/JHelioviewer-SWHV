@@ -27,24 +27,13 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  */
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
 
-    private double dobsRadii;
-
-    private double innerRadius = 0.;
-    private double outerRadius = 40.;
-
     private String instrument = "";
     private String detector = "";
     private String measurement = " ";
     private String observatory = " ";
     private String fullName = "";
 
-    private GL3DQuatd localRotation;
-
-    private double meterPerPixel;
     private GL3DVec2d sunPixelPosition;
-
-    private int pixelWidth;
-    private int pixelHeight;
 
     /**
      * Default constructor.
@@ -149,14 +138,14 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
         // otherwise default epoch
         if (observedDate != null)
-            dateTime = ImmutableDateTime.parseDateTime(observedDate);
+            dateObs = ImmutableDateTime.parseDateTime(observedDate);
     }
 
     private void retrievePosition(MetaDataContainer m) {
-        Date dateObs = dateTime.getTime();
+        Date obsDate = dateObs.getTime();
 
-        if ((dobsRadii = m.tryGetDouble("DSUN_OBS") / Constants.SunRadiusInMeter) == 0) {
-            dobsRadii = Astronomy.getDistanceSolarRadii(dateObs);
+        if ((distanceObsRadii = m.tryGetDouble("DSUN_OBS") / Constants.SunRadiusInMeter) == 0) {
+            distanceObsRadii = Astronomy.getDistanceSolarRadii(obsDate);
         }
 
         double stonyhurstLatitude, theta;
@@ -164,7 +153,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
                 if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
                     // presumably not found
-                    stonyhurstLatitude = Astronomy.getB0Degree(dateObs);
+                    stonyhurstLatitude = Astronomy.getB0Degree(obsDate);
                 }
             }
         }
@@ -174,12 +163,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if ((stonyhurstLongitude = m.tryGetDouble("HGLN_OBS")) == 0) {
             stonyhurstLongitude = m.tryGetDouble("REF_L0");
             if (stonyhurstLongitude != 0) {
-                stonyhurstLongitude -= Astronomy.getL0Degree(dateObs);
+                stonyhurstLongitude -= Astronomy.getL0Degree(obsDate);
             }
         }
-        phi = Astronomy.getL0Radians(dateObs) - stonyhurstLongitude / MathUtils.radeg;
+        phi = Astronomy.getL0Radians(obsDate) - stonyhurstLongitude / MathUtils.radeg;
 
-        localRotation = new GL3DQuatd(theta, phi);
+        rotationObs = new GL3DQuatd(theta, phi);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
@@ -198,7 +187,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan2(1., dobsRadii) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(1., distanceObsRadii) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
         } else if (instrument.equals("EIT")) {
             newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
@@ -237,16 +226,17 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         double sunY = m.tryGetDouble("CRPIX2") - 1;
         sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
-        meterPerPixel = Constants.SunRadius / newSolarPixelRadius;
-        setPhysicalLowerLeftCorner(new GL3DVec2d(-meterPerPixel * sunX, -meterPerPixel * sunY));
-        setPhysicalSize(new GL3DVec2d(pixelWidth * meterPerPixel, pixelHeight * meterPerPixel));
+        // meter / pixel
+        unitPerPixel = Constants.SunRadius / newSolarPixelRadius;
+        setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
+        setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return new Region((roi.x / zoompercent - sunPixelPosition.x) * meterPerPixel,
-                          (roi.y / zoompercent - sunPixelPosition.y) * meterPerPixel,
-                          roi.width * meterPerPixel / zoompercent,
-                          roi.height * meterPerPixel / zoompercent);
+        return new Region((roi.x / zoompercent - sunPixelPosition.x) * unitPerPixel,
+                          (roi.y / zoompercent - sunPixelPosition.y) * unitPerPixel,
+                          roi.width * unitPerPixel / zoompercent,
+                          roi.height * unitPerPixel / zoompercent);
     }
 
     /**
@@ -281,44 +271,12 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         return observatory;
     }
 
-    @Override
-    public String getFullName() {
-        return fullName;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public double getUnitsPerPixel() {
-        return meterPerPixel;
-    }
-
-    @Override
-    public GL3DQuatd getLocalRotation() {
-        return localRotation;
-    }
-
-    @Override
-    public int getPixelHeight() {
-        return pixelHeight;
-    }
-
-    @Override
-    public int getPixelWidth() {
-        return pixelWidth;
-    }
-
-    public double getDistanceSolarRadii() {
-        return dobsRadii;
-    }
-
-    public double getInnerPhysicalOcculterRadius() {
-        return innerRadius;
-    }
-
-    public double getOuterPhysicalOcculterRadius() {
-        return outerRadius;
+    public String getFullName() {
+        return fullName;
     }
 
 }

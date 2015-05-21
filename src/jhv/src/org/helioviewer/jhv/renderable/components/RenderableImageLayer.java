@@ -419,7 +419,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public String getTimeString() {
-        return mainLayerView.getMetaData().getDateTime().getCachedDate();
+        return mainLayerView.getMetaData().getDateObs().getCachedDate();
     }
 
     public AbstractView getMainLayerView() {

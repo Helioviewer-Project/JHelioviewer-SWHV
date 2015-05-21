@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -80,12 +79,12 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
 
     private void updateRotation(Date date) {
         double d;
-        MetaData metadata;
         AbstractView view = LayersModel.getActiveView();
 
-        if (view != null && (metadata = view.getMetaData()) instanceof HelioviewerMetaData) {
-            this.localRotation = metadata.getLocalRotation();
-            d = ((HelioviewerMetaData) metadata).getDistanceSolarRadii();
+        if (view != null) {
+            MetaData metadata = view.getMetaData();
+            this.localRotation = metadata.getRotationObs();
+            d = metadata.getDistanceObsRadii();
         } else {
             this.localRotation = new GL3DQuatd(0, Astronomy.getL0Radians(date), 0);
             d = Astronomy.getDistanceSolarRadii(date);

@@ -560,7 +560,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
         newImageData.setFrameNumber(compositionLayer);
-        newImageData.setLocalRotation(metaData.getLocalRotation());
+        newImageData.setLocalRotation(metaData.getRotationObs());
 
         if (metaData instanceof HelioviewerMetaData) {
             HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
@@ -580,7 +580,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
 
         imageData = newImageData;
 
-        fireFrameChanged(this, metaData.getDateTime());
+        fireFrameChanged(this, metaData.getDateObs());
     }
 
     protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {

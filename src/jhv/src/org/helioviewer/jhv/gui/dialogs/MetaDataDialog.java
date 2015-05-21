@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -32,6 +31,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -197,8 +197,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("Instrument  : " + m.getInstrument());
             addDataItem("Detector    : " + m.getDetector());
             addDataItem("Measurement : " + m.getMeasurement());
-            addDataItem("Date        : " + m.getDateTime().getFormattedDate());
-            addDataItem("Time        : " + m.getDateTime().getFormattedTime());
+            addDataItem("Date        : " + m.getDateObs().getFormattedDate());
+            addDataItem("Time        : " + m.getDateObs().getFormattedTime());
 
             String xmlText = null;
             if (v instanceof JHVJP2View) {
@@ -237,14 +237,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
                     // set the xml data for the MetaDataDialog
                     xmlDoc = doc;
-
-                    // set the export file name for
-                    // MetaDataDialog
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss'Z'");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + " " + dateFormat.format(m.getDateTime().getTime()) + ".fits.xml";
-
+                    // export file name
+                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + ImmutableDateTime.filenameDateFormat.format(m.getDateObs().getTime()) + ".fits.xml";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -275,12 +269,10 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("      Helioviewer Header");
             addDataItem("-------------------------------");
         } else {
-
             String tab = "";
             for (int i = 0; i < indent; i++) {
                 tab = tab + "\t";
             }
-
             addDataItem(tab + nodeName + ": " + nodeValue);
         }
 

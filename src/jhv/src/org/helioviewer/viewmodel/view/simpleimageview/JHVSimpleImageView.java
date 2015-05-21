@@ -128,7 +128,7 @@ public class JHVSimpleImageView extends AbstractView {
             }
             region = new Region(-1.5, -1.5, 3., 3.);
             subImageData.setRegion(region);
-            subImageData.setLocalRotation(m.getLocalRotation());
+            subImageData.setLocalRotation(m.getRotationObs());
         } else {
             subImageData = null;
         }

@@ -70,7 +70,7 @@ public class LayersModel {
         if (view instanceof JHVJPXView) {
             result = ((JHVJPXView) view).getFrameDateTime(0);
         } else {
-            result = view.getMetaData().getDateTime();
+            result = view.getMetaData().getDateObs();
         }
         return result;
     }
@@ -83,7 +83,7 @@ public class LayersModel {
             int lastFrame = tmv.getMaximumFrameNumber();
             result = tmv.getFrameDateTime(lastFrame);
         } else {
-            result = view.getMetaData().getDateTime();
+            result = view.getMetaData().getDateObs();
         }
         return result;
     }

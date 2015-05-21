@@ -48,15 +48,15 @@ public interface MetaData {
      * @return height of the image in pixels
      */
     public int getPixelHeight();
-    /**
-     * Returns the conversion factor from pixels to a physical unit.
-     *
-     * @return conversion factor from pixels to a physical unit.
-     */
-    public double getUnitsPerPixel();
 
-    public ImmutableDateTime getDateTime();
+    public ImmutableDateTime getDateObs();
 
-    public GL3DQuatd getLocalRotation();
+    public GL3DQuatd getRotationObs();
+
+    public double getDistanceObsRadii();
+
+    public double getInnerPhysicalOcculterRadius();
+
+    public double getOuterPhysicalOcculterRadius();
 
 }

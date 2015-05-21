@@ -1,29 +1,25 @@
 package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.jhv.display.Displayer;
 
-/**
- * Abstract base class implementing MetaData.
- *
- * <p>
- * This class implements the all functions of meta data. The lower left corner
- * and the size are saved, which contains all information needed. The other
- * corners are calculates based on the lower left corner and the size.
- *
- * @author Ludwig Schmidt
- *
- */
 public abstract class AbstractMetaData implements MetaData {
 
     private GL3DVec2d lowerLeftCorner;
     private GL3DVec2d sizeVector;
-    protected ImmutableDateTime dateTime = Displayer.epochDateTime;
 
-    /**
-     * Default constructor, does not set size or position.
-     */
+    protected int pixelWidth;
+    protected int pixelHeight;
+
+    protected ImmutableDateTime dateObs = Displayer.epoch;
+    protected GL3DQuatd rotationObs = GL3DQuatd.ZERO;
+    protected double distanceObsRadii = 1.;
+    protected double innerRadius = 0.;
+    protected double outerRadius = 40.;
+    protected double unitPerPixel = 1.;
+
     public AbstractMetaData() {
         lowerLeftCorner = null;
         sizeVector = null;
@@ -47,27 +43,6 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GL3DVec2d getPhysicalLowerLeft() {
-        return lowerLeftCorner;
-    }
-
-    @Override
-    public GL3DVec2d getPhysicalUpperLeft() {
-        return new GL3DVec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GL3DVec2d getPhysicalSize() {
-        return sizeVector;
-    }
-
-    /**
      * Sets the physical size of the corresponding image.
      *
      * @param newImageSize
@@ -88,8 +63,53 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public ImmutableDateTime getDateTime() {
-        return dateTime;
+    public GL3DVec2d getPhysicalLowerLeft() {
+        return lowerLeftCorner;
+    }
+
+    @Override
+    public GL3DVec2d getPhysicalUpperLeft() {
+        return new GL3DVec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    }
+
+    @Override
+    public GL3DVec2d getPhysicalSize() {
+        return sizeVector;
+    }
+
+    @Override
+    public int getPixelWidth() {
+        return pixelWidth;
+    }
+
+    @Override
+    public int getPixelHeight() {
+        return pixelHeight;
+    }
+
+    @Override
+    public ImmutableDateTime getDateObs() {
+        return dateObs;
+    }
+
+    @Override
+    public GL3DQuatd getRotationObs() {
+        return rotationObs;
+    }
+
+    @Override
+    public double getDistanceObsRadii() {
+        return distanceObsRadii;
+    }
+
+    @Override
+    public double getInnerPhysicalOcculterRadius() {
+        return innerRadius;
+    }
+
+    @Override
+    public double getOuterPhysicalOcculterRadius() {
+        return outerRadius;
     }
 
 }

@@ -598,11 +598,11 @@ class J2KRender implements Runnable {
 
     private class AbsoluteFrameChooser implements FrameChooser {
 
-        private long absoluteStartTime = parentViewRef.jp2Image.metaDataList[currParams.compositionLayer].getDateTime().getMillis();
+        private long absoluteStartTime = parentViewRef.jp2Image.metaDataList[currParams.compositionLayer].getDateObs().getMillis();
         private long systemStartTime = System.currentTimeMillis();
 
         public void resetStartTime(int frameNumber) {
-            absoluteStartTime = parentViewRef.jp2Image.metaDataList[frameNumber].getDateTime().getMillis();
+            absoluteStartTime = parentViewRef.jp2Image.metaDataList[frameNumber].getDateObs().getMillis();
             systemStartTime = System.currentTimeMillis();
         }
 
@@ -616,7 +616,7 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(parentViewRef.jp2Image.metaDataList[nextCandidate].getDateTime().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(parentViewRef.jp2Image.metaDataList[nextCandidate].getDateObs().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {
