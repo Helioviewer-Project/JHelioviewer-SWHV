@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -42,7 +41,7 @@ public class ZoomOneToOneAction extends AbstractAction {
         AbstractView view = LayersModel.getActiveView();
         if (view != null) {
             GL3DCamera camera = Displayer.getActiveCamera();
-            double imageFraction = Displayer.getViewportHeight() / (double) ((HelioviewerMetaData) view.getMetaData()).getPixelHeight();
+            double imageFraction = Displayer.getViewportHeight() / (double) view.getMetaData().getPixelHeight();
             double fov = 2. * Math.atan(-view.getMetaData().getPhysicalSize().y * imageFraction / 2. / camera.getTranslation().z);
             camera.setCameraFOV(fov);
             Displayer.display();
