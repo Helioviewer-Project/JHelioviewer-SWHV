@@ -166,13 +166,12 @@ public class ImageViewerGui {
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
         prepareGuiExtra();
+    }
 
+    public static void showMainFrame() {
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
-
-        // force GLCanvas initialisation for pixel scale
-        componentView.display();
     }
 
     private static void prepareGuiExtra() {
