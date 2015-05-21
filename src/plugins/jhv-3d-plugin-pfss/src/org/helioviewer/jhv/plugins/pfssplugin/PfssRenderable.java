@@ -77,7 +77,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public String getName() {
-        return "PFSS data";
+        return "PFSS model";
     }
 
     @Override

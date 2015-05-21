@@ -60,10 +60,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
                 pluginPanes.add(plotOne);
 
                 ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
-                ImageViewerGui.getLeftContentPane().revalidate();
-
                 ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-                ImageViewerGui.getMainContentPanel().revalidate();
 
                 ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
                 ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());

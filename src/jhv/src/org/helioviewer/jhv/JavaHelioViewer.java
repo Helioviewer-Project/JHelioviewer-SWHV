@@ -127,14 +127,21 @@ public class JavaHelioViewer {
                 JHVLoader.loadRemotePlugins(args);
             } else {
                 Log.info("Load bundled plugins");
-                JHVLoader.loadBundledPlugin("PfssPlugin.jar");
-                JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
                 JHVLoader.loadBundledPlugin("EVEPlugin.jar");
                 JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
+                JHVLoader.loadBundledPlugin("PfssPlugin.jar");
+                JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    ImageViewerGui.showMainFrame();
+                }
+        });
     }
 
 }
