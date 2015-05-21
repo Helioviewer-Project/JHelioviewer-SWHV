@@ -7,7 +7,6 @@ import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -261,15 +260,8 @@ public abstract class AbstractView implements View {
             GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
         }
 
-        double innerCutOff = 0;
-        double outerCutOff = 40;
         MetaData metadata = getMetaData();
-        if (metadata instanceof HelioviewerMetaData) {
-            HelioviewerMetaData md = (HelioviewerMetaData) metadata;
-            innerCutOff = md.getInnerPhysicalOcculterRadius();
-            outerCutOff = md.getOuterPhysicalOcculterRadius();
-        }
-        GLSLShader.setCutOffRadius(innerCutOff, outerCutOff);
+        GLSLShader.setCutOffRadius(metadata.getInnerPhysicalOcculterRadius(), metadata.getOuterPhysicalOcculterRadius());
     }
 
     public void setImageLayer(RenderableImageLayer imageLayer) {
