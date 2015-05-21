@@ -53,10 +53,10 @@ public interface MetaData {
 
     public GL3DQuatd getRotationObs();
 
-    public double getDistanceObsRadii();
+    public double getDistanceObs();
 
-    public double getInnerPhysicalOcculterRadius();
+    public double getInnerCutOffRadius();
 
-    public double getOuterPhysicalOcculterRadius();
+    public double getOuterCutOffRadius();
 
 }

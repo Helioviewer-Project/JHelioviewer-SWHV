@@ -261,7 +261,7 @@ public abstract class AbstractView implements View {
         }
 
         MetaData metadata = getMetaData();
-        GLSLShader.setCutOffRadius(metadata.getInnerPhysicalOcculterRadius(), metadata.getOuterPhysicalOcculterRadius());
+        GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
     }
 
     public void setImageLayer(RenderableImageLayer imageLayer) {

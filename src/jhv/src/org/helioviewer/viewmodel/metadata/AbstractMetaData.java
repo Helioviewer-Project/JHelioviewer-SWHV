@@ -16,7 +16,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     protected ImmutableDateTime dateObs = Displayer.epoch;
     protected GL3DQuatd rotationObs = GL3DQuatd.ZERO;
-    protected double distanceObsRadii = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
+    protected double distanceObs = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
     protected double innerRadius = 0.;
     protected double outerRadius = 40.;
     protected double unitPerPixel = 1.;
@@ -99,17 +99,17 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public double getDistanceObsRadii() {
-        return distanceObsRadii;
+    public double getDistanceObs() {
+        return distanceObs;
     }
 
     @Override
-    public double getInnerPhysicalOcculterRadius() {
+    public double getInnerCutOffRadius() {
         return innerRadius;
     }
 
     @Override
-    public double getOuterPhysicalOcculterRadius() {
+    public double getOuterCutOffRadius() {
         return outerRadius;
     }
 
