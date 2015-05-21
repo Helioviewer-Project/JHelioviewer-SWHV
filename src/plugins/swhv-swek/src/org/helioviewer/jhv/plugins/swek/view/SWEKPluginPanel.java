@@ -34,9 +34,6 @@ public class SWEKPluginPanel extends JPanel implements SWEKTreeModelListener {
         treeModelInstance = SWEKTreeModel.getSingletonInstance();
         treeModelInstance.addSWEKTreeModelListener(this);
         initVisualComponents();
-        this.revalidate();
-        this.repaint();
-
     }
 
     /**

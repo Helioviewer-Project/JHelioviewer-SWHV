@@ -81,9 +81,16 @@ public class SWEKPlugin implements Plugin {
             protected void done() {
                 eventContainer.registerHandler(incomingRequestManager);
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), false);
+                ImageViewerGui.getLeftContentPane().revalidate();
             }
         };
         loadPlugin.execute();
+    }
+
+    @Override
+    public void uninstallPlugin() {
+        ImageViewerGui.getLeftContentPane().remove(SWEKPluginPanel.getSWEKPluginPanelInstance());
+        ImageViewerGui.getLeftContentPane().revalidate();
     }
 
     /*
@@ -127,10 +134,6 @@ public class SWEKPlugin implements Plugin {
         if (!swekSourceJarDirectory.isDirectory()) {
             swekSourceJarDirectory.mkdirs();
         }
-    }
-
-    @Override
-    public void uninstallPlugin() {
     }
 
 }
