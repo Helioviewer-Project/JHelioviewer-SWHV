@@ -38,7 +38,7 @@ public class PluginSettings {
 
     private static final String PLUGIN_FILENAME = "PluginProperties.xml";
 
-    private static PluginSettings singeltonInstance = new PluginSettings();
+    private static PluginSettings singletonInstance = new PluginSettings();
 
     private String settingsFileName;
 
@@ -63,7 +63,7 @@ public class PluginSettings {
      * @return the only instance of this class.
      * */
     public static PluginSettings getSingletonInstance() {
-        return singeltonInstance;
+        return singletonInstance;
     }
 
     /**
@@ -258,7 +258,7 @@ public class PluginSettings {
     public boolean isPluginActivated(URI pluginLocation) {
         // This is to activate plugins automatically during the debugging phase
         // in eclipse
-        if (pluginLocation == null || pluginsRootNode == null) {
+        if (pluginLocation == null) {
             return true;
         }
 

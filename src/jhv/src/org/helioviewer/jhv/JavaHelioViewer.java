@@ -9,6 +9,7 @@ import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.CommandLineProcessor;
+import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.J2KRenderGlobalOptions;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
@@ -118,6 +119,9 @@ public class JavaHelioViewer {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        Log.info("Load plugin settings");
+        PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
 
         try {
             if (args.length != 0 && args[0].equals("--exclude-plugins")) {

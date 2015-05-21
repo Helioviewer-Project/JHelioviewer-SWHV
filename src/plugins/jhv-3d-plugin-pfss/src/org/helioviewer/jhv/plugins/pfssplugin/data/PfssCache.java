@@ -14,16 +14,6 @@ public class PfssCache {
     private final PfssData[] data = new PfssData[PfssSettings.CACHE_SIZE];
     private int numberOfElementsInCache = 0;
 
-    /**
-     * The private constructor to support the singleton pattern.
-     * */
-    public PfssCache() {
-    }
-
-    public void preloadData(long time, String url) {
-
-    }
-
     public void addData(PfssData pfssData) {
         if (numberOfElementsInCache < PfssSettings.CACHE_SIZE) {
             this.data[numberOfElementsInCache] = pfssData;

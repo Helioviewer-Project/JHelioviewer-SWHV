@@ -119,7 +119,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getState() {
-        return "";
+        return null;
     }
 
 }
