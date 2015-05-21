@@ -105,7 +105,6 @@ public class ImageViewerGui {
 
         JMenuBar menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
-        observationDialog = new ObservationDialog(mainFrame);
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         mainFrame.setContentPane(contentPanel);
@@ -128,6 +127,7 @@ public class ImageViewerGui {
 
         // Layer control
         imageObservationPanel = new ImageDataPanel();
+        observationDialog = new ObservationDialog(mainFrame);
         observationDialog.addUserInterface("Image data", imageObservationPanel);
 
         renderableContainer = new RenderableContainer();
@@ -170,6 +170,9 @@ public class ImageViewerGui {
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
+
+        // force GLCanvas initialisation for pixel scale
+        componentView.display();
     }
 
     private static void prepareGuiExtra() {

@@ -73,10 +73,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
         canvas = new GLCanvas(caps);
         // GUI events can lead to context destruction and invalidation of GL objects and state
         canvas.setSharedAutoDrawable(sharedDrawable);
-
         canvas.setMinimumSize(new Dimension(1, 1));
-        canvas.addGLEventListener(this);
 
+        canvas.addGLEventListener(this);
         Displayer.setDisplayListener(this);
     }
 
