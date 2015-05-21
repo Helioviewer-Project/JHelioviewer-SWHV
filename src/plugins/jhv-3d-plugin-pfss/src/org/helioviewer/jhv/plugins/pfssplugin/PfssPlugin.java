@@ -42,6 +42,7 @@ public class PfssPlugin implements Plugin {
     @Override
     public void installPlugin() {
         renderable = new PfssRenderable();
+        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override

@@ -33,8 +33,7 @@ public class PfssRenderable implements Renderable, LayersListener {
      */
     public PfssRenderable() {
         type = new RenderableType("PFSS plugin");
-        this.optionsPanel = new PfssPluginPanel();
-        ImageViewerGui.getRenderableContainer().addRenderable(this);
+        optionsPanel = new PfssPluginPanel();
         LayersModel.addLayersListener(this);
     }
 

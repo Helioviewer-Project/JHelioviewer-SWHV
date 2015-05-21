@@ -39,8 +39,9 @@ public class SWHVHEKPlugin implements Plugin {
      */
     @Override
     public void installPlugin() {
-        controller = new SWHVHEKImagePanelEventPopupController();
         renderable = new SWHVHEKPluginRenderable();
+        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
+        controller = new SWHVHEKImagePanelEventPopupController();
         ImageViewerGui.getInputController().addPlugin(controller);
     }
 
