@@ -74,10 +74,9 @@ public class MainContentPanel extends JPanel implements ActionListener {
      *            Plugin to be removed from the container.
      * */
     public void removePlugin(MainContentPanelPlugin plugin) {
-        if (!pluginList.remove(plugin)) {
-            return;
+        if (pluginList.remove(plugin)) {
+            updateLayout();
         }
-        updateLayout();
     }
 
     /**
