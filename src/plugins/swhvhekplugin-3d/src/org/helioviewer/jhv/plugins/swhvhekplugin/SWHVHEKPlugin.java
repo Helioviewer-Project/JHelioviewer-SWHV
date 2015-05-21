@@ -3,30 +3,37 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 public class SWHVHEKPlugin implements Plugin {
 
+    private static SWHVHEKData swekData;
     private SWHVHEKPluginRenderable renderable;
     private SWHVHEKImagePanelEventPopupController controller;
 
     public SWHVHEKPlugin() {
-        SWHVHEKData.getSingletonInstance();
         renderable = new SWHVHEKPluginRenderable();
+    }
+
+    public static SWHVHEKData getSWEKData() {
+        return swekData;
     }
 
     @Override
     public void installPlugin() {
-        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
         controller = new SWHVHEKImagePanelEventPopupController();
         ImageViewerGui.getInputController().addPlugin(controller);
+        LayersModel.addLayersListener(SWHVHEKData.getSingletonInstance());
+        ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
     public void uninstallPlugin() {
+        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
+        LayersModel.removeLayersListener(SWHVHEKData.getSingletonInstance());
         ImageViewerGui.getInputController().removePlugin(controller);
         controller = null;
-        ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
     }
 
     @Override
