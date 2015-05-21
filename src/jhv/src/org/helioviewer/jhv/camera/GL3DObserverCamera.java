@@ -84,7 +84,7 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
         if (view != null) {
             MetaData metadata = view.getMetaData();
             this.localRotation = metadata.getRotationObs();
-            d = metadata.getDistanceObsRadii();
+            d = metadata.getDistanceObs();
         } else {
             this.localRotation = new GL3DQuatd(0, Astronomy.getL0Radians(date), 0);
             d = Astronomy.getDistanceSolarRadii(date);
