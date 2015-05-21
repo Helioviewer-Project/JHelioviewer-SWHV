@@ -109,10 +109,6 @@ public class JHVLoader {
             }
         }
 
-        // Load Plug ins at the very last point
-        Log.info("Load plugin settings");
-        PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
-
         Set<String> deactivedPlugins = new HashSet<String>();
 
         for (int i = 0; i < args.length - 1; ++i) {
