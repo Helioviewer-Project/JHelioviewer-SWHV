@@ -13,25 +13,45 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 public class JHVJP2CallistoView extends JHVJP2View {
 
+    private boolean viewportSet;
+    private boolean regionSet;
     private JHVJP2CallistoViewDataHandler dataHandler;
 
     public JHVJP2CallistoView() {
         region = new Region(0, 0, 86400, 380);
         viewport = new Viewport(2700, 12);
+        viewportSet = false;
+        regionSet = false;
     }
 
     @Override
     public boolean setViewport(Viewport v) {
+        boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
+        viewportSet = true;
         viewport = v;
-        renderRequestedSignal.signal(RenderReasons.OTHER);
-        return true;
+
+        if (regionSet) {
+            if (setImageViewParams(calculateParameter())) {
+                return true;
+            } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
+                renderRequestedSignal.signal(RenderReasons.OTHER);
+                return true;
+            }
+        }
+
+        return viewportChanged;
     }
 
     @Override
     public boolean setRegion(Region r) {
+        boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        setImageViewParams(calculateParameter());
-        return true;
+        regionSet = true;
+        if (viewportSet) {
+            changed |= setImageViewParams(calculateParameter());
+        }
+
+        return changed;
     }
 
     @Override
