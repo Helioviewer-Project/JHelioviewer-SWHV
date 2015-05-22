@@ -24,17 +24,17 @@
                         <fileset dir="." includes="*/build.xml" />
                 </subant>
         </target>
-        
+
         <target name="copy-to-root-build">
                 <subant target="copy-to-root-build" >
                         <fileset dir="." includes="*/build.xml" />
                 </subant>
         </target>
-        
+
         <target name="install-plugins" >
                 <subant target="install-plugin" >
                         <fileset dir="." includes="*/build.xml" />
                 </subant>
-        </target>               
+        </target>
 
 </project>
