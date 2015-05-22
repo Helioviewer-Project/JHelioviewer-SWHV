@@ -27,4 +27,5 @@ public interface JHVEventHandler {
      * 
      */
     public abstract void cacheUpdated();
+
 }

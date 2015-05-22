@@ -205,7 +205,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
         Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
         if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
-            precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents());
+            precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", precedingEvents);
         }
 
         Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
