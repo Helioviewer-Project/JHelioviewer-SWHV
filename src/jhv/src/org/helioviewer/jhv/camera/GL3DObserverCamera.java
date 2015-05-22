@@ -7,27 +7,19 @@ import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
+public class GL3DObserverCamera extends GL3DCamera {
 
     private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;
 
-    public GL3DObserverCamera(boolean init) {
+    public GL3DObserverCamera() {
         super();
         observerCameraOptionPanel = new GL3DObserverCameraOptionPanel(this);
-        if (init) {
-            Displayer.addFirstTimeListener(this);
-        }
-    }
-
-    public GL3DObserverCamera() {
-        this(false);
     }
 
     @Override
@@ -43,14 +35,11 @@ public class GL3DObserverCamera extends GL3DCamera implements TimeListener {
             this.timeChanged(Displayer.getLastUpdatedTimestamp());
         else
             this.timeChanged(new Date());
-
-        Displayer.addFirstTimeListener(this);
     }
 
     @Override
     public void deactivate() {
         super.deactivate();
-        Displayer.removeTimeListener(this);
     }
 
     @Override

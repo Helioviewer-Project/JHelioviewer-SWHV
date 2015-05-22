@@ -7,7 +7,6 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -15,7 +14,7 @@ import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
-public class GL3DExpertCamera extends GL3DCamera implements LayersListener, TimeListener {
+public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     private final GL3DExpertCameraOptionPanel followObjectCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
@@ -47,13 +46,11 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener, Time
         super.activate(precedingCamera);
         this.activeLayerChanged(LayersModel.getActiveView());
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        Displayer.addFirstTimeListener(this);
     }
 
     @Override
     public void deactivate() {
         super.deactivate();
-        Displayer.removeTimeListener(this);
     }
 
     @Override
