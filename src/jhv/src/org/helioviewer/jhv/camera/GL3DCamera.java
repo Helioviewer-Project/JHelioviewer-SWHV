@@ -208,9 +208,11 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        GL3DVec2d normalizedScreenpos = new GL3DVec2d(2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5));
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
@@ -222,9 +224,11 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
-        GL3DVec2d normalizedScreenpos = new GL3DVec2d(2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5));
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
@@ -236,9 +240,11 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     public GL3DVec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
-        GL3DVec2d normalizedScreenpos = new GL3DVec2d(2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5), -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5));
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= Sun.Radius2 / 2.) {
