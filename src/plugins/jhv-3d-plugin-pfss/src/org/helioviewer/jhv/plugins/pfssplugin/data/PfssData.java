@@ -3,9 +3,7 @@ package org.helioviewer.jhv.plugins.pfssplugin.data;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
@@ -118,10 +116,10 @@ public class PfssData {
             this.dateString = date.substring(11, 30);
 
             Date dd = TimeUtils.utcDateFormat.parse(dateString);
-            this.createBuffer(fieldlinex.length);
-            Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(dd.getTime());
             double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;
+            double sphi = Math.sin(phi), cphi = Math.cos(phi);
+
+            this.createBuffer(fieldlinex.length);
 
             for (int i = 0; i < fieldlinex.length; i++) {
                 if (i / PfssSettings.POINTS_PER_LINE % 9 <= 8 - PfssSettings.qualityReduction) {
@@ -133,8 +131,8 @@ public class PfssData {
                     y = 3. * (ry * 2. / 65535 - 1.);
                     z = 3. * (rz * 2. / 65535 - 1.);
 
-                    double helpx = Math.cos(phi) * x + Math.sin(phi) * y;
-                    double helpy = -Math.sin(phi) * x + Math.cos(phi) * y;
+                    double helpx = cphi * x + sphi * y;
+                    double helpy = -sphi * x + cphi * y;
                     x = helpx;
                     y = helpy;
 
@@ -166,7 +164,6 @@ public class PfssData {
                                 type = 2;
                                 counter = this.addColor(PfssData.OPENFIELDCOLOR, counter);
                             }
-
                         }
                     } else if (i % PfssSettings.POINTS_PER_LINE == PfssSettings.POINTS_PER_LINE - 1) {
                         counter = this.addVertex((float) x, (float) z, (float) -y, counter);
