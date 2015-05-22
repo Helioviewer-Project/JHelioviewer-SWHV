@@ -60,7 +60,7 @@ public class GL3DEarthCamera extends GL3DCamera {
     }
 
     private void updateRotation(Date date) {
-        double b = Astronomy.getB0(date);
+        double b = Astronomy.getBL(date);
         double l = Astronomy.getL0Radians(date);
         double d = Astronomy.getDistanceSolarRadii(date);
 

@@ -14,14 +14,22 @@ public class Astronomy {
 
     private static final Calendar calendar = new GregorianCalendar();
 
-    public static double getDistanceSolarRadii(Date date) {
+    private static double date2mjd(Date date) {
         calendar.setTime(date);
         int y = calendar.get(Calendar.YEAR);
         int m = calendar.get(Calendar.MONTH) + 1;
         int d = calendar.get(Calendar.DATE);
         double f = DateUtils.getFragmentInMilliseconds(calendar, Calendar.DATE) / (double) DateUtils.MILLIS_PER_DAY;
 
-        double t = (JulianDay.DJM0 - 2415020.) / 36525. + (JulianDay.cal2mjd(y, m, d) + f) / 36525.;
+        return JulianDay.cal2mjd(y, m, d) + f;
+    }
+
+    private static double mjd2jcy(double mjd, double epoch) {
+        return (JulianDay.DJM0 - epoch) / 36525. + mjd / 36525.;
+    }
+
+    public static double getDistanceSolarRadii(Date date) {
+        double t = mjd2jcy(date2mjd(date), 2415020.);
 
         double L0 = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
         L0 = L0 % 360.;
@@ -33,14 +41,9 @@ public class Astronomy {
         return R * Sun.MeanEarthDistance;
     }
 
-    public static double getB0(Date date) {
-        calendar.setTime(date);
-        int y = calendar.get(Calendar.YEAR);
-        int m = calendar.get(Calendar.MONTH) + 1;
-        int d = calendar.get(Calendar.DATE);
-        double f = DateUtils.getFragmentInMilliseconds(calendar, Calendar.DATE) / (double) DateUtils.MILLIS_PER_DAY;
-
-        double t = (JulianDay.DJM0 - 2415020.) / 36525. + (JulianDay.cal2mjd(y, m, d) + f) / 36525.;
+    public static double getBL(Date date) {
+        double mjd = date2mjd(date);
+        double t = mjd2jcy(mjd, 2415020.);
 
         double mnl = 279.69668 + 36000.76892 * t + 0.0003025 * t * t;
         mnl = MathUtils.mapTo0To360(mnl);
@@ -63,17 +66,21 @@ public class Astronomy {
 
         double he_lat = Math.asin(Math.sin(diff) * Math.sin(i / MathUtils.radeg));
 
+        /*
+        double y = -Math.sin(diff) * Math.cos(i / MathUtils.radeg);
+        double x = -Math.cos(diff);
+        double eta = MathUtils.mapTo0To360(Math.atan2(y, x) * MathUtils.radeg);
+        double theta = ((JulianDay.DJM0 - 2398220.) + mjd) * 360. / 25.38;
+        double he_lon = MathUtils.mapTo0To360(eta - theta);
+        */
+
         return he_lat;
     }
 
-    public static double ymd2jd(int y, int m, int d) {
-        double jd = 367 * y - 7 * (y + (m + 9) / 12) / 4 - 3 * ((y + (m - 9) / 7) / 100 + 1) / 4 + 275 * m / 9 + d + 1721029. - 0.5;
-        return jd;
-    }
+    public static double getL0Degree(Date date) {
+        double mjd = date2mjd(date);
+        double t = mjd2jcy(mjd, 2451545.);
 
-    public static double getL0Degree(int year, int month, int day, double et) {
-        double jd = ymd2jd(year, month, day) + et / 24.;
-        double t = (jd - 2451545.) / 36525.;
         double mnl = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
         mnl = mnl % 360.;
         double mna = 357.52910 + 35999.05030 * t - 0.0001559 * t * t - 0.0000048 * t * t * t;
@@ -89,8 +96,8 @@ public class Astronomy {
         double Lpt = 218.3165 + 481267.8813 * t;
         double ob1t = ob1 + 9.2 / 3600. * Math.cos(ob1tom / MathUtils.radeg) + 0.57 / 3600. * Math.cos(2 * Lt / MathUtils.radeg) + 0.1 / 3600. * Math.cos(2 * Lpt / MathUtils.radeg) - 0.09 / 3600. * Math.cos(2 * ob1tom / MathUtils.radeg);
         //double deps = 9.2 / 3600. * Math.cos(ob1tom) + 0.57 / 3600. * Math.cos(2 * Lt) + 0.1 / 3600. * Math.cos(2 * Lpt) - 0.09 / 3600. * Math.cos(2 * ob1tom);
-        double theta = (jd - 2398220.) * 360. / 25.38;
-        double k = 73.6667 + 1.3958333 * (jd - 2396758.) / 36525.;
+        double theta = ((JulianDay.DJM0 - 2398220.) + mjd) * 360. / 25.38;
+        double k = 73.6667 + 1.3958333 * mjd2jcy(mjd, 2396758.);
         double i = 7.25;
         double lamda = true_long - 0.005705;
         double lamda2 = lamda - 0.00478 * Math.sin(omega / MathUtils.radeg);
@@ -106,15 +113,7 @@ public class Astronomy {
     }
 
     public static double getL0Radians(Date date) {
-        calendar.setTime(date);
-        int nosecs = calendar.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
-        return -Math.PI / 180. * getL0Degree(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), (nosecs) / 60. / 60.);
-    }
-
-    public static double getL0Degree(Date date) {
-        calendar.setTime(date);
-        int nosecs = calendar.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
-        return getL0Degree(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), (nosecs) / 60. / 60.);
+        return -Math.PI / 180. * getL0Degree(date);
     }
 
 }

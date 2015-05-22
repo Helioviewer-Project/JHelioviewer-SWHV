@@ -108,7 +108,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             }
         } else if (date != null) {
             currentL = 0;
-            currentB = Astronomy.getB0(date);
+            currentB = Astronomy.getBL(date);
             currentDistance = Astronomy.getDistanceSolarRadii(date);
             updateRotation(date);
         }
