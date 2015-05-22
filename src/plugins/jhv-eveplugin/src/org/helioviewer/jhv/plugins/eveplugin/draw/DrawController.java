@@ -16,7 +16,6 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
@@ -32,8 +31,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
-    private static final DrawController instance = new DrawController();;
-    // private final DrawControllerData drawControllerData;
+    private static final DrawController instance = new DrawController();
 
     private Interval<Date> selectedInterval = new Interval<Date>(null, null);
     private Interval<Date> availableInterval = new Interval<Date>(null, null);
@@ -56,11 +54,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new HashSet<YAxisElement>();
-        // drawControllerData = new DrawControllerData();
+
         tListeners = new ArrayList<TimingListener>();
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        LayersModel.addLayersListener(this);
-        Displayer.addTimeListener(this);
+
         keepFullValueRange = false;
         pas = PlotAreaSpace.getSingletonInstance();
         pas.addPlotAreaSpaceListener(this);
