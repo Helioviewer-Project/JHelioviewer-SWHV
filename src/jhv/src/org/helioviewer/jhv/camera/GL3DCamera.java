@@ -2,12 +2,12 @@ package org.helioviewer.jhv.camera;
 
 import java.awt.Point;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -16,13 +16,13 @@ import com.jogamp.opengl.GL2;
 
 public abstract class GL3DCamera implements TimeListener {
 
-    public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
-    public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
+    public static final double MAX_DISTANCE = -Sun.MeanEarthDistance * 1.8;
+    public static final double MIN_DISTANCE = -Sun.Radius * 1.2;
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
     public static final double MAX_FOV = INITFOV * 10;
-    private final double clipNear = Constants.SunRadius * 3;
-    private final double clipFar = Constants.SunRadius * 10000.;
+    private final double clipNear = Sun.Radius * 3;
+    private final double clipFar = Sun.Radius * 10000.;
     private double fov = INITFOV;
     private double aspect = 0.0;
     private double previousAspect = -1.0;
@@ -50,7 +50,7 @@ public abstract class GL3DCamera implements TimeListener {
     private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
-    protected static final double DEFAULT_CAMERA_DISTANCE = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
+    protected static final double DEFAULT_CAMERA_DISTANCE = Sun.MeanEarthDistance / Sun.RadiusMeter;
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
@@ -248,10 +248,10 @@ public abstract class GL3DCamera implements TimeListener {
         double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= Constants.SunRadius2 / 2.) {
-            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(Constants.SunRadius2 - radius2));
+        if (radius2 <= Sun.Radius2 / 2.) {
+            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         } else {
-            hitPoint = new GL3DVec3d(up1x, up1y, Constants.SunRadius2 / (2. * Math.sqrt(radius2)));
+            hitPoint = new GL3DVec3d(up1x, up1y, Sun.Radius2 / (2. * Math.sqrt(radius2)));
         }
         GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
         hitPoint = roti.multiply(hitPoint);

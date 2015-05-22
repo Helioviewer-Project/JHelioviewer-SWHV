@@ -2,10 +2,10 @@ package org.helioviewer.jhv.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -20,7 +20,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
-    private double currentDistance = Constants.SunMeanDistanceToEarth / Constants.SunRadius;
+    private double currentDistance = Sun.MeanEarthDistance / Sun.Radius;
 
     private Date cameraDate;
     private boolean interpolation;

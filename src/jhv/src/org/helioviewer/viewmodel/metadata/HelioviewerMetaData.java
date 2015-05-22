@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.metadata;
 import java.util.Date;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DQuatd;
@@ -10,7 +11,6 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
@@ -52,28 +52,28 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
-        innerRadius = m.tryGetDouble("HV_ROCC_INNER") * Constants.SunRadius;
-        outerRadius = m.tryGetDouble("HV_ROCC_OUTER") * Constants.SunRadius;
+        innerRadius = m.tryGetDouble("HV_ROCC_INNER") * Sun.Radius;
+        outerRadius = m.tryGetDouble("HV_ROCC_OUTER") * Sun.Radius;
 
         if (innerRadius == 0) {
             if (detector.equalsIgnoreCase("C2")) {
-                innerRadius = 2.3 * Constants.SunRadius;
-                outerRadius = 8.0 * Constants.SunRadius;
+                innerRadius = 2.3 * Sun.Radius;
+                outerRadius = 8.0 * Sun.Radius;
             } else if (detector.equalsIgnoreCase("C3")) {
-                innerRadius = 4.4 * Constants.SunRadius;
-                outerRadius = 31.5 * Constants.SunRadius;
+                innerRadius = 4.4 * Sun.Radius;
+                outerRadius = 31.5 * Sun.Radius;
             } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR1")) {
-                innerRadius = 1.36 * Constants.SunRadius;
-                outerRadius = 4.5 * Constants.SunRadius;
+                innerRadius = 1.36 * Sun.Radius;
+                outerRadius = 4.5 * Sun.Radius;
             } else if (observatory.equalsIgnoreCase("STEREO_A") && detector.equalsIgnoreCase("COR2")) {
-                innerRadius = 2.4 * Constants.SunRadius;
-                outerRadius = 15.6 * Constants.SunRadius;
+                innerRadius = 2.4 * Sun.Radius;
+                outerRadius = 15.6 * Sun.Radius;
             } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR1")) {
-                innerRadius = 1.5 * Constants.SunRadius;
-                outerRadius = 4.9 * Constants.SunRadius;
+                innerRadius = 1.5 * Sun.Radius;
+                outerRadius = 4.9 * Sun.Radius;
             } else if (observatory.equalsIgnoreCase("STEREO_B") && detector.equalsIgnoreCase("COR2")) {
-                innerRadius = 3.25 * Constants.SunRadius;
-                outerRadius = 17 * Constants.SunRadius;
+                innerRadius = 3.25 * Sun.Radius;
+                outerRadius = 17 * Sun.Radius;
             }
         }
         if (outerRadius == 0) {
@@ -144,7 +144,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private void retrievePosition(MetaDataContainer m) {
         Date obsDate = dateObs.getTime();
 
-        if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Constants.SunRadiusInMeter) == 0) {
+        if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
             distanceObs = Astronomy.getDistanceSolarRadii(obsDate);
         }
 
@@ -187,7 +187,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan2(Constants.SunRadius, distanceObs) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(Sun.Radius, distanceObs) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
         } else if (instrument.equals("EIT")) {
             newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
@@ -227,7 +227,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
         // meter / pixel
-        unitPerPixel = Constants.SunRadius / newSolarPixelRadius;
+        unitPerPixel = Sun.Radius / newSolarPixelRadius;
         setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
         setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
     }

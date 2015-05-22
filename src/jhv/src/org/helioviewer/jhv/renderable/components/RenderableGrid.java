@@ -9,11 +9,11 @@ import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.physics.Astronomy;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -199,7 +199,7 @@ public class RenderableGrid implements Renderable {
     private void drawText(GL2 gl) {
         float zdist = 0f;
 
-        double size = Constants.SunRadius * 1.06;
+        double size = Sun.Radius * 1.06;
         //The scale factor has to be divided by the current font size
         float textScaleFactor = this.textScale / font.getSize();
         //Adjust for font size in horizontal and vertical direction (centering the text approximately)
@@ -231,7 +231,7 @@ public class RenderableGrid implements Renderable {
         }
         renderer.end3DRendering();
 
-        size = Constants.SunRadius * 1.02;
+        size = Sun.Radius * 1.02;
 
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             String txt = String.format("%.1f", theta);
