@@ -26,7 +26,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
@@ -73,8 +73,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     Date start = LayersModel.getStartDate(activeView);
                     Date end = LayersModel.getEndDate(activeView);
                     try {
-                        Date obsStartDate = FormatDate.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                        Date obsEndDate = FormatDate.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
+                        Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
+                        Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
                         // only updates if its really necessary with a
                         // tolerance of an hour
                         final int tolerance = 60 * 60 * 1000;

@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
@@ -57,7 +57,7 @@ public class SaveScreenshotAction extends AbstractAction {
      */
     static String getDefaultFileName() {
         String output = new String("JHV_screenshot_created_");
-        output += FormatDate.filenameDateFormat.format(new Date());
+        output += TimeUtils.filenameDateFormat.format(new Date());
 
         return output;
     }

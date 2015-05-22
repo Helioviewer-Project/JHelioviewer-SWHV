@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.physics.Astronomy;
@@ -520,7 +520,7 @@ public class HEKParser implements SWEKParser {
      */
     private Date parseDate(String date) {
         try {
-            return FormatDate.utcDateFormat.parse(date);
+            return TimeUtils.utcDateFormat.parse(date);
         } catch (ParseException e) {
             Log.error("The date " + date + " could not be parsed.");
             return null;

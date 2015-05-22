@@ -12,7 +12,7 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -117,7 +117,7 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             this.dateString = date.substring(11, 30);
 
-            Date dd = FormatDate.utcDateFormat.parse(dateString);
+            Date dd = TimeUtils.utcDateFormat.parse(dateString);
             this.createBuffer(fieldlinex.length);
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(dd.getTime());

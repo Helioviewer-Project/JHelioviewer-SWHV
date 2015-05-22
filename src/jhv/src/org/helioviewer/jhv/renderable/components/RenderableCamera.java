@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.Date;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
@@ -155,7 +155,7 @@ public class RenderableCamera implements Renderable {
     }
 
     public void setTimeString(Date date) {
-        timeString = FormatDate.utcDateFormat.format(date);
+        timeString = TimeUtils.utcDateFormat.format(date);
     }
 
     @Override

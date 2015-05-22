@@ -31,7 +31,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -238,7 +238,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
                     // set the xml data for the MetaDataDialog
                     xmlDoc = doc;
                     // export file name
-                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + FormatDate.filenameDateFormat.format(m.getDateObs().getTime()) + ".fits.xml";
+                    outFileName = JHVDirectory.EXPORTS.getPath() + m.getFullName() + "__" + TimeUtils.filenameDateFormat.format(m.getDateObs().getTime()) + ".fits.xml";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

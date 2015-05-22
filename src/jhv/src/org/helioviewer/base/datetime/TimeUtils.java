@@ -4,7 +4,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
-public class FormatDate {
+public class TimeUtils {
 
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 

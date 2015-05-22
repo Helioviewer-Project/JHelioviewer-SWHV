@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
@@ -122,14 +122,14 @@ public class EventDescriptionPanel extends JPanel {
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
 
-        textStartTime = new JTextArea(FormatDate.utcDateFormat.format(event.getStartDate()));
+        textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
         textStartTime.setBackground(this.getBackground());
         textStartTime.setLineWrap(true);
         textStartTime.setWrapStyleWord(true);
         textStartTime.setFont(labelIcon.getFont());
         textStartTime.setMargin(new Insets(0, 0, 0, 0));
 
-        textEndTime = new JTextArea(FormatDate.utcDateFormat.format(event.getEndDate()));
+        textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
         textEndTime.setBackground(this.getBackground());
         textEndTime.setLineWrap(true);
         textEndTime.setWrapStyleWord(true);
