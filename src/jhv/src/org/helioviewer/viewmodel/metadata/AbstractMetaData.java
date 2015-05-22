@@ -16,7 +16,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     protected ImmutableDateTime dateObs = TimeUtils.epoch;
     protected GL3DQuatd rotationObs = GL3DQuatd.ZERO;
-    protected double distanceObs = Sun.MeanEarthDistance / Sun.RadiusMeter;
+    protected double distanceObs = Sun.MeanEarthDistance;
     protected double innerRadius = 0.;
     protected double outerRadius = 40.;
     protected double unitPerPixel = 1.;

@@ -20,7 +20,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
-    private double currentDistance = Sun.MeanEarthDistance / Sun.Radius;
+    private double currentDistance = Sun.MeanEarthDistance;
 
     private Date cameraDate;
     private boolean interpolation;

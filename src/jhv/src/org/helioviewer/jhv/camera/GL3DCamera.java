@@ -16,8 +16,6 @@ import com.jogamp.opengl.GL2;
 
 public abstract class GL3DCamera implements TimeListener {
 
-    public static final double MAX_DISTANCE = -Sun.MeanEarthDistance * 1.8;
-    public static final double MIN_DISTANCE = -Sun.Radius * 1.2;
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
     public static final double MAX_FOV = INITFOV * 10;
@@ -50,7 +48,7 @@ public abstract class GL3DCamera implements TimeListener {
     private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
-    protected static final double DEFAULT_CAMERA_DISTANCE = Sun.MeanEarthDistance / Sun.RadiusMeter;
+    protected static final double DEFAULT_CAMERA_DISTANCE = Sun.MeanEarthDistance;
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
@@ -114,8 +112,7 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     protected void setZTranslation(double z) {
-        double truncatedz = Math.min(MIN_DISTANCE, Math.max(MAX_DISTANCE, z));
-        this.translation.z = truncatedz;
+        this.translation.z = z;
     }
 
     public void setPanning(double x, double y) {
