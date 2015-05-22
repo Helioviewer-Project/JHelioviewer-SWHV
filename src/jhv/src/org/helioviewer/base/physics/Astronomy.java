@@ -22,12 +22,7 @@ public class Astronomy {
 
     public static double getDistanceSolarRadii(Date date) {
         calendar.setTime(date);
-        return getDistance(calendar) / Sun.RadiusMeter;
-    }
-
-    public static double getDistanceMeters(Date date) {
-        calendar.setTime(date);
-        return getDistance(calendar);
+        return getDistance(calendar) * Sun.MeanEarthDistance;
     }
 
     private static double getDistance(Calendar time) {
@@ -39,8 +34,7 @@ public class Astronomy {
         M = M % 360.;
         double e = 0.0167908617 + t * 0.000042037 + t * t * 0.0000001236;
         double C = (1.914600 * t + 0.004817 * t + 0.000014 * t * t) * Math.sin(M / MathUtils.radeg) + (0.019993 - 0.000101 * t) * Math.sin(2. * M / MathUtils.radeg) + 0.000290 * Math.sin(3. * M / MathUtils.radeg);
-        double R = 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
-        return Sun.MeanEarthDistance * R;
+        return 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
     }
 
     public static double getB0InRadians(Calendar time) {

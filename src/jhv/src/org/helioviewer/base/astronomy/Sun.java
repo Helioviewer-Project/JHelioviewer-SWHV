@@ -5,7 +5,9 @@ public class Sun {
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
     public static final double RadiusMeter = 6.96e8;
-    public static final double MeanEarthDistance = 149597870700.0;
+
+    public static final double MeanEarthDistanceMeter = 149597870700.0;
+    public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
 
     public static double calculateRotationInRadians(double latitude, double deltaTsec) {
         /*
