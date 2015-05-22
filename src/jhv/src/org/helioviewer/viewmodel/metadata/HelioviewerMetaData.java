@@ -153,7 +153,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
                 if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
                     // presumably not found
-                    stonyhurstLatitude = Astronomy.getB0(obsDate) * MathUtils.radeg;
+                    stonyhurstLatitude = Astronomy.getBL(obsDate) * MathUtils.radeg;
                 }
             }
         }

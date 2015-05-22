@@ -184,7 +184,7 @@ public class RenderableGrid implements Renderable {
                 gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
                 {
                     gl.glRotatef(90 + (float) Astronomy.getL0Degree(timestamp), 0, 1, 0);
-                    gl.glRotatef((float) -(Astronomy.getB0(timestamp) * MathUtils.radeg), 0, 0, 1);
+                    gl.glRotatef((float) -(Astronomy.getBL(timestamp) * MathUtils.radeg), 0, 0, 1);
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
 
                     gl.glRotatef(90, 1, 0, 0);
