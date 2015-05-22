@@ -8,8 +8,8 @@
             "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader", 
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser",
             "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/heksource.jar",
-	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/HEKSource.jar",
-	        "jar_location" : "jar:///sources/HEKSource.jar",
+	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/heksource.jar",
+	        "jar_location" : "jar:///sources/heksource.jar",
             "base_url"              : "http://www.lmsal.com/hek/her",
             "general_parameters"    : [
                 {

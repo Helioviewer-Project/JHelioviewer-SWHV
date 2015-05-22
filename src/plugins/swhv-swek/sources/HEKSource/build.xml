@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<project basedir="." default="all" name="HEKSource">
+<project basedir="." default="all" name="heksource">
     <property environment="env"/>
-    <property name="source.name" value="HEKSource" />
+    <property name="source.name" value="heksource" />
     <property name="swhvproject.location" value="${basedir}/../../../../.." />
     <property name="swhv-swek.location" value="../../"/>
     <property name="swhv-swek.build" value="${swhv-swek.location}/build" />
@@ -32,7 +32,7 @@
     </path>
 
     <target name="all" depends="copy-to-root-build" />
-        
+
     <target name="copy-to-root-build" depends="jar-bundle">
         <copy todir="${swhv.build}">
                 <fileset dir="${heksource.build}" />
@@ -124,13 +124,13 @@
             <!--<zipgroupfileset dir="${swhv-swek.build}" includes="**/*.jar"/>-->
         </jar>
     </target>
-    
+
     <target name="doc" />
-    
+
     <target name="bundle-src" />
-    
+
     <target name="install-source" depends="jar-bundle">
         <copy file="${heksource.build}/${source.name}.jar" todir="${swhv-swek.homedir.sources}" />
     </target>
-    
+
 </project>
