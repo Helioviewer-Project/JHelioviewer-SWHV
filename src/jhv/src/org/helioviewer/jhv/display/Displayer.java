@@ -2,7 +2,7 @@ package org.helioviewer.jhv.display;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Date;
 
 import javax.swing.Timer;
@@ -22,10 +22,10 @@ public class Displayer implements JHVEventHighlightListener {
     public static final ImmutableDateTime epoch = ImmutableDateTime.parseDateTime("2000-01-01T00:00:00");
 
     private static DisplayListener displayListener;
-    private static final ArrayList<RenderListener> renderListeners = new ArrayList<RenderListener>();
-    private static final ArrayList<TimeListener> timeListeners = new ArrayList<TimeListener>();
+    private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
+    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
-    private static GL3DCamera activeCamera = new GL3DObserverCamera(true);
+    private static GL3DCamera activeCamera = new GL3DObserverCamera();
     private static int viewportWidth;
     private static int viewportHeight;
 
@@ -105,10 +105,6 @@ public class Displayer implements JHVEventHighlightListener {
         timeListeners.add(timeListener);
     }
 
-    public static void addFirstTimeListener(final TimeListener timeListener) {
-        timeListeners.add(0, timeListener);
-    }
-
     public static void removeTimeListener(final TimeListener timeListener) {
         timeListeners.remove(timeListener);
     }
@@ -125,6 +121,7 @@ public class Displayer implements JHVEventHighlightListener {
 
                 lastTimestamp = dateTime.getTime();
                 // fire TimeChanged
+                activeCamera.timeChanged(lastTimestamp);
                 for (final TimeListener listener : timeListeners) {
                     listener.timeChanged(lastTimestamp);
                 }

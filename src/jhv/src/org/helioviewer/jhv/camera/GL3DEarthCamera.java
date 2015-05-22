@@ -6,11 +6,10 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.base.physics.DifferentialRotation;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
-public class GL3DEarthCamera extends GL3DCamera implements TimeListener {
+public class GL3DEarthCamera extends GL3DCamera {
 
     private final GL3DEarthCameraOptionPanel earthCameraOptionPanel;
 
@@ -30,13 +29,11 @@ public class GL3DEarthCamera extends GL3DCamera implements TimeListener {
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        Displayer.addFirstTimeListener(this);
     }
 
     @Override
     public void deactivate() {
         super.deactivate();
-        Displayer.removeTimeListener(this);
     }
 
     @Override

@@ -9,11 +9,12 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class GL3DCamera {
+public abstract class GL3DCamera implements TimeListener {
 
     public static final double MAX_DISTANCE = -Constants.SunMeanDistanceToEarth * 1.8;
     public static final double MIN_DISTANCE = -Constants.SunRadius * 1.2;
