@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.view.View;
@@ -19,7 +19,7 @@ import org.helioviewer.viewmodel.view.View;
 public class UIViewListenerDistributor {
 
     private final static UIViewListenerDistributor singletonObject = new UIViewListenerDistributor();
-    private final ArrayList<UIViewListener> listeners = new ArrayList<UIViewListener>();
+    private final HashSet<UIViewListener> listeners = new HashSet<UIViewListener>();
 
     private UIViewListenerDistributor() {
     }

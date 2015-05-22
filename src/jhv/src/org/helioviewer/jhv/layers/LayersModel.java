@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.swing.JOptionPane;
 
@@ -27,7 +28,7 @@ public class LayersModel {
     private static int activeLayer = -1;
     private static final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
 
-    private static final ArrayList<LayersListener> layerListeners = new ArrayList<LayersListener>();
+    private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
 
     /**
      * Return the view associated with the active Layer
