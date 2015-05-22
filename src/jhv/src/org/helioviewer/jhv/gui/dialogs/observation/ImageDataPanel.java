@@ -32,7 +32,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.base.EventDispatchQueue;
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
@@ -304,8 +304,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         }
 
         try {
-            ObservationDialogDateModel.getInstance().setStartDate(ImmutableDateTime.apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
-            ObservationDialogDateModel.getInstance().setEndDate(ImmutableDateTime.apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
+            ObservationDialogDateModel.getInstance().setStartDate(FormatDate.apiDateFormat.parse(timeSelectionPanel.getStartTime()), true);
+            ObservationDialogDateModel.getInstance().setEndDate(FormatDate.apiDateFormat.parse(timeSelectionPanel.getEndTime()), true);
         } catch (ParseException e) {
             Log.debug("Date could not be parsed" + e);
         }
@@ -449,7 +449,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         public void setEndDate(Date newEnd, boolean byUser) {
             calendarEndDate.setDate(newEnd);
-            textEndTime.setText(ImmutableDateTime.timeDateFormat.format(newEnd));
+            textEndTime.setText(FormatDate.timeDateFormat.format(newEnd));
             if (!setFromOutside) {
                 ObservationDialogDateModel.getInstance().setEndDate(newEnd, byUser);
             } else {
@@ -465,7 +465,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
          */
         public void setStartDate(Date newStart, boolean byUser) {
             calendarStartDate.setDate(newStart);
-            textStartTime.setText(ImmutableDateTime.timeDateFormat.format(newStart));
+            textStartTime.setText(FormatDate.timeDateFormat.format(newStart));
             if (!setFromOutside) {
                 ObservationDialogDateModel.getInstance().setStartDate(newStart, byUser);
             } else {
@@ -495,7 +495,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (e.getSource() == calendarStartDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(ImmutableDateTime.apiDateFormat.parse(getStartTime()));
+                    calendar.setTime(FormatDate.apiDateFormat.parse(getStartTime()));
                     setStartDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse start date " + getStartTime());
@@ -505,7 +505,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (e.getSource() == calendarEndDate) {
                 Calendar calendar = new GregorianCalendar();
                 try {
-                    calendar.setTime(ImmutableDateTime.apiDateFormat.parse(getEndTime()));
+                    calendar.setTime(FormatDate.apiDateFormat.parse(getEndTime()));
                     setEndDate(calendar.getTime(), true);
                 } catch (ParseException e1) {
                     Log.error("Could not parse end date " + getEndTime());

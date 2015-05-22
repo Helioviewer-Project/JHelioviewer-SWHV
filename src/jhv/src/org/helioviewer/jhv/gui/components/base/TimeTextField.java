@@ -7,7 +7,7 @@ import java.util.Date;
 
 import javax.swing.JTextField;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 
 /**
  * This offers a text field to edit the time at a day. A normal
@@ -67,7 +67,7 @@ public class TimeTextField extends JTextField {
      */
     public String getFormattedInput() {
         try {
-            return ImmutableDateTime.timeDateFormat.format(ImmutableDateTime.timeDateFormat.parse(getText()));
+            return FormatDate.timeDateFormat.format(FormatDate.timeDateFormat.parse(getText()));
         } catch (ParseException e) {
             return defaultTime;
         }
@@ -80,10 +80,10 @@ public class TimeTextField extends JTextField {
      */
     public Date getValue() {
         try {
-            return ImmutableDateTime.timeDateFormat.parse(getText());
+            return FormatDate.timeDateFormat.parse(getText());
         } catch (ParseException e) {
             try {
-                return ImmutableDateTime.timeDateFormat.parse(defaultTime);
+                return FormatDate.timeDateFormat.parse(defaultTime);
             } catch (ParseException e1) {
                 // The default time should always parseable
                 return null;
@@ -105,7 +105,7 @@ public class TimeTextField extends JTextField {
      *            new time to set
      */
     public void setValue(Date time) {
-        setText(ImmutableDateTime.timeDateFormat.format(time));
+        setText(FormatDate.timeDateFormat.format(time));
     }
 
 }

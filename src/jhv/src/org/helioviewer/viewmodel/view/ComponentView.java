@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.DisplayListener;
@@ -198,7 +198,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
             exportMode = true;
 
             JHVJPXView jpxView = (JHVJPXView) mv;
-            moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + ImmutableDateTime.filenameDateFormat.format(new Date()) + ".mp4";
+            moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + FormatDate.filenameDateFormat.format(new Date()) + ".mp4";
 
             framerate = jpxView.getDesiredRelativeSpeed();
             if (framerate <= 0 || framerate > 60)

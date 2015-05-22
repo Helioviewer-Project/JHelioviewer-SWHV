@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -249,16 +249,16 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             startDate = new Date(System.currentTimeMillis());
         }
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(ImmutableDateTime.timeDateFormat.format(startDate));
+        beginTimePicker.setText(FormatDate.timeDateFormat.format(startDate));
         setBeginTime(applyChanges);
     }
 
     private void syncBothLayerNow() {
         Date nowDate = new Date(System.currentTimeMillis());
         beginDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(ImmutableDateTime.timeDateFormat.format(nowDate));
+        beginTimePicker.setText(FormatDate.timeDateFormat.format(nowDate));
         endDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(ImmutableDateTime.timeDateFormat.format(nowDate));
+        endTimePicker.setText(FormatDate.timeDateFormat.format(nowDate));
         setBeginTime(false);
         setEndTime(true);
     }
@@ -273,9 +273,9 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             currentDate = new Date(System.currentTimeMillis());
         }
         endDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(ImmutableDateTime.timeDateFormat.format(currentDate));
+        endTimePicker.setText(FormatDate.timeDateFormat.format(currentDate));
         beginDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(ImmutableDateTime.timeDateFormat.format(currentDate));
+        beginTimePicker.setText(FormatDate.timeDateFormat.format(currentDate));
         setBeginTime(false);
         setEndTime(true);
     }
@@ -287,7 +287,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             endDate = new Date(System.currentTimeMillis());
         }
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(ImmutableDateTime.timeDateFormat.format(endDate));
+        endTimePicker.setText(FormatDate.timeDateFormat.format(endDate));
         setEndTime(applyChanges);
     }
 
