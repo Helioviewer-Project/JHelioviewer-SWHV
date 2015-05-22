@@ -13,6 +13,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 
 public class AssociationsPrinter {
+
     private static int fileNumber = 0;
 
     public static void printAssociation(String association1, String association2) {
@@ -104,4 +105,5 @@ public class AssociationsPrinter {
         }
 
     }
+
 }

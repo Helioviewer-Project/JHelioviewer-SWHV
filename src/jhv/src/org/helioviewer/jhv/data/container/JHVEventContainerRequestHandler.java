@@ -38,4 +38,5 @@ public interface JHVEventContainerRequestHandler {
      *            the list of dates
      */
     public abstract void handleRequestForDateList(List<Date> dates);
+
 }
