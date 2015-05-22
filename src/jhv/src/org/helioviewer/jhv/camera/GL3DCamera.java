@@ -20,9 +20,9 @@ public abstract class GL3DCamera implements TimeListener {
     public static final double MIN_FOV = INITFOV * 0.02;
     public static final double MAX_FOV = INITFOV * 10;
     private final double clipNear = Sun.Radius * 3;
-    private final double clipFar = Sun.Radius * 10000.;
+    private final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
-    private double aspect = 0.0;
+
     private double previousAspect = -1.0;
 
     private GL3DMat4d cameraTransformation;
@@ -34,10 +34,6 @@ public abstract class GL3DCamera implements TimeListener {
 
     protected GL3DQuatd localRotation;
 
-    private long timeDelay;
-
-    protected long time;
-
     private boolean trackingMode;
 
     private GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
@@ -48,7 +44,6 @@ public abstract class GL3DCamera implements TimeListener {
     private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
-    protected static final double DEFAULT_CAMERA_DISTANCE = Sun.MeanEarthDistance;
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
@@ -94,11 +89,12 @@ public abstract class GL3DCamera implements TimeListener {
 
             this.updateCameraTransformation();
 
-            if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getRotateInteraction())) {
+            GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
+            if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
                 this.setCurrentInteraction(this.getRotateInteraction());
-            } else if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getPanInteraction())) {
+            } else if (precedingInteraction.equals(precedingCamera.getPanInteraction())) {
                 this.setCurrentInteraction(this.getPanInteraction());
-            } else if (precedingCamera.getCurrentInteraction().equals(precedingCamera.getZoomInteraction())) {
+            } else if (precedingInteraction.equals(precedingCamera.getZoomInteraction())) {
                 this.setCurrentInteraction(this.getZoomInteraction());
             }
         } else {
@@ -160,7 +156,7 @@ public abstract class GL3DCamera implements TimeListener {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        this.aspect = Displayer.getViewportWidth() / (double) Displayer.getViewportHeight();
+        double aspect = Displayer.getViewportWidth() / (double) Displayer.getViewportHeight();
         cameraWidth = -translation.z * Math.tan(fov / 2.);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
@@ -285,29 +281,9 @@ public abstract class GL3DCamera implements TimeListener {
         return this.fov;
     }
 
-    public final double getClipNear() {
-        return clipNear;
-    }
-
-    public final double getClipFar() {
-        return clipFar;
-    }
-
-    public double getAspect() {
-        return aspect;
-    }
-
     @Override
     public String toString() {
         return getName();
-    }
-
-    public void setTimeDelay(long timeDelay) {
-        this.timeDelay = timeDelay;
-    }
-
-    public long getTimeDelay() {
-        return this.timeDelay;
     }
 
     public GL3DQuatd getCurrentDragRotation() {
@@ -342,20 +318,20 @@ public abstract class GL3DCamera implements TimeListener {
         this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
     }
 
-    public GL3DInteraction getPanInteraction() {
-        return this.panInteraction;
-    }
-
-    public GL3DInteraction getRotateInteraction() {
-        return this.rotationInteraction;
+    public void setCurrentInteraction(GL3DInteraction currentInteraction) {
+        this.currentInteraction = currentInteraction;
     }
 
     public GL3DInteraction getCurrentInteraction() {
         return this.currentInteraction;
     }
 
-    public void setCurrentInteraction(GL3DInteraction currentInteraction) {
-        this.currentInteraction = currentInteraction;
+    public GL3DInteraction getPanInteraction() {
+        return this.panInteraction;
+    }
+
+    public GL3DInteraction getRotateInteraction() {
+        return this.rotationInteraction;
     }
 
     public GL3DInteraction getZoomInteraction() {
