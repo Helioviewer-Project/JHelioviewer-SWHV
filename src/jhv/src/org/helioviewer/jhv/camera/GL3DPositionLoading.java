@@ -17,10 +17,10 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.physics.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -220,14 +220,14 @@ public class GL3DPositionLoading {
 
     public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
         if (this.isLoaded && positionDateTime.length > 0) {
+            double dist, hgln, hglt;
+
             long t3 = this.getBeginDate().getTime();
             long t4 = this.getEndDate().getTime();
             if (t3 == t4) {
-                double hgln = positionDateTime[0].y;
-                double hglt = positionDateTime[0].z;
-                double dist = positionDateTime[0].x;
-                dist *= 1000. / Constants.SunRadiusInMeter;
-                return new GL3DVec3d(dist, hgln, hglt);
+                dist = positionDateTime[0].x;
+                hgln = positionDateTime[0].y;
+                hglt = positionDateTime[0].z;
             } else {
                 double interpolatedIndex = (currentCameraTime - t3) / (double) (t4 - t3) * positionDateTime.length;
                 int i = (int) interpolatedIndex;
@@ -237,12 +237,12 @@ public class GL3DPositionLoading {
                 }
                 int inext = Math.min(i + 1, positionDateTime.length - 1);
                 double alpha = 1. - interpolatedIndex % 1.;
-                double hgln = alpha * positionDateTime[i].y + (1. - alpha) * positionDateTime[inext].y;
-                double hglt = alpha * positionDateTime[i].z + (1. - alpha) * positionDateTime[inext].z;
-                double dist = alpha * positionDateTime[i].x + (1. - alpha) * positionDateTime[inext].x;
-                dist *= 1000. / Constants.SunRadiusInMeter;
-                return new GL3DVec3d(dist, hgln, hglt);
+                dist = alpha * positionDateTime[i].x + (1. - alpha) * positionDateTime[inext].x;
+                hgln = alpha * positionDateTime[i].y + (1. - alpha) * positionDateTime[inext].y;
+                hglt = alpha * positionDateTime[i].z + (1. - alpha) * positionDateTime[inext].z;
             }
+            dist *= 1000. / Sun.RadiusMeter;
+            return new GL3DVec3d(dist, hgln, hglt);
         } else {
             return null;
         }

@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.physics.Constants;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -48,8 +48,8 @@ public class RenderableImageLayer implements Renderable {
         return layerId;
     }
 
-    public double minZ = -Constants.SunRadius;
-    public double maxZ = Constants.SunRadius;
+    public double minZ = -Sun.Radius;
+    public double maxZ = Sun.Radius;
 
     private final int resolution = 3;
     private final GL3DVec2d[] pointlist = new GL3DVec2d[(resolution + 1) * 2 * 2];

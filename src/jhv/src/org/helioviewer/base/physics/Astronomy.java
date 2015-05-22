@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.MathUtils;
 
 public class Astronomy {
@@ -21,7 +22,7 @@ public class Astronomy {
 
     public static double getDistanceSolarRadii(Date date) {
         calendar.setTime(date);
-        return getDistance(calendar) / Constants.SunRadiusInMeter;
+        return getDistance(calendar) / Sun.RadiusMeter;
     }
 
     public static double getDistanceMeters(Date date) {
@@ -39,7 +40,7 @@ public class Astronomy {
         double e = 0.0167908617 + t * 0.000042037 + t * t * 0.0000001236;
         double C = (1.914600 * t + 0.004817 * t + 0.000014 * t * t) * Math.sin(M / MathUtils.radeg) + (0.019993 - 0.000101 * t) * Math.sin(2. * M / MathUtils.radeg) + 0.000290 * Math.sin(3. * M / MathUtils.radeg);
         double R = 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
-        return Constants.SunMeanDistanceToEarth * R;
+        return Sun.MeanEarthDistance * R;
     }
 
     public static double getB0InRadians(Calendar time) {
