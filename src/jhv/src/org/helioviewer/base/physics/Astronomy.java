@@ -5,42 +5,42 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.helioviewer.base.astronomy.Sun;
+import org.helioviewer.base.datetime.JulianDay;
 import org.helioviewer.base.math.MathUtils;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 public class Astronomy {
+
     private static final Calendar calendar = new GregorianCalendar();
-
-    public static double getB0Degree(Date date) {
-        calendar.setTime(date);
-        return (getB0InRadians(calendar)) * MathUtils.radeg;
-    }
-
-    public static double getB0Radians(Date date) {
-        calendar.setTime(date);
-        return getB0InRadians(calendar);
-    }
 
     public static double getDistanceSolarRadii(Date date) {
         calendar.setTime(date);
-        return getDistance(calendar) * Sun.MeanEarthDistance;
-    }
+        int y = calendar.get(Calendar.YEAR);
+        int m = calendar.get(Calendar.MONTH) + 1;
+        int d = calendar.get(Calendar.DATE);
+        double f = DateUtils.getFragmentInMilliseconds(calendar, Calendar.DATE) / (double) DateUtils.MILLIS_PER_DAY;
 
-    private static double getDistance(Calendar time) {
-        JulianDay jd = new JulianDay(time);
-        double t = (jd.getJDN() - 2415020) / 36525;
+        double t = (JulianDay.DJM0 - 2415020.) / 36525. + (JulianDay.cal2mjd(y, m, d) + f) / 36525.;
+
         double L0 = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
         L0 = L0 % 360.;
         double M = 357.52910 + 35999.05030 * t - 0.0001559 * t * t - 0.0000048 * t * t * t;
         M = M % 360.;
         double e = 0.0167908617 + t * 0.000042037 + t * t * 0.0000001236;
         double C = (1.914600 * t + 0.004817 * t + 0.000014 * t * t) * Math.sin(M / MathUtils.radeg) + (0.019993 - 0.000101 * t) * Math.sin(2. * M / MathUtils.radeg) + 0.000290 * Math.sin(3. * M / MathUtils.radeg);
-        return 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
+        double R = 1.000001018 * (1. - e * e) / (1. + e * Math.cos((M + C) / MathUtils.radeg));
+        return R * Sun.MeanEarthDistance;
     }
 
-    public static double getB0InRadians(Calendar time) {
-        JulianDay jd = new JulianDay(time);
+    public static double getB0(Date date) {
+        calendar.setTime(date);
+        int y = calendar.get(Calendar.YEAR);
+        int m = calendar.get(Calendar.MONTH) + 1;
+        int d = calendar.get(Calendar.DATE);
+        double f = DateUtils.getFragmentInMilliseconds(calendar, Calendar.DATE) / (double) DateUtils.MILLIS_PER_DAY;
 
-        double t = (jd.getJDN() - 2415020) / 36525;
+        double t = (JulianDay.DJM0 - 2415020.) / 36525. + (JulianDay.cal2mjd(y, m, d) + f) / 36525.;
 
         double mnl = 279.69668 + 36000.76892 * t + 0.0003025 * t * t;
         mnl = MathUtils.mapTo0To360(mnl);
@@ -64,10 +64,6 @@ public class Astronomy {
         double he_lat = Math.asin(Math.sin(diff) * Math.sin(i / MathUtils.radeg));
 
         return he_lat;
-    }
-
-    public static double getB0InDegree(Calendar time) {
-        return getB0InRadians(time) * MathUtils.radeg;
     }
 
     public static double ymd2jd(int y, int m, int d) {
@@ -120,4 +116,5 @@ public class Astronomy {
         int nosecs = calendar.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
         return getL0Degree(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), (nosecs) / 60. / 60.);
     }
+
 }

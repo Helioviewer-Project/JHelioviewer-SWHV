@@ -153,7 +153,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
                 if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
                     // presumably not found
-                    stonyhurstLatitude = Astronomy.getB0Degree(obsDate);
+                    stonyhurstLatitude = Astronomy.getB0(obsDate) * MathUtils.radeg;
                 }
             }
         }
@@ -226,7 +226,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         double sunY = m.tryGetDouble("CRPIX2") - 1;
         sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
 
-        // meter / pixel
         unitPerPixel = Sun.Radius / newSolarPixelRadius;
         setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
         setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
