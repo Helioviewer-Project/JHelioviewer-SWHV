@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
@@ -111,6 +112,7 @@ public class JavaHelioViewer {
             EventQueue.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
+                    TimeUtils.getSingletonInstance(); // instantiate class
                     Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
                     ImageViewerGui.getSingletonInstance(); // build UI
                     ImageViewerGui.loadAtStart();
