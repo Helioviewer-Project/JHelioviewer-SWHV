@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -141,7 +140,6 @@ public class GL3DPositionLoading {
 
     private void parseData() {
         try {
-            GregorianCalendar calendar = new GregorianCalendar();
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
 
@@ -156,16 +154,14 @@ public class GL3DPositionLoading {
                 String dateString = (String) iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
-                Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                calendar.setTime(date);
-
                 double x, y, z, jy;
                 x = posArray.getDouble(0);
                 jy = posArray.getDouble(1);
                 y = jy + (jy > 0 ? -Math.PI : Math.PI);
                 z = -posArray.getDouble(2);
 
-                positionDateTimehelper[j] = new GL3DPositionDateTime(calendar.getTimeInMillis(), x, y, z);
+                Date date = TimeUtils.utcFullDateFormat.parse(dateString);
+                positionDateTimehelper[j] = new GL3DPositionDateTime(date.getTime(), x, y, z);
             }
             this.positionDateTime = positionDateTimehelper;
         } catch (JSONException e) {
