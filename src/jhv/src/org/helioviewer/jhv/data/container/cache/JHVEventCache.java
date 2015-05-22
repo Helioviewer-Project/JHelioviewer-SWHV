@@ -367,14 +367,6 @@ public class JHVEventCache {
                         nextEvents.put(relatedEvent.getUniqueID(), new JHVEventRelation(relatedEvent.getUniqueID(), relatedEvent));
                     }
                 }
-                /*
-                 * if
-                 * (relatedEvent.getEventRelationShip().getRelationshipRules()
-                 * .containsKey(event.getUniqueID())) { JHVEventRelation
-                 * relation =
-                 * relatedEvent.getEventRelationShip().getRelatedEventsByRule
-                 * ().get(event.getUniqueID()); relation.setTheEvent(event); }
-                 */
             }
             missingEventsInEventRelations.remove(event.getUniqueID());
         }
