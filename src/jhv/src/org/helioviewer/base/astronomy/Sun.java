@@ -1,13 +1,12 @@
-package org.helioviewer.base.physics;
+package org.helioviewer.base.astronomy;
 
-
-public class DifferentialRotation {
+public class Sun {
 
     public static double calculateRotationInRadians(double latitude, double timeDifferenceInSeconds) {
         /*
          * sin2l = sin(latitude)^2 sin4l = sin2l*sin2l rotation =
          * 1.e-6*dt_rot*(2.894-0.428*sin2l-0.37*sin4l)*180/pi.
-         * 
+         *.
          * from rotation rate of small magnetic features (Howard, Harvey, and
          * Forgach, Solar Physics, 130, 295, 1990)
          */
