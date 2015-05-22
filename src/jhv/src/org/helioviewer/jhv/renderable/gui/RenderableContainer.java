@@ -124,6 +124,10 @@ public class RenderableContainer implements TableModel, Reorderable {
         return renderables.get(rowIndex);
     }
 
+    public Renderable getTypedValueAt(int rowIndex, int columnIndex) {
+        return renderables.get(rowIndex);
+    }
+
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         renderables.add(rowIndex, (Renderable) aValue);
