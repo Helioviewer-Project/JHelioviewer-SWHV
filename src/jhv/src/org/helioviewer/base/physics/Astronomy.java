@@ -29,7 +29,7 @@ public class Astronomy {
         return getDistance(calendar);
     }
 
-    public static double getDistance(Calendar time) {
+    private static double getDistance(Calendar time) {
         JulianDay jd = new JulianDay(time);
         double t = (jd.getJDN() - 2415020) / 36525;
         double L0 = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;

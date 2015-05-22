@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
@@ -261,7 +261,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the date in format yyyy-mm-ddThh:mm-ss
      */
     private String formatDate(Date date) {
-        return ImmutableDateTime.utcDateFormat.format(date);
+        return FormatDate.utcDateFormat.format(date);
     }
 
     private StringBuilder appendPage(StringBuilder baseURL, int page) {

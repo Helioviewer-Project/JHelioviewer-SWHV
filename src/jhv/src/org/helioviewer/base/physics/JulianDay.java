@@ -34,7 +34,7 @@ import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.FormatDate;
 import org.helioviewer.base.logging.Log;
 
 /***
@@ -648,7 +648,7 @@ public final class JulianDay implements Cloneable {
 
         String retStr = "";
         if (getJDN() > EPOCH_0) {
-            retStr = ImmutableDateTime.sqlDateFormat.format(getTime());
+            retStr = FormatDate.sqlDateFormat.format(getTime());
         } else {
             StringBuffer strBuf = new StringBuffer(fmt4Dig.format(get(JulianDay.YEAR)));
             strBuf.append("-");
