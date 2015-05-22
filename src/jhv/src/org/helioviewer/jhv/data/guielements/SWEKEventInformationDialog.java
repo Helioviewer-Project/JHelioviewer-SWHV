@@ -42,7 +42,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
 
     private JPanel allTablePanel;
@@ -203,17 +203,26 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
-        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty()) {
+        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getPrecedingEvents())) {
             precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents());
         }
 
-        if (!event.getEventRelationShip().getNextEvents().isEmpty()) {
+        if (!event.getEventRelationShip().getNextEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
             followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", event.getEventRelationShip().getNextEvents());
         }
 
-        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
+        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty() && notNullRelationShip(event.getEventRelationShip().getRelatedEventsByRule())) {
             otherRelatedEvents = createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip().getRelatedEventsByRule());
         }
+    }
+
+    private boolean notNullRelationShip(Map<String, JHVEventRelation> precedingEvents) {
+        for (JHVEventRelation r : precedingEvents.values()) {
+            if (r.getTheEvent() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setCollapsiblePanels() {
@@ -247,7 +256,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
         int gridYPosition = 3;
 
-        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty()) {
+        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getPrecedingEvents())) {
             gc.gridy = gridYPosition;
             if (precedingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -258,7 +267,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             gridYPosition++;
         }
 
-        if (!event.getEventRelationShip().getNextEvents().isEmpty()) {
+        if (!event.getEventRelationShip().getNextEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
             gc.gridy = gridYPosition;
             if (followingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -269,7 +278,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             gridYPosition++;
         }
 
-        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty()) {
+        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
             gc.gridy = gridYPosition;
             if (otherRelatedEvents.isExpanded()) {
                 gc.weighty = 1;
@@ -286,7 +295,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
         SortedSet<JHVEventRelation> sortedER = new TreeSet<JHVEventRelation>(new JHVEventRelationComparator());
         for (final JHVEventRelation er : relations.values()) {
-            sortedER.add(er);
+            if (er.getTheEvent() != null) {
+                sortedER.add(er);
+            }
         }
         for (final JHVEventRelation er : sortedER) {
             if (er.getTheEvent() != null) {
