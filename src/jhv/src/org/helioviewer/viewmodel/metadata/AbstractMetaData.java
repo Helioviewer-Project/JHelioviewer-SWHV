@@ -1,10 +1,10 @@
 package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.physics.Constants;
-import org.helioviewer.jhv.display.Displayer;
 
 public abstract class AbstractMetaData implements MetaData {
 
@@ -14,7 +14,7 @@ public abstract class AbstractMetaData implements MetaData {
     protected int pixelWidth;
     protected int pixelHeight;
 
-    protected ImmutableDateTime dateObs = Displayer.epoch;
+    protected ImmutableDateTime dateObs = TimeUtils.epoch;
     protected GL3DQuatd rotationObs = GL3DQuatd.ZERO;
     protected double distanceObs = Constants.SunMeanDistanceToEarth / Constants.SunRadiusInMeter;
     protected double innerRadius = 0.;

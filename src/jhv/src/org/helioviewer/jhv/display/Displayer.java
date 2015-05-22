@@ -19,8 +19,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Displayer implements JHVEventHighlightListener {
 
-    public static final ImmutableDateTime epoch = ImmutableDateTime.parseDateTime("2000-01-01T00:00:00");
-
     private static DisplayListener displayListener;
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
     private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();

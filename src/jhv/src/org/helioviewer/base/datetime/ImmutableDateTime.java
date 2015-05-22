@@ -14,8 +14,6 @@ import java.util.TimeZone;
  */
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-
     /** Default DateFormat used to format the date. */
     protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
@@ -35,11 +33,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         if ((_year | _month | _day | _hour | _minute | _second) < 0)
             throw new IllegalArgumentException("Arguments cannot be negative!");
         try {
-            calendar = Calendar.getInstance(UTC);
+            calendar = Calendar.getInstance(TimeUtils.UTC);
             calendar.clear();
             calendar.set(_year, _month, _day, _hour, _minute, _second);
-            dateFormat.setTimeZone(UTC);
-            timeFormat.setTimeZone(UTC);
+            dateFormat.setTimeZone(TimeUtils.UTC);
+            timeFormat.setTimeZone(TimeUtils.UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,11 +49,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         }
 
         try {
-            calendar = Calendar.getInstance(UTC);
+            calendar = Calendar.getInstance(TimeUtils.UTC);
             calendar.clear();
             calendar.setTimeInMillis(seconds * 1000);
-            dateFormat.setTimeZone(UTC);
-            timeFormat.setTimeZone(UTC);
+            dateFormat.setTimeZone(TimeUtils.UTC);
+            timeFormat.setTimeZone(TimeUtils.UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,11 +65,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         }
 
         try {
-            calendar = Calendar.getInstance(UTC);
+            calendar = Calendar.getInstance(TimeUtils.UTC);
             calendar.clear();
             calendar.setTimeInMillis(original.getMillis());
-            dateFormat.setTimeZone(UTC);
-            timeFormat.setTimeZone(UTC);
+            dateFormat.setTimeZone(TimeUtils.UTC);
+            timeFormat.setTimeZone(TimeUtils.UTC);
         } catch (Exception e) {
             e.printStackTrace();
         }
