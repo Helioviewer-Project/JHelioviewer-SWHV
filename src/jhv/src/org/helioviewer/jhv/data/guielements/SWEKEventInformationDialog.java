@@ -203,16 +203,19 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
-        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getPrecedingEvents())) {
+        Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
+        if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
             precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", event.getEventRelationShip().getPrecedingEvents());
         }
 
-        if (!event.getEventRelationShip().getNextEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
-            followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", event.getEventRelationShip().getNextEvents());
+        Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
+        if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
+            followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", nextEvents);
         }
 
-        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty() && notNullRelationShip(event.getEventRelationShip().getRelatedEventsByRule())) {
-            otherRelatedEvents = createRelatedEventsCollapsiblePane("Other Related Events", event.getEventRelationShip().getRelatedEventsByRule());
+        Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
+        if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
+            otherRelatedEvents = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
         }
     }
 
@@ -256,7 +259,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
         int gridYPosition = 3;
 
-        if (!event.getEventRelationShip().getPrecedingEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getPrecedingEvents())) {
+        Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
+        if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
             gc.gridy = gridYPosition;
             if (precedingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -267,7 +271,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             gridYPosition++;
         }
 
-        if (!event.getEventRelationShip().getNextEvents().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
+        Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
+        if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
             gc.gridy = gridYPosition;
             if (followingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -278,7 +283,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
             gridYPosition++;
         }
 
-        if (!event.getEventRelationShip().getRelatedEventsByRule().isEmpty() && notNullRelationShip(event.getEventRelationShip().getNextEvents())) {
+        Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
+        if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
             gc.gridy = gridYPosition;
             if (otherRelatedEvents.isExpanded()) {
                 gc.weighty = 1;
