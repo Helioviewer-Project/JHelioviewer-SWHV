@@ -347,11 +347,25 @@ public class JHVEventCache {
                     JHVEventRelation relation = relatedEvent.getEventRelationShip().getNextEvents().get(event.getUniqueID());
                     relation.setTheEvent(event);
                     event.getEventRelationShip().setRelationshipColor(relatedEvent.getColor());
+                    // it might be possible there is no definition in the
+                    // current event for the relationship with the related
+                    // event. So we add a preceding event relationship.
+                    Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
+                    if (!precedingEvents.containsKey(relatedEvent.getUniqueID())) {
+                        precedingEvents.put(relatedEvent.getUniqueID(), new JHVEventRelation(relatedEvent.getUniqueID(), relatedEvent));
+                    }
                 }
                 if (relatedEvent.getEventRelationShip().getPrecedingEvents().containsKey(event.getUniqueID())) {
                     JHVEventRelation relation = relatedEvent.getEventRelationShip().getPrecedingEvents().get(event.getUniqueID());
                     relation.setTheEvent(event);
                     relatedEvent.getEventRelationShip().setRelationshipColor(event.getEventRelationShip().getRelationshipColor());
+                    // it might be possible there is no definition in the
+                    // current event for the relationship with the related
+                    // event. So we add a next event relationship.
+                    Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
+                    if (!nextEvents.containsKey(relatedEvent.getUniqueID())) {
+                        nextEvents.put(relatedEvent.getUniqueID(), new JHVEventRelation(relatedEvent.getUniqueID(), relatedEvent));
+                    }
                 }
                 /*
                  * if
