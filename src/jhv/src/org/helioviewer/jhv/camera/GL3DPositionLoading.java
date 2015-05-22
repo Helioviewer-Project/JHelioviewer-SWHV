@@ -17,7 +17,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.physics.Constants;
@@ -156,7 +156,7 @@ public class GL3DPositionLoading {
                 String dateString = (String) iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
-                Date date = FormatDate.utcFullDateFormat.parse(dateString);
+                Date date = TimeUtils.utcFullDateFormat.parse(dateString);
                 calendar.setTime(date);
 
                 double x, y, z, jy;
@@ -191,7 +191,7 @@ public class GL3DPositionLoading {
     }
 
     public void setBeginDate(Date beginDate, boolean applyChanges) {
-        this.beginDate = FormatDate.utcFullDateFormat.format(beginDate);
+        this.beginDate = TimeUtils.utcFullDateFormat.format(beginDate);
         this.beginDatems = beginDate;
         if (applyChanges) {
             applyChanges();
@@ -199,7 +199,7 @@ public class GL3DPositionLoading {
     }
 
     public void setEndDate(Date endDate, boolean applyChanges) {
-        this.endDate = FormatDate.utcFullDateFormat.format(endDate);
+        this.endDate = TimeUtils.utcFullDateFormat.format(endDate);
         this.endDatems = endDate;
         if (applyChanges) {
             applyChanges();

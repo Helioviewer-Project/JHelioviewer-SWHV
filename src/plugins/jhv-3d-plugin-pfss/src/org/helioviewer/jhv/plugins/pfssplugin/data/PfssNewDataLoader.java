@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.helioviewer.base.Pair;
-import org.helioviewer.base.datetime.FormatDate;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -68,7 +68,7 @@ public class PfssNewDataLoader implements Runnable {
                         while ((inputLine = in.readLine()) != null) {
                             splitted = inputLine.split(" ");
                             url = splitted[1];
-                            Date dd = FormatDate.utcDateFormat.parse(splitted[0]);
+                            Date dd = TimeUtils.utcDateFormat.parse(splitted[0]);
                             urls.add(new Pair<String, Long>(url, dd.getTime()));
                         }
                         in.close();

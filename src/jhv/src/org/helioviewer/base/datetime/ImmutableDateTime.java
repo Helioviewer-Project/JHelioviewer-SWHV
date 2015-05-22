@@ -135,7 +135,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     public String getCachedDate() {
         if (cachedDate == null) {
-            cachedDate = FormatDate.utcDateFormat.format(calendar.getTime());
+            cachedDate = TimeUtils.utcDateFormat.format(calendar.getTime());
         }
         return cachedDate;
     }
