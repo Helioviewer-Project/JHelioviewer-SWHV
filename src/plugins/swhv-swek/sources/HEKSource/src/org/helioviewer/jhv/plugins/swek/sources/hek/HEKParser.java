@@ -830,7 +830,11 @@ public class HEKParser implements SWEKParser {
 
     public JHVPoint convertHGSJHV(JHVPoint el, HEKEvent evt) {
         double theta = el.getCoordinate2() / MathUtils.radeg;
-        double phi = el.getCoordinate1() / MathUtils.radeg - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+
+        Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
+        double[] RBL = Astronomy.getRBL(date);
+        double phi = el.getCoordinate1() / MathUtils.radeg - RBL[2];
+
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);

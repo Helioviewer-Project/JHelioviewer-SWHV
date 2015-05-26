@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.display.Displayer;
@@ -73,8 +74,8 @@ public class GL3DObserverCamera extends GL3DCamera {
             this.localRotation = metadata.getRotationObs();
             d = metadata.getDistanceObs();
         } else {
-            this.localRotation = new GL3DQuatd(0, Astronomy.getL0Radians(date), 0);
-            d = Astronomy.getDistanceSolarRadii(date);
+            this.localRotation = GL3DQuatd.ZERO;
+            d = Sun.MeanEarthDistance;
         }
         this.setZTranslation(-d);
 
