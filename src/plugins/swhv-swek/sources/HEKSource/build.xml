@@ -108,7 +108,7 @@
         </condition>
     </target>
 
-    <target name="jar-bundle" depends="compile">
+    <target name="jar-bundle" depends="compile, compile_without">
         <!-- JAR File -->
         <jar destfile="${heksource.build}/${source.name}.jar">
             <manifest>
