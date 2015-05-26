@@ -21,14 +21,13 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
             label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
             label.setToolTipText("Click to remove");
         } else {
-            label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER_GRAY));
-            label.setToolTipText("Cannot be removed");
+            label.setIcon(null); // IconBank.getIcon(JHVIcon.REMOVE_LAYER_GRAY))
+            label.setToolTipText(null); // "Cannot be removed"
         }
         label.setBorder(RenderableContainerPanel.commonRightBorder);
         label.setText(null);
 
         return label;
-
     }
 
 }
