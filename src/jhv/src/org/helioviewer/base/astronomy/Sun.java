@@ -82,7 +82,9 @@ public class Sun {
         if (he_lon < 0)
             he_lon += (2 * Math.PI);
 
-        double[] RBL = new double[] { dist * Sun.MeanEarthDistance, he_lat, he_lon };
+        // convert distance to solar radii
+        // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
+        double[] RBL = new double[] { dist * Sun.MeanEarthDistance, he_lat, -he_lon };
         prevRBL = RBL;
 
         return RBL;
