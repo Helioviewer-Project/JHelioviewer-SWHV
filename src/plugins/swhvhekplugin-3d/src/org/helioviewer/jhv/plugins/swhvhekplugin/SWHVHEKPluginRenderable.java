@@ -11,9 +11,9 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -76,7 +76,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double lineResolution = 10;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        double[] RBL = Astronomy.getRBL(date);
+        double[] RBL = Sun.getRBL(date);
 
         double thetaDelta = RBL[1];
         double thetaStart = principleAngle - angularWidth / 2.;

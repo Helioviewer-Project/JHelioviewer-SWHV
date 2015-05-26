@@ -14,7 +14,6 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -183,7 +182,7 @@ public class RenderableGrid implements Renderable {
                 gl.glRotatef(-90, 0, 1, 0);
                 gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
                 {
-                    double[] rbl = Astronomy.getRBL(timestamp);
+                    double[] rbl = Sun.getRBL(timestamp);
                     gl.glRotatef(90 - (float) (rbl[2] * MathUtils.radeg), 0, 1, 0);
                     gl.glRotatef((float) -(rbl[1] * MathUtils.radeg), 0, 0, 1);
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);

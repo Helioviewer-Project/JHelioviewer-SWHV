@@ -10,8 +10,8 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.TimeUtils;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -116,7 +116,7 @@ public class PfssData {
             this.dateString = date.substring(11, 30);
 
             Date dd = TimeUtils.utcDateFormat.parse(dateString);
-            double[] RBL = Astronomy.getRBL(dd);
+            double[] RBL = Sun.getRBL(dd);
             double phi = RBL[2] - Math.PI / 2.;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);

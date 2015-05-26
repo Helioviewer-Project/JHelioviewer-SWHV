@@ -10,7 +10,6 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
@@ -143,7 +142,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     private void retrievePosition(MetaDataContainer m) {
         Date obsDate = dateObs.getTime();
-        double[] rbl = Astronomy.getRBL(obsDate);
+        double[] rbl = Sun.getRBL(obsDate);
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
             distanceObs = rbl[0];
