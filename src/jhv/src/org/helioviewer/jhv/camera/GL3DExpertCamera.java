@@ -5,7 +5,6 @@ import java.util.Date;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -107,7 +106,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 updateRotation(date);
             }
         } else if (date != null) {
-            double[] rbl = Astronomy.getRBL(date);
+            double[] rbl = Sun.getRBL(date);
             currentDistance = rbl[0];
             currentB = rbl[1];
             currentL = 0;
@@ -116,7 +115,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     private void updateRotation(Date date) {
-        double[] rbl = Astronomy.getRBL(date);
+        double[] rbl = Sun.getRBL(date);
 
         double b = currentB;
         double l = -currentL + rbl[2];

@@ -2,8 +2,8 @@ package org.helioviewer.jhv.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.physics.Astronomy;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
@@ -60,7 +60,7 @@ public class GL3DEarthCamera extends GL3DCamera {
     }
 
     private void updateRotation(Date date) {
-        double[] rbl = Astronomy.getRBL(date);
+        double[] rbl = Sun.getRBL(date);
 
         this.localRotation = new GL3DQuatd(rbl[1], rbl[2]);
         this.setZTranslation(-rbl[0]);
