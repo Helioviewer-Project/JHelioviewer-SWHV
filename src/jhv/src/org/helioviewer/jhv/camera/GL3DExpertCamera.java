@@ -107,16 +107,19 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 updateRotation(date);
             }
         } else if (date != null) {
+            double[] rbl = Astronomy.getRBL(date);
+            currentDistance = rbl[0];
+            currentB = rbl[1];
             currentL = 0;
-            currentB = Astronomy.getBL(date);
-            currentDistance = Astronomy.getDistanceSolarRadii(date);
             updateRotation(date);
         }
     }
 
     private void updateRotation(Date date) {
+        double[] rbl = Astronomy.getRBL(date);
+
         double b = currentB;
-        double l = (-currentL + Astronomy.getL0Radians(date)) % (Math.PI * 2.0);
+        double l = -currentL + rbl[2];
         double d = currentDistance;
 
         this.localRotation = new GL3DQuatd(b, l);

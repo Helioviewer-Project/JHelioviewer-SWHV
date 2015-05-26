@@ -116,7 +116,9 @@ public class PfssData {
             this.dateString = date.substring(11, 30);
 
             Date dd = TimeUtils.utcDateFormat.parse(dateString);
-            double phi = Astronomy.getL0Radians(dd) - Math.PI / 2.;
+            double[] RBL = Astronomy.getRBL(dd);
+            double phi = RBL[2] - Math.PI / 2.;
+
             double sphi = Math.sin(phi), cphi = Math.cos(phi);
 
             this.createBuffer(fieldlinex.length);

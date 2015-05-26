@@ -73,11 +73,17 @@ public class SWHVHEKPluginRenderable implements Renderable {
             }
         }
         double arcResolution = 100;
-        double thetaDelta = Astronomy.getB0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        double lineResolution = 10;
+
+        Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
+        double[] RBL = Astronomy.getRBL(date);
+
+        double thetaDelta = RBL[1];
         double thetaStart = principleAngle - angularWidth / 2.;
         double thetaEnd = principleAngle + angularWidth / 2.;
-        double phi = -Math.PI / 2. - Astronomy.getL0Radians(new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-        double lineResolution = 10;
+
+        double phi = -Math.PI / 2. - RBL[2];
+
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3f(eventColor.getRed() / 255f, eventColor.getGreen() / 255f, eventColor.getBlue() / 255f);
 
