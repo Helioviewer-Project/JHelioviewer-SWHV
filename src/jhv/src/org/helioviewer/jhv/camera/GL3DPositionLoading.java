@@ -216,23 +216,21 @@ public class GL3DPositionLoading {
     }
 
     public long getStartTime() {
-        int llen = position.length;
-        if (llen > 0) {
+        if (position.length > 0) {
             return position[0].milli;
         }
         return -1L;
     }
 
     public long getEndTime() {
-        int llen = position.length;
-        if (llen > 0) {
-            return position[llen - 1].milli;
+        if (position.length > 0) {
+            return position[position.length - 1].milli;
         }
         return -1L;
     }
 
-    public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
-        if (this.isLoaded && position.length > 0) {
+    public Position.Latitudinal getInterpolatedPosition(long currentCameraTime) {
+        if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
 
             long tstart = getStartTime();
@@ -254,7 +252,7 @@ public class GL3DPositionLoading {
                 hgln = alpha * position[i].lon + (1. - alpha) * position[inext].lon;
                 hglt = alpha * position[i].lat + (1. - alpha) * position[inext].lat;
             }
-            return new GL3DVec3d(dist, hgln, hglt);
+            return new Position.Latitudinal(dist, hgln, hglt);
         } else {
             return null;
         }

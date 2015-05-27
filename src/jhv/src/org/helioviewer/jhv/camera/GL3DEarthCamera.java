@@ -49,14 +49,15 @@ public class GL3DEarthCamera extends GL3DCamera {
     }
 
     public void forceTimeChanged(Date date) {
-        if (date != null) {
-            updateRotation(date);
+        if (date == null)
+            return;
 
-            RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
-            if (renderableCamera != null) {
-                renderableCamera.setTimeString(date);
-                ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
-            }
+        updateRotation(date);
+
+        RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
+        if (renderableCamera != null) {
+            renderableCamera.setTimeString(date);
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
 
