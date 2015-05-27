@@ -66,8 +66,10 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     public void forceTimeChanged(Date date) {
-        if (date != null && this.positionLoading.isLoaded()) {
+        if (date == null)
+            return;
 
+        if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
                 long tLayerStart = 0, tLayerEnd = 0;
@@ -98,19 +100,20 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
             }
 
-            GL3DVec3d position = this.positionLoading.getInterpolatedPosition(currentCameraTime);
-            if (position != null) {
-                currentL = position.y;
-                currentB = position.z;
-                currentDistance = position.x;
+            Position.Latitudinal p = positionLoading.getInterpolatedPosition(currentCameraTime);
+            if (p != null) {
+                currentDistance = p.rad;
+                currentL = p.lon;
+                currentB = p.lat;
 
-                updateRotation(date);
+                updateRotation(cameraDate);
             }
-        } else if (date != null) {
+        } else {
             Position.Latitudinal p = Sun.getRBL(date);
             currentDistance = p.rad;
-            currentB = p.lat;
             currentL = 0;
+            currentB = p.lat;
+
             updateRotation(date);
         }
     }
