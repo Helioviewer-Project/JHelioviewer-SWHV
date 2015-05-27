@@ -219,8 +219,8 @@ public class GL3DPositionLoading {
         if (this.isLoaded && position.length > 0) {
             double dist, hgln, hglt;
 
-            long t3 = this.getBeginDate().getTime();
-            long t4 = this.getEndDate().getTime();
+            long t3 = position[0].milli;
+            long t4 = position[position.length - 1].milli;
             if (t3 == t4) {
                 dist = position[0].rad;
                 hgln = position[0].lon;
