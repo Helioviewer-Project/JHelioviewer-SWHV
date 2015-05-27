@@ -33,7 +33,6 @@ public class GL3DPositionLoading {
     private final String PARTIALSTATE = "Partial";
 
     private boolean isLoaded = false;
-    private URL url;
     private JSONObject jsonResult;
     private Position.Latitudinal[] position;
     private String beginDate = "2014-05-28T00:00:00";
@@ -41,7 +40,6 @@ public class GL3DPositionLoading {
     private final String target = "SUN";
     private String observer = "Earth";
     private final String baseUrl = "http://swhv.oma.be/position?";
-    private int deltat = 45;
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
     private SwingWorker<Integer, Integer> worker;
@@ -51,15 +49,16 @@ public class GL3DPositionLoading {
         this.camera = camera;
     }
 
-    private void buildRequestURL() {
+    private URL buildRequestURL(long deltat) {
         try {
-            url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
+            return new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
         } catch (MalformedURLException e) {
-            Log.error("A wrong url is given.", e);
+            Log.error("Wrong URL", e);
         }
+        return null;
     }
 
-    public void requestData() {
+    private void requestData() {
         if (worker != null) {
             worker.cancel(false);
         }
@@ -72,13 +71,13 @@ public class GL3DPositionLoading {
             protected Integer doInBackground() throws Exception {
                 Thread.currentThread().setName("GL3DPositionLoading--Main");
                 try {
-                    if (endDatems.getTime() - beginDatems.getTime() < 1000 * 60 * 60 * 24 * 20) {
-                        deltat = 60 * 60 / 64;
-                    } else {
-                        deltat = 60 * 60 * 24;
-                    }
-                    buildRequestURL();
+                    long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
+                    final long max = 100000;
 
+                    if (span / deltat > max)
+                        deltat = span / max;
+
+                    URL url = buildRequestURL(deltat);
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
@@ -101,16 +100,15 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
-
                 return 1;
             }
 
             @Override
-            public void process(List<Integer> chunks) {
+            protected void process(List<Integer> chunks) {
             }
 
             @Override
-            public void done() {
+            protected void done() {
                 if (!this.isCancelled()) {
                     if (report == null && jsonResult != null) {
                         parseData();
@@ -143,7 +141,6 @@ public class GL3DPositionLoading {
         try {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
-
             Position.Latitudinal[] positionHelper = new Position.Latitudinal[resLength];
 
             for (int j = 0; j < resLength; j++) {
