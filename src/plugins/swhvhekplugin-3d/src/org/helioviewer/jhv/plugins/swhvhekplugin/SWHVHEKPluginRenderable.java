@@ -94,46 +94,50 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glLineWidth(0.8f);
         }
 
+        double r, alpha, theta;
+        double x, y, z;
+        double xrot, yrot, zrot;
+
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution; i++) {
-            double alpha = 1. - 1. * i / arcResolution;
-            double r = alpha * distSun + (1 - alpha) * (distSun + 2);
-            double theta = thetaStart;
+            alpha = 1. - 1. * i / arcResolution;
+            r = alpha * distSun + (1 - alpha) * (distSun + 2);
+            theta = thetaStart;
 
-            double x = r * Math.cos(theta) * Math.sin(phi);
-            double z = r * Math.cos(theta) * Math.cos(phi);
-            double y = r * Math.sin(theta);
-            double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            double xrot = x;
+            x = r * Math.cos(theta) * Math.sin(phi);
+            z = r * Math.cos(theta) * Math.cos(phi);
+            y = r * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
 
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         for (int i = 0; i <= arcResolution; i++) {
-            double alpha = 1. - 1. * i / arcResolution;
-            double theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
+            alpha = 1. - 1. * i / arcResolution;
+            theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
 
-            double x = distSun * Math.cos(theta) * Math.sin(phi);
-            double z = distSun * Math.cos(theta) * Math.cos(phi);
-            double y = distSun * Math.sin(theta);
-            double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            double xrot = x;
+            x = distSun * Math.cos(theta) * Math.sin(phi);
+            z = distSun * Math.cos(theta) * Math.cos(phi);
+            y = distSun * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
 
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         for (int i = 0; i <= lineResolution; i++) {
-            double alpha = 1. - 1. * i / arcResolution;
-            double r = alpha * distSun + (1 - alpha) * (distSun + 2);
-            double theta = thetaEnd;
+            alpha = 1. - 1. * i / arcResolution;
+            r = alpha * distSun + (1 - alpha) * (distSun + 2);
+            theta = thetaEnd;
 
-            double x = r * Math.cos(theta) * Math.sin(phi);
-            double z = r * Math.cos(theta) * Math.cos(phi);
-            double y = r * Math.sin(theta);
-            double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            double xrot = x;
+            x = r * Math.cos(theta) * Math.sin(phi);
+            z = r * Math.cos(theta) * Math.cos(phi);
+            y = r * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
 
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
@@ -167,14 +171,11 @@ public class SWHVHEKPluginRenderable implements Renderable {
             return;
         }
 
-        // draw bounds
-        JHVPoint oldBoundaryPoint3d = null;
-        if (evt.getEventRelationShip().getRelationshipColor() != null) {
-            Color evtColor = evt.getEventRelationShip().getRelationshipColor();
-            gl.glColor3f(evtColor.getRed() / 255f, evtColor.getGreen() / 255f, evtColor.getBlue() / 255f);
-        } else {
-            gl.glColor3f(evt.getColor().getRed() / 255f, evt.getColor().getGreen() / 255f, evt.getColor().getBlue() / 255f);
-        }
+
+        Color color = evt.getEventRelationShip().getRelationshipColor();
+        if (color == null)
+            color = evt.getColor();
+        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
             gl.glLineWidth(1.6f);
@@ -182,9 +183,13 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glLineWidth(0.7f);
         }
 
+        // draw bounds
+        JHVPoint oldBoundaryPoint3d = null;
+
         gl.glDisable(GL2.GL_TEXTURE_2D);
         for (JHVPoint point : points) {
             int divpoints = 10;
+
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
@@ -193,12 +198,8 @@ public class SWHVHEKPluginRenderable implements Renderable {
                     double ynew = alpha * oldBoundaryPoint3d.getCoordinate2() + (1 - alpha) * point.getCoordinate2();
                     double znew = alpha * oldBoundaryPoint3d.getCoordinate3() + (1 - alpha) * point.getCoordinate3();
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    xnew = xnew / r;
-                    ynew = ynew / r;
-                    znew = znew / r;
-                    gl.glVertex3d(xnew, -ynew, znew);
+                    gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
                 }
-
             }
             gl.glEnd();
 

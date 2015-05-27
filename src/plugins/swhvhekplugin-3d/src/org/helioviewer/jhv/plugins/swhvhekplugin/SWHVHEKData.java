@@ -113,7 +113,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
         if (events != null) {
             for (JHVEvent event : events) {
-                Log.debug("Loop over events :  " + event.getStartDate() + " - " + event.getEndDate() + " current date : " + currentDate);
                 if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
                     if (event.getStartDate().getTime() <= currentDate.getTime() && event.getEndDate().getTime() >= currentDate.getTime()) {
                         activeEvents.add(event);
