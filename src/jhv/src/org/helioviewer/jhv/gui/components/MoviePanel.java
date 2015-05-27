@@ -604,6 +604,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         public void activeLayerChanged(AbstractView view) {
             this.searchCorrespondingMoviePanel(view);
+            ImageViewerGui.getMoviePanelContainer().updateActiveView(view);
         }
 
         /**
