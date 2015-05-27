@@ -39,6 +39,15 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
      * private constructor
      */
     private SWHVHEKData() {
+        Date first, last;
+        if ((first = LayersModel.getFirstDate()) != null)
+            beginDate = first;
+        if ((last = LayersModel.getLastDate()) != null)
+            endDate = last;
+
+        if (beginDate != null && endDate != null)
+            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
+
         LayersModel.addLayersListener(this);
     }
 
