@@ -72,7 +72,6 @@ public class ImageViewerGui {
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;
-    private static MoviePanel moviePanel;
     private static ControlPanelContainer moviePanelContainer;
     private static FiltersPanel filtersPanel;
 
@@ -120,9 +119,7 @@ public class ImageViewerGui {
 
         leftPane = new SideContentPane();
         // Movie control
-        moviePanelContainer = new ControlPanelContainer();
-        moviePanel = new MoviePanel();
-        moviePanelContainer.setDefaultPanel(moviePanel);
+        moviePanelContainer = new ControlPanelContainer(new MoviePanel());
         leftPane.add("Movie Controls", moviePanelContainer, true);
 
         // Layer control
