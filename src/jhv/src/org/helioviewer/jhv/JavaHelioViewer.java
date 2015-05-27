@@ -141,13 +141,6 @@ public class JavaHelioViewer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    ImageViewerGui.showMainFrame();
-                }
-        });
     }
 
 }
