@@ -171,7 +171,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
             return;
         }
 
-
         Color color = evt.getEventRelationShip().getRelationshipColor();
         if (color == null)
             color = evt.getColor();
