@@ -14,10 +14,12 @@ import org.helioviewer.viewmodel.view.View;
 @SuppressWarnings({"serial"})
 public class ControlPanelContainer extends JPanel implements LayersListener {
 
-    HashMap<View, Component> controlMap = new HashMap<View, Component>();
+    private HashMap<View, Component> controlMap = new HashMap<View, Component>();
 
-    public ControlPanelContainer() {
+    public ControlPanelContainer(Component comp) {
         this.setLayout(new CardLayout());
+        this.add(comp, "null");
+        this.controlMap.put(null, comp);
         LayersModel.addLayersListener(this);
     }
 
@@ -29,10 +31,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
     public void removeLayer(View v) {
         Component toRemove = controlMap.get(v);
         this.getLayout().removeLayoutComponent(toRemove);
-    }
-
-    public Component getViewComponent(View v) {
-        return controlMap.get(v);
     }
 
     private void updateActiveView(AbstractView v) {
@@ -50,29 +48,15 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
         revalidate();
     }
 
-    public void setDefaultPanel(Component comp) {
-        this.add(comp, "null");
-        this.controlMap.put(null, comp);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void activeLayerChanged(AbstractView view) {
         updateActiveView(view);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void layerAdded(int newIndex) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void layerRemoved(int oldIndex) {
     }
