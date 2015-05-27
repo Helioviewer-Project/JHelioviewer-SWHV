@@ -219,14 +219,14 @@ public class GL3DPositionLoading {
         if (this.isLoaded && position.length > 0) {
             double dist, hgln, hglt;
 
-            long t3 = position[0].milli;
-            long t4 = position[position.length - 1].milli;
-            if (t3 == t4) {
+            long tstart = position[0].milli;
+            long tend = position[position.length - 1].milli;
+            if (tstart == tend) {
                 dist = position[0].rad;
                 hgln = position[0].lon;
                 hglt = position[0].lat;
             } else {
-                double interpolatedIndex = (currentCameraTime - t3) / (double) (t4 - t3) * position.length;
+                double interpolatedIndex = (currentCameraTime - tstart) / (double) (tend - tstart) * position.length;
                 int i = (int) interpolatedIndex;
                 i = Math.min(i, position.length - 1);
                 if (i < 0) {
