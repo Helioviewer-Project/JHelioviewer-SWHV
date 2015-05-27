@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
@@ -76,13 +77,13 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double lineResolution = 10;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        double[] RBL = Sun.getRBL(date);
+        Position.Latitudinal p = Sun.getRBL(date);
 
-        double thetaDelta = RBL[1];
+        double thetaDelta = p.lat;
         double thetaStart = principleAngle - angularWidth / 2.;
         double thetaEnd = principleAngle + angularWidth / 2.;
 
-        double phi = -Math.PI / 2. - RBL[2];
+        double phi = -Math.PI / 2. - p.lon;
 
         Color eventColor = evt.getEventRelationShip().getRelationshipColor();
         gl.glColor3f(eventColor.getRed() / 255f, eventColor.getGreen() / 255f, eventColor.getBlue() / 255f);

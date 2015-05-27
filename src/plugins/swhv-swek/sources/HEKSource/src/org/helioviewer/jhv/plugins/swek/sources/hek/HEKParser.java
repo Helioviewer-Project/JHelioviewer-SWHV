@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
@@ -832,8 +833,8 @@ public class HEKParser implements SWEKParser {
         double theta = el.getCoordinate2() / MathUtils.radeg;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        double[] RBL = Sun.getRBL(date);
-        double phi = el.getCoordinate1() / MathUtils.radeg - RBL[2];
+        Position.Latitudinal p = Sun.getRBL(date);
+        double phi = el.getCoordinate1() / MathUtils.radeg - p.lon;
 
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
