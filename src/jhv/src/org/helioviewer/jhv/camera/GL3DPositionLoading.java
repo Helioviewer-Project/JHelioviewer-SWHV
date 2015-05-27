@@ -215,12 +215,28 @@ public class GL3DPositionLoading {
         return this.endDatems;
     }
 
+    public long getStartTime() {
+        int llen = position.length;
+        if (llen > 0) {
+            return position[0].milli;
+        }
+        return -1L;
+    }
+
+    public long getEndTime() {
+        int llen = position.length;
+        if (llen > 0) {
+            return position[llen - 1].milli;
+        }
+        return -1L;
+    }
+
     public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
         if (this.isLoaded && position.length > 0) {
             double dist, hgln, hglt;
 
-            long tstart = position[0].milli;
-            long tend = position[position.length - 1].milli;
+            long tstart = getStartTime();
+            long tend = getEndTime();
             if (tstart == tend) {
                 dist = position[0].rad;
                 hgln = position[0].lon;

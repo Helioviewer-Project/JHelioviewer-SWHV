@@ -70,21 +70,21 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
-                long t1 = 0, t2 = 0;
+                long tLayerStart = 0, tLayerEnd = 0;
                 // Active layer times
                 AbstractView view = LayersModel.getActiveView();
                 if (view instanceof JHVJPXView) {
-                    t1 = LayersModel.getStartDate(view).getTime();
-                    t2 = LayersModel.getEndDate(view).getTime();
+                    tLayerStart = LayersModel.getStartDate(view).getTime();
+                    tLayerEnd = LayersModel.getEndDate(view).getTime();
                 }
                 //Camera times
-                long t3 = this.positionLoading.getBeginDate().getTime();
-                long t4 = this.positionLoading.getEndDate().getTime();
+                long tPositionStart = this.positionLoading.getStartTime();
+                long tPositionEnd = this.positionLoading.getEndTime();
 
-                if (t2 != t1) {
-                    currentCameraTime = (long) (t3 + (t4 - t3) * (dateTime - t1) / (double) (t2 - t1));
+                if (tLayerEnd != tLayerStart) {
+                    currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (dateTime - tLayerStart) / (double) (tLayerEnd - tLayerStart));
                 } else {
-                    currentCameraTime = t4;
+                    currentCameraTime = tPositionEnd;
                 }
             } else {
                 currentCameraTime = dateTime;
