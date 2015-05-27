@@ -232,10 +232,12 @@ public class GL3DPositionLoading {
     public Position.Latitudinal getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
+            long milli;
 
             long tstart = getStartTime();
             long tend = getEndTime();
             if (tstart == tend) {
+                milli = position[0].milli;
                 dist = position[0].rad;
                 hgln = position[0].lon;
                 hglt = position[0].lat;
@@ -247,12 +249,22 @@ public class GL3DPositionLoading {
                     i = 0;
                 }
                 int inext = Math.min(i + 1, position.length - 1);
-                double alpha = 1. - interpolatedIndex % 1.;
-                dist = alpha * position[i].rad + (1. - alpha) * position[inext].rad;
-                hgln = alpha * position[i].lon + (1. - alpha) * position[inext].lon;
-                hglt = alpha * position[i].lat + (1. - alpha) * position[inext].lat;
+
+                tstart = position[i].milli;
+                tend = position[inext].milli;
+
+                double alpha;
+                if (tend == tstart)
+                    alpha = 1.;
+                else
+                    alpha = ((currentCameraTime - tstart) / (double) (tend - tstart)) % 1.;
+
+                milli = (long) ((1. - alpha) * position[i].milli + alpha * position[inext].milli);
+                dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
+                hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
+                hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
-            return new Position.Latitudinal(dist, hgln, hglt);
+            return new Position.Latitudinal(milli, dist, hgln, hglt);
         } else {
             return null;
         }
