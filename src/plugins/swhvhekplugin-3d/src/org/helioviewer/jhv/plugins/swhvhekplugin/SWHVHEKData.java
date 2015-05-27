@@ -87,6 +87,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     @Override
     public void cacheUpdated() {
+        Log.debug("beginDate : " + beginDate);
+        Log.debug("endDate : " + endDate);
         if (beginDate != null && endDate != null) {
             JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate);
             data = result.getAvailableEvents();
@@ -96,6 +98,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                     for (Date eDate : data.get(eventType).get(sDate).keySet()) {
                         for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
                             events.add(event);
+                            Log.debug("Add event: " + event.getStartDate() + " - " + event.getEndDate());
                         }
                     }
                 }
@@ -113,8 +116,9 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
         if (events != null) {
             for (JHVEvent event : events) {
+                Log.debug("Loop over events :  " + event.getStartDate() + " - " + event.getEndDate() + " current date : " + currentDate);
                 if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
-                    if (event.getStartDate().getTime() < currentDate.getTime() && event.getEndDate().getTime() > currentDate.getTime()) {
+                    if (event.getStartDate().getTime() <= currentDate.getTime() && event.getEndDate().getTime() >= currentDate.getTime()) {
                         activeEvents.add(event);
                     }
                     event.addHighlightListener(Displayer.getSingletonInstance());
