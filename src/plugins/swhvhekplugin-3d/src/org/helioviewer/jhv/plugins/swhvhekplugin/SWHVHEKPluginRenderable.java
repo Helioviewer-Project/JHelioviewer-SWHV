@@ -77,7 +77,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double lineResolution = 10;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        Position.Latitudinal p = Sun.getRBL(date);
+        Position.Latitudinal p = Sun.getEarth(date);
 
         double thetaDelta = p.lat;
         double thetaStart = principleAngle - angularWidth / 2.;

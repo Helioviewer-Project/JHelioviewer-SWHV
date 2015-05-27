@@ -833,7 +833,7 @@ public class HEKParser implements SWEKParser {
         double theta = el.getCoordinate2() / MathUtils.radeg;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        Position.Latitudinal p = Sun.getRBL(date);
+        Position.Latitudinal p = Sun.getEarth(date);
         double phi = el.getCoordinate1() / MathUtils.radeg - p.lon;
 
         double x = Math.cos(theta) * Math.sin(phi);

@@ -114,10 +114,10 @@ public class PfssData {
             Header header = bhdu.getHeader();
 
             String date = header.findKey("DATE-OBS");
-            this.dateString = date.substring(11, 30);
+            dateString = date.substring(11, 30);
 
             Date dd = TimeUtils.utcDateFormat.parse(dateString);
-            Position.Latitudinal p = Sun.getRBL(dd);
+            Position.Latitudinal p = Sun.getEarth(dd);
             double phi = p.lon - Math.PI / 2.;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);

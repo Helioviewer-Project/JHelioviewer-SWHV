@@ -62,7 +62,7 @@ public class GL3DEarthCamera extends GL3DCamera {
     }
 
     private void updateRotation(Date date) {
-        Position.Latitudinal p = Sun.getRBL(date);
+        Position.Latitudinal p = Sun.getEarth(date);
 
         this.localRotation = new GL3DQuatd(p.lat, p.lon);
         this.setZTranslation(-p.rad);
