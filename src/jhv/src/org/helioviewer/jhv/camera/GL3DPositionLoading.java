@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
@@ -34,7 +35,7 @@ public class GL3DPositionLoading {
     private boolean isLoaded = false;
     private URL url;
     private JSONObject jsonResult;
-    private GL3DPositionDateTime[] positionDateTime;
+    private Position.Latitudinal[] position;
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
     private final String target = "SUN";
@@ -114,9 +115,9 @@ public class GL3DPositionLoading {
                     if (report == null && jsonResult != null) {
                         parseData();
                         jsonResult = null;
-                        if (positionDateTime != null && positionDateTime.length > 0) {
+                        if (position != null && position.length > 0) {
                             setLoaded(true);
-                        } else if (positionDateTime == null) {
+                        } else if (position == null) {
                             report = "response is void";
                         } else {
                             report = "response is zero length array";
@@ -143,7 +144,7 @@ public class GL3DPositionLoading {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
 
-            GL3DPositionDateTime[] positionDateTimehelper = new GL3DPositionDateTime[resLength];
+            Position.Latitudinal[] positionHelper = new Position.Latitudinal[resLength];
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
@@ -154,16 +155,16 @@ public class GL3DPositionLoading {
                 String dateString = (String) iterKeys.next();
                 JSONArray posArray = posObject.getJSONArray(dateString);
 
-                double x, y, z, jy;
-                x = posArray.getDouble(0);
-                jy = posArray.getDouble(1);
-                y = jy + (jy > 0 ? -Math.PI : Math.PI);
-                z = -posArray.getDouble(2);
+                double rad, lon, lat, jlon;
+                rad = posArray.getDouble(0) * (1000. / Sun.RadiusMeter);
+                jlon = posArray.getDouble(1);
+                lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
+                lat = -posArray.getDouble(2);
 
                 Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                positionDateTimehelper[j] = new GL3DPositionDateTime(date.getTime(), x, y, z);
+                positionHelper[j] = new Position.Latitudinal(date.getTime(), rad, lon, lat);
             }
-            this.positionDateTime = positionDateTimehelper;
+            this.position = positionHelper;
         } catch (JSONException e) {
             this.fireLoaded(this.PARTIALSTATE);
             Log.warn("JSON response parse failure", e);
@@ -182,7 +183,7 @@ public class GL3DPositionLoading {
 
     private void applyChanges() {
         this.setLoaded(false);
-        this.positionDateTime = null;
+        this.position = null;
         this.requestData();
     }
 
@@ -215,29 +216,28 @@ public class GL3DPositionLoading {
     }
 
     public GL3DVec3d getInterpolatedPosition(long currentCameraTime) {
-        if (this.isLoaded && positionDateTime.length > 0) {
+        if (this.isLoaded && position.length > 0) {
             double dist, hgln, hglt;
 
             long t3 = this.getBeginDate().getTime();
             long t4 = this.getEndDate().getTime();
             if (t3 == t4) {
-                dist = positionDateTime[0].x;
-                hgln = positionDateTime[0].y;
-                hglt = positionDateTime[0].z;
+                dist = position[0].rad;
+                hgln = position[0].lon;
+                hglt = position[0].lat;
             } else {
-                double interpolatedIndex = (currentCameraTime - t3) / (double) (t4 - t3) * positionDateTime.length;
+                double interpolatedIndex = (currentCameraTime - t3) / (double) (t4 - t3) * position.length;
                 int i = (int) interpolatedIndex;
-                i = Math.min(i, positionDateTime.length - 1);
+                i = Math.min(i, position.length - 1);
                 if (i < 0) {
                     i = 0;
                 }
-                int inext = Math.min(i + 1, positionDateTime.length - 1);
+                int inext = Math.min(i + 1, position.length - 1);
                 double alpha = 1. - interpolatedIndex % 1.;
-                dist = alpha * positionDateTime[i].x + (1. - alpha) * positionDateTime[inext].x;
-                hgln = alpha * positionDateTime[i].y + (1. - alpha) * positionDateTime[inext].y;
-                hglt = alpha * positionDateTime[i].z + (1. - alpha) * positionDateTime[inext].z;
+                dist = alpha * position[i].rad + (1. - alpha) * position[inext].rad;
+                hgln = alpha * position[i].lon + (1. - alpha) * position[inext].lon;
+                hglt = alpha * position[i].lat + (1. - alpha) * position[inext].lat;
             }
-            dist *= 1000. / Sun.RadiusMeter;
             return new GL3DVec3d(dist, hgln, hglt);
         } else {
             return null;
