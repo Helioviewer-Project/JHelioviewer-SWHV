@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.metadata;
 import java.util.Date;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
@@ -142,10 +143,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     private void retrievePosition(MetaDataContainer m) {
         Date obsDate = dateObs.getTime();
-        double[] rbl = Sun.getRBL(obsDate);
+        Position.Latitudinal p = Sun.getRBL(obsDate);
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
-            distanceObs = rbl[0];
+            distanceObs = p.rad;
         }
 
         double stonyhurstLatitude, theta;
@@ -153,7 +154,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
                 if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
                     // presumably not found
-                    stonyhurstLatitude = rbl[1] * MathUtils.radeg;
+                    stonyhurstLatitude = p.lat * MathUtils.radeg;
                 }
             }
         }
@@ -163,10 +164,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if ((stonyhurstLongitude = m.tryGetDouble("HGLN_OBS")) == 0) {
             stonyhurstLongitude = m.tryGetDouble("REF_L0");
             if (stonyhurstLongitude != 0) {
-                stonyhurstLongitude += rbl[2] * MathUtils.radeg;
+                stonyhurstLongitude += p.lon * MathUtils.radeg;
             }
         }
-        phi = rbl[2] - stonyhurstLongitude / MathUtils.radeg;
+        phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
         rotationObs = new GL3DQuatd(theta, phi);
     }

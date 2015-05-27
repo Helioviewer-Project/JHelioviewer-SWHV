@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
@@ -182,9 +183,9 @@ public class RenderableGrid implements Renderable {
                 gl.glRotatef(-90, 0, 1, 0);
                 gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
                 {
-                    double[] rbl = Sun.getRBL(timestamp);
-                    gl.glRotatef(90 - (float) (rbl[2] * MathUtils.radeg), 0, 1, 0);
-                    gl.glRotatef((float) -(rbl[1] * MathUtils.radeg), 0, 0, 1);
+                    Position.Latitudinal p = Sun.getRBL(timestamp);
+                    gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
+                    gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
 
                     gl.glRotatef(90, 1, 0, 0);

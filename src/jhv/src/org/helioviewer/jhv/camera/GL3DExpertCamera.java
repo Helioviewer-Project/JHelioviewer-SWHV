@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import java.util.Date;
 
+import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
@@ -106,19 +107,19 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 updateRotation(date);
             }
         } else if (date != null) {
-            double[] rbl = Sun.getRBL(date);
-            currentDistance = rbl[0];
-            currentB = rbl[1];
+            Position.Latitudinal p = Sun.getRBL(date);
+            currentDistance = p.rad;
+            currentB = p.lat;
             currentL = 0;
             updateRotation(date);
         }
     }
 
     private void updateRotation(Date date) {
-        double[] rbl = Sun.getRBL(date);
+        Position.Latitudinal p = Sun.getRBL(date);
 
         double b = currentB;
-        double l = -currentL + rbl[2];
+        double l = -currentL + p.lon;
         double d = currentDistance;
 
         this.localRotation = new GL3DQuatd(b, l);

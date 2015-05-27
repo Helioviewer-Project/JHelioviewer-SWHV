@@ -35,10 +35,10 @@ public class Sun {
     }
 
     private static long prevMilli = 0;
-    private static double[] prevRBL = new double[] { 0, 0, 0 };
+    private static Position.Latitudinal prevRBL = new Position.Latitudinal(0, 0, 0);
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    public static double[] getRBL(Date date) {
+    public static Position.Latitudinal getRBL(Date date) {
         long milli;
         if ((milli = date.getTime()) == prevMilli) {
             return prevRBL;
@@ -84,7 +84,7 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        double[] RBL = new double[] { dist * Sun.MeanEarthDistance, he_lat, -he_lon };
+        Position.Latitudinal RBL = new Position.Latitudinal(dist * Sun.MeanEarthDistance, -he_lon, he_lat);
         prevRBL = RBL;
 
         return RBL;
