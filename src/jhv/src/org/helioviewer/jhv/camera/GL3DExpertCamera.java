@@ -36,8 +36,8 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     @Override
     public void reset() {
-        forceTimeChanged(cameraDate);
         super.reset();
+        forceTimeChanged(cameraDate);
     }
 
     @Override
@@ -92,29 +92,26 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 currentCameraTime = dateTime;
             }
 
-            cameraDate = new Date(currentCameraTime);
-
-            RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
-            if (renderableCamera != null) {
-                renderableCamera.setTimeString(cameraDate);
-                ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
-            }
-
             Position.Latitudinal p = positionLoading.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
+                cameraDate = date = new Date(p.milli);
                 currentDistance = p.rad;
                 currentL = p.lon;
                 currentB = p.lat;
-
-                updateRotation(cameraDate);
             }
         } else {
             Position.Latitudinal p = Sun.getRBL(date);
             currentDistance = p.rad;
             currentL = 0;
             currentB = p.lat;
+        }
 
-            updateRotation(date);
+        updateRotation(date);
+
+        RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
+        if (renderableCamera != null) {
+            renderableCamera.setTimeString(date);
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
 
