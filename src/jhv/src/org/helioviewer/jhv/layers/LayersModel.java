@@ -19,7 +19,6 @@ import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
@@ -338,7 +337,7 @@ public class LayersModel {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public static void removeLayer(View view) {
+    public static void removeLayer(AbstractView view) {
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
@@ -346,6 +345,7 @@ public class LayersModel {
                 moviePanel.remove();
             }
         }
+        ImageViewerGui.getMoviePanelContainer().removeLayer(view);
 
         int index = layers.indexOf(view);
 

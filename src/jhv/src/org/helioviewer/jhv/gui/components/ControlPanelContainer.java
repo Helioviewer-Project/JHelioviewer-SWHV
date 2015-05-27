@@ -6,34 +6,30 @@ import java.util.HashMap;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.View;
 
 @SuppressWarnings({"serial"})
-public class ControlPanelContainer extends JPanel implements LayersListener {
+public class ControlPanelContainer extends JPanel {
 
-    private HashMap<View, Component> controlMap = new HashMap<View, Component>();
+    private HashMap<AbstractView, Component> controlMap = new HashMap<AbstractView, Component>();
 
     public ControlPanelContainer(Component comp) {
         this.setLayout(new CardLayout());
         this.add(comp, "null");
         this.controlMap.put(null, comp);
-        LayersModel.addLayersListener(this);
     }
 
-    public void addLayer(View v, Component controlPanel) {
+    public void addLayer(AbstractView v, Component controlPanel) {
         controlMap.put(v, controlPanel);
         this.add(controlPanel, v.toString());
     }
 
-    public void removeLayer(View v) {
+    public void removeLayer(AbstractView v) {
         Component toRemove = controlMap.get(v);
         this.getLayout().removeLayoutComponent(toRemove);
     }
 
-    private void updateActiveView(AbstractView v) {
+    public void updateActiveView(AbstractView v) {
         CardLayout cl = (CardLayout) this.getLayout();
         cl.show(this, v == null ? "null" : v.toString());
         ensureSize();
@@ -46,19 +42,6 @@ public class ControlPanelContainer extends JPanel implements LayersListener {
             }
         }
         revalidate();
-    }
-
-    @Override
-    public void activeLayerChanged(AbstractView view) {
-        updateActiveView(view);
-    }
-
-    @Override
-    public void layerAdded(int newIndex) {
-    }
-
-    @Override
-    public void layerRemoved(int oldIndex) {
     }
 
 }
