@@ -13,7 +13,6 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -275,15 +274,10 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void render(GL2 gl) {
-        Log.debug("Render called");
         AbstractView view;
-        Log.debug("isVisible : " + isVisible);
-        Log.debug("active view not null : " + LayersModel.getActiveView() != null);
         if (isVisible && (view = LayersModel.getActiveView()) != null) {
             Date currentDate = view.getMetaData().getDateObs().getTime();
-            Log.debug("current Date : " + currentDate);
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
-            Log.debug("toDraw size : " + toDraw.size());
             for (JHVEvent evt : toDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evt, currentDate);
