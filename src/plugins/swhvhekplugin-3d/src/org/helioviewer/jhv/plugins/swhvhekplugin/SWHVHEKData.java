@@ -42,15 +42,19 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         return instance;
     }
 
+    public void reset() {
+        instance = null;
+    }
+
     public void requestEvents() {
         boolean request = false;
         Date first = LayersModel.getFirstDate();
         Date last = LayersModel.getLastDate();
-        if (beginDate == null || first.getTime() < beginDate.getTime()) {
+        if (beginDate == null || (first != null && first.getTime() < beginDate.getTime())) {
             beginDate = first;
             request = true;
         }
-        if (endDate == null || last.getTime() > endDate.getTime()) {
+        if (endDate == null || (last != null && last.getTime() > endDate.getTime())) {
             endDate = last;
             request = true;
         }

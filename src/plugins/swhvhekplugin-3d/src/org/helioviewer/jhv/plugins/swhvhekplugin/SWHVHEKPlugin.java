@@ -34,6 +34,7 @@ public class SWHVHEKPlugin implements Plugin {
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         LayersModel.removeLayersListener(SWHVHEKData.getSingletonInstance());
+        SWHVHEKData.getSingletonInstance().reset();
 
         ImageViewerGui.getInputController().removePlugin(controller);
         controller = null;
