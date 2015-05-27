@@ -31,19 +31,16 @@ public class Sun {
     }
 
     private static double mjd2jcy(double mjd, double epoch) {
-        return (JulianDay.DJM0 - epoch) / 36525. + mjd / 36525.;
+        return (JulianDay.DJM0 - epoch + mjd) / 36525.;
     }
 
-    private static long prevMilli = 0;
-    private static Position.Latitudinal prevRBL = new Position.Latitudinal(0, 0, 0);
+    private static Position.Latitudinal prevEarth = new Position.Latitudinal(0, 0, 0, 0);
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    public static Position.Latitudinal getRBL(Date date) {
+    public static Position.Latitudinal getEarth(Date date) {
         long milli;
-        if ((milli = date.getTime()) == prevMilli) {
-            return prevRBL;
-        } else {
-            prevMilli = milli;
+        if ((milli = date.getTime()) == prevEarth.milli) {
+            return prevEarth;
         }
 
         double mjd = date2mjd(date);
@@ -84,10 +81,10 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        Position.Latitudinal RBL = new Position.Latitudinal(dist * Sun.MeanEarthDistance, -he_lon, he_lat);
-        prevRBL = RBL;
+        Position.Latitudinal Earth = new Position.Latitudinal(milli, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
+        prevEarth = Earth;
 
-        return RBL;
+        return Earth;
     }
 
     // better precison, to be recovered later
