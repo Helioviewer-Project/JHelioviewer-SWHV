@@ -24,6 +24,8 @@ public class SWHVHEKPlugin implements Plugin {
     public void installPlugin() {
         controller = new SWHVHEKImagePanelEventPopupController();
         ImageViewerGui.getInputController().addPlugin(controller);
+
+        SWHVHEKData.getSingletonInstance().requestEvents();
         LayersModel.addLayersListener(SWHVHEKData.getSingletonInstance());
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
@@ -32,6 +34,7 @@ public class SWHVHEKPlugin implements Plugin {
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         LayersModel.removeLayersListener(SWHVHEKData.getSingletonInstance());
+
         ImageViewerGui.getInputController().removePlugin(controller);
         controller = null;
     }

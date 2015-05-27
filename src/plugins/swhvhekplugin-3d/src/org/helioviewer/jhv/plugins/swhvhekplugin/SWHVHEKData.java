@@ -26,36 +26,15 @@ import org.helioviewer.viewmodel.view.AbstractView;
  */
 public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
-    /** The singleton instance of the outgoing request manager */
     private static SWHVHEKData instance;
     private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> data;
     private ArrayList<JHVEvent> events;
     private Date beginDate = null;
     private Date endDate = null;
 
-    /** instance of the swek event handler */
-
-    /**
-     * private constructor
-     */
     private SWHVHEKData() {
-        Date first, last;
-        if ((first = LayersModel.getFirstDate()) != null)
-            beginDate = first;
-        if ((last = LayersModel.getLastDate()) != null)
-            endDate = last;
-
-        if (beginDate != null && endDate != null)
-            JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
-
-        LayersModel.addLayersListener(this);
     }
 
-    /**
-     * Gets the singleton instance of the outgoing request manager
-     *
-     * @return the singleton instance
-     */
     public static SWHVHEKData getSingletonInstance() {
         if (instance == null) {
             instance = new SWHVHEKData();
@@ -63,8 +42,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         return instance;
     }
 
-    @Override
-    public void layerAdded(int idx) {
+    public void requestEvents() {
         boolean request = false;
         Date first = LayersModel.getFirstDate();
         Date last = LayersModel.getLastDate();
@@ -80,6 +58,11 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         if (request) {
             JHVEventContainer.getSingletonInstance().requestForInterval(beginDate, endDate, SWHVHEKData.this);
         }
+    }
+
+    @Override
+    public void layerAdded(int idx) {
+        requestEvents();
     }
 
     @Override
