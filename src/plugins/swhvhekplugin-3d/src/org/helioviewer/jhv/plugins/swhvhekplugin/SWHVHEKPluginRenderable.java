@@ -31,9 +31,7 @@ import com.jogamp.opengl.GL2;
 public class SWHVHEKPluginRenderable implements Renderable {
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
-
     private boolean isVisible = true;
-
     private final RenderableType type;
 
     public SWHVHEKPluginRenderable() {
@@ -62,17 +60,22 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double principleAngle = 0;
         double angularWidth = 0;
         double distSun = 1.;
+
         for (JHVEventParameter param : params) {
-            if (param.getParameterName().equals("cme_angularwidth")) {
-                angularWidth = Double.parseDouble(param.getParameterValue()) * Math.PI / 180.;
+            String name = param.getParameterName();
+            String value = param.getParameterValue();
+
+            if (name.equals("cme_angularwidth")) {
+                angularWidth = Double.parseDouble(value) * Math.PI / 180.;
             }
-            if (param.getParameterName().equals("event_coord1")) {
-                principleAngle = -(Double.parseDouble(param.getParameterValue()) - 90.) * Math.PI / 180.;
+            if (name.equals("event_coord1")) {
+                principleAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
             }
-            if (param.getParameterName().equals("event_coord2")) {
-                distSun = Double.parseDouble(param.getParameterValue());
+            if (name.equals("event_coord2")) {
+                distSun = Double.parseDouble(value);
             }
         }
+
         double arcResolution = 100;
         double lineResolution = 10;
 
@@ -85,8 +88,10 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
         double phi = -Math.PI / 2. - p.lon;
 
-        Color eventColor = evt.getEventRelationShip().getRelationshipColor();
-        gl.glColor3f(eventColor.getRed() / 255f, eventColor.getGreen() / 255f, eventColor.getBlue() / 255f);
+        Color color = evt.getEventRelationShip().getRelationshipColor();
+        if (color == null)
+            color = evt.getColor();
+        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
             gl.glLineWidth(1.6f);
@@ -161,14 +166,14 @@ public class SWHVHEKPluginRenderable implements Renderable {
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
             return;
         }
-        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
 
+        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
         List<JHVPoint> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
             points = el.getBoundBox();
-        }
-        if (points == null || points.size() == 0) {
-            return;
+            if (points == null || points.size() == 0) {
+                return;
+            }
         }
 
         Color color = evt.getEventRelationShip().getRelationshipColor();
