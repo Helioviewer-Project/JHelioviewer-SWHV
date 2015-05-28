@@ -12,9 +12,9 @@ public interface LayersListener {
      * Gets fired if a new layer has been added.
      *
      * @param idx
-     *            - index of the new layer
+     *            - view of the added layer
      */
-    public void layerAdded(int idx);
+    public void layerAdded(AbstractView view);
 
     /**
      * Gets fired if the active layer has changed (meaning, a new layer has

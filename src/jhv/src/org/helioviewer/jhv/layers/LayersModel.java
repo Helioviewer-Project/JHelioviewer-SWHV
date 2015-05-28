@@ -307,9 +307,8 @@ public class LayersModel {
         }
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
-        int newIndex = layers.size() - 1;
-        fireLayerAdded(newIndex);
-        setActiveLayer(newIndex);
+        fireLayerAdded(view);
+        setActiveLayer(layers.size() - 1);
     }
 
     public static void addView(AbstractView view) {
@@ -395,9 +394,9 @@ public class LayersModel {
         return result;
     }
 
-    private static void fireLayerAdded(int newIndex) {
+    private static void fireLayerAdded(AbstractView view) {
         for (LayersListener ll : layerListeners) {
-            ll.layerAdded(newIndex);
+            ll.layerAdded(view);
         }
     }
 
