@@ -290,7 +290,10 @@ public class LayersModel {
         dialog.showDialog();
     }
 
-    private static void addLayer(AbstractView view) {
+    public static void addLayer(AbstractView view) {
+        if (view == null)
+            return;
+
         // needed for proper linked movies (tbd)
         LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
 

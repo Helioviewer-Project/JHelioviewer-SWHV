@@ -8,15 +8,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -29,9 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
-import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
@@ -104,32 +100,32 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * */
     @Override
     public void serverChanged(final boolean donotloadStartup) {
-        Thread t = new Thread(new Runnable() {
+        SwingWorker<DataSources, Void> setupSources = new SwingWorker<DataSources, Void>() {
+
             @Override
-            public void run() {
+            protected DataSources doInBackground() {
+                return DataSources.getSingletonInstance();
+            }
+
+            @Override
+            public void done() {
                 try {
-                    instrumentsPanel.setupSources();
+                    instrumentsPanel.setupSources(get());
                     // Check if we were able to set it up
                     if (instrumentsPanel.validSelection()) {
                         if (!donotloadStartup) {
-                            timeSelectionPanel.setupTime();
-                        }
-                        if (!donotloadStartup && Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie"))) {
-                            loadRemote(false);
+                            timeSelectionPanel.setupTime(Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")));
                         }
                     } else {
                         Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                     }
-                } catch (InterruptedException e) {
-                    Log.error("Could not setup observation dialog", e);
-                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
                     Log.error("Could not setup observation dialog", e);
                     Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
                 }
             }
-        }, "ObservationSetup");
-        t.start();
+        };
+        setupSources.execute();
     }
 
     /**
@@ -229,25 +225,19 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private void loadRemote(final boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
+        final RenderableDummy renderableDummy = new RenderableDummy();
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final RenderableDummy renderableDummy = new RenderableDummy();
-
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
-                    }
-                });
-
                 AbstractView view = null;
+
                 try {
                     if (isImage)
                         view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                     else
                         view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    LayersModel.addView(view);
                 } catch (IOException e) {
                     Log.error("An error occured while opening the remote file!", e);
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
@@ -259,9 +249,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     @Override
                     public void run() {
                         ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
-                        // tbd
-                        if (theView != null)
-                            LayersModel.setActiveLayer(theView);
+                        LayersModel.addLayer(theView);
                     }
 
                     public Runnable init(AbstractView theView) {
@@ -402,43 +390,58 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             add(endTimePane);
         }
 
-        private class LatestImageDateCall implements Callable<Date> {
-            final AtomicReference<InstrumentsPanel> refPanel = new AtomicReference<InstrumentsPanel>();
-
-            public LatestImageDateCall(InstrumentsPanel panel) {
-                this.refPanel.set(panel);
-            }
-
-            @Override
-            public Date call() {
-                return APIRequestManager.getLatestImageDate(refPanel.get().getObservatory(), refPanel.get().getInstrument(), refPanel.get().getDetector(), refPanel.get().getMeasurement(), true);
-            }
-        }
-
         /**
          * Sets the latest available image (or now if fails) to the end time and
          * the start 24h earlier.
-         * <p>
-         * Can be called from any thread and will take care that the GUI
-         * operations run in EventQueue.
-         * <p>
-         * Must be called after the instrumentPanel has been setup
-         *
-         * @throws InvocationTargetException
-         *             From inserting into the AWT Queue
-         * @throws InterruptedException
-         *             From inserting into the AWT Queue
          */
-        public void setupTime() throws InterruptedException, InvocationTargetException {
-            Date endDate = EventDispatchQueue.invokeAndWait(new LatestImageDateCall(instrumentsPanel));
-            GregorianCalendar gregorianCalendar = new GregorianCalendar();
-            gregorianCalendar.setTime(endDate);
+        public void setupTime(final boolean load) {
 
-            gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());
-            setEndDate(gregorianCalendar.getTime(), false);
+            class SetupTimeTask extends SwingWorker<Date, Void> {
 
-            gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-            setStartDate(gregorianCalendar.getTime(), false);
+                private final String observatory;
+                private final String instrument;
+                private final String detector;
+                private final String measurement;
+
+                SetupTimeTask(String _observatory, String _instrument, String _detector, String _measurement) {
+                    observatory = _observatory;
+                    instrument = _instrument;
+                    detector = _detector;
+                    measurement = _measurement;
+                }
+
+                @Override
+                protected Date doInBackground() {
+                    return APIRequestManager.getLatestImageDate(observatory, instrument, detector, measurement, true);
+                }
+
+                @Override
+                public void done() {
+                    try {
+                        Date endDate = get();
+                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                        gregorianCalendar.setTime(endDate);
+
+                        gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());
+                        setEndDate(gregorianCalendar.getTime(), false);
+
+                        gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
+                        setStartDate(gregorianCalendar.getTime(), false);
+
+                        if (load)
+                            loadRemote(false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            SetupTimeTask setupTimeTask = new SetupTimeTask(
+                                                instrumentsPanel.getObservatory(),
+                                                instrumentsPanel.getInstrument(),
+                                                instrumentsPanel.getDetector(),
+                                                instrumentsPanel.getMeasurement());
+            setupTimeTask.execute();
         }
 
         /**
@@ -493,7 +496,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         @Override
         public void actionPerformed(JHVCalendarEvent e) {
             if (e.getSource() == calendarStartDate) {
-                Calendar calendar = new GregorianCalendar();
+                GregorianCalendar calendar = new GregorianCalendar();
                 try {
                     calendar.setTime(TimeUtils.apiDateFormat.parse(getStartTime()));
                     setStartDate(calendar.getTime(), true);
@@ -503,7 +506,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             }
 
             if (e.getSource() == calendarEndDate) {
-                Calendar calendar = new GregorianCalendar();
+                GregorianCalendar calendar = new GregorianCalendar();
                 try {
                     calendar.setTime(TimeUtils.apiDateFormat.parse(getEndTime()));
                     setEndDate(calendar.getTime(), true);
@@ -729,11 +732,12 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     return result;
                 }
             };
+
             comboObservatory.setRenderer(itemRenderer);
             comboInstrument.setRenderer(itemRenderer);
             comboDetectorMeasurement.setRenderer(itemRenderer);
             comboServer.setRenderer(itemRenderer);
-            // Update the choices if necessary
+
             comboServer.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
@@ -753,12 +757,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             } else {
                 comboServer.setSelectedItem(serverList[0]);
             }
+
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
                     setComboBox(comboInstrument, DataSources.getSingletonInstance().getInstruments(InstrumentsPanel.this.getObservatory()));
                 }
             });
+
             comboInstrument.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
@@ -790,24 +796,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             });
         }
 
-        /**
-         * Function which will setup the data sources. Can be called from any
-         * thread and will take care that EventQueue does the job and wait until
-         * it is set to return
-         *
-         * @throws InvocationTargetException
-         *             From inserting into the AWT Queue
-         * @throws InterruptedException
-         *             From inserting into the AWT Queue
-         */
-        public void setupSources() throws InterruptedException, InvocationTargetException {
-            final DataSources source = DataSources.getSingletonInstance();
-            EventQueue.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
-                }
-            });
+        public void setupSources(DataSources source) {
+            InstrumentsPanel.this.setComboBox(comboObservatory, source.getObservatories());
         }
 
         /**
