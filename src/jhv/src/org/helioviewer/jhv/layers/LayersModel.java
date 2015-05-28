@@ -314,7 +314,8 @@ public class LayersModel {
         setActiveLayer(layers.size() - 1);
     }
 
-    public static void addView(AbstractView view) {
+    // special
+    public static void addLayerFromThread(AbstractView view) {
         if (view == null)
             return;
 
