@@ -97,7 +97,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void layerAdded(int idx) {
+    public void layerAdded(AbstractView view) {
         PfssPlugin.getPfsscache().clear();
         Date start = LayersModel.getFirstDate();
         Date end = LayersModel.getLastDate();

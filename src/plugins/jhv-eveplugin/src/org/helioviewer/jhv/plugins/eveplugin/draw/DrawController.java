@@ -254,17 +254,17 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void layerAdded(int idx) {
+    public void layerAdded(AbstractView view) {
         final Interval<Date> interval = new Interval<Date>(LayersModel.getFirstDate(), LayersModel.getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
         } else {
             Date start = availableInterval.getStart();
-            if (interval.getStart().before(availableInterval.getStart())) {
+            if (interval.getStart().before(start)) {
                 start = interval.getStart();
             }
             Date end = availableInterval.getEnd();
-            if (interval.getEnd().after(availableInterval.getEnd())) {
+            if (interval.getEnd().after(end)) {
                 end = interval.getEnd();
             }
             this.setAvailableInterval(new Interval<Date>(start, end));

@@ -583,8 +583,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     // Layers Listener
 
     @Override
-    public void layerAdded(int idx) {
-
+    public void layerAdded(AbstractView view) {
     }
 
     @Override

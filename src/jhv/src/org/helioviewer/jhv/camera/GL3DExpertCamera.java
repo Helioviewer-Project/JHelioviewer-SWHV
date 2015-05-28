@@ -150,7 +150,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     @Override
-    public void layerAdded(int idx) {
+    public void layerAdded(AbstractView view) {
     }
 
     @Override

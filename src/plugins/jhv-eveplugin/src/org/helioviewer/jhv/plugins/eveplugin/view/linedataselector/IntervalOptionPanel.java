@@ -194,7 +194,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     @Override
-    public void layerAdded(int idx) {
+    public void layerAdded(AbstractView view) {
     }
 
     @Override

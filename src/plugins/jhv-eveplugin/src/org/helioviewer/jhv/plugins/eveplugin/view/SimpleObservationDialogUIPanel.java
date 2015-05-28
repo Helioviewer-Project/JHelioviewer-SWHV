@@ -228,8 +228,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void layerAdded(int idx) {
-        AbstractView view = LayersModel.getLayer(idx);
+    public void layerAdded(AbstractView view) {
         if (view instanceof JHVJPXView) {
             Date start = LayersModel.getStartDate(view);
             calendarStartDate.setDate(start);

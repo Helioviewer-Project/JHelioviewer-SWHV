@@ -65,7 +65,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void layerAdded(int idx) {
+    public void layerAdded(AbstractView view) {
         requestEvents();
     }
 

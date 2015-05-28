@@ -588,7 +588,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * {@inheritDoc}
          */
         @Override
-        public void layerAdded(int idx) {
+        public void layerAdded(AbstractView view) {
         }
 
         /**
