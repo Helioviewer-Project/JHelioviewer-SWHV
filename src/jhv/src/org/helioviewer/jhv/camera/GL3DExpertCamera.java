@@ -154,10 +154,6 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
         if (!interpolation && view instanceof JHVJPXView) {
             positionLoading.setBeginDate(LayersModel.getStartDate(view), false);

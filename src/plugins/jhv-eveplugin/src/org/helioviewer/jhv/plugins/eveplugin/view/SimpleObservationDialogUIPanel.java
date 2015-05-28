@@ -238,10 +238,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
     }
 

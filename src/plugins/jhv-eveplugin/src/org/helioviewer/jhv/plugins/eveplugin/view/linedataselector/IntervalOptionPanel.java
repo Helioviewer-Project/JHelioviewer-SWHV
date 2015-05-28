@@ -56,8 +56,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
         periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
         periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        periodFromLayersButton.setEnabled(LayersModel.getActiveView() != null);
         periodFromLayersButton.addActionListener(this);
-        setEnabledStateOfPeriodMovieButton();
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
@@ -132,13 +132,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    private void setEnabledStateOfPeriodMovieButton() {
-        Date start = LayersModel.getFirstDate();
-        Date end = LayersModel.getLastDate();
-
-        periodFromLayersButton.setEnabled(start != null && end != null);
-    }
-
     private void fillZoomComboBox() {
         final DefaultComboBoxModel model = (DefaultComboBoxModel) zoomComboBox.getModel();
         model.removeAllElements();
@@ -205,13 +198,9 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-        setEnabledStateOfPeriodMovieButton();
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
-        setEnabledStateOfPeriodMovieButton();
+        periodFromLayersButton.setEnabled(view != null);
+
         if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
             setDefaultPeriod = false;
             if (view instanceof JHVJPXView) {
