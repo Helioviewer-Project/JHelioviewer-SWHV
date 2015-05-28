@@ -588,10 +588,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
         if (view instanceof JHVJPXView) {
             Date start = LayersModel.getStartDate(view);

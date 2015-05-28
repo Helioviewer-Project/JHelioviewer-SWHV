@@ -240,10 +240,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
         if (view != null) {
             setOptionsPanel(view.getImageLayer());

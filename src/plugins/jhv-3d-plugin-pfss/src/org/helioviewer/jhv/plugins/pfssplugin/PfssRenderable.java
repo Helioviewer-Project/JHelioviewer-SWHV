@@ -106,10 +106,6 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
     }
 

@@ -272,14 +272,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void layerRemoved(int oldIdx) {
-        if (LayersModel.getNumLayers() == 0) {
-            fireRedrawRequestMovieFrameChanged(null);
-        }
-    }
-
-    @Override
     public void activeLayerChanged(AbstractView view) {
+        if (view == null)
+            fireRedrawRequestMovieFrameChanged(null);
     }
 
     private Interval<Date> makeCompleteDay(final Interval<Date> interval) {

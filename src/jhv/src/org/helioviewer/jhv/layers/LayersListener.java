@@ -17,14 +17,6 @@ public interface LayersListener {
     public void layerAdded(int idx);
 
     /**
-     * Gets fired if a layer has been removed.
-     *
-     * @param oldIdx
-     *            - (old) index of the layer that has been removed
-     */
-    public void layerRemoved(int oldIdx);
-
-    /**
      * Gets fired if the active layer has changed (meaning, a new layer has
      * become the new active layer).
      *

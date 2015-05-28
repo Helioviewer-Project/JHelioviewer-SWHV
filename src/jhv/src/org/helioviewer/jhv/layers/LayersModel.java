@@ -353,7 +353,6 @@ public class LayersModel {
         if (view instanceof JHVJPXView) {
             ((JHVJPXView) view).abolish();
         }
-        fireLayerRemoved(index);
 
         int newIndex = determineNewActiveLayer(index);
         setActiveLayer(newIndex);
@@ -394,12 +393,6 @@ public class LayersModel {
             result = Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100;
         }
         return result;
-    }
-
-    private static void fireLayerRemoved(int oldIndex) {
-        for (LayersListener ll : layerListeners) {
-            ll.layerRemoved(oldIndex);
-        }
     }
 
     private static void fireLayerAdded(int newIndex) {
