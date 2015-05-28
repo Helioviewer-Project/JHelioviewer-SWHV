@@ -64,6 +64,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private final CadencePanel cadencePanel = new CadencePanel();
     private final InstrumentsPanel instrumentsPanel;
 
+    private boolean isFirst = true;
+
     /**
      * Used format for the API of the data and time
      */
@@ -71,61 +73,40 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     public ImageDataPanel() {
         super();
         instrumentsPanel = new InstrumentsPanel(this);
-        DataSourceServers.getSingletonInstance().addListener(this);
-        initVisualComponents();
-        serverChanged(false);
-    }
 
-    /**
-     * Sets up the visual sub components and the component itself.
-     * */
-    private void initVisualComponents() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        final JPanel timePane = new JPanel();
+        JPanel timePane = new JPanel();
         timePane.setLayout(new BoxLayout(timePane, BoxLayout.PAGE_AXIS));
         timePane.add(timeSelectionPanel);
         timePane.add(cadencePanel);
 
-        final JPanel instrumentsPane = new JPanel();
+        JPanel instrumentsPane = new JPanel();
         instrumentsPane.setLayout(new BorderLayout());
         instrumentsPane.add(instrumentsPanel, BorderLayout.CENTER);
 
         add(timePane);
         add(instrumentsPane);
+
+        DataSourceServers.getSingletonInstance().addListener(this);
     }
 
     /**
      * Adds available data to the displayed components
      * */
     @Override
-    public void serverChanged(final boolean donotloadStartup) {
-        SwingWorker<DataSources, Void> setupSources = new SwingWorker<DataSources, Void>() {
-
-            @Override
-            protected DataSources doInBackground() {
-                return DataSources.getSingletonInstance();
+    public void serverChanged(boolean donotloadStartup) {
+        instrumentsPanel.setupSources(DataSources.getSingletonInstance());
+        // Check if we were able to set it up
+        if (instrumentsPanel.validSelection()) {
+            // first time ignore donotloadStartup - comes via comboServer.setSelectedItem() below
+            if (isFirst || !donotloadStartup) {
+                isFirst = false;
+                timeSelectionPanel.setupTime(Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")));
             }
-
-            @Override
-            public void done() {
-                try {
-                    instrumentsPanel.setupSources(get());
-                    // Check if we were able to set it up
-                    if (instrumentsPanel.validSelection()) {
-                        if (!donotloadStartup) {
-                            timeSelectionPanel.setupTime(Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")));
-                        }
-                    } else {
-                        Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                    }
-                } catch (Exception e) {
-                    Log.error("Could not setup observation dialog", e);
-                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-                }
-            }
-        };
-        setupSources.execute();
+        } else {
+            Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+        }
     }
 
     /**
@@ -412,6 +393,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
                 @Override
                 protected Date doInBackground() {
+                    Thread.currentThread().setName("SetupTime");
                     return APIRequestManager.getLatestImageDate(observatory, instrument, detector, measurement, true);
                 }
 

@@ -3,6 +3,8 @@ package org.helioviewer.jhv.io;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingWorker;
+
 import org.helioviewer.jhv.Settings;
 
 public class DataSourceServers {
@@ -60,16 +62,24 @@ public class DataSourceServers {
             Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
         }
 
-        Thread t = new Thread(new Runnable() {
+        SwingWorker<Void, Void> reloadSources = new SwingWorker<Void, Void>() {
+
             @Override
-            public void run() {
+            protected Void doInBackground() {
+                Thread.currentThread().setName("ReloadServer");
                 DataSources.getSingletonInstance().reload();
+                return null;
+            }
+
+            @Override
+            public void done() {
                 for (DataSourceServerListener l : listeners) {
                     l.serverChanged(donotloadStartup);
                 }
             }
-        }, "change server");
-        t.start();
+
+        };
+        reloadSources.execute();
     }
 
     public String[] getServerList() {

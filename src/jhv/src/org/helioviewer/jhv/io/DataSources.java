@@ -160,17 +160,11 @@ public class DataSources {
         }
     }
 
-    /**
-     * singleton instance
-     */
     private static final DataSources singleton = new DataSources();
 
-    /**
-     * Returns the only instance of this class and will be initialize on the
-     * first use.
-     *
-     * @return the only instance of this class.
-     * */
+    private DataSources() {
+    }
+
     public static DataSources getSingletonInstance() {
         return singleton;
     }
@@ -185,12 +179,6 @@ public class DataSources {
      */
     private final Comparator<String> keyComparator = new AlphanumComparator();
 
-    /**
-     * Use singleton
-     */
-    private DataSources() {
-    }
-
     public void reload() {
         Settings settingsInstance = Settings.getSingletonInstance();
         String prop = settingsInstance.getProperty("supported.data.sources");
@@ -203,6 +191,8 @@ public class DataSources {
                 }
             }
         }
+
+        jsonResult = null;
 
         while (true) {
             try {
