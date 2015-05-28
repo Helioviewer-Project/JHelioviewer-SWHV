@@ -19,7 +19,9 @@ import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -82,6 +84,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private int lastHeight;
     private boolean updateRequestReceived;
     private final Timer timer;
+    private final List<DrawableType> zOrderList = new ArrayList<DrawableType>(EnumSet.allOf(DrawableType.class));
 
     public ChartDrawGraphPane() {
         updateRequestReceived = false;
@@ -177,7 +180,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void drawData(Graphics2D chartg, Graphics2D plotG, Graphics2D leftAxisG, Point mousePosition) {
         Map<DrawableType, Set<DrawableElement>> drawableElements = drawController.getDrawableElements();
-        List<DrawableType> drawTypeList = DrawableType.getZOrderedList();
+        List<DrawableType> drawTypeList = zOrderList;
         boolean labelsDrawn = false;
         for (DrawableType dt : drawTypeList) {
             if ((dt != DrawableType.FULL_IMAGE) && !labelsDrawn) {

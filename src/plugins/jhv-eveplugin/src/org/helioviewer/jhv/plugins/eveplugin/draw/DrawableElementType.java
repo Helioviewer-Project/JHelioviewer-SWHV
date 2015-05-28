@@ -13,8 +13,4 @@ public enum DrawableElementType {
         return type;
     }
 
-    public void setLevel(DrawableType type) {
-        this.type = type;
-    }
-
 }
