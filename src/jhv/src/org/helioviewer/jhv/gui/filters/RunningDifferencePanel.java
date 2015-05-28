@@ -10,6 +10,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -17,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -28,6 +34,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -229,7 +237,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                LayersModel.downloadLayer((JHVJP2View) jp2view);
+                downloadLayer((JHVJP2View) jp2view);
             }
         };
         downloadLayerButton.setAction(downloadLayerAction);
@@ -241,7 +249,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                LayersModel.showMetaInfo(jp2view);
+                showMetaInfo(jp2view);
             }
         };
         showMetaButton.setAction(showMetaAction);
@@ -255,6 +263,79 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     public Component getPanel() {
         return this.diffPanel;
+    }
+
+    // weird location for the following functions
+
+    /**
+     * Trigger downloading the layer in question
+     *
+     * @param view
+     *            - View that can be associated with the layer in question
+     */
+    private static void downloadLayer(JHVJP2View view) {
+        Thread downloadThread = new Thread(new Runnable() {
+            private JHVJP2View theView;
+
+            @Override
+            public void run() {
+                downloadFromJPIP(theView);
+            }
+
+            public Runnable init(JHVJP2View theView) {
+                this.theView = theView;
+                return this;
+            }
+        }.init(view), "DownloadFromJPIPThread");
+        downloadThread.start();
+    }
+
+    /**
+     * Downloads the complete image from the JPIP server.
+     *
+     * Changes the source of the View afterwards, since a local file is always
+     * faster.
+     */
+    private static void downloadFromJPIP(JHVJP2View v) {
+        FileDownloader fileDownloader = new FileDownloader();
+        URI downloadUri = v.getDownloadURI();
+        URI uri = v.getUri();
+
+        // the http server to download the file from is unknown
+        if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {
+            String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", uri);
+            if (inputValue != null) {
+                try {
+                    downloadUri = new URI(inputValue);
+                } catch (URISyntaxException e) {
+                }
+            }
+        }
+
+        File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
+        try {
+            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName())) {
+                return;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    /**
+     * Trigger showing a dialog displaying the meta data of the layer in
+     * question.
+     *
+     * @param view
+     *            - View that can be associated with the layer in question
+     *
+     * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
+     */
+    private static void showMetaInfo(AbstractView view) {
+        MetaDataDialog dialog = new MetaDataDialog();
+        dialog.setMetaData(view);
+        dialog.showDialog();
     }
 
 }

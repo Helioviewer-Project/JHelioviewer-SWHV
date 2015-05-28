@@ -657,4 +657,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         lut = gray;
     }
 
+    public float getActualFramerate() {
+        return 0;
+    }
+
 }
