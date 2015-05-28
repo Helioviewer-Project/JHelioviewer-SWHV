@@ -9,8 +9,8 @@ public class FramerateStatusPanel extends JLabel {
         updateFramerate(0);
     }
 
-    public void updateFramerate(int fps) {
-        setText(String.format("fps: % 2d", fps));
+    public void updateFramerate(float fps) {
+        setText(String.format("fps: % 2d", Math.round(fps * 100) / 100));
     }
 
 }

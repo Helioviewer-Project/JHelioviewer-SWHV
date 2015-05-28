@@ -1,21 +1,13 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
-import javax.swing.JOptionPane;
-
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -219,77 +211,6 @@ public class LayersModel {
         return candidate;
     }
 
-    /**
-     * Trigger downloading the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
-    public static void downloadLayer(JHVJP2View view) {
-        Thread downloadThread = new Thread(new Runnable() {
-            private JHVJP2View theView;
-
-            @Override
-            public void run() {
-                downloadFromJPIP(theView);
-            }
-
-            public Runnable init(JHVJP2View theView) {
-                this.theView = theView;
-                return this;
-            }
-        }.init(view), "DownloadFromJPIPThread");
-        downloadThread.start();
-    }
-
-    /**
-     * Downloads the complete image from the JPIP server.
-     *
-     * Changes the source of the View afterwards, since a local file is always
-     * faster.
-     */
-    private static void downloadFromJPIP(JHVJP2View v) {
-        FileDownloader fileDownloader = new FileDownloader();
-        URI downloadUri = v.getDownloadURI();
-        URI uri = v.getUri();
-
-        // the http server to download the file from is unknown
-        if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {
-            String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", uri);
-            if (inputValue != null) {
-                try {
-                    downloadUri = new URI(inputValue);
-                } catch (URISyntaxException e) {
-                }
-            }
-        }
-
-        File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
-        try {
-            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName())) {
-                return;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-    }
-
-    /**
-     * Trigger showing a dialog displaying the meta data of the layer in
-     * question.
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     *
-     * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
-     */
-    public static void showMetaInfo(AbstractView view) {
-        MetaDataDialog dialog = new MetaDataDialog();
-        dialog.setMetaData(view);
-        dialog.showDialog();
-    }
-
     public static void addLayer(AbstractView view) {
         if (view == null)
             return;
@@ -380,22 +301,6 @@ public class LayersModel {
                 moviePanel.setMovieLink(link);
             }
         }
-    }
-
-    /**
-     * Return the current framerate for the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return the current framerate or 0 if the movie is not playing, or if an
-     *         error occurs
-     */
-    public static int getFPS(JHVJP2View view) {
-        int result = 0;
-        if (view instanceof JHVJPXView) {
-            result = Math.round(((JHVJPXView) view).getActualFramerate() * 100) / 100;
-        }
-        return result;
     }
 
     private static void fireLayerAdded(AbstractView view) {
