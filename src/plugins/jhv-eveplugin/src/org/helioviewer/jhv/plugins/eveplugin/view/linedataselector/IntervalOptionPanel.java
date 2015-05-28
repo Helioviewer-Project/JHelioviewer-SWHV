@@ -33,7 +33,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     private final JComboBox zoomComboBox;
     private final JToggleButton periodFromLayersButton;
-    private boolean setDefaultPeriod = true;
     private boolean selectedIndexSetByProgram;
     private Interval<Date> selectedIntervalByZoombox = null;
     private final DrawController drawController;
@@ -43,7 +42,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     };
 
     public IntervalOptionPanel() {
-        LayersModel.addLayersListener(this);
         drawController = DrawController.getSingletonInstance();
         drawController.addTimingListener(this);
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
@@ -62,6 +60,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
         add(periodFromLayersButton);
+
+        LayersModel.addLayersListener(this);
     }
 
     @Override
@@ -200,20 +200,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     @Override
     public void activeLayerChanged(AbstractView view) {
         periodFromLayersButton.setEnabled(view != null);
-
-        if (setDefaultPeriod || TimeIntervalLockModel.getInstance().isLocked()) {
-            setDefaultPeriod = false;
-            if (view instanceof JHVJPXView) {
-                Date start = LayersModel.getStartDate(view);
-                Date end = LayersModel.getEndDate(view);
-
-                Interval<Date> interval = new Interval<Date>(start, end);
-                // ZoomController.getSingletonInstance().setAvailableInterval(interval);
-                if (TimeIntervalLockModel.getInstance().isLocked()) {
-                    DrawController.getSingletonInstance().setSelectedInterval(interval, false);
-                }
-            }
-        }
     }
 
     @Override
