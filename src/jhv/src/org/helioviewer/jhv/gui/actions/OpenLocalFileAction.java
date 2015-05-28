@@ -75,7 +75,7 @@ public class OpenLocalFileAction extends AbstractAction {
                     @Override
                     public void run() {
                         try {
-                            LayersModel.addView(APIRequestManager.loadView(uri, uri));
+                            LayersModel.addLayerFromThread(APIRequestManager.loadView(uri, uri));
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         }
