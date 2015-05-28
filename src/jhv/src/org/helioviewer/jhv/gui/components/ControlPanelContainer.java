@@ -6,10 +6,12 @@ import java.util.HashMap;
 
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 @SuppressWarnings({"serial"})
-public class ControlPanelContainer extends JPanel {
+public class ControlPanelContainer extends JPanel implements LayersListener {
 
     private HashMap<AbstractView, Component> controlMap = new HashMap<AbstractView, Component>();
 
@@ -17,6 +19,7 @@ public class ControlPanelContainer extends JPanel {
         this.setLayout(new CardLayout());
         this.add(comp, "null");
         this.controlMap.put(null, comp);
+        LayersModel.addLayersListener(this);
     }
 
     public void addLayer(AbstractView v, Component controlPanel) {
@@ -29,12 +32,6 @@ public class ControlPanelContainer extends JPanel {
         this.getLayout().removeLayoutComponent(toRemove);
     }
 
-    public void updateActiveView(AbstractView v) {
-        CardLayout cl = (CardLayout) this.getLayout();
-        cl.show(this, v == null ? "null" : v.toString());
-        ensureSize();
-    }
-
     public void ensureSize() {
         for (Component comp : this.getComponents()) {
             if (comp.isVisible()) {
@@ -42,6 +39,17 @@ public class ControlPanelContainer extends JPanel {
             }
         }
         revalidate();
+    }
+
+    @Override
+    public void activeLayerChanged(AbstractView view) {
+        CardLayout cl = (CardLayout) this.getLayout();
+        cl.show(this, view == null ? "null" : view.toString());
+        ensureSize();
+    }
+
+    @Override
+    public void layerAdded(AbstractView view) {
     }
 
 }
