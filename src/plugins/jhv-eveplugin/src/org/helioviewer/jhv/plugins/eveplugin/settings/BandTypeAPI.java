@@ -14,7 +14,6 @@ import java.util.Properties;
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
@@ -41,7 +40,6 @@ public class BandTypeAPI extends APIAbstract {
 
     private BandTypeAPI() {
         super();
-        LogSettings.init("/settings/log4j.initial.properties", JHVDirectory.SETTINGS.getPath() + "log4j.properties", JHVDirectory.LOGS.getPath(), false);
         this.loadSettings();
         this.setBaseUrl(defaultProperties.getProperty("plugin.eve.dataseturl"));
         this.updateDatasets();
