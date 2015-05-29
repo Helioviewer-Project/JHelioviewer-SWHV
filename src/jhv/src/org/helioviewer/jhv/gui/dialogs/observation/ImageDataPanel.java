@@ -209,9 +209,11 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         final RenderableDummy renderableDummy = new RenderableDummy();
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
 
-        Thread thread = new Thread(new Runnable() {
+        SwingWorker<AbstractView, Void> remoteTask = new SwingWorker<AbstractView, Void>() {
+
             @Override
-            public void run() {
+            protected AbstractView doInBackground() {
+                Thread.currentThread().setName("LoadRemote");
                 AbstractView view = null;
 
                 try {
@@ -224,23 +226,21 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
 
-                EventQueue.invokeLater(new Runnable() {
-                    private AbstractView theView;
-
-                    @Override
-                    public void run() {
-                        ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
-                        LayersModel.addLayer(theView);
-                    }
-
-                    public Runnable init(AbstractView theView) {
-                        this.theView = theView;
-                        return this;
-                    }
-                }.init(view));
+                return view;
             }
-        }, "LoadRemote");
-        thread.start();
+
+            @Override
+            public void done() {
+                ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+                try {
+                    LayersModel.addLayer(get());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+        remoteTask.execute();
     }
 
     // Methods derived from Observation Dialog Panel
