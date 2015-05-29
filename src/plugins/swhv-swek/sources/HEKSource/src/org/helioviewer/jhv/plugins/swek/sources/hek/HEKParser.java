@@ -114,7 +114,6 @@ public class HEKParser implements SWEKParser {
         associationsMap = new HashMap<String, List<Association>>();
         associationEventsMap = new HashMap<String, HEKEvent>();
         overmax = false;
-
     }
 
     @Override
@@ -131,7 +130,7 @@ public class HEKParser implements SWEKParser {
         try {
             StringBuilder sb = new StringBuilder();
             if (downloadInputStream != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream));
+                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream, "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
@@ -788,14 +787,17 @@ public class HEKParser implements SWEKParser {
                 }
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
+
             ArrayList<JHVPoint> jhvBoundedBox = new ArrayList<JHVPoint>();
             for (JHVPoint el : localHGSBoundedBox) {
                 jhvBoundedBox.add(convertHGSJHV(el, currentEvent));
             }
+
             ArrayList<JHVPoint> jhvBoundCC = new ArrayList<JHVPoint>();
             for (JHVPoint el : localHGSBoundCC) {
                 jhvBoundCC.add(convertHGSJHV(el, currentEvent));
             }
+
             JHVPoint jhvCentralPoint = null;
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
@@ -803,20 +805,20 @@ public class HEKParser implements SWEKParser {
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.JHV, new HEKPositionInformation(JHVCoordinateSystem.JHV, jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
 
             ArrayList<JHVPoint> jhvBoundedBox2D = new ArrayList<JHVPoint>();
-
             for (JHVPoint el : localHGSBoundedBox) {
                 jhvBoundedBox2D.add(convertHGSJHV2D(el, currentEvent));
             }
+
             ArrayList<JHVPoint> jhvBoundCC2D = new ArrayList<JHVPoint>();
             for (JHVPoint el : localHGSBoundCC) {
                 jhvBoundCC2D.add(convertHGSJHV2D(el, currentEvent));
             }
+
             JHVPoint jhvCentralPoint2D = null;
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint2D = convertHGSJHV2D(localHGSCentralPoint, currentEvent);
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.JHV2D, new HEKPositionInformation(JHVCoordinateSystem.JHV2D, jhvBoundedBox2D, jhvBoundCC2D, jhvCentralPoint2D));
-
         }
     }
 
@@ -870,7 +872,6 @@ public class HEKParser implements SWEKParser {
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
         }
-
     }
 
     /**
@@ -901,7 +902,6 @@ public class HEKParser implements SWEKParser {
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
         }
-
     }
 
     private List<JHVEventRelationShipRule> getEventRelationShipRules() {

@@ -67,7 +67,7 @@ public class ComesepParser implements SWEKParser {
         try {
             StringBuilder sb = new StringBuilder();
             if (downloadInputStream != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream));
+                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream, "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
@@ -127,7 +127,6 @@ public class ComesepParser implements SWEKParser {
                             // event reference.
                             currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
                             currentEvent.getEventRelationShip().getNextEvents().put(association.getAssociationChild(), new JHVEventRelation(association.getAssociationChild()));
-
                         }
                     } else if (association.getAssociationChild().equals(currentEvent.getUniqueID())) {
                         // current event is the child event of the relationship
@@ -140,7 +139,6 @@ public class ComesepParser implements SWEKParser {
                             associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
                             currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                             currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
-
                         } else {
                             // The associated event is not in the list so we
                             // start a
@@ -148,7 +146,6 @@ public class ComesepParser implements SWEKParser {
                             // previous event without event type.
                             currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
                             currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationParent(), new JHVEventRelation(association.getAssociationParent()));
-
                         }
                     }
                 }
@@ -162,7 +159,6 @@ public class ComesepParser implements SWEKParser {
         startTimeSet = false;
         endTimeSet = false;
         cactusLiftOff = null;
-
     }
 
     private void parseResult(JSONObject result, ComesepEvent currentEvent) throws JSONException {

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.awt.Color;
@@ -140,7 +137,7 @@ public class SWEKConfigurationManager {
      */
     private boolean isManuallyChanged() {
         try {
-            Log.debug("configURL : " + configFileURL.toString());
+            Log.debug("configURL: " + configFileURL.toString());
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
             BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
@@ -152,10 +149,10 @@ public class SWEKConfigurationManager {
             JSONObject configJSON = new JSONObject(sb.toString());
             return parseManuallyChanged(configJSON);
         } catch (JSONException e) {
-            Log.error("Could not parse the json : " + e.getMessage());
+            Log.error("Could not parse JSON: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
-            Log.error("Could not load the file : " + e.getMessage());
+            Log.error("Could not load the file: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -225,7 +222,7 @@ public class SWEKConfigurationManager {
         } catch (MalformedURLException e) {
             Log.debug("Could not create a URL from the value found in the properties file: " + swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
         } catch (IOException e) {
-            Log.debug("Something went wrong downloading the configuration file from the server or saving it to the local machine : " + e);
+            Log.debug("Something went wrong downloading the configuration file from the server or saving it: " + e);
         }
         return false;
     }
@@ -242,7 +239,7 @@ public class SWEKConfigurationManager {
             configFileURL = (new File(saveFile)).toURI().toURL();
             return true;
         } catch (IOException e) {
-            Log.debug("Something went wrong extracting the configuration file from the jar bundle or saving it to the local machine : " + e);
+            Log.debug("Something went wrong extracting the configuration file from the jar bundle or saving it: " + e);
         }
         return false;
     }
@@ -263,10 +260,10 @@ public class SWEKConfigurationManager {
                 configFileURL = f.toURI().toURL();
                 return true;
             } else {
-                Log.debug("File created from the settings : " + configFile + " does not exists on this system.");
+                Log.debug("File created from the settings: " + configFile + " does not exists on this system");
             }
         } catch (MalformedURLException e) {
-            Log.debug("File at possition " + configFile + " could not be parsed into an URL");
+            Log.debug("File " + configFile + " could not be parsed into an URL");
         }
         return false;
     }
@@ -278,22 +275,22 @@ public class SWEKConfigurationManager {
      *         found.
      */
     private boolean checkAndOpenUserSetFile() {
-        Log.debug("Search for a user defined configuration file in the JHelioviewer setting file.");
+        Log.debug("Search for a user defined configuration file in the JHelioviewer setting file");
         Settings jhvSettings = Settings.getSingletonInstance();
         String fileName = jhvSettings.getProperty("plugin.swek.configfile");
         if (fileName == null) {
-            Log.debug("No configured filename found.");
+            Log.debug("No configured filename found");
             return false;
         } else {
             try {
                 URI fileLocation = new URI(fileName);
                 configFileURL = fileLocation.toURL();
-                Log.debug("Config file : " + configFileURL.toString());
+                Log.debug("Config file: " + configFileURL.toString());
                 return true;
             } catch (URISyntaxException e) {
-                Log.debug("Wrong URI syntax for the found file name : " + fileName);
+                Log.debug("Wrong URI syntax for the found file name: " + fileName);
             } catch (MalformedURLException e) {
-                Log.debug("Could not convert the URI in a correct URL. The found file name : " + fileName);
+                Log.debug("Could not convert the URI in a correct URL. The found file name: " + fileName);
             }
             return false;
         }
@@ -306,7 +303,7 @@ public class SWEKConfigurationManager {
         try {
             InputStream configIs = configFileURL.openStream();
             StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(configIs));
+            BufferedReader br = new BufferedReader(new InputStreamReader(configIs, "UTF-8"));
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);
@@ -314,9 +311,9 @@ public class SWEKConfigurationManager {
             JSONObject configJSON = new JSONObject(sb.toString());
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
-            Log.debug("The configuration file could not be parsed : " + e);
+            Log.debug("Configuration file could not be parsed: " + e);
         } catch (JSONException e) {
-            Log.debug("Could not parse the given JSON : " + e);
+            Log.debug("Could not parse JSON: " + e);
         }
         return false;
     }
@@ -338,7 +335,7 @@ public class SWEKConfigurationManager {
             configuration.setRelatedEvents(parseRelatedEvents(configJSON));
             return true;
         } catch (JSONException e) {
-            Log.error("Could not parse config json");
+            Log.error("Could not parse JSON");
             e.printStackTrace();
             return false;
         }
@@ -575,11 +572,11 @@ public class SWEKConfigurationManager {
                 } else if (colorURI.getScheme().toLowerCase().equals("colorcode")) {
                     return parseColorCode(colorURI.getHost());
                 } else {
-                    Log.info("Could not understand : " + color + " returned black color");
+                    Log.info("Could not understand: " + color + ", black returned");
                     return Color.black;
                 }
             } catch (URISyntaxException e) {
-                Log.info("Could not parse the URI " + color + " black color is returned.");
+                Log.info("Could not parse the URI " + color + ", black returned");
             }
         }
         return Color.black;
@@ -597,7 +594,7 @@ public class SWEKConfigurationManager {
         try {
             return Color.decode(colorCode);
         } catch (NumberFormatException ex) {
-            Log.info("Could not parse the color code " + colorCode + " black color is returned.");
+            Log.info("Could not parse the color code " + colorCode + ", black returned");
             return Color.black;
         }
     }
@@ -615,7 +612,7 @@ public class SWEKConfigurationManager {
             Field field = Class.forName("java.awt.Color").getField(colorName);
             return (Color) field.get(null);
         } catch (Exception e) {
-            Log.info("Could not parse the color name " + colorName + " black color is returned.");
+            Log.info("Could not parse the color name " + colorName + ", black returned");
             return Color.black; // Not defined
         }
 
@@ -642,7 +639,7 @@ public class SWEKConfigurationManager {
                 }
                 // TODO Bram : Add other ways to add icons (file,url,...)
             } catch (URISyntaxException e) {
-                Log.info("Could not parse the URI " + eventIconValue + " null icon is returned.");
+                Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
                 return null;
             }
         }
@@ -991,12 +988,15 @@ public class SWEKConfigurationManager {
      *             if the "spatial_region" could not be parsed from the json
      */
     private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
-        SWEKSpatialRegion spacialRegion = new SWEKSpatialRegion();
-        spacialRegion.setX1(parseX1(object.getJSONObject("spatial_region")));
-        spacialRegion.setY1(parseY1(object.getJSONObject("spatial_region")));
-        spacialRegion.setX2(parseX2(object.getJSONObject("spatial_region")));
-        spacialRegion.setY2(parseY2(object.getJSONObject("spatial_region")));
-        return spacialRegion;
+        JSONObject jsonObject = object.getJSONObject("spatial_region");
+
+        SWEKSpatialRegion spatialRegion = new SWEKSpatialRegion();
+        spatialRegion.setX1(parseX1(jsonObject));
+        spatialRegion.setY1(parseY1(jsonObject));
+        spatialRegion.setX2(parseX2(jsonObject));
+        spatialRegion.setY2(parseY2(jsonObject));
+
+        return spatialRegion;
     }
 
     /**
@@ -1173,4 +1173,5 @@ public class SWEKConfigurationManager {
         String parameterName = jsonObject.getString("parameter_with");
         return new SWEKParameter("", parameterName, parameterName, null, false);
     }
+
 }

@@ -198,7 +198,7 @@ public class APIRequestManager {
     private static AbstractView requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput())));
+            APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8")));
 
             // Could we handle the answer from the server
             if (!response.hasData()) {
