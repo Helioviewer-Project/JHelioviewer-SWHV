@@ -248,8 +248,8 @@ public class LayersModel {
                 addLayer(theView);
             }
 
-            public Runnable init(AbstractView theView) {
-                this.theView = theView;
+            public Runnable init(AbstractView _view) {
+                theView = _view;
                 return this;
             }
         }.init(view));

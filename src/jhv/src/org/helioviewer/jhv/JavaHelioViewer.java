@@ -107,40 +107,45 @@ public class JavaHelioViewer {
         Settings.getSingletonInstance().update();
         J2KRenderGlobalOptions.setDoubleBufferingOption(true);
 
-        Log.info("Start main window");
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    TimeUtils.getSingletonInstance(); // instantiate class
-                    Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
-                    ImageViewerGui.getSingletonInstance(); // build UI
-                    ImageViewerGui.loadAtStart();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                TimeUtils.getSingletonInstance(); // instantiate class
+                Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
+
+                Log.info("Start main window");
+                ImageViewerGui.getSingletonInstance(); // build UI
+                ImageViewerGui.loadAtStart();
+
+                Log.info("Load plugin settings");
+                PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
+
+                try {
+                    if (theArgs.length != 0 && theArgs[0].equals("--exclude-plugins")) {
+                        Log.info("Do not load plugins");
+                    } else if (theArgs.length != 0 && theArgs[0].equals("--remote-plugins")) {
+                        Log.info("Load remote plugins");
+                       JHVLoader.loadRemotePlugins(theArgs);
+                    } else {
+                        Log.info("Load bundled plugins");
+                        JHVLoader.loadBundledPlugin("EVEPlugin.jar");
+                        JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
+                        JHVLoader.loadBundledPlugin("PfssPlugin.jar");
+                        JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        Log.info("Load plugin settings");
-        PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
-
-        try {
-            if (args.length != 0 && args[0].equals("--exclude-plugins")) {
-                Log.info("Do not load plugins");
-            } else if (args.length != 0 && args[0].equals("--remote-plugins")) {
-                Log.info("Load remote plugins");
-                JHVLoader.loadRemotePlugins(args);
-            } else {
-                Log.info("Load bundled plugins");
-                JHVLoader.loadBundledPlugin("EVEPlugin.jar");
-                JHVLoader.loadBundledPlugin("SWEKPlugin.jar");
-                JHVLoader.loadBundledPlugin("PfssPlugin.jar");
-                JHVLoader.loadBundledPlugin("SWHVHEKPlugin.jar");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+            private String[] theArgs;
+
+            public Runnable init(String[] _args) {
+                theArgs = _args;
+                return this;
+             }
+
+        }.init(args));
     }
 
 }

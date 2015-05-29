@@ -169,7 +169,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        //componentView.display();
+        componentView.display();
     }
 
     private static void prepareGuiExtra() {
