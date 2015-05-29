@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -238,17 +237,14 @@ public class DataSources {
             SortedSet<Item> children = new TreeSet<Item>();
             Iterator<?> iter = root.keys();
             while (iter.hasNext()) {
-                String key = new String(((String) iter.next()).getBytes(), "UTF-8");
+                String key = (String) iter.next();
                 JSONObject child = root.getJSONObject(key);
-                Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name").replace((char) 8287,
-                    ' '), child.getString("description"));
+                Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name"), child.getString("description"));
                 children.add(newItem);
             }
             return children.toArray(new Item[children.size()]);
         } catch (JSONException e) {
             Log.error("Error finding children of " + root, e);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
         return null;
     }
