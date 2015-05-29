@@ -5,7 +5,6 @@ import java.util.Date;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -23,7 +22,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     private double currentDistance = Sun.MeanEarthDistance;
 
     private Date cameraDate;
-    private boolean interpolation;
+    private boolean interpolation = false;
 
     public GL3DExpertCamera() {
         super();
@@ -147,6 +146,9 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     public void setInterpolation(boolean interpolation) {
         this.interpolation = interpolation;
+        if (!this.interpolation) {
+            activeLayerChanged(LayersModel.getActiveView());
+        }
     }
 
     @Override
