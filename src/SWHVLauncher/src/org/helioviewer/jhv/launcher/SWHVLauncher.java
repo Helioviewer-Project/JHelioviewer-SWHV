@@ -22,17 +22,7 @@ public class SWHVLauncher {
         System.out.println("JHelioviewer developer version with external plugins compiled-in.");
         System.out.println("=================================================================\n\n");
 
-        String[] args2 = new String[7];
-
-        args2[0] = "--exclude-plugins";
-        args2[1] = "--deactivate-plugin";
-        args2[2] = "SWEKPlugin.jar";
-        args2[3] = "--deactivate-plugin";
-        args2[4] = "EVEPlugin.jar";
-        args2[5] = "--deactivate-plugin";
-        args2[6] = "SWHVHEKPlugin.jar";
-        args2[5] = "--deactivate-plugin";
-        args2[6] = "PfssPlugin.jar";
+        String[] args2 = new String[] { "--exclude-plugins" };
         JavaHelioViewer.main(args2);
 
         EventQueue.invokeLater(new Runnable() {
