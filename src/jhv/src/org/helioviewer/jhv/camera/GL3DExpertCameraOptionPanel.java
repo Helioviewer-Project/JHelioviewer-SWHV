@@ -30,7 +30,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.LayersModel;
 
-@SuppressWarnings({"unchecked","serial"})
+@SuppressWarnings({ "unchecked", "serial" })
 public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;
@@ -95,7 +95,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
         addSyncButtons(c);
         buttonPanel.setVisible(false);
-        camera.setInterpolation(false);
         exactDateCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -103,7 +102,12 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
                 addBeginDatePanel.setVisible(selected);
                 addEndDatePanel.setVisible(selected);
                 buttonPanel.setVisible(selected);
-                camera.setInterpolation(selected);
+                if (selected) {
+                    setBeginTime(false);
+                    setEndTime(true);
+                } else
+                    camera.setInterpolation(selected);
+
             }
         });
     }
