@@ -8,14 +8,14 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.io.DataSourceServerListener;
-import org.helioviewer.jhv.io.DataSourceServers;
+import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.DataSourcesListener;
 
 //Java 6 does not support generics for JComboBox and DefaultComboBoxModel
 //Should be removed if support for Java 6 is not needed anymore
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
-public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements DataSourceServerListener {
+public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements DataSourcesListener {
 
     private final String[] serverList;
     private final JComboBox comboServer;
@@ -23,10 +23,10 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
     public RadioObservationDialogUIPanel() {
         super();
-        serverList = DataSourceServers.getSingletonInstance().getServerList();
+        serverList = DataSources.getSingletonInstance().getServerList();
         comboServer = new JComboBox(serverList);
         setFromOutside = true;
-        comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
+        comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
         setFromOutside = false;
 
         JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
@@ -41,7 +41,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
             public void actionPerformed(ActionEvent arg0) {
                 if (!setFromOutside) {
                     String server = (String) comboServer.getSelectedItem();
-                    DataSourceServers.getSingletonInstance().changeServer(server, true);
+                    DataSources.getSingletonInstance().changeServer(server, true);
                 } else {
                     setFromOutside = false;
                 }
@@ -50,13 +50,13 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
         add(container);
 
-        DataSourceServers.getSingletonInstance().addListener(this);
+        DataSources.getSingletonInstance().addListener(this);
     }
 
     @Override
     public void serverChanged(boolean donotloadStartup) {
         setFromOutside = true;
-        comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
+        comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
     }
 
 }

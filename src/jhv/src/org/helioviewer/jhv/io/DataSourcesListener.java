@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.io;
 
-public interface DataSourceServerListener {
+public interface DataSourcesListener {
 
     public abstract void serverChanged(boolean donotloadStartup);
 
