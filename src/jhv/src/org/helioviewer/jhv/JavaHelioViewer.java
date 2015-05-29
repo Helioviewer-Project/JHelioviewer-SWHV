@@ -124,8 +124,8 @@ public class JavaHelioViewer {
                     if (theArgs.length != 0 && theArgs[0].equals("--exclude-plugins")) {
                         Log.info("Do not load plugins");
                     } else if (theArgs.length != 0 && theArgs[0].equals("--remote-plugins")) {
-                        Log.info("Load remote plugins");
-                       JHVLoader.loadRemotePlugins(theArgs);
+                        Log.info("Load remote plugins -- not recommended");
+                        JHVLoader.loadRemotePlugins(theArgs);
                     } else {
                         Log.info("Load bundled plugins");
                         JHVLoader.loadBundledPlugin("EVEPlugin.jar");
