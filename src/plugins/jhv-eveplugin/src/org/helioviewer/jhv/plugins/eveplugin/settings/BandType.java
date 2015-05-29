@@ -5,7 +5,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -22,8 +21,6 @@ public class BandType {
     private String scale = "";
     private boolean isLog = false;
 
-    // private double multiplier = 1.0;
-
     public URL buildUrl(Interval<Date> interval) {
         final SimpleDateFormat eveAPIDateFormat = new SimpleDateFormat(EVEAPI.API_DATE_FORMAT);
         URL url = null;
@@ -33,22 +30,6 @@ public class BandType {
             Log.error("Something is wrong with the EVEAPI url", e);
         }
         return url;
-    }
-
-    public String toStringAlt() {
-        String str = "baseUrl:" + baseUrl;
-        str += "\ngroup:" + group.toString();
-        str += "\nlabel:" + label;
-        str += "\nunitLabel:" + unitLabel;
-        str += "\nwarnLevels: [";
-        for (Map.Entry<String, Double> entry : warnLevels.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            str += key + ":";
-            str += value.toString() + ",";
-        }
-        str += ']';
-        return str;
     }
 
     @Override
@@ -132,9 +113,4 @@ public class BandType {
     public boolean isLogScale() {
         return isLog;
     }
-
-    /*
-     * public double getMultiplier() { return multiplier; } public void
-     * setMultiplier(double multiplier) { this.multiplier = multiplier; }
-     */
 }
