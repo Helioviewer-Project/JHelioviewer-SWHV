@@ -43,7 +43,7 @@ public class LayersModel {
      * @param idx
      *            - index of the layer to be set as active Layer
      */
-    public static void setActiveLayer(int idx) {
+    private static void setActiveLayer(int idx) {
         AbstractView view = getLayer(idx);
         if (view == null && idx != -1) {
             return;

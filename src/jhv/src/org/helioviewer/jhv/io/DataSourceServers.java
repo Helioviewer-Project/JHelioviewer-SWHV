@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.swing.SwingWorker;
 
@@ -11,15 +10,12 @@ public class DataSourceServers {
 
     private static DataSourceServers instance;
 
-    private final List<DataSourceServerListener> listeners;
+    private static final HashSet<DataSourceServerListener> listeners = new HashSet<DataSourceServerListener>();
 
-    private String selectedServer;
-
+    private String selectedServer = "";
     private final String[] serverList = new String[] { "ROB", "Helioviewer.org", "IAS" };
 
     private DataSourceServers() {
-        listeners = new ArrayList<DataSourceServerListener>();
-        selectedServer = "";
     }
 
     public static DataSourceServers getSingletonInstance() {
