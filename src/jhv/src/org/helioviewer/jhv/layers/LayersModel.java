@@ -16,10 +16,33 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class LayersModel {
 
-    private static int activeLayer = -1;
+    private static AbstractView activeView;
     private static final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
 
-    private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
+    /**
+     * Returns the view at a given position within the stack of layers.
+     *
+     * @param index
+     *            Position within the stack of layers
+     * @return View at given position
+     */
+    private static AbstractView getLayer(int index) {
+        try {
+            return layers.get(index);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns number of layers
+     *
+     * @return Number of layers
+     * @see #getNumberOfVisibleLayer
+     */
+    public static int getNumLayers() {
+        return layers.size();
+    }
 
     /**
      * Return the view associated with the active Layer
@@ -27,33 +50,12 @@ public class LayersModel {
      * @return View associated with the active Layer
      */
     public static AbstractView getActiveView() {
-        return getLayer(activeLayer);
+        return activeView;
     }
 
-    /**
-     * @return Index of the currently active Layer
-     */
-    public static int getActiveLayer() {
-        return activeLayer;
-    }
-
-    /**
-     * Set the activeLayer to the Layer associated with the given index
-     *
-     * @param idx
-     *            - index of the layer to be set as active Layer
-     */
-    private static void setActiveLayer(int idx) {
-        AbstractView view = getLayer(idx);
-        if (view == null && idx != -1) {
-            return;
-        }
-        activeLayer = idx;
+    public static void setActiveView(AbstractView view) {
+        activeView = view;
         fireActiveLayerChanged(view);
-    }
-
-    public static void setActiveLayer(AbstractView view) {
-        setActiveLayer(findView(view));
     }
 
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
@@ -168,49 +170,6 @@ public class LayersModel {
         return latest == null ? null : latest.getTime();
     }
 
-    /**
-     * Find the index of the layer that can be associated with the given view
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return index of the layer that can be associated with the given view
-     */
-    public static int findView(AbstractView view) {
-        return layers.indexOf(view);
-    }
-
-    /**
-     * Check if the given index is valid, given the current state of the
-     * ViewChain
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the index is valid
-     */
-    private static boolean isValidIndex(int idx) {
-        if (idx >= 0 && idx < layers.size()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Calulate a new activeLayer after the old Layer has been deleted
-     *
-     * @param oldActiveLayerIdx
-     *            - index of old active, but deleted, layer
-     * @return the index of the new active layer to choose, or -1 if no suitable
-     *         new layer can be found
-     */
-    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
-        int candidate = oldActiveLayerIdx;
-        if (!isValidIndex(candidate)) {
-            candidate = layers.size() - 1;
-        }
-
-        return candidate;
-    }
-
     public static void addLayer(AbstractView view) {
         if (view == null)
             return;
@@ -232,7 +191,7 @@ public class LayersModel {
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
         fireLayerAdded(view);
-        setActiveLayer(layers.size() - 1);
+        setActiveView(view);
     }
 
     // special
@@ -253,6 +212,38 @@ public class LayersModel {
                 return this;
             }
         }.init(view));
+    }
+
+    /**
+     * Check if the given index is valid, given the current state of the
+     * ViewChain
+     *
+     * @param idx
+     *            - index of the layer in question
+     * @return true if the index is valid
+     */
+    private static boolean isValidIndex(int idx) {
+        if (idx >= 0 && idx < layers.size()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Calculate a new activeLayer after the old Layer has been deleted
+     *
+     * @param oldActiveLayerIdx
+     *            - index of old active, but deleted, layer
+     * @return the index of the new active layer to choose, or -1 if no suitable
+     *         new layer can be found
+     */
+    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
+        int candidate = oldActiveLayerIdx;
+        if (!isValidIndex(candidate)) {
+            candidate = layers.size() - 1;
+        }
+
+        return candidate;
     }
 
     /**
@@ -278,8 +269,7 @@ public class LayersModel {
             ((JHVJPXView) view).abolish();
         }
 
-        int newIndex = determineNewActiveLayer(index);
-        setActiveLayer(newIndex);
+        setActiveView(getLayer(determineNewActiveLayer(index)));
     }
 
     public static void removeLayer(int idx) {
@@ -315,37 +305,14 @@ public class LayersModel {
         }
     }
 
+    private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
+
     public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);
     }
 
     public static void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
-    }
-
-    /**
-     * Returns the view at a given position within the stack of layers.
-     *
-     * @param index
-     *            Position within the stack of layers
-     * @return View at given position
-     */
-    public static AbstractView getLayer(int index) {
-        try {
-            return layers.get(index);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Returns number of layers
-     *
-     * @return Number of layers
-     * @see #getNumberOfVisibleLayer
-     */
-    public static int getNumLayers() {
-        return layers.size();
     }
 
 }
