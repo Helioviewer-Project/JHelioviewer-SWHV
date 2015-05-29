@@ -88,8 +88,8 @@ public class FileUtils {
      * @throws IOException
      */
     public static void logProcessOutput(final Process process, final String processName, final Level logLevel, boolean blockUntilFinished) throws IOException {
-        final BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        final BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        final BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+        final BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream(), "UTF-8"));
         Thread threadStdout = new Thread(new Runnable() {
             @Override
             public void run() {

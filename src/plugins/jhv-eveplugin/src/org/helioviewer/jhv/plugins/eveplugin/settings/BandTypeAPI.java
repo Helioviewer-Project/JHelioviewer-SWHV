@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BandTypeAPI extends APIAbstract {
+
     private static BandTypeAPI singletonInstance;
     private BandType[] bandtypes;
     private Boolean isUpdated = Boolean.FALSE;
@@ -53,7 +54,6 @@ public class BandTypeAPI extends APIAbstract {
         } catch (IOException ex) {
             Log.error(">> Settings.load(boolean) > Could not load settings", ex);
         }
-
     }
 
     private String getDatasetUrl() {
@@ -200,4 +200,5 @@ public class BandTypeAPI extends APIAbstract {
         }
         return orderedGroups;
     }
+
 }

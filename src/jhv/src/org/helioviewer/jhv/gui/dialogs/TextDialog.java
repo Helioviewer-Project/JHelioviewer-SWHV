@@ -28,7 +28,7 @@ public class TextDialog extends JDialog implements ActionListener, ShowableDialo
         String linebreak = System.getProperty("line.separator");
 
         try {
-            Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream())));
+            Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(textFile.openStream(), "UTF-8")));
             while (scanner.hasNext()) {
                 text += scanner.nextLine() + linebreak;
             }

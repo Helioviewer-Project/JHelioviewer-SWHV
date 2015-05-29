@@ -127,14 +127,12 @@ public class DownloadController {
     private LinkedList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
         // get missing data intervals within given interval
         final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
-
         if (missingIntervals.size() == 0) {
             return null;
         }
 
         // split intervals (if necessary) into smaller intervals
         final LinkedList<Interval<Date>> intervals = new LinkedList<Interval<Date>>();
-
         for (final Interval<Date> i : missingIntervals) {
             intervals.addAll(splitInterval(i));
         }
@@ -144,25 +142,20 @@ public class DownloadController {
 
     public void stopDownloads(final Band band) {
         final LinkedList<Interval<Date>> list = downloadMap.get(band);
-
         if (list == null) {
             return;
         }
-
         if (list.size() == 0) {
             downloadMap.remove(band);
         }
-
         fireDownloadFinished(band, null, 0);
     }
 
     public boolean isDownloadActive(final Band band) {
         final LinkedList<Interval<Date>> list = downloadMap.get(band);
-
         if (list == null) {
             return false;
         }
-
         return list.size() > 0;
     }
 
@@ -218,28 +211,23 @@ public class DownloadController {
             final Interval<Date> interval = jobs[i].getInterval();
 
             LinkedList<Interval<Date>> list = downloadMap.get(band);
-
             if (list == null) {
                 list = new LinkedList<Interval<Date>>();
             }
-
             list.add(interval);
 
             downloadMap.put(band, list);
-
             downloadPool.submit(jobs[i]);
         }
     }
 
     private void downloadFinished(final Band band, final Interval<Date> interval) {
-
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 int numberOfDownloads = 0;
 
                 final LinkedList<Interval<Date>> list = downloadMap.get(band);
-
                 if (list != null) {
                     list.remove(interval);
                     numberOfDownloads = list.size();
@@ -249,24 +237,14 @@ public class DownloadController {
                     }
                 }
                 fireDownloadFinished(band, interval, numberOfDownloads);
-
             }
         });
-
     }
 
     private class DownloadThread implements Runnable {
 
-        // //////////////////////////////////////////////////////////////////////////
-        // Definitions
-        // //////////////////////////////////////////////////////////////////////////
-
         private final Interval<Date> interval;
         private final Band band;
-
-        // //////////////////////////////////////////////////////////////////////////
-        // Methods
-        // //////////////////////////////////////////////////////////////////////////
 
         public DownloadThread(final Band band, final Interval<Date> interval) {
             this.interval = interval;
@@ -310,15 +288,13 @@ public class DownloadController {
             // this might take a while
             try {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                 final StringBuilder sb = new StringBuilder();
                 String str;
 
                 while ((str = in.readLine()) != null) {
                     sb.append(str);
                 }
-
                 in.close();
 
                 EventQueue.invokeLater(new Runnable() {
@@ -331,7 +307,6 @@ public class DownloadController {
                         }
                     }
                 });
-
             } catch (final IOException e1) {
                 Log.error("Error Parsing the EVE Response.", e1);
             }
