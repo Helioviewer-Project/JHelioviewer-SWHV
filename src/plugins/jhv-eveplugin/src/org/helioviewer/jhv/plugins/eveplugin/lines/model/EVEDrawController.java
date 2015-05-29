@@ -130,6 +130,17 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
         availableRangeMap.get(band.getUnitLabel()).setMin(data.getMinimumValue());
         availableRangeMap.get(band.getUnitLabel()).setMax(data.getMaximumValue());
+        double avMin = availableRangeMap.get(band.getUnitLabel()).min;
+        double avMax = availableRangeMap.get(band.getUnitLabel()).max;
+        if (avMin == avMax) {
+            if (avMin == 0) {
+                availableRangeMap.get(band.getUnitLabel()).setMin(-1.0);
+                availableRangeMap.get(band.getUnitLabel()).setMax(1.0);
+            } else {
+                availableRangeMap.get(band.getUnitLabel()).setMin(avMin - avMin / 10);
+                availableRangeMap.get(band.getUnitLabel()).setMax(avMax + avMax / 10);
+            }
+        }
         if (oldAvailableRange.min != availableRangeMap.get(band.getUnitLabel()).min || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
             // Log.trace("update band available range changed so we change the plotareaSpace");
             checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
