@@ -2,21 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="../lib/kdu_jni.jar"/>
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="../lib/gluegen-rt.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
-		</attributes>
-		<classpathentry kind="lib" path="../lib/fits.jar"/>	</classpathentry>
+	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
+    <classpathentry kind="lib" path="../lib/fits.jar"/>
 	<classpathentry kind="lib" path="../resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="../lib/jogl-all.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/bramb/Documents/OMA/jhelioviewer/git/client/jhv-3d-wcs/nativelib/jogl/macosx-universal"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="../lib/jogl-all.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-api-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-log4j12-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-nop-1.7.12.jar"/>
