@@ -52,8 +52,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
 
     private final EventsSelectorElement eventSelectorElement;
 
-    private final List<EventModelListener> listeners;
-
     private boolean eventsActivated;
 
     private boolean prevNoPlotConfig;
@@ -68,7 +66,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         eventPanel = new EventPanel();
         currentSwingWorker = null;
         eventSelectorElement = new EventsSelectorElement(this);
-        listeners = new ArrayList<EventModelListener>();
         eventsActivated = false;
     }
 
@@ -82,16 +79,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
             instance = new EventModel();
         }
         return instance;
-    }
-
-    /**
-     * Adds an event model listener to the event model.
-     *
-     * @param listener
-     *            the listener to add
-     */
-    public void addEventModelListener(EventModelListener listener) {
-        listeners.add(listener);
     }
 
     @Override
@@ -144,7 +131,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
             eventsActivated = false;
             DrawController.getSingletonInstance().removeDrawableElement(eventPanel);
             // LineDataSelectorModel.getSingletonInstance().removeLineData(eventSelectorElement);
-            fireEventsDeactivated();
         }
     }
 
@@ -337,12 +323,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         double selectedDuration = 1.0 * (selectedInterval.getEnd().getTime() - selectedInterval.getStart().getTime());
         double position = 1.0 * (date.getTime() - selectedInterval.getStart().getTime());
         return position / selectedDuration;
-    }
-
-    private void fireEventsDeactivated() {
-        for (EventModelListener l : listeners) {
-            l.eventsDeactivated();
-        }
     }
 
     public boolean hasElementsToDraw() {
