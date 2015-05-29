@@ -248,12 +248,11 @@ public class ImageViewerGui {
             return;
         }
 
-        // all requests below are synchronous on EDT
         // -jpx
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    LayersModel.addLayer(APIRequestManager.loadView(jpxUrl, jpxUrl));
+                    LayersModel.addLayerFromThread(APIRequestManager.loadView(jpxUrl, jpxUrl));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -263,7 +262,7 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
-                    LayersModel.addLayer(APIRequestManager.loadView(jpipUri, jpipUri));
+                    LayersModel.addLayerFromThread(APIRequestManager.loadView(jpipUri, jpipUri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -278,7 +277,7 @@ public class ImageViewerGui {
                     fileDownloader.get(downloadAddress, downloadFile);
                     URI uri = downloadFile.toURI();
 
-                    LayersModel.addLayer(APIRequestManager.loadView(uri, uri));
+                    LayersModel.addLayerFromThread(APIRequestManager.loadView(uri, uri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
