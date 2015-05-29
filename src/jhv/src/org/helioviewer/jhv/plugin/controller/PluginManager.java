@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugin.controller;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,12 +13,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
@@ -188,7 +184,7 @@ public class PluginManager {
      * @return true if the plug-in could be loaded successfully; false
      *         otherwise.
      */
-    private boolean loadPlugin_raw(URI pluginLocation) {
+    public boolean loadPlugin(URI pluginLocation) {
         URL[] urls = new URL[1];
         try {
             urls[0] = pluginLocation.toURL();
@@ -239,23 +235,6 @@ public class PluginManager {
         }
 
         return false;
-    }
-
-    private class LoadPluginCall implements Callable<Boolean> {
-        final AtomicReference<URI> refURI = new AtomicReference<URI>();
-
-        public LoadPluginCall(URI location) {
-            refURI.set(location);
-        }
-
-        @Override
-        public Boolean call() {
-            return loadPlugin_raw(refURI.get());
-        }
-    }
-
-    public boolean loadPlugin(URI location) throws InterruptedException, InvocationTargetException {
-        return EventDispatchQueue.invokeAndWait(new LoadPluginCall(location));
     }
 
     /**
