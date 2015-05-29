@@ -108,24 +108,20 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
-        int idx = LayersModel.findView(view);
-        if (idx != -1 /* LayersModel.isValidIndex(idx) */) {
-            // update timestamp labels
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+        ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
-            if (idx == LayersModel.getActiveLayer() && dateTime != null) {
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
-                MoviePanel.setFrameSlider(view);
+        if (view == LayersModel.getActiveView() && dateTime != null) {
+            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
+            MoviePanel.setFrameSlider(view);
 
-                lastTimestamp = dateTime.getTime();
-                // fire TimeChanged
-                activeCamera.timeChanged(lastTimestamp);
-                for (final TimeListener listener : timeListeners) {
-                    listener.timeChanged(lastTimestamp);
-                }
+            lastTimestamp = dateTime.getTime();
+            // fire TimeChanged
+            activeCamera.timeChanged(lastTimestamp);
+            for (final TimeListener listener : timeListeners) {
+                listener.timeChanged(lastTimestamp);
             }
-            display();
         }
+        display();
     }
 
     public static Date getLastUpdatedTimestamp() {
