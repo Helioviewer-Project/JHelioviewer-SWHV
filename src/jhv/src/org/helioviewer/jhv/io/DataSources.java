@@ -233,7 +233,7 @@ public class DataSources {
      *            Element for which the children will be created
      * @return List of items to select or null if some error occurs
      */
-    public Item[] getChildrenList(JSONObject root) {
+    private Item[] getChildrenList(JSONObject root) {
         try {
             SortedSet<Item> children = new TreeSet<Item>();
             Iterator<?> iter = root.keys();
