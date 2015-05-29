@@ -40,10 +40,9 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.io.DataSourceServerListener;
-import org.helioviewer.jhv.io.DataSourceServers;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
+import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -56,7 +55,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
  * @author Stephan Pagel
  * */
 @SuppressWarnings({"unchecked","rawtypes","serial"})
-public class ImageDataPanel extends ObservationDialogPanel implements DataSourceServerListener {
+public class ImageDataPanel extends ObservationDialogPanel implements DataSourcesListener {
 
     private boolean isSelected = false;
 
@@ -88,7 +87,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         add(timePane);
         add(instrumentsPane);
 
-        DataSourceServers.getSingletonInstance().addListener(this);
+        DataSources.getSingletonInstance().addListener(this);
     }
 
     /**
@@ -638,7 +637,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * @author rewritten Helge Dietert
      * @author original Stephan Pagel
      * */
-    private static class InstrumentsPanel extends JPanel implements DataSourceServerListener {
+    private static class InstrumentsPanel extends JPanel implements DataSourcesListener {
         /**
          * Combobox to select observatory
          */
@@ -666,8 +665,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
             // Setup grid
             setFromOutside = false;
-            serverList = DataSourceServers.getSingletonInstance().getServerList();
-            DataSourceServers.getSingletonInstance().addListener(this);
+            serverList = DataSources.getSingletonInstance().getServerList();
+            DataSources.getSingletonInstance().addListener(this);
 
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
@@ -725,7 +724,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 public void actionPerformed(ActionEvent arg0) {
                     if (!setFromOutside) {
                         String server = (String) comboServer.getSelectedItem();
-                        DataSourceServers.getSingletonInstance().changeServer(server, true);
+                        DataSources.getSingletonInstance().changeServer(server, true);
                     } else {
                         setFromOutside = false;
                     }
@@ -966,7 +965,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         @Override
         public void serverChanged(boolean donotloadStartup) {
             setFromOutside = true;
-            comboServer.setSelectedItem(DataSourceServers.getSingletonInstance().getSelectedServer());
+            comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
         }
     }
 
