@@ -6,7 +6,7 @@ import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 
 /**
  * This class describes an Y-axis.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
  */
 
@@ -32,7 +32,7 @@ public class YAxisElement {
     /**
      * Creates a Y-axis element with a selected value range, an available value
      * range, a label, a minimum value, a maximum value and a color.
-     * 
+     *
      * @param selectedRange
      *            The current selected value range
      * @param availableRange
@@ -54,13 +54,24 @@ public class YAxisElement {
         this.maxValue = maxValue;
         this.color = color;
         this.isLogScale = isLogScale;
+        checkMinMax();
+    }
+
+    private void checkMinMax() {
+        if (minValue == 0.0 && maxValue == 0.0) {
+            minValue = -1.0;
+            maxValue = 1.0;
+        } else if (minValue == maxValue) {
+            minValue = minValue - minValue / 10;
+            maxValue = maxValue + maxValue / 10;
+        }
     }
 
     /**
      * Creates a default Y-axis element with a selected range (0,0), available
      * range (0,0), empty label, minimum and maximum value of 0.0 and a black
      * color.
-     * 
+     *
      */
     public YAxisElement() {
         selectedRange = new Range();
@@ -75,7 +86,7 @@ public class YAxisElement {
 
     /**
      * Gives the selected range.
-     * 
+     *
      * @return The selected range
      */
     public Range getSelectedRange() {
@@ -84,7 +95,7 @@ public class YAxisElement {
 
     /**
      * Sets the selected range.
-     * 
+     *
      * @param selectedRange
      *            The selected range
      */
@@ -94,7 +105,7 @@ public class YAxisElement {
 
     /**
      * Gets the available range.
-     * 
+     *
      * @return The available range
      */
     public Range getAvailableRange() {
@@ -103,7 +114,7 @@ public class YAxisElement {
 
     /**
      * Sets the available range.
-     * 
+     *
      * @param availableRange
      *            The available range
      */
@@ -113,7 +124,7 @@ public class YAxisElement {
 
     /**
      * Gets the label.
-     * 
+     *
      * @return The label
      */
 
@@ -128,7 +139,7 @@ public class YAxisElement {
 
     /**
      * Sets the label.
-     * 
+     *
      * @param label
      *            The label
      */
@@ -138,7 +149,7 @@ public class YAxisElement {
 
     /**
      * Gets the minimum value.
-     * 
+     *
      * @return The minimum value
      */
     public double getMinValue() {
@@ -147,7 +158,7 @@ public class YAxisElement {
 
     /**
      * Sets the minimum value.
-     * 
+     *
      * @param minValue
      *            The minimum value
      */
@@ -157,7 +168,7 @@ public class YAxisElement {
 
     /**
      * Gets the maximum value.
-     * 
+     *
      * @return The maximum value
      */
     public double getMaxValue() {
@@ -166,7 +177,7 @@ public class YAxisElement {
 
     /**
      * Sets the maximum value.
-     * 
+     *
      * @param maxValue
      *            The maximum value
      */
@@ -176,7 +187,7 @@ public class YAxisElement {
 
     /**
      * Gets the color.
-     * 
+     *
      * @return The color.
      */
     public Color getColor() {
@@ -185,7 +196,7 @@ public class YAxisElement {
 
     /**
      * Sets the color.
-     * 
+     *
      * @param color
      *            The color.
      */
@@ -196,7 +207,7 @@ public class YAxisElement {
     /**
      * Sets the available range, selected range, label minimum value, maximum
      * value and color of the y-axis element.
-     * 
+     *
      * @param availableRange
      *            The available range
      * @param selectedRange
@@ -219,6 +230,7 @@ public class YAxisElement {
         this.color = color;
         this.isLogScale = isLogScale;
         this.activationTime = activationTime;
+        checkMinMax();
     }
 
     public boolean isLogScale() {
