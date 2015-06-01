@@ -242,7 +242,7 @@ public class DataSources {
                 String key = (String) iter.next();
                 JSONObject child = root.getJSONObject(key);
                 Item newItem = new Item(key, child.optBoolean("default", false),
-                                        child.getString("name").replace((char) 8287, ' '), // windows needs this
+                                        child.getString("name").replace((char) 8287, ' '), // e.g. 304\u205f\u212b
                                         child.getString("description"));
                 children.add(newItem);
             }

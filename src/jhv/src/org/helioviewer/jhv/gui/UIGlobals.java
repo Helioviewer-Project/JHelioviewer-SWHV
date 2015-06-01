@@ -52,7 +52,7 @@ public class UIGlobals {
         return instance;
     }
 
-    public static void setUIFont(Font font) {
+    public void setUIFont(Font font) {
         FontUIResource f = new FontUIResource(font);
         Enumeration<?> keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
