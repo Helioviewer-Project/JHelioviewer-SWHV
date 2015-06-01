@@ -241,7 +241,9 @@ public class DataSources {
             while (iter.hasNext()) {
                 String key = (String) iter.next();
                 JSONObject child = root.getJSONObject(key);
-                Item newItem = new Item(key, child.optBoolean("default", false), child.getString("name"), child.getString("description"));
+                Item newItem = new Item(key, child.optBoolean("default", false),
+                                        child.getString("name").replace((char) 8287, ' '), // windows needs this
+                                        child.getString("description"));
                 children.add(newItem);
             }
             return children.toArray(new Item[children.size()]);
