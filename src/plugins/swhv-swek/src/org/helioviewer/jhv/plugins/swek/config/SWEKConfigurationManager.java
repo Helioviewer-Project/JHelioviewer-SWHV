@@ -115,7 +115,7 @@ public class SWEKConfigurationManager {
                 } else {
                     isConfigParsed = parseConfigFile();
                 }
-            } else if (checkAndOpenOnlineFile()) {
+            } else if (checkAndOpenZippedFile()) {
                 isConfigParsed = parseConfigFile();
             } else {
                 isConfigParsed = false;
