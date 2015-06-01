@@ -202,13 +202,21 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    private void loadRemote(final boolean isImage) {
+    private void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        final RenderableDummy renderableDummy = new RenderableDummy();
+        RenderableDummy renderableDummy = new RenderableDummy();
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
 
-        SwingWorker<AbstractView, Void> remoteTask = new SwingWorker<AbstractView, Void>() {
+        class LoadRemoteTask extends SwingWorker<AbstractView, Void> {
+
+            private RenderableDummy dummy;
+            private boolean image;
+
+            LoadRemoteTask(RenderableDummy _dummy, boolean _image) {
+                dummy = _dummy;
+                image = _image;
+            }
 
             @Override
             protected AbstractView doInBackground() {
@@ -216,7 +224,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 AbstractView view = null;
 
                 try {
-                    if (isImage)
+                    if (image)
                         view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
                     else
                         view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
@@ -229,8 +237,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             }
 
             @Override
-            public void done() {
-                ImageViewerGui.getRenderableContainer().removeRenderable(renderableDummy);
+            protected void done() {
+                ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
                 try {
                     LayersModel.addLayer(get());
                 } catch (Exception e) {
@@ -238,7 +246,9 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 }
             }
 
-        };
+        }
+
+        LoadRemoteTask remoteTask = new LoadRemoteTask(renderableDummy, isImage);
         remoteTask.execute();
     }
 

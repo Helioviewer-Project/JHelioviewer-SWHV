@@ -396,7 +396,7 @@ public class DataSources {
             }
 
             @Override
-            public void done() {
+            protected void done() {
                 for (DataSourcesListener l : listeners) {
                     l.serverChanged(donotloadStartup);
                 }

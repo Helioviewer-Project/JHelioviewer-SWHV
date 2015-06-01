@@ -33,7 +33,6 @@ public class GL3DPositionLoading {
     private final String PARTIALSTATE = "Partial";
 
     private boolean isLoaded = false;
-    private JSONObject jsonResult;
     private Position.Latitudinal[] position;
     private String beginDate = "2014-05-28T00:00:00";
     private String endDate = "2014-05-28T00:00:00";
@@ -42,7 +41,7 @@ public class GL3DPositionLoading {
     private final String baseUrl = "http://swhv.oma.be/position?";
     private Date beginDatems = new Date(0);
     private Date endDatems = new Date();
-    private SwingWorker<Integer, Integer> worker;
+    private SwingWorker<Void, Void> worker;
     private final GL3DExpertCamera camera;
 
     public GL3DPositionLoading(GL3DExpertCamera camera) {
@@ -64,11 +63,12 @@ public class GL3DPositionLoading {
         }
         fireLoaded("Loading...");
 
-        worker = new SwingWorker<Integer, Integer>() {
+        worker = new SwingWorker<Void, Void>() {
             private String report = null;
+            private JSONObject result = null;
 
             @Override
-            protected Integer doInBackground() throws Exception {
+            protected Void doInBackground() throws Exception {
                 Thread.currentThread().setName("GL3DPositionLoading--Main");
                 try {
                     long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
@@ -81,12 +81,11 @@ public class GL3DPositionLoading {
                     DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                     Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                     if (!ds.getResponse400()) {
-                        jsonResult = new JSONObject(new JSONTokener(reader));
+                        result = new JSONObject(new JSONTokener(reader));
                     } else {
                         JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                         if (jsonObject.has("faultstring")) {
-                            String faultstring = jsonObject.getString("faultstring");
-                            report = faultstring;
+                            report = jsonObject.getString("faultstring");
                         } else {
                             report = "Invalid network response";
                         }
@@ -100,19 +99,15 @@ public class GL3DPositionLoading {
                 } catch (URISyntaxException e) {
                     report = FAILEDSTATE + ": wrong URI";
                 }
-                return 1;
-            }
-
-            @Override
-            protected void process(List<Integer> chunks) {
+                return null;
             }
 
             @Override
             protected void done() {
                 if (!this.isCancelled()) {
-                    if (report == null && jsonResult != null) {
-                        parseData();
-                        jsonResult = null;
+                    if (report == null && result != null) {
+                        parseData(result);
+                        result = null;
                         if (position != null && position.length > 0) {
                             setLoaded(true);
                         } else if (position == null) {
@@ -123,6 +118,7 @@ public class GL3DPositionLoading {
                     }
                     if (report != null) {
                         fireLoaded(report);
+                        report = null;
                     }
                 }
             }
@@ -137,7 +133,7 @@ public class GL3DPositionLoading {
         }
     }
 
-    private void parseData() {
+    private void parseData(JSONObject jsonResult) {
         try {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
