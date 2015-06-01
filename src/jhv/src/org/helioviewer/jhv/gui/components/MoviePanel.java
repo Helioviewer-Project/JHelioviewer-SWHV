@@ -74,7 +74,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * @author Malte Nuhn
  *
  */
-@SuppressWarnings({"unchecked","rawtypes","serial"})
+@SuppressWarnings({ "serial" })
 public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, UIViewListener {
 
     // different animation speeds

@@ -56,7 +56,7 @@ import org.w3c.dom.NodeList;
  * @author Alen Agheksanterian
  * @author Stephan Pagel
  */
-@SuppressWarnings({"unchecked","rawtypes","serial"})
+@SuppressWarnings({ "serial" })
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final JButton closeButton = new JButton("Close");
