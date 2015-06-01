@@ -9,6 +9,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
@@ -111,6 +112,7 @@ public class JavaHelioViewer {
             @Override
             public void run() {
                 TimeUtils.getSingletonInstance(); // instantiate class
+                UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
 
                 Log.info("Start main window");

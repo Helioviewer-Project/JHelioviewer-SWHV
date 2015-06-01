@@ -87,7 +87,6 @@ public class Band implements LineDataSelectorElement {
     @Override
     public void setDataColor(Color c) {
         this.setGraphColor(c);
-
     }
 
     @Override

@@ -2,7 +2,11 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.util.Enumeration;
 import java.util.Hashtable;
+
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 
 public class UIGlobals {
 
@@ -46,6 +50,17 @@ public class UIGlobals {
             }
         }
         return instance;
+    }
+
+    public static void setUIFont(Font font) {
+        FontUIResource f = new FontUIResource(font);
+        Enumeration<?> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value != null && value instanceof FontUIResource)
+                UIManager.put(key, f);
+        }
     }
 
     public static Font UIFont = new Font("SansSerif", Font.PLAIN, 12);

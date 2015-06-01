@@ -53,7 +53,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
     @Override
     public void removeLineData() {
         radioDataManager.removeDownloadRequestData(this);
-
     }
 
     @Override
@@ -89,7 +88,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
 
     @Override
     public boolean isAvailable() {
-        // TODO Auto-generated method stub
         return true;
     }
 
@@ -99,7 +97,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
 
     @Override
     public String getUnitLabel() {
-        // TODO Auto-generated method stub
         return "Don't know yet";
     }
 
@@ -123,4 +120,5 @@ public class DownloadRequestData implements LineDataSelectorElement {
     public Component getOptionsPanel() {
         return new RadioOptionsPanel();
     }
+
 }
