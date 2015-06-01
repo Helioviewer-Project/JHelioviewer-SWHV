@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +9,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -161,7 +161,7 @@ public class Settings {
      * @param lookAndFeel
      *            name of the lookandfeel.
      */
-    public void setLookAndFeelEverywhere(Component c, String lookAndFeel) {
+    public void setLookAndFeelEverywhere(JFrame frame, String lookAndFeel) {
         if (lookAndFeel == null) {
            lookAndFeel = getProperty("display.laf");
            if (lookAndFeel == null) {
@@ -173,8 +173,10 @@ public class Settings {
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
             try {
                 UIManager.setLookAndFeel(lookAndFeel);
-                if (c != null)
-                    SwingUtilities.updateComponentTreeUI(c);
+                if (frame != null) {
+                    SwingUtilities.updateComponentTreeUI(frame);
+                    frame.pack();
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
