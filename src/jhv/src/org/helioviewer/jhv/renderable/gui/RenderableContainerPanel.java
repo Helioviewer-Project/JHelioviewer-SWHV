@@ -97,18 +97,19 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         }
     };
 
-    public final JTable grid;
-    private Component optionsPanel = null;
-    private final GridBagConstraints gc = new GridBagConstraints();
+    private final JTable grid;
     private final JPanel optionsPanelWrapper;
 
     public RenderableContainerPanel(final RenderableContainer renderableContainer) {
         this.setLayout(new GridBagLayout());
+
+        GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
+
         grid = new JTable(renderableContainer);
         renderableContainer.addTableModelListener(grid);
 
@@ -220,19 +221,16 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         LayersModel.addLayersListener(this);
     }
 
-    void setOptionsPanel(Renderable renderable) {
+    private void setOptionsPanel(Renderable renderable) {
         setOptionsPanel(renderable.getOptionsPanel());
     }
 
     private void setOptionsPanel(Component cmp) {
-        if (optionsPanel != null)
-            optionsPanelWrapper.remove(optionsPanel);
-        optionsPanel = cmp;
-        if (optionsPanel != null)
-            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
-
+        optionsPanelWrapper.removeAll();
+        if (cmp != null)
+            optionsPanelWrapper.add(cmp, BorderLayout.CENTER);
         super.revalidate();
-        super.repaint();
+        // super.repaint();
     }
 
     @Override
