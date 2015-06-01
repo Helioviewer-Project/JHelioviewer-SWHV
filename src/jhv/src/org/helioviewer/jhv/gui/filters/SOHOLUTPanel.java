@@ -24,7 +24,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
  *
  * @author Helge Dietert (extended)
  */
-@SuppressWarnings({"unchecked","rawtypes"})
 public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
