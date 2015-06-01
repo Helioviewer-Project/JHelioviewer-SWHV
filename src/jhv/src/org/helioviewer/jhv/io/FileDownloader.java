@@ -92,61 +92,6 @@ public class FileDownloader {
         return new File(outFileName).toURI();
     }
 
-    //
-    // /**
-    // * Downloads a file from a given JPIP address to the download directory of
-    // * JHV. This method only works for the Helioviewer server because of the
-    // * source URI modifications which have to be done in this method.
-    // *
-    // * @param sourceURI
-    // * address of file which have to be downloaded.
-    // * @param downloadIfAlreadyExists
-    // * set this flag to download a file when a file in the download
-    // * directory with the same name already exists. The file will not
-    // * be overridden but an increased number will be added to the
-    // * file name.
-    // * @return URI to the downloaded file or null if download fails.
-    // */
-    // public static URI downloadFromJPIP(URI sourceURI, boolean
-    // downloadIfAlreadyExists) {
-    //
-    // URI sourceURI = null;
-    //
-    // // set up source url and destination
-    // try {
-    // sourceURI = new URI(sourceURI.toString().replaceFirst("jpip://",
-    // "http://").replaceFirst(":" + sourceURI.getPort(), "/jp2"));
-    // } catch (MalformedURIException e) {
-    // e.printStackTrace();
-    // }
-    // String outFileName = JHVDirectory.REMOTEFILES.getPath() +
-    // sourceURI.getPath().substring(sourceURI.getPath().lastIndexOf('/')+1);
-    //
-    // // change output file name if file already exists locally and it should
-    // be downloaded again
-    // if (downloadIfAlreadyExists && new File(outFileName).exists()) {
-    // String suffix = outFileName.substring(outFileName.lastIndexOf('.'));
-    // outFileName = outFileName.substring(0, outFileName.lastIndexOf('.'));
-    //
-    // int i = 1;
-    // while (new File(outFileName + "(" + i + ")" + suffix).exists()) {
-    // i++;
-    // }
-    //
-    // outFileName = outFileName + "(" + i + ")" + suffix;
-    // }
-    //
-    // // if local file name doesn't exist, download file
-    // if (!(new File(outFileName).exists())) {
-    //
-    // if (!downloadFile(sourceURI, outFileName)) {
-    // JHVGlobals.err("Download", "Unable to download from jpip", false);
-    // }
-    // }
-    //
-    // return new File(outFileName).toURI();
-    // }
-
     public File getDefaultDownloadLocation(URI source) {
         if (source == null) {
             return null;

@@ -130,8 +130,8 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             if (tree == null) {
                 tree = new JTree(treeModel);
                 tree.addMouseListener(mouseListener);
-
             }
+
             fromJPIP.addActionListener(this);
             refresh.addActionListener(this);
             connectPanel.add(refresh, BorderLayout.EAST);
@@ -217,7 +217,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      * changes the download source from http to jpip or vice versa
      *
      */
-    public void changeSource() {
+    private void changeSource() {
         if (fromJPIP.isSelected() == true) {
             inputAddress.setEnabled(false);
         } else {
@@ -233,7 +233,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      *            the actionEvent that has occured
      *
      */
-    public void show(ActionEvent arg) {
+    private void show(ActionEvent arg) {
         this.setSize(this.getPreferredSize());
         if (advancedOptions == true) {
             connectPanel.setVisible(false);
@@ -264,7 +264,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     /**
      * When the the refresh ("Connect") button is pressed a new JTree is loaded
      */
-    public void refresh() {
+    private void refresh() {
         String http = imageAddress.getText();
         if (!http.endsWith("/"))
             http = http + "/";
@@ -303,7 +303,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         }
 
         try {
-
             String text = imageAddress.getText();
             if (!text.endsWith("/")) {
                 text = text + "/";
@@ -331,7 +330,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
      * downloads the selected file via http, stores it in the emote folder of
      * JHelioViewer and loads it locally from there
      */
-    public void downloadFromHTTP() {
+    private void downloadFromHTTP() {
         if (tree.getLastSelectedPathComponent() != null) {
             if (!tree.getModel().isLeaf(tree.getLastSelectedPathComponent())) {
                 tree.expandPath(tree.getSelectionPath());
@@ -378,7 +377,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     /**
      * The selected file is streamed from the server.
      */
-    public void open() {
+    private void open() {
         if (tree.getLastSelectedPathComponent() != null) {
             if (!tree.getModel().isLeaf(tree.getLastSelectedPathComponent())) {
                 tree.expandPath(tree.getSelectionPath());
