@@ -54,6 +54,7 @@ public class RenderableCamera implements Renderable {
             gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glBegin(GL2.GL_LINE_LOOP);
 
+            double x, y, z, n;
             double bw = width * scale / 2.;
             double bh = height * scale / 2.;
             int subdivisions = 10;
@@ -63,11 +64,12 @@ public class RenderableCamera implements Renderable {
                 } else {
                     gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
-                double x = -bw + 2 * bw / subdivisions * i;
-                double y = bh;
-                double z = epsilon;
-                if (x * x + y * y < 1) {
-                    z += Math.sqrt(1 - x * x - y * y);
+                x = -bw + 2 * bw / subdivisions * i;
+                y = bh;
+                z = epsilon;
+                n = 1 - x * x - y * y;
+                if (n > 0) {
+                    z += Math.sqrt(n);
                 }
                 gl.glVertex3f((float) x, (float) y, (float) z);
             }
@@ -77,11 +79,12 @@ public class RenderableCamera implements Renderable {
                 } else {
                     gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
-                double x = bw;
-                double y = bh - 2 * bh / subdivisions * i;
-                double z = epsilon;
-                if (x * x + y * y < 1) {
-                    z += Math.sqrt(1 - x * x - y * y);
+                x = bw;
+                y = bh - 2 * bh / subdivisions * i;
+                z = epsilon;
+                n = 1 - x * x - y * y;
+                if (n > 0) {
+                    z += Math.sqrt(n);
                 }
                 gl.glVertex3f((float) x, (float) y, (float) z);
             }
@@ -91,11 +94,12 @@ public class RenderableCamera implements Renderable {
                 } else {
                     gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
-                double x = bw - 2 * bw / subdivisions * i;
-                double y = -bh;
-                double z = epsilon;
-                if (x * x + y * y < 1) {
-                    z += Math.sqrt(1 - x * x - y * y);
+                x = bw - 2 * bw / subdivisions * i;
+                y = -bh;
+                z = epsilon;
+                n = 1 - x * x - y * y;
+                if (n > 0) {
+                    z += Math.sqrt(n);
                 }
                 gl.glVertex3f((float) x, (float) y, (float) z);
             }
@@ -105,11 +109,12 @@ public class RenderableCamera implements Renderable {
                 } else {
                     gl.glColor3f(twoRed, twoGreen, twoBlue);
                 }
-                double x = -bw;
-                double y = -bh + 2 * bh / subdivisions * i;
-                double z = epsilon;
-                if (x * x + y * y < 1) {
-                    z += Math.sqrt(1 - x * x - y * y);
+                x = -bw;
+                y = -bh + 2 * bh / subdivisions * i;
+                z = epsilon;
+                n = 1 - x * x - y * y;
+                if (n > 0) {
+                    z += Math.sqrt(n);
                 }
                 gl.glVertex3f((float) x, (float) y, (float) z);
             }

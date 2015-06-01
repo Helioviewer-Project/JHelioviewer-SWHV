@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 
 public interface LineDataSelectorElement {
+
     public abstract void removeLineData();
 
     public abstract void setVisibility(boolean visible);
@@ -23,4 +24,5 @@ public interface LineDataSelectorElement {
     public abstract String getUnitLabel();
 
     public abstract Component getOptionsPanel();
+
 }

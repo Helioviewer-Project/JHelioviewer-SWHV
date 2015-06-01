@@ -128,12 +128,12 @@ public class ImageViewerGui {
         observationDialog.addUserInterface("Image data", imageObservationPanel);
 
         renderableContainer = new RenderableContainer();
-        RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
-
         renderableContainer.addRenderable(new RenderableSolarAxes(new RenderableSolarAxesType("Solar Axes")));
         renderableContainer.addRenderable(new RenderableGrid(new RenderableGridType("Grids"), false));
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
+
+        RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
         leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -162,7 +162,8 @@ public class ImageViewerGui {
 
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
 
-        prepareGuiExtra();
+        // extra widgets
+        filtersPanel = new FiltersPanel();
 
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
@@ -170,10 +171,6 @@ public class ImageViewerGui {
 
         // force GLCanvas initialisation for pixel scale
         componentView.display();
-    }
-
-    private static void prepareGuiExtra() {
-        filtersPanel = new FiltersPanel();
     }
 
     private static JFrame createMainFrame() {

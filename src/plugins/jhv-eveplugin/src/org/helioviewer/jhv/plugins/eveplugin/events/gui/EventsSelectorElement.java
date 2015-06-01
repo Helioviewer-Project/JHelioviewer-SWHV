@@ -17,13 +17,11 @@ public class EventsSelectorElement implements LineDataSelectorElement {
     @Override
     public void removeLineData() {
         eventModel.deactivateEvents();
-
     }
 
     @Override
     public void setVisibility(boolean visible) {
         eventModel.setEventsVisible(visible);
-
     }
 
     @Override
@@ -43,13 +41,10 @@ public class EventsSelectorElement implements LineDataSelectorElement {
 
     @Override
     public void setDataColor(Color c) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isDownloading() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -65,7 +60,6 @@ public class EventsSelectorElement implements LineDataSelectorElement {
 
     @Override
     public Component getOptionsPanel() {
-        // TODO Auto-generated method stub
         return null;
     }
 
