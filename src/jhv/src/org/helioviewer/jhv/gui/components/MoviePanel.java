@@ -30,6 +30,7 @@ import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
@@ -37,12 +38,8 @@ import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIViewListener;
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -74,8 +71,8 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
  * @author Malte Nuhn
  *
  */
-@SuppressWarnings({ "serial" })
-public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener, UIViewListener {
+@SuppressWarnings("serial")
+public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -200,7 +197,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
         timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
 
-        UIViewListenerDistributor.getSingletonInstance().addViewListener(this);
         this.setEnabled(true);
     }
 
@@ -461,7 +457,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * {@inheritDoc}
      */
     @Override
-    public void stateChanged(javax.swing.event.ChangeEvent e) {
+    public void stateChanged(ChangeEvent e) {
         // Jump to different frame
         if (e.getSource() == timeSlider) {
             jumpToFrameNumber(timeSlider.getValue());
@@ -545,20 +541,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    @Override
-    public void UIviewChanged(View sender, ChangeEvent aEvent) {
-        CacheStatusChangedReason cacheReason = aEvent.getLastChangedReasonByType(CacheStatusChangedReason.class);
-        if (cacheReason != null && cacheReason.getView() == view) {
-            switch (cacheReason.getType()) {
-            case PARTIAL:
-                timeSlider.setPartialCachedUntil(cacheReason.getValue());
-                break;
-            case COMPLETE:
-                timeSlider.setCompleteCachedUntil(cacheReason.getValue());
-                break;
-            }
-            timeSlider.repaint();
+    public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
+        TimeSlider slider = getMoviePanel(view).timeSlider;
+        if (complete) {
+            slider.setCompleteCachedUntil(until);
+        } else {
+            slider.setPartialCachedUntil(until);
         }
+        slider.repaint();
     }
 
     /**

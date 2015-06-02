@@ -465,7 +465,6 @@ class J2KReader implements Runnable {
                                         }
                                     }
 
-                                    // Fire ChangeEvent if wanted
                                     if ((parentViewRef.getReaderMode() == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || parentViewRef.getReaderMode() == ReaderMode.ALWAYSFIREONNEWDATA) {
                                         // if package belongs to current frame tell the render-thread
                                         switch (strategy) {
