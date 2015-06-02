@@ -33,8 +33,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     protected ImageCacheStatus imageCacheStatus;
     protected int lastRenderedCompositionLayer = -1;
 
-    private final LinkedMovieManager linkedMovieManager = LinkedMovieManager.getSingletonInstance();
-
     /**
      * {@inheritDoc}
      */
@@ -80,12 +78,12 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
 
         if (forceSignal) {
-            linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
+            LinkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
         } else {
             boolean changed = setCurrentFrameNumber(frameNumber, forceSignal);
             // may come twice, but jpx.setCurrentFrameNumber has a check
             if (changed) {
-                linkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
+                LinkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
             }
         }
     }
@@ -199,7 +197,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public void linkMovie() {
-        linkedMovieManager.linkMovie(this);
+        LinkedMovieManager.linkMovie(this);
     }
 
     /**
@@ -207,7 +205,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public void unlinkMovie() {
-        linkedMovieManager.unlinkMovie(this);
+        LinkedMovieManager.unlinkMovie(this);
     }
 
     /**
@@ -242,7 +240,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     @Override
     public void playMovie() {
         if (getMaximumFrameNumber() > 0) {
-            if (linkedMovieManager.isMaster(this)) {
+            if (LinkedMovieManager.isMaster(this)) {
                 if (render != null) {
                     render.setMovieMode(true);
                 }
@@ -281,7 +279,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     public void abolish(boolean unlinkMovie) {
         if (unlinkMovie) {
-            linkedMovieManager.unlinkMovie(this);
+            LinkedMovieManager.unlinkMovie(this);
         }
         super.abolish();
     }

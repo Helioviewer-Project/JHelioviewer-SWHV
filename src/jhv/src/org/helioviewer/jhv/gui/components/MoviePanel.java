@@ -357,14 +357,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             playPauseButton.setIcon(playIcon);
             playPauseButton.setToolTipText("Play movie");
             if (!onlyGUI) {
-                LinkedMovieManager.getSingletonInstance().pauseLinkedMovies();
-                //timeSlider.setValue(view.getCurrentFrameNumber());
+                LinkedMovieManager.pauseLinkedMovies();
             }
         } else {
             playPauseButton.setIcon(pauseIcon);
             playPauseButton.setToolTipText("Pause movie");
             if (!onlyGUI) {
-                LinkedMovieManager.getSingletonInstance().playLinkedMovies();
+                LinkedMovieManager.playLinkedMovies();
             }
         }
     }
@@ -536,8 +535,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        MoviePanel panel;
-        if (view == null || (panel = getMoviePanel(view)) == null)
+        MoviePanel panel = getMoviePanel(view);
+        if (panel == null)
             return;
 
         if (complete) {

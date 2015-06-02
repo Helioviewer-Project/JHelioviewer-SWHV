@@ -427,7 +427,7 @@ class J2KRender implements Runnable {
 
                         @Override
                         public void run() {
-                            LinkedMovieManager.getSingletonInstance().updateCurrentFrameToMaster(jpxView);
+                            LinkedMovieManager.updateCurrentFrameToMaster(jpxView);
                         }
 
                         public Runnable init(JHVJPXView jpxView) {
