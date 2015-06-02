@@ -66,4 +66,5 @@ public interface ImageCacheStatus {
      * @return highest frame, until which the status is COMPLETE.
      */
     public int getImageCachedCompletelyUntil();
+
 }
