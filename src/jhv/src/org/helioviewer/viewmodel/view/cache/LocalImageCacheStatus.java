@@ -26,6 +26,7 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
      * 
      * In this case, always returns COMPLETE.
      */
+    @Override
     public CacheStatus getImageStatus(int compositionLayer) {
         return CacheStatus.COMPLETE;
     }
@@ -35,6 +36,7 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
      * 
      * In this case, does nothing.
      */
+    @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
     }
 
@@ -43,12 +45,14 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
      * 
      * In this case, does nothing.
      */
+    @Override
     public void downgradeImageStatus(int compositionLayer) {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageCachedPartiallyUntil() {
         return parent.getMaximumFrameNumber();
     }
@@ -56,7 +60,9 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageCachedCompletelyUntil() {
         return parent.getMaximumFrameNumber();
     }
+
 }
