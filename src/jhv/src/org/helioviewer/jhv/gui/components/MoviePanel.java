@@ -494,7 +494,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mousePressed(MouseEvent e) {
         moviePanelManager.someoneIsDragging = true;
-
         if (isPlaying) {
             view.pauseMovie();
         }
@@ -537,16 +536,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        if (view == null)
+        MoviePanel panel;
+        if (view == null || (panel = getMoviePanel(view)) == null)
             return;
 
-        TimeSlider slider = getMoviePanel(view).timeSlider;
         if (complete) {
-            slider.setCompleteCachedUntil(until);
+            panel.timeSlider.setCompleteCachedUntil(until);
         } else {
-            slider.setPartialCachedUntil(until);
+            panel.timeSlider.setPartialCachedUntil(until);
         }
-        slider.repaint();
+        panel.timeSlider.repaint();
     }
 
     /**
