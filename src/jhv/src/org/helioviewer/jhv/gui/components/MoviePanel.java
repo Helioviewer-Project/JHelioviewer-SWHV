@@ -177,7 +177,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (view.getMetaData() instanceof ObserverMetaData) {
             SpeedUnit[] newunits = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
             units = newunits;
-
         } else {
             SpeedUnit[] newunits = { SpeedUnit.FRAMESPERSECOND };
             units = newunits;
@@ -538,6 +537,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
+        if (view == null)
+            return;
+
         TimeSlider slider = getMoviePanel(view).timeSlider;
         if (complete) {
             slider.setCompleteCachedUntil(until);
