@@ -327,7 +327,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     }
 
     /**
-     * downloads the selected file via http, stores it in the emote folder of
+     * downloads the selected file via http, stores it in the remote folder of
      * JHelioViewer and loads it locally from there
      */
     private void downloadFromHTTP() {

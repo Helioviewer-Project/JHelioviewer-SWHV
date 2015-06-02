@@ -106,9 +106,6 @@ public class JHVSimpleImageView extends AbstractView {
     /**
      * Recalculates the image data by copying the desired region out of the full
      * image.
-     *
-     * @param event
-     *            ChangeEvent to fire after the new data is available
      */
     protected void updateImageData() {
         int width = (int) (bufferedImage.getWidth() * region.getWidth() / m.getPhysicalSize().x);

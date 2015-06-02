@@ -64,8 +64,6 @@ public interface MovieView extends View {
      *
      * @param frameNumber
      *            number of new frame, first frame = 0
-     * @param event
-     *            ChangeEvent to append new ChangeReasons
      * @see #getCurrentFrameNumber
      * @see #getMaximumFrameNumber
      * @see TimedMovieView#setCurrentFrame
@@ -79,8 +77,6 @@ public interface MovieView extends View {
      *
      * @param frameNumber
      *            number of new frame, first frame = 0
-     * @param event
-     *            ChangeEvent to append new ChangeReasons
      * @param forceSignal
      *            Forces a reader signal and depending on the reader mode a
      *            render signal regardless whether the frame changed
@@ -213,8 +209,6 @@ public interface MovieView extends View {
      * 
      * @param time
      *            time which should be matches as close as possible
-     * @param event
-     *            ChangeEvent to append new ChangeReasons
      * @see MovieView#setCurrentFrame
      * @see #getCurrentFrameNumber
      * @see #getMaximumFrameNumber
@@ -228,8 +222,6 @@ public interface MovieView extends View {
      * 
      * @param time
      *            time which should be matches as close as possible
-     * @param event
-     *            ChangeEvent to append new ChangeReasons
      * @param forceSignal
      *            Forces a reader signal and depending on the reader mode a
      *            render signal regardless whether the frame changed
