@@ -39,7 +39,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     @Override
     public void setJP2Image(JP2Image newJP2Image) {
         if (jp2Image != null) {
-            abolish(false);
+            abolish();
         }
 
         jp2Image = newJP2Image;
@@ -250,28 +250,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void abolish() {
-        abolish(true);
-    }
-
-    /**
-     * Abolishes the jpx view
-     *
-     * @param unlinkMovie
-     *            true, if the movie should be unlinked before abolishing it
-     */
-    public void abolish(boolean unlinkMovie) {
-        if (unlinkMovie) {
-            LinkedMovieManager.unlinkMovie(this);
-        }
-        super.abolish();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-
     @Override
     void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
         fullyLoaded = this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
