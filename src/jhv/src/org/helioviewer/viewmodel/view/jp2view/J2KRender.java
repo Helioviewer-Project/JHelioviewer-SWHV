@@ -12,7 +12,6 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -419,22 +418,6 @@ class J2KRender implements Runnable {
                         parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
                         break;
                     }
-                }
-
-                if (movieMode && parentViewRef instanceof JHVJPXView) {
-                    EventQueue.invokeLater(new Runnable() {
-                        private JHVJPXView jpxView;
-
-                        @Override
-                        public void run() {
-                            LinkedMovieManager.updateCurrentFrameToMaster(jpxView);
-                        }
-
-                        public Runnable init(JHVJPXView jpxView) {
-                            this.jpxView = jpxView;
-                            return this;
-                        }
-                    }.init((JHVJPXView) parentViewRef));
                 }
 
                 renderLayer(curLayer);

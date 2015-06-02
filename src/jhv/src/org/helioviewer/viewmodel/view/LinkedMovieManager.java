@@ -86,7 +86,7 @@ public class LinkedMovieManager {
      * Updates all linked movies according to the current frame of the master
      * frame.
      */
-    public static void updateCurrentFrameToMaster(MovieView view) {
+    public static void updateCurrentFrameToMaster(View view) {
         if (masterView == null || view != masterView)
             return;
 
@@ -116,7 +116,7 @@ public class LinkedMovieManager {
     /**
      * Recalculates the master view.
      *
-     * The master view is the view, whose movie is actually playing, whereas all
+     * The master view is the view whose movie is actually playing, whereas all
      * other movies just jump to the frame closest to the current frame from the
      * master panel.
      */
