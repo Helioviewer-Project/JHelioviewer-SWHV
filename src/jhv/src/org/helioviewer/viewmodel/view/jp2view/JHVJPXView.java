@@ -196,22 +196,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public void linkMovie() {
-        LinkedMovieManager.linkMovie(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void unlinkMovie() {
-        LinkedMovieManager.unlinkMovie(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public float getActualFramerate() {
         if (render != null)
             return render.getActualMovieFramerate();
