@@ -22,17 +22,8 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
  */
 public class LinkedMovieManager {
 
-    private static final LinkedMovieManager instance = new LinkedMovieManager();
-
-    public static LinkedMovieManager getSingletonInstance() {
-        return instance;
-    }
-
-    private LinkedMovieManager() {
-    }
-
-    private final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
-    private MovieView masterView;
+    private static final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
+    private static MovieView masterView;
 
     /**
      * Adds the given movie view to the set of linked movies.
@@ -40,7 +31,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to add to the set of linked movies.
      */
-    public void linkMovie(MovieView movieView) {
+    public static void linkMovie(MovieView movieView) {
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
             updateMaster();
@@ -53,14 +44,10 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to remove from the set of linked movies.
      */
-    public void unlinkMovie(MovieView movieView) {
+    public static void unlinkMovie(MovieView movieView) {
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
             updateMaster();
-
-            if (!linkedMovies.isEmpty()) {
-                movieView.pauseMovie();
-            }
         }
     }
 
@@ -71,7 +58,7 @@ public class LinkedMovieManager {
      *            View to test
      * @return True if the given view is the master view, false otherwise.
      */
-    public boolean isMaster(MovieView movieView) {
+    public static boolean isMaster(MovieView movieView) {
         if (movieView == null) {
             return false;
         } else {
@@ -82,7 +69,7 @@ public class LinkedMovieManager {
     /**
      * Plays the set of linked movies.
      */
-    public void playLinkedMovies() {
+    public static void playLinkedMovies() {
         if (masterView != null)
             masterView.playMovie();
     }
@@ -90,7 +77,7 @@ public class LinkedMovieManager {
     /**
      * Pauses the set of linked movies.
      */
-    public void pauseLinkedMovies() {
+    public static void pauseLinkedMovies() {
         if (masterView != null)
             masterView.pauseMovie();
     }
@@ -99,7 +86,7 @@ public class LinkedMovieManager {
      * Updates all linked movies according to the current frame of the master
      * frame.
      */
-    public void updateCurrentFrameToMaster(MovieView view) {
+    public static void updateCurrentFrameToMaster(MovieView view) {
         if (masterView == null || view != masterView)
             return;
 
@@ -120,7 +107,7 @@ public class LinkedMovieManager {
      *            Forces a reader signal and depending on the reader mode a
      *            render signal regardless whether the frame changed
      */
-    public void setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
+    public static void setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
         for (MovieView movieView : linkedMovies) {
             movieView.setCurrentFrame(dateTime, forceSignal);
         }
@@ -133,7 +120,7 @@ public class LinkedMovieManager {
      * other movies just jump to the frame closest to the current frame from the
      * master panel.
      */
-    private void updateMaster() {
+    private static void updateMaster() {
         masterView = null;
 
         if (linkedMovies.isEmpty()) {
