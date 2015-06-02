@@ -169,38 +169,34 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
 
     // to be accessed only from LinkedMovieManager
     public void pauseMovie() {
-        if (!isMoviePlaying()) {
+        if (!isMoviePlaying())
             return;
-        }
 
-        readerSignal.signal();
         if (render != null) {
             render.setMovieMode(false);
         }
+        readerSignal.signal();
         MoviePanel.getMoviePanel(this).playStateChanged(false);
     }
 
     // to be accessed only from LinkedMovieManager
     public void playMovie() {
-        if (getMaximumFrameNumber() > 0) {
-            if (render != null) {
-                render.setMovieMode(true);
-            }
-            readerSignal.signal();
-            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-            }
-            // send notification
-            MoviePanel.getMoviePanel(this).playStateChanged(true);
+        if (isMoviePlaying() || getMaximumFrameNumber() <= 0)
+            return;
+
+        if (render != null) {
+            render.setMovieMode(true);
         }
+        readerSignal.signal();
+
+        if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+            renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
+        }
+        MoviePanel.getMoviePanel(this).playStateChanged(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     /* accessed from reader thread */
-    @Override
-    public boolean isMoviePlaying() {
+    boolean isMoviePlaying() {
         return render != null && render.isMovieMode();
     }
 

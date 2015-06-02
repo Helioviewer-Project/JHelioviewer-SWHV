@@ -119,15 +119,6 @@ public interface MovieView extends View {
     public float getActualFramerate();
 
     /**
-     * Returns whether the movie is playing right now
-     *
-     * @return true if movie is playing, false otherwise
-     * @see #playMovie
-     * @see #pauseMovie
-     */
-    public boolean isMoviePlaying();
-
-    /**
      * Sets whether the byte and integer buffers should be reused between
      * frames.
      * <p>

@@ -325,7 +325,7 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (!((MovieView) parentViewRef).isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (!((JHVJPXView) parentViewRef).isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
                             } else if (((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
