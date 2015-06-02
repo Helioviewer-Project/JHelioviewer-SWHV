@@ -196,9 +196,6 @@ public class LayersModel {
 
     // special
     public static void addLayerFromThread(AbstractView view) {
-        if (view == null)
-            return;
-
         EventQueue.invokeLater(new Runnable() {
             private AbstractView theView;
 
