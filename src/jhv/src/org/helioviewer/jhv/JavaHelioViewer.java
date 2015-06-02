@@ -113,7 +113,7 @@ public class JavaHelioViewer {
             public void run() {
                 TimeUtils.getSingletonInstance(); // instantiate class
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
-                Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null);
+                Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
 
                 Log.info("Start main window");
                 ImageViewerGui.getSingletonInstance(); // build UI
