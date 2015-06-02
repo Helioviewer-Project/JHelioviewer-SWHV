@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -60,7 +59,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         plotPane = new JPanel();
 
         // set up time settings
-        calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
         calendarStartDate.addJHVCalendarListener(this);
         calendarStartDate.setToolTipText("UTC date for observation start");
 

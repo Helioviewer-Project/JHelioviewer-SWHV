@@ -10,11 +10,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -40,8 +38,6 @@ import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
@@ -55,10 +51,8 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
  * @author Markus Langenberg
  * @author Andre Dau
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class PreferencesDialog extends JDialog implements ShowableDialog {
-
-    private final String defaultDateFormat = "yyyy-MM-dd";
 
     private JRadioButton loadDefaultMovieOnStartUp;
     private JRadioButton doNothingOnStartUp;
@@ -72,8 +66,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JComboBox debugConsoleCombo = null;
     private JTextField debugFileTextField = null;
     private DefaultsSelectionPanel defaultsPanel;
-    private JTextField dateFormatField;
-    private JButton dateFormatInfo;
 
     private final Settings settings = Settings.getSingletonInstance();
 
@@ -123,11 +115,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         acceptBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!isDateFormatValid(dateFormatField.getText())) {
-                    Message.err("Syntax error", "The entered date pattern contains illegal signs!\nAll suppported signs are listed in the associated information dialog.", false);
-                    return;
-                }
-
                 try {
                     if (limitMaxSize.isSelected() && !(Double.parseDouble(maxCacheBox.getText()) > 0.0)) {
                         Message.err("Invalid value", "The value for the maximal cache size must be greater than 0.", false);
@@ -158,7 +145,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                     defaultsPanel.resetSettings();
                     loadDefaultMovieOnStartUp.setSelected(true);
                     maxCacheBox.setText("0.0");
-                    dateFormatField.setText(defaultDateFormat);
 
                     LogSettings logSettings = LogSettings.getSingletonInstance();
 
@@ -240,7 +226,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private UIManager.LookAndFeelInfo[] getAllowedLookAndFeels() {
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         // erase disallowed look and feels:
-        List<LookAndFeelInfo> result = new LinkedList<LookAndFeelInfo>();
+        LinkedList<LookAndFeelInfo> result = new LinkedList<LookAndFeelInfo>();
         for (int i = 0; i < this.disallowedLafs.length; i++) {
             for (UIManager.LookAndFeelInfo item : lafs) {
                 if (!disallowedLafs[i].equals(item.getName())) {
@@ -297,13 +283,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             debugConsoleCombo.setSelectedItem(logSettings.getLoggingLevel("console"));
         }
 
-        // Default date format
-        String fmt = settings.getProperty("default.date.format");
-        if (fmt == null)
-            dateFormatField.setText(defaultDateFormat);
-        else
-            dateFormatField.setText(fmt);
-
         // Default values
         defaultsPanel.loadSettings();
         // Maximum JPIP cache size
@@ -345,8 +324,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             logSettings.setLoggingLevel("console", level);
         }
 
-        // Default date format
-        settings.setProperty("default.date.format", dateFormatField.getText());
         // Default values
         defaultsPanel.saveSettings();
         // Maximum JPIP cache size
@@ -472,31 +449,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         row1.add(new JLabel("Look and Feel:  "));
         row1.add(lafCombo);
         paramsPanel.add(row1);
-
-        dateFormatField = new JTextField();
-        dateFormatField.setPreferredSize(new Dimension(150, 23));
-
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row2.add(new JLabel("Default date format:  "));
-        row2.add(dateFormatField);
-
-        Icon infoIcon = IconBank.getIcon(JHVIcon.INFO);
-
-        dateFormatInfo = new JButton(infoIcon);
-        dateFormatInfo.setBorder(BorderFactory.createEtchedBorder());
-        dateFormatInfo.setPreferredSize(new Dimension(infoIcon.getIconWidth() + 5, 23));
-        dateFormatInfo.setToolTipText("Show possible date format information");
-        dateFormatInfo.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DateFormatInfoDialog dialog = new DateFormatInfoDialog();
-                dialog.showDialog();
-            }
-        });
-
-        row2.add(dateFormatInfo);
-        paramsPanel.add(row2);
 
         LogSettings logSettings = LogSettings.getSingletonInstance();
         Level fileLoggingLevel = logSettings.getLoggingLevel(LogSettings.getSingletonInstance().FILE_LOGGER);

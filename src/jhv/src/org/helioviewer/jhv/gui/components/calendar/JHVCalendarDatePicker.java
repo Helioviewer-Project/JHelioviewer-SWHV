@@ -35,21 +35,15 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * This component allows to select a date or enter a date by hand. It works
  * similar to a combobox apart from that the popup is not a list but represents
  * a {@link JHVCalendar} component.
- * <p>
- * To use this component create an instance of the class, set the default date
- * format by calling the method {@link #setDateFormat(String)} to display the
- * date like the user prefers and set the date which should be selected by
- * calling the method {@link #setDate(Date)}. To get the selected date call
- * {@link #getDate()}.
  * 
  * @see JHVCalendar
  * @author Stephan Pagel
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class JHVCalendarDatePicker extends JPanel implements FocusListener, ActionListener, KeyListener, JHVCalendarListener {
 
     private final AbstractList<JHVCalendarListener> listeners = new LinkedList<JHVCalendarListener>();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final Calendar calendar = new GregorianCalendar();
 
     private JHVCalendar jhvCalendar = null;
@@ -252,7 +246,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      *            add focus listener to subcomponents of this parent
      */
     private void addFocusListenerToAllChildren(JComponent parent) {
-
         for (Component component : parent.getComponents()) {
             if (component.getFocusListeners().length > 0) {
                 component.addFocusListener(this);
@@ -267,7 +260,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * Closes the popup window if it is still displayed.
      */
     private void hidePopup() {
-
         if (popup != null) {
             popup.hide();
             popup = null;
@@ -279,50 +271,13 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      */
     @Override
     public void actionPerformed(JHVCalendarEvent e) {
-
         // close popup
         hidePopup();
-
         // set selected date
         setDate(jhvCalendar.getDate());
         jhvCalendar = null;
-
-        // inform all listeners of this class that a new date was choosen by the
-        // user
+        // inform all listeners of this class that a new date was choosen by the user
         informAllJHVCalendarListeners(new JHVCalendarEvent(this));
-    }
-
-    /**
-     * Set the date pattern. The date will be displayed in defined format.
-     * 
-     * @param pattern
-     *            pattern how date should be displayed.
-     * @return boolean value if pattern is valid.
-     */
-    public boolean setDateFormat(String pattern) {
-
-        try {
-            dateFormat.applyPattern(pattern);
-            return true;
-
-        } catch (NullPointerException e1) {
-        } catch (IllegalArgumentException e2) {
-        }
-
-        return false;
-    }
-
-    /**
-     * Sets the date format pattern. The date will be displayed in defined
-     * format.
-     * 
-     * @param newFormat
-     *            new pattern to use
-     */
-    public void setDateFormat(SimpleDateFormat newFormat) {
-        if (newFormat != null) {
-            dateFormat = newFormat;
-        }
     }
 
     /**
@@ -333,7 +288,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
         if (date != null) {
             calendar.setTime(date);
         }
-
         textField.setText(dateFormat.format(calendar.getTime()));
     }
 
@@ -343,7 +297,6 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * @return the selected date.
      */
     public Date getDate() {
-
         return calendar.getTime();
     }
 
@@ -356,14 +309,11 @@ public class JHVCalendarDatePicker extends JPanel implements FocusListener, Acti
      * @return the corresponding date object.
      */
     private Date parseDate(String source) {
-
         Date date = null;
-
         try {
             date = dateFormat.parse(source);
         } catch (ParseException e) {
         }
-
         return date;
     }
 

@@ -191,13 +191,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     }
 
     /**
-     * Updates the visual behavior of the component.
-     */
-    public void updateComponent() {
-        timeSelectionPanel.updateDateFormat();
-    }
-
-    /**
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
@@ -335,7 +328,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
             // create end date picker
             calendarEndDate = new JHVCalendarDatePicker();
-            calendarEndDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
             calendarEndDate.addJHVCalendarListener(this);
             calendarEndDate.setToolTipText("UTC date for observation end");
 
@@ -345,16 +337,12 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
             // create start date picker
             calendarStartDate = new JHVCalendarDatePicker();
-            calendarStartDate.setDateFormat(Settings.getSingletonInstance().getProperty("default.date.format"));
             calendarStartDate.addJHVCalendarListener(this);
             calendarStartDate.setToolTipText("UTC date for observation start");
 
             // create start time field
             textStartTime = new TimeTextField();
             textStartTime.setToolTipText("UTC time for observation start");
-
-            // set date format to components
-            updateDateFormat();
 
             // add components to panel
             JPanel startDatePane = new JPanel(new BorderLayout());
@@ -464,19 +452,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             } else {
                 setFromOutside = false;
             }
-        }
-
-        /**
-         * Updates the date format to the calendar components.
-         */
-        public void updateDateFormat() {
-            String pattern = Settings.getSingletonInstance().getProperty("default.date.format");
-
-            calendarStartDate.setDateFormat(pattern);
-            calendarEndDate.setDateFormat(pattern);
-
-            calendarStartDate.setDate(calendarStartDate.getDate());
-            calendarEndDate.setDate(calendarEndDate.getDate());
         }
 
         /**
