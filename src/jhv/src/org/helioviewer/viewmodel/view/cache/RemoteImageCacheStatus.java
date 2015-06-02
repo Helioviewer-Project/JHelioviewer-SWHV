@@ -1,11 +1,10 @@
 package org.helioviewer.viewmodel.view.cache;
 
+import java.awt.EventQueue;
+
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.helioviewer.jhv.gui.UIViewListenerDistributor;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason;
-import org.helioviewer.viewmodel.changeevent.CacheStatusChangedReason.CacheType;
-import org.helioviewer.viewmodel.changeevent.ChangeEvent;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.view.MovieView;
 
 /**
@@ -57,9 +56,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
                 if (tempImagePartialUntil > imagePartialUntil) {
                     imagePartialUntil = tempImagePartialUntil;
-
-                    ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.PARTIAL, imagePartialUntil));
-                    UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
+                    updateUI(parent, false, imagePartialUntil);
                 }
             // COMPLETE
             } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
@@ -76,9 +73,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                     if (imagePartialUntil < imageCompleteUntil) {
                         imagePartialUntil = imageCompleteUntil;
                     }
-
-                    ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
-                    UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
+                    updateUI(parent, true, imageCompleteUntil);
                 }
             // HEADER
             } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
@@ -113,9 +108,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
             if (tempImageCompleteUntil < imageCompleteUntil) {
                 imageCompleteUntil = tempImageCompleteUntil;
-
-                ChangeEvent changeEvent = new ChangeEvent(new CacheStatusChangedReason(parent, CacheType.COMPLETE, imageCompleteUntil));
-                UIViewListenerDistributor.getSingletonInstance().viewChanged(null, changeEvent);
+                updateUI(parent, true, imageCompleteUntil);
             }
         } finally {
             lock.unlock();
@@ -148,6 +141,26 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     @Override
     public int getImageCachedCompletelyUntil() {
         return imageCompleteUntil;
+    }
+
+    private static void updateUI(MovieView view, boolean complete, int until) {
+        EventQueue.invokeLater(new Runnable() {
+            private MovieView view;
+            private boolean complete;
+            private int until;
+
+            @Override
+            public void run() {
+                MoviePanel.cacheStatusChanged(view, complete, until);
+            }
+
+            public Runnable init(MovieView _view, boolean _complete, int _until) {
+                view = _view;
+                complete = _complete;
+                until = _until;
+                return this;
+            }
+        }.init(view, complete, until));
     }
 
 }
