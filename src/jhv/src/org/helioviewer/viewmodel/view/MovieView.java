@@ -149,19 +149,6 @@ public interface MovieView extends View {
     public ImageCacheStatus getImageCacheStatus();
 
     /**
-     * Sets the frame currently shown.
-     * 
-     * Searches the closest frame to the given time.
-     * 
-     * @param time
-     *            time which should be matches as close as possible
-     * @see MovieView#setCurrentFrame
-     * @see #getCurrentFrameNumber
-     * @see #getMaximumFrameNumber
-     */
-    public void setCurrentFrame(ImmutableDateTime time);
-
-    /**
      * Returns time stamp of the current frame.
      * 
      * @return time stamp of the current frame

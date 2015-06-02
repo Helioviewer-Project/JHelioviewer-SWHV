@@ -34,7 +34,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -47,7 +46,6 @@ import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Panel containing the movie controls.
@@ -148,7 +146,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private final JPanel speedPanel;
 
     // References
-    private JHVJPXView view;
+    private MovieView view;
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -162,7 +160,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel(JHVJPXView movieView) {
+    public MoviePanel(MovieView movieView) {
         this();
 
         if (movieView == null) {
@@ -599,7 +597,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            View to search panel for
          */
         private void searchCorrespondingMoviePanel(AbstractView view) {
-            if (view instanceof JHVJPXView) {
+            if (view instanceof MovieView) {
                 setEnabled(true);
                 for (MoviePanel panel : panelList) {
                     if (panel.view == view) {
@@ -735,17 +733,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 newPanel.speedSpinner.setValue(copyFrom.speedSpinner.getValue());
                 newPanel.speedUnitComboBox.setSelectedItem(copyFrom.speedUnitComboBox.getSelectedItem());
                 newPanel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
-
-                // move frame
-                int maxFrame = newPanel.view.getMaximumAccessibleFrameNumber();
-                if (maxFrame > -1) {
-                    ImmutableDateTime newDateTime = newPanel.view.getFrameDateTime(maxFrame);
-                    ImmutableDateTime copyDateTime = copyFrom.view.getCurrentFrameDateTime();
-                    if (newDateTime.getMillis() >= copyDateTime.getMillis())
-                        newPanel.view.setCurrentFrame(copyDateTime);
-                    else
-                        newPanel.view.setCurrentFrame(newDateTime);
-                }
             }
 
             linkedMovies.add(newPanel);

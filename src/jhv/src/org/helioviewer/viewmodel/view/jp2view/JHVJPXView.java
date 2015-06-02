@@ -61,10 +61,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return imageCacheStatus;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    // to be accessed only from LinkedMovieManager
     public void setCurrentFrame(ImmutableDateTime time) {
         if (time == null)
             return;

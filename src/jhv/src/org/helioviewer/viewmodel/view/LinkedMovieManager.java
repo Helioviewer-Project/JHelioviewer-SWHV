@@ -94,7 +94,7 @@ public class LinkedMovieManager {
         ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
         for (MovieView movieView : linkedMovies) {
             if (movieView != masterView) {
-                movieView.setCurrentFrame(masterTime);
+                ((JHVJPXView) movieView).setCurrentFrame(masterTime);
             }
         }
     }
@@ -107,7 +107,7 @@ public class LinkedMovieManager {
      */
     public static void setCurrentFrame(ImmutableDateTime dateTime) {
         for (MovieView movieView : linkedMovies) {
-            movieView.setCurrentFrame(dateTime);
+            ((JHVJPXView) movieView).setCurrentFrame(dateTime);
         }
     }
 
