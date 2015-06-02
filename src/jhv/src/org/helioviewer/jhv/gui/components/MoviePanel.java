@@ -191,11 +191,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
-
         speedUnitComboBox.addActionListener(this);
-
-        timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
-        timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
 
         this.setEnabled(true);
     }
