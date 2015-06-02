@@ -258,20 +258,4 @@ public interface MovieView extends View {
      */
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
 
-    /**
-     * Puts the movie view to the set of movies, which are playing
-     * simultaneously.
-     * 
-     * @see #unlinkMovie()
-     */
-    public void linkMovie();
-
-    /**
-     * Removes the movie view from the set of movies, which are playing
-     * simultaneously.
-     * 
-     * @see #linkMovie()
-     */
-    public void unlinkMovie();
-
 }

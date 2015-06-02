@@ -723,8 +723,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 return;
             }
 
-            newPanel.view.linkMovie();
-
             if (!linkedMovies.isEmpty()) {
                 // Copy Settings
                 MoviePanel copyFrom = linkedMovies.element();
@@ -745,6 +743,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             linkedMovies.add(newPanel);
+            LinkedMovieManager.linkMovie(newPanel.view);
         }
 
         /**
@@ -757,7 +756,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to remove
          */
         public void unlinkMoviePanel(MoviePanel panel) {
-            panel.view.unlinkMovie();
+            LinkedMovieManager.unlinkMovie(panel.view);
             linkedMovies.remove(panel);
         }
 
