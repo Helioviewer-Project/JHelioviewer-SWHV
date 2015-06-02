@@ -250,10 +250,11 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(AbstractView view) {
+        LinkedMovieManager.pauseLinkedMovies();
+
         if (view instanceof JHVJPXView) {
             MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
             if (moviePanel != null) {
-                ((JHVJPXView) view).pauseMovie();
                 moviePanel.remove();
             }
         }

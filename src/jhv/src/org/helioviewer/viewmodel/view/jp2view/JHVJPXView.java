@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view.jp2view;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
@@ -168,10 +167,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    // to be accessed only from LinkedMovieManager
     public void pauseMovie() {
         if (!isMoviePlaying()) {
             return;
@@ -184,20 +180,15 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         MoviePanel.getMoviePanel(this).playStateChanged(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    // to be accessed only from LinkedMovieManager
     public void playMovie() {
         if (getMaximumFrameNumber() > 0) {
-            if (LinkedMovieManager.isMaster(this)) {
-                if (render != null) {
-                    render.setMovieMode(true);
-                }
-                readerSignal.signal();
-                if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                    renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-                }
+            if (render != null) {
+                render.setMovieMode(true);
+            }
+            readerSignal.signal();
+            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
             }
             // send notification
             MoviePanel.getMoviePanel(this).playStateChanged(true);

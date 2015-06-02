@@ -328,7 +328,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static void setFrameSlider(View view) {
         if (view instanceof MovieView) {
             MovieView mv = (MovieView) view;
-            getMoviePanel(mv).timeSlider.setValue(mv.getCurrentFrameNumber());
+            MoviePanel panel = getMoviePanel(mv);
+
+            if (panel != null)
+                panel.timeSlider.setValue(mv.getCurrentFrameNumber());
         }
     }
 
@@ -495,7 +498,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mousePressed(MouseEvent e) {
         moviePanelManager.someoneIsDragging = true;
         if (isPlaying) {
-            view.pauseMovie();
+            LinkedMovieManager.pauseLinkedMovies();
         }
     }
 
@@ -519,7 +522,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
-            view.playMovie();
+            LinkedMovieManager.playLinkedMovies();
         }
         moviePanelManager.someoneIsDragging = false;
     }

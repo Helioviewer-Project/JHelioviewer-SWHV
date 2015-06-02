@@ -119,22 +119,6 @@ public interface MovieView extends View {
     public float getActualFramerate();
 
     /**
-     * Starts playing the movie at the current frame.
-     *
-     * @see #pauseMovie
-     * @see #isMoviePlaying
-     */
-    public void playMovie();
-
-    /**
-     * Pauses playing the movie at the current frame.
-     *
-     * @see #playMovie
-     * @see #isMoviePlaying
-     */
-    public void pauseMovie();
-
-    /**
      * Returns whether the movie is playing right now
      *
      * @return true if movie is playing, false otherwise
