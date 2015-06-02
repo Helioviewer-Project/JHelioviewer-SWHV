@@ -13,7 +13,7 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
  * other linked movies are set according to the new values.
  *
  * <p>
- * When actually playing a movie instead of just scrolling around, a master
+ * When playing a movie instead of just scrolling around, a master
  * movie is chosen, based on the average cadence of all linked movies. Only the
  * master movie is actually playing, all other movies are just set to the frame
  * closest to the one from the master movie.
@@ -102,15 +102,17 @@ public class LinkedMovieManager {
      * Updates all linked movies according to the given time stamp.
      *
      * @param dateTime
-     *            time which should be matches as close as possible
-     * @param forceSignal
-     *            Forces a reader signal and depending on the reader mode a
-     *            render signal regardless whether the frame changed
+     *            time which should be matched as close as possible
      */
-    public static void setCurrentFrame(ImmutableDateTime dateTime, boolean forceSignal) {
+    public static void setCurrentFrame(ImmutableDateTime dateTime) {
         for (MovieView movieView : linkedMovies) {
-            movieView.setCurrentFrame(dateTime, forceSignal);
+            movieView.setCurrentFrame(dateTime);
         }
+    }
+
+    public static void setCurrentFrame(MovieView view, int frameNumber) {
+        frameNumber = Math.max(0, Math.min(view.getMaximumFrameNumber(), frameNumber));
+        setCurrentFrame(view.getFrameDateTime(frameNumber));
     }
 
     /**

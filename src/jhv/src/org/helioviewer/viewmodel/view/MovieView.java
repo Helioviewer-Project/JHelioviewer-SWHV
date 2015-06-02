@@ -58,35 +58,6 @@ public interface MovieView extends View {
     }
 
     /**
-     * Sets the frame currently shown.
-     *
-     * The given frameNumber is cropped to [0, maximumFrameNumber).
-     *
-     * @param frameNumber
-     *            number of new frame, first frame = 0
-     * @see #getCurrentFrameNumber
-     * @see #getMaximumFrameNumber
-     * @see TimedMovieView#setCurrentFrame
-     */
-    public void setCurrentFrame(int frameNumber);
-
-    /**
-     * Sets the frame currently shown.
-     *
-     * The given frameNumber is cropped to [0, maximumFrameNumber).
-     *
-     * @param frameNumber
-     *            number of new frame, first frame = 0
-     * @param forceSignal
-     *            Forces a reader signal and depending on the reader mode a
-     *            render signal regardless whether the frame changed
-     * @see #getCurrentFrameNumber
-     * @see #getMaximumFrameNumber
-     * @see TimedMovieView#setCurrentFrame
-     */
-    public void setCurrentFrame(int frameNumber, boolean forceSignal);
-
-    /**
      * Returns the current frame number.
      *
      * @return current frame number
@@ -214,22 +185,6 @@ public interface MovieView extends View {
      * @see #getMaximumFrameNumber
      */
     public void setCurrentFrame(ImmutableDateTime time);
-
-    /**
-     * Sets the frame currently shown.
-     * 
-     * Searches the closest frame to the given time.
-     * 
-     * @param time
-     *            time which should be matches as close as possible
-     * @param forceSignal
-     *            Forces a reader signal and depending on the reader mode a
-     *            render signal regardless whether the frame changed
-     * @see MovieView#setCurrentFrame
-     * @see #getCurrentFrameNumber
-     * @see #getMaximumFrameNumber
-     */
-    public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal);
 
     /**
      * Returns time stamp of the current frame.

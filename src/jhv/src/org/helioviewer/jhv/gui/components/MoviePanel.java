@@ -34,6 +34,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -340,7 +341,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private void jumpToFrameNumber(int frame) {
         frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
-        view.setCurrentFrame(frame);
+        LinkedMovieManager.setCurrentFrame(view, frame);
     }
 
     /**
@@ -735,10 +736,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 // move frame
                 int maxFrame = newPanel.view.getMaximumAccessibleFrameNumber();
                 if (maxFrame > -1) {
-                    if (newPanel.view.getFrameDateTime(maxFrame).getMillis() >= copyFrom.view.getCurrentFrameDateTime().getMillis())
-                        newPanel.view.setCurrentFrame(copyFrom.view.getCurrentFrameDateTime());
+                    ImmutableDateTime newDateTime = newPanel.view.getFrameDateTime(maxFrame);
+                    ImmutableDateTime copyDateTime = copyFrom.view.getCurrentFrameDateTime();
+                    if (newDateTime.getMillis() >= copyDateTime.getMillis())
+                        newPanel.view.setCurrentFrame(copyDateTime);
                     else
-                        newPanel.view.setCurrentFrame(maxFrame);
+                        newPanel.view.setCurrentFrame(newDateTime);
                 }
             }
 

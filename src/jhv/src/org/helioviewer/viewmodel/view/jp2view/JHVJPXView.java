@@ -66,41 +66,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentFrame(int frameNumber) {
-        setCurrentFrame(frameNumber, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCurrentFrame(int frameNumber, boolean forceSignal) {
-        frameNumber = Math.max(0, Math.min(getMaximumFrameNumber(), frameNumber));
-
-        if (forceSignal) {
-            LinkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
-        } else {
-            boolean changed = setCurrentFrameNumber(frameNumber, forceSignal);
-            // may come twice, but jpx.setCurrentFrameNumber has a check
-            if (changed) {
-                LinkedMovieManager.setCurrentFrame(getFrameDateTime(frameNumber), forceSignal);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setCurrentFrame(ImmutableDateTime time) {
-        setCurrentFrame(time, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCurrentFrame(ImmutableDateTime time, boolean forceSignal) {
         if (time == null)
             return;
 
@@ -113,9 +79,9 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
 
         if (-lastDiff < currentDiff) {
-            setCurrentFrameNumber(frameNumber - 1, forceSignal);
+            setCurrentFrameNumber(frameNumber - 1);
         } else {
-            setCurrentFrameNumber(frameNumber, forceSignal);
+            setCurrentFrameNumber(frameNumber);
         }
     }
 
@@ -266,8 +232,8 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * @param frameNumber
      * @return true, if the frame number has changed
      */
-    public boolean setCurrentFrameNumber(int frameNumber, boolean forceSignal) {
-        if (frameNumber != imageViewParams.compositionLayer || forceSignal) {
+    private boolean setCurrentFrameNumber(int frameNumber) {
+        if (frameNumber != imageViewParams.compositionLayer) {
             imageViewParams.compositionLayer = frameNumber;
 
             readerSignal.signal();
