@@ -99,8 +99,8 @@ public class LinkedMovieManager {
      * Updates all linked movies according to the current frame of the master
      * frame.
      */
-    public void updateCurrentFrameToMaster() {
-        if (masterView == null)
+    public void updateCurrentFrameToMaster(MovieView view) {
+        if (masterView == null || view != masterView)
             return;
 
         ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
