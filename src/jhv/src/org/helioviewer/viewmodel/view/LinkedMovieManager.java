@@ -63,27 +63,12 @@ public class LinkedMovieManager {
     }
 
     /**
-     * Returns whether the given view is the master view.
-     *
-     * @param movieView
-     *            View to test
-     * @return True if the given view is the master view, false otherwise.
-     */
-    public static boolean isMaster(MovieView movieView) {
-        if (movieView == null) {
-            return false;
-        } else {
-            return (movieView == masterView);
-        }
-    }
-
-    /**
      * Plays the set of linked movies.
      */
     public static void playLinkedMovies() {
         if (masterView instanceof JHVJPXView) {
             ((JHVJPXView) masterView).playMovie();
-            MoviePanel.getSingletonInstance().playStateChanged(true);
+            MoviePanel.playStateChanged(true);
         }
     }
 
