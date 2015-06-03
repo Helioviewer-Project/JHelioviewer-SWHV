@@ -174,8 +174,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         activeView = (MovieView) view;
+
+        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(activeView.getMaximumFrameNumber());
         timeSlider.setValue(activeView.getCurrentFrameNumber());
+        timeSlider.addChangeListener(instance);
 
         setEnabled(true);
     }
@@ -303,7 +306,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     private static void jumpToFrameNumber(int frame) {
-        frame = Math.min(frame, activeView.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
         LinkedMovieManager.setCurrentFrame(activeView, frame);
     }
