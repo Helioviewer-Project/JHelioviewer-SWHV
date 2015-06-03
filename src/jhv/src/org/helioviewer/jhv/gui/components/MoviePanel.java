@@ -121,17 +121,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     // Status
     private static boolean isAdvanced = false;
-    private boolean isPlaying = false;
+    private static boolean isPlaying = false;
 
     // Gui elements
-    private final TimeSlider timeSlider;
+    private static TimeSlider timeSlider;
     private final JLabel frameNumberLabel;
-    private final JButton previousFrameButton;
-    private final JButton playPauseButton;
-    private final JButton nextFrameButton;
+    private static JButton previousFrameButton;
+    private static JButton nextFrameButton;
+    private static JButton playPauseButton;
     private final JButton advancedButton;
-    private final JSpinner speedSpinner;
-    private final JComboBox speedUnitComboBox;
+    private static JSpinner speedSpinner;
+    private static JComboBox speedUnitComboBox;
     private final JComboBox animationModeComboBox;
 
     private final JPanel modePanel;
@@ -154,7 +154,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     public void setView(AbstractView view) {
         if (!(view instanceof MovieView)) {
-            instance.setEnabled(false);
+            setEnabled(false);
             return;
         }
 
@@ -164,7 +164,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setMaximum(((MovieView) view).getMaximumFrameNumber());
         timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
 
-        instance.setEnabled(true);
+        setEnabled(true);
     }
 
     @Override
@@ -263,8 +263,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        this.setEnabled(false);
-        this.setAdvanced(MoviePanel.isAdvanced);
+        setEnabled(false);
+        setAdvanced(isAdvanced);
     }
 
     /**
@@ -288,8 +288,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         advancedButton.setEnabled(enabled);
     }
 
-    public void setAdvanced(boolean advanced) {
-        MoviePanel.isAdvanced = advanced;
+    private void setAdvanced(boolean advanced) {
+        isAdvanced = advanced;
 
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
         modePanel.setVisible(advanced);
@@ -298,7 +298,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     public static void setFrameSlider(AbstractView view) {
         if (view instanceof MovieView) {
-            instance.timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
+            timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
         }
     }
 
@@ -308,7 +308,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param frame
      *            the number of the frame
      */
-    private void jumpToFrameNumber(int frame) {
+    private static void jumpToFrameNumber(int frame) {
         frame = Math.min(frame, activeView.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
         LinkedMovieManager.setCurrentFrame(activeView, frame);
@@ -317,11 +317,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     /**
      * Toggles between playing and not playing the animation.
      */
-    private void togglePlayPause() {
+    private static void togglePlayPause() {
         setPlaying(!isPlaying, false);
     }
 
-    private void setPlaying(boolean playing, boolean onlyGUI) {
+    private static void setPlaying(boolean playing, boolean onlyGUI) {
         isPlaying = playing;
 
         if (!isPlaying) {
@@ -343,7 +343,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Updates the speed of the animation. This function is called when changing
      * the speed of the animation or the its unit.
      */
-    private void updateMovieSpeed() {
+    private static void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             activeView.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
         } else {
@@ -357,7 +357,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == advancedButton) {
-            this.setAdvanced(!MoviePanel.isAdvanced);
+            setAdvanced(!isAdvanced);
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {
             togglePlayPause();
@@ -465,19 +465,21 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         someoneIsDragging = false;
     }
 
-    public void playStateChanged(boolean playing) {
+    public static void playStateChanged(boolean playing) {
         if (playing != isPlaying && !someoneIsDragging) {
             setPlaying(playing, true);
         }
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        if (complete) {
-            instance.timeSlider.setCompleteCachedUntil(until);
-        } else {
-            instance.timeSlider.setPartialCachedUntil(until);
+        if (view == activeView) {
+            if (complete) {
+                timeSlider.setCompleteCachedUntil(until);
+            } else {
+                timeSlider.setPartialCachedUntil(until);
+            }
+            timeSlider.repaint();
         }
-        instance.timeSlider.repaint();
     }
 
     /**
@@ -499,9 +501,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(instance.playPauseButton, 0, ""));
-            putValue(NAME, instance.playPauseButton.getToolTipText());
-            putValue(SMALL_ICON, instance.playPauseButton.getIcon());
+            actionPerformed(new ActionEvent(playPauseButton, 0, ""));
+            putValue(NAME, playPauseButton.getToolTipText());
+            putValue(SMALL_ICON, playPauseButton.getIcon());
         }
 
     }
@@ -526,7 +528,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(instance.previousFrameButton, 0, ""));
+            actionPerformed(new ActionEvent(previousFrameButton, 0, ""));
         }
 
     }
@@ -551,7 +553,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(instance.nextFrameButton, 0, ""));
+            actionPerformed(new ActionEvent(nextFrameButton, 0, ""));
         }
 
     }
@@ -568,8 +570,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         private static final Color partialCachedColor = new Color(0x8080FF);
         private static final Color completeCachedColor = new Color(0x4040FF);
 
-        private int partialCachedUntil = 0;
-        private int completeCachedUntil = 0;
+        private static int partialCachedUntil = 0;
+        private static int completeCachedUntil = 0;
 
         /**
          * Default constructor
@@ -604,7 +606,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param cachedUntil
          *            Frame number, to which partial information is loaded.
          */
-        public void setPartialCachedUntil(int cachedUntil) {
+        protected void setPartialCachedUntil(int cachedUntil) {
             partialCachedUntil = cachedUntil;
             repaint();
         }
@@ -618,7 +620,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param cachedUntil
          *            Frame number, to which complete information is loaded.
          */
-        public void setCompleteCachedUntil(int cachedUntil) {
+        protected void setCompleteCachedUntil(int cachedUntil) {
             completeCachedUntil = cachedUntil;
             if (partialCachedUntil < cachedUntil) {
                 partialCachedUntil = cachedUntil;
