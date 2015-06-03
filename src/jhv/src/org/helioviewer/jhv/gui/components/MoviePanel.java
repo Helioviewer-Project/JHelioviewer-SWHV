@@ -596,14 +596,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     public static class MoviePanelManager {
 
-        private final LinkedList<MoviePanel> linkedMovies = new LinkedList<MoviePanel>();
         public boolean someoneIsDragging = false;
-
-        public void playStateChanged(boolean playing) {
-            for (MoviePanel panel : linkedMovies) {
-                panel.playStateChanged(playing);
-            }
-        }
 
         /**
          * Adds an image series to the set of series playing simultaneous.
@@ -617,9 +610,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void linkView(AbstractView view) {
             if (!(view instanceof MovieView))
                 return;
-
-            MoviePanel newPanel = instance;
-            linkedMovies.add(newPanel);
             LinkedMovieManager.linkMovie((MovieView) view);
         }
 
@@ -635,9 +625,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void unlinkView(AbstractView view) {
             if (!(view instanceof MovieView))
                 return;
-
             LinkedMovieManager.unlinkMovie((MovieView) view);
-            linkedMovies.remove(instance);
         }
 
     }
