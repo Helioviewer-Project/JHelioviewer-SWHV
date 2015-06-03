@@ -177,14 +177,13 @@ public class LayersModel {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.pauseLinkedMovies();
 
-        RenderableImageLayer imageLayer = new RenderableImageLayer(view);
-        view.setImageLayer(imageLayer);
+        view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
         MoviePanel moviePanel;
         if (view instanceof JHVJPXView) {
             moviePanel = new MoviePanel((JHVJPXView) view);
-            setLink(view, true);
+            MoviePanel.getMoviePanelManager().linkMoviePanel(moviePanel);
         } else {
             moviePanel = new MoviePanel(null);
         }
@@ -272,23 +271,6 @@ public class LayersModel {
 
     public static void removeLayer(int idx) {
         removeLayer(getLayer(idx));
-    }
-
-    /**
-     * Set the link-state of the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @param link
-     *            - true if the layer in question should be linked
-     */
-    private static void setLink(AbstractView view, boolean link) {
-        if (view instanceof JHVJPXView) {
-            MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
-            if (moviePanel != null) {
-                moviePanel.setMovieLink(link);
-            }
-        }
     }
 
     private static void fireLayerAdded(AbstractView view) {

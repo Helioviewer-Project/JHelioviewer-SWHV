@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.util.LinkedList;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
@@ -71,16 +72,20 @@ public class LinkedMovieManager {
      * Plays the set of linked movies.
      */
     public static void playLinkedMovies() {
-        if (masterView instanceof JHVJPXView)
+        if (masterView instanceof JHVJPXView) {
             ((JHVJPXView) masterView).playMovie();
+            MoviePanel.getMoviePanelManager().playStateChanged(true);
+        }
     }
 
     /**
      * Pauses the set of linked movies.
      */
     public static void pauseLinkedMovies() {
-        if (masterView instanceof JHVJPXView)
+        if (masterView instanceof JHVJPXView) {
             ((JHVJPXView) masterView).pauseMovie();
+            MoviePanel.getMoviePanelManager().playStateChanged(false);
+        }
     }
 
     /**
