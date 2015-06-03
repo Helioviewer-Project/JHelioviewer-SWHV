@@ -14,7 +14,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.ParseException;
-import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -39,7 +38,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
@@ -80,7 +78,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             @Override
-            public int getSecondsPerSecond() {
+            protected int getSecondsPerSecond() {
                 return 0;
             }
         },
@@ -91,7 +89,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             @Override
-            public int getSecondsPerSecond() {
+            protected int getSecondsPerSecond() {
                 return 60;
             }
         },
@@ -102,7 +100,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             @Override
-            public int getSecondsPerSecond() {
+            protected int getSecondsPerSecond() {
                 return 3600;
             }
         },
@@ -113,19 +111,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             @Override
-            public int getSecondsPerSecond() {
+            protected int getSecondsPerSecond() {
                 return 86400;
             }
         };
 
-        public abstract int getSecondsPerSecond();
-    }
-
-    // Linking movies to play simultaneously
-    private static MoviePanelManager moviePanelManager = new MoviePanelManager();
-
-    public static MoviePanelManager getMoviePanelManager() {
-        return moviePanelManager;
+        protected abstract int getSecondsPerSecond();
     }
 
     // Status
@@ -153,6 +144,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
     private static MovieView activeView;
+    private static boolean someoneIsDragging = false;
 
     /**
      * Default constructor.
@@ -172,14 +164,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setMaximum(((MovieView) view).getMaximumFrameNumber());
         timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
 
-        SpeedUnit[] units;
-        if (view.getMetaData() instanceof ObserverMetaData) {
-            SpeedUnit[] newunits = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
-            units = newunits;
-        } else {
-            SpeedUnit[] newunits = { SpeedUnit.FRAMESPERSECOND };
-            units = newunits;
-        }
+        SpeedUnit[] units = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
 
         speedUnitComboBox.removeActionListener(this);
         speedUnitComboBox.removeAllItems();
@@ -385,25 +370,21 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == advancedButton) {
             this.setAdvanced(!MoviePanel.isAdvanced);
-
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {
             togglePlayPause();
-
             // Previous frame
         } else if (e.getSource() == previousFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
             jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
-
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
             jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
-
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
@@ -412,11 +393,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 e1.printStackTrace();
             }
             updateMovieSpeed();
-
             // Change animation speed unit
         } else if (e.getSource() == speedUnitComboBox) {
             updateMovieSpeed();
-
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox) {
             activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
@@ -467,7 +446,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        moviePanelManager.someoneIsDragging = true;
+        someoneIsDragging = true;
         if (isPlaying) {
             LinkedMovieManager.pauseLinkedMovies();
         }
@@ -495,11 +474,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (isPlaying) {
             LinkedMovieManager.playLinkedMovies();
         }
-        moviePanelManager.someoneIsDragging = false;
+        someoneIsDragging = false;
     }
 
     public void playStateChanged(boolean playing) {
-        if (playing != isPlaying && !moviePanelManager.someoneIsDragging) {
+        if (playing != isPlaying && !someoneIsDragging) {
             setPlaying(playing, true);
         }
     }
@@ -585,47 +564,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         public void actionPerformed(ActionEvent e) {
             instance.actionPerformed(new ActionEvent(instance.nextFrameButton, 0, ""));
-        }
-
-    }
-
-    /**
-     * Class to synchronize linked image series.
-     *
-     * Synchronize the GUI elements as well as the actual movie.
-     */
-    public static class MoviePanelManager {
-
-        public boolean someoneIsDragging = false;
-
-        /**
-         * Adds an image series to the set of series playing simultaneous.
-         *
-         * <p>
-         * The master movie panel may change.
-         *
-         * @param newPanel
-         *            Panel to add
-         */
-        public void linkView(AbstractView view) {
-            if (!(view instanceof MovieView))
-                return;
-            LinkedMovieManager.linkMovie((MovieView) view);
-        }
-
-        /**
-         * Removes an image series from the set of series playing simultaneous.
-         *
-         * <p>
-         * The master movie panel may change.
-         *
-         * @param panel
-         *            Panel to remove
-         */
-        public void unlinkView(AbstractView view) {
-            if (!(view instanceof MovieView))
-                return;
-            LinkedMovieManager.unlinkMovie((MovieView) view);
         }
 
     }

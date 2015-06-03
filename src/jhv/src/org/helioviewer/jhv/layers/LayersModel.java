@@ -178,8 +178,8 @@ public class LayersModel {
 
         // needed for proper linked movies (tbd)
         LinkedMovieManager.pauseLinkedMovies();
+        LinkedMovieManager.linkMovie(view);
         MoviePanel.getSingletonInstance().setView(view);
-        MoviePanel.getMoviePanelManager().linkView(view);
 
         fireLayerAdded(view);
         setActiveView(view);
@@ -242,7 +242,7 @@ public class LayersModel {
      */
     public static void removeLayer(AbstractView view) {
         LinkedMovieManager.pauseLinkedMovies();
-        MoviePanel.getMoviePanelManager().unlinkView(view);
+        LinkedMovieManager.unlinkMovie(view);
 
         int index = layers.indexOf(view);
 
