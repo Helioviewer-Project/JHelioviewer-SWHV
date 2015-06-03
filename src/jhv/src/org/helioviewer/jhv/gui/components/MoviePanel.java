@@ -327,7 +327,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     public static void setFrameSlider(AbstractView view) {
         if (view instanceof MovieView) {
-            view.getMoviePanel().timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
+            instance.timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
         }
     }
 
@@ -512,60 +512,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        MoviePanel panel = ((AbstractView) view).getMoviePanel();
-        if (panel == null) { // this may come before view added as layer
-            return;
-        }
-
         if (complete) {
-            panel.timeSlider.setCompleteCachedUntil(until);
+            instance.timeSlider.setCompleteCachedUntil(until);
         } else {
-            panel.timeSlider.setPartialCachedUntil(until);
+            instance.timeSlider.setPartialCachedUntil(until);
         }
-        panel.timeSlider.repaint();
-    }
-
-    /**
-     * Abstract base class for all static movie actions.
-     *
-     * Static movie actions are supposed be integrated into {@link MenuBar},
-     * also to provide shortcuts. They always refer to the active layer.
-     */
-    private static abstract class StaticMovieAction extends AbstractAction implements ActionListener, LayersListener {
-
-        protected MoviePanel activePanel;
-
-        /**
-         * Default constructor.
-         *
-         * @param name
-         *            name of the action that shall be displayed on a button
-         * @param icon
-         *            icon of the action that shall be displayed on a button
-         */
-        public StaticMovieAction(String name, Icon icon) {
-            super(name, icon);
-            LayersModel.addLayersListener(this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void layerAdded(AbstractView view) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void activeLayerChanged(AbstractView view) {
-            if (view == null)
-                activePanel = null;
-            else
-                activePanel = view.getMoviePanel();
-        }
-
+        instance.timeSlider.repaint();
     }
 
     /**
@@ -574,7 +526,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticPlayPauseAction extends StaticMovieAction {
+    public static class StaticPlayPauseAction extends AbstractAction implements ActionListener {
 
         public StaticPlayPauseAction() {
             super("Play movie", playIcon);
@@ -587,24 +539,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activePanel != null) {
-                activePanel.actionPerformed(new ActionEvent(activePanel.playPauseButton, 0, ""));
-                putValue(NAME, activePanel.playPauseButton.getToolTipText());
-                putValue(SMALL_ICON, activePanel.playPauseButton.getIcon());
-            }
+            instance.actionPerformed(new ActionEvent(instance.playPauseButton, 0, ""));
+            putValue(NAME, instance.playPauseButton.getToolTipText());
+            putValue(SMALL_ICON, instance.playPauseButton.getIcon());
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void activeLayerChanged(AbstractView view) {
-            super.activeLayerChanged(view);
-            if (activePanel != null && getValue(SMALL_ICON) != activePanel.playPauseButton.getIcon()) {
-                putValue(NAME, activePanel.playPauseButton.getToolTipText());
-                putValue(SMALL_ICON, activePanel.playPauseButton.getIcon());
-            }
-        }
     }
 
     /**
@@ -614,7 +553,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticPreviousFrameAction extends StaticMovieAction {
+    public static class StaticPreviousFrameAction extends AbstractAction implements ActionListener {
 
         public StaticPreviousFrameAction() {
             super("Step to previous frame", IconBank.getIcon(JHVIcon.BACK));
@@ -627,10 +566,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activePanel != null) {
-                activePanel.actionPerformed(new ActionEvent(activePanel.previousFrameButton, 0, ""));
-            }
+            instance.actionPerformed(new ActionEvent(instance.previousFrameButton, 0, ""));
         }
+
     }
 
     /**
@@ -640,7 +578,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Static movie actions are supposed be integrated into {@link MenuBar},
      * also to provide shortcuts. They always refer to the active layer.
      */
-    public static class StaticNextFrameAction extends StaticMovieAction {
+    public static class StaticNextFrameAction extends AbstractAction implements ActionListener {
 
         public StaticNextFrameAction() {
             super("Step to next frame", IconBank.getIcon(JHVIcon.FORWARD));
@@ -653,10 +591,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activePanel != null) {
-                activePanel.actionPerformed(new ActionEvent(activePanel.nextFrameButton, 0, ""));
-            }
+            instance.actionPerformed(new ActionEvent(instance.nextFrameButton, 0, ""));
         }
+
     }
 
     /**
@@ -688,7 +625,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (!(view instanceof MovieView))
                 return;
 
-            MoviePanel newPanel = view.getMoviePanel();
+            MoviePanel newPanel = instance;
             if (!linkedMovies.isEmpty()) {
                 // Copy Settings
                 MoviePanel copyFrom = linkedMovies.element();
@@ -717,7 +654,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 return;
 
             LinkedMovieManager.unlinkMovie((MovieView) view);
-            linkedMovies.remove(view.getMoviePanel());
+            linkedMovies.remove(instance);
         }
 
         /**

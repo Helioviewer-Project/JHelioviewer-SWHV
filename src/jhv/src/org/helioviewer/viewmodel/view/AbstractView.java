@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view;
 import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
@@ -18,7 +17,6 @@ import com.jogamp.opengl.GL2;
 public abstract class AbstractView implements View {
 
     private RenderableImageLayer imageLayer;
-    private MoviePanel moviePanel;
 
     protected ImageData imageData;
     private ColorMask colorMask = new ColorMask(true, true, true);
@@ -272,14 +270,6 @@ public abstract class AbstractView implements View {
 
     public RenderableImageLayer getImageLayer() {
         return imageLayer;
-    }
-
-    public void setMoviePanel(MoviePanel moviePanel) {
-        this.moviePanel = moviePanel;
-    }
-
-    public MoviePanel getMoviePanel() {
-        return moviePanel;
     }
 
     public void init(GL2 gl) {

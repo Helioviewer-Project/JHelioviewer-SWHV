@@ -181,7 +181,6 @@ public class LayersModel {
         layers.add(view);
 
         MoviePanel moviePanel = MoviePanel.getSingletonInstance().setView(view);
-        view.setMoviePanel(moviePanel);
         MoviePanel.getMoviePanelManager().linkView(view);
 
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
@@ -249,8 +248,6 @@ public class LayersModel {
         LinkedMovieManager.pauseLinkedMovies();
 
         MoviePanel.getMoviePanelManager().unlinkView(view);
-        view.setMoviePanel(null);
-
         ImageViewerGui.getMoviePanelContainer().removeLayer(view);
 
         int index = layers.indexOf(view);
