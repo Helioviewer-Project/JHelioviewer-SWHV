@@ -74,7 +74,7 @@ public class LinkedMovieManager {
     public static void playLinkedMovies() {
         if (masterView instanceof JHVJPXView) {
             ((JHVJPXView) masterView).playMovie();
-            MoviePanel.getMoviePanelManager().playStateChanged(true);
+            MoviePanel.getSingletonInstance().playStateChanged(true);
         }
     }
 
@@ -84,7 +84,7 @@ public class LinkedMovieManager {
     public static void pauseLinkedMovies() {
         if (masterView instanceof JHVJPXView) {
             ((JHVJPXView) masterView).pauseMovie();
-            MoviePanel.getMoviePanelManager().playStateChanged(false);
+            MoviePanel.getSingletonInstance().playStateChanged(false);
         }
     }
 
