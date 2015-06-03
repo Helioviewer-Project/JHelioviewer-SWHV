@@ -165,17 +165,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel(MovieView movieView) {
+    public MoviePanel(View movieView) {
         this();
 
-        if (movieView == null) {
+        if (!(movieView instanceof MovieView)) {
             return;
         }
 
-        view = movieView;
+        view = (MovieView) movieView;
 
-        timeSlider.setMaximum(movieView.getMaximumFrameNumber());
-        timeSlider.setValue(movieView.getCurrentFrameNumber());
+        timeSlider.setMaximum(view.getMaximumFrameNumber());
+        timeSlider.setValue(view.getCurrentFrameNumber());
 
         SpeedUnit[] units;
         if (view.getMetaData() instanceof ObserverMetaData) {
@@ -275,7 +275,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         modePanel.add(animationModeComboBox);
 
         mainPanel.add(modePanel);
-        panelList.add(this);
 
         this.setEnabled(false);
         this.setAdvanced(MoviePanel.isAdvanced);
@@ -512,6 +511,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         moviePanelManager.someoneIsDragging = false;
     }
 
+    public static void addMoviePanel(MoviePanel panel) {
+        panelList.add(panel);
+        moviePanelManager.linkMoviePanel(panel);
+    }
+
     public void remove() {
         moviePanelManager.unlinkMoviePanel(this);
         panelList.remove(this);
@@ -714,9 +718,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to add
          */
         public void linkMoviePanel(MoviePanel newPanel) {
-            if (newPanel.view == null) {
+            if (!(newPanel.view instanceof MovieView))
                 return;
-            }
 
             if (!linkedMovies.isEmpty()) {
                 // Copy Settings
@@ -742,6 +745,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          *            Panel to remove
          */
         public void unlinkMoviePanel(MoviePanel panel) {
+            if (!(panel.view instanceof MovieView))
+                return;
+
             LinkedMovieManager.unlinkMovie(panel.view);
             linkedMovies.remove(panel);
         }
