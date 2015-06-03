@@ -180,13 +180,8 @@ public class LayersModel {
         view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
-        MoviePanel moviePanel;
-        if (view instanceof JHVJPXView) {
-            moviePanel = new MoviePanel((JHVJPXView) view);
-            MoviePanel.getMoviePanelManager().linkMoviePanel(moviePanel);
-        } else {
-            moviePanel = new MoviePanel(null);
-        }
+        MoviePanel moviePanel = new MoviePanel(view);
+        MoviePanel.addMoviePanel(moviePanel);
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
         fireLayerAdded(view);
