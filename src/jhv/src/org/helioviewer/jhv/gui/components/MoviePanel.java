@@ -37,7 +37,6 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
@@ -161,10 +160,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel setView(AbstractView view) {
+    public void setView(AbstractView view) {
         if (!(view instanceof MovieView)) {
             instance.setEnabled(false);
-            return instance;
+            return;
         }
 
         // tbd
@@ -193,7 +192,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedUnitComboBox.addActionListener(this);
 
         instance.setEnabled(true);
-        return instance;
     }
 
     @Override
@@ -387,7 +385,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == advancedButton) {
             this.setAdvanced(!MoviePanel.isAdvanced);
-            ImageViewerGui.getMoviePanelContainer().ensureSize();
 
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {

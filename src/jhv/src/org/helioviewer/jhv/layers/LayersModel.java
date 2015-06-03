@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -174,16 +173,13 @@ public class LayersModel {
         if (view == null)
             return;
 
-        // needed for proper linked movies (tbd)
-        LinkedMovieManager.pauseLinkedMovies();
-
         view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
-        MoviePanel moviePanel = MoviePanel.getSingletonInstance().setView(view);
+        // needed for proper linked movies (tbd)
+        LinkedMovieManager.pauseLinkedMovies();
+        MoviePanel.getSingletonInstance().setView(view);
         MoviePanel.getMoviePanelManager().linkView(view);
-
-        ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
         fireLayerAdded(view);
         setActiveView(view);
@@ -246,9 +242,7 @@ public class LayersModel {
      */
     public static void removeLayer(AbstractView view) {
         LinkedMovieManager.pauseLinkedMovies();
-
         MoviePanel.getMoviePanelManager().unlinkView(view);
-        ImageViewerGui.getMoviePanelContainer().removeLayer(view);
 
         int index = layers.indexOf(view);
 
