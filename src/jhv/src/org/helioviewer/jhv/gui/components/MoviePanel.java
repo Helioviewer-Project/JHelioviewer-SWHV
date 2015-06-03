@@ -130,8 +130,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         return moviePanelManager;
     }
 
-    private static LinkedList<MoviePanel> panelList = new LinkedList<MoviePanel>();
-
     // Status
     private static boolean isAdvanced = false;
     private boolean isPlaying = false;
@@ -169,6 +167,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         this();
 
         if (!(movieView instanceof MovieView)) {
+            this.setEnabled(false);
             return;
         }
 
@@ -309,31 +308,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel.setVisible(advanced);
     }
 
-    /**
-     * Returns the movie panel for the given view
-     *
-     * @return movie panel if available, else null
-     */
-    public static MoviePanel getMoviePanel(MovieView view) {
-        if (view.getMaximumFrameNumber() <= 0) {
-            return null;
-        }
-
-        for (MoviePanel moviePanel : panelList) {
-            if (moviePanel.view != null && moviePanel.view.equals(view)) {
-                return moviePanel;
-            }
-        }
-        return null;
-    }
-
-    public static void setFrameSlider(View view) {
+    public static void setFrameSlider(AbstractView view) {
         if (view instanceof MovieView) {
-            MovieView mv = (MovieView) view;
-            MoviePanel panel = getMoviePanel(mv);
-
-            if (panel != null)
-                panel.timeSlider.setValue(mv.getCurrentFrameNumber());
+            view.getMoviePanel().timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
         }
     }
 
@@ -511,16 +488,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         moviePanelManager.someoneIsDragging = false;
     }
 
-    public static void addMoviePanel(MoviePanel panel) {
-        panelList.add(panel);
-        moviePanelManager.linkMoviePanel(panel);
-    }
-
-    public void remove() {
-        moviePanelManager.unlinkMoviePanel(this);
-        panelList.remove(this);
-    }
-
     public void playStateChanged(boolean playing) {
         if (playing != isPlaying && !moviePanelManager.someoneIsDragging) {
             setPlaying(playing, true);
@@ -528,9 +495,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        MoviePanel panel = getMoviePanel(view);
-        if (panel == null)
+        MoviePanel panel = ((AbstractView) view).getMoviePanel();
+        if (panel == null) { // this may come before view added as layer
             return;
+        }
 
         if (complete) {
             panel.timeSlider.setCompleteCachedUntil(until);
@@ -575,30 +543,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void activeLayerChanged(AbstractView view) {
-            this.searchCorrespondingMoviePanel(view);
+            activePanel = view.getMoviePanel();
         }
 
-        /**
-         * Searches the movie panel corresponding to the given view.
-         *
-         * All static movie actions are performed by accessing the movie panel
-         * of the active and basically clicking on the corresponding button.
-         *
-         * @param view
-         *            View to search panel for
-         */
-        private void searchCorrespondingMoviePanel(AbstractView view) {
-            if (view instanceof MovieView) {
-                setEnabled(true);
-                for (MoviePanel panel : panelList) {
-                    if (panel.view == view) {
-                        activePanel = panel;
-                        return;
-                    }
-                }
-            }
-            setEnabled(false);
-        }
     }
 
     /**

@@ -181,7 +181,9 @@ public class LayersModel {
         layers.add(view);
 
         MoviePanel moviePanel = new MoviePanel(view);
-        MoviePanel.addMoviePanel(moviePanel);
+        view.setMoviePanel(moviePanel);
+        MoviePanel.getMoviePanelManager().linkMoviePanel(moviePanel);
+
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
         fireLayerAdded(view);
@@ -246,12 +248,10 @@ public class LayersModel {
     public static void removeLayer(AbstractView view) {
         LinkedMovieManager.pauseLinkedMovies();
 
-        if (view instanceof JHVJPXView) {
-            MoviePanel moviePanel = MoviePanel.getMoviePanel((JHVJPXView) view);
-            if (moviePanel != null) {
-                moviePanel.remove();
-            }
-        }
+        MoviePanel moviePanel = view.getMoviePanel();
+        MoviePanel.getMoviePanelManager().unlinkMoviePanel(moviePanel);
+        view.setMoviePanel(null);
+
         ImageViewerGui.getMoviePanelContainer().removeLayer(view);
 
         int index = layers.indexOf(view);
