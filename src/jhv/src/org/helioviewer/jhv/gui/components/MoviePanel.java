@@ -175,6 +175,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         activeView = (MovieView) view;
 
+        // inhibit change event
         timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(activeView.getMaximumFrameNumber());
         timeSlider.setValue(activeView.getCurrentFrameNumber());

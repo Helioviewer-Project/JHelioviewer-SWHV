@@ -175,12 +175,12 @@ public class LayersModel {
         view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
-        // needed for proper linked movies (tbd)
-        LinkedMovieManager.pauseLinkedMovies();
-        LinkedMovieManager.linkMovie(view);
-
+        // the order of next four important
         fireLayerAdded(view);
         setActiveView(view);
+
+        LinkedMovieManager.pauseLinkedMovies();
+        LinkedMovieManager.linkMovie(view);
     }
 
     // special
