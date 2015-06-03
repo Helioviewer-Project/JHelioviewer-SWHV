@@ -411,17 +411,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
-            moviePanelManager.updateSpeedSpinnerLinkedMovies(this);
             updateMovieSpeed();
 
             // Change animation speed unit
         } else if (e.getSource() == speedUnitComboBox) {
-            moviePanelManager.updateSpeedUnitComboBoxLinkedMovies(this);
             updateMovieSpeed();
 
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox) {
-            moviePanelManager.updateAnimationModeComboBoxLinkedMovies(this);
             activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
@@ -440,7 +437,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
             // Change animation speed
         } else if (e.getSource() == speedSpinner) {
-            moviePanelManager.updateSpeedSpinnerLinkedMovies(this);
             updateMovieSpeed();
         }
     }
@@ -623,16 +619,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 return;
 
             MoviePanel newPanel = instance;
-            if (!linkedMovies.isEmpty()) {
-                // Copy Settings
-                MoviePanel copyFrom = linkedMovies.element();
-                newPanel.isPlaying = copyFrom.isPlaying;
-                newPanel.playPauseButton.setIcon(copyFrom.playPauseButton.getIcon());
-                newPanel.speedSpinner.setValue(copyFrom.speedSpinner.getValue());
-                newPanel.speedUnitComboBox.setSelectedItem(copyFrom.speedUnitComboBox.getSelectedItem());
-                newPanel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
-            }
-
             linkedMovies.add(newPanel);
             LinkedMovieManager.linkMovie((MovieView) view);
         }
@@ -652,45 +638,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
             LinkedMovieManager.unlinkMovie((MovieView) view);
             linkedMovies.remove(instance);
-        }
-
-        /**
-         * Copies the value from the speed spinner of the given panel to all
-         * other linked panels.
-         *
-         * @param copyFrom
-         *            Panel dominating the other ones right now
-         */
-        public void updateSpeedSpinnerLinkedMovies(MoviePanel copyFrom) {
-            for (MoviePanel panel : linkedMovies) {
-                panel.speedSpinner.setValue(copyFrom.speedSpinner.getValue());
-            }
-        }
-
-        /**
-         * Copies the value from the speed unit combobox of the given panel to
-         * all other linked panels.
-         *
-         * @param copyFrom
-         *            Panel dominating the other ones right now
-         */
-        public void updateSpeedUnitComboBoxLinkedMovies(MoviePanel copyFrom) {
-            for (MoviePanel panel : linkedMovies) {
-                panel.speedUnitComboBox.setSelectedItem(copyFrom.speedUnitComboBox.getSelectedItem());
-            }
-        }
-
-        /**
-         * Copies the value from the animation mode combobox of the given panel
-         * to all other linked panels.
-         *
-         * @param copyFrom
-         *            Panel dominating the other ones right now
-         */
-        public void updateAnimationModeComboBoxLinkedMovies(MoviePanel copyFrom) {
-            for (MoviePanel panel : linkedMovies) {
-                panel.animationModeComboBox.setSelectedItem(copyFrom.animationModeComboBox.getSelectedItem());
-            }
         }
 
     }
