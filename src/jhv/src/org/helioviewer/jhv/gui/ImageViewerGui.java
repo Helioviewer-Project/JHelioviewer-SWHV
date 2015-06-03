@@ -23,7 +23,6 @@ import javax.swing.JSplitPane;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
-import org.helioviewer.jhv.gui.components.ControlPanelContainer;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -72,7 +71,6 @@ public class ImageViewerGui {
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;
-    private static ControlPanelContainer moviePanelContainer;
     private static FiltersPanel filtersPanel;
 
     private static ComponentView componentView;
@@ -119,8 +117,7 @@ public class ImageViewerGui {
 
         leftPane = new SideContentPane();
         // Movie control
-        moviePanelContainer = new ControlPanelContainer(MoviePanel.getSingletonInstance());
-        leftPane.add("Movie Controls", moviePanelContainer, true);
+        leftPane.add("Movie Controls", MoviePanel.getSingletonInstance(), true);
 
         // Layer control
         imageObservationPanel = new ImageDataPanel();
@@ -314,10 +311,6 @@ public class ImageViewerGui {
 
     public static ImageDataPanel getObservationImagePane() {
         return imageObservationPanel;
-    }
-
-    public static ControlPanelContainer getMoviePanelContainer() {
-        return moviePanelContainer;
     }
 
     public static ComponentView getComponentView() {
