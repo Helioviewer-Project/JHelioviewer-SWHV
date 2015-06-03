@@ -146,25 +146,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static MovieView activeView;
     private static boolean someoneIsDragging = false;
 
-    /**
-     * Default constructor.
-     *
-     * @param movieView
-     *            Associated movie view
-     */
-    public void setView(AbstractView view) {
-        if (!(view instanceof MovieView)) {
-            setEnabled(false);
-            return;
+    private static MoviePanel instance;
+
+    public static MoviePanel getSingletonInstance() {
+        if (instance == null) {
+            instance = new MoviePanel();
+            LayersModel.addLayersListener(instance);
         }
-
-        // tbd
-        activeView = (MovieView) view;
-
-        timeSlider.setMaximum(((MovieView) view).getMaximumFrameNumber());
-        timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
-
-        setEnabled(true);
+        return instance;
     }
 
     @Override
@@ -176,14 +165,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         setView(view);
     }
 
-    private static MoviePanel instance;
-
-    public static MoviePanel getSingletonInstance() {
-        if (instance == null) {
-            instance = new MoviePanel();
-            LayersModel.addLayersListener(instance);
+    private void setView(AbstractView view) {
+        if (!(view instanceof MovieView)) {
+            setEnabled(false);
+            setPlaying(false, false);
+            activeView = null;
+            return;
         }
-        return instance;
+
+        activeView = (MovieView) view;
+        timeSlider.setMaximum(activeView.getMaximumFrameNumber());
+        timeSlider.setValue(activeView.getCurrentFrameNumber());
+
+        setEnabled(true);
     }
 
     private MoviePanel() {
@@ -501,7 +495,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            actionPerformed(new ActionEvent(playPauseButton, 0, ""));
+            instance.actionPerformed(new ActionEvent(playPauseButton, 0, ""));
             putValue(NAME, playPauseButton.getToolTipText());
             putValue(SMALL_ICON, playPauseButton.getIcon());
         }
@@ -528,7 +522,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            actionPerformed(new ActionEvent(previousFrameButton, 0, ""));
+            instance.actionPerformed(new ActionEvent(previousFrameButton, 0, ""));
         }
 
     }
@@ -553,7 +547,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            actionPerformed(new ActionEvent(nextFrameButton, 0, ""));
+            instance.actionPerformed(new ActionEvent(nextFrameButton, 0, ""));
         }
 
     }
