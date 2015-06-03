@@ -33,7 +33,11 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to add to the set of linked movies.
      */
-    public static void linkMovie(MovieView movieView) {
+    public static void linkMovie(View view) {
+        if (!(view instanceof MovieView))
+            return;
+
+        MovieView movieView = (MovieView) view;
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
             updateMaster();
@@ -46,7 +50,11 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to remove from the set of linked movies.
      */
-    public static void unlinkMovie(MovieView movieView) {
+    public static void unlinkMovie(View view) {
+        if (!(view instanceof MovieView))
+            return;
+
+        MovieView movieView = (MovieView) view;
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
             updateMaster();
