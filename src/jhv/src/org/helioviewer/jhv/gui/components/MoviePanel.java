@@ -170,6 +170,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             setEnabled(false);
             setPlaying(false, false);
 
+            // reset timeSlider
+            cacheStatusChanged(activeView, false, 0);
+            cacheStatusChanged(activeView, true, 0);
             timeSlider.setMaximum(0);
             timeSlider.setValue(0);
 
