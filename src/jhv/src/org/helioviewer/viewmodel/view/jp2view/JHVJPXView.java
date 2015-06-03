@@ -211,19 +211,16 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * the image.
      *
      * @param frameNumber
-     * @return true, if the frame number has changed
      */
-    private boolean setCurrentFrameNumber(int frameNumber) {
-        if (frameNumber != imageViewParams.compositionLayer) {
+    private void setCurrentFrameNumber(int frameNumber) {
+        if (frameNumber != imageViewParams.compositionLayer && frameNumber <= getMaximumAccessibleFrameNumber()) {
             imageViewParams.compositionLayer = frameNumber;
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                 renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
             }
-            return true;
         }
-        return false;
     }
 
     /**
