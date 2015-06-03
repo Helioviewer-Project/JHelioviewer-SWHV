@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -173,7 +172,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
             render.setMovieMode(false);
         }
         readerSignal.signal();
-        MoviePanel.getMoviePanel(this).playStateChanged(false);
     }
 
     // to be accessed only from LinkedMovieManager
@@ -189,7 +187,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
             renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
         }
-        MoviePanel.getMoviePanel(this).playStateChanged(true);
     }
 
     /* accessed from reader thread */

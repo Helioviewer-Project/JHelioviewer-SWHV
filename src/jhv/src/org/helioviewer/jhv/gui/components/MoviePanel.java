@@ -125,6 +125,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     // Linking movies to play simultaneously
     private static MoviePanelManager moviePanelManager = new MoviePanelManager();
+
+    public static MoviePanelManager getMoviePanelManager() {
+        return moviePanelManager;
+    }
+
     private static LinkedList<MoviePanel> panelList = new LinkedList<MoviePanel>();
 
     // Status
@@ -379,24 +384,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             view.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
         } else {
             view.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
-        }
-    }
-
-    /**
-     * Locks or unlocks the movie, Should only be called by LayersModel
-     *
-     * In future developments, the concept of linked movies might either be
-     * dropped (when introducing a global timestamp/timeline) or be moved to
-     * LayersModel
-     *
-     * @param link
-     *            true, if it should be locked, else false
-     */
-    public void setMovieLink(boolean link) {
-        if (!link) {
-            moviePanelManager.unlinkMoviePanel(this);
-        } else {
-            moviePanelManager.linkMoviePanel(this);
         }
     }
 
@@ -706,10 +693,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *
      * Synchronize the GUI elements as well as the actual movie.
      */
-    private static class MoviePanelManager {
+    public static class MoviePanelManager {
 
         private final LinkedList<MoviePanel> linkedMovies = new LinkedList<MoviePanel>();
         public boolean someoneIsDragging = false;
+
+        public void playStateChanged(boolean playing) {
+            for (MoviePanel panel : linkedMovies) {
+                panel.playStateChanged(playing);
+            }
+        }
 
         /**
          * Adds an image series to the set of series playing simultaneous.
