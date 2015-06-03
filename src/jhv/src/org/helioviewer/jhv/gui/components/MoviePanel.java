@@ -169,17 +169,18 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (!(view instanceof MovieView)) {
             setEnabled(false);
             setPlaying(false, false);
+
+            timeSlider.setMaximum(0);
+            timeSlider.setValue(0);
+
             activeView = null;
             return;
         }
 
         activeView = (MovieView) view;
 
-        // inhibit change event
-        timeSlider.removeChangeListener(instance);
         timeSlider.setMaximum(activeView.getMaximumFrameNumber());
         timeSlider.setValue(activeView.getCurrentFrameNumber());
-        timeSlider.addChangeListener(instance);
 
         setEnabled(true);
     }
@@ -395,7 +396,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Jump to different frame
         if (e.getSource() == timeSlider) {
             jumpToFrameNumber(timeSlider.getValue());
-            frameNumberLabel.setText((activeView.getCurrentFrameNumber() + 1) + "/" + (timeSlider.getMaximum() + 1));
+
+            int max = timeSlider.getMaximum();
+            if (max == 0)
+                frameNumberLabel.setText("1/1");
+            else
+                frameNumberLabel.setText((activeView.getCurrentFrameNumber() + 1) + "/" + (max + 1));
+
             if (activeView.getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
                 togglePlayPause();
             }
