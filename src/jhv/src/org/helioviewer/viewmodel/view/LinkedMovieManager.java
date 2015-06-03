@@ -34,7 +34,6 @@ public class LinkedMovieManager {
      *            View to add to the set of linked movies.
      */
     public static void linkMovie(AbstractView view) {
-        MoviePanel.getSingletonInstance().setView(view);
         if (!(view instanceof MovieView))
             return;
 

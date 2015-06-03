@@ -159,11 +159,10 @@ public class Settings {
      */
     public void setLookAndFeelEverywhere(JFrame frame, String lookAndFeel) {
         if (lookAndFeel == null) {
-           lookAndFeel = getProperty("display.laf");
-           if (lookAndFeel == null) {
+            lookAndFeel = getProperty("display.laf");
+            if (lookAndFeel == null) {
                 lookAndFeel = UIManager.getSystemLookAndFeelClassName();
-                setProperty("display.laf", lookAndFeel);
-           }
+            }
         }
 
         if (!UIManager.getLookAndFeel().getClass().getName().equals(lookAndFeel)) {
