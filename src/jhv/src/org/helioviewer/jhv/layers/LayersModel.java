@@ -182,7 +182,7 @@ public class LayersModel {
 
         MoviePanel moviePanel = new MoviePanel(view);
         view.setMoviePanel(moviePanel);
-        MoviePanel.getMoviePanelManager().linkMoviePanel(moviePanel);
+        MoviePanel.getMoviePanelManager().linkView(view);
 
         ImageViewerGui.getMoviePanelContainer().addLayer(view, moviePanel);
 
@@ -248,8 +248,7 @@ public class LayersModel {
     public static void removeLayer(AbstractView view) {
         LinkedMovieManager.pauseLinkedMovies();
 
-        MoviePanel moviePanel = view.getMoviePanel();
-        MoviePanel.getMoviePanelManager().unlinkMoviePanel(moviePanel);
+        MoviePanel.getMoviePanelManager().unlinkView(view);
         view.setMoviePanel(null);
 
         ImageViewerGui.getMoviePanelContainer().removeLayer(view);

@@ -45,7 +45,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
-import org.helioviewer.viewmodel.view.View;
 
 /**
  * Panel containing the movie controls.
@@ -148,14 +147,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private final JPanel modePanel;
     private final JPanel speedPanel;
 
-    // References
-    private MovieView view;
-
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
     private static final Icon pauseIcon = IconBank.getIcon(JHVIcon.PAUSE);
     private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
+
+    private static MovieView activeView;
 
     /**
      * Default constructor.
@@ -163,18 +161,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel(View movieView) {
+    public MoviePanel(AbstractView view) {
         this();
 
-        if (!(movieView instanceof MovieView)) {
+        if (!(view instanceof MovieView)) {
             this.setEnabled(false);
             return;
         }
 
-        view = (MovieView) movieView;
+        // tbd
+        activeView = (MovieView) view;
 
-        timeSlider.setMaximum(view.getMaximumFrameNumber());
-        timeSlider.setValue(view.getCurrentFrameNumber());
+        timeSlider.setMaximum(((MovieView) view).getMaximumFrameNumber());
+        timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
 
         SpeedUnit[] units;
         if (view.getMetaData() instanceof ObserverMetaData) {
@@ -285,7 +284,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void setEnabled(boolean enabled) {
-        if (view == null) {
+        if (activeView == null) {
             enabled = false;
         }
 
@@ -321,9 +320,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     private void jumpToFrameNumber(int frame) {
-        frame = Math.min(frame, view.getMaximumAccessibleFrameNumber());
+        frame = Math.min(frame, activeView.getMaximumAccessibleFrameNumber());
         timeSlider.setValue(frame);
-        LinkedMovieManager.setCurrentFrame(view, frame);
+        LinkedMovieManager.setCurrentFrame(activeView, frame);
     }
 
     /**
@@ -357,9 +356,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     private void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
-            view.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
+            activeView.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
         } else {
-            view.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+            activeView.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
         }
     }
 
@@ -381,14 +380,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(view.getCurrentFrameNumber() - 1);
+            jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
 
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(view.getCurrentFrameNumber() + 1);
+            jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
 
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
@@ -408,7 +407,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox) {
             moviePanelManager.updateAnimationModeComboBoxLinkedMovies(this);
-            view.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+            activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 
@@ -420,8 +419,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // Jump to different frame
         if (e.getSource() == timeSlider) {
             jumpToFrameNumber(timeSlider.getValue());
-            frameNumberLabel.setText((view.getCurrentFrameNumber() + 1) + "/" + (timeSlider.getMaximum() + 1));
-            if (view.getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
+            frameNumberLabel.setText((activeView.getCurrentFrameNumber() + 1) + "/" + (timeSlider.getMaximum() + 1));
+            if (activeView.getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
                 togglePlayPause();
             }
             // Change animation speed
@@ -470,9 +469,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
-                jumpToFrameNumber(view.getCurrentFrameNumber() + 1);
+                jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
             } else if (e.getWheelRotation() > 0) {
-                jumpToFrameNumber(view.getCurrentFrameNumber() - 1);
+                jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
             }
         }
     }
@@ -544,6 +543,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         public void activeLayerChanged(AbstractView view) {
             activePanel = view.getMoviePanel();
+
+            if (view instanceof MovieView)
+                activeView = (MovieView) view;
+            else
+                activeView = null;
         }
 
     }
@@ -664,10 +668,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param newPanel
          *            Panel to add
          */
-        public void linkMoviePanel(MoviePanel newPanel) {
-            if (!(newPanel.view instanceof MovieView))
+        public void linkView(AbstractView view) {
+            if (!(view instanceof MovieView))
                 return;
 
+            MoviePanel newPanel = view.getMoviePanel();
             if (!linkedMovies.isEmpty()) {
                 // Copy Settings
                 MoviePanel copyFrom = linkedMovies.element();
@@ -679,7 +684,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
 
             linkedMovies.add(newPanel);
-            LinkedMovieManager.linkMovie(newPanel.view);
+            LinkedMovieManager.linkMovie((MovieView) view);
         }
 
         /**
@@ -691,12 +696,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          * @param panel
          *            Panel to remove
          */
-        public void unlinkMoviePanel(MoviePanel panel) {
-            if (!(panel.view instanceof MovieView))
+        public void unlinkView(AbstractView view) {
+            if (!(view instanceof MovieView))
                 return;
 
-            LinkedMovieManager.unlinkMovie(panel.view);
-            linkedMovies.remove(panel);
+            LinkedMovieManager.unlinkMovie((MovieView) view);
+            linkedMovies.remove(view.getMoviePanel());
         }
 
         /**
