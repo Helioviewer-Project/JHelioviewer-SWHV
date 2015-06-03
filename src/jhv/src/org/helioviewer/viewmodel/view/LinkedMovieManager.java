@@ -33,7 +33,8 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to add to the set of linked movies.
      */
-    public static void linkMovie(View view) {
+    public static void linkMovie(AbstractView view) {
+        MoviePanel.getSingletonInstance().setView(view);
         if (!(view instanceof MovieView))
             return;
 
@@ -50,7 +51,7 @@ public class LinkedMovieManager {
      * @param movieView
      *            View to remove from the set of linked movies.
      */
-    public static void unlinkMovie(View view) {
+    public static void unlinkMovie(AbstractView view) {
         if (!(view instanceof MovieView))
             return;
 

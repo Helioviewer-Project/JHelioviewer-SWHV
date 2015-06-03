@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.LinkedMovieManager;
@@ -179,7 +178,6 @@ public class LayersModel {
         // needed for proper linked movies (tbd)
         LinkedMovieManager.pauseLinkedMovies();
         LinkedMovieManager.linkMovie(view);
-        MoviePanel.getSingletonInstance().setView(view);
 
         fireLayerAdded(view);
         setActiveView(view);

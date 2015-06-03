@@ -164,18 +164,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setMaximum(((MovieView) view).getMaximumFrameNumber());
         timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
 
-        SpeedUnit[] units = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
-
-        speedUnitComboBox.removeActionListener(this);
-        speedUnitComboBox.removeAllItems();
-
-        for (SpeedUnit unit : units) {
-            speedUnitComboBox.addItem(unit);
-        }
-
-        speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
-        speedUnitComboBox.addActionListener(this);
-
         instance.setEnabled(true);
     }
 
@@ -255,9 +243,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND };
+        SpeedUnit[] units = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
         speedUnitComboBox = new JComboBox(units);
-
+        speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
         speedPanel.add(speedUnitComboBox);
 
