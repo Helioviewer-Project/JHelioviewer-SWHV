@@ -180,7 +180,7 @@ public class LayersModel {
         view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
-        MoviePanel moviePanel = new MoviePanel(view);
+        MoviePanel moviePanel = MoviePanel.getSingletonInstance().setView(view);
         view.setMoviePanel(moviePanel);
         MoviePanel.getMoviePanelManager().linkView(view);
 

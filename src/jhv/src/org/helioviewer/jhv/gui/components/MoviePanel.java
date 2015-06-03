@@ -70,7 +70,7 @@ import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
  *
  */
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener {
+public class MoviePanel extends JPanel implements ActionListener, ChangeListener, LayersListener, MouseListener, MouseWheelListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -161,12 +161,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * @param movieView
      *            Associated movie view
      */
-    public MoviePanel(AbstractView view) {
-        this();
-
+    public MoviePanel setView(AbstractView view) {
         if (!(view instanceof MovieView)) {
-            this.setEnabled(false);
-            return;
+            instance.setEnabled(false);
+            return instance;
         }
 
         // tbd
@@ -194,10 +192,30 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
 
-        this.setEnabled(true);
+        instance.setEnabled(true);
+        return instance;
     }
 
-    public MoviePanel() {
+    @Override
+    public void layerAdded(AbstractView view) {
+    }
+
+    @Override
+    public void activeLayerChanged(AbstractView view) {
+        setView(view);
+    }
+
+    private static MoviePanel instance;
+
+    public static MoviePanel getSingletonInstance() {
+        if (instance == null) {
+            instance = new MoviePanel();
+            LayersModel.addLayersListener(instance);
+        }
+        return instance;
+    }
+
+    private MoviePanel() {
         super(new BorderLayout());
 
         JPanel mainPanel = new JPanel();
@@ -542,12 +560,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void activeLayerChanged(AbstractView view) {
-            activePanel = view.getMoviePanel();
-
-            if (view instanceof MovieView)
-                activeView = (MovieView) view;
+            if (view == null)
+                activePanel = null;
             else
-                activeView = null;
+                activePanel = view.getMoviePanel();
         }
 
     }
