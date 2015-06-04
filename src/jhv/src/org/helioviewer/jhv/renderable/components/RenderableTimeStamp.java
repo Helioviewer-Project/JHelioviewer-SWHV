@@ -21,7 +21,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableTimeStamp implements Renderable {
 
     private Font font;
-    private float baseFontSize = 16;
+    private final float baseFontSize = 16;
     private float fontSize;
     private TextRenderer textRenderer;
 
@@ -46,7 +46,7 @@ public class RenderableTimeStamp implements Renderable {
 
     @Override
     public void render(GL2 gl) {
-       if (!isVisible)
+        if (!isVisible)
             return;
 
         int sx = GLInfo.pixelScale[0];
@@ -118,6 +118,7 @@ public class RenderableTimeStamp implements Renderable {
     @Override
     public void dispose(GL2 gl) {
         textRenderer.dispose();
+        textRenderer = null;
     }
 
 }
