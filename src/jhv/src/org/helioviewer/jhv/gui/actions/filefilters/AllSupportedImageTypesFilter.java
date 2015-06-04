@@ -7,9 +7,6 @@ package org.helioviewer.jhv.gui.actions.filefilters;
  */
 public class AllSupportedImageTypesFilter extends ExtensionFileFilter {
 
-    /**
-     * Default Constructor.
-     */
     public AllSupportedImageTypesFilter() {
         extensions = new String[] { "jpg", "jpeg", "png", "fts", "fits", "jp2", "jpx" };
     }
@@ -20,4 +17,5 @@ public class AllSupportedImageTypesFilter extends ExtensionFileFilter {
     public String getDescription() {
         return "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".jp2\", \".jpx\")";
     }
+
 }

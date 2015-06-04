@@ -7,9 +7,6 @@ package org.helioviewer.jhv.gui.actions.filefilters;
  */
 public class FitsFilter extends ExtensionFileFilter {
 
-    /**
-     * Default Constructor.
-     */
     public FitsFilter() {
         extensions = new String[] { "fits", "fts" };
     }
