@@ -36,6 +36,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -327,6 +328,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         isPlaying = playing;
 
         if (!isPlaying) {
+            ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
             playPauseButton.setIcon(playIcon);
             playPauseButton.setToolTipText("Play movie");
             if (!onlyGUI) {
