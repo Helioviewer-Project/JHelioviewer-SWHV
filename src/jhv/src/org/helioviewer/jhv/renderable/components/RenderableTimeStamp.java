@@ -60,6 +60,7 @@ public class RenderableTimeStamp implements Renderable {
             }
             textRenderer = new TextRenderer(font, true, true);
             textRenderer.setUseVertexArrays(true);
+            textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
         }
 

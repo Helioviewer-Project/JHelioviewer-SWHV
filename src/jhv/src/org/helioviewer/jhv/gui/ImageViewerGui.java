@@ -128,7 +128,7 @@ public class ImageViewerGui {
 
         renderableContainer = new RenderableContainer();
         renderableContainer.addRenderable(new RenderableSolarAxes(new RenderableSolarAxesType("Solar axes")));
-        renderableContainer.addRenderable(new RenderableGrid(new RenderableGridType("Grids"), false));
+        renderableContainer.addRenderable(new RenderableGrid(new RenderableGridType("Grid")));
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
         renderableContainer.addRenderable(new RenderableTimeStamp(new RenderableTimeStampType("Timestamp")));

@@ -25,25 +25,25 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid implements Renderable {
-    private static final int SUBDIVISIONS = 120;
 
+    private static final int SUBDIVISIONS = 120;
     private float lonstepDegrees = 13.2f;
     private float latstepDegrees = 20.f;
-    private Font font;
-    private TextRenderer textRenderer;
-    //The height of the text in solar radii
-    private final float textScale = 0.07f;
-    private final boolean followCamera;
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
+
+    private Font font;
+    private TextRenderer textRenderer;
+    // the height of the text in solar radii
+    private final float textScale = 0.07f;
+
     private final RenderableType renderableType;
     private final Component optionsPanel;
     private final String name = "Grid";
     private boolean isVisible = true;
 
-    public RenderableGrid(RenderableType renderableType, boolean followCamera) {
+    public RenderableGrid(RenderableType renderableType) {
         this.renderableType = renderableType;
-        this.followCamera = followCamera;
 
         InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
@@ -69,31 +69,29 @@ public class RenderableGrid implements Renderable {
             return;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
+
+        float pixelsPerSolarRadiusDoubled = (float) (textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
+        if (textRenderer == null || pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
+            oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
+
+            float cfontsize = pixelsPerSolarRadiusDoubled;
+            cfontsize = cfontsize < 10 ? 10 : cfontsize;
+            font = font.deriveFont(cfontsize);
+            if (textRenderer != null) {
+                textRenderer.dispose();
+            }
+            textRenderer = new TextRenderer(font, true, true);
+            textRenderer.setUseVertexArrays(true);
+            //textRenderer.setSmoothing(false);
+            textRenderer.setColor(Color.WHITE);
+        }
+
         GL3DMat4d cameraMatrix = activeCamera.getLocalRotation().toMatrix();
 
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            gl.glColor3f(1, 1, 0);
-            float pixelsPerSolarRadiusDoubled = (float) (textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
-            if (textRenderer == null || pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
-                oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
-
-                float cfontsize = pixelsPerSolarRadiusDoubled;
-                cfontsize = cfontsize < 10 ? 10 : cfontsize;
-                font = font.deriveFont(cfontsize);
-                if (textRenderer != null) {
-                    textRenderer.dispose();
-                }
-                textRenderer = new TextRenderer(font, true, true);
-                textRenderer.setUseVertexArrays(true);
-                //renderer.setSmoothing(true);
-                textRenderer.setColor(Color.WHITE);
-            }
-
-            if (!followCamera) {
-                drawText(gl);
-            }
+            drawText(gl);
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl, cameraMatrix);
@@ -200,23 +198,29 @@ public class RenderableGrid implements Renderable {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
+    private static String formatStrip(double v) {
+        String txt = String.format("%.1f", v);
+        if (txt.endsWith(".0")) {
+            txt = txt.substring(0, txt.length() - 2);
+        }
+        return txt;
+    }
+
     private void drawText(GL2 gl) {
         float zdist = 0f;
 
         double size = Sun.Radius * 1.06;
         //The scale factor has to be divided by the current font size
-        float textScaleFactor = this.textScale / font.getSize();
+        float textScaleFactor = textScale / font.getSize();
         //Adjust for font size in horizontal and vertical direction (centering the text approximately)
-        float horizontalAdjustment = this.textScale / 2f;
-        float verticalAdjustment = this.textScale / 3f;
+        float horizontalAdjustment = textScale / 2f;
+        float verticalAdjustment = textScale / 3f;
 
         textRenderer.begin3DRendering();
         for (double phi = 0; phi <= 90; phi += latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = String.format("%.1f", phi);
-            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
-                txt = txt.substring(0, txt.length() - 2);
-            }
+            String txt = formatStrip(phi);
+
             textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != 90) {
                 textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
@@ -224,10 +228,8 @@ public class RenderableGrid implements Renderable {
         }
         for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
-            String txt = String.format("%.1f", phi);
-            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
-                txt = txt.substring(0, txt.length() - 2);
-            }
+            String txt = formatStrip(phi);
+
             textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != -90) {
                 textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
@@ -238,11 +240,9 @@ public class RenderableGrid implements Renderable {
         size = Sun.Radius * 1.02;
 
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
-            String txt = String.format("%.1f", theta);
-            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
-                txt = txt.substring(0, txt.length() - 2);
-            }
             double angle = (90 - theta) * Math.PI / 180.;
+            String txt = formatStrip(theta);
+
             gl.glPushMatrix();
             {
                 gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
@@ -256,11 +256,8 @@ public class RenderableGrid implements Renderable {
         }
 
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
-            String txt = String.format("%.1f", theta);
-            if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
-                txt = txt.substring(0, txt.length() - 2);
-            }
             double angle = (90 - theta) * Math.PI / 180.;
+            String txt = formatStrip(theta);
 
             gl.glPushMatrix();
             {
@@ -284,13 +281,13 @@ public class RenderableGrid implements Renderable {
             positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
             positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
             if (i % 2 == 0) {
-                colorBuffer.put(this.firstColor.getRed() / 255f);
-                colorBuffer.put(this.firstColor.getGreen() / 255f);
-                colorBuffer.put(this.firstColor.getBlue() / 255f);
+                colorBuffer.put(firstColor.getRed() / 255f);
+                colorBuffer.put(firstColor.getGreen() / 255f);
+                colorBuffer.put(firstColor.getBlue() / 255f);
             } else {
-                colorBuffer.put(this.secondColor.getRed() / 255f);
-                colorBuffer.put(this.secondColor.getGreen() / 255f);
-                colorBuffer.put(this.secondColor.getBlue() / 255f);
+                colorBuffer.put(secondColor.getRed() / 255f);
+                colorBuffer.put(secondColor.getGreen() / 255f);
+                colorBuffer.put(secondColor.getBlue() / 255f);
             }
         }
 
