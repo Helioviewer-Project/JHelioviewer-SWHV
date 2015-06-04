@@ -175,11 +175,9 @@ public class LayersModel {
         view.setImageLayer(new RenderableImageLayer(view));
         layers.add(view);
 
-        // the order of next four important
         fireLayerAdded(view);
         setActiveView(view);
 
-        LinkedMovieManager.pauseLinkedMovies();
         LinkedMovieManager.linkMovie(view);
     }
 
@@ -239,7 +237,6 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(AbstractView view) {
-        LinkedMovieManager.pauseLinkedMovies();
         LinkedMovieManager.unlinkMovie(view);
 
         int index = layers.indexOf(view);

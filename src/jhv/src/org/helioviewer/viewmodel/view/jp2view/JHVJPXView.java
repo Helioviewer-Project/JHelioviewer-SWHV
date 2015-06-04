@@ -61,6 +61,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     }
 
     // to be accessed only from LinkedMovieManager
+    @Override
     public void setCurrentFrame(ImmutableDateTime time) {
         if (time == null)
             return;
@@ -164,6 +165,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     }
 
     // to be accessed only from LinkedMovieManager
+    @Override
     public void pauseMovie() {
         if (!isMoviePlaying())
             return;
@@ -175,6 +177,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     }
 
     // to be accessed only from LinkedMovieManager
+    @Override
     public void playMovie() {
         if (isMoviePlaying() || getMaximumFrameNumber() <= 0)
             return;
@@ -190,7 +193,8 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     }
 
     /* accessed from reader thread */
-    boolean isMoviePlaying() {
+    @Override
+    public boolean isMoviePlaying() {
         return render != null && render.isMovieMode();
     }
 
