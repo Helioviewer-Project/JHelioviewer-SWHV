@@ -21,7 +21,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableTimeStamp implements Renderable {
 
     private Font font;
-    private float baseFontSize = 20;
+    private float baseFontSize = 16;
     private float fontSize;
     private TextRenderer textRenderer;
 
@@ -64,9 +64,6 @@ public class RenderableTimeStamp implements Renderable {
         textRenderer.beginRendering(sx * Displayer.getViewportWidth(), sy * Displayer.getViewportHeight(), true);
         textRenderer.draw(TimeUtils.utcDateFormat.format(Displayer.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
         textRenderer.endRendering();
-    }
-
-    private void drawText(GL2 gl) {
     }
 
     @Override
