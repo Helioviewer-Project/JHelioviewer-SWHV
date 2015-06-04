@@ -9,9 +9,9 @@ import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.util.Date;
 
+import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
@@ -82,7 +82,9 @@ public class RenderableGrid implements Renderable {
                 float cfontsize = pixelsPerSolarRadiusDoubled;
                 cfontsize = cfontsize < 10 ? 10 : cfontsize;
                 font = font.deriveFont(cfontsize);
-
+                if (textRenderer != null) {
+                    textRenderer.dispose();
+                }
                 textRenderer = new TextRenderer(font, true, true);
                 textRenderer.setUseVertexArrays(true);
                 //renderer.setSmoothing(true);
