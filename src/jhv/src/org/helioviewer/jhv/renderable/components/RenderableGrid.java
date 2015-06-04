@@ -19,6 +19,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -35,7 +36,7 @@ public class RenderableGrid implements Renderable {
     private Font font;
     private TextRenderer textRenderer;
     // the height of the text in solar radii
-    private final float textScale = 0.07f;
+    private final float textScale = 0.08f;
 
     private final RenderableType renderableType;
     private final Component optionsPanel;
@@ -80,7 +81,9 @@ public class RenderableGrid implements Renderable {
             if (textRenderer != null) {
                 textRenderer.dispose();
             }
-            textRenderer = new TextRenderer(font, true, true);
+
+            boolean antiAlias = GLInfo.pixelScale[1] == 1 ? false : true;
+            textRenderer = new TextRenderer(font, antiAlias, antiAlias, null, true);
             textRenderer.setUseVertexArrays(true);
             //textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
@@ -200,7 +203,7 @@ public class RenderableGrid implements Renderable {
 
     private static String formatStrip(double v) {
         String txt = String.format("%.1f", v);
-        if (txt.endsWith(".0")) {
+        if (txt.endsWith("0")) {
             txt = txt.substring(0, txt.length() - 2);
         }
         return txt;
