@@ -85,7 +85,7 @@ public class LinkedMovieManager {
      * Updates all linked movies according to the current frame of the master
      * frame.
      */
-    public static void updateCurrentFrameToMaster(View view) {
+    public static void requestMasterSync(View view) {
         if (masterView == null || view != masterView)
             return;
 
