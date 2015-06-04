@@ -171,8 +171,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             setPlaying(false, false);
 
             // reset timeSlider
-            cacheStatusChanged(activeView, false, 0);
-            cacheStatusChanged(activeView, true, 0);
+            timeSlider.setPartialCachedUntil(0);
+            timeSlider.setCompleteCachedUntil(0);
             timeSlider.setMaximum(0);
             timeSlider.setValue(0);
 
@@ -182,6 +182,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         activeView = (MovieView) view;
 
+        timeSlider.setPartialCachedUntil(activeView.getImageCacheStatus().getImageCachedPartiallyUntil());
+        timeSlider.setCompleteCachedUntil(activeView.getImageCacheStatus().getImageCachedCompletelyUntil());
         timeSlider.setMaximum(activeView.getMaximumFrameNumber());
         timeSlider.setValue(activeView.getCurrentFrameNumber());
 
