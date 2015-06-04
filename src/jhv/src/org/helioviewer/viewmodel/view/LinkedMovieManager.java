@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  * Class managing all linked movies.
@@ -40,7 +39,7 @@ public class LinkedMovieManager {
         MovieView movieView = (MovieView) view;
         if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
-            updateMaster();
+            resetState();
         }
     }
 
@@ -57,7 +56,8 @@ public class LinkedMovieManager {
         MovieView movieView = (MovieView) view;
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
-            updateMaster();
+            resetState();
+            movieView.pauseMovie();
         }
     }
 
@@ -65,8 +65,8 @@ public class LinkedMovieManager {
      * Plays the set of linked movies.
      */
     public static void playLinkedMovies() {
-        if (masterView instanceof JHVJPXView) {
-            ((JHVJPXView) masterView).playMovie();
+        if (masterView != null) {
+            masterView.playMovie();
             MoviePanel.playStateChanged(true);
         }
     }
@@ -75,8 +75,8 @@ public class LinkedMovieManager {
      * Pauses the set of linked movies.
      */
     public static void pauseLinkedMovies() {
-        if (masterView instanceof JHVJPXView) {
-            ((JHVJPXView) masterView).pauseMovie();
+        if (masterView != null) {
+            masterView.pauseMovie();
             MoviePanel.playStateChanged(false);
         }
     }
@@ -92,7 +92,7 @@ public class LinkedMovieManager {
         ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
         for (MovieView movieView : linkedMovies) {
             if (movieView != masterView) {
-                ((JHVJPXView) movieView).setCurrentFrame(masterTime);
+                movieView.setCurrentFrame(masterTime);
             }
         }
     }
@@ -105,13 +105,22 @@ public class LinkedMovieManager {
      */
     public static void setCurrentFrame(ImmutableDateTime dateTime) {
         for (MovieView movieView : linkedMovies) {
-            ((JHVJPXView) movieView).setCurrentFrame(dateTime);
+            movieView.setCurrentFrame(dateTime);
         }
     }
 
     public static void setCurrentFrame(MovieView view, int frameNumber) {
         frameNumber = Math.max(0, Math.min(view.getMaximumFrameNumber(), frameNumber));
         setCurrentFrame(view.getFrameDateTime(frameNumber));
+    }
+
+    private static void resetState() {
+        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
+        if (wasPlaying)
+            pauseLinkedMovies();
+        updateMaster();
+        if (wasPlaying)
+            playLinkedMovies();
     }
 
     /**
@@ -135,9 +144,9 @@ public class LinkedMovieManager {
         MovieView minimalIntervalView = null;
 
         for (MovieView movie : linkedMovies) {
-            int lastAvailableFrame = movie.getMaximumFrameNumber();
-            long interval = movie.getFrameDateTime(lastAvailableFrame).getMillis() - movie.getFrameDateTime(0).getMillis();
-            interval /= (lastAvailableFrame + 1);
+            int nframes = movie.getMaximumFrameNumber();
+            long interval = movie.getFrameDateTime(nframes).getMillis() - movie.getFrameDateTime(0).getMillis();
+            interval /= (nframes + 1);
 
             if (interval < minimalInterval) {
                 minimalInterval = interval;

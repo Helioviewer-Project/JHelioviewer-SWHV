@@ -175,4 +175,14 @@ public interface MovieView extends View {
      */
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
 
+    // <!- only for LinkedMovieManager
+    public boolean isMoviePlaying();
+
+    public void playMovie();
+
+    public void pauseMovie();
+
+    public void setCurrentFrame(ImmutableDateTime time);
+    // -->
+
 }
