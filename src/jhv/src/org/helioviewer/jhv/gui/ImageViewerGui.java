@@ -45,6 +45,8 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableGridType;
 import org.helioviewer.jhv.renderable.components.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.components.RenderableSolarAxesType;
+import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
+import org.helioviewer.jhv.renderable.components.RenderableTimeStampType;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 import org.helioviewer.viewmodel.view.ComponentView;
@@ -125,10 +127,11 @@ public class ImageViewerGui {
         observationDialog.addUserInterface("Image data", imageObservationPanel);
 
         renderableContainer = new RenderableContainer();
-        renderableContainer.addRenderable(new RenderableSolarAxes(new RenderableSolarAxesType("Solar Axes")));
+        renderableContainer.addRenderable(new RenderableSolarAxes(new RenderableSolarAxesType("Solar axes")));
         renderableContainer.addRenderable(new RenderableGrid(new RenderableGridType("Grids"), false));
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
+        renderableContainer.addRenderable(new RenderableTimeStamp(new RenderableTimeStampType("Timestamp")));
 
         RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
