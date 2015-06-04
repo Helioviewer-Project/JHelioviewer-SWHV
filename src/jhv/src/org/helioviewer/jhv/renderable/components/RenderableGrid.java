@@ -76,7 +76,7 @@ public class RenderableGrid implements Renderable {
         {
             gl.glColor3f(1, 1, 0);
             float pixelsPerSolarRadiusDoubled = (float) (textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
-            if (pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
+            if (textRenderer == null || pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
                 oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
 
                 float cfontsize = pixelsPerSolarRadiusDoubled;
@@ -375,7 +375,10 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void dispose(GL2 gl) {
-        textRenderer.dispose();
+        if (textRenderer != null) {
+            textRenderer.dispose();
+            textRenderer = null;
+        }
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
         oldPixelsPerSolarRadiusDoubled = -1;

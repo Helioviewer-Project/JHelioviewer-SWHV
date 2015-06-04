@@ -117,8 +117,10 @@ public class RenderableTimeStamp implements Renderable {
 
     @Override
     public void dispose(GL2 gl) {
-        textRenderer.dispose();
-        textRenderer = null;
+        if (textRenderer != null) {
+            textRenderer.dispose();
+            textRenderer = null;
+        }
     }
 
 }
