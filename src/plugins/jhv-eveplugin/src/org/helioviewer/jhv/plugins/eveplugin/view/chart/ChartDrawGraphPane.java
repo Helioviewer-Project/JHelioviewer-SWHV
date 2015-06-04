@@ -85,6 +85,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private boolean updateRequestReceived;
     private final Timer timer;
     private final List<DrawableType> zOrderList = new ArrayList<DrawableType>(EnumSet.allOf(DrawableType.class));
+    private boolean movieLineRequest = false;
+    private boolean forceRedrawGraph = false;
 
     public ChartDrawGraphPane() {
         updateRequestReceived = false;
@@ -145,7 +147,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int width = sx * getWidth();
         int height = sy * getHeight();
 
-        if (width > 0 && height > 0 && sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width) {
+        if (width > 0 && height > 0 && sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width && (!movieLineRequest || forceRedrawGraph)) {
             if (width != lastWidth || height != lastHeight) {
                 screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
                 lastWidth = width;
@@ -175,6 +177,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.dispose();
         }
         this.repaint();
+        movieLineRequest = false;
+        forceRedrawGraph = false;
         // Log.info("Run time: " + (System.currentTimeMillis() - start));
     }
 
@@ -685,6 +689,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void drawRequest() {
         setTwoAxisInformation();
+        forceRedrawGraph = true;
         updateGraph();
     }
 
@@ -694,6 +699,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             movieTimestamp = time;
             if (!TimeIntervalLockModel.getInstance().isLocked()) {
                 if (updateMovieLineInformation()) {
+                    movieLineRequest = true;
                     updateGraph();
                 }
             }
