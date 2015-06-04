@@ -110,7 +110,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-        LinkedMovieManager.updateCurrentFrameToMaster(view);
+        LinkedMovieManager.requestMasterSync(view);
 
         if (view == LayersModel.getActiveView() && dateTime != null) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());

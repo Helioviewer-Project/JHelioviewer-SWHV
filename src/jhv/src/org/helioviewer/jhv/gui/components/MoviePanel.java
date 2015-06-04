@@ -162,10 +162,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        setView(view);
-    }
-
-    private void setView(AbstractView view) {
         if (!(view instanceof MovieView)) {
             setEnabled(false);
             setPlaying(false, false);
@@ -186,6 +182,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setCompleteCachedUntil(activeView.getImageCacheStatus().getImageCachedCompletelyUntil());
         timeSlider.setMaximum(activeView.getMaximumFrameNumber());
         timeSlider.setValue(activeView.getCurrentFrameNumber());
+
+        updateMovieSpeed();
+        activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
 
         setEnabled(true);
     }
