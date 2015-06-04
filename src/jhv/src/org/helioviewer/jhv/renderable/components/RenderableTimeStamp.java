@@ -55,7 +55,9 @@ public class RenderableTimeStamp implements Renderable {
         if (textRenderer == null || fontSize != sy * baseFontSize) {
             fontSize = sy * baseFontSize;
             font = font.deriveFont(fontSize);
-
+            if (textRenderer != null) {
+                textRenderer.dispose();
+            }
             textRenderer = new TextRenderer(font, true, true);
             textRenderer.setUseVertexArrays(true);
             textRenderer.setColor(Color.WHITE);
