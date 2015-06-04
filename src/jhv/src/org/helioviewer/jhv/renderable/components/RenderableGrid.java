@@ -30,7 +30,7 @@ public class RenderableGrid implements Renderable {
     private float lonstepDegrees = 13.2f;
     private float latstepDegrees = 20.f;
     private Font font;
-    private TextRenderer renderer;
+    private TextRenderer textRenderer;
     //The height of the text in solar radii
     private final float textScale = 0.07f;
     private final boolean followCamera;
@@ -49,10 +49,10 @@ public class RenderableGrid implements Renderable {
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException e) {
-            Log.warn("Font Not loaded correctly, fallback to default");
+            Log.warn("Font not loaded correctly, fallback to default");
             font = new Font("SansSerif", Font.PLAIN, 20);
         } catch (IOException e) {
-            Log.warn("Font Not loaded correctly, fallback to default");
+            Log.warn("Font not loaded correctly, fallback to default");
             font = new Font("SansSerif", Font.PLAIN, 20);
         }
 
@@ -83,10 +83,10 @@ public class RenderableGrid implements Renderable {
                 cfontsize = cfontsize < 10 ? 10 : cfontsize;
                 font = font.deriveFont(cfontsize);
 
-                renderer = new TextRenderer(font, true, true);
-                renderer.setUseVertexArrays(true);
+                textRenderer = new TextRenderer(font, true, true);
+                textRenderer.setUseVertexArrays(true);
                 //renderer.setSmoothing(true);
-                renderer.setColor(Color.WHITE);
+                textRenderer.setColor(Color.WHITE);
             }
 
             if (!followCamera) {
@@ -208,16 +208,16 @@ public class RenderableGrid implements Renderable {
         float horizontalAdjustment = this.textScale / 2f;
         float verticalAdjustment = this.textScale / 3f;
 
-        renderer.begin3DRendering();
+        textRenderer.begin3DRendering();
         for (double phi = 0; phi <= 90; phi += latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = String.format("%.1f", phi);
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+            textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != 90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+                textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             }
         }
         for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
@@ -226,12 +226,12 @@ public class RenderableGrid implements Renderable {
             if (txt.substring(txt.length() - 1, txt.length()).equals("0")) {
                 txt = txt.substring(0, txt.length() - 2);
             }
-            renderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+            textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             if (phi != -90) {
-                renderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+                textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
             }
         }
-        renderer.end3DRendering();
+        textRenderer.end3DRendering();
 
         size = Sun.Radius * 1.02;
 
@@ -246,9 +246,9 @@ public class RenderableGrid implements Renderable {
                 gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
                 gl.glRotatef((float) theta, 0, 1, 0);
 
-                renderer.begin3DRendering();
-                renderer.draw3D(txt, 0, 0, 0, textScaleFactor);
-                renderer.end3DRendering();
+                textRenderer.begin3DRendering();
+                textRenderer.draw3D(txt, 0, 0, 0, textScaleFactor);
+                textRenderer.end3DRendering();
             }
             gl.glPopMatrix();
         }
@@ -265,9 +265,9 @@ public class RenderableGrid implements Renderable {
                 gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
                 gl.glRotatef((float) theta, 0, 1, 0);
 
-                renderer.begin3DRendering();
-                renderer.draw3D(txt, 0, 0, 0, textScaleFactor);
-                renderer.end3DRendering();
+                textRenderer.begin3DRendering();
+                textRenderer.draw3D(txt, 0, 0, 0, textScaleFactor);
+                textRenderer.end3DRendering();
             }
             gl.glPopMatrix();
         }
@@ -375,7 +375,7 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void dispose(GL2 gl) {
-        renderer.dispose();
+        textRenderer.dispose();
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
         oldPixelsPerSolarRadiusDoubled = -1;
