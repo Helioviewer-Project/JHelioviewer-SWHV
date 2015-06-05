@@ -71,7 +71,8 @@ public class RenderableGrid implements Renderable {
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
 
-        float pixelsPerSolarRadiusDoubled = (float) (textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
+        // cameraWidth ever changes so slightly with distance to Sun
+        float pixelsPerSolarRadiusDoubled = (float) Math.round(textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
         if (textRenderer == null || pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
             oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
 
