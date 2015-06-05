@@ -60,7 +60,7 @@ public class RenderableGrid implements Renderable {
         optionsPanel = new RenderableGridOptionsPanel(this);
     }
 
-    private float oldPixelsPerSolarRadiusDoubled = -1;
+    private int oldPixelsPerSolarRadius = -1;
     private int positionBufferID;
     private int colorBufferID;
 
@@ -71,13 +71,12 @@ public class RenderableGrid implements Renderable {
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
 
-        // cameraWidth ever changes so slightly with distance to Sun
-        float pixelsPerSolarRadiusDoubled = (float) Math.round(textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
-        if (textRenderer == null || pixelsPerSolarRadiusDoubled != oldPixelsPerSolarRadiusDoubled) {
-            oldPixelsPerSolarRadiusDoubled = pixelsPerSolarRadiusDoubled;
+        // cameraWidth ever changes so slightly with distance to Sun; 4x pix/Rsun
+        int pixelsPerSolarRadius = (int) (2 * textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
+        if (textRenderer == null || pixelsPerSolarRadius != oldPixelsPerSolarRadius) {
+            oldPixelsPerSolarRadius = pixelsPerSolarRadius;
 
-            float cfontsize = pixelsPerSolarRadiusDoubled;
-            cfontsize = cfontsize < 10 ? 10 : cfontsize;
+            float cfontsize = pixelsPerSolarRadius < 10 ? 10 : pixelsPerSolarRadius;
             font = font.deriveFont(cfontsize);
             if (textRenderer != null) {
                 textRenderer.dispose();
@@ -86,7 +85,7 @@ public class RenderableGrid implements Renderable {
             boolean antiAlias = GLInfo.pixelScale[1] == 1 ? false : true;
             textRenderer = new TextRenderer(font, antiAlias, antiAlias, null, true);
             textRenderer.setUseVertexArrays(true);
-            //textRenderer.setSmoothing(false);
+            // textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
         }
 
@@ -214,9 +213,9 @@ public class RenderableGrid implements Renderable {
         float zdist = 0f;
 
         double size = Sun.Radius * 1.06;
-        //The scale factor has to be divided by the current font size
+        // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / font.getSize();
-        //Adjust for font size in horizontal and vertical direction (centering the text approximately)
+        // adjust for font size in horizontal and vertical direction (centering the text approximately)
         float horizontalAdjustment = textScale / 2f;
         float verticalAdjustment = textScale / 3f;
 
@@ -384,7 +383,7 @@ public class RenderableGrid implements Renderable {
         }
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
-        oldPixelsPerSolarRadiusDoubled = -1;
+        oldPixelsPerSolarRadius = -1;
     }
 
 }
