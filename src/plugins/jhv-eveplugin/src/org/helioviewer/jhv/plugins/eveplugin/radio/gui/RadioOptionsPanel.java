@@ -31,7 +31,7 @@ public class RadioOptionsPanel extends JPanel implements ActionListener {
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
         lut = new JComboBox(lutMap.keySet().toArray());
-        lut.setSelectedItem("Rainbow 2");
+        lut.setSelectedItem(ColorLookupModel.getInstance().getLut().getName());
         lut.addActionListener(this);
 
         add(lut);
