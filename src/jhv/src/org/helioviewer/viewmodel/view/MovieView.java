@@ -21,11 +21,6 @@ import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
  * TimedMovieView should automatically skip frames to keep its speed. On the
  * other hand, if the time gaps between frames vary, the TimedMovieView should
  * adjust its frame rate as well.
- * <p>
- * Apart from that, timed movie views can be linked together, so that they will
- * be animated simultaneously. This means, that all frames will stay as close
- * together as possible. For further information about linked movies, also see
- * {@link LinkedMovieManager}.
  *
  * @author Markus Langenberg
  */
@@ -175,7 +170,7 @@ public interface MovieView extends View {
      */
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
 
-    // <!- only for LinkedMovieManager
+    // <!- only for Displayer
     public boolean isMoviePlaying();
 
     public void playMovie();
