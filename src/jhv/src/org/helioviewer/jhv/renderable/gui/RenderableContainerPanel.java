@@ -116,6 +116,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 7 + 2));
+        jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.setBorder(BorderFactory.createTitledBorder(""));
@@ -131,6 +132,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
+
         grid.getColumnModel().getColumn(VISIBLEROW).setCellRenderer(new RenderableVisibleCellRenderer());
         grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH + 3);
         grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH + 3);
@@ -227,8 +229,9 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     private void setOptionsPanel(Component cmp) {
         optionsPanelWrapper.removeAll();
-        if (cmp != null)
+        if (cmp != null) {
             optionsPanelWrapper.add(cmp, BorderLayout.CENTER);
+        }
         super.revalidate();
         // super.repaint();
     }
