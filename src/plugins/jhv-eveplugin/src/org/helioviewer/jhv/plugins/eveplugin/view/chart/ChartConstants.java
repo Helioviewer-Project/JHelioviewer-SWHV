@@ -32,7 +32,7 @@ public class ChartConstants {
     public static final Color UNSELECTED_AREA_COLOR = new Color(200, 200, 200);
     public static final Color LABEL_TEXT_COLOR = Color.BLACK;
 
-    public static final Color MOVIE_FRAME_COLOR = Color.GREEN;
+    public static final Color MOVIE_FRAME_COLOR = Color.BLACK;
     public static final Color MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
 
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,##0.00");
