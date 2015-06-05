@@ -6,9 +6,9 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
@@ -178,7 +178,7 @@ public class LayersModel {
         fireLayerAdded(view);
         setActiveView(view);
 
-        LinkedMovieManager.linkMovie(view);
+        Displayer.linkMovie(view);
     }
 
     // special
@@ -237,7 +237,7 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(AbstractView view) {
-        LinkedMovieManager.unlinkMovie(view);
+        Displayer.unlinkMovie(view);
 
         int index = layers.indexOf(view);
 

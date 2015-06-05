@@ -207,9 +207,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
             movieWriter = ToolFactory.makeWriter(moviePath);
             movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, canvas.getWidth(), canvas.getHeight());
 
-            LinkedMovieManager.pauseLinkedMovies();
-            LinkedMovieManager.setCurrentFrame(jpxView, 0);
-            LinkedMovieManager.playLinkedMovies();
+            Displayer.pauseMovies();
+            Displayer.setTime(jpxView.getFrameDateTime(0));
+            Displayer.playMovies();
         } else {
             exportMovieDialog.fail();
             exportMovieDialog = null;
