@@ -60,7 +60,7 @@ public class RenderableGrid implements Renderable {
         optionsPanel = new RenderableGridOptionsPanel(this);
     }
 
-    private int oldPixelsPerSolarRadius = -1;
+    private float oldFontSize = -1;
     private int positionBufferID;
     private int colorBufferID;
 
@@ -73,11 +73,12 @@ public class RenderableGrid implements Renderable {
 
         // cameraWidth ever changes so slightly with distance to Sun; 4x pix/Rsun
         int pixelsPerSolarRadius = (int) (2 * textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
-        if (textRenderer == null || pixelsPerSolarRadius != oldPixelsPerSolarRadius) {
-            oldPixelsPerSolarRadius = pixelsPerSolarRadius;
+        float fontSize = Math.max(10, Math.min(288, pixelsPerSolarRadius));
 
-            float cfontsize = pixelsPerSolarRadius < 10 ? 10 : pixelsPerSolarRadius;
-            font = font.deriveFont(cfontsize);
+        if (textRenderer == null || fontSize != oldFontSize) {
+            oldFontSize = fontSize;
+            font = font.deriveFont(fontSize);
+
             if (textRenderer != null) {
                 textRenderer.dispose();
             }
@@ -383,7 +384,7 @@ public class RenderableGrid implements Renderable {
         }
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
-        oldPixelsPerSolarRadius = -1;
+        oldFontSize = -1;
     }
 
 }
