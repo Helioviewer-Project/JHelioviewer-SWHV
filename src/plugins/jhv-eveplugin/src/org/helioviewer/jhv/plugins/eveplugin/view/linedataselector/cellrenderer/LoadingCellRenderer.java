@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -24,6 +25,7 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
             downloadProgressBar.setVisible(element.isDownloading());
             downloadProgressBar.setBorder(LineDateSelectorTablePanel.commonBorder);
             downloadProgressBar.setOpaque(false);
+            downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
             return downloadProgressBar;
         } else {
             JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
