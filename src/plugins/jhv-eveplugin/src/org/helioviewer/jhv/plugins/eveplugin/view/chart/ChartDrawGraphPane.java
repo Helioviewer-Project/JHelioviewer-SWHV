@@ -5,10 +5,14 @@ import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -110,6 +114,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     private void initVisualComponents() {
         setOpaque(true);
+        setDoubleBuffered(false);
     }
 
     @Override
@@ -149,7 +154,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (width > 0 && height > 0 && sy * (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace() + 1) < height && sx * (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + 1) < width && (!movieLineRequest || forceRedrawGraph)) {
             if (width != lastWidth || height != lastHeight) {
-                screenImage = new BufferedImage(width, height, BufferedImage.OPAQUE);
+                GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                GraphicsDevice device = env.getDefaultScreenDevice();
+                GraphicsConfiguration config = device.getDefaultConfiguration();
+
+                screenImage = config.createCompatibleImage(width, height, Transparency.OPAQUE);
                 lastWidth = width;
                 lastHeight = height;
             }
