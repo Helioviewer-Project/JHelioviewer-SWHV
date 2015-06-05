@@ -92,9 +92,17 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-        requestMasterSync(view);
 
-        if (view == LayersModel.getActiveView() && dateTime != null) {
+        // sync linked movies to master
+        if (view == masterView) {
+            for (MovieView movieView : linkedMovies) {
+                if (movieView != masterView) {
+                    movieView.setCurrentFrame(dateTime);
+                }
+            }
+        }
+
+        if (view == LayersModel.getActiveView()) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             MoviePanel.setFrameSlider(view);
 
@@ -110,6 +118,26 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
     private static MovieView masterView;
+
+    public static void playMovies() {
+        if (masterView != null) {
+            masterView.playMovie();
+            MoviePanel.playStateChanged(true);
+        }
+    }
+
+    public static void pauseMovies() {
+        if (masterView != null) {
+            masterView.pauseMovie();
+            MoviePanel.playStateChanged(false);
+        }
+    }
+
+    public static void setTime(ImmutableDateTime dateTime) {
+        for (MovieView movieView : linkedMovies) {
+            movieView.setCurrentFrame(dateTime);
+        }
+    }
 
     /**
      * Adds the given movie view to the set of linked movies.
@@ -143,38 +171,6 @@ public class Displayer implements JHVEventHighlightListener {
             linkedMovies.remove(movieView);
             resetState();
             movieView.pauseMovie();
-        }
-    }
-
-    public static void playMovies() {
-        if (masterView != null) {
-            masterView.playMovie();
-            MoviePanel.playStateChanged(true);
-        }
-    }
-
-    public static void pauseMovies() {
-        if (masterView != null) {
-            masterView.pauseMovie();
-            MoviePanel.playStateChanged(false);
-        }
-    }
-
-    public static void setTime(ImmutableDateTime dateTime) {
-        for (MovieView movieView : linkedMovies) {
-            movieView.setCurrentFrame(dateTime);
-        }
-    }
-
-    private static void requestMasterSync(JHVJP2View view) {
-        if (masterView == null || view != masterView)
-            return;
-
-        ImmutableDateTime masterTime = masterView.getCurrentFrameDateTime();
-        for (MovieView movieView : linkedMovies) {
-            if (movieView != masterView) {
-                movieView.setCurrentFrame(masterTime);
-            }
         }
     }
 
