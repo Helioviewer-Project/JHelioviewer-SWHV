@@ -38,6 +38,7 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
@@ -48,7 +49,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 /**
@@ -461,7 +461,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long timestamp = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime()) / 1000;
 
-        LinkedMovieManager.setCurrentFrame(new ImmutableDateTime(timestamp));
+        Displayer.setTime(new ImmutableDateTime(timestamp));
     }
 
     // Mouse Input Listener

@@ -33,6 +33,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -40,7 +41,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.LinkedMovieManager;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 
@@ -313,8 +313,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     private static void jumpToFrameNumber(int frame) {
+        frame = Math.max(0, Math.min(activeView.getMaximumFrameNumber(), frame));
+        Displayer.setTime(activeView.getFrameDateTime(frame));
         timeSlider.setValue(frame);
-        LinkedMovieManager.setCurrentFrame(activeView, frame);
     }
 
     /**
@@ -332,13 +333,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             playPauseButton.setIcon(playIcon);
             playPauseButton.setToolTipText("Play movie");
             if (!onlyGUI) {
-                LinkedMovieManager.pauseLinkedMovies();
+                Displayer.pauseMovies();
             }
         } else {
             playPauseButton.setIcon(pauseIcon);
             playPauseButton.setToolTipText("Pause movie");
             if (!onlyGUI) {
-                LinkedMovieManager.playLinkedMovies();
+                Displayer.playMovies();
             }
         }
     }
@@ -446,7 +447,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
         if (isPlaying) {
-            LinkedMovieManager.pauseLinkedMovies();
+            Displayer.pauseMovies();
         }
     }
 
@@ -470,7 +471,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
-            LinkedMovieManager.playLinkedMovies();
+            Displayer.playMovies();
         }
         someoneIsDragging = false;
     }
