@@ -18,8 +18,10 @@ import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_tile;
+import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -32,7 +34,6 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -47,8 +48,6 @@ public class JP2Image {
 
     /** An array of the file extensions this class currently supports */
     public static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
-
-    private static int numJP2Images = 0;
 
     /** This is the URI that uniquely identifies the image. */
     private final URI uri;
@@ -79,6 +78,8 @@ public class JP2Image {
      * function.
      */
     private Kdu_region_compositor compositor = new Kdu_region_compositor();
+
+    private Kdu_thread_env threadEnv;
 
     /** The range of valid quality layers for the image. */
     private Interval<Integer> qLayerRange;
@@ -149,7 +150,15 @@ public class JP2Image {
      * @throws JHV_KduException
      */
     public JP2Image(URI newUri, URI downloadURI) throws IOException, JHV_KduException, Exception {
-        numJP2Images++;
+        try {
+            int numThreads = Kdu_global.Kdu_get_num_processors();
+            threadEnv = new Kdu_thread_env();
+            threadEnv.Create();
+            for (int i = 1; i < numThreads; i++)
+                threadEnv.Add_thread();
+        } catch (KduException e) {
+            e.printStackTrace();
+        }
 
         uri = newUri;
         this.downloadURI = downloadURI;
@@ -213,7 +222,6 @@ public class JP2Image {
             // Download the necessary initial data if there isn't any cache file
             // yet
             if ((cache.getCacheFile() == null) || !cache.getCacheFile().exists()) {
-
                 boolean initialDataLoaded = false;
                 int numTries = 0;
 
@@ -291,7 +299,7 @@ public class JP2Image {
             // I don't know if I should be using the codestream in a persistent
             // mode or not...
             compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
-            compositor.Set_thread_env(null, 0);
+            compositor.Set_thread_env(threadEnv, 0);
 
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
@@ -493,7 +501,6 @@ public class JP2Image {
      * {@link #abolish()}.
      */
     public synchronized void addReference() {
-        JHV_Kdu_thread_env.getSingletonInstance().updateNumThreads();
         referenceCounter++;
     }
 
@@ -509,13 +516,14 @@ public class JP2Image {
         if (referenceCounter < 0) {
             throw new IllegalStateException("JP2Image abolished more than once: " + uri);
         }
-        numJP2Images--;
 
         APIResponseDump.getSingletonInstance().removeResponse(uri);
 
         try {
             if (compositor != null) {
-                compositor.Set_thread_env(null, 0);
+                threadEnv.Terminate(0, true);
+                threadEnv.Native_destroy();
+
                 compositor.Remove_compositing_layer(-1, true);
                 compositor.Native_destroy();
             }
@@ -635,15 +643,6 @@ public class JP2Image {
     /** Returns the jpx source */
     Jpx_source getJpxSource() {
         return jpxSrc;
-    }
-
-    /**
-     * Returns the number of JP2Image instances currently in use.
-     *
-     * @return Number of JP2Image instances currently in use
-     */
-    static int numJP2ImagesInUse() {
-        return numJP2Images;
     }
 
 }
