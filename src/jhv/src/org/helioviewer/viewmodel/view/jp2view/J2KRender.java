@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
@@ -243,11 +242,6 @@ class J2KRender implements Runnable {
         parentImageRef.getLock().lock();
 
         try {
-            if (JP2Image.numJP2ImagesInUse() == 1) {
-                compositorRef.Set_thread_env(JHV_Kdu_thread_env.getSingletonInstance(), 0);
-            } else {
-                compositorRef.Set_thread_env(null, 0);
-            }
 
             // see TODO below
             // compositorRef.Refresh();
