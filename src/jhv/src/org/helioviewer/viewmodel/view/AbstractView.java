@@ -203,7 +203,7 @@ public abstract class AbstractView implements View {
     }
 
     public float getTruncation() {
-        return this.truncation;
+        return truncation;
     }
 
     public float getOpacity() {
@@ -212,6 +212,10 @@ public abstract class AbstractView implements View {
 
     public float getContrast() {
         return contrast;
+    }
+
+    public float getSharpen() {
+        return sharpenWeighting;
     }
 
     public float getGamma() {
