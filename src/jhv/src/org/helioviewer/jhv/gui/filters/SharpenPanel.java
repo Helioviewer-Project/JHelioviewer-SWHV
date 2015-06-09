@@ -9,6 +9,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Panel containing a slider for changing the weighting of the sharpening.
@@ -61,6 +62,12 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
      */
     void setValue(float sharpen) {
         sharpeningSlider.setValue((int) (sharpen * 10.f));
+    }
+
+    @Override
+    public void setJP2View(AbstractView jp2view) {
+        super.setJP2View(jp2view);
+        setValue(jp2view.getSharpen());
     }
 
     @Override
