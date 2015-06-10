@@ -234,7 +234,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         for (Set<DrawableElement> des : drawableElements.values()) {
             for (DrawableElement de : des) {
                 if (de.getLastDateWithData() != null) {
-                    if (tempLastDate == null || de.getLastDateWithData().before(lastDate)) {
+                    if (tempLastDate == null || de.getLastDateWithData().before(tempLastDate)) {
                         tempLastDate = de.getLastDateWithData();
                     }
                 }
@@ -273,8 +273,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        if (view == null)
+        if (view == null) {
             fireRedrawRequestMovieFrameChanged(null);
+        }
     }
 
     private Interval<Date> makeCompleteDay(final Interval<Date> interval) {
