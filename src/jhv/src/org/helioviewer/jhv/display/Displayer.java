@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import javax.swing.Timer;
 
@@ -14,10 +13,7 @@ import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Displayer implements JHVEventHighlightListener {
@@ -93,15 +89,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
-        // sync linked movies to master
-        if (view == masterView) {
-            for (MovieView movieView : linkedMovies) {
-                if (movieView != masterView) {
-                    movieView.setCurrentFrame(dateTime);
-                }
-            }
-            MoviePanel.setFrameSlider(masterView);
-        }
+        LayersModel.syncMaster(view, dateTime);
 
         if (view == LayersModel.getActiveView()) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
@@ -114,79 +102,6 @@ public class Displayer implements JHVEventHighlightListener {
             }
         }
         display();
-    }
-
-    private static final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
-    private static MovieView masterView;
-
-    public static void setMasterMovie(AbstractView view) {
-        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
-
-        if (wasPlaying)
-            pauseMovies();
-
-        if (view instanceof MovieView) {
-            masterView = (MovieView) view;
-        } else
-            masterView = null;
-
-        MoviePanel.getSingletonInstance().setActiveMovie(masterView);
-
-        if (wasPlaying)
-            playMovies();
-    }
-
-    public static void playMovies() {
-        if (masterView != null) {
-            masterView.playMovie();
-            MoviePanel.playStateChanged(true);
-        }
-    }
-
-    public static void pauseMovies() {
-        if (masterView != null) {
-            masterView.pauseMovie();
-            MoviePanel.playStateChanged(false);
-        }
-    }
-
-    public static void setTime(ImmutableDateTime dateTime) {
-        for (MovieView movieView : linkedMovies) {
-            movieView.setCurrentFrame(dateTime);
-        }
-    }
-
-    /**
-     * Adds the given movie view to the set of linked movies.
-     *
-     * @param movieView
-     *            View to add to the set of linked movies.
-     */
-    public static void linkMovie(AbstractView view) {
-        if (!(view instanceof MovieView))
-            return;
-
-        MovieView movieView = (MovieView) view;
-        if (!linkedMovies.contains(movieView)) {
-            linkedMovies.add(movieView);
-        }
-    }
-
-    /**
-     * Removes the given movie view from the set of linked movies.
-     *
-     * @param movieView
-     *            View to remove from the set of linked movies.
-     */
-    public static void unlinkMovie(AbstractView view) {
-        if (!(view instanceof MovieView))
-            return;
-
-        MovieView movieView = (MovieView) view;
-        if (linkedMovies.contains(movieView)) {
-            linkedMovies.remove(movieView);
-            movieView.pauseMovie();
-        }
     }
 
     public static Date getLastUpdatedTimestamp() {
