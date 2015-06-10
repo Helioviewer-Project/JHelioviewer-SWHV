@@ -36,8 +36,6 @@ public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
-    private final LinkedList<DownloadControllerListener> listeners = new LinkedList<DownloadControllerListener>();
-
     private final HashMap<Band, LinkedList<Interval<Date>>> downloadMap = new HashMap<Band, LinkedList<Interval<Date>>>();
 
     private final LineDataSelectorModel selectorModel;
@@ -49,14 +47,6 @@ public class DownloadController {
 
     public static final DownloadController getSingletonInstance() {
         return singletonInstance;
-    }
-
-    public void addListener(final DownloadControllerListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(final DownloadControllerListener listener) {
-        listeners.remove(listener);
     }
 
     public void updateBands(final BandType[] bandTypes, final Interval<Date> interval, final Interval<Date> priorityInterval) {
@@ -160,16 +150,10 @@ public class DownloadController {
     }
 
     private void fireDownloadStarted(final Band band, final Interval<Date> interval) {
-        for (final DownloadControllerListener listener : listeners) {
-            listener.downloadStarted(band, interval);
-        }
         selectorModel.downloadStarted(band);
     }
 
     private void fireDownloadFinished(final Band band, final Interval<Date> interval, final int activeBandDownloads) {
-        for (final DownloadControllerListener listener : listeners) {
-            listener.downloadFinished(band, interval, activeBandDownloads);
-        }
         selectorModel.downloadFinished(band);
     }
 
