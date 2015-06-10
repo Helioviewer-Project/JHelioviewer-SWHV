@@ -119,6 +119,21 @@ public class Displayer implements JHVEventHighlightListener {
     private static final LinkedList<MovieView> linkedMovies = new LinkedList<MovieView>();
     private static MovieView masterView;
 
+    public static void setMasterMovie(AbstractView view) {
+        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
+
+        if (wasPlaying)
+            pauseMovies();
+
+        if (view instanceof MovieView) {
+            masterView = (MovieView) view;
+        } else
+            masterView = null;
+
+        if (wasPlaying)
+            playMovies();
+    }
+
     public static void playMovies() {
         if (masterView != null) {
             masterView.playMovie();
@@ -150,9 +165,8 @@ public class Displayer implements JHVEventHighlightListener {
             return;
 
         MovieView movieView = (MovieView) view;
-        if (movieView.getMaximumFrameNumber() > 0 && !linkedMovies.contains(movieView)) {
+        if (!linkedMovies.contains(movieView)) {
             linkedMovies.add(movieView);
-            resetState();
         }
     }
 
@@ -169,51 +183,8 @@ public class Displayer implements JHVEventHighlightListener {
         MovieView movieView = (MovieView) view;
         if (linkedMovies.contains(movieView)) {
             linkedMovies.remove(movieView);
-            resetState();
             movieView.pauseMovie();
         }
-    }
-
-    private static void resetState() {
-        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
-        if (wasPlaying)
-            pauseMovies();
-        updateMaster();
-        if (wasPlaying)
-            playMovies();
-    }
-
-    /**
-     * Recalculates the master view.
-     *
-     * The master view is the view whose movie is actually playing, whereas all
-     * other movies just jump to the frame closest to the current frame from the
-     * master panel.
-     */
-    private static void updateMaster() {
-        masterView = null;
-
-        if (linkedMovies.isEmpty()) {
-            return;
-        } else if (linkedMovies.size() == 1) {
-            masterView = linkedMovies.element();
-            return;
-        }
-
-        long minimalInterval = Long.MAX_VALUE;
-        MovieView minimalIntervalView = null;
-
-        for (MovieView movie : linkedMovies) {
-            int nframes = movie.getMaximumFrameNumber();
-            long interval = movie.getFrameDateTime(nframes).getMillis() - movie.getFrameDateTime(0).getMillis();
-            interval /= (nframes + 1);
-
-            if (interval < minimalInterval) {
-                minimalInterval = interval;
-                minimalIntervalView = movie;
-            }
-        }
-        masterView = minimalIntervalView;
     }
 
     public static Date getLastUpdatedTimestamp() {
