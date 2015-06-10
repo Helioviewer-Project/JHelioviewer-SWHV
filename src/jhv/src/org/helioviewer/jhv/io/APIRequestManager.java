@@ -349,6 +349,12 @@ public class APIRequestManager {
                 if (jp2Image.isMultiFrame()) {
                     JHVJPXView jpxView = new JHVJPXView();
                     jpxView.setJP2Image(jp2Image);
+
+                    // wait until there is something to show before adding to the UI
+                    while (jpxView.getImageData() == null) {
+                        Thread.sleep(100);
+                    }
+
                     return jpxView;
                 } else {
                     JHVJP2View jp2View = new JHVJP2View();
