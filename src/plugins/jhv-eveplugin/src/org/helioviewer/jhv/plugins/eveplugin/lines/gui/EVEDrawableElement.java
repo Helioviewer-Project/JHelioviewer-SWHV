@@ -38,7 +38,7 @@ public class EVEDrawableElement implements DrawableElement {
         // this.values = values;
         this.yAxisElement = yAxisElement;
         intervalAvailable = interval.getStart() != null && interval.getEnd() != null;
-        lastMilliWithData = 0;
+        lastMilliWithData = -1;
     }
 
     public EVEDrawableElement() {
@@ -46,6 +46,7 @@ public class EVEDrawableElement implements DrawableElement {
         bands = new Band[0];
         // values = new EVEValues[0];
         yAxisElement = new YAxisElement();
+        lastMilliWithData = -1;
     }
 
     @Override
@@ -274,7 +275,11 @@ public class EVEDrawableElement implements DrawableElement {
 
     @Override
     public Date getLastDateWithData() {
-        return new Date(lastMilliWithData);
+        if (lastMilliWithData >= 0) {
+            return new Date(lastMilliWithData);
+        } else {
+            return null;
+        }
     }
 
 }
