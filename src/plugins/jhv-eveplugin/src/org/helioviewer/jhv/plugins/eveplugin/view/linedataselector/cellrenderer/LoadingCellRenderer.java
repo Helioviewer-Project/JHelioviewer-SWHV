@@ -19,19 +19,25 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        LineDataSelectorElement element = (LineDataSelectorElement) value;
-        if (element.isDownloading()) {
-            downloadProgressBar.setIndeterminate(true);
-            downloadProgressBar.setVisible(element.isDownloading());
-            downloadProgressBar.setBorder(LineDateSelectorTablePanel.commonBorder);
-            downloadProgressBar.setOpaque(false);
-            downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
-            return downloadProgressBar;
+        if (value != null) { // In some case this can be called with value null
+            // (getAccessibleChild(int i) of JTable )
+
+            LineDataSelectorElement element = (LineDataSelectorElement) value;
+            if (element.isDownloading()) {
+                downloadProgressBar.setIndeterminate(true);
+                downloadProgressBar.setVisible(element.isDownloading());
+                downloadProgressBar.setBorder(LineDateSelectorTablePanel.commonBorder);
+                downloadProgressBar.setOpaque(false);
+                downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
+                return downloadProgressBar;
+            } else {
+                JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                p.setBorder(LineDateSelectorTablePanel.commonBorder);
+                p.setText("");
+                return p;
+            }
         } else {
-            JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            p.setBorder(LineDateSelectorTablePanel.commonBorder);
-            p.setText("");
-            return p;
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
 

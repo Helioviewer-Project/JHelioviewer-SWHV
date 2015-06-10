@@ -16,19 +16,24 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelec
 public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (lineDataElement.isVisible()) {
-            label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
-            label.setToolTipText("Click to hide");
+        if (value != null) { // In some case this can be called with value null
+            // (getAccessibleChild(int i) of JTable )
+            LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (lineDataElement.isVisible()) {
+                label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
+                label.setToolTipText("Click to hide");
+            } else {
+                label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
+                label.setToolTipText("Click to show");
+            }
+            label.setText("");
+            label.setBorder(LineDateSelectorTablePanel.commonLeftBorder);
+            return label;
+
         } else {
-            label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
-            label.setToolTipText("Click to show");
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
-        label.setText("");
-        label.setBorder(LineDateSelectorTablePanel.commonLeftBorder);
-        return label;
 
     }
-
 }

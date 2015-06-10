@@ -16,11 +16,16 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        label.setText("");
-        label.setToolTipText("Click to remove");
-        label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
-        return label;
+        if (value != null) { // In some case this can be called with value null
+            // (getAccessibleChild(int i) of JTable )
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
+            label.setText("");
+            label.setToolTipText("Click to remove");
+            label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
+            return label;
+        } else {
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
     }
 }
