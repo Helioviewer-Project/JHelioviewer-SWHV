@@ -371,13 +371,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
+            if (activeView != null) jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
-            jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
+            if (activeView != null) jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
