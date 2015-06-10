@@ -49,7 +49,7 @@ public class LineDataSelectorModel implements TableModel {
     }
 
     public int getNumberOfAvailableLineData() {
-        return elements == null ? 0 : elements.size();
+        return elements.size();
     }
 
     public void addLineData(LineDataSelectorElement element) {
@@ -64,10 +64,9 @@ public class LineDataSelectorModel implements TableModel {
     }
 
     public void removeLineData(LineDataSelectorElement element) {
-        if (elements != null) {
-            elements.remove(element);
-            BandColors.resetColor(element.getDataColor());
-        }
+        elements.remove(element);
+        BandColors.resetColor(element.getDataColor());
+
         fireLineDataSelectorElementRemoved(element);
         fireListeners();
     }
