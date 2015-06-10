@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.interval.Interval;
@@ -37,6 +38,7 @@ public class DownloadController {
     private static final DownloadController singletonInstance = new DownloadController();
 
     private final HashMap<Band, LinkedList<Interval<Date>>> downloadMap = new HashMap<Band, LinkedList<Interval<Date>>>();
+    private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     private final LineDataSelectorModel selectorModel;
     private final static ExecutorService downloadPool = Executors.newFixedThreadPool(5);
@@ -97,11 +99,20 @@ public class DownloadController {
             }
 
             // add download jobs
-            addDownloads(jobs);
+            addFutureJobs(addDownloads(jobs), band);
 
             // inform listeners
             fireDownloadStarted(band, queryInterval);
         }
+    }
+
+    private void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
+        List<Future<?>> fj = new LinkedList<Future<?>>();
+        if (futureJobs.containsKey(band)) {
+            fj = futureJobs.get(band);
+        }
+        fj.addAll(newFutureJobs);
+        futureJobs.put(band, fj);
     }
 
     private Interval<Date> extendQueryInterval(Interval<Date> queryInterval) {
@@ -138,6 +149,11 @@ public class DownloadController {
         if (list.size() == 0) {
             downloadMap.remove(band);
         }
+        final List<Future<?>> fjs = futureJobs.get(band);
+        for (Future<?> fj : fjs) {
+            fj.cancel(true);
+        }
+        futureJobs.remove(band);
         fireDownloadFinished(band, null, 0);
     }
 
@@ -188,7 +204,8 @@ public class DownloadController {
         return intervals;
     }
 
-    private void addDownloads(final DownloadThread[] jobs) {
+    private List<Future<?>> addDownloads(final DownloadThread[] jobs) {
+        List<Future<?>> futureJobs = new LinkedList<Future<?>>();
         for (int i = 0; i < jobs.length; ++i) {
             // add to download map
             final Band band = jobs[i].getBand();
@@ -201,8 +218,9 @@ public class DownloadController {
             list.add(interval);
 
             downloadMap.put(band, list);
-            downloadPool.submit(jobs[i]);
+            futureJobs.add(downloadPool.submit(jobs[i]));
         }
+        return futureJobs;
     }
 
     private void downloadFinished(final Band band, final Interval<Date> interval) {
