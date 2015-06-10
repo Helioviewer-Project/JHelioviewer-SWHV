@@ -53,6 +53,7 @@ public class LayersModel {
 
     public static void setActiveView(AbstractView view) {
         activeView = view;
+        Displayer.setMasterMovie(view);
         fireActiveLayerChanged(view);
     }
 
