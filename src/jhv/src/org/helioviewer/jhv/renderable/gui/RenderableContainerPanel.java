@@ -56,11 +56,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     private static final int REMOVEROW = 3;
     public static final int NUMBEROFCOLUMNS = 4;
 
-    private final Action addLayerAction = new AbstractAction("Add layer", IconBank.getIcon(JHVIcon.ADD)) {
-        {
-            putValue(SHORT_DESCRIPTION, "Add a new layer");
-        }
-
+    private final Action addLayerAction = new AbstractAction() {
         /**
          * {@inheritDoc}
          */
