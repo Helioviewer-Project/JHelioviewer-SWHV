@@ -32,7 +32,6 @@ public class JHVGlobals {
     private static String version = "";
     private static String revision = "";
 
-    /** Constructor is private to prevent instantiation. */
     private JHVGlobals() {
     }
 

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
  *
  */
 public class SWEKRelatedEvents {
+
     /** The source event */
     private SWEKEventType event;
 
@@ -99,4 +97,5 @@ public class SWEKRelatedEvents {
     public void setRelatedOnList(List<SWEKRelatedOn> relatedOnList) {
         this.relatedOnList = relatedOnList;
     }
+
 }

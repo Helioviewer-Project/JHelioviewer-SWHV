@@ -346,7 +346,7 @@ public class DownloadController {
 
                 EVECacheController.getSingletonInstance().addToCache(band, values, dates);
             } catch (JSONException e) {
-                Log.error("", e);
+                Log.error(e);
             }
         }
     }

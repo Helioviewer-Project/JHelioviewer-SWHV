@@ -106,13 +106,11 @@ public class SubImage {
     /** Overridden toString method */
     @Override
     public String toString() {
-        String ret = "";
-        ret += "x=" + domain.getStart() + "   ";
+        String ret = "x=" + domain.getStart() + "   ";
         ret += "y=" + range.getStart() + "   ";
         ret += "width=" + (domain.getEnd() - domain.getStart()) + "   ";
         ret += "height=" + (range.getEnd() - range.getStart()) + "   ";
         return ret;
-
     }
 
-};
+}

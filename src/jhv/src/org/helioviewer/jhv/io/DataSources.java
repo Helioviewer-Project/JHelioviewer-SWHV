@@ -221,7 +221,7 @@ public class DataSources {
                     Thread.sleep(5000);
                 } catch (InterruptedException e1) {
                     // Should not occur
-                    Log.error("", e1);
+                    Log.error(e1);
                 }
             }
         }

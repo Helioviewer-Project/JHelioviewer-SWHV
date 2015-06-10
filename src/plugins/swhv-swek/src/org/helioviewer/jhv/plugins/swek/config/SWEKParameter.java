@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 /**
@@ -11,6 +8,7 @@ package org.helioviewer.jhv.plugins.swek.config;
  *
  */
 public class SWEKParameter {
+
     /** The source from where this parameter comes*/
     private String source;
 
@@ -145,4 +143,5 @@ public class SWEKParameter {
     public void setDefaultVisible(boolean defaultVisible) {
         this.defaultVisible = defaultVisible;
     }
+
 }

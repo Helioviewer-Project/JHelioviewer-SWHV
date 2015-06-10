@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.awt.Color;
@@ -16,6 +13,7 @@ import javax.swing.ImageIcon;
  * 
  */
 public class SWEKEventType {
+
     /** The name of the event */
     private String eventName;
 
@@ -358,4 +356,5 @@ public class SWEKEventType {
         }
         return false;
     }
+
 }

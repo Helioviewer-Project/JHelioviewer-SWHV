@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
  * 
  */
 public class SWEKSource {
+
     /** The name of this source */
     private String sourceName;
 
@@ -248,4 +246,5 @@ public class SWEKSource {
         }
         return null;
     }
+
 }

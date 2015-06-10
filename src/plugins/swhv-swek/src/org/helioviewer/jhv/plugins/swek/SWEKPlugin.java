@@ -117,9 +117,7 @@ public class SWEKPlugin implements Plugin {
 
     @Override
     public String getAboutLicenseText() {
-        String description = "";
-        description += "<p>The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
-        return description;
+        return "<p>The plugin uses the <a href=\"http://www.json.org/java/\">JSON in Java</a> Library, licensed under a <a href=\"http://www.json.org/license.html\">custom License</a>.";
     }
 
     /**
