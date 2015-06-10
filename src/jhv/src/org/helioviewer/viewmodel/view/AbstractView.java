@@ -71,9 +71,6 @@ public abstract class AbstractView implements View {
     }
 
     public void applyFilters(GL2 gl) {
-        if (imageData == null)
-            return;
-
         copyScreenToTexture(gl);
         applyRunningDifferenceGL(gl);
 
