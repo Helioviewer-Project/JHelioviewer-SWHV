@@ -27,7 +27,7 @@ public class StatusPanel extends JPanel {
     private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-    private static JLabel statusInfoLabel = new JLabel("");
+    private static JLabel statusInfoLabel = new JLabel();
 
     public enum Alignment {
         LEFT, RIGHT

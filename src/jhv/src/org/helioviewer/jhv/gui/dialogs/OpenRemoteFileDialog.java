@@ -162,7 +162,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             fromJPIP.setSelected(false);
             inputAddress.setEnabled(true);
-            imageAddress.setText("");
+            imageAddress.setText(null);
             add(panel);
             this.setResizable(true);
 

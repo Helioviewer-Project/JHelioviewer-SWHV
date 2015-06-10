@@ -122,7 +122,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
             filterPanel.add(filterButton);
 
         }
-        loadingLabel = new JLabel("");
+        loadingLabel = new JLabel();
         filterPanel.add(loadingLabel);
         add(filterPanel, BorderLayout.LINE_END);
     }

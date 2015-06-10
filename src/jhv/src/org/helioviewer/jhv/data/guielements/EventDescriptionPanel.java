@@ -26,7 +26,7 @@ public class EventDescriptionPanel extends JPanel {
     private final JHVEvent event;
 
     /** Label showing the event icon in the summary of the event */
-    private JLabel labelIcon = new JLabel("");
+    private JLabel labelIcon = new JLabel();
 
     /**
      * Label showing the event type in the summary of the event

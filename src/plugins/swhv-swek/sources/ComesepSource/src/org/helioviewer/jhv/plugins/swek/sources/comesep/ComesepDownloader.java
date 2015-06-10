@@ -31,8 +31,6 @@ public class ComesepDownloader implements SWEKDownloader {
 
     @Override
     public void stopDownload() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -131,4 +129,5 @@ public class ComesepDownloader implements SWEKDownloader {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         return sdf.format(date);
     }
+
 }

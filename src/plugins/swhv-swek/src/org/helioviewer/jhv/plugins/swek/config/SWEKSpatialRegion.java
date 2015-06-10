@@ -7,6 +7,7 @@ package org.helioviewer.jhv.plugins.swek.config;
  * 
  */
 public class SWEKSpatialRegion {
+
     /** x1 coordinate of the spatial region */
     private int x1;
     /** y1 coordinate of the spatial region */

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 /**
@@ -10,6 +7,7 @@ package org.helioviewer.jhv.plugins.swek.config;
  * 
  */
 public class SWEKParameterFilter {
+
     /** The type of filter */
     private String filterType;
 
@@ -222,4 +220,5 @@ public class SWEKParameterFilter {
     public void setUnits(String units) {
         this.units = units;
     }
+
 }

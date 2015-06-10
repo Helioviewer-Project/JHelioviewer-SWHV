@@ -279,7 +279,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
         private final JButton quickBackButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_DOUBLEARROW_LEFT));
         private final JButton forwardButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_RIGHT));
         private final JButton backButton = new JButton(IconBank.getIcon(JHVIcon.SIMPLE_ARROW_LEFT));
-        private final JButton selectButton = new JButton("");
+        private final JButton selectButton = new JButton();
 
         public NavigationPanel() {
             initVisualComponents();

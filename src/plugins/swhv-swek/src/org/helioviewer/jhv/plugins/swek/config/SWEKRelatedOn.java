@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 /**
@@ -10,6 +7,7 @@ package org.helioviewer.jhv.plugins.swek.config;
  *
  */
 public class SWEKRelatedOn {
+
     /** The parameter from the source event  */
     private SWEKParameter parameterFrom;
 
@@ -72,6 +70,5 @@ public class SWEKRelatedOn {
     public void setParameterWith(SWEKParameter parameterWith) {
         this.parameterWith = parameterWith;
     }
-
 
 }

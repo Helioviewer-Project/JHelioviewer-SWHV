@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-
 public abstract class AbstractJHVEventType implements JHVEventType {
+
     @Override
     public final boolean equals(Object otherEventType) {
         if (otherEventType instanceof JHVEventType) {
@@ -14,7 +14,7 @@ public abstract class AbstractJHVEventType implements JHVEventType {
 
     @Override
     public final int hashCode() {
-        return ("" + getEventType() + getEventSource() + getEventProvider()).hashCode();
+        return (getEventType() + getEventSource() + getEventProvider()).hashCode();
     }
 
 }

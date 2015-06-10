@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 /**
@@ -10,6 +7,7 @@ package org.helioviewer.jhv.plugins.swek.config;
  * 
  */
 public class SWEKSupplier {
+
     /** Name of the supplier */
     private String supplierName;
 

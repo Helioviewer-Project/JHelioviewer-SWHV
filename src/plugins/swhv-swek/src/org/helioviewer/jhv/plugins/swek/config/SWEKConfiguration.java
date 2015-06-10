@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.swek.config;
 
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
  *
  */
 public class SWEKConfiguration {
+
     /** The configuration version */
     private String configurationVersion;
 
@@ -147,4 +145,5 @@ public class SWEKConfiguration {
     public void setRelatedEvents(List<SWEKRelatedEvents> relatedEvents) {
         this.relatedEvents = relatedEvents;
     }
+
 }
