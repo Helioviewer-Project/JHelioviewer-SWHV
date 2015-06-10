@@ -105,7 +105,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getDescription() {
-        return "This plugin visualizes the level 2 data of the EVE project";
+        return "This plugin visualizes 1D and 2D time series";
     }
 
     @Override

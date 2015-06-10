@@ -188,14 +188,14 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton.setSelected(false);
         trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
         trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
-        trackSolarRotationButton.setToolTipText("Solar rotation tracking");
+        trackSolarRotationButton.setToolTipText("Track solar rotation");
         addButton(trackSolarRotationButton);
 
         coronaVisibilityButton = new JToggleButton(new ToggleCoronaVisibilityAction());
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
-        coronaVisibilityButton.setToolTipText("Corona visibility");
+        coronaVisibilityButton.setToolTipText("Show off-disk corona");
         addButton(coronaVisibilityButton);
 
         addSeparator();

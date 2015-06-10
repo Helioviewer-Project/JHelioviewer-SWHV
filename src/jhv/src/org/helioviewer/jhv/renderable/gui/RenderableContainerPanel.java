@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
@@ -206,12 +207,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         JButton addLayerButton = new JButton(addLayerAction);
         addLayerButton.setBorder(null);
-        addLayerButton.setText(null);
+        addLayerButton.setText("Add layer");
+        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
 
-        addLayerButton.setToolTipText("Add extra data layers");
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
