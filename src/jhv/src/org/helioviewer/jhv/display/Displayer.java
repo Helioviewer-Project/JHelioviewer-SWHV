@@ -100,11 +100,11 @@ public class Displayer implements JHVEventHighlightListener {
                     movieView.setCurrentFrame(dateTime);
                 }
             }
+            MoviePanel.setFrameSlider(masterView);
         }
 
         if (view == LayersModel.getActiveView()) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
-            MoviePanel.setFrameSlider(view);
 
             lastTimestamp = dateTime.getTime();
             // fire TimeChanged
@@ -129,6 +129,8 @@ public class Displayer implements JHVEventHighlightListener {
             masterView = (MovieView) view;
         } else
             masterView = null;
+
+        MoviePanel.getSingletonInstance().setActiveMovie(masterView);
 
         if (wasPlaying)
             playMovies();
