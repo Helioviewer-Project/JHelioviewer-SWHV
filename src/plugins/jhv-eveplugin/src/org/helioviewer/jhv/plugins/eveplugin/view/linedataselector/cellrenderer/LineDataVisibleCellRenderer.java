@@ -27,7 +27,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
                 label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
                 label.setToolTipText("Click to show");
             }
-            label.setText("");
+            label.setText(null);
             label.setBorder(LineDateSelectorTablePanel.commonLeftBorder);
             return label;
 

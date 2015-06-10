@@ -20,7 +20,7 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
             // (getAccessibleChild(int i) of JTable )
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-            label.setText("");
+            label.setText(null);
             label.setToolTipText("Click to remove");
             label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
             return label;
