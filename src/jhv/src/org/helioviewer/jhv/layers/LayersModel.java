@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 public class LayersModel {
 
@@ -53,15 +53,67 @@ public class LayersModel {
 
     public static void setActiveView(AbstractView view) {
         activeView = view;
-        Displayer.setMasterMovie(view);
+        setMasterMovie(view);
         fireActiveLayerChanged(view);
+    }
+
+    private static MovieView masterView;
+
+    private static void setMasterMovie(AbstractView view) {
+        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
+
+        if (wasPlaying)
+            pauseMovies();
+
+        if (view instanceof MovieView) {
+            masterView = (MovieView) view;
+        } else
+            masterView = null;
+
+        MoviePanel.getSingletonInstance().setActiveMovie(masterView);
+
+        if (wasPlaying)
+            playMovies();
+    }
+
+    public static void syncMaster(AbstractView view, ImmutableDateTime dateTime) {
+        if (view == masterView) {
+            for (AbstractView movieView : layers) {
+                if (movieView != masterView && movieView instanceof MovieView) {
+                    ((MovieView) movieView).setCurrentFrame(dateTime);
+                }
+            }
+            MoviePanel.setFrameSlider(masterView);
+        }
+    }
+
+    public static void playMovies() {
+        if (masterView != null) {
+            masterView.playMovie();
+            MoviePanel.playStateChanged(true);
+        }
+    }
+
+    public static void pauseMovies() {
+        if (masterView != null) {
+            masterView.pauseMovie();
+            MoviePanel.playStateChanged(false);
+        }
+    }
+
+    public static void setTime(ImmutableDateTime dateTime) {
+        for (AbstractView movieView : layers) {
+            if (movieView instanceof MovieView) {
+                ((MovieView) movieView).setCurrentFrame(dateTime);
+            }
+        }
     }
 
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
-        if (view instanceof JHVJPXView) {
-            result = ((JHVJPXView) view).getFrameDateTime(0);
+        if (view instanceof MovieView) {
+            result = ((MovieView) view).getFrameDateTime(0);
         } else {
             result = view.getMetaData().getDateObs();
         }
@@ -71,8 +123,8 @@ public class LayersModel {
     private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
         ImmutableDateTime result = null;
 
-        if (view instanceof JHVJPXView) {
-            JHVJPXView tmv = (JHVJPXView) view;
+        if (view instanceof MovieView) {
+            MovieView tmv = (MovieView) view;
             int lastFrame = tmv.getMaximumFrameNumber();
             result = tmv.getFrameDateTime(lastFrame);
         } else {
@@ -178,8 +230,6 @@ public class LayersModel {
 
         fireLayerAdded(view);
         setActiveView(view);
-
-        Displayer.linkMovie(view);
     }
 
     // special
@@ -238,13 +288,11 @@ public class LayersModel {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(AbstractView view) {
-        Displayer.unlinkMovie(view);
-
         int index = layers.indexOf(view);
 
         layers.remove(view);
-        if (view instanceof JHVJPXView) {
-            ((JHVJPXView) view).abolish();
+        if (view instanceof JHVJP2View) {
+            ((JHVJP2View) view).abolish();
         }
 
         setActiveView(getLayer(determineNewActiveLayer(index)));

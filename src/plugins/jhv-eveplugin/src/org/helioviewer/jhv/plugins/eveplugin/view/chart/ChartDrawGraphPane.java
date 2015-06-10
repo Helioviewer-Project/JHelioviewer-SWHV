@@ -42,9 +42,9 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
@@ -470,7 +470,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long timestamp = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime()) / 1000;
 
-        Displayer.setTime(new ImmutableDateTime(timestamp));
+        LayersModel.setTime(new ImmutableDateTime(timestamp));
     }
 
     // Mouse Input Listener

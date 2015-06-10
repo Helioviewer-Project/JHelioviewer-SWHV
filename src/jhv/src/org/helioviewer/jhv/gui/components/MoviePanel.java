@@ -33,11 +33,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 
@@ -302,7 +302,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static void jumpToFrameNumber(int frame) {
         if (activeMovie != null) {
             frame = Math.max(0, Math.min(activeMovie.getMaximumFrameNumber(), frame));
-            Displayer.setTime(activeMovie.getFrameDateTime(frame));
+            LayersModel.setTime(activeMovie.getFrameDateTime(frame));
             timeSlider.setValue(frame);
         }
     }
@@ -322,13 +322,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             playPauseButton.setIcon(playIcon);
             playPauseButton.setToolTipText("Play movie");
             if (!onlyGUI) {
-                Displayer.pauseMovies();
+                LayersModel.pauseMovies();
             }
         } else {
             playPauseButton.setIcon(pauseIcon);
             playPauseButton.setToolTipText("Pause movie");
             if (!onlyGUI) {
-                Displayer.playMovies();
+                LayersModel.playMovies();
             }
         }
     }
@@ -441,7 +441,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
         if (isPlaying) {
-            Displayer.pauseMovies();
+            LayersModel.pauseMovies();
         }
     }
 
@@ -465,7 +465,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
-            Displayer.playMovies();
+            LayersModel.playMovies();
         }
         someoneIsDragging = false;
     }
