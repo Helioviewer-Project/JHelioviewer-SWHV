@@ -359,6 +359,11 @@ public class APIRequestManager {
                 } else {
                     JHVJP2View jp2View = new JHVJP2View();
                     jp2View.setJP2Image(jp2Image);
+
+                    // wait until there is something to show before adding to the UI
+                    while (jp2View.getImageData() == null) {
+                        Thread.sleep(100);
+                    }
                     return jp2View;
                 }
             } catch (Exception e) {

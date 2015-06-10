@@ -49,6 +49,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 16;
+    private static final int TITLE_WIDTH = 140;
 
     private static final int VISIBLEROW = 0;
     private static final int TITLEROW = 1;
@@ -131,12 +132,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid.setBackground(Color.white);
 
         grid.getColumnModel().getColumn(VISIBLEROW).setCellRenderer(new RenderableVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH + 3);
-        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH + 3);
+        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(TITLEROW).setCellRenderer(new RenderableCellRenderer());
-        grid.getColumnModel().getColumn(TITLEROW).setPreferredWidth(80);
-        grid.getColumnModel().getColumn(TITLEROW).setMaxWidth(80);
+        grid.getColumnModel().getColumn(TITLEROW).setPreferredWidth(TITLE_WIDTH);
+        grid.getColumnModel().getColumn(TITLEROW).setMaxWidth(TITLE_WIDTH);
 
         grid.getColumnModel().getColumn(TIMEROW).setCellRenderer(new RenderableTimeCellRenderer());
 
