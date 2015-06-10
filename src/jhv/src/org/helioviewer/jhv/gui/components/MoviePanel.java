@@ -38,9 +38,6 @@ import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
-import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 
@@ -68,7 +65,7 @@ import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
  *
  */
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ActionListener, ChangeListener, LayersListener, MouseListener, MouseWheelListener {
+public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener {
 
     // different animation speeds
     private enum SpeedUnit {
@@ -133,7 +130,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private final JButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
-    private final JComboBox animationModeComboBox;
+    private static JComboBox animationModeComboBox;
 
     private final JPanel modePanel;
     private final JPanel speedPanel;
@@ -144,7 +141,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
-    private static MovieView activeView;
+    private static MovieView activeMovie;
     private static boolean someoneIsDragging = false;
 
     private static MoviePanel instance;
@@ -152,18 +149,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static MoviePanel getSingletonInstance() {
         if (instance == null) {
             instance = new MoviePanel();
-            LayersModel.addLayersListener(instance);
         }
         return instance;
     }
 
-    @Override
-    public void layerAdded(AbstractView view) {
-    }
+    public void setActiveMovie(MovieView view) {
+        activeMovie = view;
 
-    @Override
-    public void activeLayerChanged(AbstractView view) {
-        if (!(view instanceof MovieView)) {
+        if (activeMovie == null) {
             setEnabled(false);
             setPlaying(false, false);
 
@@ -172,20 +165,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             timeSlider.setCompleteCachedUntil(0);
             timeSlider.setMaximum(0);
             timeSlider.setValue(0);
-
-            activeView = null;
             return;
         }
 
-        activeView = (MovieView) view;
-
-        timeSlider.setPartialCachedUntil(activeView.getImageCacheStatus().getImageCachedPartiallyUntil());
-        timeSlider.setCompleteCachedUntil(activeView.getImageCacheStatus().getImageCachedCompletelyUntil());
-        timeSlider.setMaximum(activeView.getMaximumFrameNumber());
-        timeSlider.setValue(activeView.getCurrentFrameNumber());
+        timeSlider.setPartialCachedUntil(activeMovie.getImageCacheStatus().getImageCachedPartiallyUntil());
+        timeSlider.setCompleteCachedUntil(activeMovie.getImageCacheStatus().getImageCachedCompletelyUntil());
+        timeSlider.setMaximum(activeMovie.getMaximumFrameNumber());
+        timeSlider.setValue(activeMovie.getCurrentFrameNumber());
 
         updateMovieSpeed();
-        activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+        activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
 
         setEnabled(true);
     }
@@ -277,7 +266,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void setEnabled(boolean enabled) {
-        if (activeView == null) {
+        if (activeMovie == null) {
             enabled = false;
         }
 
@@ -300,10 +289,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel.setVisible(advanced);
     }
 
-    public static void setFrameSlider(AbstractView view) {
-        if (view instanceof MovieView) {
-            timeSlider.setValue(((MovieView) view).getCurrentFrameNumber());
-        }
+    public static void setFrameSlider(MovieView view) {
+        timeSlider.setValue(view.getCurrentFrameNumber());
     }
 
     /**
@@ -313,9 +300,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     private static void jumpToFrameNumber(int frame) {
-        frame = Math.max(0, Math.min(activeView.getMaximumFrameNumber(), frame));
-        Displayer.setTime(activeView.getFrameDateTime(frame));
-        timeSlider.setValue(frame);
+        if (activeMovie != null) {
+            frame = Math.max(0, Math.min(activeMovie.getMaximumFrameNumber(), frame));
+            Displayer.setTime(activeMovie.getFrameDateTime(frame));
+            timeSlider.setValue(frame);
+        }
     }
 
     /**
@@ -349,10 +338,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * the speed of the animation or the its unit.
      */
     private static void updateMovieSpeed() {
-        if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
-            activeView.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-        } else {
-            activeView.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+        if (activeMovie != null) {
+            if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
+                activeMovie.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
+            } else {
+                activeMovie.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
+                                                   ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+            }
         }
     }
 
@@ -371,13 +363,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-            if (activeView != null) jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
+            if (activeMovie != null) jumpToFrameNumber(activeMovie.getCurrentFrameNumber() - 1);
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
-            if (activeView != null) jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
+            if (activeMovie != null) jumpToFrameNumber(activeMovie.getCurrentFrameNumber() + 1);
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
@@ -390,8 +382,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         } else if (e.getSource() == speedUnitComboBox) {
             updateMovieSpeed();
             // Change animation mode
-        } else if (e.getSource() == animationModeComboBox) {
-            activeView.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+        } else if (e.getSource() == animationModeComboBox && activeMovie != null) {
+            activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 
@@ -405,12 +397,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             jumpToFrameNumber(timeSlider.getValue());
 
             int max = timeSlider.getMaximum();
-            if (max == 0)
+            if (max == 0 || activeMovie == null)
                 frameNumberLabel.setText("1/1");
             else
-                frameNumberLabel.setText((activeView.getCurrentFrameNumber() + 1) + "/" + (max + 1));
+                frameNumberLabel.setText((activeMovie.getCurrentFrameNumber() + 1) + "/" + (max + 1));
 
-            if (activeView.getCurrentFrameNumber() == timeSlider.getMinimum() && animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
+            if (activeMovie != null &&
+                activeMovie.getCurrentFrameNumber() == timeSlider.getMinimum() &&
+                animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
                 togglePlayPause();
             }
             // Change animation speed
@@ -458,9 +452,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
-                jumpToFrameNumber(activeView.getCurrentFrameNumber() + 1);
+                jumpToFrameNumber(activeMovie.getCurrentFrameNumber() + 1);
             } else if (e.getWheelRotation() > 0) {
-                jumpToFrameNumber(activeView.getCurrentFrameNumber() - 1);
+                jumpToFrameNumber(activeMovie.getCurrentFrameNumber() - 1);
             }
         }
     }
@@ -483,7 +477,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
-        if (view == activeView) {
+        if (view == activeMovie) {
             if (complete) {
                 timeSlider.setCompleteCachedUntil(until);
             } else {
