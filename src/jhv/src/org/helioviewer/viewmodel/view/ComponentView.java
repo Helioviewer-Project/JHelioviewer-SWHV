@@ -74,6 +74,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         // GUI events can lead to context destruction and invalidation of GL objects and state
         canvas.setSharedAutoDrawable(sharedDrawable);
         canvas.setMinimumSize(new Dimension(1, 1));
+        canvas.setAutoSwapBufferMode(false);
 
         canvas.addGLEventListener(this);
         Displayer.setDisplayListener(this);
@@ -135,6 +136,8 @@ public class ComponentView implements GLEventListener, DisplayListener {
         camera.applyCamera(gl);
         ImageViewerGui.getRenderableContainer().render(gl);
         camera.resumePerspective(gl);
+
+        drawable.swapBuffers();
 
         if (exportMode || screenshotMode) {
             exportFrame();
