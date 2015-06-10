@@ -179,7 +179,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
             for (YAxisElement el : yAxisElements) {
-                if (el.getOriginalLabel().equals("Mhz")) {
+                if (el.getOriginalLabel().equals("MHz")) {
                     downloadOK = true;
                     break;
                 }
