@@ -145,25 +145,22 @@ class J2KRender implements Runnable {
      * @param jp2Image
      */
     void abolish(JP2Image jp2Image) {
+        stop = true;
+        myThread.interrupt();
         try {
-            stop = true;
-            myThread.interrupt();
-            myThread.join(100);
-            /* if (myThread.isAlive()) {
-                abolish(jp2Image);
-                return;
-            } */
-
-            myThread = null;
-
-            localIntBuffer = null;
-            intBuffer = null;
-            byteBuffer = null;
-
-            jp2Image.abolish();
-        } catch (InterruptedException ex) {
-            Log.info("J2KRender Thread was interrupted");
+            myThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        myThread = null;
+
+        localIntBuffer = null;
+        intBuffer = null;
+        byteBuffer = null;
+
+        jp2Image.abolish();
+
     }
 
     public void setMovieMode(boolean val) {
@@ -222,101 +219,64 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         synchronized (renderLock) {
-        parentImageRef.getLock().lock();
+            parentImageRef.getLock().lock();
 
-        try {
+            try {
 
-            // see TODO below
-            // compositorRef.Refresh();
-            // compositorRef.Remove_compositing_layer(-1, true);
+                // see TODO below
+                // compositorRef.Refresh();
+                // compositorRef.Remove_compositing_layer(-1, true);
 
-            // not needed: the raw component is extracted from codestream
-            // parentImageRef.deactivateColorLookupTable(numLayer);
+                // not needed: the raw component is extracted from codestream
+                // parentImageRef.deactivateColorLookupTable(numLayer);
 
-            // TODO: figure out for getNumComponents() > 2
-            // Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-            // compositorRef.Add_compositing_layer(numLayer, dimsRef1,
-            // dimsRef2);
+                // TODO: figure out for getNumComponents() > 2
+                // Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
+                // compositorRef.Add_compositing_layer(numLayer, dimsRef1,
+                // dimsRef2);
 
-            if (lastCompositionLayerRendered != numLayer) {
-                lastCompositionLayerRendered = numLayer;
-                parentImageRef.updateResolutionSet(numLayer);
-            }
-
-            compositorRef.Set_surface_initialization_mode(false);
-            compositorRef.Set_max_quality_layers(currParams.qualityLayers);
-            compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
-            if (parentImageRef.getNumComponents() <= 2) {
-                compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
-            }
-
-            SubImage roi = currParams.subImage;
-            Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
-            compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
-
-            Kdu_dims actualBufferedRegion = new Kdu_dims();
-            Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
-
-            Kdu_coords actualOffset = new Kdu_coords();
-            actualOffset.Assign(actualBufferedRegion.Access_pos());
-
-            Kdu_dims newRegion = new Kdu_dims();
-
-            if (parentImageRef.getNumComponents() < 2) {
-                currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
-                byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
-
-            } else {
-                currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                // if (differenceMode || roi.getNumPixels() !=
-                // intBuffer[currentIntBuffer].length || (!movieMode &&
-                // !linkedMovieMode &&
-                // !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
-                intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
-                // } else if (J2KRenderGlobalOptions.getDoubleBufferingOption())
-                // {
-                // Arrays.fill(intBuffer[currentIntBuffer], 0);
-                // }
-            }
-            //
-
-            while (!compositorRef.Is_processing_complete()) {
-                compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
-                Kdu_coords newOffset = newRegion.Access_pos();
-                Kdu_coords newSize = newRegion.Access_size();
-
-                newOffset.Subtract(actualOffset);
-
-                int newWidth = newSize.Get_x();
-                int newHeight = newSize.Get_y();
-                int newPixels = newWidth * newHeight;
-
-                if (newPixels == 0) {
-                    continue;
+                if (lastCompositionLayerRendered != numLayer) {
+                    lastCompositionLayerRendered = numLayer;
+                    parentImageRef.updateResolutionSet(numLayer);
                 }
 
-                localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-                compositorBuf.Get_region(newRegion, localIntBuffer);
+                compositorRef.Set_surface_initialization_mode(false);
+                compositorRef.Set_max_quality_layers(currParams.qualityLayers);
+                compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
+                if (parentImageRef.getNumComponents() <= 2) {
+                    compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
+                }
 
-                int srcIdx = 0;
-                int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
+                SubImage roi = currParams.subImage;
+                Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
+                compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
+
+                Kdu_dims actualBufferedRegion = new Kdu_dims();
+                Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
+
+                Kdu_coords actualOffset = new Kdu_coords();
+                actualOffset.Assign(actualBufferedRegion.Access_pos());
+
+                Kdu_dims newRegion = new Kdu_dims();
 
                 if (parentImageRef.getNumComponents() < 2) {
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[currentByteBuffer][destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
-                        }
-                    }
-                } else {
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
-                    }
-                }
-            }
+                    currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
+                    byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
 
-            if (parentImageRef.getNumComponents() == 2) {
-                // extract alpha component
-                compositorRef.Set_single_component(numLayer, 1, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
+                } else {
+                    currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
+                    // if (differenceMode || roi.getNumPixels() !=
+                    // intBuffer[currentIntBuffer].length || (!movieMode &&
+                    // !linkedMovieMode &&
+                    // !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
+                    intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
+                    // } else if (J2KRenderGlobalOptions.getDoubleBufferingOption())
+                    // {
+                    // Arrays.fill(intBuffer[currentIntBuffer], 0);
+                    // }
+                }
+                //
+
                 while (!compositorRef.Is_processing_complete()) {
                     compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
                     Kdu_coords newOffset = newRegion.Access_pos();
@@ -338,26 +298,63 @@ class J2KRender implements Runnable {
                     int srcIdx = 0;
                     int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            // long unsignedValue =
-                            // (intBuffer[currentByteBuffer][destIdx + col] &
-                            // 0xffffffffl) >> 24;
-                            intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                    if (parentImageRef.getNumComponents() < 2) {
+                        for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                            for (int col = 0; col < newWidth; ++col) {
+                                byteBuffer[currentByteBuffer][destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                            }
+                        }
+                    } else {
+                        for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                            System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
                         }
                     }
                 }
-            }
 
-            if (compositorBuf != null) {
-                compositorBuf.Native_destroy();
-            }
+                if (parentImageRef.getNumComponents() == 2) {
+                    // extract alpha component
+                    compositorRef.Set_single_component(numLayer, 1, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
+                    while (!compositorRef.Is_processing_complete()) {
+                        compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
+                        Kdu_coords newOffset = newRegion.Access_pos();
+                        Kdu_coords newSize = newRegion.Access_size();
 
-        } catch (KduException e) {
-            e.printStackTrace();
-        } finally {
-            parentImageRef.getLock().unlock();
-        }
+                        newOffset.Subtract(actualOffset);
+
+                        int newWidth = newSize.Get_x();
+                        int newHeight = newSize.Get_y();
+                        int newPixels = newWidth * newHeight;
+
+                        if (newPixels == 0) {
+                            continue;
+                        }
+
+                        localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
+                        compositorBuf.Get_region(newRegion, localIntBuffer);
+
+                        int srcIdx = 0;
+                        int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
+
+                        for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                            for (int col = 0; col < newWidth; ++col) {
+                                // long unsignedValue =
+                                // (intBuffer[currentByteBuffer][destIdx + col] &
+                                // 0xffffffffl) >> 24;
+                                intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                            }
+                        }
+                    }
+                }
+
+                if (compositorBuf != null) {
+                    compositorBuf.Native_destroy();
+                }
+
+            } catch (KduException e) {
+                e.printStackTrace();
+            } finally {
+                parentImageRef.getLock().unlock();
+            }
         }
     }
 
