@@ -91,8 +91,8 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
         grid.getColumnModel().getColumn(VISIBLE_ROW).setCellRenderer(new LineDataVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH + 3);
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH + 3);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
         // grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);

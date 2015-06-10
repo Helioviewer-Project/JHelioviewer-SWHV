@@ -33,7 +33,7 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
             } else {
                 JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 p.setBorder(LineDateSelectorTablePanel.commonBorder);
-                p.setText("");
+                p.setText(null);
                 return p;
             }
         } else {
