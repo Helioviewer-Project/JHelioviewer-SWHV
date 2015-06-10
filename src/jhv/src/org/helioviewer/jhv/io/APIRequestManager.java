@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -65,7 +67,19 @@ public class APIRequestManager {
                 date = view.getMetaData().getDateObs().getTime();
                 readDate = true;
                 if (view instanceof JHVJP2View) {
-                    ((JHVJP2View) view).abolish();
+                    EventQueue.invokeLater(new Runnable() {
+                        private JHVJP2View view;
+
+                        @Override
+                        public void run() {
+                            view.abolish();
+                        }
+
+                        public Runnable init(JHVJP2View _view) {
+                            view = _view;
+                            return this;
+                        }
+                    }.init((JHVJP2View) view));
                 }
             } else {
                 Log.error(">> APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());

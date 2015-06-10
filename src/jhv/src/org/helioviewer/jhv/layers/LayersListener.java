@@ -3,8 +3,8 @@ package org.helioviewer.jhv.layers;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
- * Interface for GUI objects to react to changes of layers The events come on
- * the Event Dispatch Thread (EventQueue)
+ * Interface for GUI objects to react to changes of layers
+ * The callbacks are invoked on the Event Dispatch Thread
  */
 public interface LayersListener {
 
