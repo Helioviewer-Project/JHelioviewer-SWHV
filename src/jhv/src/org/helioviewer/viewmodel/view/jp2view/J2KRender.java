@@ -238,7 +238,10 @@ class J2KRender implements Runnable {
         return movieMode;
     }
 
+    private static final Object renderLock = new Object();
+
     private void renderLayer(int numLayer) {
+        synchronized (renderLock) {
         parentImageRef.getLock().lock();
 
         try {
@@ -374,6 +377,7 @@ class J2KRender implements Runnable {
             e.printStackTrace();
         } finally {
             parentImageRef.getLock().unlock();
+        }
         }
     }
 

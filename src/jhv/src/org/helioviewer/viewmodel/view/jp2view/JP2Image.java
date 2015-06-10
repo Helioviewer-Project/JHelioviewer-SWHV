@@ -18,10 +18,8 @@ import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
-import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_tile;
-import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -34,6 +32,7 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -78,8 +77,6 @@ public class JP2Image {
      * function.
      */
     private Kdu_region_compositor compositor = new Kdu_region_compositor();
-
-    private Kdu_thread_env threadEnv;
 
     /** The range of valid quality layers for the image. */
     private Interval<Integer> qLayerRange;
@@ -150,16 +147,6 @@ public class JP2Image {
      * @throws JHV_KduException
      */
     public JP2Image(URI newUri, URI downloadURI) throws IOException, JHV_KduException, Exception {
-        try {
-            int numThreads = Kdu_global.Kdu_get_num_processors();
-            threadEnv = new Kdu_thread_env();
-            threadEnv.Create();
-            for (int i = 1; i < numThreads; i++)
-                threadEnv.Add_thread();
-        } catch (KduException e) {
-            e.printStackTrace();
-        }
-
         uri = newUri;
         this.downloadURI = downloadURI;
         String name = uri.getPath().toUpperCase();
@@ -299,7 +286,7 @@ public class JP2Image {
             // I don't know if I should be using the codestream in a persistent
             // mode or not...
             compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
-            compositor.Set_thread_env(threadEnv, 0);
+            compositor.Set_thread_env(JHV_Kdu_thread_env.getThreadEnv(), 0);
 
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
@@ -521,9 +508,6 @@ public class JP2Image {
 
         try {
             if (compositor != null) {
-                threadEnv.Terminate(0, true);
-                threadEnv.Native_destroy();
-
                 compositor.Remove_compositing_layer(-1, true);
                 compositor.Native_destroy();
             }
