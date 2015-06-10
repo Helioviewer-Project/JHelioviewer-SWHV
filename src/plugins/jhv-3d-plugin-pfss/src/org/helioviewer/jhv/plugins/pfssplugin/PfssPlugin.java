@@ -38,7 +38,7 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return null;
+        return "This plugin visualizes PFSS model data";
     }
 
     @Override

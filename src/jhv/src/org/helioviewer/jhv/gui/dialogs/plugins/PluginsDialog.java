@@ -51,16 +51,16 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private final JPanel contentPane = new JPanel();
 
     private final JComboBox filterComboBox = new JComboBox(new String[] { "All", "Enabled", "Disabled" });
-    private final JButton addButton = new JButton("Add Plug-in", IconBank.getIcon(JHVIcon.ADD));
+    private final JButton addButton = new JButton("Add plug-in", IconBank.getIcon(JHVIcon.ADD));
     private final JButton downloadButton = new JButton("Download");
 
-    private final JLabel emptyLabel = new JLabel("No Plug-ins available", JLabel.CENTER);
+    private final JLabel emptyLabel = new JLabel("No plug-ins available", JLabel.CENTER);
     private final List pluginList = new List();
     private final JScrollPane emptyScrollPane = new JScrollPane(emptyLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
 
-    private final JButton okButton = new JButton("Ok", IconBank.getIcon(JHVIcon.CHECK));
+    private final JButton okButton = new JButton("OK", IconBank.getIcon(JHVIcon.CHECK));
 
     public PluginsDialog() {
         super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
@@ -80,14 +80,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         // header
         final StringBuilder headerText = new StringBuilder();
         headerText.append("<html><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
-        headerText.append("<b>JHelioviewer Plug-ins</b>");
         headerText.append("<p style=\"padding-left:10px\">");
-        headerText.append("Manage available plug-ins of JHelioviewer.<br>");
-        headerText.append("You can import enable or delete plug-ins.<br>"); // TODO
-        // SP:
-        // add
-        // "download"
-        headerText.append("Press the information buttons to get additional details.");
+        headerText.append("You can import, enable or delete JHelioviewer plug-ins."); // TODO
         headerText.append("</p></font></html>");
 
         final JEditorPane headerPane = new JEditorPane("text/html", headerText.toString());
@@ -122,7 +116,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         installedButtonPane.add(addButton);
         // installedButtonPane(downloadButton); //TODO SP: add
 
-        addButton.setToolTipText("Add a new plug-in to JHelioviewer.");
+        addButton.setToolTipText("Add a new plug-in to JHelioviewer");
         addButton.addActionListener(this);
         downloadButton.addActionListener(this);
 
@@ -144,7 +138,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         footer.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         footer.add(okButton);
 
-        okButton.setToolTipText("Closes the dialog.");
+        okButton.setToolTipText("Close the dialog");
         okButton.addActionListener(this);
 
         // content pane
@@ -164,13 +158,13 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         } else {
             switch (filterComboBox.getSelectedIndex()) {
             case 0:
-                emptyLabel.setText("No Plug-ins available");
+                emptyLabel.setText("No plug-ins available");
                 break;
             case 1:
-                emptyLabel.setText("No Plug-ins enabled");
+                emptyLabel.setText("No plug-ins enabled");
                 break;
             case 2:
-                emptyLabel.setText("No Plug-ins disabled");
+                emptyLabel.setText("No plug-ins disabled");
                 break;
             }
             listLayout.show(listContainerPane, "empty");

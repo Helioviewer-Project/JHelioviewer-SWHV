@@ -42,7 +42,7 @@ public class SWHVHEKPlugin implements Plugin {
 
     @Override
     public String getDescription() {
-        return null;
+        return "This plugin visualizes SWEK events on the solar disk";
     }
 
     @Override
