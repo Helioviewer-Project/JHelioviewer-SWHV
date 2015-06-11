@@ -23,6 +23,7 @@ import javax.swing.JSplitPane;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
+import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -49,7 +50,6 @@ import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStampType;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
-import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * A class that sets up the graphical user interface.
@@ -75,8 +75,8 @@ public class ImageViewerGui {
     private static SideContentPane leftPane;
     private static FiltersPanel filtersPanel;
 
-    private static ComponentView componentView;
     private static InputController inputController;
+    private static MainComponent mainComponent;
     private static MainContentPanel mainContentPanel;
 
     private static ImageDataPanel imageObservationPanel;
@@ -140,8 +140,8 @@ public class ImageViewerGui {
         leftScrollPane.setFocusable(false);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
-        componentView = new ComponentView();
-        Component canvas = componentView.getComponent();
+        mainComponent = new MainComponent();
+        Component canvas = mainComponent.getComponent();
         inputController = new InputController(canvas);
         mainContentPanel = new MainContentPanel(canvas);
 
@@ -170,7 +170,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        componentView.display();
+        mainComponent.display();
     }
 
     private static JFrame createMainFrame() {
@@ -304,6 +304,10 @@ public class ImageViewerGui {
         return leftPane;
     }
 
+    public static MainComponent getMainComponent() {
+        return mainComponent;
+    }
+
     public static MainContentPanel getMainContentPanel() {
         return mainContentPanel;
     }
@@ -314,10 +318,6 @@ public class ImageViewerGui {
 
     public static ImageDataPanel getObservationImagePane() {
         return imageObservationPanel;
-    }
-
-    public static ComponentView getComponentView() {
-        return componentView;
     }
 
     public static InputController getInputController() {

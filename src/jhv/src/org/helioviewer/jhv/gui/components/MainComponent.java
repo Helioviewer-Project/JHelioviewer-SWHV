@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view;
+package org.helioviewer.jhv.gui.components;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -22,6 +22,7 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 import com.jogamp.opengl.GL2;
@@ -39,11 +40,7 @@ import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.video.ConverterFactory;
 
-/**
- * The ComponentView is responsible for rendering the actual image to a
- * Component.
- */
-public class ComponentView implements GLEventListener, DisplayListener {
+public class MainComponent implements GLEventListener, DisplayListener {
 
     private static GLCanvas canvas;
 
@@ -61,7 +58,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     private int previousScreenshot = -1;
     private File outputFile;
 
-    public ComponentView() {
+    public MainComponent() {
         GLProfile glp = GLProfile.getDefault();
         GLCapabilities caps = new GLCapabilities(glp);
 

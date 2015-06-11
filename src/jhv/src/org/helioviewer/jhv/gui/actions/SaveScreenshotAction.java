@@ -42,7 +42,7 @@ public class SaveScreenshotAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");
-        if (ImageViewerGui.getComponentView().saveScreenshot("png", new File(filename))) {
+        if (ImageViewerGui.getMainComponent().saveScreenshot("png", new File(filename))) {
             JTextArea text = new JTextArea("Saved screenshot at: " + filename);
             text.setBackground(null);
             JOptionPane.showMessageDialog(ImageViewerGui.getMainFrame(), text);
