@@ -4,13 +4,13 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLSLShader;
-import org.helioviewer.viewmodel.view.opengl.GLTexture;
 
 import com.jogamp.opengl.GL2;
 

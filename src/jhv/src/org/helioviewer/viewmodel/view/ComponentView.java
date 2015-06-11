@@ -20,9 +20,9 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
-import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
