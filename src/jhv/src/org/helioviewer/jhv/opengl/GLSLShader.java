@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view.opengl;
+package org.helioviewer.jhv.opengl;
 
 import java.io.InputStream;
 
