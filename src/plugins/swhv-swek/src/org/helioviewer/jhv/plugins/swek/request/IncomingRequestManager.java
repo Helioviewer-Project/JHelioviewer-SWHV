@@ -30,7 +30,6 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      */
     private IncomingRequestManager() {
         eventContainer = JHVEventContainer.getSingletonInstance();
-        eventContainer.registerHandler(this);
         listeners = new ArrayList<IncomingRequestManagerListener>();
         // intervalList = new ArrayList<Interval<Date>>();
         dateList = new ArrayList<Date>();
