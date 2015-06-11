@@ -43,7 +43,7 @@ public class JHVEventCache {
 
     private final Set<JHVEventType> activeEventTypes;
 
-    private final RequestCache requestCache;
+    private final RequestCache downloadedCache;
 
     /**
      * private default constructor
@@ -56,7 +56,7 @@ public class JHVEventCache {
         idsPerColor = new HashMap<Color, Set<String>>();
         eventsWithRelationRules = new ArrayList<JHVEvent>();
         activeEventTypes = new HashSet<JHVEventType>();
-        requestCache = new RequestCache();
+        downloadedCache = new RequestCache();
     }
 
     /**
@@ -178,7 +178,7 @@ public class JHVEventCache {
 
             }
         }
-        List<Interval<Date>> missingIntervals = requestCache.adaptRequestCache(startDate, endDate);
+        List<Interval<Date>> missingIntervals = downloadedCache.adaptRequestCache(startDate, endDate);
         List<Date> missingDates = new ArrayList<Date>();
         return new JHVEventCacheResult(eventsResult, missingIntervals, missingDates);
     }
@@ -511,12 +511,11 @@ public class JHVEventCache {
     }
 
     public Collection<Interval<Date>> getAllRequestIntervals() {
-        return requestCache.getAllRequestIntervals();
+        return downloadedCache.getAllRequestIntervals();
     }
 
     public void removeRequestedIntervals(Interval<Date> interval) {
-        requestCache.removeRequestedIntervals(interval);
+        downloadedCache.removeRequestedIntervals(interval);
 
     }
-
 }
