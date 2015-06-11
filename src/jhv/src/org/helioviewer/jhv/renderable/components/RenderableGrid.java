@@ -17,9 +17,9 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;

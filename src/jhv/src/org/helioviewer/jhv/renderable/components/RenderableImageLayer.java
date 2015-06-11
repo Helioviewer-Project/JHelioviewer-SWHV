@@ -18,14 +18,14 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
-import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
