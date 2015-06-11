@@ -2,8 +2,10 @@ package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 
@@ -24,11 +26,11 @@ public class SWEKTreeModel {
     private final List<SWEKTreeModelListener> listeners;
 
     /**  */
-    private final Map<SWEKEventType, Integer> loadingTypes;
+    private final Map<SWEKEventType, Set<Object>> loadingTypes;
 
     private SWEKTreeModel() {
         listeners = new ArrayList<SWEKTreeModelListener>();
-        loadingTypes = new HashMap<SWEKEventType, Integer>();
+        loadingTypes = new HashMap<SWEKEventType, Set<Object>>();
     }
 
     public static SWEKTreeModel getSingletonInstance() {
@@ -77,14 +79,15 @@ public class SWEKTreeModel {
      *
      * @param eventType
      *            the event type that started loading
+     * @param worker
      */
-    public void setStartLoading(SWEKEventType eventType) {
+    public void setStartLoading(SWEKEventType eventType, Object obj) {
         if (loadingTypes.containsKey(eventType)) {
-            Integer i = loadingTypes.get(eventType);
-            i++;
-            loadingTypes.put(eventType, i);
+            Set<Object> objs = loadingTypes.get(eventType);
+            objs.add(obj);
+            loadingTypes.put(eventType, objs);
         } else {
-            loadingTypes.put(eventType, 1);
+            loadingTypes.put(eventType, new HashSet<Object>());
             fireEventTypeStartLoading(eventType);
         }
     }
@@ -95,19 +98,24 @@ public class SWEKTreeModel {
      * @param eventType
      *            the event type that stopped loading
      */
-    public void setStopLoading(SWEKEventType eventType) {
+    public void setStopLoading(SWEKEventType eventType, Object obj) {
         if (loadingTypes.containsKey(eventType)) {
-            Integer i = loadingTypes.get(eventType);
-            i--;
-            if (i == 0) {
+            Set<Object> objs = loadingTypes.get(eventType);
+            objs.remove(obj);
+            if (objs.size() == 0) {
                 loadingTypes.remove(eventType);
                 fireEventTypeStopLoading(eventType);
             } else {
-                loadingTypes.put(eventType, i);
+                loadingTypes.put(eventType, objs);
             }
         } else {
             fireEventTypeStopLoading(eventType);
         }
+    }
+
+    public void resetEventType(SWEKEventType eventType) {
+        loadingTypes.remove(eventType);
+        fireEventTypeStopLoading(eventType);
     }
 
     /**

@@ -16,9 +16,9 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 /**
  * The model of the event type panel. This model is a TreeModel and is used by
  * the tree on the event type panel.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
@@ -36,7 +36,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Creates a SWEKTreeModel for the given SWEK event type.
-     * 
+     *
      * @param eventType
      *            The event type for which to create the tree model
      */
@@ -49,7 +49,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Adds a new event panel model listener.
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -59,7 +59,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Removes an event panel model listener.
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -71,7 +71,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      * Informs the model about the row that was clicked. The clicked row will be
      * selected or unselected if it previously respectively was unselected or
      * selected.
-     * 
+     *
      * @param row
      *            The row that was selected
      */
@@ -96,21 +96,20 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
                 for (SWEKTreeModelSupplier stms : eventType.getSwekTreeSuppliers()) {
                     eventTypeSelected = eventTypeSelected || stms.isCheckboxSelected();
                 }
+                SWEKTreeModel.getSingletonInstance().resetEventType(eventType.getSwekEventType());
                 eventType.setCheckboxSelected(eventTypeSelected);
             }
             if (supplier.isCheckboxSelected()) {
-                fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(),
-                        supplier.getSwekSupplier());
+                fireNewEventTypeAndSourceActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(), supplier.getSwekSupplier());
             } else {
-                fireNewEventTypeAndSourceInActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(),
-                        supplier.getSwekSupplier());
+                fireNewEventTypeAndSourceInActive(eventType.getSwekEventType(), supplier.getSwekSupplier().getSource(), supplier.getSwekSupplier());
             }
         }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#addTreeModelListener(javax.swing.event.
      * TreeModelListener)
      */
@@ -122,7 +121,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
      */
     @Override
@@ -136,7 +135,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
      */
     @Override
@@ -150,7 +149,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#getIndexOfChild(java.lang.Object,
      * java.lang.Object)
      */
@@ -171,7 +170,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#getRoot()
      */
     @Override
@@ -181,7 +180,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.tree.TreeModel#isLeaf(java.lang.Object)
      */
     @Override
@@ -195,7 +194,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * javax.swing.tree.TreeModel#removeTreeModelListener(javax.swing.event.
      * TreeModelListener)
@@ -208,7 +207,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * javax.swing.tree.TreeModel#valueForPathChanged(javax.swing.tree.TreePath,
      * java.lang.Object)
@@ -219,7 +218,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * javax.swing.event.TreeExpansionListener#treeCollapsed(javax.swing.event
      * .TreeExpansionEvent)
@@ -231,7 +230,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * javax.swing.event.TreeExpansionListener#treeExpanded(javax.swing.event
      * .TreeExpansionEvent)
@@ -243,7 +242,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Informs the listeners about an event type and source that became active.
-     * 
+     *
      * @param eventType
      *            the event type that became active
      * @param swekSource
@@ -260,7 +259,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     /**
      * Informs the listeners about an event type and source that became
      * inactive.
-     * 
+     *
      * @param eventType
      *            the event type that became inactive
      * @param swekSource
@@ -274,7 +273,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Informs the listeners about an event type that became active.
-     * 
+     *
      * @param swekEventType
      *            the event type that became active
      */
@@ -286,7 +285,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /**
      * Informs the listeners about an event type that became inactive.
-     * 
+     *
      * @param swekEventType
      *            the event type that became inactive
      */
