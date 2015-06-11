@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodel.view.ComponentView;
 
 /**
  * Dialog to export movies to standard video formats.
@@ -28,14 +28,14 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
     final JButton exportButton = new JButton("Click to start export");
 
     public void setLabelText(String exportingText) {
-        this.movieLabel.setText(exportingText);
+        movieLabel.setText(exportingText);
     }
 
     public void reset() {
         setVisible(false);
         remove(movieLabel);
-        this.exportButton.setEnabled(true);
-        this.exportButton.setVisible(true);
+        exportButton.setEnabled(true);
+        exportButton.setVisible(true);
     }
 
     private class CloseDialogTask extends TimerTask {
@@ -46,7 +46,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
     }
 
     public void fail() {
-        this.movieLabel.setText("No image series. Aborting...");
+        movieLabel.setText("No image series. Aborting...");
         Timer timer = new Timer();
         timer.schedule(new CloseDialogTask(), 2000);
     }
@@ -55,7 +55,7 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
         super(ImageViewerGui.getMainFrame(), "Export Movie", true);
         ImageViewerGui.getLeftContentPane().setEnabled(false);
 
-        final ComponentView componentView = ImageViewerGui.getComponentView();
+        final MainComponent mainComponent = ImageViewerGui.getMainComponent();
         final ExportMovieDialog exportMovieDialog = this;
 
         exportButton.addActionListener(new ActionListener() {
@@ -63,12 +63,12 @@ public class ExportMovieDialog extends JDialog implements ActionListener, Showab
             public void actionPerformed(ActionEvent e) {
                 add(movieLabel);
                 movieLabel.setText("Export started...");
-                componentView.startExport(exportMovieDialog);
+                mainComponent.startExport(exportMovieDialog);
                 exportButton.setEnabled(false);
                 exportButton.setVisible(false);
             }
         });
-        this.add(exportButton);
+        add(exportButton);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class SaveScreenshotAsAction extends AbstractAction {
                 selectedFile = new File(selectedFile.getPath() + "." + fileFilter.getDefaultExtension());
             }
 
-            ImageViewerGui.getComponentView().saveScreenshot(fileFilter.getDefaultExtension(), selectedFile);
+            ImageViewerGui.getMainComponent().saveScreenshot(fileFilter.getDefaultExtension(), selectedFile);
         }
     }
 
