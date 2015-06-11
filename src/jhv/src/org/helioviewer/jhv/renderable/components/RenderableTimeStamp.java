@@ -11,9 +11,9 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
-import org.helioviewer.viewmodel.view.opengl.GLInfo;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;

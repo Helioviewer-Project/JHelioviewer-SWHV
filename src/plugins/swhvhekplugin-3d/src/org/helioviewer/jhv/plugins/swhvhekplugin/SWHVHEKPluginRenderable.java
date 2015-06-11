@@ -21,10 +21,10 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.opengl.GLTexture;
 
 import com.jogamp.opengl.GL2;
 
