@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view.opengl;
+package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.base.logging.Log;
 
