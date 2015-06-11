@@ -22,9 +22,9 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 
 /**
  * A download worker will download events for a type of event from a source.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class DownloadWorker implements Runnable {
     /** The event type to download */
@@ -100,7 +100,7 @@ public class DownloadWorker implements Runnable {
     /**
      * Creates a worker thread to download the events of the given event type
      * from the given source for a given date.
-     * 
+     *
      * @param eventType
      *            the type to download
      * @param swekSource
@@ -111,7 +111,7 @@ public class DownloadWorker implements Runnable {
      *            the date for which to download the events
      * @param param
      *            the parameters to use in the downloader
-     * 
+     *
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
         isStopped = false;
@@ -133,7 +133,7 @@ public class DownloadWorker implements Runnable {
     /**
      * Creates a worker thread to download the events of the given event type,
      * from the given source for a given interval.
-     * 
+     *
      * @param eventType
      *            the type to download
      * @param swekSource
@@ -165,7 +165,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Adds a new listener to the download worker thread.
-     * 
+     *
      * @param listener
      *            The listener to add.
      */
@@ -175,7 +175,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Removes the listener from the download worker thread.
-     * 
+     *
      * @param listener
      *            The listener to remove.
      */
@@ -187,7 +187,7 @@ public class DownloadWorker implements Runnable {
      * Stops the worker thread
      */
     public void stopWorker() {
-        // Log.debug("Dw " + this + " is stopped. ");
+        Log.debug("Downloadworker stopped: " + this);
         // Thread.dumpStack();
         isStopped = true;
         if (downloader != null) {
@@ -200,6 +200,7 @@ public class DownloadWorker implements Runnable {
 
     @Override
     public void run() {
+        Log.debug("Start download worker: " + this);
         fireDownloadWorkerStarted();
         // create downloader
         downloader = createDownloader();
@@ -240,11 +241,12 @@ public class DownloadWorker implements Runnable {
 
         }
         fireDownloadWorkerFinished();
+        Log.debug("Downloadworker finished: " + this);
     }
 
     /**
      * Gets the start date of the download.
-     * 
+     *
      * @return the start date of the download
      */
     public Date getDownloadStartDate() {
@@ -253,7 +255,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Gets the end date of the download.
-     * 
+     *
      * @return the end date of the download
      */
     public Date getDownloadEndDate() {
@@ -262,7 +264,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Gets the source from which the worker downloads its data.
-     * 
+     *
      * @return The source
      */
     public SWEKSource getSource() {
@@ -271,7 +273,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Gets the event type this download worker is downloading.
-     * 
+     *
      * @return The event type that is downloading
      */
     public SWEKEventType getEventType() {
@@ -280,7 +282,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Gets the supplier providing the events
-     * 
+     *
      * @return the supplier
      */
     public SWEKSupplier getSupplier() {
@@ -293,7 +295,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Sends the events to the event container.
-     * 
+     *
      * @param swekEventStream
      * @throws InterruptedException
      * @throws InvocationTargetException
@@ -328,7 +330,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Parses the source specific input stream to a jhv specific event type.
-     * 
+     *
      * @return
      */
     private SWEKEventStream parseData(InputStream downloadInputStream) {
@@ -346,7 +348,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Downloads the data from the source.
-     * 
+     *
      * @param page
      * @return
      */
@@ -364,7 +366,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Creates a parser for the given SWEK source.
-     * 
+     *
      * @return the parser for the source
      */
     private SWEKParser createParser() {
@@ -378,7 +380,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Requests the downloader from the source manager
-     * 
+     *
      * @return The downloader or null if the download was stopped.
      */
     private SWEKDownloader createDownloader() {
@@ -392,7 +394,7 @@ public class DownloadWorker implements Runnable {
 
     /**
      * Gets the date of give date with hour, minute, seconds, milliseconds to 0.
-     * 
+     *
      * @param date
      *            the date to round
      * @return the rounded date
@@ -410,7 +412,7 @@ public class DownloadWorker implements Runnable {
     /**
      * Gets the date rounded up to the following day. So day+1, hour, minute,
      * second, millisecond 0.
-     * 
+     *
      * @param date
      *            The date to round up.
      * @return The rounded up date on the day
