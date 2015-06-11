@@ -10,17 +10,20 @@ import java.util.TreeMap;
 import org.helioviewer.base.interval.Interval;
 
 public class RequestCache {
-    private final Map<Date, Interval<Date>> requestCache;
+    private final Map<Date, Interval<Date>> requestedAndDownloadedCache;
+    private final Map<Date, Interval<Date>> requestedCache;
 
     public RequestCache() {
-        requestCache = new TreeMap<Date, Interval<Date>>();
+        requestedAndDownloadedCache = new TreeMap<Date, Interval<Date>>();
+        requestedCache = new TreeMap<Date, Interval<Date>>();
     }
 
     public List<Interval<Date>> adaptRequestCache(Date startDate, Date endDate) {
         ArrayList<Interval<Date>> missingIntervals = new ArrayList<Interval<Date>>();
-        if (requestCache.isEmpty()) {
+        if (requestedAndDownloadedCache.isEmpty()) {
             missingIntervals.add(new Interval<Date>(startDate, endDate));
-            requestCache.put(startDate, new Interval<Date>(startDate, endDate));
+            requestedAndDownloadedCache.put(startDate, new Interval<Date>(startDate, endDate));
+            requestedCache.put(startDate, new Interval<Date>(startDate, endDate));
         } else {
             missingIntervals = getMissingIntervals(new Interval<Date>(startDate, endDate));
             updateRequestCache(startDate, endDate);
@@ -34,13 +37,13 @@ public class RequestCache {
         Interval<Date> previousInterval = null;
         boolean startFound = false;
         boolean endFound = false;
-        for (Date iStartDate : requestCache.keySet()) {
+        for (Date iStartDate : requestedAndDownloadedCache.keySet()) {
             // define start
             if (!startFound) {
                 if (startDate.before(iStartDate)) {
                     if (previousInterval == null) {
                         startFound = true;
-                        previousInterval = requestCache.get(iStartDate);
+                        previousInterval = requestedAndDownloadedCache.get(iStartDate);
                     } else {
                         // There was a previous interval. Check if start lies
                         // within previous interval
@@ -56,7 +59,7 @@ public class RequestCache {
                                     break;
                                 } else {
                                     intervalsToRemove.add(iStartDate);
-                                    previousInterval = requestCache.get(iStartDate);
+                                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
                                 }
                             }
                             startFound = true;
@@ -68,11 +71,11 @@ public class RequestCache {
                                 endFound = true;
                                 break;
                             }
-                            previousInterval = requestCache.get(iStartDate);
+                            previousInterval = requestedAndDownloadedCache.get(iStartDate);
                         }
                     }
                 } else {
-                    previousInterval = requestCache.get(iStartDate);
+                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
                 }
             } else {
                 // define end
@@ -87,7 +90,7 @@ public class RequestCache {
                         break;
                     } else {
                         intervalsToRemove.add(previousInterval.getStart());
-                        previousInterval = requestCache.get(iStartDate);
+                        previousInterval = requestedAndDownloadedCache.get(iStartDate);
                         continue;
                     }
                 }
@@ -119,9 +122,11 @@ public class RequestCache {
             }
         }
         for (Date toRemove : intervalsToRemove) {
-            requestCache.remove(toRemove);
+            requestedAndDownloadedCache.remove(toRemove);
+            requestedCache.remove(toRemove);
         }
-        requestCache.put(intervalToAdd.getStart(), intervalToAdd);
+        requestedAndDownloadedCache.put(intervalToAdd.getStart(), intervalToAdd);
+        requestedCache.put(intervalToAdd.getStart(), intervalToAdd);
     }
 
     public void removeRequestedIntervals(Interval<Date> remInterval) {
@@ -129,8 +134,8 @@ public class RequestCache {
         List<Interval<Date>> intervalsToAdd = new ArrayList<Interval<Date>>();
         List<Date> intervalsToRemove = new ArrayList<Date>();
         Date start = remInterval.getStart();
-        for (Date isDate : requestCache.keySet()) {
-            Interval<Date> rcInterval = requestCache.get(isDate);
+        for (Date isDate : requestedAndDownloadedCache.keySet()) {
+            Interval<Date> rcInterval = requestedAndDownloadedCache.get(isDate);
             if (start.before(rcInterval.getStart()) || start.equals(rcInterval.getStart())) {
                 if (remInterval.getEnd().after(rcInterval.getStart())) {
                     intervalsToRemove.add(isDate);
@@ -159,16 +164,16 @@ public class RequestCache {
 
         }
         for (Date date : intervalsToRemove) {
-            requestCache.remove(date);
+            requestedAndDownloadedCache.remove(date);
         }
         for (Interval<Date> intToAdd : intervalsToAdd) {
-            requestCache.put(intToAdd.getStart(), intToAdd);
+            requestedAndDownloadedCache.put(intToAdd.getStart(), intToAdd);
         }
 
     }
 
     public Collection<Interval<Date>> getAllRequestIntervals() {
-        return requestCache.values();
+        return requestedCache.values();
     }
 
     public ArrayList<Interval<Date>> getMissingIntervals(Interval<Date> interval) {
@@ -177,11 +182,11 @@ public class RequestCache {
         Date endDate = interval.getEnd();
         Date currentStartDate = interval.getStart();
         boolean endDateUsed = false;
-        if (requestCache.isEmpty()) {
+        if (requestedAndDownloadedCache.isEmpty()) {
             missingIntervals.add(new Interval<Date>(startDate, endDate));
         } else {
             Interval<Date> previousInterval = null;
-            for (Date iStartDate : requestCache.keySet()) {
+            for (Date iStartDate : requestedAndDownloadedCache.keySet()) {
                 if (currentStartDate.before(iStartDate)) {
                     if (previousInterval == null) {
                         // No previous interval check if endate is also before
@@ -189,7 +194,7 @@ public class RequestCache {
                         if (endDate.before(iStartDate)) {
                             // complete new interval
                             missingIntervals.add(new Interval<Date>(startDate, endDate));
-                            previousInterval = requestCache.get(iStartDate);
+                            previousInterval = requestedAndDownloadedCache.get(iStartDate);
                             break;
                         } else {
                             // overlapping interval => missing interval =
@@ -197,7 +202,7 @@ public class RequestCache {
                             // continue with interval = {iStartDate, endDate}
                             currentStartDate = iStartDate;
                             missingIntervals.add(new Interval<Date>(startDate, iStartDate));
-                            previousInterval = requestCache.get(iStartDate);
+                            previousInterval = requestedAndDownloadedCache.get(iStartDate);
                             continue;
                         }
                     } else {
@@ -224,7 +229,7 @@ public class RequestCache {
                                     missingIntervals.add(new Interval<Date>(previousInterval.getEnd(), iStartDate));
                                     currentStartDate = iStartDate;
                                 }
-                                previousInterval = requestCache.get(iStartDate);
+                                previousInterval = requestedAndDownloadedCache.get(iStartDate);
                                 continue;
                             }
 
@@ -250,7 +255,7 @@ public class RequestCache {
                                 } else {
                                     // 2)
                                     missingIntervals.add(new Interval<Date>(currentStartDate, iStartDate));
-                                    previousInterval = requestCache.get(iStartDate);
+                                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
                                     currentStartDate = iStartDate;
                                     continue;
                                 }
@@ -261,7 +266,7 @@ public class RequestCache {
                         }
                     }
                 } else {
-                    previousInterval = requestCache.get(iStartDate);
+                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
                 }
             }
             // check if current start date is after or equal previous (last
