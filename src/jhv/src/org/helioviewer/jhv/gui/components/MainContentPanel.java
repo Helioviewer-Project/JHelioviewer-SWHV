@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,12 +38,13 @@ public class MainContentPanel extends JPanel implements ActionListener {
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
         collapsiblePane.toggleButton.addActionListener(this);
 
-        // this is needed to avoid crash of JOGL components inside JSplitPane
-        JPanel pane = new JPanel(new BorderLayout(0, 0));
-        pane.add(mainComponent, BorderLayout.CENTER);
+        // nest in a container to avoid crash of GLCanvas inside JSplitPane
+        Container container = new Container();
+        container.setLayout(new BorderLayout());
+        container.add(mainComponent);
 
         splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
-        splitpane.setTopComponent(pane);
+        splitpane.setTopComponent(container);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
         splitpane.setDividerSize(6);
