@@ -17,8 +17,8 @@ import javax.swing.border.BevelBorder;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
@@ -54,14 +54,14 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
         periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
         periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        periodFromLayersButton.setEnabled(LayersModel.getActiveView() != null);
+        periodFromLayersButton.setEnabled(Layers.getActiveView() != null);
         periodFromLayersButton.addActionListener(this);
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         add(zoomComboBox);
         add(periodFromLayersButton);
 
-        LayersModel.addLayersListener(this);
+        Layers.addLayersListener(this);
     }
 
     @Override
@@ -122,10 +122,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     }
 
     private void setDateRange() {
-        AbstractView view = LayersModel.getActiveView();
+        AbstractView view = Layers.getActiveView();
         if (view instanceof JHVJPXView) {
-            Date start = LayersModel.getStartDate(view);
-            Date end = LayersModel.getEndDate(view);
+            Date start = Layers.getStartDate(view);
+            Date end = Layers.getEndDate(view);
 
             Interval<Date> interval = new Interval<Date>(start, end);
             DrawController.getSingletonInstance().setSelectedInterval(interval, true);

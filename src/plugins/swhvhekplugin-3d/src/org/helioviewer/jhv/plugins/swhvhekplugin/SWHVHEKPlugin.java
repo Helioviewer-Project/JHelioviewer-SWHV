@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 public class SWHVHEKPlugin implements Plugin {
@@ -26,14 +26,14 @@ public class SWHVHEKPlugin implements Plugin {
         ImageViewerGui.getInputController().addPlugin(controller);
 
         SWHVHEKData.getSingletonInstance().requestEvents();
-        LayersModel.addLayersListener(SWHVHEKData.getSingletonInstance());
+        Layers.addLayersListener(SWHVHEKData.getSingletonInstance());
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        LayersModel.removeLayersListener(SWHVHEKData.getSingletonInstance());
+        Layers.removeLayersListener(SWHVHEKData.getSingletonInstance());
         SWHVHEKData.getSingletonInstance().reset();
 
         ImageViewerGui.getInputController().removePlugin(controller);

@@ -39,7 +39,7 @@ import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableGridType;
@@ -249,7 +249,7 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 try {
-                    LayersModel.addLayerFromThread(APIRequestManager.loadView(jpxUrl, jpxUrl));
+                    Layers.addLayerFromThread(APIRequestManager.loadView(jpxUrl, jpxUrl));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -259,7 +259,7 @@ public class ImageViewerGui {
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 try {
-                    LayersModel.addLayerFromThread(APIRequestManager.loadView(jpipUri, jpipUri));
+                    Layers.addLayerFromThread(APIRequestManager.loadView(jpipUri, jpipUri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }
@@ -274,7 +274,7 @@ public class ImageViewerGui {
                     fileDownloader.get(downloadAddress, downloadFile);
                     URI uri = downloadFile.toURI();
 
-                    LayersModel.addLayerFromThread(APIRequestManager.loadView(uri, uri));
+                    Layers.addLayerFromThread(APIRequestManager.loadView(uri, uri));
                 } catch (IOException e) {
                     Message.err("An error occured while opening the remote file!", e.getMessage(), false);
                 }

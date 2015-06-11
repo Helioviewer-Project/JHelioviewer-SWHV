@@ -12,7 +12,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
-public class LayersModel {
+public class Layers {
 
     private static AbstractView activeView;
     private static final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();

@@ -17,7 +17,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -30,14 +30,6 @@ import org.helioviewer.viewmodel.view.opengl.GLSLShader;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-/**
- * This is the scene graph equivalent of an image layer sub view chain attached
- * to the GL3DLayeredView. It represents exactly one image layer in the view
- * chain
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public class RenderableImageLayer implements Renderable {
 
     private static boolean showCorona = true;
@@ -63,27 +55,27 @@ public class RenderableImageLayer implements Renderable {
     private boolean isVisible = true;
 
     public RenderableImageLayer(AbstractView view) {
-        this.type = new RenderableImageType(view.getName());
+        type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
-        this.mainLayerView = view;
+        mainLayerView = view;
 
         int count = 0;
-        for (int i = 0; i <= this.resolution; i++) {
+        for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                this.pointlist[count] = new GL3DVec2d(2. * (1. * i / this.resolution - 0.5), -2. * (j - 0.5));
+                pointlist[count] = new GL3DVec2d(2. * (1. * i / resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
-            for (int j = 0; j <= this.resolution; j++) {
-                this.pointlist[count] = new GL3DVec2d(2. * (i / 1. - 0.5), -2. * (1. * j / this.resolution - 0.5));
+            for (int j = 0; j <= resolution; j++) {
+                pointlist[count] = new GL3DVec2d(2. * (i / 1. - 0.5), -2. * (1. * j / resolution - 0.5));
                 count++;
             }
         }
 
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
-        float opacity = (float) (1. / (1. + LayersModel.getNumLayers()));
+        float opacity = (float) (1. / (1. + Layers.getNumLayers()));
         if (mainLayerView instanceof JHVJP2View) {
             JHVJP2View jp2v = ((JHVJP2View) mainLayerView);
             if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
@@ -100,11 +92,11 @@ public class RenderableImageLayer implements Renderable {
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
-        this.positionBufferSize = positionBuffer.capacity();
+        positionBufferSize = positionBuffer.capacity();
         positionBufferID = generate(gl);
 
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER, this.positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positionBufferSize * Buffers.SIZEOF_FLOAT, positionBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
         indexBufferID = generate(gl);
@@ -123,7 +115,7 @@ public class RenderableImageLayer implements Renderable {
         double maxPhysicalY = Double.MIN_VALUE;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
-        GL3DQuatd camdiff = this.getCameraDifferenceRotationQuatd(activeCamera, mainLayerView.getImageData());
+        GL3DQuatd camdiff = getCameraDifferenceRotationQuatd(activeCamera, mainLayerView.getImageData());
 
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
@@ -185,7 +177,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void render(GL2 gl) {
-        if (!this.isVisible)
+        if (!isVisible)
             return;
 
         GLSLShader.bind(gl);
@@ -205,11 +197,11 @@ public class RenderableImageLayer implements Renderable {
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getImageData()));
-            if (this.mainLayerView.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getBaseDifferenceImageData()));
-            } else if (this.mainLayerView.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, this.mainLayerView.getPreviousImageData()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getImageData()));
+            if (mainLayerView.getBaseDifferenceMode()) {
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getBaseDifferenceImageData()));
+            } else if (mainLayerView.getDifferenceMode()) {
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getPreviousImageData()));
             }
 
             enablePositionVBO(gl);
@@ -219,11 +211,11 @@ public class RenderableImageLayer implements Renderable {
                 GLSLShader.bindIsDisc(gl, 0);
 
                 gl.glDepthRange(1.f, 1.f);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (this.indexBufferSize - 6) * Buffers.SIZEOF_INT);
+                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
                 gl.glDepthRange(0.f, 1.f);
 
                 GLSLShader.bindIsDisc(gl, 1);
-                gl.glDrawElements(GL2.GL_TRIANGLES, this.indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
             }
             disableIndexVBO(gl);
             disablePositionVBO(gl);
@@ -261,16 +253,16 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private void deletePositionVBO(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { this.positionBufferID }, 0);
+        gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
     }
 
     private void deleteIndexVBO(GL2 gl) {
-        gl.glDeleteBuffers(1, new int[] { this.indexBufferID }, 0);
+        gl.glDeleteBuffers(1, new int[] { indexBufferID }, 0);
     }
 
     @Override
     public void remove(GL2 gl) {
-        LayersModel.removeLayer(mainLayerView);
+        Layers.removeLayer(mainLayerView);
         dispose(gl);
     }
 
@@ -392,7 +384,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public RenderableType getType() {
-        return this.type;
+        return type;
     }
 
     @Override
@@ -408,8 +400,8 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void setVisible(boolean _isVisible) {
+        isVisible = _isVisible;
     }
 
     @Override
@@ -433,7 +425,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public boolean isActiveImageLayer() {
-        return LayersModel.getActiveView() == this.mainLayerView;
+        return Layers.getActiveView() == mainLayerView;
     }
 
     @Override

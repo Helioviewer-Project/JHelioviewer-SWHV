@@ -60,7 +60,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return imageCacheStatus;
     }
 
-    // to be accessed only from LayersModel
+    // to be accessed only from Layers
     @Override
     public void setCurrentFrame(ImmutableDateTime time) {
         if (time == null)
@@ -164,7 +164,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return 0;
     }
 
-    // to be accessed only from LayersModel
+    // to be accessed only from Layers
     @Override
     public void pauseMovie() {
         if (!isMoviePlaying())
@@ -176,7 +176,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         readerSignal.signal();
     }
 
-    // to be accessed only from LayersModel
+    // to be accessed only from Layers
     @Override
     public void playMovie() {
         if (isMoviePlaying() || getMaximumFrameNumber() <= 0)

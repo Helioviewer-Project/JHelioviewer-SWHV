@@ -42,7 +42,7 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.io.DataSourcesListener;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -232,7 +232,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             protected void done() {
                 ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
                 try {
-                    LayersModel.addLayer(get());
+                    Layers.addLayer(get());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

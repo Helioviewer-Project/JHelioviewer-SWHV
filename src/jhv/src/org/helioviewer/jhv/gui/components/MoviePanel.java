@@ -37,7 +37,7 @@ import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 
@@ -302,7 +302,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static void jumpToFrameNumber(int frame) {
         if (activeMovie != null) {
             frame = Math.max(0, Math.min(activeMovie.getMaximumFrameNumber(), frame));
-            LayersModel.setTime(activeMovie.getFrameDateTime(frame));
+            Layers.setTime(activeMovie.getFrameDateTime(frame));
             timeSlider.setValue(frame);
         }
     }
@@ -322,13 +322,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             playPauseButton.setIcon(playIcon);
             playPauseButton.setToolTipText("Play movie");
             if (!onlyGUI) {
-                LayersModel.pauseMovies();
+                Layers.pauseMovies();
             }
         } else {
             playPauseButton.setIcon(pauseIcon);
             playPauseButton.setToolTipText("Pause movie");
             if (!onlyGUI) {
-                LayersModel.playMovies();
+                Layers.playMovies();
             }
         }
     }
@@ -441,7 +441,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
         if (isPlaying) {
-            LayersModel.pauseMovies();
+            Layers.pauseMovies();
         }
     }
 
@@ -465,7 +465,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
-            LayersModel.playMovies();
+            Layers.playMovies();
         }
         someoneIsDragging = false;
     }

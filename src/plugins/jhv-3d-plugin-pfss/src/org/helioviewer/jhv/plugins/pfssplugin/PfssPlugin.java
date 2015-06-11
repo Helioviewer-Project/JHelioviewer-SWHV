@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 import java.net.URL;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
 
@@ -26,14 +26,14 @@ public class PfssPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        LayersModel.addLayersListener(renderable);
+        Layers.addLayersListener(renderable);
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
     }
 
     @Override
     public void uninstallPlugin() {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
-        LayersModel.removeLayersListener(renderable);
+        Layers.removeLayersListener(renderable);
     }
 
     @Override

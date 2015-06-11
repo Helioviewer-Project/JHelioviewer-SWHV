@@ -24,8 +24,8 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
@@ -74,7 +74,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         this.add(timePane);
         this.add(plotPane);
 
-        LayersModel.addLayersListener(SimpleObservationDialogUIPanel.this);
+        Layers.addLayersListener(SimpleObservationDialogUIPanel.this);
     }
 
     public void setDate(final Date start) {
@@ -92,7 +92,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        Interval<Date> movieInterval = new Interval<Date>(LayersModel.getFirstDate(), LayersModel.getLastDate());
+        Interval<Date> movieInterval = new Interval<Date>(Layers.getFirstDate(), Layers.getLastDate());
         if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
             return movieInterval;
         } else {
@@ -228,7 +228,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     @Override
     public void layerAdded(AbstractView view) {
         if (view instanceof JHVJPXView) {
-            Date start = LayersModel.getStartDate(view);
+            Date start = Layers.getStartDate(view);
             calendarStartDate.setDate(start);
             ObservationDialogDateModel.getInstance().setStartDate(start, false);
         }

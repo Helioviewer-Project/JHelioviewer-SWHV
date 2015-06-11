@@ -170,7 +170,7 @@ public interface MovieView extends View {
      */
     public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
 
-    // <!- only for LayersModel
+    // <!- only for Layers
     public boolean isMoviePlaying();
 
     public void playMovie();
