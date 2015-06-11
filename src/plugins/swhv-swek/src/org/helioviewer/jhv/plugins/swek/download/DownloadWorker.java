@@ -146,7 +146,7 @@ public class DownloadWorker implements Runnable {
      *            the parameters to use in the download
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
-        // Log.debug("Create dw " + this + " downloading interval " + interval);
+        Log.debug("Create dw " + this + " downloading interval " + interval);
         // Thread.dumpStack();
         isStopped = false;
         requestInterval = interval;
@@ -187,7 +187,7 @@ public class DownloadWorker implements Runnable {
      * Stops the worker thread
      */
     public void stopWorker() {
-        Log.debug("Downloadworker stopped: " + this);
+        // Log.debug("Downloadworker stopped: " + this);
         // Thread.dumpStack();
         isStopped = true;
         if (downloader != null) {
@@ -200,48 +200,55 @@ public class DownloadWorker implements Runnable {
 
     @Override
     public void run() {
-        Log.debug("Start download worker: " + this);
-        fireDownloadWorkerStarted();
-        // create downloader
-        downloader = createDownloader();
-        // create parser
-        parser = createParser();
-        //
-        boolean moreDownloads = false;
-        int page = 0;
-        do {
-            // download the data
-            InputStream downloadInputStream = downloadData(page);
-            // parse the data
-            SWEKEventStream swekEventStream = parseData(downloadInputStream);
-            if (swekEventStream != null) {
-                moreDownloads = swekEventStream.additionalDownloadNeeded();
-            }
-            // distribute the data
-            distributeData(swekEventStream);
-            page++;
-        } while (moreDownloads);
-        // inform JHVEventContainer data finished downloading
         if (!isStopped) {
-            try {
-                EventQueue.invokeAndWait(new Runnable() {
+            // Log.debug("Start download worker: " + this);
+            fireDownloadWorkerStarted();
+            // create downloader
+            downloader = createDownloader();
+            // create parser
+            parser = createParser();
+            //
+            boolean moreDownloads = false;
+            int page = 0;
+            do {
+                // download the data
+                InputStream downloadInputStream = downloadData(page);
+                // parse the data
+                SWEKEventStream swekEventStream = parseData(downloadInputStream);
+                if (swekEventStream != null) {
+                    moreDownloads = swekEventStream.additionalDownloadNeeded();
+                }
+                // distribute the data
+                distributeData(swekEventStream);
+                page++;
+            } while (moreDownloads && !isStopped);
+            // inform JHVEventContainer data finished downloading
+            if (!isStopped) {
+                try {
+                    EventQueue.invokeAndWait(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        eventContainer.finishedDownload();
-                    }
-                });
-            } catch (InvocationTargetException e) {
-                Log.error("Invoke and wait called from event queue", e);
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                Log.error("Invoke and wait interrupted", e);
-                e.printStackTrace();
+                        @Override
+                        public void run() {
+                            eventContainer.finishedDownload();
+                        }
+                    });
+                } catch (InvocationTargetException e) {
+                    Log.error("Invoke and wait called from event queue", e);
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    Log.error("Invoke and wait interrupted", e);
+                    e.printStackTrace();
+                }
+
             }
-
+            fireDownloadWorkerFinished();
+            Log.debug("Downloadworker finished: " + this);
+        } else {
+            Log.debug("Download worker was stopped before it could be started");
+            Log.debug(this);
+            fireDownloadWorkerForcedStopped();
+            fireDownloadWorkerFinished();
         }
-        fireDownloadWorkerFinished();
-        Log.debug("Downloadworker finished: " + this);
     }
 
     /**
