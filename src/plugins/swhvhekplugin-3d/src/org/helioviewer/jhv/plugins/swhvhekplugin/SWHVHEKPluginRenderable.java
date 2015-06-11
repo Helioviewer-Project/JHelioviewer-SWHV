@@ -20,7 +20,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -280,7 +280,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void render(GL2 gl) {
         AbstractView view;
-        if (isVisible && (view = LayersModel.getActiveView()) != null) {
+        if (isVisible && (view = Layers.getActiveView()) != null) {
             Date currentDate = view.getMetaData().getDateObs().getTime();
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
             for (JHVEvent evt : toDraw) {

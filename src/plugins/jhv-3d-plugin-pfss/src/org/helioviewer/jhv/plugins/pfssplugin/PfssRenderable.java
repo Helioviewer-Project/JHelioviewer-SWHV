@@ -6,8 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -39,7 +39,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void render(GL2 gl) {
         AbstractView view;
-        if (isVisible && (view = LayersModel.getActiveView()) != null) {
+        if (isVisible && (view = Layers.getActiveView()) != null) {
             PfssData pfssData;
 
             long millis = view.getMetaData().getDateObs().getMillis();
@@ -99,8 +99,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void layerAdded(AbstractView view) {
         PfssPlugin.getPfsscache().clear();
-        Date start = LayersModel.getFirstDate();
-        Date end = LayersModel.getLastDate();
+        Date start = Layers.getFirstDate();
+        Date end = Layers.getLastDate();
         Thread t = new Thread(new PfssNewDataLoader(start, end), "PFFSLoader");
         pfssNewLoadPool.submit(t);
     }

@@ -33,7 +33,7 @@ import org.helioviewer.jhv.gui.components.DynamicModel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 
 /**
  * Dialog that is used to open user defined JPIP images.
@@ -361,7 +361,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                     URI newUri = filedownloader.downloadFromHTTP(uri, true);
 
                     try {
-                        LayersModel.addLayerFromThread(APIRequestManager.loadView(newUri, uri));
+                        Layers.addLayerFromThread(APIRequestManager.loadView(newUri, uri));
                         dispose();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -426,7 +426,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
                 @Override
                 public void run() {
                     try {
-                        LayersModel.addLayerFromThread(APIRequestManager.loadView(uri, new URI(httpPath)));
+                        Layers.addLayerFromThread(APIRequestManager.loadView(uri, new URI(httpPath)));
                         if (advancedOptions == false) {
                             Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
                         }

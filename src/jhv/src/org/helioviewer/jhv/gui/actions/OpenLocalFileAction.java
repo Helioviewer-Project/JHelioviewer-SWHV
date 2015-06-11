@@ -17,7 +17,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
 import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 
 /**
  * Action to open a local file.
@@ -63,7 +63,7 @@ public class OpenLocalFileAction extends AbstractAction {
                     @Override
                     public void run() {
                         try {
-                            LayersModel.addLayerFromThread(APIRequestManager.loadView(uri, uri));
+                            Layers.addLayerFromThread(APIRequestManager.loadView(uri, uri));
                         } catch (IOException e) {
                             Message.err("An error occured while opening the file!", e.getMessage(), false);
                         }

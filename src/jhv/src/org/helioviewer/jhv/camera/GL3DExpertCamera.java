@@ -7,8 +7,8 @@ import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
@@ -43,12 +43,12 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
         this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        LayersModel.addLayersListener(this);
+        Layers.addLayersListener(this);
     }
 
     @Override
     public void deactivate() {
-        LayersModel.removeLayersListener(this);
+        Layers.removeLayersListener(this);
         super.deactivate();
     }
 
@@ -73,14 +73,14 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             if (interpolation) {
                 long tLayerStart = 0, tLayerEnd = 0;
                 // Active layer times
-                AbstractView view = LayersModel.getActiveView();
+                AbstractView view = Layers.getActiveView();
                 if (view instanceof JHVJPXView) {
-                    tLayerStart = LayersModel.getStartDate(view).getTime();
-                    tLayerEnd = LayersModel.getEndDate(view).getTime();
+                    tLayerStart = Layers.getStartDate(view).getTime();
+                    tLayerEnd = Layers.getEndDate(view).getTime();
                 }
                 //Camera times
-                long tPositionStart = this.positionLoading.getStartTime();
-                long tPositionEnd = this.positionLoading.getEndTime();
+                long tPositionStart = positionLoading.getStartTime();
+                long tPositionEnd = positionLoading.getEndTime();
 
                 if (tLayerEnd != tLayerStart) {
                     currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (dateTime - tLayerStart) / (double) (tLayerEnd - tLayerStart));
@@ -121,10 +121,9 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         double l = -currentL + p.lon;
         double d = currentDistance;
 
-        this.localRotation = new GL3DQuatd(b, l);
-        this.setZTranslation(-d);
-
-        this.updateCameraTransformation();
+        localRotation = new GL3DQuatd(b, l);
+        setZTranslation(-d);
+        updateCameraTransformation();
     }
 
     public void fireNewLoaded(String state) {
@@ -133,21 +132,21 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     public void setBeginDate(Date date, boolean applyChanges) {
-        this.positionLoading.setBeginDate(date, applyChanges);
+        positionLoading.setBeginDate(date, applyChanges);
     }
 
     public void setEndDate(Date date, boolean applyChanges) {
-        this.positionLoading.setEndDate(date, applyChanges);
+        positionLoading.setEndDate(date, applyChanges);
     }
 
     public void setObservingObject(String object, boolean applyChanges) {
-        this.positionLoading.setObserver(object, applyChanges);
+        positionLoading.setObserver(object, applyChanges);
     }
 
-    public void setInterpolation(boolean interpolation) {
-        this.interpolation = interpolation;
-        if (!this.interpolation) {
-            activeLayerChanged(LayersModel.getActiveView());
+    public void setInterpolation(boolean _interpolation) {
+        interpolation = _interpolation;
+        if (!interpolation) {
+            activeLayerChanged(Layers.getActiveView());
         }
     }
 
@@ -158,17 +157,17 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     @Override
     public void activeLayerChanged(AbstractView view) {
         if (!interpolation && view instanceof JHVJPXView) {
-            positionLoading.setBeginDate(LayersModel.getStartDate(view), false);
-            positionLoading.setEndDate(LayersModel.getEndDate(view), true);
+            positionLoading.setBeginDate(Layers.getStartDate(view), false);
+            positionLoading.setEndDate(Layers.getEndDate(view), true);
         }
     }
 
     public Date getBeginTime() {
-        return this.positionLoading.getBeginDate();
+        return positionLoading.getBeginDate();
     }
 
     public Date getEndTime() {
-        return this.positionLoading.getEndDate();
+        return positionLoading.getEndDate();
     }
 
     @Override

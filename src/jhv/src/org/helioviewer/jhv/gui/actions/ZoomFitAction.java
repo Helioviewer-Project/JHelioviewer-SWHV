@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
@@ -38,7 +38,7 @@ public class ZoomFitAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        AbstractView view = LayersModel.getActiveView();
+        AbstractView view = Layers.getActiveView();
         if (view != null) {
             GL3DCamera camera = Displayer.getActiveCamera();
             double fov = 2. * Math.atan(-view.getMetaData().getPhysicalSize().y / 2. / camera.getTranslation().z);

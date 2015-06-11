@@ -28,7 +28,7 @@ import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings({ "serial" })
 public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
@@ -248,7 +248,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     void syncWithLayerBeginTime(boolean applyChanges) {
         Date startDate = null;
-        startDate = LayersModel.getFirstDate();
+        startDate = Layers.getFirstDate();
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
         }
@@ -286,7 +286,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     void syncWithLayerEndTime(boolean applyChanges) {
         Date endDate = null;
-        endDate = LayersModel.getLastDate();
+        endDate = Layers.getLastDate();
         if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
         }
@@ -343,7 +343,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     public void fireLoaded(String state) {
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
-        this.loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
+        loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
     }
 
 }

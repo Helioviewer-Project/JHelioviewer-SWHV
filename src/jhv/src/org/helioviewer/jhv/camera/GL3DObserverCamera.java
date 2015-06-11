@@ -6,7 +6,7 @@ import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -67,19 +67,18 @@ public class GL3DObserverCamera extends GL3DCamera {
 
     private void updateRotation(Date date) {
         double d;
-        AbstractView view = LayersModel.getActiveView();
+        AbstractView view = Layers.getActiveView();
 
         if (view != null) {
             MetaData metadata = view.getMetaData();
-            this.localRotation = metadata.getRotationObs();
+            localRotation = metadata.getRotationObs();
             d = metadata.getDistanceObs();
         } else {
-            this.localRotation = GL3DQuatd.ZERO;
+            localRotation = GL3DQuatd.ZERO;
             d = Sun.MeanEarthDistance;
         }
-        this.setZTranslation(-d);
-
-        this.updateCameraTransformation();
+        setZTranslation(-d);
+        updateCameraTransformation();
     }
 
     @Override

@@ -17,8 +17,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.display.TimeListener;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.layers.LayersModel;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
@@ -255,7 +255,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void layerAdded(AbstractView view) {
-        final Interval<Date> interval = new Interval<Date>(LayersModel.getFirstDate(), LayersModel.getLastDate());
+        final Interval<Date> interval = new Interval<Date>(Layers.getFirstDate(), Layers.getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
         } else {

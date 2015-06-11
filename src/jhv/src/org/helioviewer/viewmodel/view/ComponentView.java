@@ -19,7 +19,7 @@ import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.opengl.GLInfo;
 import org.helioviewer.viewmodel.view.opengl.GLSLShader;
@@ -150,7 +150,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
     }
 
     private void exportFrame() {
-        AbstractView mv = LayersModel.getActiveView();
+        AbstractView mv = Layers.getActiveView();
         if (mv == null) {
             stopExport();
             return;
@@ -196,7 +196,7 @@ public class ComponentView implements GLEventListener, DisplayListener {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getLeftContentPane().setEnabled(false);
 
-        AbstractView mv = LayersModel.getActiveView();
+        AbstractView mv = Layers.getActiveView();
         if (mv instanceof JHVJPXView) {
             exportMode = true;
 
@@ -210,9 +210,9 @@ public class ComponentView implements GLEventListener, DisplayListener {
             movieWriter = ToolFactory.makeWriter(moviePath);
             movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, canvas.getWidth(), canvas.getHeight());
 
-            LayersModel.pauseMovies();
-            LayersModel.setTime(jpxView.getFrameDateTime(0));
-            LayersModel.playMovies();
+            Layers.pauseMovies();
+            Layers.setTime(jpxView.getFrameDateTime(0));
+            Layers.playMovies();
         } else {
             exportMovieDialog.fail();
             exportMovieDialog = null;

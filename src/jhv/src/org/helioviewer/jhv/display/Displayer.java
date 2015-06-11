@@ -13,7 +13,7 @@ import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.LayersModel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Displayer implements JHVEventHighlightListener {
@@ -89,9 +89,9 @@ public class Displayer implements JHVEventHighlightListener {
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
-        LayersModel.syncMaster(view, dateTime);
+        Layers.syncMaster(view, dateTime);
 
-        if (view == LayersModel.getActiveView()) {
+        if (view == Layers.getActiveView()) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
 
             lastTimestamp = dateTime.getTime();
@@ -106,7 +106,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static Date getLastUpdatedTimestamp() {
         if (lastTimestamp == null) {
-            lastTimestamp = LayersModel.getLastDate();
+            lastTimestamp = Layers.getLastDate();
         }
         return lastTimestamp;
     }
