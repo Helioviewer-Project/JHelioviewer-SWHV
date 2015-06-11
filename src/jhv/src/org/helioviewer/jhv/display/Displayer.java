@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.display;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -18,7 +19,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Displayer implements JHVEventHighlightListener {
 
-    private static DisplayListener displayListener;
+    private static Component displayComponent;
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
     private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
@@ -74,7 +75,7 @@ public class Displayer implements JHVEventHighlightListener {
         public void actionPerformed(ActionEvent e) {
             if (todisplay == true) {
                 todisplay = false;
-                displayListener.display();
+                displayComponent.repaint();
             }
 
             if (torender == true) {
@@ -116,8 +117,8 @@ public class Displayer implements JHVEventHighlightListener {
         display();
     }
 
-    public static void setDisplayListener(DisplayListener listener) {
-        displayListener = listener;
+    public static void setDisplayComponent(Component component) {
+        displayComponent = component;
     }
 
     public static void addRenderListener(final RenderListener renderListener) {

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Window;
@@ -141,9 +140,8 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
         mainComponent = new MainComponent();
-        Component canvas = mainComponent.getComponent();
-        inputController = new InputController(canvas);
-        mainContentPanel = new MainContentPanel(canvas);
+        inputController = new InputController(mainComponent);
+        mainContentPanel = new MainContentPanel(mainComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);

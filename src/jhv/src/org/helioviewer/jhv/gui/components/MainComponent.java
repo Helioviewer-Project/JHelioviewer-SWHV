@@ -15,7 +15,6 @@ import javax.swing.JTextArea;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.DisplayListener;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
@@ -40,9 +39,8 @@ import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.video.ConverterFactory;
 
-public class MainComponent implements GLEventListener, DisplayListener {
-
-    private static GLCanvas canvas;
+@SuppressWarnings("serial")
+public class MainComponent extends GLCanvas implements GLEventListener {
 
     // screenshot & movie
     private final AWTGLReadBufferUtil rbu;
@@ -59,26 +57,20 @@ public class MainComponent implements GLEventListener, DisplayListener {
     private File outputFile;
 
     public MainComponent() {
-        GLProfile glp = GLProfile.getDefault();
-        GLCapabilities caps = new GLCapabilities(glp);
+        super(new GLCapabilities(GLProfile.getDefault()));
 
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(glp).createDummyAutoDrawable(null, true, caps, null);
+        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(getGLProfile()).createDummyAutoDrawable(null, true, getRequestedGLCapabilities(), null);
         sharedDrawable.display();
 
-        rbu = new AWTGLReadBufferUtil(glp, false);
-
-        canvas = new GLCanvas(caps);
         // GUI events can lead to context destruction and invalidation of GL objects and state
-        canvas.setSharedAutoDrawable(sharedDrawable);
-        canvas.setMinimumSize(new Dimension(1, 1));
-        canvas.setAutoSwapBufferMode(false);
+        setSharedAutoDrawable(sharedDrawable);
+        setMinimumSize(new Dimension());
+        setAutoSwapBufferMode(false);
 
-        canvas.addGLEventListener(this);
-        Displayer.setDisplayListener(this);
-    }
+        addGLEventListener(this);
+        Displayer.setDisplayComponent(this);
 
-    public final Component getComponent() {
-        return canvas;
+        rbu = new AWTGLReadBufferUtil(getGLProfile(), false);
     }
 
     @Override
@@ -86,7 +78,7 @@ public class MainComponent implements GLEventListener, DisplayListener {
         GL2 gl = drawable.getGL().getGL2(); // try to force an exception
 
         GLInfo.update(gl);
-        GLInfo.updatePixelScale(canvas);
+        GLInfo.updatePixelScale(this);
 
         gl.glEnable(GL2.GL_TEXTURE_1D);
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -118,13 +110,13 @@ public class MainComponent implements GLEventListener, DisplayListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setViewportSize(canvas.getWidth(), canvas.getHeight());
+        Displayer.setViewportSize(getWidth(), getHeight());
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(canvas);
+        GLInfo.updatePixelScale(this);
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
@@ -137,16 +129,11 @@ public class MainComponent implements GLEventListener, DisplayListener {
         drawable.swapBuffers();
 
         if (exportMode || screenshotMode) {
-            exportFrame();
+            exportFrame(gl);
         }
     }
 
-    @Override
-    public void display() {
-        canvas.display();
-    }
-
-    private void exportFrame() {
+    private void exportFrame(GL2 gl) {
         AbstractView mv = Layers.getActiveView();
         if (mv == null) {
             stopExport();
@@ -154,8 +141,7 @@ public class MainComponent implements GLEventListener, DisplayListener {
         }
 
         BufferedImage screenshot;
-        GL2 gl = (GL2) canvas.getGL();
-        int width = canvas.getWidth();
+        int width = getWidth();
 
         if (exportMode) {
             int currentScreenshot = 1;
@@ -205,7 +191,7 @@ public class MainComponent implements GLEventListener, DisplayListener {
                 framerate = 20;
 
             movieWriter = ToolFactory.makeWriter(moviePath);
-            movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, canvas.getWidth(), canvas.getHeight());
+            movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, getWidth(), getHeight());
 
             Layers.pauseMovies();
             Layers.setTime(jpxView.getFrameDateTime(0));
