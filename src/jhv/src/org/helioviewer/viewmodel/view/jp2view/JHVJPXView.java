@@ -245,22 +245,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return calculateParameter(getCurrentNumQualityLayers(), getCurrentFrameNumber());
     }
 
-    /**
-     * @see org.helioviewer.viewmodel.view.MovieView#setReuseBuffer(boolean)
-     */
-    @Override
-    public void setReuseBuffer(boolean reuseBuffer) {
-        render.setReuseBuffer(reuseBuffer);
-    }
-
-    /**
-     * @see org.helioviewer.viewmodel.view.MovieView#isReuseBuffer()
-     */
-    @Override
-    public boolean isReuseBuffer() {
-        return render.isReuseBuffer();
-    }
-
     @Override
     public int getDesiredRelativeSpeed() {
         return this.render.getMovieRelativeSpeed();
