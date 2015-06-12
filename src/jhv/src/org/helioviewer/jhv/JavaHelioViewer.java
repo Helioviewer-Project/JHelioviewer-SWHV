@@ -14,7 +14,7 @@ import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduEngine;
 
 /**
  * This class starts the applications.
@@ -85,19 +85,12 @@ public class JavaHelioViewer {
         Log.info("OS: " + System.getProperty("jhv.os") + " - arch: " + System.getProperty("jhv.arch") + " - java arch: " + System.getProperty("jhv.java.arch"));
 
         Log.debug("Instantiate Kakadu engine");
-        KakaduEngine engine = new KakaduEngine();
-
         try {
             JHVLoader.copyKDULibs();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
+            KakaduEngine engine = new KakaduEngine();
             engine.startKduMessageSystem();
-        } catch (JHV_KduException e) {
-            Log.fatal("Failed to setup Kakadu message handlers.", e);
-            Message.err("Error starting Kakadu message handler", e.getMessage(), true);
+        } catch (Exception e) {
+            Message.err("Failed to setup Kakadu", e.getMessage(), true);
             return;
         }
 
