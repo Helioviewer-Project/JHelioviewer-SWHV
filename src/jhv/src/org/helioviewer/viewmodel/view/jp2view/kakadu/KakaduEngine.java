@@ -1,11 +1,8 @@
-package org.helioviewer.jhv;
+package org.helioviewer.viewmodel.view.jp2view.kakadu;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_message_formatter;
-
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_message;
 
 /**
  * This class takes care of setting up the internal Kakadu messaging objects.
@@ -34,7 +31,7 @@ public class KakaduEngine {
      * 
      * @throws JHV_KduException
      */
-    public void startKduMessageSystem() throws JHV_KduException {
+    public void startKduMessageSystem() throws Exception {
         try {
             warnings = new JHV_Kdu_message(false);
             errors = new JHV_Kdu_message(true);
@@ -43,7 +40,7 @@ public class KakaduEngine {
             Kdu_global.Kdu_customize_warnings(warningsFormatter);
             Kdu_global.Kdu_customize_errors(errorsFormatter);
         } catch (KduException ex) {
-            throw new JHV_KduException("Error initializing Kakadu error handler:\n" + ex.getMessage());
+            throw new Exception("Error initializing Kakadu error handler:\n" + ex.getMessage());
         }
     }
 
