@@ -71,40 +71,8 @@ class J2KRender implements Runnable {
     /** Maximum of samples to process per rendering iteration */
     private final int MAX_RENDER_SAMPLES = 50000;
 
-    /** Maximum rendering iterations per layer allowed */
-    // Is now calculated automatically as num_pix / MAX_RENDER_SAMPLES
-    //private final int MAX_RENDER_ITERATIONS = 150;
-
     /** It says if the render is going to play a movie instead of a single image */
     private boolean movieMode = false;
-
-    /**
-     * Sets whether the byte and integer buffers should be reused between
-     * frames.
-     * <p>
-     * Normally this avoids garbage collection, but for some cases it must be
-     * deactivated
-     */
-    private boolean reuseBuffer = true;
-
-    /**
-     * Gets whether to reuse the buffer
-     *
-     * @return the reuseBuffer
-     */
-    public boolean isReuseBuffer() {
-        return reuseBuffer;
-    }
-
-    /**
-     * Sets whether to reuse the buffer
-     *
-     * @param reuseBuffer
-     *            the reuseBuffer to set
-     */
-    public void setReuseBuffer(boolean reuseBuffer) {
-        this.reuseBuffer = reuseBuffer;
-    }
 
     private int movieSpeed = 20;
     private float actualMovieFramerate = 0.0f;
@@ -120,11 +88,7 @@ class J2KRender implements Runnable {
      * @param _parentViewRef
      */
     J2KRender(JHVJP2View _parentViewRef) {
-        if (_parentViewRef == null) {
-            throw new NullPointerException();
-        }
         parentViewRef = _parentViewRef;
-
         parentImageRef = parentViewRef.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
 
