@@ -226,20 +226,10 @@ class J2KRender implements Runnable {
                 if (parentImageRef.getNumComponents() < 2) {
                     currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
                     byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
-
                 } else {
                     currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                    // if (differenceMode || roi.getNumPixels() !=
-                    // intBuffer[currentIntBuffer].length || (!movieMode &&
-                    // !linkedMovieMode &&
-                    // !J2KRenderGlobalOptions.getDoubleBufferingOption())) {
                     intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
-                    // } else if (J2KRenderGlobalOptions.getDoubleBufferingOption())
-                    // {
-                    // Arrays.fill(intBuffer[currentIntBuffer], 0);
-                    // }
                 }
-                //
 
                 while (!compositorRef.Is_processing_complete()) {
                     compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
