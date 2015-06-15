@@ -116,7 +116,7 @@ public class Layers {
                     ((MovieView) movieView).setCurrentFrame(dateTime);
                 }
             }
-            MoviePanel.setFrameSlider(masterView);
+            MoviePanel.getSingletonInstance().setFrameSlider(frame);
         }
     }
 
