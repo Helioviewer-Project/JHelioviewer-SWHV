@@ -11,6 +11,7 @@ import java.util.List;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
@@ -515,6 +516,10 @@ public class DownloadWorker implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    public JHVEventType getJHVEventType() {
+        return new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName());
     }
 
 }
