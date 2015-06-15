@@ -382,7 +382,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             updateMovieSpeed();
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox && activeMovie != null) {
-            // activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+            Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 
