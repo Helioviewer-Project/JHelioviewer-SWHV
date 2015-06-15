@@ -78,8 +78,8 @@ class J2KRender implements Runnable {
     private long lastSleepTime = 0;
     private int lastCompositionLayerRendered = -1;
 
-    private NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
-    private FrameChooser frameChooser = new RelativeFrameChooser();
+    private NextFrameCandidateChooser nextFrameCandidateChooser;
+    private FrameChooser frameChooser;
 
     /**
      * The constructor.
@@ -90,6 +90,9 @@ class J2KRender implements Runnable {
         parentViewRef = _parentViewRef;
         parentImageRef = parentViewRef.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
+
+        nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
+        frameChooser = new RelativeFrameChooser();
 
         stop = false;
         myThread = null;
@@ -310,10 +313,7 @@ class J2KRender implements Runnable {
         }
     }
 
-    /**
-     * The method that decompresses and renders the image. It pushes it to the
-     * ViewObserver.
-     */
+    // The method that decompresses and renders the image
     @Override
     public void run() {
         int numFrames = 0;
@@ -329,7 +329,6 @@ class J2KRender implements Runnable {
             }
 
             currParams = parentViewRef.getImageViewParams();
-            nextFrameCandidateChooser.updateRange();
 
             while (!Thread.interrupted() && !stop) {
                 tfrm = System.currentTimeMillis();
@@ -393,7 +392,6 @@ class J2KRender implements Runnable {
                     }
 
                     lastSleepTime = tmax - (tnow - tfrm);
-
                     if (lastSleepTime > 0) {
                         try {
                             Thread.sleep(lastSleepTime);
@@ -426,13 +424,7 @@ class J2KRender implements Runnable {
         protected int maximumFrameNumber;
 
         public NextFrameCandidateChooser() {
-            updateRange();
-        }
-
-        public void updateRange() {
-            if (parentImageRef != null) {
-                maximumFrameNumber = parentImageRef.getMaximumFrameNumber();
-            }
+            maximumFrameNumber = parentImageRef.getMaximumFrameNumber();
         }
 
         protected void resetStartTime(int frameNumber) {
