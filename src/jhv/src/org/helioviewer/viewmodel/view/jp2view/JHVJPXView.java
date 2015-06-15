@@ -148,7 +148,8 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * @param frameNumber
      */
     private void setCurrentFrameNumber(int frameNumber) {
-        if (frameNumber != imageViewParams.compositionLayer && frameNumber >= 0 && frameNumber <= getMaximumAccessibleFrameNumber()) {
+        if (frameNumber != imageViewParams.compositionLayer &&
+            frameNumber >= 0 && frameNumber <= getMaximumAccessibleFrameNumber()) {
             imageViewParams.compositionLayer = frameNumber;
 
             readerSignal.signal();

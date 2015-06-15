@@ -55,10 +55,10 @@ public class Displayer implements JHVEventHighlightListener {
     private static boolean torender = false;
     private static boolean todisplay = false;
 
-    private final Timer timer = new Timer(1000 / 20, new MyListener());
+    private static final Timer displayTimer = new Timer(1000 / 20, new DisplayTimerListener());
 
     private Displayer() {
-        timer.start();
+        displayTimer.start();
     }
 
     public static void render() {
@@ -70,7 +70,7 @@ public class Displayer implements JHVEventHighlightListener {
         todisplay = true;
     }
 
-    private class MyListener implements ActionListener {
+    private static class DisplayTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (todisplay == true) {
@@ -89,8 +89,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-
-        Layers.syncMaster(view, dateTime);
 
         if (view == Layers.getActiveView()) {
             ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getCurrentFramerate());

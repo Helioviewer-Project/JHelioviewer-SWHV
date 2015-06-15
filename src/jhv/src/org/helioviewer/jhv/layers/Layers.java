@@ -69,7 +69,7 @@ public class Layers {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (masterView != null) {
-                masterView.setCurrentFrame(masterView.getFrameDateTime(masterView.getCurrentFrameNumber() + 1));
+                setFrame(masterView.getCurrentFrameNumber() + 1);
             }
         }
     }
@@ -91,21 +91,9 @@ public class Layers {
             playMovies();
     }
 
-    public static void syncMaster(AbstractView view, ImmutableDateTime dateTime) {
-        if (view == masterView) {
-            for (AbstractView movieView : layers) {
-                if (movieView != masterView && movieView instanceof MovieView) {
-                    ((MovieView) movieView).setCurrentFrame(dateTime);
-                }
-            }
-            MoviePanel.setFrameSlider(masterView);
-        }
-    }
-
     public static void playMovies() {
         if (masterView != null) {
             frameTimer.restart();
-            // masterView.playMovie();
             MoviePanel.playStateChanged(true);
         }
     }
@@ -113,14 +101,22 @@ public class Layers {
     public static void pauseMovies() {
         if (masterView != null) {
             frameTimer.stop();
-            // masterView.pauseMovie();
             MoviePanel.playStateChanged(false);
         }
     }
 
-    public static void setTime(ImmutableDateTime dateTime) {
+    public static void setFrame(int frame) {
         if (masterView != null) {
-            masterView.setCurrentFrame(dateTime);
+            ImmutableDateTime dateTime = masterView.getFrameDateTime(frame);
+            if (dateTime == null) // out of range
+                return;
+
+            for (AbstractView movieView : layers) {
+                if (movieView instanceof MovieView) {
+                    ((MovieView) movieView).setCurrentFrame(dateTime);
+                }
+            }
+            MoviePanel.setFrameSlider(masterView);
         }
     }
 

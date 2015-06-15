@@ -300,11 +300,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      *            the number of the frame
      */
     private static void jumpToFrameNumber(int frame) {
-        if (activeMovie != null) {
-            frame = Math.max(0, Math.min(activeMovie.getMaximumFrameNumber(), frame));
-            Layers.setTime(activeMovie.getFrameDateTime(frame));
-            timeSlider.setValue(frame);
-        }
+        Layers.setFrame(frame);
+        timeSlider.setValue(frame);
     }
 
     /**
