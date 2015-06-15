@@ -92,7 +92,7 @@ class J2KRender implements Runnable {
         compositorRef = parentImageRef.getCompositorRef();
 
         nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
-        frameChooser = new RelativeFrameChooser();
+        frameChooser = new RelativeFrameChooser(1000 / 20);
 
         stop = false;
         myThread = null;
@@ -140,22 +140,26 @@ class J2KRender implements Runnable {
         }
     }
 
-    public void setMovieRelativeSpeed(int framesPerSecond) {
+    public void setMovieRelativeSpeed(int framesPerSecond /* > 0 */) {
         if (movieMode && lastSleepTime > 1000) {
             myThread.interrupt();
         }
 
-        movieSpeed = framesPerSecond;
-        frameChooser = new RelativeFrameChooser();
+        frameChooser = new RelativeFrameChooser(1000 / framesPerSecond);
     }
 
-    public void setMovieAbsoluteSpeed(int secondsPerSecond) {
+    public void setMovieAbsoluteSpeed(int secondsPerSecond /* > 0 */) {
         if (movieMode && lastSleepTime > 1000) {
             myThread.interrupt();
         }
 
-        movieSpeed = secondsPerSecond;
-        frameChooser = new AbsoluteFrameChooser();
+
+        long[] obsMillis = new long[parentImageRef.getMaximumFrameNumber() + 1];
+        for (int i = 0; i <= parentImageRef.getMaximumFrameNumber(); ++i) {
+            obsMillis[i] = parentImageRef.metaDataList[i].getDateObs().getMillis() / secondsPerSecond;
+        }
+
+        frameChooser = new AbsoluteFrameChooser(obsMillis);
     }
 
     public void setAnimationMode(AnimationMode mode) {
@@ -486,20 +490,33 @@ class J2KRender implements Runnable {
     }
 
     private class RelativeFrameChooser implements FrameChooser {
+
+        private long dt;
+
+        public RelativeFrameChooser(long _dt) {
+            dt = _dt;
+        }
+
         @Override
         public long moveToNextFrame() {
             currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(currParams.compositionLayer);
-            return 1000 / movieSpeed;
+            return dt;
         }
     }
 
     private class AbsoluteFrameChooser implements FrameChooser {
 
-        private long absoluteStartTime = parentViewRef.jp2Image.metaDataList[currParams.compositionLayer].getDateObs().getMillis();
-        private long systemStartTime = System.currentTimeMillis();
+        private long[] obsMillis;
+        private long absoluteStartTime;
+        private long systemStartTime;
+
+        public AbsoluteFrameChooser(long[] _obsMillis) {
+            obsMillis = _obsMillis;
+            resetStartTime(currParams.compositionLayer);
+        }
 
         public void resetStartTime(int frameNumber) {
-            absoluteStartTime = parentViewRef.jp2Image.metaDataList[frameNumber].getDateObs().getMillis();
+            absoluteStartTime = obsMillis[frameNumber];
             systemStartTime = System.currentTimeMillis();
         }
 
@@ -513,15 +530,15 @@ class J2KRender implements Runnable {
                 nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
 
                 lastDiff = nextDiff;
-                nextDiff = Math.abs(parentViewRef.jp2Image.metaDataList[nextCandidate].getDateObs().getMillis() - absoluteStartTime) - ((System.currentTimeMillis() - systemStartTime) * movieSpeed);
+                nextDiff = Math.abs(obsMillis[nextCandidate] - absoluteStartTime) - (System.currentTimeMillis() - systemStartTime);
             } while (nextDiff < 0);
 
             if (-lastDiff < nextDiff) {
                 currParams.compositionLayer = lastCandidate;
-                return lastDiff / movieSpeed;
+                return lastDiff;
             } else {
                 currParams.compositionLayer = nextCandidate;
-                return nextDiff / movieSpeed;
+                return nextDiff;
             }
         }
     }
