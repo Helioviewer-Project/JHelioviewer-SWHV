@@ -10,6 +10,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.MovieView;
+import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
@@ -25,16 +26,16 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  * @author Desmond Amadigwe
  * @author Markus Langenberg
  */
-class J2KRender implements Runnable {
+class J2KRender1 implements Runnable {
 
     /**
      * There could be multiple reason that the Render object was signaled. This
      * enum lists them.
      */
-    public enum RenderReasons {
+/*    public enum RenderReasons {
         NEW_DATA, OTHER, MOVIE_PLAY
     };
-
+*/
     /** The thread that this object runs on. */
     private volatile Thread myThread;
 
@@ -69,24 +70,46 @@ class J2KRender implements Runnable {
     /** Maximum of samples to process per rendering iteration */
     private final int MAX_RENDER_SAMPLES = 50000;
 
+    /** It says if the render is going to play a movie instead of a single image */
+    private boolean movieMode = false;
+
+    private int movieSpeed = 20;
     private float actualMovieFramerate = 0.0f;
+    private long lastSleepTime = 0;
     private int lastCompositionLayerRendered = -1;
 
-    J2KRender(JHVJP2View _parentViewRef) {
+    private NextFrameCandidateChooser nextFrameCandidateChooser;
+    private FrameChooser frameChooser;
+
+    /**
+     * The constructor.
+     *
+     * @param _parentViewRef
+     */
+    J2KRender1(JHVJP2View _parentViewRef) {
         parentViewRef = _parentViewRef;
         parentImageRef = parentViewRef.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
+
+        nextFrameCandidateChooser = new NextFrameCandidateLoopChooser(parentImageRef.getMaximumFrameNumber());
+        frameChooser = new RelativeFrameChooser(1000 / 20);
 
         stop = false;
         myThread = null;
     }
 
+    /** Starts the J2KRender thread. */
     void start() {
         myThread = new Thread(JHVJP2View.renderGroup, this, "J2KRender");
         stop = false;
         myThread.start();
     }
 
+    /**
+     * Stops the J2KRender thread.
+     *
+     * @param jp2Image
+     */
     void abolish(JP2Image jp2Image) {
         stop = true;
         myThread.interrupt();
@@ -105,8 +128,62 @@ class J2KRender implements Runnable {
         jp2Image.abolish();
     }
 
+    public void setMovieMode(boolean val) {
+        if (movieMode) {
+            myThread.interrupt();
+            System.gc();
+        }
+
+        movieMode = val;
+        if (frameChooser instanceof AbsoluteFrameChooser) {
+            ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
+        }
+    }
+
+    public void setMovieRelativeSpeed(int framesPerSecond /* > 0 */) {
+        if (movieMode && lastSleepTime > 1000) {
+            myThread.interrupt();
+        }
+
+        frameChooser = new RelativeFrameChooser(1000 / framesPerSecond);
+    }
+
+    public void setMovieAbsoluteSpeed(int secondsPerSecond /* > 0 */) {
+        if (movieMode && lastSleepTime > 1000) {
+            myThread.interrupt();
+        }
+
+
+        long[] obsMillis = new long[parentImageRef.getMaximumFrameNumber() + 1];
+        for (int i = 0; i <= parentImageRef.getMaximumFrameNumber(); ++i) {
+            obsMillis[i] = parentImageRef.metaDataList[i].getDateObs().getMillis() / secondsPerSecond;
+        }
+
+        frameChooser = new AbsoluteFrameChooser(obsMillis);
+        ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
+    }
+
+    public void setAnimationMode(AnimationMode mode) {
+        int maxFrame = parentImageRef.getMaximumFrameNumber();
+        switch (mode) {
+        case LOOP:
+            nextFrameCandidateChooser = new NextFrameCandidateLoopChooser(maxFrame);
+            break;
+        case STOP:
+            nextFrameCandidateChooser = new NextFrameCandidateStopChooser(maxFrame);
+            break;
+        case SWING:
+            nextFrameCandidateChooser = new NextFrameCandidateSwingChooser(maxFrame);
+            break;
+        }
+    }
+
     public float getActualMovieFramerate() {
         return actualMovieFramerate;
+    }
+
+    public boolean isMovieMode() {
+        return movieMode;
     }
 
     private static final Object renderLock = new Object();
@@ -116,6 +193,7 @@ class J2KRender implements Runnable {
             parentImageRef.getLock().lock();
 
             try {
+
                 // see TODO below
                 // compositorRef.Refresh();
                 // compositorRef.Remove_compositing_layer(-1, true);
@@ -241,10 +319,12 @@ class J2KRender implements Runnable {
         }
     }
 
+    // The method that decompresses and renders the image
     @Override
     public void run() {
         int numFrames = 0;
         lastFrame = -1;
+        long tfrm;
         long tnow, tini = System.currentTimeMillis();
 
         while (!stop) {
@@ -256,43 +336,77 @@ class J2KRender implements Runnable {
 
             currParams = parentViewRef.getImageViewParams();
 
-            int curLayer = currParams.compositionLayer;
-            if (parentViewRef instanceof MovieView) {
-                MovieView parent = (MovieView) parentViewRef;
-                if (parent.getMaximumAccessibleFrameNumber() < curLayer) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
+            while (!Thread.interrupted() && !stop) {
+                tfrm = System.currentTimeMillis();
+                int curLayer = currParams.compositionLayer;
+
+                if (parentViewRef instanceof MovieView) {
+                    MovieView parent = (MovieView) parentViewRef;
+                    if (parent.getMaximumAccessibleFrameNumber() < curLayer) {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                        }
+                        parentViewRef.renderRequestedSignal.signal(J2KRender.RenderReasons.NEW_DATA);
+                        break;
                     }
-                    parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
-                    continue;
                 }
-            }
 
-            renderLayer(curLayer);
+                renderLayer(curLayer);
 
-            SubImage roi = currParams.subImage;
-            int width = roi.width;
-            int height = roi.height;
+                SubImage roi = currParams.subImage;
+                int width = roi.width;
+                int height = roi.height;
 
-            if (parentImageRef.getNumComponents() < 2) {
-                if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                    SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                if (parentImageRef.getNumComponents() < 2) {
+                    if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
+                        SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                    } else {
+                        Log.warn("J2KRender: Params out of sync, skip frame");
+                    }
                 } else {
-                    Log.warn("J2KRender: Params out of sync, skip frame");
+                    if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
+                        boolean singleChannel = false;
+                        if (parentImageRef.getNumComponents() == 2) {
+                            singleChannel = true;
+                        }
+
+                        ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                    } else {
+                        Log.warn("J2KRender: Params out of sync, skip frame");
+                    }
                 }
-            } else {
-                if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                    boolean singleChannel = false;
-                    if (parentImageRef.getNumComponents() == 2) {
-                        singleChannel = true;
+
+                if (!movieMode) {
+                    break;
+                } else {
+                    currParams = parentViewRef.getImageViewParams();
+                    numFrames += currParams.compositionLayer - lastFrame;
+                    lastFrame = currParams.compositionLayer;
+                    long tmax = frameChooser.moveToNextFrame(lastFrame);
+                    if (lastFrame > currParams.compositionLayer) {
+                        lastFrame = -1;
+                    }
+                    tnow = System.currentTimeMillis();
+
+                    if ((tnow - tini) >= 1000) {
+                        actualMovieFramerate = (numFrames * 1000.0f) / (tnow - tini);
+                        tini = tnow;
+                        numFrames = 0;
                     }
 
-                    ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
-                } else {
-                    Log.warn("J2KRender: Params out of sync, skip frame");
+                    lastSleepTime = tmax - (tnow - tfrm);
+                    if (lastSleepTime > 0) {
+                        try {
+                            Thread.sleep(lastSleepTime);
+                        } catch (InterruptedException ex) {
+                            break;
+                        }
+                    } else {
+                        Thread.yield();
+                    }
                 }
             }
 
@@ -301,12 +415,145 @@ class J2KRender implements Runnable {
             if (lastFrame > currParams.compositionLayer) {
                 lastFrame = -1;
             }
-
             tnow = System.currentTimeMillis();
+
             if ((tnow - tini) >= 1000) {
                 actualMovieFramerate = (numFrames * 1000.0f) / (tnow - tini);
                 tini = tnow;
                 numFrames = 0;
+            }
+        }
+    }
+
+    private abstract class NextFrameCandidateChooser {
+
+        protected int maxFrame;
+
+        public NextFrameCandidateChooser(int _maxFrame) {
+            maxFrame = _maxFrame;
+        }
+
+        protected void resetStartTime(int frame) {
+            if (frameChooser instanceof AbsoluteFrameChooser) {
+                ((AbsoluteFrameChooser) frameChooser).resetStartTime(frame);
+            }
+        }
+
+        public abstract int getNextCandidate(int lastCandidate);
+    }
+
+    private class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
+
+        public NextFrameCandidateLoopChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            if (++lastCandidate > maxFrame) {
+                System.gc();
+                resetStartTime(0);
+                return 0;
+            }
+            return lastCandidate;
+        }
+    }
+
+    private class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
+
+        public NextFrameCandidateStopChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            if (++lastCandidate > maxFrame) {
+                movieMode = false;
+                resetStartTime(0);
+                return 0;
+            }
+            return lastCandidate;
+        }
+    }
+
+    private class NextFrameCandidateSwingChooser extends NextFrameCandidateChooser {
+
+        public NextFrameCandidateSwingChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
+        private int currentDirection = 1;
+
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            lastCandidate += currentDirection;
+            if (lastCandidate < 0 && currentDirection == -1) {
+                currentDirection = 1;
+                resetStartTime(0);
+                return 1;
+            } else if (lastCandidate > maxFrame && currentDirection == 1) {
+                currentDirection = -1;
+                resetStartTime(maxFrame);
+                return maxFrame - 1;
+            }
+
+            return lastCandidate;
+        }
+    }
+
+    private interface FrameChooser {
+        public long moveToNextFrame(int frameNumber);
+    }
+
+    private class RelativeFrameChooser implements FrameChooser {
+
+        private long dt;
+
+        public RelativeFrameChooser(long _dt) {
+            dt = _dt;
+        }
+
+        @Override
+        public long moveToNextFrame(int frame) {
+            currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(frame);
+            return dt;
+        }
+    }
+
+    private class AbsoluteFrameChooser implements FrameChooser {
+
+        private long[] obsMillis;
+        private long absoluteStartTime;
+        private long systemStartTime;
+
+        public AbsoluteFrameChooser(long[] _obsMillis) {
+            obsMillis = _obsMillis;
+        }
+
+        public void resetStartTime(int frame) {
+            absoluteStartTime = obsMillis[frame];
+            systemStartTime = System.currentTimeMillis();
+        }
+
+        @Override
+        public long moveToNextFrame(int frame) {
+            int lastCandidate, nextCandidate = frame;
+            long lastDiff, nextDiff = -Long.MAX_VALUE;
+
+            do {
+                lastCandidate = nextCandidate;
+                nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
+
+                lastDiff = nextDiff;
+                nextDiff = Math.abs(obsMillis[nextCandidate] - absoluteStartTime) - (System.currentTimeMillis() - systemStartTime);
+            } while (nextDiff < 0);
+
+            if (-lastDiff < nextDiff) {
+                currParams.compositionLayer = lastCandidate;
+                return lastDiff;
+            } else {
+                currParams.compositionLayer = nextCandidate;
+                return nextDiff;
             }
         }
     }

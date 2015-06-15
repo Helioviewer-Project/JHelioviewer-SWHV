@@ -113,37 +113,10 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        return jp2Image.metaDataList[frameNumber].getDateObs();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setAnimationMode(AnimationMode mode) {
-        if (render != null) {
-            render.setAnimationMode(mode);
+        if (frameNumber >= 0 && frameNumber <= getMaximumFrameNumber()) {
+            return jp2Image.metaDataList[frameNumber].getDateObs();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setDesiredRelativeSpeed(int framesPerSecond) {
-        if (render != null) {
-            render.setMovieRelativeSpeed(framesPerSecond);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond) {
-        if (render != null) {
-            render.setMovieAbsoluteSpeed(observationSecondsPerSecond);
-        }
+        return null;
     }
 
     /**
@@ -154,40 +127,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         if (render != null)
             return render.getActualMovieFramerate();
         return 0;
-    }
-
-    // to be accessed only from Layers
-    @Override
-    public void pauseMovie() {
-        if (!isMoviePlaying())
-            return;
-
-        if (render != null) {
-            render.setMovieMode(false);
-        }
-        readerSignal.signal();
-    }
-
-    // to be accessed only from Layers
-    @Override
-    public void playMovie() {
-        if (isMoviePlaying() || getMaximumFrameNumber() <= 0)
-            return;
-
-        if (render != null) {
-            render.setMovieMode(true);
-        }
-        readerSignal.signal();
-
-        if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-            renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-        }
-    }
-
-    /* accessed from reader thread */
-    @Override
-    public boolean isMoviePlaying() {
-        return render != null && render.isMovieMode();
     }
 
     /**
@@ -209,7 +148,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * @param frameNumber
      */
     private void setCurrentFrameNumber(int frameNumber) {
-        if (frameNumber != imageViewParams.compositionLayer && frameNumber <= getMaximumAccessibleFrameNumber()) {
+        if (frameNumber != imageViewParams.compositionLayer && frameNumber >= 0 && frameNumber <= getMaximumAccessibleFrameNumber()) {
             imageViewParams.compositionLayer = frameNumber;
 
             readerSignal.signal();
