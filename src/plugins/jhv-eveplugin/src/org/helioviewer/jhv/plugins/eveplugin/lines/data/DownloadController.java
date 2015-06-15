@@ -57,16 +57,6 @@ public class DownloadController {
         }
     }
 
-    public void updateBands(final Band[] bands, final Interval<Date> interval, final Interval<Date> priorityInterval) {
-        for (int i = 0; i < bands.length; i++) {
-            updateBand(bands[i], interval, priorityInterval);
-        }
-    }
-
-    public void updateBand(final BandType bandType, final Interval<Date> interval, final Interval<Date> priorityInterval) {
-        updateBand(new Band(bandType), interval, priorityInterval);
-    }
-
     public void updateBand(final Band band, final Interval<Date> queryInterval, final Interval<Date> priorityInterval) {
         if (band == null || queryInterval == null || queryInterval.getStart() == null || queryInterval.getEnd() == null) {
             return;

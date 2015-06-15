@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 
 /**
@@ -81,14 +80,6 @@ public class EVECacheController {
         }
 
         return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
-    }
-
-    public Range getMinMaxInInterval(final Band band, final Interval<Date> interval) {
-        if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
-            return new Range();
-        }
-
-        return cache.getMinMaxInInterval(band, interval);
     }
 
     public List<Interval<Date>> getMissingDaysInInterval(final Band band, final Interval<Date> interval) {
