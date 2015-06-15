@@ -112,14 +112,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableDateTime getCurrentFrameDateTime() {
-        return jp2Image.metaDataList[getCurrentFrameNumber()].getDateObs();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
         return jp2Image.metaDataList[frameNumber].getDateObs();
     }
@@ -158,7 +150,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public float getActualFramerate() {
+    public float getCurrentFramerate() {
         if (render != null)
             return render.getActualMovieFramerate();
         return 0;
@@ -243,11 +235,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     @Override
     protected JP2ImageParameter calculateParameter() {
         return calculateParameter(getCurrentNumQualityLayers(), getCurrentFrameNumber());
-    }
-
-    @Override
-    public int getDesiredRelativeSpeed() {
-        return this.render.getMovieRelativeSpeed();
     }
 
 }

@@ -187,6 +187,11 @@ public abstract class AbstractView implements View {
         return baseDifferenceMode;
     }
 
+    @Override
+    public float getCurrentFramerate() {
+        return 0;
+    }
+
     public void setBaseDifferenceNoRot(boolean baseDifferenceNoRot) {
         this.baseDifferenceNoRot = baseDifferenceNoRot;
     }

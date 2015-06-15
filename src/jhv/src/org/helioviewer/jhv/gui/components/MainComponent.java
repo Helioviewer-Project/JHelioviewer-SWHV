@@ -49,7 +49,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     private String moviePath;
     private IMediaWriter movieWriter;
-    private double framerate;
+    private final double framerate = 30;
 
     private boolean exportMode = false;
     private boolean screenshotMode = false;
@@ -185,10 +185,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
             JHVJPXView jpxView = (JHVJPXView) mv;
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
-
-            framerate = jpxView.getDesiredRelativeSpeed();
-            if (framerate <= 0 || framerate > 60)
-                framerate = 20;
 
             movieWriter = ToolFactory.makeWriter(moviePath);
             movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, getWidth(), getHeight());

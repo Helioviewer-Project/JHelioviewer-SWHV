@@ -536,8 +536,4 @@ class J2KRender implements Runnable {
         }
     }
 
-    public int getMovieRelativeSpeed() {
-        return this.movieSpeed;
-    }
-
 }

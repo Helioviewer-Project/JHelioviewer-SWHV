@@ -60,4 +60,14 @@ public interface View {
 
     public boolean setViewport(Viewport r);
 
+    /**
+     * Returns the frame rate on which the View is operating right now.
+     *
+     * The number has not been recalculated every frame, so changes on the desired
+     * frame rate may not be visible immediately.
+     *
+     * @return average current frame rate
+     */
+    public float getCurrentFramerate();
+
 }
