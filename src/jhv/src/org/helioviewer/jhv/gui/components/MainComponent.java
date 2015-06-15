@@ -189,7 +189,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, getWidth(), getHeight());
 
             Layers.pauseMovies();
-            Layers.setTime(jpxView.getFrameDateTime(0));
+            Layers.setFrame(0);
             Layers.playMovies();
         } else {
             exportMovieDialog.fail();
