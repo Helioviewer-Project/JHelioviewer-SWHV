@@ -103,31 +103,12 @@ public interface MovieView extends View {
      */
     public void setDesiredRelativeSpeed(int framesPerSecond);
 
-    /**
-     * Returns the frame rate, on which the MovieView is operating right now.
-     *
-     * The number has not be recalculated every frame, so changes on the desired
-     * frame rate may not be visible immediately.
-     *
-     * @return average actual frame rate
-     */
-    public float getActualFramerate();
-
-    public int getDesiredRelativeSpeed();
-
    /**
      * Returns the image cache status.
      *
      * @return image cache status
      */
     public ImageCacheStatus getImageCacheStatus();
-
-    /**
-     * Returns time stamp of the current frame.
-     * 
-     * @return time stamp of the current frame
-     */
-    public ImmutableDateTime getCurrentFrameDateTime();
 
     /**
      * Returns time stamp of any frame specified.
