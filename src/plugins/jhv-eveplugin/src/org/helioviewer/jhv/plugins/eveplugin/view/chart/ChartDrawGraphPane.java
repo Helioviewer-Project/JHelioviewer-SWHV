@@ -306,7 +306,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
             g.setColor(ChartConstants.LABEL_TEXT_COLOR);
             g.drawString(text, x, y);
-
         }
         // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
         // start) + " total time: " + drawLabelsOperarionTime +
@@ -554,7 +553,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mousePressedPosition = null;
         mouseDragPosition = null;
-
     }
 
     @Override
