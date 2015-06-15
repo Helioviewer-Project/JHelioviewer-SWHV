@@ -32,7 +32,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
 
-    private final LinkedList<EVEDrawControllerListener> listeners = new LinkedList<EVEDrawControllerListener>();
     private final Map<String, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<String, Map<Band, EVEValues>>();
 
     private final Map<String, Range> selectedRangeMap = new HashMap<String, Range>();
@@ -71,14 +70,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             instance = new EVEDrawController();
         }
         return instance;
-    }
-
-    public void addDrawControllerListener(final EVEDrawControllerListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeDrawControllerListener(final EVEDrawControllerListener listener) {
-        listeners.remove(listener);
     }
 
     private void addToMap(final Band band) {
@@ -210,9 +201,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
             }
 
-            for (EVEDrawControllerListener listener : listeners) {
-                listener.drawRequest(interval, bands, values.toArray(new EVEValues[0]), availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
-            }
             YAxisElement yAxisElement = new YAxisElement();
             if (yAxisElementMap.containsKey(unitLabel)) {
                 yAxisElement = yAxisElementMap.get(unitLabel);

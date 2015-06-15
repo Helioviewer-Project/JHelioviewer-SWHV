@@ -58,19 +58,7 @@ public class Range {
         max = max > value ? max : value;
     }
 
-    public void combineWith(final Range range) {
-        min = min < range.min ? min : range.min;
-        max = max < range.max ? max : range.max;
-    }
-
-    public boolean isPositivRange() {
-        return min <= max;
-    }
-
-    public boolean contains(final Range range) {
-        return range.min >= this.min && range.max <= this.max;
-    }
-
+    @Override
     public String toString() {
         return "Range: [" + min + "," + max + "]";
     }
