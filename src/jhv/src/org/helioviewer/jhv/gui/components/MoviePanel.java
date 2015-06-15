@@ -286,19 +286,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel.setVisible(advanced);
     }
 
-    public static void setFrameSlider(MovieView view) {
-        timeSlider.setValue(view.getCurrentFrameNumber());
-    }
-
-    /**
-     * Jumps to the specified frame
-     *
-     * @param frame
-     *            the number of the frame
-     */
-    private static void jumpToFrameNumber(int frame) {
-        Layers.setFrame(frame);
+    public void setFrameSlider(int frame) {
+        // update just UI, tbd
+        timeSlider.removeChangeListener(this);
         timeSlider.setValue(frame);
+        frameNumberLabel.setText((frame + 1) + "/" + (timeSlider.getMaximum() + 1));
+        timeSlider.addChangeListener(this);
     }
 
     /**
@@ -358,13 +351,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (isPlaying) {
                 togglePlayPause();
             }
-            if (activeMovie != null) jumpToFrameNumber(activeMovie.getCurrentFrameNumber() - 1);
+            if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
                 togglePlayPause();
             }
-            if (activeMovie != null) jumpToFrameNumber(activeMovie.getCurrentFrameNumber() + 1);
+            if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
@@ -437,9 +430,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
-                jumpToFrameNumber(activeMovie.getCurrentFrameNumber() + 1);
+                timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
             } else if (e.getWheelRotation() > 0) {
-                jumpToFrameNumber(activeMovie.getCurrentFrameNumber() - 1);
+                timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
             }
         }
     }
