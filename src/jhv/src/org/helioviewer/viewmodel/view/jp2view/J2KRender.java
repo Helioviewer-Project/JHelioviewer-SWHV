@@ -160,6 +160,7 @@ class J2KRender implements Runnable {
         }
 
         frameChooser = new AbsoluteFrameChooser(obsMillis);
+        ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
     }
 
     public void setAnimationMode(AnimationMode mode) {
@@ -383,7 +384,7 @@ class J2KRender implements Runnable {
                     currParams = parentViewRef.getImageViewParams();
                     numFrames += currParams.compositionLayer - lastFrame;
                     lastFrame = currParams.compositionLayer;
-                    tmax = frameChooser.moveToNextFrame();
+                    tmax = frameChooser.moveToNextFrame(lastFrame);
                     if (lastFrame > currParams.compositionLayer) {
                         lastFrame = -1;
                     }
@@ -486,7 +487,7 @@ class J2KRender implements Runnable {
     }
 
     private interface FrameChooser {
-        public long moveToNextFrame();
+        public long moveToNextFrame(int frameNumber);
     }
 
     private class RelativeFrameChooser implements FrameChooser {
@@ -498,8 +499,8 @@ class J2KRender implements Runnable {
         }
 
         @Override
-        public long moveToNextFrame() {
-            currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(currParams.compositionLayer);
+        public long moveToNextFrame(int frameNumber) {
+            currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(frameNumber);
             return dt;
         }
     }
@@ -512,7 +513,6 @@ class J2KRender implements Runnable {
 
         public AbsoluteFrameChooser(long[] _obsMillis) {
             obsMillis = _obsMillis;
-            resetStartTime(currParams.compositionLayer);
         }
 
         public void resetStartTime(int frameNumber) {
@@ -521,8 +521,8 @@ class J2KRender implements Runnable {
         }
 
         @Override
-        public long moveToNextFrame() {
-            int lastCandidate, nextCandidate = currParams.compositionLayer;
+        public long moveToNextFrame(int frameNumber) {
+            int lastCandidate, nextCandidate = frameNumber;
             long lastDiff, nextDiff = -Long.MAX_VALUE;
 
             do {
