@@ -188,7 +188,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public float getCurrentFramerate() {
+    public float getActualFramerate() {
         return 0;
     }
 
