@@ -123,7 +123,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public float getCurrentFramerate() {
+    public float getActualFramerate() {
         if (render != null)
             return render.getActualMovieFramerate();
         return 0;

@@ -91,7 +91,7 @@ public class Displayer implements JHVEventHighlightListener {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
         if (view == Layers.getActiveView()) {
-            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getCurrentFramerate());
+            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
 
             lastTimestamp = dateTime.getTime();
             // fire TimeChanged

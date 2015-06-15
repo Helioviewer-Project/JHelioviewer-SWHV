@@ -66,8 +66,8 @@ public interface View {
      * The number has not been recalculated every frame, so changes on the desired
      * frame rate may not be visible immediately.
      *
-     * @return average current frame rate
+     * @return average actual frame rate
      */
-    public float getCurrentFramerate();
+    public float getActualFramerate();
 
 }
