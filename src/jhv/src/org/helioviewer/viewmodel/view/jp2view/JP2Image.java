@@ -81,8 +81,8 @@ public class JP2Image {
     /** The range of valid quality layers for the image. */
     private Interval<Integer> qLayerRange;
 
-    /** The range of valid composition layer indices for the image. */
-    private Interval<Integer> layerRange;
+    /** The number of composition layers for the image. */
+    private int frameCount;
 
     /** An object with all the resolution layer information. */
     private ResolutionSet resolutionSet;
@@ -168,7 +168,7 @@ public class JP2Image {
 
         createKakaduMachinery();
 
-        metaDataList = new MetaData[layerRange.getEnd() + 1];
+        metaDataList = new MetaData[frameCount];
         KakaduUtils.cacheMetaData(familySrc, metaDataList);
     }
 
@@ -299,7 +299,7 @@ public class JP2Image {
                 {
                     int[] tempVar = new int[1];
                     jpxSrc.Count_compositing_layers(tempVar);
-                    layerRange = new Interval<Integer>(0, tempVar[0] - 1);
+                    frameCount = tempVar[0];
                 }
 
                 Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_codestream(0, false, true));
@@ -373,7 +373,6 @@ public class JP2Image {
      * @return True, if the image contains multiple frames, false otherwise
      */
     public boolean isMultiFrame() {
-        int frameCount = layerRange.getEnd() + 1;
         return isJpx && frameCount > 1;
     }
 
@@ -424,9 +423,8 @@ public class JP2Image {
         return numComponents;
     }
 
-    /** Returns the an interval of the valid composition layer indices. */
-    public Interval<Integer> getCompositionLayerRange() {
-        return layerRange;
+    public int getMaximumFrameNumber() {
+        return frameCount - 1;
     }
 
     /** Returns the an interval of the valid quality layer values */

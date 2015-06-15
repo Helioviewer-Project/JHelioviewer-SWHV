@@ -72,7 +72,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         do {
             lastDiff = currentDiff;
             currentDiff = jp2Image.metaDataList[++frameNumber].getDateObs().getMillis() - timeMillis;
-        } while (currentDiff < 0 && frameNumber < jp2Image.getCompositionLayerRange().getEnd());
+        } while (currentDiff < 0 && frameNumber < jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {
             setCurrentFrameNumber(frameNumber - 1);
@@ -94,7 +94,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public int getMaximumFrameNumber() {
-        return jp2Image.getCompositionLayerRange().getEnd();
+        return jp2Image.getMaximumFrameNumber();
     }
 
     /**
