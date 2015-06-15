@@ -336,10 +336,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     private static void updateMovieSpeed() {
         if (activeMovie != null) {
-            /*
             if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
-                activeMovie.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-            } else {
+                Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
+            } /* else {
                 activeMovie.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
                                                    ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
             }
