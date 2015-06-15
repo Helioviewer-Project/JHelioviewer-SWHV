@@ -77,11 +77,6 @@ public class Layers {
     }
 
     private static void setMasterMovie(AbstractView view) {
-        boolean wasPlaying = masterView != null && frameTimer.isRunning();
-
-        if (wasPlaying)
-            pauseMovies();
-
         if (view instanceof MovieView)
             masterView = (MovieView) view;
         else
@@ -89,9 +84,6 @@ public class Layers {
         nextFrameCandidateChooser.setMaxFrame();
 
         MoviePanel.getSingletonInstance().setActiveMovie(masterView);
-
-        if (wasPlaying)
-            playMovies();
     }
 
     // accessed from reader thread, tbd
@@ -397,7 +389,7 @@ public class Layers {
         @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > maxFrame) {
-                pauseMovies();
+                frameTimer.stop();
                 resetStartTime(0);
                 return 0;
             }
