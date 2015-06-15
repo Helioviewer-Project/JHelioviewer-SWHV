@@ -6,7 +6,6 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_region_compositor;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -424,7 +423,7 @@ class J2KRender implements Runnable {
 
     private abstract class NextFrameCandidateChooser {
 
-        protected Interval<Integer> layers;
+        protected int maximumFrameNumber;
 
         public NextFrameCandidateChooser() {
             updateRange();
@@ -432,7 +431,7 @@ class J2KRender implements Runnable {
 
         public void updateRange() {
             if (parentImageRef != null) {
-                layers = parentImageRef.getCompositionLayerRange();
+                maximumFrameNumber = parentImageRef.getMaximumFrameNumber();
             }
         }
 
@@ -448,10 +447,10 @@ class J2KRender implements Runnable {
     private class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
         @Override
         public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > layers.getEnd()) {
+            if (++lastCandidate > maximumFrameNumber) {
                 System.gc();
-                resetStartTime(layers.getStart());
-                return layers.getStart();
+                resetStartTime(0);
+                return 0;
             }
             return lastCandidate;
         }
@@ -460,10 +459,10 @@ class J2KRender implements Runnable {
     private class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
         @Override
         public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > layers.getEnd()) {
+            if (++lastCandidate > maximumFrameNumber) {
                 movieMode = false;
-                resetStartTime(layers.getStart());
-                return layers.getStart();
+                resetStartTime(0);
+                return 0;
             }
             return lastCandidate;
         }
@@ -476,14 +475,14 @@ class J2KRender implements Runnable {
         @Override
         public int getNextCandidate(int lastCandidate) {
             lastCandidate += currentDirection;
-            if (lastCandidate < layers.getStart() && currentDirection == -1) {
+            if (lastCandidate < 0 && currentDirection == -1) {
                 currentDirection = 1;
-                resetStartTime(layers.getStart());
-                return layers.getStart() + 1;
-            } else if (lastCandidate > layers.getEnd() && currentDirection == 1) {
+                resetStartTime(0);
+                return 1;
+            } else if (lastCandidate > maximumFrameNumber && currentDirection == 1) {
                 currentDirection = -1;
-                resetStartTime(layers.getEnd());
-                return layers.getEnd() - 1;
+                resetStartTime(maximumFrameNumber);
+                return maximumFrameNumber - 1;
             }
 
             return lastCandidate;

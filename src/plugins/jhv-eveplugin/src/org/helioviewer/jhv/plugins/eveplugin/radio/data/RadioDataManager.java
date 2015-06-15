@@ -616,11 +616,11 @@ public class RadioDataManager implements RadioDownloaderListener {
             jp2CallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             JP2Image image = jp2CallistoView.getJP2Image();
             ResolutionSet rs = image.getResolutionSet();
-            Interval<Integer> interval = image.getCompositionLayerRange();
+            int maximumFrameNumber = image.getMaximumFrameNumber();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
 
             XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
-            for (int i = interval.getStart(); i <= interval.getEnd(); i++) {
+            for (int i = 0; i <= maximumFrameNumber; i++) {
                 try {
                     hvMetaData.parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
                     Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
