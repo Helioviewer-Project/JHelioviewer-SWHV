@@ -102,10 +102,8 @@ public class Layers {
     }
 
     public static void setTime(ImmutableDateTime dateTime) {
-        for (AbstractView movieView : layers) {
-            if (movieView instanceof MovieView) {
-                ((MovieView) movieView).setCurrentFrame(dateTime);
-            }
+        if (masterView != null) {
+            masterView.setCurrentFrame(dateTime);
         }
     }
 
