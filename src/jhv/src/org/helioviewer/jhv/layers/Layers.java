@@ -94,6 +94,11 @@ public class Layers {
             playMovies();
     }
 
+    // accessed from reader thread, tbd
+    public static boolean isMoviePlaying() {
+        return frameTimer.isRunning();
+    }
+
     public static void playMovies() {
         if (masterView != null) {
             frameTimer.restart();
@@ -336,6 +341,10 @@ public class Layers {
 
     public static void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
+    }
+
+    public static void setDesiredRelativeSpeed(int fps) {
+        frameTimer.setDelay(1000 / fps);
     }
 
     public static void setAnimationMode(AnimationMode mode) {
