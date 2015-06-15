@@ -113,7 +113,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         }
         jp2Image = newJP2Image;
 
-        imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
+        imageViewParams = calculateParameter(newJP2Image.getMaximumNumQualityLayers(), 0);
 
         jp2Image.addReference();
         try {
@@ -239,7 +239,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      */
     @Override
     public int getMaximumNumQualityLayers() {
-        return jp2Image.getQualityLayerRange().getEnd();
+        return jp2Image.getMaximumNumQualityLayers();
     }
 
     /**

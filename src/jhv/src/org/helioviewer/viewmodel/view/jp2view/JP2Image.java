@@ -21,7 +21,6 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_tile;
 
-import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.io.APIResponseDump;
@@ -78,8 +77,8 @@ public class JP2Image {
      */
     private Kdu_region_compositor compositor = new Kdu_region_compositor();
 
-    /** The range of valid quality layers for the image. */
-    private Interval<Integer> qLayerRange;
+    /** The number of quality layers for the image. */
+    private int qualityLayers;
 
     /** The number of composition layers for the image. */
     private int frameCount;
@@ -307,10 +306,8 @@ public class JP2Image {
                 {
                     Kdu_coords coordRef = new Kdu_coords();
                     Kdu_tile tile = stream.Open_tile(coordRef);
-
                     // Retrieve the number of quality layers.
-                    qLayerRange = new Interval<Integer>(1, tile.Get_num_layers());
-
+                    qualityLayers = tile.Get_num_layers();
                     // Cleanup
                     tile.Close();
                     tile = null;
@@ -427,9 +424,8 @@ public class JP2Image {
         return frameCount - 1;
     }
 
-    /** Returns the an interval of the valid quality layer values */
-    public Interval<Integer> getQualityLayerRange() {
-        return qLayerRange;
+    public int getMaximumNumQualityLayers() {
+        return qualityLayers;
     }
 
     /**
