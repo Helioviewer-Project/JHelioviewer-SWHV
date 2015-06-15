@@ -91,7 +91,7 @@ class J2KRender implements Runnable {
         parentImageRef = parentViewRef.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
 
-        nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
+        nextFrameCandidateChooser = new NextFrameCandidateLoopChooser(parentImageRef.getMaximumFrameNumber());
         frameChooser = new RelativeFrameChooser(1000 / 20);
 
         stop = false;
@@ -164,15 +164,16 @@ class J2KRender implements Runnable {
     }
 
     public void setAnimationMode(AnimationMode mode) {
+        int maxFrame = parentImageRef.getMaximumFrameNumber();
         switch (mode) {
         case LOOP:
-            nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
+            nextFrameCandidateChooser = new NextFrameCandidateLoopChooser(maxFrame);
             break;
         case STOP:
-            nextFrameCandidateChooser = new NextFrameCandidateStopChooser();
+            nextFrameCandidateChooser = new NextFrameCandidateStopChooser(maxFrame);
             break;
         case SWING:
-            nextFrameCandidateChooser = new NextFrameCandidateSwingChooser();
+            nextFrameCandidateChooser = new NextFrameCandidateSwingChooser(maxFrame);
             break;
         }
     }
@@ -323,7 +324,7 @@ class J2KRender implements Runnable {
     public void run() {
         int numFrames = 0;
         lastFrame = -1;
-        long tfrm, tmax = 0;
+        long tfrm;
         long tnow, tini = System.currentTimeMillis();
 
         while (!stop) {
@@ -384,7 +385,7 @@ class J2KRender implements Runnable {
                     currParams = parentViewRef.getImageViewParams();
                     numFrames += currParams.compositionLayer - lastFrame;
                     lastFrame = currParams.compositionLayer;
-                    tmax = frameChooser.moveToNextFrame(lastFrame);
+                    long tmax = frameChooser.moveToNextFrame(lastFrame);
                     if (lastFrame > currParams.compositionLayer) {
                         lastFrame = -1;
                     }
@@ -426,15 +427,15 @@ class J2KRender implements Runnable {
 
     private abstract class NextFrameCandidateChooser {
 
-        protected int maximumFrameNumber;
+        protected int maxFrame;
 
-        public NextFrameCandidateChooser() {
-            maximumFrameNumber = parentImageRef.getMaximumFrameNumber();
+        public NextFrameCandidateChooser(int _maxFrame) {
+            maxFrame = _maxFrame;
         }
 
-        protected void resetStartTime(int frameNumber) {
+        protected void resetStartTime(int frame) {
             if (frameChooser instanceof AbsoluteFrameChooser) {
-                ((AbsoluteFrameChooser) frameChooser).resetStartTime(frameNumber);
+                ((AbsoluteFrameChooser) frameChooser).resetStartTime(frame);
             }
         }
 
@@ -442,9 +443,14 @@ class J2KRender implements Runnable {
     }
 
     private class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
+
+        public NextFrameCandidateLoopChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
         @Override
         public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > maximumFrameNumber) {
+            if (++lastCandidate > maxFrame) {
                 System.gc();
                 resetStartTime(0);
                 return 0;
@@ -454,9 +460,14 @@ class J2KRender implements Runnable {
     }
 
     private class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
+
+        public NextFrameCandidateStopChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
         @Override
         public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > maximumFrameNumber) {
+            if (++lastCandidate > maxFrame) {
                 movieMode = false;
                 resetStartTime(0);
                 return 0;
@@ -467,6 +478,10 @@ class J2KRender implements Runnable {
 
     private class NextFrameCandidateSwingChooser extends NextFrameCandidateChooser {
 
+        public NextFrameCandidateSwingChooser(int _maxFrame) {
+            super(_maxFrame);
+        }
+
         private int currentDirection = 1;
 
         @Override
@@ -476,10 +491,10 @@ class J2KRender implements Runnable {
                 currentDirection = 1;
                 resetStartTime(0);
                 return 1;
-            } else if (lastCandidate > maximumFrameNumber && currentDirection == 1) {
+            } else if (lastCandidate > maxFrame && currentDirection == 1) {
                 currentDirection = -1;
-                resetStartTime(maximumFrameNumber);
-                return maximumFrameNumber - 1;
+                resetStartTime(maxFrame);
+                return maxFrame - 1;
             }
 
             return lastCandidate;
@@ -499,8 +514,8 @@ class J2KRender implements Runnable {
         }
 
         @Override
-        public long moveToNextFrame(int frameNumber) {
-            currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(frameNumber);
+        public long moveToNextFrame(int frame) {
+            currParams.compositionLayer = nextFrameCandidateChooser.getNextCandidate(frame);
             return dt;
         }
     }
@@ -515,14 +530,14 @@ class J2KRender implements Runnable {
             obsMillis = _obsMillis;
         }
 
-        public void resetStartTime(int frameNumber) {
-            absoluteStartTime = obsMillis[frameNumber];
+        public void resetStartTime(int frame) {
+            absoluteStartTime = obsMillis[frame];
             systemStartTime = System.currentTimeMillis();
         }
 
         @Override
-        public long moveToNextFrame(int frameNumber) {
-            int lastCandidate, nextCandidate = frameNumber;
+        public long moveToNextFrame(int frame) {
+            int lastCandidate, nextCandidate = frame;
             long lastDiff, nextDiff = -Long.MAX_VALUE;
 
             do {
