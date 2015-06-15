@@ -124,7 +124,6 @@ class J2KRender implements Runnable {
         byteBuffer = null;
 
         jp2Image.abolish();
-
     }
 
     public void setMovieMode(boolean val) {
