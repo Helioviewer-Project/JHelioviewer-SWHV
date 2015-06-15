@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -147,10 +146,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             int currentScreenshot = 1;
             int maxframeno = 1;
             if (mv instanceof JHVJPXView) {
-                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
+                currentScreenshot = ((JHVJPXView) mv).getImageData().getFrameNumber();
                 maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
             }
-
+            //Log.info("CURRENTFN : " + currentScreenshot);
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
                 BufferedImage xugScreenshot = ConverterFactory.convertToType(screenshot, BufferedImage.TYPE_3BYTE_BGR);
