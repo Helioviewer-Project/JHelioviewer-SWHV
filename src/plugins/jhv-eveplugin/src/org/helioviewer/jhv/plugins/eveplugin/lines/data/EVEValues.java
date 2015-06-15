@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 public class EVEValues {
-
+    static int MINIMUMDISTANCEFORTIMEGAP = 60000;
     public final long[] dates;
     public final double[] minValues;
     public final double[] maxValues;
@@ -36,25 +36,25 @@ public class EVEValues {
     }
 
     public void addValues(final long[] indates, final double[] invalues) {
-        for (int i = 0; i < indates.length; i++) {
-            double value = invalues[i];
-            if (!Double.isNaN(value)) {
-                int index = (int) ((indates[i] - binStart) / timePerBin);
-                if (index >= 0 && index < numOfBins) {
-                    maxValues[index] = Math.max(maxValues[index], value);
-                    minValues[index] = Math.min(minValues[index], value);
-                    minValue = value < minValue ? value : minValue;
-                    maxValue = value > maxValue ? value : maxValue;
-                } else {
-                    // Log.debug("index out of bound avoided");
-                    // Log.debug("indates : " + indates[i] + " | binStart : " +
-                    // binStart + " | binEnd : " + binEnd +
-                    // " | indates[i] - binStart : " + (indates[i] - binStart) +
-                    // " | timePerBin : " + timePerBin + " | index : " + index +
-                    // " | numOfBins : " + numOfBins);
-                }
-
+        int j = 0;
+        long tg = Math.max(MINIMUMDISTANCEFORTIMEGAP, timePerBin / 2);
+        for (int i = 0; i < maxValues.length; i++) {
+            long startt = binStart + (timePerBin * i) + timePerBin / 2;
+            while (j >= 1 && j < indates.length && ((indates[j] - startt) >= -tg)) {
+                j--;
             }
+            while (j < indates.length && (indates[j] - startt) <= -tg) {
+                j++;
+            }
+            while (j < indates.length && indates[j] - startt <= tg && !Double.isNaN(invalues[j])) {
+                double value = invalues[j];
+                maxValues[i] = Math.max(maxValues[i], value);
+                minValues[i] = Math.min(minValues[i], value);
+                minValue = value < minValue ? value : minValue;
+                maxValue = value > maxValue ? value : maxValue;
+                j++;
+            }
+
         }
     }
 
