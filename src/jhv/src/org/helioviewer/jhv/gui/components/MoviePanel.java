@@ -173,9 +173,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setMaximum(activeMovie.getMaximumFrameNumber());
         timeSlider.setValue(activeMovie.getCurrentFrameNumber());
 
-        updateMovieSpeed();
-        // activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
-
         setEnabled(true);
     }
 
@@ -392,19 +389,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void stateChanged(ChangeEvent e) {
         // Jump to different frame
         if (e.getSource() == timeSlider) {
-            jumpToFrameNumber(timeSlider.getValue());
-
-            int max = timeSlider.getMaximum();
-            if (max == 0 || activeMovie == null)
-                frameNumberLabel.setText("1/1");
-            else
-                frameNumberLabel.setText((activeMovie.getCurrentFrameNumber() + 1) + "/" + (max + 1));
-
-            if (activeMovie != null &&
-                activeMovie.getCurrentFrameNumber() == timeSlider.getMinimum() &&
-                animationModeComboBox.getSelectedItem() == AnimationMode.STOP) {
-                togglePlayPause();
-            }
+            int val = timeSlider.getValue();
+            Layers.setFrame(val);
+            frameNumberLabel.setText((val + 1) + "/" + (timeSlider.getMaximum() + 1));
             // Change animation speed
         } else if (e.getSource() == speedSpinner) {
             updateMovieSpeed();

@@ -389,7 +389,7 @@ public class Layers {
         @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > maxFrame) {
-                frameTimer.stop();
+                pauseMovies();
                 resetStartTime(0);
                 return 0;
             }
