@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.MovieView;
+import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
@@ -62,15 +63,16 @@ public class Layers {
     }
 
     private static MovieView masterView;
+    private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
+    private static FrameChooser frameChooser = new RelativeFrameChooser();
 
     private static final Timer frameTimer = new Timer(1000 / 20, new FrameListener());
 
     private static class FrameListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (masterView != null) {
-                setFrame(masterView.getCurrentFrameNumber() + 1);
-            }
+            if (masterView != null)
+                setFrame(frameChooser.moveToNextFrame(masterView.getCurrentFrameNumber()));
         }
     }
 
@@ -80,10 +82,11 @@ public class Layers {
         if (wasPlaying)
             pauseMovies();
 
-        if (view instanceof MovieView) {
+        if (view instanceof MovieView)
             masterView = (MovieView) view;
-        } else
+        else
             masterView = null;
+        nextFrameCandidateChooser.setMaxFrame();
 
         MoviePanel.getSingletonInstance().setActiveMovie(masterView);
 
@@ -333,6 +336,133 @@ public class Layers {
 
     public static void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
+    }
+
+    public static void setAnimationMode(AnimationMode mode) {
+        switch (mode) {
+        case LOOP:
+            nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
+            break;
+        case STOP:
+            nextFrameCandidateChooser = new NextFrameCandidateStopChooser();
+            break;
+        case SWING:
+            nextFrameCandidateChooser = new NextFrameCandidateSwingChooser();
+            break;
+        }
+        nextFrameCandidateChooser.setMaxFrame();
+    }
+
+    private static abstract class NextFrameCandidateChooser {
+        protected int maxFrame;
+
+        protected void setMaxFrame() {
+            if (masterView == null)
+                maxFrame = 0;
+            else
+                maxFrame = masterView.getMaximumFrameNumber();
+        }
+
+        protected void resetStartTime(int frame) {
+            if (frameChooser instanceof AbsoluteFrameChooser) {
+                ((AbsoluteFrameChooser) frameChooser).resetStartTime(frame);
+            }
+        }
+
+        public abstract int getNextCandidate(int lastCandidate);
+    }
+
+    private static class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            if (++lastCandidate > maxFrame) {
+                System.gc();
+                resetStartTime(0);
+                return 0;
+            }
+            return lastCandidate;
+        }
+    }
+
+    private static class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            if (++lastCandidate > maxFrame) {
+                pauseMovies();
+                resetStartTime(0);
+                return 0;
+            }
+            return lastCandidate;
+        }
+    }
+
+    private static class NextFrameCandidateSwingChooser extends NextFrameCandidateChooser {
+        private int currentDirection = 1;
+
+        @Override
+        public int getNextCandidate(int lastCandidate) {
+            lastCandidate += currentDirection;
+            if (lastCandidate < 0 && currentDirection == -1) {
+                currentDirection = 1;
+                resetStartTime(0);
+                return 1;
+            } else if (lastCandidate > maxFrame && currentDirection == 1) {
+                currentDirection = -1;
+                resetStartTime(maxFrame);
+                return maxFrame - 1;
+            }
+
+            return lastCandidate;
+        }
+    }
+
+    private interface FrameChooser {
+        public int moveToNextFrame(int frameNumber);
+    }
+
+    private static class RelativeFrameChooser implements FrameChooser {
+        @Override
+        public int moveToNextFrame(int frame) {
+            return nextFrameCandidateChooser.getNextCandidate(frame);
+        }
+    }
+
+    private static class AbsoluteFrameChooser implements FrameChooser {
+
+        private long[] obsMillis;
+        private long absoluteStartTime;
+        private long systemStartTime;
+
+        public AbsoluteFrameChooser(long[] _obsMillis) {
+            obsMillis = _obsMillis;
+        }
+
+        public void resetStartTime(int frame) {
+            absoluteStartTime = obsMillis[frame];
+            systemStartTime = System.currentTimeMillis();
+        }
+
+        @Override
+        public int moveToNextFrame(int frame) {
+            int lastCandidate, nextCandidate = frame;
+            long lastDiff, nextDiff = -Long.MAX_VALUE;
+
+            do {
+                lastCandidate = nextCandidate;
+                nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
+
+                lastDiff = nextDiff;
+                nextDiff = Math.abs(obsMillis[nextCandidate] - absoluteStartTime) - (System.currentTimeMillis() - systemStartTime);
+            } while (nextDiff < 0);
+
+            if (-lastDiff < nextDiff) {
+                return lastCandidate;
+                // return lastDiff;
+            } else {
+                return nextCandidate;
+                // return nextDiff;
+            }
+        }
     }
 
 }
