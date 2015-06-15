@@ -43,7 +43,7 @@ public class JHVEventCache {
 
     private final Set<JHVEventType> activeEventTypes;
 
-    private final RequestCache downloadedCache;
+    private final Map<JHVEventType, RequestCache> downloadedCache;
 
     /**
      * private default constructor
@@ -56,7 +56,7 @@ public class JHVEventCache {
         idsPerColor = new HashMap<Color, Set<String>>();
         eventsWithRelationRules = new ArrayList<JHVEvent>();
         activeEventTypes = new HashSet<JHVEventType>();
-        downloadedCache = new RequestCache();
+        downloadedCache = new HashMap<JHVEventType, RequestCache>();
     }
 
     /**
@@ -120,7 +120,7 @@ public class JHVEventCache {
             }
         }
 
-        return new JHVEventCacheResult(eventsResult, new ArrayList<Interval<Date>>(), new ArrayList<Date>());
+        return new JHVEventCacheResult(eventsResult, new HashMap<JHVEventType, List<Interval<Date>>>(), new ArrayList<Date>());
     }
 
     /**
@@ -137,7 +137,7 @@ public class JHVEventCache {
                 eventsResult = mergeMaps(eventsResult, get(date).getAvailableEvents());
             }
         }
-        return new JHVEventCacheResult(eventsResult, new ArrayList<Interval<Date>>(), new ArrayList<Date>());
+        return new JHVEventCacheResult(eventsResult, new HashMap<JHVEventType, List<Interval<Date>>>(), new ArrayList<Date>());
     }
 
     /**
@@ -178,7 +178,11 @@ public class JHVEventCache {
 
             }
         }
-        List<Interval<Date>> missingIntervals = downloadedCache.adaptRequestCache(startDate, endDate);
+
+        Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
+        for (JHVEventType evt : activeEventTypes) {
+            missingIntervals.put(evt, downloadedCache.get(evt).adaptRequestCache(startDate, endDate));
+        }
         List<Date> missingDates = new ArrayList<Date>();
         return new JHVEventCacheResult(eventsResult, missingIntervals, missingDates);
     }
@@ -510,12 +514,19 @@ public class JHVEventCache {
         return eventsResult;
     }
 
-    public Collection<Interval<Date>> getAllRequestIntervals() {
-        return downloadedCache.getAllRequestIntervals();
+    public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {
+        return downloadedCache.get(eventType).getAllRequestIntervals();
     }
 
-    public void removeRequestedIntervals(Interval<Date> interval) {
-        downloadedCache.removeRequestedIntervals(interval);
+    public void removeRequestedIntervals(JHVEventType eventType, Interval<Date> interval) {
+        downloadedCache.get(eventType).removeRequestedIntervals(interval);
 
+    }
+
+    public void eventTypeActivated(JHVEventType eventType) {
+        activeEventTypes.add(eventType);
+        if (!downloadedCache.containsKey(eventType)) {
+            downloadedCache.put(eventType, new RequestCache());
+        }
     }
 }

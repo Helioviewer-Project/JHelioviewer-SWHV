@@ -200,6 +200,21 @@ public class SWEKConfigurationManager {
         return configuration.getRelatedEvents();
     }
 
+    public SWEKEventType getEventType(String eventTypeName) {
+        loadConfiguration();
+        return configuration.getSWEKEventType(eventTypeName);
+    }
+
+    public SWEKSupplier getSWEKSupplier(String supplierName, String eventTypeName) {
+        loadConfiguration();
+        return configuration.getSWEKSupplier(supplierName, eventTypeName);
+    }
+
+    public SWEKSource getSWEKSource(String sourceName) {
+        loadConfiguration();
+        return configuration.getSWEKSource(sourceName);
+    }
+
     /**
      * Downloads the SWEK configuration from the Internet and saves it in the
      * plugin home directory.

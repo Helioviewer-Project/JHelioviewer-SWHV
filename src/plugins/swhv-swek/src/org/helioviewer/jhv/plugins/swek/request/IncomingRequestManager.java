@@ -7,6 +7,7 @@ import java.util.List;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
@@ -87,9 +88,9 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     }
 
     @Override
-    public void handleRequestForInterval(Date startDate, Date endDate) {
+    public void handleRequestForInterval(JHVEventType eventType, Date startDate, Date endDate) {
         Interval<Date> interval = new Interval<Date>(startDate, endDate);
-        fireNewIntervalRequested(interval);
+        fireNewIntervalRequested(eventType, interval);
     }
 
     @Override
@@ -113,14 +114,16 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
 
     /**
      * Informs the listeners about a new interval that was requested.
+     * 
+     * @param eventType
      *
      * @param interval
      *            interval that was requested
      * @param requestID
      */
-    private void fireNewIntervalRequested(Interval<Date> interval) {
+    private void fireNewIntervalRequested(JHVEventType eventType, Interval<Date> interval) {
         for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForInterval(interval);
+            l.newRequestForInterval(eventType, interval);
         }
     }
 

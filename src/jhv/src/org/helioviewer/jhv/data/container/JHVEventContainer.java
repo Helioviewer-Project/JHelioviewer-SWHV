@@ -133,9 +133,12 @@ public class JHVEventContainer {
             Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
-            for (Interval<Date> missing : result.getMissingIntervals()) {
+            for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
                 // Log.debug("Missing interval: " + missing);
-                requestEvents(missing.getStart(), missing.getEnd());
+                List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
+                for (Interval<Date> missing : missingList) {
+                    requestEvents(eventType, missing.getStart(), missing.getEnd());
+                }
             }
         }
     }
@@ -186,14 +189,16 @@ public class JHVEventContainer {
     /**
      * Request data from the request handlers over an interval.
      *
+     * @param eventType
+     *
      * @param startDate
      *            the start of the interval
      * @param endDate
      *            the end of the interval
      */
-    private void requestEvents(Date startDate, Date endDate) {
+    private void requestEvents(JHVEventType eventType, Date startDate, Date endDate) {
         for (JHVEventContainerRequestHandler handler : requestHandlers) {
-            handler.handleRequestForInterval(startDate, endDate);
+            handler.handleRequestForInterval(eventType, startDate, endDate);
         }
     }
 
@@ -209,7 +214,6 @@ public class JHVEventContainer {
         for (JHVEventHandler handler : handlers) {
             handler.cacheUpdated();
         }
-
     }
 
     /**
@@ -217,12 +221,16 @@ public class JHVEventContainer {
      *
      * @return A list with intervals
      */
-    public Collection<Interval<Date>> getAllRequestIntervals() {
-        return JHVEventCache.getSingletonInstance().getAllRequestIntervals();
+    public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {
+        return JHVEventCache.getSingletonInstance().getAllRequestIntervals(eventType);
     }
 
-    public void intervalsNotDownloaded(Interval<Date> interval) {
-        JHVEventCache.getSingletonInstance().removeRequestedIntervals(interval);
+    public void intervalsNotDownloaded(JHVEventType eventType, Interval<Date> interval) {
+        JHVEventCache.getSingletonInstance().removeRequestedIntervals(eventType, interval);
     }
 
+    public void eventTypeActivated(JHVEventType eventType) {
+        eventCache.eventTypeActivated(eventType);
+        fireEventCacheChanged();
+    }
 }

@@ -109,7 +109,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#addTreeModelListener(javax.swing.event.
      * TreeModelListener)
      */
@@ -121,7 +121,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
      */
     @Override
@@ -135,7 +135,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
      */
     @Override
@@ -149,7 +149,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#getIndexOfChild(java.lang.Object,
      * java.lang.Object)
      */
@@ -170,7 +170,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#getRoot()
      */
     @Override
@@ -180,7 +180,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.swing.tree.TreeModel#isLeaf(java.lang.Object)
      */
     @Override
@@ -194,7 +194,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * javax.swing.tree.TreeModel#removeTreeModelListener(javax.swing.event.
      * TreeModelListener)
@@ -207,7 +207,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * javax.swing.tree.TreeModel#valueForPathChanged(javax.swing.tree.TreePath,
      * java.lang.Object)
@@ -218,7 +218,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * javax.swing.event.TreeExpansionListener#treeCollapsed(javax.swing.event
      * .TreeExpansionEvent)
@@ -230,7 +230,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * javax.swing.event.TreeExpansionListener#treeExpanded(javax.swing.event
      * .TreeExpansionEvent)
