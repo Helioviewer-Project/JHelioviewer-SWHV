@@ -75,34 +75,6 @@ public interface MovieView extends View {
      */
     public int getMaximumAccessibleFrameNumber();
 
-    /**
-     * Sets the current animation mode.
-     *
-     * The animation mode describes, what should happen when the last frames is
-     * reached:
-     * <p>
-     * LOOP: Go back to first frame and start again.<br>
-     * STOP: Go back to first frame and stop playing.<br>
-     * SWING: On reaching the last frame, play movie backwards, on reaching the
-     * first frame again, play movie forwards.
-     *
-     * @param mode
-     *            new animation mode
-     */
-    public void setAnimationMode(AnimationMode mode);
-
-    /**
-     * Sets the desired frame rate.
-     *
-     * Implicit, switches to relative mode and thus overrides all settings
-     * previously set by {@link TimedMovieView#setDesiredAbsoluteSpeed}.
-     *
-     * @param framesPerSecond
-     *            desired frame rate
-     * @see TimedMovieView#setDesiredAbsoluteSpeed
-     */
-    public void setDesiredRelativeSpeed(int framesPerSecond);
-
    /**
      * Returns the image cache status.
      *
@@ -118,25 +90,7 @@ public interface MovieView extends View {
      */
     public ImmutableDateTime getFrameDateTime(int frameNumber);
 
-    /**
-     * Sets the desired absolute speed.
-     * 
-     * Implicit, switches to absolute mode and thus overrides all settings
-     * previously set by {@link MovieView#setDesiredRelativeSpeed}
-     * 
-     * @param observationSecondsPerSecond
-     *            desired absolute speed
-     * @see MovieView#setDesiredRelativeSpeed
-     */
-    public void setDesiredAbsoluteSpeed(int observationSecondsPerSecond);
-
     // <!- only for Layers
-    public boolean isMoviePlaying();
-
-    public void playMovie();
-
-    public void pauseMovie();
-
     public void setCurrentFrame(ImmutableDateTime time);
     // -->
 

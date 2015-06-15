@@ -1,9 +1,13 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+
+import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -59,8 +63,19 @@ public class Layers {
 
     private static MovieView masterView;
 
+    private static final Timer frameTimer = new Timer(1000 / 20, new FrameListener());
+
+    private static class FrameListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (masterView != null) {
+                masterView.setCurrentFrame(masterView.getFrameDateTime(masterView.getCurrentFrameNumber() + 1));
+            }
+        }
+    }
+
     private static void setMasterMovie(AbstractView view) {
-        boolean wasPlaying = masterView != null && masterView.isMoviePlaying();
+        boolean wasPlaying = masterView != null && frameTimer.isRunning();
 
         if (wasPlaying)
             pauseMovies();
@@ -89,14 +104,16 @@ public class Layers {
 
     public static void playMovies() {
         if (masterView != null) {
-            masterView.playMovie();
+            frameTimer.restart();
+            // masterView.playMovie();
             MoviePanel.playStateChanged(true);
         }
     }
 
     public static void pauseMovies() {
         if (masterView != null) {
-            masterView.pauseMovie();
+            frameTimer.stop();
+            // masterView.pauseMovie();
             MoviePanel.playStateChanged(false);
         }
     }

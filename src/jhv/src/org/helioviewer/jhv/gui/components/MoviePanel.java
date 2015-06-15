@@ -174,7 +174,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setValue(activeMovie.getCurrentFrameNumber());
 
         updateMovieSpeed();
-        activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+        // activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
 
         setEnabled(true);
     }
@@ -339,12 +339,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     private static void updateMovieSpeed() {
         if (activeMovie != null) {
+            /*
             if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
                 activeMovie.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
             } else {
                 activeMovie.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
                                                    ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
             }
+            */
         }
     }
 
@@ -383,7 +385,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             updateMovieSpeed();
             // Change animation mode
         } else if (e.getSource() == animationModeComboBox && activeMovie != null) {
-            activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
+            // activeMovie.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
 
