@@ -99,7 +99,6 @@ public class JP2Image {
 
     protected MetaData[] metaDataList;
 
-    private JHVJP2View parentView;
     private final ReentrantLock lock = new ReentrantLock();
     private int referenceCounter = 0;
     private JPIPSocket socket;
@@ -355,35 +354,6 @@ public class JP2Image {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    /**
-     * Sets the parent view of this image.
-     *
-     * The parent view is used to determine the current frame when accessing
-     * meta data.
-     *
-     * @param _parentView
-     *            The new parent view
-     * @see #getParentView()
-     * @see #getValueFromXML(String, String)
-     */
-    public void setParentView(JHVJP2View _parentView) {
-        parentView = _parentView;
-    }
-
-    /**
-     * Returns the parent view of this image.
-     *
-     * The parent view is used to determine the current frame when accessing
-     * meta data.
-     *
-     * @return The current parent view
-     * @see #setParentView(JHVJP2View)
-     * @see #getValueFromXML(String, String)
-     */
-    public JHVJP2View getParentView() {
-        return parentView;
     }
 
     /**

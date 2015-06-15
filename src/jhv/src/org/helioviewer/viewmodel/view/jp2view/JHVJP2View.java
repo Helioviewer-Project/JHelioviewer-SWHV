@@ -115,7 +115,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
 
         imageViewParams = calculateParameter(newJP2Image.getQualityLayerRange().getEnd(), 0);
 
-        jp2Image.setParentView(this);
         jp2Image.addReference();
         try {
             reader = new J2KReader(this);
@@ -335,7 +334,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
             render.abolish(jp2Image);
             render = null;
         }
-        // jp2Image.abolish();
     }
 
     /**
