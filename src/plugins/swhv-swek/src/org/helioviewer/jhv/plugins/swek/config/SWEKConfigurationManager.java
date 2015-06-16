@@ -215,33 +215,6 @@ public class SWEKConfigurationManager {
         return configuration.getSWEKSource(sourceName);
     }
 
-    /**
-     * Downloads the SWEK configuration from the Internet and saves it in the
-     * plugin home directory.
-     *
-     * @return true if the the file was found and copied to the home directory,
-     *         false if the file could not be found, copied or something else
-     *         went wrong.
-     */
-    private boolean checkAndOpenOnlineFile() {
-        Log.debug("Download the configuration file from the net and copy it to the plugin home directory");
-        try {
-            URL url = new URL(swekProperties.getProperty("plugin.swek.onlineconfigfile"));
-            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            String saveFile = SWEKSettings.SWEK_HOME + swekProperties.getProperty("plugin.swek.configfilename");
-            FileOutputStream fos = new FileOutputStream(saveFile);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-            configFileURL = (new File(saveFile)).toURI().toURL();
-            return true;
-        } catch (MalformedURLException e) {
-            Log.debug("Could not create a URL from the value found in the properties file: " + swekProperties.getProperty("plugin.swek.onlineconfigfile") + " : " + e);
-        } catch (IOException e) {
-            Log.debug("Something went wrong downloading the configuration file from the server or saving it: " + e);
-        }
-        return false;
-    }
-
     private boolean checkAndOpenZippedFile() {
         URL url = SWEKPlugin.class.getResource(swekProperties.getProperty("plugin.swek.zipconfigfile"));
         ReadableByteChannel rbc;
