@@ -185,7 +185,7 @@ class J2KRender1 implements Runnable {
 
     private void renderLayer(int numLayer) {
         synchronized (renderLock) {
-            parentImageRef.getLock().lock();
+            // parentImageRef.getLock().lock();
 
             try {
 
@@ -309,7 +309,7 @@ class J2KRender1 implements Runnable {
             } catch (KduException e) {
                 e.printStackTrace();
             } finally {
-                parentImageRef.getLock().unlock();
+                //parentImageRef.getLock().unlock();
             }
         }
     }

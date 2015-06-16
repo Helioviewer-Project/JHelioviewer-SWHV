@@ -6,8 +6,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -35,8 +33,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
- * This class can open JPEG2000 images, yeah baby! Modified to improve the JPIP
- * communication.
+ * This class can open JPEG2000 images. Modified to improve the JPIP communication.
  *
  * @author caplins
  * @author Benjamin Wamsler
@@ -61,7 +58,7 @@ public class JP2Image {
     private JHV_Kdu_cache cache;
 
     /**
-     * The this extended version of Jp2_threadsafe_family_src can open any file
+     * This extended version of Jp2_threadsafe_family_src can open any file
      * conforming to the jp2 specifications (.jp2, .jpx, .mj2, etc). The reason
      * for extending this class is that the Acquire/Release_lock() functions
      * needed to be implemented.
@@ -98,7 +95,6 @@ public class JP2Image {
 
     protected MetaData[] metaDataList;
 
-    private final ReentrantLock lock = new ReentrantLock();
     private int referenceCounter = 0;
     private JPIPSocket socket;
 
@@ -335,16 +331,13 @@ public class JP2Image {
                     cmap.Native_destroy();
                     cmap = null;
                 }
-
                 // Cleanup
                 stream = null;
             }
 
             updateResolutionSet(0);
-
             // Remove the layer that was added
             compositor.Remove_compositing_layer(-1, true);
-
         } catch (KduException ex) {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
@@ -553,7 +546,6 @@ public class JP2Image {
      */
     void deactivateColorLookupTable(int numLayer) {
         try {
-            lock.lock();
             Jpx_codestream_source jpxStream = jpxSrc.Access_codestream(0);
             Jp2_palette palette = jpxStream.Access_palette();
 
@@ -563,13 +555,7 @@ public class JP2Image {
 
         } catch (KduException e) {
             e.printStackTrace();
-        } finally {
-            lock.unlock();
         }
-    }
-
-    Lock getLock() {
-        return lock;
     }
 
     /** Returns the cache reference */
