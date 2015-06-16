@@ -355,7 +355,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter() {
-        return calculateParameter(getCurrentNumQualityLayers(), 0);
+        return calculateParameter(getCurrentNumQualityLayers(), imageViewParams.compositionLayer);
     }
 
     /**
