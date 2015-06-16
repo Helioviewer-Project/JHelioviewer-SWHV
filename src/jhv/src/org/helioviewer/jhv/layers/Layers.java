@@ -149,8 +149,7 @@ public class Layers {
 
         if (view instanceof MovieView) {
             MovieView tmv = (MovieView) view;
-            int lastFrame = tmv.getMaximumFrameNumber();
-            result = tmv.getFrameDateTime(lastFrame);
+            result = tmv.getFrameDateTime(tmv.getMaximumFrameNumber());
         } else {
             result = view.getMetaData().getDateObs();
         }
