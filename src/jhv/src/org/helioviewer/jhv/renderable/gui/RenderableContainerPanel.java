@@ -66,28 +66,25 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             // Check the dates if possible
             AbstractView activeView = Layers.getActiveView();
             if (activeView instanceof JHVJPXView) {
-                JHVJPXView jpxView = (JHVJPXView) activeView;
-                if (jpxView.getMaximumAccessibleFrameNumber() == jpxView.getMaximumFrameNumber()) {
-                    Date start = Layers.getStartDate(activeView);
-                    Date end = Layers.getEndDate(activeView);
-                    try {
-                        Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                        Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
-                        // only updates if its really necessary with a
-                        // tolerance of an hour
-                        final int tolerance = 60 * 60 * 1000;
-                        if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
-                            if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                                ObservationDialogDateModel.getInstance().setStartDate(start, false);
-                            }
-                            if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                                ObservationDialogDateModel.getInstance().setEndDate(end, false);
-                            }
+                Date start = Layers.getStartDate(activeView);
+                Date end = Layers.getEndDate(activeView);
+                try {
+                    Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
+                    Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
+                    // only updates if its really necessary with a
+                    // tolerance of an hour
+                    final int tolerance = 60 * 60 * 1000;
+                    if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
+                        if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
+                            ObservationDialogDateModel.getInstance().setStartDate(start, false);
                         }
-                    } catch (ParseException e) {
-                        // Should not happen
-                        Log.error("Cannot update observation dialog", e);
+                        if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
+                            ObservationDialogDateModel.getInstance().setEndDate(end, false);
+                        }
                     }
+                } catch (ParseException e) {
+                    // Should not happen
+                    Log.error("Cannot update observation dialog", e);
                 }
             }
             // Show dialog

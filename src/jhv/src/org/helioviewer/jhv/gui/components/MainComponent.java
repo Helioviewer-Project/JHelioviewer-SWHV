@@ -149,7 +149,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 currentScreenshot = ((JHVJPXView) mv).getImageData().getFrameNumber();
                 maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
             }
-            //Log.info("CURRENTFN : " + currentScreenshot);
+
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
                 BufferedImage xugScreenshot = ConverterFactory.convertToType(screenshot, BufferedImage.TYPE_3BYTE_BGR);
@@ -181,8 +181,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         AbstractView mv = Layers.getActiveView();
         if (mv instanceof JHVJPXView) {
             exportMode = true;
-
-            JHVJPXView jpxView = (JHVJPXView) mv;
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
 
             movieWriter = ToolFactory.makeWriter(moviePath);

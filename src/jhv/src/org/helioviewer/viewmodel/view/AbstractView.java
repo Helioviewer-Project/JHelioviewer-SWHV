@@ -10,7 +10,6 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 import com.jogamp.opengl.GL2;
 
@@ -99,7 +98,7 @@ public abstract class AbstractView implements View {
 
         LUT currlut;
 
-        if ((this instanceof JHVJPXView) && ((JHVJPXView) this).getDifferenceMode()) {
+        if (differenceMode || baseDifferenceMode) {
             currlut = gray;
         } else {
             currlut = lut;
