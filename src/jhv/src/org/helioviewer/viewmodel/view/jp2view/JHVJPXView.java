@@ -1,15 +1,11 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
-import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
-import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of TimedMovieView for JPX files.
@@ -144,24 +140,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         if (render != null)
             return render.getActualMovieFramerate();
         return 0;
-    }
-
-    /**
-     * Recalculates the image parameters.
-     *
-     * <p>
-     * This function maps between the set of parameters used within the view
-     * chain and the set of parameters used within the jp2-package.
-     *
-     * <p>
-     * To achieve this, calls {@link #calculateParameter(int, int)} with the
-     * currently used number of quality layers and the current frame number.
-     *
-     * @return Set of parameters used within the jp2-package
-     */
-    @Override
-    protected JP2ImageParameter calculateParameter() {
-        return calculateParameter(getCurrentNumQualityLayers(), getCurrentFrameNumber());
     }
 
 }
