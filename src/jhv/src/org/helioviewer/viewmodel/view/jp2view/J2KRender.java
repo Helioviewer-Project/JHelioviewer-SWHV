@@ -113,8 +113,6 @@ class J2KRender implements Runnable {
 
     private void renderLayer(int numLayer) {
         synchronized (renderLock) {
-            parentImageRef.getLock().lock();
-
             try {
                 // see TODO below
                 // compositorRef.Refresh();
@@ -235,8 +233,6 @@ class J2KRender implements Runnable {
 
             } catch (KduException e) {
                 e.printStackTrace();
-            } finally {
-                parentImageRef.getLock().unlock();
             }
         }
     }

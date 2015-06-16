@@ -89,10 +89,6 @@ public abstract class AbstractView implements View {
         colorMask = new ColorMask(redColormask, greenColormask, blueColormask);
     }
 
-    public void setStartLUT() {
-        lut = gray;
-    }
-
     private void applyGLLUT(GL2 gl) {
         gl.glActiveTexture(GL2.GL_TEXTURE1);
 

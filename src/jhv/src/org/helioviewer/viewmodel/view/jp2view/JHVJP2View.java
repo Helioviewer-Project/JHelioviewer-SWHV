@@ -161,11 +161,9 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * Returns the built-in color lookup table.
      *
      */
-    public int[] getBuiltInLUT() {
+    private int[] getBuiltInLUT() {
         try {
-            jp2Image.getLock().lock();
             Jp2_palette palette = jp2Image.getJpxSource().Access_codestream(0).Access_palette();
-
             if (palette.Get_num_luts() == 0) {
                 return null;
             }
@@ -188,8 +186,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
 
         } catch (KduException e) {
             e.printStackTrace();
-        } finally {
-            jp2Image.getLock().unlock();
         }
 
         return null;
@@ -633,9 +629,8 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         renderRequestedSignal.signal(RenderReasons.NEW_DATA);
     }
 
-    @Override
-    public void setStartLUT() {
-        int[] builtIn = this.getBuiltInLUT();
+    private void setStartLUT() {
+        int[] builtIn = getBuiltInLUT();
         if (builtIn != null) {
             LUT builtInLut = new LUT("built-in", builtIn/* , builtIn */);
             lut = builtInLut;
