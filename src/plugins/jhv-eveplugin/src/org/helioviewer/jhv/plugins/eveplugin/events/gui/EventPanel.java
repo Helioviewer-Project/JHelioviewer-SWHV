@@ -42,7 +42,7 @@ public class EventPanel implements DrawableElement {
                 for (EventPlotConfiguration epc : epcs.get(eventType)) {
                     epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
                     if (first) {
-                        spacePerLine = 2 * Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue());
+                        spacePerLine = 2 * Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue()));
                         int spaceNeeded = spacePerLine * etpc.getMaxLinesPerEventType().get(eventType).intValue();
                         ImageIcon icon = epc.getEvent().getIcon();
                         leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);

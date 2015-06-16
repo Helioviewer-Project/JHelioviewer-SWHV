@@ -5,13 +5,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**
- * 
- * 
+ *
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventPlotConfiguration {
     /** The event */
@@ -33,7 +34,7 @@ public class EventPlotConfiguration {
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
-     * 
+     *
      * @param event
      *            the event for this plot configuration
      * @param scaledX0
@@ -58,7 +59,7 @@ public class EventPlotConfiguration {
 
     /**
      * Draws the event plot configuration on the given graph area.
-     * 
+     *
      * @param g
      *            the graphics on which to draw
      * @param graphArea
@@ -75,8 +76,9 @@ public class EventPlotConfiguration {
      *            the number of lines used already
      */
     public void draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
-        int spacePerLine = Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue());
+        int spacePerLine = Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue()));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
+        Log.debug("Start position : " + startPosition + " = " + spacePerLine + " * 2 * ( " + nrPreviousLines + " + " + yPosition + " )");
         // g.setColor(event.getColor());
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
         // minimal width is 1
@@ -117,7 +119,7 @@ public class EventPlotConfiguration {
 
     /**
      * Gets the event at the given point.
-     * 
+     *
      * @param p
      *            the location to check for an event.
      * @return null if no event is located there, the event if found
@@ -135,7 +137,7 @@ public class EventPlotConfiguration {
 
     /**
      * Checks if the given point is located where the event was drawn.
-     * 
+     *
      * @param p
      *            the point to check
      * @return true if the point is located in the event area, false if the
