@@ -324,13 +324,13 @@ public class DownloadController {
                 }
 
                 // Log.warn(data.toString());
-                final double[] values = new double[length];
+                final float[] values = new float[length];
                 final long[] dates = new long[length];
 
                 for (int i = 0; i < length; i++) {
                     final JSONArray entry = data.getJSONArray(i);
                     final long millis = ((long) entry.getDouble(0)) * 1000;
-                    values[i] = entry.getDouble(1) * multiplier;
+                    values[i] = (float) (entry.getDouble(1) * multiplier);
                     dates[i] = millis;
                 }
 

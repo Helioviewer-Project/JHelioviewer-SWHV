@@ -24,7 +24,7 @@ public class EVECache {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void add(final double[] values, final long[] dates) {
+    public void add(final float[] values, final long[] dates) {
         GregorianCalendar calendar = new GregorianCalendar();
 
         for (int i = 0; i < values.length; i++) {

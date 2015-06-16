@@ -105,9 +105,9 @@ public class EVEDrawableElement implements DrawableElement {
 
                     int counter = 0;
                     for (int j = 0; j < num; j++) {
-                        double value = values.maxValues[j];
+                        float value = values.maxValues[j];
 
-                        if (yAxisElement.isLogScale() && value < 10e-50) {
+                        if (yAxisElement.isLogScale() && value < 10e-32) {
                             if (counter > 1) {
                                 graphPolylines.add(new GraphPolyline(pointList, bands[i].getGraphColor(), warnLevels, warnLabels, ratioX, graphArea.getWidth()));
                             }
