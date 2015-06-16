@@ -79,8 +79,10 @@ public class Layers {
     private static void setMasterMovie(AbstractView view) {
         if (view instanceof MovieView)
             masterView = (MovieView) view;
-        else
+        else {
             masterView = null;
+            frameTimer.stop();
+        }
         nextFrameCandidateChooser.setMaxFrame();
 
         MoviePanel.getSingletonInstance().setActiveMovie(masterView);
