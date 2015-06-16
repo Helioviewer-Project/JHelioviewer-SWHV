@@ -1,13 +1,18 @@
 package org.helioviewer.jhv.data.container;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
@@ -29,6 +34,10 @@ public class JHVEventContainer {
     /** the event handler cache */
     private final JHVEventHandlerCache eventHandlerCache;
 
+    private final Map<JHVEventType, RequestCache> missingIntervals;
+
+    private final Timer eventTimer;
+
     /**
      * Private constructor.
      */
@@ -36,6 +45,9 @@ public class JHVEventContainer {
         requestHandlers = new ArrayList<JHVEventContainerRequestHandler>();
         eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
+        missingIntervals = new HashMap<JHVEventType, RequestCache>();
+        eventTimer = new Timer("SWEK download missing");
+        eventTimer.schedule(new EventDownloadTask(), 0, 5000);
     }
 
     /**
@@ -137,7 +149,14 @@ public class JHVEventContainer {
                 // Log.debug("Missing interval: " + missing);
                 List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
                 for (Interval<Date> missing : missingList) {
-                    requestEvents(eventType, missing.getStart(), missing.getEnd());
+                    // requestEvents(eventType, missing.getStart(),
+                    // missing.getEnd());
+                    RequestCache rc = new RequestCache();
+                    if (missingIntervals.containsKey(eventType)) {
+                        rc = missingIntervals.get(eventType);
+                    }
+                    rc.adaptRequestCache(missing.getStart(), missing.getEnd());
+                    missingIntervals.put(eventType, rc);
                 }
             }
         }
@@ -232,5 +251,28 @@ public class JHVEventContainer {
     public void eventTypeActivated(JHVEventType eventType) {
         eventCache.eventTypeActivated(eventType);
         fireEventCacheChanged();
+    }
+
+    public class EventDownloadTask extends TimerTask {
+
+        @Override
+        public void run() {
+            EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (!missingIntervals.isEmpty()) {
+                        for (JHVEventType evt : missingIntervals.keySet()) {
+                            for (Interval<Date> interv : missingIntervals.get(evt).getAllRequestIntervals()) {
+                                requestEvents(evt, interv.getStart(), interv.getEnd());
+                            }
+                        }
+                    }
+                    missingIntervals.clear();
+                }
+
+            });
+        }
+
     }
 }
