@@ -151,6 +151,7 @@ public class JHVEventContainer {
      */
     public void removeEvents(final JHVEventType eventType) {
         eventCache.removeEventType(eventType);
+        missingIntervals.remove(eventType);
         fireEventCacheChanged();
     }
 
