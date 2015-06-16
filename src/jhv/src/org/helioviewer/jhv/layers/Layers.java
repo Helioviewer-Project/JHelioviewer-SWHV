@@ -108,11 +108,9 @@ public class Layers {
     }
 
     public static void setTime(ImmutableDateTime dateTime) {
-        for (AbstractView movieView : layers) {
-            if (movieView instanceof MovieView) {
-                MovieView mv = (MovieView) movieView;
-                mv.setFrame(mv.getFrame(dateTime));
-            }
+        if (masterView != null) {
+            int frame = masterView.getFrame(dateTime);
+            syncRequest(dateTime, frame);
         }
     }
 
@@ -121,15 +119,18 @@ public class Layers {
             ImmutableDateTime dateTime = masterView.getFrameDateTime(frame);
             if (dateTime == null) // out of range
                 return;
-
-            for (AbstractView movieView : layers) {
-                if (movieView instanceof MovieView) {
-                    MovieView mv = (MovieView) movieView;
-                    mv.setFrame(mv.getFrame(dateTime));
-                }
-            }
-            MoviePanel.getSingletonInstance().setFrameSlider(frame);
+            syncRequest(dateTime, frame);
         }
+    }
+
+    private static void syncRequest(ImmutableDateTime dateTime, int frame) {
+        for (AbstractView movieView : layers) {
+            if (movieView instanceof MovieView) {
+                MovieView mv = (MovieView) movieView;
+                mv.setFrame(mv.getFrame(dateTime));
+            }
+        }
+        MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
