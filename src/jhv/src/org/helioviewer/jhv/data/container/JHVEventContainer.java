@@ -84,44 +84,6 @@ public class JHVEventContainer {
     }
 
     /**
-     * Request the JHVEventContainer for events from a specific date. The events
-     * will be send to the given handler. Events already available will directly
-     * be send to the handler. Events becoming available will also be send to
-     * the handler in the future.
-     *
-     * @param date
-     *            the date to send events for
-     * @param handler
-     *            the handler to send events to
-     */
-    public void requestForDate(final Date date, final JHVEventHandler handler) {
-        eventHandlerCache.add(handler);
-        JHVEventCacheResult result = eventCache.get(date);
-        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
-        handler.newEventsReceived(events);
-        for (Date missingDate : result.getMissingDates()) {
-            requestEvents(missingDate);
-        }
-    }
-
-    /**
-     * Request the JHVEventContainer for events from a specific list of dates.
-     * The events will be send to the given handler. Events already available
-     * will directly be send to the handler. Events becoming available will also
-     * be send to the handler in the future.
-     *
-     * @param dateList
-     *            the list of dates to send events for
-     * @param handler
-     *            the handler to send events to
-     */
-    public void requestForDateList(final List<Date> dateList, final JHVEventHandler handler) {
-        for (Date date : dateList) {
-            requestForDate(date, handler);
-        }
-    }
-
-    /**
      * Request the JHVEventContainer for events from a specific time interval.
      * The events will be send to the given handler. Events already available
      * will directly be send to the handler. Events becoming available will also
@@ -190,19 +152,6 @@ public class JHVEventContainer {
     public void removeEvents(final JHVEventType eventType) {
         eventCache.removeEventType(eventType);
         fireEventCacheChanged();
-    }
-
-    /**
-     * Request data from the request handlers for a date.
-     *
-     * @param date
-     *            the date for which to request the data
-     */
-    private void requestEvents(Date date) {
-        for (JHVEventContainerRequestHandler handler : requestHandlers) {
-            handler.handleRequestForDate(date);
-        }
-
     }
 
     /**

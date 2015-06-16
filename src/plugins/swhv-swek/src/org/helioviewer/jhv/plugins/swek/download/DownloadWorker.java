@@ -147,7 +147,7 @@ public class DownloadWorker implements Runnable {
      *            the parameters to use in the download
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
-        Log.debug("Create dw " + this + " downloading interval " + interval);
+        // Log.debug("Create dw " + this + " downloading interval " + interval);
         // Thread.dumpStack();
         isStopped = false;
         requestInterval = interval;
@@ -243,10 +243,10 @@ public class DownloadWorker implements Runnable {
 
             }
             fireDownloadWorkerFinished();
-            Log.debug("Downloadworker finished: " + this);
+            // Log.debug("Downloadworker finished: " + this);
         } else {
-            Log.debug("Download worker was stopped before it could be started");
-            Log.debug(this);
+            // Log.debug("Download worker was stopped before it could be started");
+            // Log.debug(this);
             fireDownloadWorkerForcedStopped();
             fireDownloadWorkerFinished();
         }

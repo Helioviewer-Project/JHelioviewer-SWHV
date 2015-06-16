@@ -176,11 +176,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     }
 
     @Override
-    public void newRequestForDate(Date date) {
-        downloadAllSelectedEventTypes(date);
-    }
-
-    @Override
     public void newRequestForInterval(JHVEventType eventType, Interval<Date> interval) {
         downloadEventType(eventType, interval);
     }
@@ -194,11 +189,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         } else {
             Log.debug("SWEKType: " + swekEventType + " SWEKSource: " + source + " SWEKSupplier: " + supplier);
         }
-    }
-
-    @Override
-    public void newRequestForDateList(List<Date> dates) {
-        downloadAllSelectedEventTypes(dates);
     }
 
     @Override
@@ -369,42 +359,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
         for (Interval<Date> interval : allIntervals) {
             startDownloadEventType(eventType, swekSource, interval, supplier);
-        }
-    }
-
-    /**
-     * Downloads for the given date the events of the currently active
-     * combinations of event type and swek sources.
-     *
-     * @param date
-     *            The date for which the event should be downloaded from the
-     *            sources
-     */
-    private void downloadAllSelectedEventTypes(Date date) {
-        for (SWEKEventType eventType : activeEventTypes.keySet()) {
-            for (SWEKSource source : activeEventTypes.get(eventType).keySet()) {
-                for (SWEKSupplier supplier : activeEventTypes.get(eventType).get(source)) {
-                    startDownloadEventType(eventType, source, date, supplier);
-                }
-            }
-        }
-    }
-
-    /**
-     * Downloads for the given date the events of the currently active
-     * combinations of event type and swek sources.
-     *
-     * @param interval
-     *            The interval for which the event should be downloaded from the
-     *            sources
-     */
-    private void downloadAllSelectedEventTypes(Interval<Date> interval) {
-        for (SWEKEventType eventType : activeEventTypes.keySet()) {
-            for (SWEKSource source : activeEventTypes.get(eventType).keySet()) {
-                for (SWEKSupplier supplier : activeEventTypes.get(eventType).get(source)) {
-                    startDownloadEventType(eventType, source, interval, supplier);
-                }
-            }
         }
     }
 
@@ -592,19 +546,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         datesPerSource.put(interval.getStart(), endDate);
         sourcesForEventType.put(supplier, datesPerSource);
         busyAndFinishedIntervalJobs.put(eventType, sourcesForEventType);
-    }
-
-    /**
-     * Starts downloading all the selected events for a list of dates.
-     *
-     * @param dates
-     *            the list of dates for which to download all the selected
-     *            events
-     */
-    private void downloadAllSelectedEventTypes(List<Date> dates) {
-        for (Date date : dates) {
-            downloadAllSelectedEventTypes(date);
-        }
     }
 
     /**

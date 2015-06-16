@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventContainerRequestHandler;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
@@ -14,14 +13,8 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     /** The singleton instance */
     private static IncomingRequestManager instance;
 
-    /** Local instance of the JHVEventContainer */
-    private final JHVEventContainer eventContainer;
-
     /** The listeners */
     private final List<IncomingRequestManagerListener> listeners;
-
-    /** List of requested intervals */
-    // private final List<Interval<Date>> intervalList;
 
     /** List of requested dates */
     private final List<Date> dateList;
@@ -30,9 +23,7 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      * Private constructor.
      */
     private IncomingRequestManager() {
-        eventContainer = JHVEventContainer.getSingletonInstance();
         listeners = new ArrayList<IncomingRequestManagerListener>();
-        // intervalList = new ArrayList<Interval<Date>>();
         dateList = new ArrayList<Date>();
     }
 
@@ -79,42 +70,14 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     }
 
     @Override
-    public void handleRequestForDate(Date date) {
-        ArrayList<Date> dates = new ArrayList<Date>();
-        dates.add(date);
-        dateList.addAll(dates);
-        fireNewDateRequested(date);
-
-    }
-
-    @Override
     public void handleRequestForInterval(JHVEventType eventType, Date startDate, Date endDate) {
         Interval<Date> interval = new Interval<Date>(startDate, endDate);
         fireNewIntervalRequested(eventType, interval);
     }
 
-    @Override
-    public void handleRequestForDateList(List<Date> dates) {
-        dateList.addAll(dates);
-        firedNewDateListRequested(dates);
-    }
-
-    /**
-     * Informs the listeners about a new date that was requested
-     *
-     * @param date
-     *            the date that was requested
-     * @param requestID
-     */
-    private void fireNewDateRequested(Date date) {
-        for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForDate(date);
-        }
-    }
-
     /**
      * Informs the listeners about a new interval that was requested.
-     * 
+     *
      * @param eventType
      *
      * @param interval
@@ -124,19 +87,6 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     private void fireNewIntervalRequested(JHVEventType eventType, Interval<Date> interval) {
         for (IncomingRequestManagerListener l : listeners) {
             l.newRequestForInterval(eventType, interval);
-        }
-    }
-
-    /**
-     * Informs the listeners about a new date list that was requested.
-     *
-     * @param dates
-     *            list of dates that was requested
-     * @param requestID
-     */
-    private void firedNewDateListRequested(List<Date> dates) {
-        for (IncomingRequestManagerListener l : listeners) {
-            l.newRequestForDateList(dates);
         }
     }
 
