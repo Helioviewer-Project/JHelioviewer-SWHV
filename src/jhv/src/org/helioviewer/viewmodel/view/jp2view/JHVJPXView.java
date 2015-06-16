@@ -29,7 +29,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
 
     // Caching
     protected ImageCacheStatus imageCacheStatus;
-    protected int lastRenderedCompositionLayer = -1;
 
     /**
      * {@inheritDoc}
@@ -63,9 +62,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     // to be accessed only from Layers
     @Override
     public void setCurrentFrame(ImmutableDateTime time) {
-        if (time == null)
-            return;
-
         int frameNumber = -1;
         long timeMillis = time.getMillis();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
@@ -113,7 +109,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      */
     @Override
     public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        if (frameNumber >= 0 && frameNumber <= getMaximumFrameNumber()) {
+        if (frameNumber >= 0 && frameNumber <= jp2Image.getMaximumFrameNumber()) {
             return jp2Image.metaDataList[frameNumber].getDateObs();
         }
         return null;
