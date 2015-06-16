@@ -3,11 +3,10 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 public class EVEValues {
     static int MINIMUMDISTANCEFORTIMEGAP = 60000;
     public final long[] dates;
-    public final double[] minValues;
-    public final double[] maxValues;
+    public final float[] maxValues;
 
-    private double minValue = Double.MAX_VALUE;
-    private double maxValue = Double.MIN_VALUE;
+    private double minValue = Float.MAX_VALUE;
+    private double maxValue = Float.MIN_VALUE;
 
     private final long intervalStart;
     private final long binStart;
@@ -20,8 +19,7 @@ public class EVEValues {
         this.timePerBin = timePerBin;
         this.numOfBins = numOfBins;
         dates = new long[numOfBins];
-        minValues = new double[numOfBins];
-        maxValues = new double[numOfBins];
+        maxValues = new float[numOfBins];
         fillArrays();
     }
 
@@ -30,12 +28,11 @@ public class EVEValues {
         binStart = 0;
         numOfBins = 0;
         timePerBin = 0;
-        dates = new long[numOfBins];
-        minValues = new double[numOfBins];
-        maxValues = new double[numOfBins];
+        dates = new long[0];
+        maxValues = new float[0];
     }
 
-    public void addValues(final long[] indates, final double[] invalues) {
+    public void addValues(final long[] indates, final float[] invalues) {
         int j = 0;
         long tg = Math.max(MINIMUMDISTANCEFORTIMEGAP, timePerBin / 2);
         for (int i = 0; i < maxValues.length; i++) {
@@ -48,8 +45,7 @@ public class EVEValues {
             }
             while (j < indates.length && indates[j] - startt <= tg && !Double.isNaN(invalues[j])) {
                 double value = invalues[j];
-                maxValues[i] = Math.max(maxValues[i], value);
-                minValues[i] = Math.min(minValues[i], value);
+                maxValues[i] = (float) Math.max(maxValues[i], value);
                 minValue = value < minValue ? value : minValue;
                 maxValue = value > maxValue ? value : maxValue;
                 j++;
@@ -73,12 +69,10 @@ public class EVEValues {
     private void fillArrays() {
         if (numOfBins > 0) {
             dates[0] = intervalStart;
-            maxValues[0] = Double.MIN_VALUE;
-            minValues[0] = Double.MAX_VALUE;
+            maxValues[0] = Float.MIN_VALUE;
             for (int i = 1; i < numOfBins; i++) {
                 dates[i] = dates[i - 1] + timePerBin;
-                maxValues[i] = Double.MIN_VALUE;
-                minValues[i] = Double.MAX_VALUE;
+                maxValues[i] = Float.MIN_VALUE;
             }
         }
     }

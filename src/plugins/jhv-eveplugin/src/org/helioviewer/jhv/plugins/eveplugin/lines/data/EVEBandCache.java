@@ -22,7 +22,7 @@ public class EVEBandCache {
     // Methods
     // //////////////////////////////////////////////////////////////////////////////
 
-    public void add(Band band, double[] values, long[] dates) {
+    public void add(Band band, float[] values, long[] dates) {
         EVECache cache = cacheMap.get(band);
         if (cache == null) {
             cache = new EVECache();

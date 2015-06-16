@@ -22,7 +22,7 @@ public class EVEDataOfDay {
 
     private final int MINUTES_PER_DAY = 1440;
 
-    private final double[] values = new double[MINUTES_PER_DAY];
+    private final float[] values = new float[MINUTES_PER_DAY];
     private final long[] dates = new long[MINUTES_PER_DAY];
 
     private final Range valueRange = new Range();
@@ -36,7 +36,7 @@ public class EVEDataOfDay {
     public EVEDataOfDay(final int year, final int month, final int dayOfMonth) {
         GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
 
-        Arrays.fill(values, Double.NaN);
+        Arrays.fill(values, Float.NaN);
         for (int i = 0; i < values.length; i++) {
             dates[i] = calendar.getTime().getTime();
             calendar.add(Calendar.MINUTE, 1);
@@ -49,7 +49,7 @@ public class EVEDataOfDay {
      * @param value
      *            The new value.
      * */
-    public void setValue(final int minuteOfDay, final double value, final long date) {
+    public void setValue(final int minuteOfDay, final float value, final long date) {
         values[minuteOfDay] = value;
 
         if (minuteOfDay == posMin) {
