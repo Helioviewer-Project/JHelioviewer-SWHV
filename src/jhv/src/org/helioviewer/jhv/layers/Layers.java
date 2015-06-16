@@ -110,7 +110,8 @@ public class Layers {
     public static void setTime(ImmutableDateTime dateTime) {
         for (AbstractView movieView : layers) {
             if (movieView instanceof MovieView) {
-                ((MovieView) movieView).setCurrentFrame(dateTime);
+                MovieView mv = (MovieView) movieView;
+                mv.setFrame(mv.getFrame(dateTime));
             }
         }
     }
@@ -123,7 +124,8 @@ public class Layers {
 
             for (AbstractView movieView : layers) {
                 if (movieView instanceof MovieView) {
-                    ((MovieView) movieView).setCurrentFrame(dateTime);
+                    MovieView mv = (MovieView) movieView;
+                    mv.setFrame(mv.getFrame(dateTime));
                 }
             }
             MoviePanel.getSingletonInstance().setFrameSlider(frame);

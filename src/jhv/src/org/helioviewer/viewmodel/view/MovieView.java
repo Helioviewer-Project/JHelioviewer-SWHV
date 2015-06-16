@@ -85,13 +85,14 @@ public interface MovieView extends View {
     /**
      * Returns time stamp of any frame specified.
      * 
-     * @param frameNumber
+     * @param frame
      * @return time stamp of the requested frame
      */
-    public ImmutableDateTime getFrameDateTime(int frameNumber);
+    public ImmutableDateTime getFrameDateTime(int frame);
 
     // <!- only for Layers
-    public void setCurrentFrame(ImmutableDateTime time);
+    public void setFrame(int frame);
+    public int getFrame(ImmutableDateTime time);
     // -->
 
 }

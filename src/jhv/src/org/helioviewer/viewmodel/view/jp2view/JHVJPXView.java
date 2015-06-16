@@ -61,19 +61,40 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
 
     // to be accessed only from Layers
     @Override
-    public void setCurrentFrame(ImmutableDateTime time) {
-        int frameNumber = -1;
+    public int getFrame(ImmutableDateTime time) {
+        int frame = -1;
         long timeMillis = time.getMillis();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = jp2Image.metaDataList[++frameNumber].getDateObs().getMillis() - timeMillis;
-        } while (currentDiff < 0 && frameNumber < jp2Image.getMaximumFrameNumber());
+            currentDiff = jp2Image.metaDataList[++frame].getDateObs().getMillis() - timeMillis;
+        } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {
-            setCurrentFrameNumber(frameNumber - 1);
+            return frame - 1;
         } else {
-            setCurrentFrameNumber(frameNumber);
+            return frame;
+        }
+    }
+
+    /**
+     * Before actually setting the new frame number, checks whether that is
+     * necessary. If the frame number has changed, also triggers an update of
+     * the image.
+     *
+     * @param frame
+     */
+    // to be accessed only from Layers
+    @Override
+    public void setFrame(int frame) {
+        if (frame != imageViewParams.compositionLayer &&
+            frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
+            imageViewParams.compositionLayer = frame;
+
+            readerSignal.signal();
+            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
+            }
         }
     }
 
@@ -108,9 +129,9 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableDateTime getFrameDateTime(int frameNumber) {
-        if (frameNumber >= 0 && frameNumber <= jp2Image.getMaximumFrameNumber()) {
-            return jp2Image.metaDataList[frameNumber].getDateObs();
+    public ImmutableDateTime getFrameDateTime(int frame) {
+        if (frame >= 0 && frame <= jp2Image.getMaximumFrameNumber()) {
+            return jp2Image.metaDataList[frame].getDateObs();
         }
         return null;
     }
@@ -134,26 +155,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
     }
 
-    /**
-     * Internal function for setting the current frame number.
-     *
-     * Before actually setting the new frame number, checks whether that is
-     * necessary. If the frame number has changed, also triggers an update of
-     * the image.
-     *
-     * @param frameNumber
-     */
-    private void setCurrentFrameNumber(int frameNumber) {
-        if (frameNumber != imageViewParams.compositionLayer &&
-            frameNumber >= 0 && frameNumber <= getMaximumAccessibleFrameNumber()) {
-            imageViewParams.compositionLayer = frameNumber;
-
-            readerSignal.signal();
-            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
-            }
-        }
-    }
 
     /**
      * Recalculates the image parameters.
