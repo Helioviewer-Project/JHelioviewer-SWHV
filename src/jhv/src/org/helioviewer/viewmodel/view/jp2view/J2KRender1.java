@@ -1,3 +1,6 @@
+
+// file to remove asap
+
 package org.helioviewer.viewmodel.view.jp2view;
 
 import kdu_jni.KduException;
@@ -28,14 +31,6 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  */
 class J2KRender1 implements Runnable {
 
-    /**
-     * There could be multiple reason that the Render object was signaled. This
-     * enum lists them.
-     */
-/*    public enum RenderReasons {
-        NEW_DATA, OTHER, MOVIE_PLAY
-    };
-*/
     /** The thread that this object runs on. */
     private volatile Thread myThread;
 
@@ -361,7 +356,7 @@ class J2KRender1 implements Runnable {
                 if (parentImageRef.getNumComponents() < 2) {
                     if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
                         SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
-                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }
@@ -373,7 +368,7 @@ class J2KRender1 implements Runnable {
                         }
 
                         ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
-                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                        parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
                     } else {
                         Log.warn("J2KRender: Params out of sync, skip frame");
                     }

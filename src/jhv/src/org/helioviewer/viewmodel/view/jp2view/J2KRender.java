@@ -278,7 +278,7 @@ class J2KRender implements Runnable {
             if (parentImageRef.getNumComponents() < 2) {
                 if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
                     SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
                 } else {
                     Log.warn("J2KRender: Params out of sync, skip frame");
                 }
@@ -290,7 +290,7 @@ class J2KRender implements Runnable {
                     }
 
                     ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent(), false);
+                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
                 } else {
                     Log.warn("J2KRender: Params out of sync, skip frame");
                 }

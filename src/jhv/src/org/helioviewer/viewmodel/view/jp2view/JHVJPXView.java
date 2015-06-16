@@ -147,16 +147,6 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
-        fullyLoaded = this.imageCacheStatus.getImageStatus(compositionLayer) == CacheStatus.COMPLETE;
-        super.setSubimageData(newImageData, roi, compositionLayer, zoompercent, fullyLoaded);
-    }
-
-
-    /**
      * Recalculates the image parameters.
      *
      * <p>

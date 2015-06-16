@@ -554,7 +554,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      *            Composition Layer rendered, to update meta data
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent, boolean fullyLoaded) {
+    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
         MetaData metaData = jp2Image.metaDataList[compositionLayer];
 
         newImageData.setFrameNumber(compositionLayer);
