@@ -87,7 +87,9 @@ public class SWEKTreeModel {
             objs.add(obj);
             loadingTypes.put(eventType, objs);
         } else {
-            loadingTypes.put(eventType, new HashSet<Object>());
+            Set<Object> objs = new HashSet<Object>();
+            objs.add(obj);
+            loadingTypes.put(eventType, objs);
             fireEventTypeStartLoading(eventType);
         }
     }
