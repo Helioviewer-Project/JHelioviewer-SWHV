@@ -44,7 +44,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  * application.
  *
  */
-public class JHVJP2View extends AbstractView implements JP2View, RenderListener {
+public class JHVJP2View extends AbstractView implements RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
@@ -226,32 +226,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * {@inheritDoc}
      */
     @Override
-    public int getCurrentNumQualityLayers() {
-        return imageViewParams.qualityLayers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMaximumNumQualityLayers() {
-        return jp2Image.getMaximumNumQualityLayers();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setNumQualityLayers(int newNumQualityLayers) {
-        if (newNumQualityLayers >= 1 && newNumQualityLayers <= getMaximumNumQualityLayers()) {
-            setImageViewParams(null, null, newNumQualityLayers, null);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
@@ -355,7 +329,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter() {
-        return calculateParameter(getCurrentNumQualityLayers(), imageViewParams.compositionLayer);
+        return calculateParameter(imageViewParams.qualityLayers, imageViewParams.compositionLayer);
     }
 
     /**
