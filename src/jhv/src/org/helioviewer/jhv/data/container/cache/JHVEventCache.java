@@ -15,7 +15,6 @@ import java.util.TreeMap;
 
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -183,11 +182,7 @@ public class JHVEventCache {
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
             List<Interval<Date>> missing = downloadedCache.get(evt).adaptRequestCache(startDate, endDate);
-            if (missing.isEmpty()) {
-                Log.debug("Cache hit");
-
-            } else {
-                Log.debug("Cache miss");
+            if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
             }
             missingIntervals.put(evt, missing);
