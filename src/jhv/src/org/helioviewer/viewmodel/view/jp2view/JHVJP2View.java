@@ -372,15 +372,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
 
     /**
-     * Returns the current set of parameters.
-     *
-     * @return Current set of parameters
-     */
-    JP2ImageParameter getImageViewParams() {
-        return imageViewParams;
-    }
-
-    /**
      * Sets the new image data for the given region.
      *
      * <p>
