@@ -44,7 +44,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     protected JP2ImageParameter calculateParameter() {
-        return this.calculateParameter(getCurrentNumQualityLayers(), 0);
+        return this.calculateParameter(imageViewParams.qualityLayers, 0);
     }
 
     @Override

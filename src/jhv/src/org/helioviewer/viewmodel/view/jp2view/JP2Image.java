@@ -116,24 +116,6 @@ public class JP2Image {
      *
      * @param newUri
      *            URI representing the location of the image
-     * @throws IOException
-     * @throws JHV_KduException
-     */
-    public JP2Image(URI newUri) throws IOException, JHV_KduException, Exception {
-        this(newUri, newUri);
-    }
-
-    /**
-     * Constructor
-     *
-     * <p>
-     * To open an image an URI must be given and this should be made unique. All
-     * initialization for this object is done in the constructor or in methods
-     * called by the constructor. Either the constructor throws an exception or
-     * the image was opened successfully.
-     *
-     * @param newUri
-     *            URI representing the location of the image
      * @param downloadURI
      *            In case the file should be downloaded to the local filesystem,
      *            use this URI as the source.
