@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.helioviewer.jhv.data.datatype.event;
 
@@ -11,9 +11,9 @@ import java.util.Map;
 
 /**
  * Defines the relationship between events.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class JHVEventRelationship {
     /** Events following this event */
@@ -40,7 +40,7 @@ public class JHVEventRelationship {
 
     /**
      * Gets the related events by rule.
-     * 
+     *
      * @return the relatedEventsByRule
      */
     public Map<String, JHVEventRelation> getRelatedEventsByRule() {
@@ -49,7 +49,7 @@ public class JHVEventRelationship {
 
     /**
      * Gets the next events.
-     * 
+     *
      * @return the nextEvents
      */
     public Map<String, JHVEventRelation> getNextEvents() {
@@ -58,7 +58,7 @@ public class JHVEventRelationship {
 
     /**
      * Gets the preceding events.
-     * 
+     *
      * @return the precedingEvents
      */
     public Map<String, JHVEventRelation> getPrecedingEvents() {
@@ -67,7 +67,7 @@ public class JHVEventRelationship {
 
     /**
      * Gets the relationship rules.
-     * 
+     *
      * @return the relationshipRules
      */
     public List<JHVEventRelationShipRule> getRelationshipRules() {
@@ -88,8 +88,21 @@ public class JHVEventRelationship {
     }
 
     public void merge(JHVEventRelationship eventRelationShip) {
-        nextEvents.putAll(eventRelationShip.getNextEvents());
-        precedingEvents.putAll(eventRelationShip.getPrecedingEvents());
-        relatedEventsByRule.putAll(eventRelationShip.getRelatedEventsByRule());
+        Map<String, JHVEventRelation> otherNextEvents = eventRelationShip.getNextEvents();
+        Map<String, JHVEventRelation> otherPrecedingEvents = eventRelationShip.getPrecedingEvents();
+        Map<String, JHVEventRelation> otherRulesRelated = eventRelationShip.getRelatedEventsByRule();
+        mergeTwoLists(nextEvents, otherNextEvents);
+        mergeTwoLists(precedingEvents, otherPrecedingEvents);
+        mergeTwoLists(relatedEventsByRule, otherRulesRelated);
+    }
+
+    private void mergeTwoLists(Map<String, JHVEventRelation> currentList, Map<String, JHVEventRelation> newList) {
+        for (String identifier : newList.keySet()) {
+            if (!currentList.containsKey(identifier)) {
+                JHVEventRelation newRelatedEvent = newList.get(identifier);
+                currentList.put(identifier, newRelatedEvent);
+                newRelatedEvent.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+            }
+        }
     }
 }
