@@ -348,10 +348,6 @@ public class JP2Image {
         return isJpx && frameCount > 1;
     }
 
-    public Jp2_threadsafe_family_src getFamilySrc() {
-        return familySrc;
-    }
-
     /**
      * Returns the URI representing the location of the image.
      *
@@ -561,7 +557,7 @@ public class JP2Image {
         return jpxSrc;
     }
 
-    String getXML(int boxNumber) {
+    public String getXML(int boxNumber) {
         String xml = null;
 
         try {
