@@ -16,7 +16,6 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
@@ -27,25 +26,18 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of View for JPG2000 images.
- *
  * <p>
  * This class represents the gateway to the heart of the helioviewer project. It
  * is responsible for reading and decoding JPG2000 images. Therefore, it manages
- * two Threads: One Thread for communicating with the JPIP server, the other one
+ * two threads: one thread for communicating with the JPIP server, the other one
  * for decoding the images.
- *
- * <p>
- * For decoding the images, the kakadu library is used. Unfortunately, kakaku is
- * not threadsafe, so be careful! Although kakadu is a and highly optimized
- * library, the decoding process is the bottleneck for speeding up the
- * application.
  *
  */
 public class JHVJP2View extends AbstractView implements RenderListener {
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
-    };
+    }
 
     protected Viewport viewport;
     protected Region region;
@@ -63,8 +55,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected J2KRender render;
     final ReasonSignal<RenderReasons> renderRequestedSignal = new ReasonSignal<RenderReasons>();
 
-    // Renderer-ThreadGroup - This group is necessary to identify all renderer
-    // threads
+    // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
 
     private ImageData previousImageData;
@@ -101,18 +92,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         MetaData metaData = newJP2Image.metaDataList[0];
         if (region == null) {
-            if (!(metaData instanceof PixelBasedMetaData)) {
-                region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
-            }
-            if (viewport == null) {
-                viewport = new Viewport(100, 100);
-            }
+            region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         }
-        jp2Image = newJP2Image;
-
         imageViewParams = calculateParameter(region, 0);
 
+        jp2Image = newJP2Image;
         jp2Image.addReference();
+
         try {
             reader = new J2KReader(this);
             render = new J2KRender(this);
@@ -392,13 +378,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         newImageData.setLocalRotation(metaData.getRotationObs());
 
         if (metaData instanceof HelioviewerMetaData) {
-            HelioviewerMetaData hvmd = (HelioviewerMetaData) metaData;
-            newImageData.setRegion(hvmd.roiToRegion(roi, zoompercent));
+            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(roi, zoompercent));
         }
 
         if (compositionLayer == 0) {
             baseDifferenceImageData = newImageData;
         }
+
         if (imageData != null && compositionLayer == imageData.getFrameNumber() + 1) {
             previousImageData = imageData;
         } else if (previousImageData != null && previousImageData.getFrameNumber() - compositionLayer > 2) {
@@ -460,8 +446,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         MetaData metaData = jp2Image.metaDataList[0];
         if (metaData instanceof HelioviewerMetaData) {
-            HelioviewerMetaData hvMetaData = (HelioviewerMetaData) metaData;
-            String colorKey = DefaultTable.getSingletonInstance().getColorTable(hvMetaData);
+            String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
             if (colorKey != null) {
                 lut = LUT.getStandardList().get(colorKey);
                 return;
