@@ -574,7 +574,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     public String getXMLMetaData() {
-        return jp2Image.getXML(1);
+        return jp2Image.getXML(imageViewParams.compositionLayer + 1);
     }
 
 }

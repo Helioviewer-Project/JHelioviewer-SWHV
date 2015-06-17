@@ -142,9 +142,4 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return 0;
     }
 
-    @Override
-    public String getXMLMetaData() {
-        return jp2Image.getXML(imageViewParams.compositionLayer + 1);
-    }
-
 }
