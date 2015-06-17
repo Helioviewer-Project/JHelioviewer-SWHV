@@ -170,6 +170,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.metaDataList[frameNumber];
     }
 
+    public String getXMLMetaData() {
+        return jp2Image.getXML(imageViewParams.compositionLayer + 1);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -385,12 +389,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             baseDifferenceImageData = newImageData;
         }
 
-        if (imageData != null && compositionLayer == imageData.getFrameNumber() + 1) {
+        if (imageData != null && Math.abs(compositionLayer - imageData.getFrameNumber()) == 1) {
             previousImageData = imageData;
         } else if (previousImageData != null && previousImageData.getFrameNumber() - compositionLayer > 2) {
             previousImageData = newImageData;
-        } else if (imageData != null && compositionLayer == imageData.getFrameNumber() - 1) {
-            previousImageData = imageData;
         }
 
         imageData = newImageData;
@@ -454,10 +456,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
         // no LUT found, try gray as last resort
         lut = gray;
-    }
-
-    public String getXMLMetaData() {
-        return jp2Image.getXML(imageViewParams.compositionLayer + 1);
     }
 
 }

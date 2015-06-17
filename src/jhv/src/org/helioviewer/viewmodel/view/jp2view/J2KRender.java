@@ -8,6 +8,7 @@ import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -248,8 +249,8 @@ class J2KRender implements Runnable {
             }
 
             currParams = parentViewRef.imageViewParams;
-
             int curLayer = currParams.compositionLayer;
+
             if (parentViewRef instanceof MovieView) {
                 MovieView parent = (MovieView) parentViewRef;
                 if (parent.getMaximumAccessibleFrameNumber() < curLayer) {
@@ -267,13 +268,11 @@ class J2KRender implements Runnable {
             SubImage roi = currParams.subImage;
             int width = roi.width;
             int height = roi.height;
+            ImageData imdata = null;
 
             if (parentImageRef.getNumComponents() < 2) {
                 if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                    SingleChannelByte8ImageData imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
-                } else {
-                    Log.warn("J2KRender: Params out of sync, skip frame");
+                    imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
                 }
             } else {
                 if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
@@ -281,12 +280,14 @@ class J2KRender implements Runnable {
                     if (parentImageRef.getNumComponents() == 2) {
                         singleChannel = true;
                     }
-
-                    ARGBInt32ImageData imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
-                    parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
-                } else {
-                    Log.warn("J2KRender: Params out of sync, skip frame");
+                    imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
                 }
+            }
+
+            if (imdata != null) {
+                parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
+            } else {
+                Log.warn("J2KRender: Params out of sync, skip frame");
             }
 
             numFrames += currParams.compositionLayer - lastFrame;
