@@ -1,19 +1,15 @@
 package org.helioviewer.jhv.data.container;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -34,9 +30,7 @@ public class JHVEventContainer {
     /** the event handler cache */
     private final JHVEventHandlerCache eventHandlerCache;
 
-    private final Map<JHVEventType, RequestCache> missingIntervals;
-
-    private final Timer eventTimer;
+    private final double factor = 0.2;
 
     /**
      * Private constructor.
@@ -45,9 +39,6 @@ public class JHVEventContainer {
         requestHandlers = new ArrayList<JHVEventContainerRequestHandler>();
         eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
-        missingIntervals = new HashMap<JHVEventType, RequestCache>();
-        eventTimer = new Timer("SWEK download missing");
-        eventTimer.schedule(new EventDownloadTask(), 0, 5000);
     }
 
     /**
@@ -97,13 +88,19 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("Request for interval : ["
-        // + startDate + "," + endDate + "]");
+        // Log.debug("Request for interval : [" + startDate + "," + endDate +
+        // "]");
         // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
         // + handler);
         if (startDate != null && endDate != null) {
+            long deltaT = endDate.getTime() - startDate.getTime();
+            Log.debug("Delta T = " + (1.0 * deltaT / 1000 / 60 / 60 / 24) + " days, interval extended with " + (factor * deltaT / 1000 / 60 / 60 / 24) + " days");
+            Date newStartDate = new Date((long) (startDate.getTime() - deltaT * factor));
+            Date newEndDate = new Date((long) (endDate.getTime() + deltaT * factor));
+            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate +
+            // "]");
             eventHandlerCache.add(handler);
-            JHVEventCacheResult result = eventCache.get(startDate, endDate);
+            JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
             Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
@@ -111,14 +108,7 @@ public class JHVEventContainer {
                 // Log.debug("Missing interval: " + missing);
                 List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
                 for (Interval<Date> missing : missingList) {
-                    // requestEvents(eventType, missing.getStart(),
-                    // missing.getEnd());
-                    RequestCache rc = new RequestCache();
-                    if (missingIntervals.containsKey(eventType)) {
-                        rc = missingIntervals.get(eventType);
-                    }
-                    rc.adaptRequestCache(missing.getStart(), missing.getEnd());
-                    missingIntervals.put(eventType, rc);
+                    requestEvents(eventType, missing.getStart(), missing.getEnd());
                 }
             }
         }
@@ -151,7 +141,6 @@ public class JHVEventContainer {
      */
     public void removeEvents(final JHVEventType eventType) {
         eventCache.removeEventType(eventType);
-        missingIntervals.remove(eventType);
         fireEventCacheChanged();
     }
 
@@ -203,26 +192,4 @@ public class JHVEventContainer {
         fireEventCacheChanged();
     }
 
-    public class EventDownloadTask extends TimerTask {
-
-        @Override
-        public void run() {
-            EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (!missingIntervals.isEmpty()) {
-                        for (JHVEventType evt : missingIntervals.keySet()) {
-                            for (Interval<Date> interv : missingIntervals.get(evt).getAllRequestIntervals()) {
-                                requestEvents(evt, interv.getStart(), interv.getEnd());
-                            }
-                        }
-                    }
-                    missingIntervals.clear();
-                }
-
-            });
-        }
-
-    }
 }
