@@ -30,7 +30,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     @Override
     public boolean setRegion(Region r) {
         region = r;
-        setImageViewParams(calculateParameter());
+        setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true);
         return true;
     }
 
@@ -43,18 +43,18 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter() {
-        return this.calculateParameter(imageViewParams.qualityLayers, 0);
-    }
-
-    @Override
-    protected JP2ImageParameter calculateParameter(int numQualityLayers, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(Region r, int numQualityLayers, int frameNumber) {
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension((int) Math.ceil(viewport.getWidth() / region.getWidth() * maxWidth), 2 * (int) Math.ceil(viewport.getHeight() / region.getHeight() * maxHeight)));
+        ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension(
+                                (int) Math.ceil(viewport.getWidth() / r.getWidth() * maxWidth),
+                                2 * (int) Math.ceil(viewport.getHeight() / r.getHeight() * maxHeight)));
 
-        SubImage subImage = new SubImage((int) (region.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width), (int) (region.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height), (int) (region.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (region.getHeight() / maxHeight * res.getResolutionBounds().height));
-        return new JP2ImageParameter(subImage, res, numQualityLayers, 0);
+        SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width),
+                                         (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height),
+                                         (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width),
+                                         (int) (r.getHeight() / maxHeight * res.getResolutionBounds().height));
+        return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
     }
 
     @Override

@@ -110,7 +110,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
         jp2Image = newJP2Image;
 
-        imageViewParams = calculateParameter(newJP2Image.getMaximumNumQualityLayers(), 0);
+        imageViewParams = calculateParameter(region, newJP2Image.getMaximumNumQualityLayers(), 0);
 
         jp2Image.addReference();
         try {
@@ -157,13 +157,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public boolean setViewport(Viewport v) {
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
 
-        if (setImageViewParams(calculateParameter())) {
+        if (setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true)) {
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
             renderRequestedSignal.signal(RenderReasons.OTHER);
@@ -192,7 +191,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        changed |= setImageViewParams(calculateParameter());
+        changed |= setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true);
 
         return changed;
     }
@@ -281,45 +280,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     /**
      * Recalculates the image parameters.
      *
-     * <p>
-     * This function maps between the set of parameters used within the view
-     * chain and the set of parameters used within the jp2-package.
-     *
-     * <p>
-     * To achieve this, calls {@link #calculateParameter(int, int)} with the
-     * currently used number of quality layers and the first frame.
-     *
-     * @return Set of parameters used within the jp2-package
-     */
-    protected JP2ImageParameter calculateParameter() {
-        return calculateParameter(imageViewParams.qualityLayers, imageViewParams.compositionLayer);
-    }
-
-    /**
-     * Recalculates the image parameters.
-     *
-     * This function maps between the set of parameters used within the view
-     * chain and the set of parameters used within the jp2-package.
-     *
-     * <p>
-     * To achieve this, calls
-     * {@link #calculateParameter(Viewport, Region, int, int)} with the current
-     * region and viewport and the given number of quality layers and frame
-     * number.
-     *
-     * @param numQualityLayers
-     *            Number of quality layers to use
-     * @param frameNumber
-     *            Frame number to show (has to be 0 for single images)
-     * @return Set of parameters used within the jp2-package
-     */
-    protected JP2ImageParameter calculateParameter(int numQualityLayers, int frameNumber) {
-        return calculateParameter(region, numQualityLayers, frameNumber);
-    }
-
-    /**
-     * Recalculates the image parameters.
-     *
      * This function maps between the set of parameters used within the view
      * chain and the set of parameters used within the jp2-package.
      *
@@ -374,57 +334,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     /**
-     * Sets the current ImageViewParams to the ones specified. Any parameter
-     * that should remain unchanged should be specified null. (Isn't
-     * auto-unboxing just convenient as hell sometimes?)
-     *
-     * @param _roi
-     *            Pixel region to display
-     * @param _resolution
-     *            Resolution level to use
-     * @param _qualityLayers
-     *            Number of quality layers to use
-     * @param _compositionLayer
-     *            Frame number to use
-     * @param _doReload
-     *            If true, the image is reloaded after updating the parameters
-     * @return true, if the parameters actually has changed, false otherwise
-     */
-    protected boolean setImageViewParams(SubImage _roi, ResolutionLevel _resolution, Integer _qualityLayers, Integer _compositionLayer, boolean _doReload) {
-        return setImageViewParams(new JP2ImageParameter((_roi == null ? imageViewParams.subImage : _roi), (_resolution == null ? imageViewParams.resolution : _resolution), (_qualityLayers == null ? imageViewParams.qualityLayers : _qualityLayers), (_compositionLayer == null ? imageViewParams.compositionLayer : _compositionLayer)), _doReload);
-    }
-
-    /**
-     * Method calls setImageViewParams(SubImage, ResolutionLevel, Integer,
-     * Integer, boolean) with the boolean set to true.
-     *
-     * @param _roi
-     *            Pixel region to display
-     * @param _resolution
-     *            Resolution level to use
-     * @param _qualityLayers
-     *            Number of quality layers to use
-     * @param _compositionLayer
-     *            Frame number to use
-     * @return true, if the parameters actually has changed, false otherwise
-     */
-    protected boolean setImageViewParams(SubImage _roi, ResolutionLevel _resolution, Integer _qualityLayers, Integer _compositionLayer) {
-        return setImageViewParams(_roi, _resolution, _qualityLayers, _compositionLayer, true);
-    }
-
-    /**
-     * Calls {@link #setImageViewParams(JP2ImageParameter, boolean)} with the
-     * boolean set to true.
-     *
-     * @param newParams
-     *            New set of parameters to use
-     * @return true, if the parameters actually has changed, false otherwise
-     */
-    protected boolean setImageViewParams(JP2ImageParameter newParams) {
-        return setImageViewParams(newParams, true);
-    }
-
-    /**
      * Sets the image parameters, if the given ones are valid.
      *
      * Also, triggers an update of the image using the new set of parameters, if
@@ -445,7 +354,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             if (imageData == null) {
                 return false;
             }
-            // setSubimageData(null, null, 0, 1.);
             return true;
         }
         imageViewParams = newParams;
