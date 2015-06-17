@@ -30,7 +30,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 //Java 6 does not support generics for JComboBox and DefaultComboBoxModel
 //Should be removed if support for Java 6 is not needed anymore
@@ -227,11 +226,9 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(AbstractView view) {
-        if (view instanceof JHVJPXView) {
-            Date start = Layers.getStartDate(view);
-            calendarStartDate.setDate(start);
-            ObservationDialogDateModel.getInstance().setStartDate(start, false);
-        }
+        Date start = Layers.getStartDate(view);
+        calendarStartDate.setDate(start);
+        ObservationDialogDateModel.getInstance().setStartDate(start, false);
     }
 
     @Override

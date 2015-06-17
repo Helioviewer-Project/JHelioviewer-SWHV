@@ -69,5 +69,7 @@ public interface View {
      * @return average actual frame rate
      */
     public float getActualFramerate();
+    
+    public boolean isMultiFrame();
 
 }
