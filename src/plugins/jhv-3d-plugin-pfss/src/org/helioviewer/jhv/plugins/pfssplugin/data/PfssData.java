@@ -118,7 +118,7 @@ public class PfssData {
 
             Date dd = TimeUtils.utcDateFormat.parse(dateString);
             Position.Latitudinal p = Sun.getEarth(dd);
-            double phi = p.lon - Math.PI / 2.;
+            double phi = p.lon;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);
 
