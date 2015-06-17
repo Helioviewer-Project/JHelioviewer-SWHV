@@ -30,7 +30,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     @Override
     public boolean setRegion(Region r) {
         region = r;
-        setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true);
+        setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
         return true;
     }
 
@@ -43,7 +43,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(Region r, int numQualityLayers, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
         int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
         ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension(
@@ -54,7 +54,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
                                          (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height),
                                          (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width),
                                          (int) (r.getHeight() / maxHeight * res.getResolutionBounds().height));
-        return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
+        return new JP2ImageParameter(subImage, res, frameNumber);
     }
 
     @Override

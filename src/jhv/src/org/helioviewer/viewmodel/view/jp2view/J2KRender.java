@@ -130,7 +130,6 @@ class J2KRender implements Runnable {
                 }
 
                 compositorRef.Set_surface_initialization_mode(false);
-                compositorRef.Set_max_quality_layers(currParams.qualityLayers);
                 compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
                 if (parentImageRef.getNumComponents() <= 2) {
                     compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);

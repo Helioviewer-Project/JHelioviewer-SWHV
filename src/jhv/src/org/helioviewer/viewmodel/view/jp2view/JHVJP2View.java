@@ -110,7 +110,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
         jp2Image = newJP2Image;
 
-        imageViewParams = calculateParameter(region, newJP2Image.getMaximumNumQualityLayers(), 0);
+        imageViewParams = calculateParameter(region, 0);
 
         jp2Image.addReference();
         try {
@@ -162,7 +162,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
 
-        if (setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true)) {
+        if (setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true)) {
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
             renderRequestedSignal.signal(RenderReasons.OTHER);
@@ -191,7 +191,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        changed |= setImageViewParams(calculateParameter(region, imageViewParams.qualityLayers, imageViewParams.compositionLayer), true);
+        changed |= setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
 
         return changed;
     }
@@ -292,13 +292,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      *            Viewport the image will be displayed in
      * @param r
      *            Physical region
-     * @param numQualityLayers
-     *            Number of quality layers to use
      * @param frameNumber
      *            Frame number to show (has to be 0 for single images)
      * @return Set of parameters used within the jp2-package
      */
-    protected JP2ImageParameter calculateParameter(Region r, int numQualityLayers, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
 
         double mWidth = m.getPhysicalSize().x;
@@ -331,7 +329,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight);
 
-        return new JP2ImageParameter(subImage, res, numQualityLayers, frameNumber);
+        return new JP2ImageParameter(subImage, res, frameNumber);
     }
 
     /**
