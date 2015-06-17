@@ -263,9 +263,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             reader = null;
         }
         if (render != null) {
-            render.abolish(jp2Image);
+            render.abolish();
             render = null;
         }
+        jp2Image.abolish();
     }
 
     /**

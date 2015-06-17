@@ -87,7 +87,7 @@ class J2KRender implements Runnable {
         myThread.start();
     }
 
-    void abolish(JP2Image jp2Image) {
+    void abolish() {
         stop = true;
         myThread.interrupt();
         try {
@@ -101,8 +101,6 @@ class J2KRender implements Runnable {
         localIntBuffer = null;
         intBuffer = null;
         byteBuffer = null;
-
-        jp2Image.abolish();
     }
 
     public float getActualMovieFramerate() {
