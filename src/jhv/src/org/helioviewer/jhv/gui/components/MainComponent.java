@@ -146,7 +146,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             int currentScreenshot = 1;
             int maxframeno = 1;
             if (mv instanceof JHVJPXView) {
-                currentScreenshot = ((JHVJPXView) mv).getImageData().getFrameNumber();
+                currentScreenshot = ((JHVJPXView) mv).getCurrentFrameNumber();
                 maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
             }
 
