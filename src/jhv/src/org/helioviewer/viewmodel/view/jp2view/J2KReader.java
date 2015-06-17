@@ -10,7 +10,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
@@ -233,9 +232,9 @@ class J2KReader implements Runnable {
             // If image is not remote image, do nothing and just signal render
             if (parentViewRef.getReaderMode() == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentViewRef.setReaderMode(ReaderMode.NEVERFIRE);
-                parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+                parentViewRef.renderSignal.signal();
             } else if (!parentImageRef.isRemote() && parentViewRef.getReaderMode() != ReaderMode.NEVERFIRE) {
-                parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+                parentViewRef.renderSignal.signal();
             } else {
                 // check whether view parameters have changed
                 prevParams = currParams;
@@ -465,11 +464,11 @@ class J2KReader implements Runnable {
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+                                            parentViewRef.renderSignal.signal();
                                             break;
                                         default:
                                             if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                                parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+                                                parentViewRef.renderSignal.signal();
                                             }
                                         }
                                     }
