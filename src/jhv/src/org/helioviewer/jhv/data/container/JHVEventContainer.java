@@ -9,7 +9,6 @@ import java.util.NavigableMap;
 import java.util.Set;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
@@ -94,7 +93,6 @@ public class JHVEventContainer {
         // + handler);
         if (startDate != null && endDate != null) {
             long deltaT = endDate.getTime() - startDate.getTime();
-            Log.debug("Delta T = " + (1.0 * deltaT / 1000 / 60 / 60 / 24) + " days, interval extended with " + (factor * deltaT / 1000 / 60 / 60 / 24) + " days");
             Date newStartDate = new Date((long) (startDate.getTime() - deltaT * factor));
             Date newEndDate = new Date((long) (endDate.getTime() + deltaT * factor));
             // Log.debug("new Interval : [" + newStartDate + "," + newEndDate +
