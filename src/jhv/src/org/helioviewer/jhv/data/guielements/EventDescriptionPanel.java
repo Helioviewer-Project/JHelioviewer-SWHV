@@ -19,7 +19,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class EventDescriptionPanel extends JPanel {
 
     /** The event */
@@ -85,10 +85,11 @@ public class EventDescriptionPanel extends JPanel {
 
         this.addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
         this.addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
+        this.addLineToSummaryPanel(summaryPanel, 2, "object_id", new JTextArea(event.toString()));
 
         GridBagConstraints colorLabelConstraint = new GridBagConstraints();
         colorLabelConstraint.gridx = 2;
-        colorLabelConstraint.gridy = 2;
+        colorLabelConstraint.gridy = 3;
         colorLabelConstraint.weightx = 0;
         colorLabelConstraint.weighty = 0;
 
