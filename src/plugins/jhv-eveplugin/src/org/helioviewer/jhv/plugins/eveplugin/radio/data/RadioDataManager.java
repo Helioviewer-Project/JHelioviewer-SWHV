@@ -24,7 +24,6 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
  * The radio data manager manages all the downloaded data for radio
@@ -622,7 +621,7 @@ public class RadioDataManager implements RadioDownloaderListener {
             XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
             for (int i = 0; i <= maximumFrameNumber; i++) {
                 try {
-                    hvMetaData.parseXML(KakaduUtils.getXml(image.getFamilySrc(), i));
+                    hvMetaData.parseXML(image.getXML(i));
                     Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
                     Double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
                     Date start = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-OBS")).getTime();
