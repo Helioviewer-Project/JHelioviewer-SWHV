@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.net.URI;
 
 import org.helioviewer.base.Region;
@@ -44,7 +43,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     // Member related to JP2
     protected JP2Image jp2Image;
-    public volatile JP2ImageParameter imageViewParams;
+    protected JP2ImageParameter imageViewParams;
 
     // Reader
     protected J2KReader reader;
@@ -158,16 +157,39 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return viewportChanged;
     }
 
+    private int getTrueFrameNumber() {
+        int frameNumber = 0;
+        if (imageData != null) {
+            frameNumber = imageData.getFrameNumber();
+        }
+        return frameNumber;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public MetaData getMetaData() {
-        return jp2Image.metaDataList[imageViewParams.compositionLayer];
+        return jp2Image.metaDataList[getTrueFrameNumber()];
     }
 
     public String getXMLMetaData() {
-        return jp2Image.getXML(imageViewParams.compositionLayer + 1);
+        return jp2Image.getXML(getTrueFrameNumber() + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
+        MetaData metaData = jp2Image.metaDataList[getTrueFrameNumber()];
+        if (metaData instanceof ObserverMetaData) {
+            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
+            return observerMetaData.getFullName();
+        } else {
+            String name = jp2Image.getURI().getPath();
+            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
+        }
     }
 
     /**
@@ -180,21 +202,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         changed |= setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
 
         return changed;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName() {
-        MetaData metaData = jp2Image.metaDataList[imageViewParams.compositionLayer];
-        if (metaData instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-            return observerMetaData.getFullName();
-        } else {
-            String name = jp2Image.getURI().getPath();
-            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-        }
     }
 
     /**
@@ -351,6 +358,17 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      * class.
      */
 
+    JP2ImageParameter getImageViewParams() {
+        synchronized (imageViewParams) {
+            try {
+                return (JP2ImageParameter) imageViewParams.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     /**
      * Sets the new image data for the given region.
      *
@@ -366,47 +384,32 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      *            Composition Layer rendered, to update meta data
      *            {@link org.helioviewer.viewmodel.region.Region}
      */
-    void setSubimageData(ImageData newImageData, SubImage roi, int compositionLayer, double zoompercent) {
-        MetaData metaData = jp2Image.metaDataList[compositionLayer];
+    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
+        MetaData metaData = jp2Image.metaDataList[params.compositionLayer];
 
-        newImageData.setFrameNumber(compositionLayer);
+        newImageData.setFrameNumber(params.compositionLayer);
         newImageData.setLocalRotation(metaData.getRotationObs());
 
         if (metaData instanceof HelioviewerMetaData) {
-            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(roi, zoompercent));
+            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (compositionLayer == 0) {
+        if (params.compositionLayer == 0) {
             baseDifferenceImageData = newImageData;
         }
 
-        if (imageData != null && Math.abs(compositionLayer - imageData.getFrameNumber()) == 1) {
+        if (imageData != null && Math.abs(params.compositionLayer - imageData.getFrameNumber()) == 1) {
             previousImageData = imageData;
-        } else if (previousImageData != null && previousImageData.getFrameNumber() - compositionLayer > 2) {
+        } else if (previousImageData != null && previousImageData.getFrameNumber() - params.compositionLayer > 2) {
             previousImageData = newImageData;
         }
 
         imageData = newImageData;
-
         fireFrameChanged(this, metaData.getDateObs());
     }
 
     protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
-        EventQueue.invokeLater(new Runnable() {
-            private JHVJP2View theView;
-            private ImmutableDateTime theDateTime;
-
-            @Override
-            public void run() {
-                Displayer.fireFrameChanged(theView, theDateTime);
-            }
-
-            public Runnable init(JHVJP2View theView, ImmutableDateTime theDateTime) {
-                this.theView = theView;
-                this.theDateTime = theDateTime;
-                return this;
-            }
-        }.init(aView, aDateTime));
+        Displayer.fireFrameChanged(aView, aDateTime);
     }
 
     @Override

@@ -239,7 +239,7 @@ class J2KReader implements Runnable {
             } else {
                 // check whether view parameters have changed
                 prevParams = currParams;
-                currParams = parentViewRef.imageViewParams;
+                currParams = parentViewRef.getImageViewParams();
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
 
                 // if view has changed downgrade caching status

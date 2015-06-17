@@ -1,13 +1,13 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
@@ -38,17 +38,18 @@ public class JHVJP2CallistoView extends JHVJP2View {
     public void render() {
     }
 
-    public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler dataHandler) {
-        this.dataHandler = dataHandler;
+    public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler _dataHandler) {
+        dataHandler = _dataHandler;
     }
 
     @Override
     protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
-        int maxHeight = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().height;
-        int maxWidth = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds().width;
-        ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension(
-                                (int) Math.ceil(viewport.getWidth() / r.getWidth() * maxWidth),
-                                2 * (int) Math.ceil(viewport.getHeight() / r.getHeight() * maxHeight)));
+        ResolutionSet set = jp2Image.getResolutionSet();
+        int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
+        int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
+        ResolutionLevel res = set.getClosestResolutionLevel(new Dimension(
+                                         (int) Math.ceil(viewport.getWidth() / r.getWidth() * maxWidth),
+                                         2 * (int) Math.ceil(viewport.getHeight() / r.getHeight() * maxHeight)));
 
         SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width),
                                          (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height),
@@ -59,14 +60,9 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (dataHandler != null) {
-                    dataHandler.handleData(JHVJP2CallistoView.this);
-                }
-            }
-        });
+        if (dataHandler != null) {
+            dataHandler.handleData((JHVJP2CallistoView) aView);
+        }
     }
 
     public void removeJHVJP2DataHandler() {

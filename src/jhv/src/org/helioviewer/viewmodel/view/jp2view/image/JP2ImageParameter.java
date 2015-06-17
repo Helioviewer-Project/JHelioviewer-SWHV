@@ -10,7 +10,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLeve
  * @author Benjamin Wamsler
  * 
  */
-public class JP2ImageParameter {
+public class JP2ImageParameter implements Cloneable {
 
     /** Essentially an immutable Rectangle */
     public final SubImage subImage;
@@ -28,6 +28,11 @@ public class JP2ImageParameter {
         subImage = _roi;
         resolution = _resolution;
         compositionLayer = _compositionLayer;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     /** The toString method. */

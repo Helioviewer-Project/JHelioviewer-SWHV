@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
+import java.awt.EventQueue;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
@@ -248,7 +250,7 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            currParams = parentViewRef.imageViewParams;
+            currParams = parentViewRef.getImageViewParams();
             int curLayer = currParams.compositionLayer;
 
             if (parentViewRef instanceof MovieView) {
@@ -271,24 +273,15 @@ class J2KRender implements Runnable {
             ImageData imdata = null;
 
             if (parentImageRef.getNumComponents() < 2) {
-                if (roi.getNumPixels() == byteBuffer[currentByteBuffer].length) {
-                    imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
-                }
+                imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
             } else {
-                if (roi.getNumPixels() == intBuffer[currentIntBuffer].length) {
-                    boolean singleChannel = false;
-                    if (parentImageRef.getNumComponents() == 2) {
-                        singleChannel = true;
-                    }
-                    imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
+                boolean singleChannel = false;
+                if (parentImageRef.getNumComponents() == 2) {
+                    singleChannel = true;
                 }
+                imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
             }
-
-            if (imdata != null) {
-                parentViewRef.setSubimageData(imdata, roi, curLayer, currParams.resolution.getZoomPercent());
-            } else {
-                Log.warn("J2KRender: Params out of sync, skip frame");
-            }
+            setImageData(imdata, currParams);
 
             numFrames += currParams.compositionLayer - lastFrame;
             lastFrame = currParams.compositionLayer;
@@ -303,6 +296,24 @@ class J2KRender implements Runnable {
                 numFrames = 0;
             }
         }
+    }
+
+    private void setImageData(ImageData newImdata, JP2ImageParameter newParams) {
+        EventQueue.invokeLater(new Runnable() {
+            private ImageData theImdata;
+            private JP2ImageParameter theParams;
+
+            @Override
+            public void run() {
+                parentViewRef.setSubimageData(theImdata, theParams);
+            }
+
+            public Runnable init(ImageData theImdata, JP2ImageParameter theParams) {
+                this.theImdata = theImdata;
+                this.theParams = theParams;
+                return this;
+            }
+        }.init(newImdata, newParams));
     }
 
 }
