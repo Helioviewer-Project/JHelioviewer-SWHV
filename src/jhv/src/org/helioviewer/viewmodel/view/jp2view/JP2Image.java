@@ -386,7 +386,7 @@ public class JP2Image {
         return output;
     }
 
-    /** Returns the number of output components. */
+    // Returns the number of output components
     public int getNumComponents() {
         return numComponents;
     }
@@ -536,25 +536,47 @@ public class JP2Image {
         }
     }
 
-    /** Returns the cache reference */
+    // Returns the cache reference
     JHV_Kdu_cache getCacheRef() {
         return cache;
     }
 
-    /** Sets the ImageCacheStatus */
+    // Sets the ImageCacheStatus
     void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
         if (cache != null)
             cache.setImageCacheStatus(imageCacheStatus);
     }
 
-    /** Returns the compositor reference */
+    // Returns the compositor reference
     Kdu_region_compositor getCompositorRef() {
         return compositor;
     }
 
-    /** Returns the jpx source */
-    Jpx_source getJpxSource() {
-        return jpxSrc;
+    // Returns the built-in color lookup table.
+    int[] getBuiltInLUT() {
+        try {
+            Jp2_palette palette = jpxSrc.Access_codestream(0).Access_palette();
+            if (palette.Get_num_luts() == 0) {
+                return null;
+            }
+
+            int[] lut = new int[palette.Get_num_entries()];
+            float[] red = new float[lut.length];
+            float[] green = new float[lut.length];
+            float[] blue = new float[lut.length];
+
+            palette.Get_lut(0, red);
+            palette.Get_lut(1, green);
+            palette.Get_lut(2, blue);
+
+            for (int i = 0; i < lut.length; i++) {
+                lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
+            }
+            return lut;
+        } catch (KduException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String getXML(int boxNumber) {

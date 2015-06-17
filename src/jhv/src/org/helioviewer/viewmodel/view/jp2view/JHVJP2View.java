@@ -4,9 +4,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.net.URI;
 
-import kdu_jni.Jp2_palette;
-import kdu_jni.KduException;
-
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
@@ -155,40 +152,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     public ReaderMode getReaderMode() {
         return readerMode;
-    }
-
-    /**
-     * Returns the built-in color lookup table.
-     *
-     */
-    private int[] getBuiltInLUT() {
-        try {
-            Jp2_palette palette = jp2Image.getJpxSource().Access_codestream(0).Access_palette();
-            if (palette.Get_num_luts() == 0) {
-                return null;
-            }
-
-            int[] lut = new int[palette.Get_num_entries()];
-
-            float[] red = new float[palette.Get_num_entries()];
-            float[] green = new float[palette.Get_num_entries()];
-            float[] blue = new float[palette.Get_num_entries()];
-
-            palette.Get_lut(0, red);
-            palette.Get_lut(1, green);
-            palette.Get_lut(2, blue);
-
-            for (int i = 0; i < lut.length; i++) {
-                lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
-            }
-
-            return lut;
-
-        } catch (KduException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     /**
@@ -590,7 +553,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     private void setStartLUT() {
-        int[] builtIn = getBuiltInLUT();
+        int[] builtIn = jp2Image.getBuiltInLUT();
         if (builtIn != null) {
             LUT builtInLut = new LUT("built-in", builtIn/* , builtIn */);
             lut = builtInLut;
