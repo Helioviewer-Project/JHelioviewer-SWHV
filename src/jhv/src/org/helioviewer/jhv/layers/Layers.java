@@ -351,6 +351,18 @@ public class Layers {
         frameTimer.setDelay(1000 / fps);
     }
 
+    public void setDesiredAbsoluteSpeed(int secondsPerSecond) {
+        /*
+        long[] obsMillis = new long[parentImageRef.getMaximumFrameNumber() + 1];
+        for (int i = 0; i <= parentImageRef.getMaximumFrameNumber(); ++i) {
+            obsMillis[i] = parentImageRef.metaDataList[i].getDateObs().getMillis() / secondsPerSecond;
+        }
+
+        frameChooser = new AbsoluteFrameChooser(obsMillis);
+        ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
+        */
+    }
+
     public static void setAnimationMode(AnimationMode mode) {
         switch (mode) {
         case LOOP:
