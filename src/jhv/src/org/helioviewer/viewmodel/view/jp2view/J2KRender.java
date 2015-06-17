@@ -250,7 +250,7 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            currParams = parentViewRef.getImageViewParams();
+            currParams = parentViewRef.imageViewParams;
 
             int curLayer = currParams.compositionLayer;
             if (parentViewRef instanceof MovieView) {
