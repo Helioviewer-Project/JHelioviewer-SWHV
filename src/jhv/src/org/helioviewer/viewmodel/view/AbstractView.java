@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -182,6 +183,7 @@ public abstract class AbstractView implements View {
         return baseDifferenceMode;
     }
 
+    // <!-- Defaults
     @Override
     public float getActualFramerate() {
         return 0;
@@ -191,6 +193,15 @@ public abstract class AbstractView implements View {
     public boolean isMultiFrame() {
         return false;
     }
+
+    @Override
+    public ImmutableDateTime getFrameDateTime(int frame) {
+        if (frame == 0) {
+            return getMetaData().getDateObs();
+        }
+        return null;
+    }
+    // -->
 
     public void setBaseDifferenceNoRot(boolean baseDifferenceNoRot) {
         this.baseDifferenceNoRot = baseDifferenceNoRot;

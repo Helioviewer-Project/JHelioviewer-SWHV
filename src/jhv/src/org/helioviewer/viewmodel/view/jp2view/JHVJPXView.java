@@ -120,25 +120,4 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
         return -1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImmutableDateTime getFrameDateTime(int frame) {
-        if (frame >= 0 && frame <= jp2Image.getMaximumFrameNumber()) {
-            return jp2Image.metaDataList[frame].getDateObs();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public float getActualFramerate() {
-        if (render != null)
-            return render.getActualMovieFramerate();
-        return 0;
-    }
-
 }

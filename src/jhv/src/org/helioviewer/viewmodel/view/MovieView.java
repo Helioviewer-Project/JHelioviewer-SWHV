@@ -61,14 +61,6 @@ public interface MovieView extends View {
      */
     public ImageCacheStatus getImageCacheStatus();
 
-    /**
-     * Returns time stamp of any frame specified.
-     * 
-     * @param frame
-     * @return time stamp of the requested frame
-     */
-    public ImmutableDateTime getFrameDateTime(int frame);
-
     // <!- only for Layers
     public void setFrame(int frame);
     public int getFrame(ImmutableDateTime time);
