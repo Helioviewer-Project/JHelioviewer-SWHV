@@ -94,10 +94,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (region == null) {
             region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         }
-        imageViewParams = calculateParameter(region, 0);
 
         jp2Image = newJP2Image;
         jp2Image.addReference();
+        imageViewParams = calculateParameter(region, 0);
 
         try {
             reader = new J2KReader(this);
@@ -163,11 +163,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     @Override
     public MetaData getMetaData() {
-        int frameNumber = 0;
-        if (imageData != null) {
-            frameNumber = imageData.getFrameNumber();
-        }
-        return jp2Image.metaDataList[frameNumber];
+        return jp2Image.metaDataList[imageViewParams.compositionLayer];
     }
 
     public String getXMLMetaData() {
@@ -191,12 +187,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     @Override
     public String getName() {
-        int frameNumber = 0;
-        if (imageData != null) {
-            frameNumber = imageData.getFrameNumber();
-        }
-
-        MetaData metaData = jp2Image.metaDataList[frameNumber];
+        MetaData metaData = jp2Image.metaDataList[imageViewParams.compositionLayer];
         if (metaData instanceof ObserverMetaData) {
             ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
             return observerMetaData.getFullName();
