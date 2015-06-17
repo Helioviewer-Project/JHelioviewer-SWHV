@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
@@ -98,7 +99,8 @@ public class JavaHelioViewer {
         Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
         JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
         Settings.getSingletonInstance().update();
-
+        FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
+        JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -136,7 +138,7 @@ public class JavaHelioViewer {
             public Runnable init(String[] _args) {
                 theArgs = _args;
                 return this;
-             }
+            }
 
         }.init(args));
     }
