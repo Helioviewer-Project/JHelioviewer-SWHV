@@ -74,9 +74,6 @@ public class JP2Image {
      */
     private Kdu_region_compositor compositor = new Kdu_region_compositor();
 
-    /** The number of quality layers for the image. */
-    private int qualityLayers;
-
     /** The number of composition layers for the image. */
     private int frameCount;
 
@@ -281,16 +278,6 @@ public class JP2Image {
 
                 Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_codestream(0, false, true));
 
-                {
-                    Kdu_coords coordRef = new Kdu_coords();
-                    Kdu_tile tile = stream.Open_tile(coordRef);
-                    // Retrieve the number of quality layers.
-                    qualityLayers = tile.Get_num_layers();
-                    // Cleanup
-                    tile.Close();
-                    tile = null;
-                }
-
                 // Retrieve the number of components
                 {
                     // Since it gets tricky here I am just grabbing a bunch of
@@ -393,10 +380,6 @@ public class JP2Image {
 
     public int getMaximumFrameNumber() {
         return frameCount - 1;
-    }
-
-    public int getMaximumNumQualityLayers() {
-        return qualityLayers;
     }
 
     /**

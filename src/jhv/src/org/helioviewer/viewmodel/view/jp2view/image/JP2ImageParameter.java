@@ -18,19 +18,15 @@ public class JP2ImageParameter {
     /** An object that contains the zoom/resolution information. */
     public final ResolutionLevel resolution;
 
-    /** The number of quality layers (more is a better image). */
-    public final int qualityLayers;
-
     /** Zero based frame number */
     public int compositionLayer;
 
     /** This constructor assigns all variables... throw NPE if any args are null */
-    public JP2ImageParameter(SubImage _roi, ResolutionLevel _resolution, int _qualityLayers, int _compositionLayer) {
+    public JP2ImageParameter(SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
         if (_roi == null || _resolution == null)
             throw new NullPointerException();
         subImage = _roi;
         resolution = _resolution;
-        qualityLayers = _qualityLayers;
         compositionLayer = _compositionLayer;
     }
 
@@ -40,7 +36,6 @@ public class JP2ImageParameter {
         String ret = "ImageViewParams[";
         ret += " " + subImage.toString();
         ret += " " + resolution.toString();
-        ret += " [NumQLayers=" + qualityLayers + "]";
         ret += " [CurrentLayerNum=" + compositionLayer + "]";
         ret += " ]";
         return ret;
@@ -53,7 +48,7 @@ public class JP2ImageParameter {
             return false;
         }
         JP2ImageParameter params = (JP2ImageParameter) o;
-        return subImage.equals(params.subImage) && resolution.equals(params.resolution) && qualityLayers == params.qualityLayers && compositionLayer == params.compositionLayer;
+        return subImage.equals(params.subImage) && resolution.equals(params.resolution) && compositionLayer == params.compositionLayer;
     }
 
     /** Simple static helper method... */
@@ -62,14 +57,6 @@ public class JP2ImageParameter {
             return true;
         else
             return !_param1.resolution.equals(_param2.resolution);
-    }
-
-    /** Simple static helper method... */
-    public static boolean isQualityDifferent(JP2ImageParameter _param1, JP2ImageParameter _param2) {
-        if (_param1 == null || _param2 == null)
-            return true;
-        else
-            return _param1.qualityLayers != _param2.qualityLayers;
     }
 
     /** Simple static helper method... */

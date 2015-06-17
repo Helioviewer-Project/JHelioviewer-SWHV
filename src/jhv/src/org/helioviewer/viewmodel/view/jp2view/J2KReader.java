@@ -88,22 +88,18 @@ class J2KReader implements Runnable {
 
         // Attempts to connect socket if image is remote.
         if (parentImageRef.isRemote()) {
-
             socket = parentImageRef.getSocket();
-
             if (socket == null) {
                 socket = new JPIPSocket();
                 JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
                 cacheRef.addJPIPResponseData(res);
             }
-
             // Somehow it seems we need to update the server cache model for
             // movies too
             // otherwise there can be a weird bug where the meta data seems
             // missing
             // if (!parentImageRef.isMultiFrame())
             // KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
-
         } else {
             socket = null;
         }
@@ -202,7 +198,6 @@ class J2KReader implements Runnable {
     private JPIPQuery createQuery(JP2ImageParameter currParams, int iniLayer, int endLayer) {
         JPIPQuery query = new JPIPQuery();
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
-        query.setField(JPIPRequestField.LAYERS.toString(), String.valueOf(currParams.qualityLayers));
 
         Rectangle resDims = currParams.resolution.getResolutionBounds();
         query.setField(JPIPRequestField.FSIZ.toString(), String.valueOf(resDims.width) + "," + String.valueOf(resDims.height) + "," + "closest");
@@ -245,7 +240,7 @@ class J2KReader implements Runnable {
                 // check whether view parameters have changed
                 prevParams = currParams;
                 currParams = parentViewRef.imageViewParams;
-                viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution) && currParams.qualityLayers == prevParams.qualityLayers);
+                viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
 
                 // if view has changed downgrade caching status
                 if (viewChanged) {
