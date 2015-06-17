@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
@@ -69,7 +70,15 @@ public interface View {
      * @return average actual frame rate
      */
     public float getActualFramerate();
-    
+
     public boolean isMultiFrame();
+
+    /**
+     * Returns time stamp of any frame specified.
+     *.
+     * @param frame
+     * @return time stamp of the requested frame
+     */
+    public ImmutableDateTime getFrameDateTime(int frame);
 
 }

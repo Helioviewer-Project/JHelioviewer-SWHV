@@ -426,8 +426,21 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     @Override
+    public float getActualFramerate() {
+        return render.getActualMovieFramerate();
+    }
+
+    @Override
     public boolean isMultiFrame() {
         return jp2Image.isMultiFrame();
+    }
+
+    @Override
+    public ImmutableDateTime getFrameDateTime(int frame) {
+        if (frame >= 0 && frame <= jp2Image.getMaximumFrameNumber()) {
+            return jp2Image.metaDataList[frame].getDateObs();
+        }
+        return null;
     }
 
     @Override
