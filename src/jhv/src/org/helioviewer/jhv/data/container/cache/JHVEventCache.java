@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -149,7 +150,7 @@ public class JHVEventCache {
      *            end date of the interval
      * @return the list of events that are available in the interval
      */
-    public JHVEventCacheResult get(Date startDate, Date endDate) {
+    public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
             Calendar intervalS = Calendar.getInstance();
@@ -181,7 +182,15 @@ public class JHVEventCache {
 
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
-            missingIntervals.put(evt, downloadedCache.get(evt).adaptRequestCache(startDate, endDate));
+            List<Interval<Date>> missing = downloadedCache.get(evt).adaptRequestCache(startDate, endDate);
+            if (missing.isEmpty()) {
+                Log.debug("Cache hit");
+
+            } else {
+                Log.debug("Cache miss");
+                missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
+            }
+            missingIntervals.put(evt, missing);
         }
         List<Date> missingDates = new ArrayList<Date>();
         return new JHVEventCacheResult(eventsResult, missingIntervals, missingDates);
