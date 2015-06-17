@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -42,10 +41,6 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -202,21 +197,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
 
             String xmlText = null;
             if (v instanceof JHVJP2View) {
-                JP2Image img = ((JHVJP2View) v).getJP2Image();
-
-                int boxNumber = 1;
-                if (v instanceof JHVJPXView) {
-                    if (((JHVJPXView) v).getMaximumAccessibleFrameNumber() < 0) {
-                        return;
-                    }
-                    boxNumber = ((JHVJPXView) v).getCurrentFrameNumber() + 1;
-                }
-
-                try {
-                    xmlText = KakaduUtils.getXml(img.getFamilySrc(), boxNumber);
-                } catch (JHV_KduException e) {
-                    e.printStackTrace();
-                }
+                xmlText = ((JHVJP2View) v).getXMLMetaData();
             } else if (v instanceof JHVFITSView) {
                 xmlText = ((JHVFITSView) v).getHeaderAsXML();
             }
