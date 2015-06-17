@@ -23,7 +23,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 //Java 6 does not support generics for JComboBox and DefaultComboBoxModel
 //Should be removed if support for Java 6 is not needed anymore
@@ -123,11 +122,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
 
     private void setDateRange() {
         AbstractView view = Layers.getActiveView();
-        if (view instanceof JHVJPXView) {
-            Date start = Layers.getStartDate(view);
-            Date end = Layers.getEndDate(view);
-
-            Interval<Date> interval = new Interval<Date>(start, end);
+        if (view != null && view.isMultiFrame()) {
+            Interval<Date> interval = new Interval<Date>(Layers.getStartDate(view), Layers.getEndDate(view));
             DrawController.getSingletonInstance().setSelectedInterval(interval, true);
         }
     }

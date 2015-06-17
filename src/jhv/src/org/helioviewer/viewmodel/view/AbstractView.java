@@ -187,6 +187,11 @@ public abstract class AbstractView implements View {
         return 0;
     }
 
+    @Override
+    public boolean isMultiFrame() {
+        return false;
+    }
+
     public void setBaseDifferenceNoRot(boolean baseDifferenceNoRot) {
         this.baseDifferenceNoRot = baseDifferenceNoRot;
     }

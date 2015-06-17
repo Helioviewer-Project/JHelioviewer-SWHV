@@ -33,7 +33,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 /**
  *
@@ -588,11 +587,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void activeLayerChanged(AbstractView view) {
-        if (view instanceof JHVJPXView) {
-            Date start = Layers.getStartDate(view);
-            Date end = Layers.getEndDate(view);
-
-            movieInterval = new Interval<Date>(start, end);
+        if (view != null) {
+            movieInterval = new Interval<Date>(Layers.getStartDate(view), Layers.getEndDate(view));
             repaint();
         }
     }

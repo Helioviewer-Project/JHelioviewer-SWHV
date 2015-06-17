@@ -426,6 +426,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     @Override
+    public boolean isMultiFrame() {
+        return jp2Image.isMultiFrame();
+    }
+
+    @Override
     public void render() {
         renderSignal.signal();
     }

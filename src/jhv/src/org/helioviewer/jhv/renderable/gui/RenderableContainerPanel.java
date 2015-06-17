@@ -38,7 +38,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 
 @SuppressWarnings({ "serial" })
 public class RenderableContainerPanel extends JPanel implements LayersListener {
@@ -65,7 +64,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         public void actionPerformed(ActionEvent arg0) {
             // Check the dates if possible
             AbstractView activeView = Layers.getActiveView();
-            if (activeView instanceof JHVJPXView) {
+            if (activeView != null && activeView.isMultiFrame()) {
                 Date start = Layers.getStartDate(activeView);
                 Date end = Layers.getEndDate(activeView);
                 try {
