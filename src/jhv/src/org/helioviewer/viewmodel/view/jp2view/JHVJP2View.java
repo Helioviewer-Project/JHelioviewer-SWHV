@@ -531,7 +531,7 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
      *
      * @return Current set of parameters
      */
-    public JP2ImageParameter getImageViewParams() {
+    JP2ImageParameter getImageViewParams() {
         return imageViewParams;
     }
 
@@ -595,16 +595,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
         }.init(aView, aDateTime));
     }
 
-    /**
-     * Recalculate the image parameters.
-     *
-     * This might be useful, if some assumption have changed, such as the
-     * resolution set.
-     */
-    void updateParameter() {
-        setImageViewParams(calculateParameter());
-    }
-
     @Override
     public ImageData getImageData() {
         return imageData;
@@ -618,10 +608,6 @@ public class JHVJP2View extends AbstractView implements JP2View, RenderListener 
     @Override
     public ImageData getBaseDifferenceImageData() {
         return baseDifferenceImageData;
-    }
-
-    public void setPreviousImageData(ImageData previousImageData) {
-        this.previousImageData = previousImageData;
     }
 
     @Override
