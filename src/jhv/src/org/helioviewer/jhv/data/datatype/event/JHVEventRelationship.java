@@ -101,7 +101,9 @@ public class JHVEventRelationship {
             if (!currentList.containsKey(identifier)) {
                 JHVEventRelation newRelatedEvent = newList.get(identifier);
                 currentList.put(identifier, newRelatedEvent);
-                newRelatedEvent.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+                if (newRelatedEvent.getTheEvent() != null) {
+                    newRelatedEvent.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
+                }
             }
         }
     }
