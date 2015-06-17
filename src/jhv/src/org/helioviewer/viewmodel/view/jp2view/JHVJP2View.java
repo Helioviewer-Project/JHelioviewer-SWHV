@@ -610,4 +610,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         lut = gray;
     }
 
+    public String getXMLMetaData() {
+        return jp2Image.getXML(1);
+    }
+
 }

@@ -561,4 +561,15 @@ public class JP2Image {
         return jpxSrc;
     }
 
+    String getXML(int boxNumber) {
+        String xml = null;
+
+        try {
+            xml = KakaduUtils.getXml(familySrc, boxNumber);
+        } catch (JHV_KduException e) {
+            e.printStackTrace();
+        }
+        return xml;
+    }
+
 }
