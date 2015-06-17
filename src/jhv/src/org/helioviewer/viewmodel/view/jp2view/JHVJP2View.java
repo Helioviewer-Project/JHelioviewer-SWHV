@@ -16,9 +16,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
-import org.helioviewer.viewmodel.view.jp2view.concurrency.ReasonSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -52,7 +50,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     // Renderer
     protected J2KRender render;
-    final ReasonSignal<RenderReasons> renderRequestedSignal = new ReasonSignal<RenderReasons>();
+    final BooleanSignal renderSignal = new BooleanSignal(false);
 
     // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
@@ -150,7 +148,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true)) {
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-            renderRequestedSignal.signal(RenderReasons.OTHER);
+            renderSignal.signal();
             return true;
         }
 
@@ -429,7 +427,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public void render() {
-        renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+        renderSignal.signal();
     }
 
     private void setStartLUT() {

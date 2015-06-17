@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -23,7 +22,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
     @Override
     public boolean setViewport(Viewport v) {
         viewport = v;
-        renderRequestedSignal.signal(RenderReasons.OTHER);
+        renderSignal.signal();
         return true;
     }
 

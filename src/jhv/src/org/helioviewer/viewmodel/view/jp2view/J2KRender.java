@@ -30,14 +30,6 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
  */
 class J2KRender implements Runnable {
 
-    /**
-     * There could be multiple reason that the Render object was signaled. This
-     * enum lists them.
-     */
-    public enum RenderReasons {
-        NEW_DATA, OTHER, MOVIE_PLAY
-    };
-
     /** The thread that this object runs on. */
     private volatile Thread myThread;
 
@@ -245,7 +237,7 @@ class J2KRender implements Runnable {
 
         while (!stop) {
             try {
-                parentViewRef.renderRequestedSignal.waitForSignal();
+                parentViewRef.renderSignal.waitForSignal();
             } catch (InterruptedException ex) {
                 continue;
             }
@@ -260,7 +252,7 @@ class J2KRender implements Runnable {
                         Thread.sleep(200);
                     } catch (InterruptedException e) {
                     }
-                    parentViewRef.renderRequestedSignal.signal(RenderReasons.NEW_DATA);
+                    parentViewRef.renderSignal.signal();
                     continue;
                 }
             }

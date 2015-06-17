@@ -5,7 +5,6 @@ import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
-import org.helioviewer.viewmodel.view.jp2view.J2KRender.RenderReasons;
 
 /**
  * Implementation of TimedMovieView for JPX files.
@@ -89,7 +88,7 @@ public class JHVJPXView extends JHVJP2View implements MovieView {
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                renderRequestedSignal.signal(RenderReasons.MOVIE_PLAY);
+                renderSignal.signal();
             }
         }
     }
