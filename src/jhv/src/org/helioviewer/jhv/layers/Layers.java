@@ -13,9 +13,7 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
 
@@ -267,10 +265,7 @@ public class Layers {
         int index = layers.indexOf(view);
 
         layers.remove(view);
-        if (view instanceof JHVJP2View) {
-            ((JHVJP2View) view).abolish();
-        }
-
+        view.abolish();
         setActiveView(getLayer(determineNewActiveLayer(index)));
     }
 

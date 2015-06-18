@@ -186,6 +186,10 @@ public abstract class AbstractView implements View {
 
     // <!-- Defaults
     @Override
+    public void abolish() {
+    }
+
+    @Override
     public ImageCacheStatus getImageCacheStatus() {
         return null;
     }

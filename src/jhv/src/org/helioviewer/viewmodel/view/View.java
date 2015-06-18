@@ -37,6 +37,8 @@ public interface View {
         }
     }
 
+    public void abolish();
+
     /**
      * Returns the URI representing the location of the image.
      *
