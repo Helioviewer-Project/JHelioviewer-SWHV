@@ -88,18 +88,16 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void fireFrameChanged(AbstractView view, ImmutableDateTime dateTime) {
-        ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-
         if (view == Layers.getActiveView()) {
-            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
-
             lastTimestamp = dateTime.getTime();
             // fire TimeChanged
             activeCamera.timeChanged(lastTimestamp);
             for (final TimeListener listener : timeListeners) {
                 listener.timeChanged(lastTimestamp);
             }
+            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
         }
+        ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
         display();
     }
 

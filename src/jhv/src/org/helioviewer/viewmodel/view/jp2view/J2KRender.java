@@ -269,14 +269,14 @@ class J2KRender implements Runnable {
             }
             setImageData(imdata, currParams);
 
-            numFrames += curLayer - lastFrame;
             if (lastFrame > curLayer)
-                lastFrame = -1;
+                numFrames -= curLayer - lastFrame;
             else
-                lastFrame = curLayer;
+                numFrames += curLayer - lastFrame;
+            lastFrame = curLayer;
 
             tnow = System.currentTimeMillis();
-            if ((tnow - tini) >= 1000) {
+            if ((tnow - tini) >= 200) {
                 actualMovieFramerate = (numFrames * 1000.0f) / (tnow - tini);
                 tini = tnow;
                 numFrames = 0;
