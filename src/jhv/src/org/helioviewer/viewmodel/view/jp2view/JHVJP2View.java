@@ -225,9 +225,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return reader.isConnected();
     }
 
-    /**
-     * Destroy the resources associated with this object.
-     */
+    // Destroy the resources associated with this object
+    @Override
     public void abolish() {
         Displayer.removeRenderListener(this);
 
@@ -242,9 +241,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         jp2Image.abolish();
     }
 
-    /**
-     * Starts the J2KReader/J2KRender threads.
-     */
+    // Start the J2KReader/J2KRender threads
     protected void startDecoding() {
         render.start();
         reader.start();

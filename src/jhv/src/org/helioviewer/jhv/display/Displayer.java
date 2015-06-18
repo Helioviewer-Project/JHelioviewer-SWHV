@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.AbstractView;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -87,7 +87,7 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static void fireFrameChanged(JHVJP2View view, ImmutableDateTime dateTime) {
+    public static void fireFrameChanged(AbstractView view, ImmutableDateTime dateTime) {
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
         if (view == Layers.getActiveView()) {

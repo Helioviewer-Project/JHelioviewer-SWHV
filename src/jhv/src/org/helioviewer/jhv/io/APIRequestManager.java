@@ -65,21 +65,20 @@ public class APIRequestManager {
             if (view != null) {
                 date = view.getMetaData().getDateObs().getTime();
                 readDate = true;
-                if (view instanceof JHVJP2View) {
-                    EventQueue.invokeLater(new Runnable() {
-                        private JHVJP2View view;
 
-                        @Override
-                        public void run() {
-                            view.abolish();
-                        }
+                EventQueue.invokeLater(new Runnable() {
+                    private AbstractView view;
 
-                        public Runnable init(JHVJP2View _view) {
-                            view = _view;
-                            return this;
-                        }
-                    }.init((JHVJP2View) view));
-                }
+                    @Override
+                    public void run() {
+                        view.abolish();
+                    }
+
+                    public Runnable init(AbstractView _view) {
+                        view = _view;
+                        return this;
+                    }
+                }.init(view));
             } else {
                 Log.error(">> APIRequestManager.getLatestImageDate() > Could not load latest image. Use current date as initial end date.", new Exception());
             }
