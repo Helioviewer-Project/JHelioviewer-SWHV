@@ -201,14 +201,6 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public ImmutableDateTime getFrameDateTime(int frame) {
-        if (frame == 0) {
-            return getMetaData().getDateObs();
-        }
-        return null;
-    }
-
-    @Override
     public int getCurrentFrameNumber() {
         return 0;
     }
@@ -230,6 +222,11 @@ public abstract class AbstractView implements View {
     @Override
     public int getFrame(ImmutableDateTime time) {
         return 0;
+    }
+
+    @Override
+    public ImmutableDateTime getFrame(int frame) {
+        return getMetaData().getDateObs();
     }
     // -->
 

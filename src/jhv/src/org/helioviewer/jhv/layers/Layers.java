@@ -62,7 +62,6 @@ public class Layers {
         fireActiveLayerChanged(view);
     }
 
-    private static View masterView;
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
     private static FrameChooser frameChooser = new RelativeFrameChooser();
 
@@ -71,21 +70,15 @@ public class Layers {
     private static class FrameListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (masterView != null)
-                setFrame(frameChooser.moveToNextFrame(masterView.getCurrentFrameNumber()));
+            setFrame(frameChooser.moveToNextFrame(activeView.getCurrentFrameNumber()));
         }
     }
 
     private static void setMasterMovie(AbstractView view) {
-        if (view != null && view.isMultiFrame())
-            masterView = view;
-        else {
-            masterView = null;
+        if (view == null || !view.isMultiFrame())
             frameTimer.stop();
-        }
         nextFrameCandidateChooser.setMaxFrame();
-
-        MoviePanel.getSingletonInstance().setActiveMovie(masterView);
+        MoviePanel.getSingletonInstance().setActiveMovie(view);
     }
 
     // accessed from reader thread, tbd
@@ -94,36 +87,26 @@ public class Layers {
     }
 
     public static void playMovies() {
-        if (masterView != null) {
+        if (activeView != null && activeView.isMultiFrame()) {
             frameTimer.restart();
             MoviePanel.playStateChanged(true);
         }
     }
 
     public static void pauseMovies() {
-        if (masterView != null) {
-            frameTimer.stop();
-            MoviePanel.playStateChanged(false);
-        }
+        frameTimer.stop();
+        MoviePanel.playStateChanged(false);
     }
 
     public static void setTime(ImmutableDateTime dateTime) {
-        if (masterView != null) {
-            int frame = masterView.getFrame(dateTime);
-            syncRequest(dateTime, frame);
-        }
+        for (AbstractView view : layers) {
+            view.setFrame(view.getFrame(dateTime));
+         }
+        MoviePanel.getSingletonInstance().setFrameSlider(activeView.getFrame(dateTime));
     }
 
     public static void setFrame(int frame) {
-        if (masterView != null) {
-            ImmutableDateTime dateTime = masterView.getFrameDateTime(frame);
-            if (dateTime == null) // out of range
-                return;
-            syncRequest(dateTime, frame);
-        }
-    }
-
-    private static void syncRequest(ImmutableDateTime dateTime, int frame) {
+        ImmutableDateTime dateTime = activeView.getFrame(frame);
         for (AbstractView view : layers) {
             view.setFrame(view.getFrame(dateTime));
          }
@@ -133,13 +116,13 @@ public class Layers {
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
         if (view == null)
             return null;
-        return view.getFrameDateTime(0);
+        return view.getFrame(0);
     }
 
     private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
         if (view == null)
             return null;
-        return view.getFrameDateTime(view.getMaximumFrameNumber());
+        return view.getFrame(view.getMaximumFrameNumber());
     }
 
     private static ImmutableDateTime getStartDateImmutable(int idx) {
@@ -368,10 +351,7 @@ public class Layers {
         protected int maxFrame;
 
         protected void setMaxFrame() {
-            if (masterView == null)
-                maxFrame = 0;
-            else
-                maxFrame = masterView.getMaximumFrameNumber();
+            maxFrame = activeView.getMaximumFrameNumber();
         }
 
         protected void resetStartTime(int frame) {

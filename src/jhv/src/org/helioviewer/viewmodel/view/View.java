@@ -104,14 +104,6 @@ public interface View {
     public boolean isMultiFrame();
 
     /**
-     * Returns time stamp of any frame specified.
-     *.
-     * @param frame
-     * @return time stamp of the requested frame
-     */
-    public ImmutableDateTime getFrameDateTime(int frame);
-
-    /**
      * Returns the current frame number.
      *
      * @return current frame number
@@ -135,6 +127,7 @@ public interface View {
     // <!- only for Layers
     public void setFrame(int frame);
     public int getFrame(ImmutableDateTime time);
+    public ImmutableDateTime getFrame(int frame);
     // -->
 
 }
