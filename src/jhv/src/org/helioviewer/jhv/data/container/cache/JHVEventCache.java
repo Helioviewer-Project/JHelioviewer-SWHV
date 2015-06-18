@@ -133,7 +133,7 @@ public class JHVEventCache {
 
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
-            List<Interval<Date>> missing = downloadedCache.get(evt).adaptRequestCache(startDate, endDate);
+            List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
             }
