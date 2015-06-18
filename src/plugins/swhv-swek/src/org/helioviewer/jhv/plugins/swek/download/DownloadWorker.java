@@ -230,7 +230,7 @@ public class DownloadWorker implements Runnable {
 
                         @Override
                         public void run() {
-                            eventContainer.finishedDownload();
+                            eventContainer.finishedDownload(false);
                         }
                     });
                 } catch (InvocationTargetException e) {
@@ -319,6 +319,7 @@ public class DownloadWorker implements Runnable {
                             while (eventStream.hasEvents() && !isStopped) {
                                 eventContainer.addEvent(eventStream.next());
                             }
+                            eventContainer.finishedDownload(true);
                         }
 
                     });
