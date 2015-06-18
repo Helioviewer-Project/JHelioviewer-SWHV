@@ -10,7 +10,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLeve
  * @author Benjamin Wamsler
  * 
  */
-public class JP2ImageParameter implements Cloneable {
+public class JP2ImageParameter {
 
     /** Essentially an immutable Rectangle */
     public final SubImage subImage;
@@ -30,13 +30,7 @@ public class JP2ImageParameter implements Cloneable {
         compositionLayer = _compositionLayer;
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
     /** The toString method. */
-
     public String toString() {
         String ret = "ImageViewParams[";
         ret += " " + subImage.toString();
@@ -47,7 +41,6 @@ public class JP2ImageParameter implements Cloneable {
     }
 
     /** The equals method. */
-
     public boolean equals(Object o) {
         if (!(o instanceof JP2ImageParameter)) {
             return false;
