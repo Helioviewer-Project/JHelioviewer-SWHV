@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
 
@@ -204,6 +205,10 @@ public class Layers {
 
         fireLayerAdded(view);
         setActiveView(view);
+
+        // sync UI, initial Displayer.fireFrameChanged() happened before adding to UI
+        if (view instanceof JHVJP2View)
+            ((JHVJP2View) view).render();
     }
 
     // special
