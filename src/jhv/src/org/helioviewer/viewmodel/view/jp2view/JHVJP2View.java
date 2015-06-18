@@ -184,8 +184,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     public String getName() {
         MetaData metaData = jp2Image.metaDataList[getTrueFrameNumber()];
         if (metaData instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) metaData;
-            return observerMetaData.getFullName();
+            return ((ObserverMetaData) metaData).getFullName();
         } else {
             String name = jp2Image.getURI().getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
