@@ -103,9 +103,9 @@ public class JHVEventContainer {
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
             for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
-                // Log.debug("Missing interval: " + missing);
                 List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
                 for (Interval<Date> missing : missingList) {
+                    // Log.debug("Missing interval: " + missing);
                     requestEvents(eventType, missing.getStart(), missing.getEnd());
                 }
             }
@@ -126,8 +126,10 @@ public class JHVEventContainer {
      * Indicates to the JHVEventContainer that a download was finished. This
      * must be called the event request handlers in order to propagate the
      * downloaded events to the event handlers.
+     * 
+     * @param partially
      */
-    public void finishedDownload() {
+    public void finishedDownload(boolean partially) {
         fireEventCacheChanged();
     }
 
@@ -153,6 +155,7 @@ public class JHVEventContainer {
      *            the end of the interval
      */
     private void requestEvents(JHVEventType eventType, Date startDate, Date endDate) {
+        // Log.debug("Request for events: " + requestHandlers.size());
         for (JHVEventContainerRequestHandler handler : requestHandlers) {
             handler.handleRequestForInterval(eventType, startDate, endDate);
         }
