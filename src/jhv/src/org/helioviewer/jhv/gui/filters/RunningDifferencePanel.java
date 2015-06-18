@@ -55,7 +55,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private final JPanel diffPanel = new JPanel();
 
     private JCheckBox diffRot;
-    private final static String[] combolist = { "No differences", "Running difference", "Base difference" };
+    private final static String[] combolist = { "No difference images", "Running difference", "Base difference" };
     private Action downloadLayerAction;
     private Action showMetaAction;
     private final JButton downloadLayerButton;
@@ -84,15 +84,15 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
 
         truncateSpinner = new JSpinner();
-        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(1), new Float(0.01f)));
+        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(0.99), new Float(0.01f)));
         truncateSpinner.addChangeListener(this);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);
         editor.getTextField().setColumns(3);
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         WheelSupport.installMouseWheelSupport(truncateSpinner);
-        comboBox = new JComboBox(combolist);
 
+        comboBox = new JComboBox(combolist);
         topPanel = new JPanel(new GridBagLayout());
         radPanel = new JPanel(new FlowLayout());
         addRadioButtons();
@@ -135,7 +135,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     }
 
     private void addRadioButtons() {
-        comboBox.setSelectedItem("No differences");
+        comboBox.setSelectedItem(0);
         diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
         final GridBagConstraints c = new GridBagConstraints();
