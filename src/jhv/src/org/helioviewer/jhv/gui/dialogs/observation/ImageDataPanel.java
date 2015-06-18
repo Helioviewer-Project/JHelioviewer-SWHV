@@ -197,17 +197,22 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        RenderableDummy renderableDummy = new RenderableDummy();
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderableDummy);
-
         class LoadRemoteTask extends SwingWorker<AbstractView, Void> {
 
             private RenderableDummy dummy;
             private boolean image;
+            private boolean wasPlaying;
 
-            LoadRemoteTask(RenderableDummy _dummy, boolean _image) {
-                dummy = _dummy;
+            LoadRemoteTask(boolean _image) {
                 image = _image;
+
+                // due to CacheStrategy, layers load significantly faster when movie is paused
+                wasPlaying = Layers.isMoviePlaying();
+                if (wasPlaying)
+                    Layers.pauseMovies();
+
+                dummy = new RenderableDummy();
+                ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
             }
 
             @Override
@@ -233,6 +238,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
                 try {
                     Layers.addLayer(get());
+                    if (wasPlaying)
+                        Layers.playMovies();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -240,7 +247,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
         }
 
-        LoadRemoteTask remoteTask = new LoadRemoteTask(renderableDummy, isImage);
+        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage);
         remoteTask.execute();
     }
 

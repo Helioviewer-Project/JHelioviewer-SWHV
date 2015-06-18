@@ -71,7 +71,7 @@ class J2KRender implements Runnable {
     }
 
     void start() {
-        myThread = new Thread(JHVJP2View.renderGroup, this, "J2KRender");
+        myThread = new Thread(JHVJP2View.renderGroup, this, "J2KRender " + parentViewRef.getName());
         stop = false;
         myThread.start();
     }
@@ -251,6 +251,7 @@ class J2KRender implements Runnable {
             }
 
             renderLayer(currParams);
+            Thread.yield();
 
             SubImage roi = currParams.subImage;
             int width = roi.width;
