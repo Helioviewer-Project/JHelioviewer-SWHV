@@ -251,7 +251,6 @@ class J2KRender implements Runnable {
             }
 
             renderLayer(currParams);
-            Thread.yield();
 
             SubImage roi = currParams.subImage;
             int width = roi.width;
