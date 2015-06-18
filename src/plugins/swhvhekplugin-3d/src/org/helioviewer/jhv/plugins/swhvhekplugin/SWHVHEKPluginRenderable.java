@@ -30,6 +30,9 @@ import com.jogamp.opengl.GL2;
 
 public class SWHVHEKPluginRenderable implements Renderable {
 
+    private static final float LINEWIDTH = 1f;
+    private static final float LINEWIDTH_HI = 2f;
+
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private boolean isVisible = true;
     private final RenderableType type;
@@ -55,7 +58,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D);
     }
 
-    public void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
+    private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
         List<JHVEventParameter> params = evt.getAllEventParameters();
         double principleAngle = 0;
         double angularWidth = 0;
@@ -94,9 +97,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
-            gl.glLineWidth(1.6f);
+            gl.glLineWidth(LINEWIDTH_HI);
         } else {
-            gl.glLineWidth(0.8f);
+            gl.glLineWidth(LINEWIDTH);
         }
 
         double r, alpha, theta;
@@ -150,17 +153,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
-    /**
-     * The actual rendering routine
-     *
-     * @param g
-     *            - PhysicalRenderGraphics to render to
-     * @param evt
-     *            - Event to draw
-     * @param now
-     *            - Current point in time
-     */
-    public void drawPolygon(GL2 gl, JHVEvent evt, Date now) {
+    private void drawPolygon(GL2 gl, JHVEvent evt, Date now) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
@@ -182,9 +175,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
-            gl.glLineWidth(1.6f);
+            gl.glLineWidth(LINEWIDTH_HI);
         } else {
-            gl.glLineWidth(0.7f);
+            gl.glLineWidth(LINEWIDTH);
         }
 
         // draw bounds
@@ -212,7 +205,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
-    public void drawIcon(GL2 gl, JHVEvent evt, Date now) {
+    private void drawIcon(GL2 gl, JHVEvent evt, Date now) {
         String type = evt.getJHVEventType().getEventType();
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
@@ -230,7 +223,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
     }
 
-    public void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
+    private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
@@ -288,7 +281,10 @@ public class SWHVHEKPluginRenderable implements Renderable {
                     drawCactusArc(gl, evt, currentDate);
                 } else {
                     drawPolygon(gl, evt, currentDate);
+
+                    gl.glDisable(GL2.GL_DEPTH_TEST);
                     drawIcon(gl, evt, currentDate);
+                    gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
             SWHVHEKSettings.resetCactusColor();
