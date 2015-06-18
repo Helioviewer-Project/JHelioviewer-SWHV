@@ -16,6 +16,9 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
+import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
+import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -42,6 +45,9 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // Member related to JP2
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
+
+    // Caching
+    private ImageCacheStatus imageCacheStatus;
 
     // Reader
     protected J2KReader reader;
@@ -96,6 +102,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         jp2Image.addReference();
         imageViewParams = calculateParameter(region, 0);
 
+        if (jp2Image.isRemote()) {
+            imageCacheStatus = new RemoteImageCacheStatus(this);
+        } else {
+            imageCacheStatus = new LocalImageCacheStatus(this);
+        }
+        jp2Image.setImageCacheStatus(imageCacheStatus);
+
         try {
             reader = new J2KReader(this);
             render = new J2KRender(this);
@@ -137,9 +150,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return readerMode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public boolean setRegion(Region r) {
+        boolean changed = region == null ? r == null : !region.equals(r);
+        region = r;
+        return changed || setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
+    }
+
     @Override
     public boolean setViewport(Viewport v) {
         boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
@@ -163,21 +180,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return frameNumber;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetaData getMetaData() {
-        return jp2Image.metaDataList[getTrueFrameNumber()];
-    }
-
-    public String getXMLMetaData() {
-        return jp2Image.getXML(getTrueFrameNumber() + 1);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName() {
         MetaData metaData = jp2Image.metaDataList[getTrueFrameNumber()];
@@ -190,37 +192,25 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean setRegion(Region r) {
-        boolean changed = region == null ? r == null : !region.equals(r);
-        region = r;
-        changed |= setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
-
-        return changed;
+    public MetaData getMetaData() {
+        return jp2Image.metaDataList[getTrueFrameNumber()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public String getXMLMetaData() {
+        return jp2Image.getXML(getTrueFrameNumber() + 1);
+    }
+
     @Override
     public URI getUri() {
         return jp2Image.getURI();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public URI getDownloadURI() {
         return jp2Image.getDownloadURI();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isRemote() {
         return jp2Image.isRemote();
@@ -229,13 +219,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     /**
      * Returns whether the reader is connected to a JPIP server or not.
      *
-     * @return True, if connected to a JPIP server, false otherwise
+     * @return True if connected to a JPIP server, false otherwise
      */
     public boolean isConnectedToJPIP() {
-        if (reader != null) {
-            return reader.isConnected();
-        }
-        return false;
+        return reader.isConnected();
     }
 
     /**
@@ -426,6 +413,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     @Override
+    public ImageCacheStatus getImageCacheStatus() {
+        return imageCacheStatus;
+    }
+
+    @Override
     public float getActualFramerate() {
         return render.getActualMovieFramerate();
     }
@@ -441,6 +433,60 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             return jp2Image.metaDataList[frame].getDateObs();
         }
         return null;
+    }
+
+    @Override
+    public int getCurrentFrameNumber() {
+        return imageViewParams.compositionLayer;
+    }
+
+    @Override
+    public int getMaximumFrameNumber() {
+        return jp2Image.getMaximumFrameNumber();
+    }
+
+    @Override
+    public int getMaximumAccessibleFrameNumber() {
+        return imageCacheStatus.getImageCachedPartiallyUntil();
+    }
+
+    // to be accessed only from Layers
+    @Override
+    public int getFrame(ImmutableDateTime time) {
+        int frame = -1;
+        long timeMillis = time.getMillis();
+        long lastDiff, currentDiff = -Long.MAX_VALUE;
+        do {
+            lastDiff = currentDiff;
+            currentDiff = jp2Image.metaDataList[++frame].getDateObs().getMillis() - timeMillis;
+        } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
+
+        if (-lastDiff < currentDiff) {
+            return frame - 1;
+        } else {
+            return frame;
+        }
+    }
+
+    /**
+     * Before actually setting the new frame number, checks whether that is
+     * necessary. If the frame number has changed, also triggers an update of
+     * the image.
+     *
+     * @param frame
+     */
+    // to be accessed only from Layers
+    @Override
+    public void setFrame(int frame) {
+        if (frame != imageViewParams.compositionLayer &&
+            frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
+            imageViewParams.compositionLayer = frame;
+
+            readerSignal.signal();
+            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+                renderSignal.signal();
+            }
+        }
     }
 
     @Override

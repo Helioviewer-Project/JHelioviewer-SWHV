@@ -11,6 +11,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 import com.jogamp.opengl.GL2;
 
@@ -185,6 +186,11 @@ public abstract class AbstractView implements View {
 
     // <!-- Defaults
     @Override
+    public ImageCacheStatus getImageCacheStatus() {
+        return null;
+    }
+
+    @Override
     public float getActualFramerate() {
         return 0;
     }
@@ -200,6 +206,30 @@ public abstract class AbstractView implements View {
             return getMetaData().getDateObs();
         }
         return null;
+    }
+
+    @Override
+    public int getCurrentFrameNumber() {
+        return 0;
+    }
+
+    @Override
+    public int getMaximumFrameNumber() {
+        return 0;
+    }
+
+    @Override
+    public int getMaximumAccessibleFrameNumber() {
+        return 0;
+    }
+
+    @Override
+    public void setFrame(int frame) {
+    }
+
+    @Override
+    public int getFrame(ImmutableDateTime time) {
+        return 0;
     }
     // -->
 

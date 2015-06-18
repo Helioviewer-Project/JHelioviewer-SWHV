@@ -12,7 +12,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
@@ -245,16 +244,13 @@ class J2KRender implements Runnable {
             currParams = parentViewRef.getImageViewParams();
             int curLayer = currParams.compositionLayer;
 
-            if (parentViewRef instanceof MovieView) {
-                MovieView parent = (MovieView) parentViewRef;
-                if (parent.getMaximumAccessibleFrameNumber() < curLayer) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                    }
-                    parentViewRef.renderSignal.signal();
-                    continue;
+            if (parentViewRef.getMaximumAccessibleFrameNumber() < curLayer) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
                 }
+                parentViewRef.renderSignal.signal();
+                continue;
             }
 
             renderLayer(curLayer);

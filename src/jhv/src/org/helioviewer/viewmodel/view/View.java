@@ -7,6 +7,7 @@ import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 /**
  * View to manage an image data source.
@@ -14,6 +15,28 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  * @author Ludwig Schmidt
  */
 public interface View {
+
+    public enum AnimationMode {
+        LOOP {
+            @Override
+            public String toString() {
+                return "Loop";
+            }
+        },
+        STOP {
+            @Override
+            public String toString() {
+                return "Stop";
+            }
+        },
+        SWING {
+            @Override
+            public String toString() {
+                return "Swing";
+            }
+        }
+    }
+
     /**
      * Returns the URI representing the location of the image.
      *
@@ -61,6 +84,13 @@ public interface View {
 
     public boolean setViewport(Viewport r);
 
+   /**
+     * Returns the image cache status.
+     *
+     * @return image cache status
+     */
+    public ImageCacheStatus getImageCacheStatus();
+
     /**
      * Returns the frame rate on which the View is operating right now.
      *
@@ -80,5 +110,31 @@ public interface View {
      * @return time stamp of the requested frame
      */
     public ImmutableDateTime getFrameDateTime(int frame);
+
+    /**
+     * Returns the current frame number.
+     *
+     * @return current frame number
+     */
+    public int getCurrentFrameNumber();
+
+    /**
+     * Returns the maximum frame number.
+     *
+     * @return maximum frame number
+     */
+    public int getMaximumFrameNumber();
+
+    /**
+     * Returns the last accessible frame number.
+     *
+     * @return maximum accessible frame number
+     */
+    public int getMaximumAccessibleFrameNumber();
+
+    // <!- only for Layers
+    public void setFrame(int frame);
+    public int getFrame(ImmutableDateTime time);
+    // -->
 
 }

@@ -13,8 +13,8 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.View.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
@@ -62,7 +62,7 @@ public class Layers {
         fireActiveLayerChanged(view);
     }
 
-    private static MovieView masterView;
+    private static View masterView;
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
     private static FrameChooser frameChooser = new RelativeFrameChooser();
 
@@ -77,8 +77,8 @@ public class Layers {
     }
 
     private static void setMasterMovie(AbstractView view) {
-        if (view instanceof MovieView)
-            masterView = (MovieView) view;
+        if (view != null && view.isMultiFrame())
+            masterView = view;
         else {
             masterView = null;
             frameTimer.stop();
@@ -124,36 +124,22 @@ public class Layers {
     }
 
     private static void syncRequest(ImmutableDateTime dateTime, int frame) {
-        for (AbstractView movieView : layers) {
-            if (movieView instanceof MovieView) {
-                MovieView mv = (MovieView) movieView;
-                mv.setFrame(mv.getFrame(dateTime));
-            }
-        }
+        for (AbstractView view : layers) {
+            view.setFrame(view.getFrame(dateTime));
+         }
         MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
-        ImmutableDateTime result = null;
-
-        if (view instanceof MovieView) {
-            result = ((MovieView) view).getFrameDateTime(0);
-        } else {
-            result = view.getMetaData().getDateObs();
-        }
-        return result;
+        if (view == null)
+            return null;
+        return view.getFrameDateTime(0);
     }
 
     private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
-        ImmutableDateTime result = null;
-
-        if (view instanceof MovieView) {
-            MovieView tmv = (MovieView) view;
-            result = tmv.getFrameDateTime(tmv.getMaximumFrameNumber());
-        } else {
-            result = view.getMetaData().getDateObs();
-        }
-        return result;
+        if (view == null)
+            return null;
+        return view.getFrameDateTime(view.getMaximumFrameNumber());
     }
 
     private static ImmutableDateTime getStartDateImmutable(int idx) {

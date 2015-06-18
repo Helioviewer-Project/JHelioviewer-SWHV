@@ -23,7 +23,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
 
@@ -334,9 +333,9 @@ public class APIRequestManager {
         } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-
                 JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
                 jp2CallistoView.setJP2Image(jp2Image);
+
                 return jp2CallistoView;
             } catch (Exception e) {
                 Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
@@ -345,27 +344,14 @@ public class APIRequestManager {
         } else {
             try {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
+                JHVJP2View jp2View = new JHVJP2View();
+                jp2View.setJP2Image(jp2Image);
 
-                if (jp2Image.isMultiFrame()) {
-                    JHVJPXView jpxView = new JHVJPXView();
-                    jpxView.setJP2Image(jp2Image);
-
-                    // wait until there is something to show before adding to the UI
-                    while (jpxView.getImageData() == null) {
-                        Thread.sleep(100);
-                    }
-
-                    return jpxView;
-                } else {
-                    JHVJP2View jp2View = new JHVJP2View();
-                    jp2View.setJP2Image(jp2Image);
-
-                    // wait until there is something to show before adding to the UI
-                    while (jp2View.getImageData() == null) {
-                        Thread.sleep(100);
-                    }
-                    return jp2View;
+                // wait until there is something to show before adding to the UI
+                while (jp2View.getImageData() == null) {
+                    Thread.sleep(100);
                 }
+                return jp2View;
             } catch (Exception e) {
                 Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
                 throw new IOException(e.getMessage());
