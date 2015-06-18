@@ -44,11 +44,6 @@ class J2KRender implements Runnable {
     /** A reference to the compositor used by this JP2Image. */
     private final Kdu_region_compositor compositorRef;
 
-    /** Used in run method to keep track of the current ImageViewParams */
-    private JP2ImageParameter currParams = null;
-
-    private int lastFrame = -1;
-
     private final static int NUM_BUFFERS = 1;
 
     /** An integer buffer used in the run method. */
@@ -103,9 +98,11 @@ class J2KRender implements Runnable {
 
     private static final Object renderLock = new Object();
 
-    private void renderLayer(int numLayer) {
+    private void renderLayer(JP2ImageParameter currParams) {
         synchronized (renderLock) {
             try {
+                int numLayer = currParams.compositionLayer;
+
                 // see TODO below
                 // compositorRef.Refresh();
                 // compositorRef.Remove_compositing_layer(-1, true);
@@ -231,7 +228,7 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         int numFrames = 0;
-        lastFrame = -1;
+        int lastFrame = -1;
         long tnow, tini = System.currentTimeMillis();
 
         while (!stop) {
@@ -241,7 +238,7 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            currParams = parentViewRef.getImageViewParams();
+            JP2ImageParameter currParams = parentViewRef.getImageViewParams();
             int curLayer = currParams.compositionLayer;
 
             if (parentViewRef.getMaximumAccessibleFrameNumber() < curLayer) {
@@ -253,7 +250,7 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            renderLayer(curLayer);
+            renderLayer(currParams);
 
             SubImage roi = currParams.subImage;
             int width = roi.width;
@@ -271,11 +268,11 @@ class J2KRender implements Runnable {
             }
             setImageData(imdata, currParams);
 
-            numFrames += currParams.compositionLayer - lastFrame;
-            lastFrame = currParams.compositionLayer;
-            if (lastFrame > currParams.compositionLayer) {
+            numFrames += curLayer - lastFrame;
+            if (lastFrame > curLayer)
                 lastFrame = -1;
-            }
+            else
+                lastFrame = curLayer;
 
             tnow = System.currentTimeMillis();
             if ((tnow - tini) >= 1000) {
