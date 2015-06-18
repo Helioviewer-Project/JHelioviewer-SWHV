@@ -99,6 +99,9 @@ public class Layers {
     }
 
     public static void setTime(ImmutableDateTime dateTime) {
+        if (activeView == null || !activeView.isMultiFrame())
+            return;
+
         for (AbstractView view : layers) {
             view.setFrame(view.getFrame(dateTime));
          }
@@ -106,6 +109,9 @@ public class Layers {
     }
 
     public static void setFrame(int frame) {
+        if (activeView == null || !activeView.isMultiFrame())
+            return;
+
         ImmutableDateTime dateTime = activeView.getFrame(frame);
         for (AbstractView view : layers) {
             view.setFrame(view.getFrame(dateTime));
@@ -114,14 +120,10 @@ public class Layers {
     }
 
     private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
-        if (view == null)
-            return null;
         return view.getFrame(0);
     }
 
     private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
-        if (view == null)
-            return null;
         return view.getFrame(view.getMaximumFrameNumber());
     }
 
@@ -139,16 +141,10 @@ public class Layers {
      *
      * @param view
      *            - View that can be associated with the layer in question
-     * @return timestamp of the first available image data, null if no
-     *         information available
+     * @return timestamp of the first available image data
      */
     public static Date getStartDate(AbstractView view) {
-        Date result = null;
-        ImmutableDateTime date = getStartDateImmutable(view);
-
-        if (date != null)
-            result = date.getTime();
-        return result;
+        return getStartDateImmutable(view).getTime();
     }
 
     /**
@@ -157,16 +153,10 @@ public class Layers {
      *
      * @param view
      *            - View that can be associated with the layer in question
-     * @return timestamp of the last available image data, null if no
-     *         information available
+     * @return timestamp of the last available image data
      */
     public static Date getEndDate(AbstractView view) {
-        Date result = null;
-        ImmutableDateTime date = getEndDateImmutable(view);
-
-        if (date != null)
-            result = date.getTime();
-        return result;
+        return getEndDateImmutable(view).getTime();
     }
 
     /**
@@ -181,9 +171,6 @@ public class Layers {
         int size = layers.size();
         for (int idx = 0; idx < size; idx++) {
             ImmutableDateTime start = getStartDateImmutable(idx);
-            if (start == null) {
-                continue;
-            }
             if (earliest == null || start.compareTo(earliest) < 0) {
                 earliest = start;
             }
@@ -203,9 +190,6 @@ public class Layers {
         int size = layers.size();
         for (int idx = 0; idx < size; idx++) {
             ImmutableDateTime end = getEndDateImmutable(idx);
-            if (end == null) {
-                continue;
-            }
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
@@ -351,7 +335,10 @@ public class Layers {
         protected int maxFrame;
 
         protected void setMaxFrame() {
-            maxFrame = activeView.getMaximumFrameNumber();
+            if (activeView == null)
+                maxFrame = 0;
+            else
+                maxFrame = activeView.getMaximumFrameNumber();
         }
 
         protected void resetStartTime(int frame) {

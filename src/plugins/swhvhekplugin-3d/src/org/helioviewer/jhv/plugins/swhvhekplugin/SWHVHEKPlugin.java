@@ -8,16 +8,11 @@ import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 public class SWHVHEKPlugin implements Plugin {
 
-    private static SWHVHEKData swekData;
     private SWHVHEKPluginRenderable renderable;
     private SWHVHEKImagePanelEventPopupController controller;
 
     public SWHVHEKPlugin() {
         renderable = new SWHVHEKPluginRenderable();
-    }
-
-    public static SWHVHEKData getSWEKData() {
-        return swekData;
     }
 
     @Override
