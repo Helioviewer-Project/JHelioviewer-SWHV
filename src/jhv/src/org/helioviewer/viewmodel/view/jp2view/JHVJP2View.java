@@ -341,13 +341,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     JP2ImageParameter getImageViewParams() {
         synchronized (imageViewParams) {
-            try {
-                return (JP2ImageParameter) imageViewParams.clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            return new JP2ImageParameter(imageViewParams.subImage, imageViewParams.resolution, imageViewParams.compositionLayer);
         }
-        return null;
     }
 
     /**
