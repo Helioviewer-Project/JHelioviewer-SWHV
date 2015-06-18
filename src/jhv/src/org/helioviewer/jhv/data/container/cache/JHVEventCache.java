@@ -93,54 +93,6 @@ public class JHVEventCache {
     }
 
     /**
-     * Gets the events containing the given date.
-     *
-     * @param date
-     *            The date in which the event should have happened
-     * @return the list of events happened on the given date
-     */
-    public JHVEventCacheResult get(Date date) {
-        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        if (!activeEventTypes.isEmpty()) {
-            Calendar reference = Calendar.getInstance();
-            reference.setTime(date);
-            for (Date sDate : events.keySet()) {
-                Calendar tempS = Calendar.getInstance();
-                tempS.setTime(sDate);
-                if (tempS.compareTo(reference) <= 0) {
-                    Map<Date, List<JHVEvent>> eventOnEndTime = events.get(sDate);
-                    for (Date eDate : eventOnEndTime.keySet()) {
-                        Calendar tempE = Calendar.getInstance();
-                        tempE.setTime(eDate);
-                        if (tempE.compareTo(reference) >= 0) {
-                            addEventsToResult(eventsResult, eventOnEndTime.get(eDate));
-                        }
-                    }
-                }
-            }
-        }
-
-        return new JHVEventCacheResult(eventsResult, new HashMap<JHVEventType, List<Interval<Date>>>(), new ArrayList<Date>());
-    }
-
-    /**
-     * Gets the events containing on of the dates in the list of date.
-     *
-     * @param dates
-     *            list of dates for which events are requested
-     * @return the list of events that are available for the dates
-     */
-    public JHVEventCacheResult get(List<Date> dates) {
-        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        if (!activeEventTypes.isEmpty()) {
-            for (Date date : dates) {
-                eventsResult = mergeMaps(eventsResult, get(date).getAvailableEvents());
-            }
-        }
-        return new JHVEventCacheResult(eventsResult, new HashMap<JHVEventType, List<Interval<Date>>>(), new ArrayList<Date>());
-    }
-
-    /**
      * Gets the events that are available within the interval.
      *
      * @param startDate
@@ -187,8 +139,7 @@ public class JHVEventCache {
             }
             missingIntervals.put(evt, missing);
         }
-        List<Date> missingDates = new ArrayList<Date>();
-        return new JHVEventCacheResult(eventsResult, missingIntervals, missingDates);
+        return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
     /**

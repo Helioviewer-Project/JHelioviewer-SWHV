@@ -13,11 +13,9 @@ public class JHVEventCacheResult {
 
     private final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> availableEvents;
     private final Map<JHVEventType, List<Interval<Date>>> missingIntervals;
-    private final List<Date> missingDates;
 
-    public JHVEventCacheResult(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> availableEvents, Map<JHVEventType, List<Interval<Date>>> missingIntervals, List<Date> missingDates) {
+    public JHVEventCacheResult(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> availableEvents, Map<JHVEventType, List<Interval<Date>>> missingIntervals) {
         this.availableEvents = availableEvents;
-        this.missingDates = missingDates;
         this.missingIntervals = missingIntervals;
     }
 
@@ -27,10 +25,6 @@ public class JHVEventCacheResult {
 
     public Map<JHVEventType, List<Interval<Date>>> getMissingIntervals() {
         return missingIntervals;
-    }
-
-    public List<Date> getMissingDates() {
-        return missingDates;
     }
 
 }
