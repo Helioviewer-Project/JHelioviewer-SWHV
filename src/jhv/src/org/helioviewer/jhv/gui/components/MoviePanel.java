@@ -144,7 +144,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void setActiveMovie(View view) {
         activeMovie = view;
 
-        if (activeMovie == null) {
+        if (view == null || !view.isMultiFrame()) {
             setEnabled(false);
             setPlaying(false, false);
 
@@ -156,10 +156,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             return;
         }
 
-        timeSlider.setPartialCachedUntil(activeMovie.getImageCacheStatus().getImageCachedPartiallyUntil());
-        timeSlider.setCompleteCachedUntil(activeMovie.getImageCacheStatus().getImageCachedCompletelyUntil());
-        timeSlider.setMaximum(activeMovie.getMaximumFrameNumber());
-        timeSlider.setValue(activeMovie.getCurrentFrameNumber());
+        timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
+        timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
+        timeSlider.setMaximum(view.getMaximumFrameNumber());
+        timeSlider.setValue(view.getCurrentFrameNumber());
 
         setEnabled(true);
     }
@@ -286,7 +286,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * Toggles between playing and not playing the animation.
      */
     private static void togglePlayPause() {
-        setPlaying(!isPlaying, false);
+        if (playPauseButton.isEnabled())
+            setPlaying(!isPlaying, false);
     }
 
     private static void setPlaying(boolean playing, boolean onlyGUI) {
@@ -358,7 +359,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         } else if (e.getSource() == speedUnitComboBox) {
             updateMovieSpeed();
             // Change animation mode
-        } else if (e.getSource() == animationModeComboBox && activeMovie != null) {
+        } else if (e.getSource() == animationModeComboBox) {
             Layers.setAnimationMode((AnimationMode) animationModeComboBox.getSelectedItem());
         }
     }
@@ -462,7 +463,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticPlayPauseAction extends AbstractAction implements ActionListener {
 
         public StaticPlayPauseAction() {
-            super("Play movie", playIcon);
+            super("Play/Pause movie");
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK));
         }
@@ -472,9 +473,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            instance.actionPerformed(new ActionEvent(playPauseButton, 0, ""));
+            togglePlayPause();
             putValue(NAME, playPauseButton.getToolTipText());
-            putValue(SMALL_ICON, playPauseButton.getIcon());
         }
 
     }
@@ -489,7 +489,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticPreviousFrameAction extends AbstractAction implements ActionListener {
 
         public StaticPreviousFrameAction() {
-            super("Step to previous frame", IconBank.getIcon(JHVIcon.BACK));
+            super("Step to previous frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.ALT_MASK));
         }
@@ -514,7 +514,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticNextFrameAction extends AbstractAction implements ActionListener {
 
         public StaticNextFrameAction() {
-            super("Step to next frame", IconBank.getIcon(JHVIcon.FORWARD));
+            super("Step to next frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK));
         }

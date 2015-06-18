@@ -111,6 +111,15 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     /**
+     * Returns the JPG2000 image managed by this class.
+     *
+     * @return JPG2000 image
+     */
+    public JP2Image getJP2Image() {
+        return jp2Image;
+    }
+
+    /**
      * Sets the reader mode.
      *
      * <p>
@@ -416,13 +425,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.isMultiFrame();
     }
 
-    @Override
-    public ImmutableDateTime getFrameDateTime(int frame) {
-        if (frame >= 0 && frame <= jp2Image.getMaximumFrameNumber()) {
-            return jp2Image.metaDataList[frame].getDateObs();
-        }
-        return null;
-    }
 
     @Override
     public int getCurrentFrameNumber() {
@@ -437,24 +439,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     @Override
     public int getMaximumAccessibleFrameNumber() {
         return imageCacheStatus.getImageCachedPartiallyUntil();
-    }
-
-    // to be accessed only from Layers
-    @Override
-    public int getFrame(ImmutableDateTime time) {
-        int frame = -1;
-        long timeMillis = time.getMillis();
-        long lastDiff, currentDiff = -Long.MAX_VALUE;
-        do {
-            lastDiff = currentDiff;
-            currentDiff = jp2Image.metaDataList[++frame].getDateObs().getMillis() - timeMillis;
-        } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
-
-        if (-lastDiff < currentDiff) {
-            return frame - 1;
-        } else {
-            return frame;
-        }
     }
 
     /**
@@ -476,6 +460,34 @@ public class JHVJP2View extends AbstractView implements RenderListener {
                 renderSignal.signal();
             }
         }
+    }
+
+    // to be accessed only from Layers
+    @Override
+    public int getFrame(ImmutableDateTime time) {
+        int frame = -1;
+        long timeMillis = time.getMillis();
+        long lastDiff, currentDiff = -Long.MAX_VALUE;
+        do {
+            lastDiff = currentDiff;
+            currentDiff = jp2Image.metaDataList[++frame].getDateObs().getMillis() - timeMillis;
+        } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
+
+        if (-lastDiff < currentDiff) {
+            return frame - 1;
+        } else {
+            return frame;
+        }
+    }
+
+    // to be accessed only from Layers
+    @Override
+    public ImmutableDateTime getFrame(int frame) {
+        if (frame <= 0)
+            return jp2Image.metaDataList[0].getDateObs();
+        if (frame >= jp2Image.getMaximumFrameNumber())
+            return jp2Image.metaDataList[jp2Image.getMaximumFrameNumber()].getDateObs();
+        return jp2Image.metaDataList[frame].getDateObs();
     }
 
     @Override
