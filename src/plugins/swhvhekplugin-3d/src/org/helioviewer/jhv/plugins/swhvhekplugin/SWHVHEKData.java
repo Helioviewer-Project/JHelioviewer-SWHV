@@ -75,6 +75,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
+        requestEvents();
         displayEvents();
     }
 
