@@ -69,15 +69,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     /**
-     * Returns the JPG2000 image managed by this class.
-     *
-     * @return JPG2000 image
-     */
-    public JP2Image getJP2Image() {
-        return jp2Image;
-    }
-
-    /**
      * Sets the JPG2000 image used by this class.
      *
      * This functions sets up the whole infrastructure needed for using the
@@ -88,9 +79,9 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      *
      * @param newJP2Image
      */
-    public void setJP2Image(JP2Image newJP2Image) {
-        if (jp2Image != null && reader != null) {
-            abolish();
+    public void setJP2Image(JP2Image newJP2Image) throws Exception {
+        if (jp2Image != null) {
+            throw new Exception("JP2 image already set");
         }
 
         MetaData metaData = newJP2Image.metaDataList[0];
@@ -363,29 +354,27 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      *
      * @param newImageData
      *            New image data
-     * @param roi
-     *            Area the image contains, to find the corresponding
-     * @param compositionLayer
-     *            Composition Layer rendered, to update meta data
-     *            {@link org.helioviewer.viewmodel.region.Region}
+     * @param params
+     *            New JP2Image parameters
      */
     void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
-        MetaData metaData = jp2Image.metaDataList[params.compositionLayer];
+        int frame = params.compositionLayer;
+        MetaData metaData = jp2Image.metaDataList[frame];
 
-        newImageData.setFrameNumber(params.compositionLayer);
+        newImageData.setFrameNumber(frame);
         newImageData.setLocalRotation(metaData.getRotationObs());
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (params.compositionLayer == 0) {
+        if (frame == 0) {
             baseDifferenceImageData = newImageData;
         }
 
-        if (imageData != null && Math.abs(params.compositionLayer - imageData.getFrameNumber()) == 1) {
+        if (imageData != null && Math.abs(frame - imageData.getFrameNumber()) == 1) {
             previousImageData = imageData;
-        } else if (previousImageData != null && previousImageData.getFrameNumber() - params.compositionLayer > 2) {
+        } else if (previousImageData != null && previousImageData.getFrameNumber() - frame > 2) {
             previousImageData = newImageData;
         }
 
