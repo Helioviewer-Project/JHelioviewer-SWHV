@@ -110,7 +110,7 @@ class J2KReader implements Runnable {
     void start() {
         if (myThread != null)
             stop();
-        myThread = new Thread(this, "J2KReader" + this.parentViewRef.getName());
+        myThread = new Thread(this, "J2KReader " + parentViewRef.getName());
         stop = false;
         myThread.start();
     }
