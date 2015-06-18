@@ -21,7 +21,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJPXView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -145,9 +145,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         if (exportMode) {
             int currentScreenshot = 1;
             int maxframeno = 1;
-            if (mv instanceof JHVJPXView) {
-                currentScreenshot = ((JHVJPXView) mv).getImageData().getFrameNumber();
-                maxframeno = ((JHVJPXView) mv).getMaximumFrameNumber();
+            if (mv instanceof JHVJP2View) {
+                currentScreenshot = ((JHVJP2View) mv).getImageData().getFrameNumber();
+                maxframeno = ((JHVJP2View) mv).getMaximumFrameNumber();
             }
 
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
@@ -157,7 +157,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             }
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
 
-            if ((!(mv instanceof JHVJPXView)) || (mv instanceof JHVJPXView && currentScreenshot < previousScreenshot)) {
+            if ((!(mv instanceof JHVJP2View)) || (mv instanceof JHVJP2View && currentScreenshot < previousScreenshot)) {
                 stopExport();
             }
             previousScreenshot = currentScreenshot;
@@ -179,7 +179,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         ImageViewerGui.getLeftContentPane().setEnabled(false);
 
         AbstractView mv = Layers.getActiveView();
-        if (mv instanceof JHVJPXView) {
+        if (mv instanceof JHVJP2View) {
             exportMode = true;
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
 

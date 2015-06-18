@@ -38,8 +38,8 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.viewmodel.view.MovieView;
-import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
+import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.viewmodel.view.View.AnimationMode;
 
 /**
  * Panel containing the movie controls.
@@ -47,18 +47,6 @@ import org.helioviewer.viewmodel.view.MovieView.AnimationMode;
  * <p>
  * This panel provides the capability to start and stop an movie, step to
  * certain frames and switch the movie speed as well as the movie mode.
- *
- * <p>
- * Apart from that, this component is responsible for playing multiple movie
- * simultaneous. This is done by actual playing only one movie, the one with the
- * most frames per time. All other image series just jump to the frame being
- * closest to the current frame of the series currently playing. That way, it is
- * impossible that different series get asynchronous.
- *
- * <p>
- * For further information about image series, see
- * {@link org.helioviewer.viewmodel.view.MovieView} and
- * {@link org.helioviewer.viewmodel.view.TimedMovieView}.
  *
  * @author Markus Langenberg
  * @author Malte Nuhn
@@ -141,7 +129,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
-    private static MovieView activeMovie;
+    private static View activeMovie;
     private static boolean someoneIsDragging = false;
 
     private static MoviePanel instance;
@@ -153,7 +141,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         return instance;
     }
 
-    public void setActiveMovie(MovieView view) {
+    public void setActiveMovie(View view) {
         activeMovie = view;
 
         if (activeMovie == null) {
@@ -454,7 +442,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    public static void cacheStatusChanged(MovieView view, boolean complete, int until) {
+    public static void cacheStatusChanged(View view, boolean complete, int until) {
         if (view == activeMovie) {
             if (complete) {
                 timeSlider.setCompleteCachedUntil(until);

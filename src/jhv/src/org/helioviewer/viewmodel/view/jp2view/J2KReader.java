@@ -7,7 +7,6 @@ import java.net.SocketException;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.viewmodel.view.MovieView;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
@@ -319,9 +318,9 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (!Layers.isMoviePlaying() && ((MovieView) parentViewRef).getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (!Layers.isMoviePlaying() && parentViewRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                            } else if (((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() < num_layers - 1) {
+                            } else if (parentViewRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
                             } else {
                                 strategy = CacheStrategy.ALLFRAMESEQUALLY;
@@ -358,7 +357,7 @@ class J2KReader implements Runnable {
                                 }
                                 // select current step based on strategy:
                                 if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
-                                    current_step = ((MovieView) parentViewRef).getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
+                                    current_step = parentViewRef.getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
                                 } else {
                                     current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
                                 }
@@ -409,8 +408,8 @@ class J2KReader implements Runnable {
                                     flowControl();
 
                                     // Downgrade, if necessary
-                                    if (downgradeNecessary && res.getResponseSize() > 0 && parentViewRef instanceof MovieView) {
-                                        ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
+                                    if (downgradeNecessary && res.getResponseSize() > 0) {
+                                        ImageCacheStatus cacheStatus = parentViewRef.getImageCacheStatus();
 
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
@@ -442,19 +441,17 @@ class J2KReader implements Runnable {
                                         stepQuerys[current_step] = null;
 
                                         // tell the cache status
-                                        if (parentViewRef instanceof MovieView) {
-                                            ImageCacheStatus cacheStatus = ((MovieView) parentViewRef).getImageCacheStatus();
+                                        ImageCacheStatus cacheStatus = parentViewRef.getImageCacheStatus();
 
-                                            switch (strategy) {
-                                            case CURRENTFRAMEONLY:
-                                            case CURRENTFRAMEFIRST:
-                                                cacheStatus.setImageStatus(curLayer, CacheStatus.COMPLETE);
-                                                break;
+                                        switch (strategy) {
+                                        case CURRENTFRAMEONLY:
+                                        case CURRENTFRAMEFIRST:
+                                            cacheStatus.setImageStatus(curLayer, CacheStatus.COMPLETE);
+                                            break;
 
-                                            default:
-                                                for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
-                                                    cacheStatus.setImageStatus(j, CacheStatus.COMPLETE);
-                                                }
+                                        default:
+                                            for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
+                                                cacheStatus.setImageStatus(j, CacheStatus.COMPLETE);
                                             }
                                         }
                                     }

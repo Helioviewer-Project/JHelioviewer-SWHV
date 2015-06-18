@@ -5,7 +5,7 @@ import java.awt.EventQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.viewmodel.view.MovieView;
+import org.helioviewer.viewmodel.view.View;
 
 /**
  * Implementation of JP2CacheStatus for remote movies.
@@ -15,7 +15,7 @@ import org.helioviewer.viewmodel.view.MovieView;
  */
 public class RemoteImageCacheStatus implements ImageCacheStatus {
 
-    private final MovieView parent;
+    private final View parent;
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
     private int imageCompleteUntil = -1;
@@ -28,7 +28,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      * @param _parent
      *            JP2Image, whose cache status is managed
      */
-    public RemoteImageCacheStatus(MovieView _parent) {
+    public RemoteImageCacheStatus(View _parent) {
         parent = _parent;
         imageStatus = new CacheStatus[parent.getMaximumFrameNumber() + 1];
     }
@@ -143,9 +143,9 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         return imageCompleteUntil;
     }
 
-    private static void updateUI(MovieView view, boolean complete, int until) {
+    private static void updateUI(View view, boolean complete, int until) {
         EventQueue.invokeLater(new Runnable() {
-            private MovieView view;
+            private View view;
             private boolean complete;
             private int until;
 
@@ -154,7 +154,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                 MoviePanel.cacheStatusChanged(view, complete, until);
             }
 
-            public Runnable init(MovieView _view, boolean _complete, int _until) {
+            public Runnable init(View _view, boolean _complete, int _until) {
                 view = _view;
                 complete = _complete;
                 until = _until;
