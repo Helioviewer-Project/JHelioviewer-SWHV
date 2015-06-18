@@ -421,12 +421,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.isMultiFrame();
     }
 
-
-    @Override
-    public int getCurrentFrameNumber() {
-        return imageViewParams.compositionLayer;
-    }
-
     @Override
     public int getMaximumFrameNumber() {
         return jp2Image.getMaximumFrameNumber();
@@ -435,6 +429,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     @Override
     public int getMaximumAccessibleFrameNumber() {
         return imageCacheStatus.getImageCachedPartiallyUntil();
+    }
+
+    @Override
+    public int getCurrentFrameNumber() {
+        return imageViewParams.compositionLayer;
+        // return getTrueFrameNumber() - synchronous decode
     }
 
     /**
@@ -447,7 +447,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
-        if (frame != imageViewParams.compositionLayer &&
+        if (frame != imageViewParams.compositionLayer && // getTrueFrameNumber() - synchronous decode
             frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
             imageViewParams.compositionLayer = frame;
 
