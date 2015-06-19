@@ -9,16 +9,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.viewmodel.view.AbstractView;
 
-/**
- * This manager collects all filter control components and creates a panel where
- * all components will occur at the defined area.
- * <p>
- * There are three different areas: Top, Center, Bottom. Within the areas the
- * components will be occur below each other as they were added before.
- *
- * @author Stephan Pagel
- */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class FiltersPanel extends JPanel {
 
     private final RunningDifferencePanel runningDifferencePanel;
@@ -29,13 +20,6 @@ public class FiltersPanel extends JPanel {
     private final ContrastPanel contrastPanel;
     private final SharpenPanel sharpenPanel;
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        for (Component c : this.getComponents()) {
-            c.setEnabled(enabled);
-        }
-    }
-
     public FiltersPanel() {
         runningDifferencePanel = new RunningDifferencePanel();
         opacityPanel = new OpacityPanel();
@@ -45,7 +29,7 @@ public class FiltersPanel extends JPanel {
         contrastPanel = new ContrastPanel();
         sharpenPanel = new SharpenPanel();
 
-        this.setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
@@ -98,20 +82,13 @@ public class FiltersPanel extends JPanel {
         add(details.getValue(), c);
     }
 
-    public void setActivejp2(final AbstractView jp2view) {
-        runningDifferencePanel.setEnabled(true);
+    public void setActivejp2(AbstractView jp2view) {
         runningDifferencePanel.setJP2View(jp2view);
-        opacityPanel.setEnabled(true);
         opacityPanel.setJP2View(jp2view);
-        channelMixerPanel.setEnabled(true);
         channelMixerPanel.setJP2View(jp2view);
-        lutPanel.setEnabled(true);
         lutPanel.setJP2View(jp2view);
-        gammaCorrectionPanel.setEnabled(true);
         gammaCorrectionPanel.setJP2View(jp2view);
-        contrastPanel.setEnabled(true);
         contrastPanel.setJP2View(jp2view);
-        sharpenPanel.setEnabled(true);
         sharpenPanel.setJP2View(jp2view);
     }
 
