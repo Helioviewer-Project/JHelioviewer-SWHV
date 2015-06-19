@@ -95,16 +95,6 @@ public class JHVFITSView extends AbstractView {
     }
 
     /**
-     * Updates the sub image depending on the current region.
-     *
-     * @param event
-     *            Event that belongs to the request.
-     * */
-    private void updateImageData() {
-        Displayer.display();
-    }
-
-    /**
      * {@inheritDoc}
      * */
     @Override
@@ -127,7 +117,7 @@ public class JHVFITSView extends AbstractView {
             return false;
 
         region = r;
-        updateImageData();
+        dataHandler.handleData(this, imageData);
         return true;
     }
 
@@ -179,14 +169,6 @@ public class JHVFITSView extends AbstractView {
         return uri;
     }
 
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public boolean isRemote() {
-        return false;
-    }
-
     @Override
     public URI getDownloadURI() {
         return uri;
@@ -200,21 +182,6 @@ public class JHVFITSView extends AbstractView {
     @Override
     public boolean getDifferenceMode() {
         return false;
-    }
-
-    @Override
-    public ImageData getBaseDifferenceImageData() {
-        return imageData;
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
-        return imageData;
-    }
-
-    @Override
-    public ImageData getImageData() {
-        return imageData;
     }
 
     @Override

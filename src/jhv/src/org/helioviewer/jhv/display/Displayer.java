@@ -17,8 +17,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2ViewDataHandler;
+import org.helioviewer.viewmodel.view.AbstractViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -90,12 +89,12 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static final DisplayJP2Handler displayJP2Handler = new DisplayJP2Handler();
+    public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
-    private static class DisplayJP2Handler implements JHVJP2ViewDataHandler {
+    private static class DisplayDataHandler implements AbstractViewDataHandler {
 
         @Override
-        public void handleData(JHVJP2View view, ImageData imageData) {
+        public void handleData(AbstractView view, ImageData imageData) {
             if (view == Layers.getActiveView()) {
                 lastTimestamp = imageData.getMetaData().getDateObs().getTime();
                 // fire TimeChanged
@@ -107,6 +106,7 @@ public class Displayer implements JHVEventHighlightListener {
             }
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
+            System.out.println(">>> triggered ");
         }
 
     }

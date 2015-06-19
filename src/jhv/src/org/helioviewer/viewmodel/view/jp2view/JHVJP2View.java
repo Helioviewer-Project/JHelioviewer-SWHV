@@ -16,6 +16,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.AbstractViewDataHandler;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;
@@ -66,6 +67,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     public JHVJP2View() {
         Displayer.addRenderListener(this);
+    }
+
+    @Override
+    public void setDataHandler(AbstractViewDataHandler _dataHandler) {
+        dataHandler = _dataHandler;
+        renderSignal.signal();
     }
 
     /**
@@ -381,22 +388,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }
-    }
-
-    private JHVJP2ViewDataHandler dataHandler;
-
-    public void setDataHandler(JHVJP2ViewDataHandler _dataHandler) {
-        dataHandler = _dataHandler;
-        renderSignal.signal();
-    }
-
-    public void removeDataHandler() {
-        dataHandler = null;
-    }
-
-    @Override
-    public ImageData getImageData() {
-        return imageData;
     }
 
     @Override
