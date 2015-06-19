@@ -115,7 +115,7 @@ public class RenderableImageLayer implements Renderable {
         double maxPhysicalY = Double.MIN_VALUE;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
-        GL3DQuatd camdiff = getCameraDifferenceRotationQuatd(activeCamera, mainLayerView.getImageData());
+        GL3DQuatd camdiff = getCameraDifferenceRotationQuatd(activeCamera, imageData);
 
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
@@ -128,8 +128,8 @@ public class RenderableImageLayer implements Renderable {
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.025);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.025);
+        double widthxAdd = 0; // Math.abs((maxPhysicalX - minPhysicalX) * 0.025);
+        double widthyAdd = 0; //Math.abs((maxPhysicalY - minPhysicalY) * 0.025);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
