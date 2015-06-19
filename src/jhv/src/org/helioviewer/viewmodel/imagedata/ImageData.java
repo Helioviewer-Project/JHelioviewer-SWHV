@@ -3,10 +3,9 @@ package org.helioviewer.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
+import org.helioviewer.viewmodel.metadata.MetaData;
 
 public interface ImageData {
     /**
@@ -44,12 +43,8 @@ public interface ImageData {
 
     public BufferedImage getBufferedImage();
 
-    public GL3DQuatd getLocalRotation();
+    public void setMetaData(MetaData m);
 
-    public void setLocalRotation(GL3DQuatd q);
-
-    public ImmutableDateTime getDateObs();
-
-    public void setDateObs(ImmutableDateTime dateTime);
+    public MetaData getMetaData();
 
 }

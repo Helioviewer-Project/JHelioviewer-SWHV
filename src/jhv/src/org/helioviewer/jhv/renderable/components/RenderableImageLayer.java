@@ -170,7 +170,7 @@ public class RenderableImageLayer implements Renderable {
             return new GL3DQuatd();
 
         GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
-        cameraDifferenceRotation.rotateWithConjugate(imageData.getLocalRotation());
+        cameraDifferenceRotation.rotateWithConjugate(imageData.getMetaData().getRotationObs());
 
         return cameraDifferenceRotation;
     }
