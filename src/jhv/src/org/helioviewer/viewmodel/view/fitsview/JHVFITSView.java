@@ -139,9 +139,4 @@ public class JHVFITSView extends AbstractView {
         return uri;
     }
 
-    @Override
-    public void applyFilters(GL2 gl) {
-        super.applyFilters(gl);
-    }
-
 }

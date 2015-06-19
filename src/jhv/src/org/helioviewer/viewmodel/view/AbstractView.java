@@ -75,20 +75,20 @@ public abstract class AbstractView implements View {
         lutChanged = true;
     }
 
-    public void applyFilters(GL2 gl) {
-        copyScreenToTexture(gl);
-        applyRunningDifferenceGL(gl);
+    public void applyFilters(GL2 gl, ImageData _imageData) {
+        copyScreenToTexture(gl, _imageData);
+        applyRunningDifferenceGL(gl, _imageData);
 
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
         GLSLShader.setGamma(gamma);
         GLSLShader.setAlpha(opacity);
 
-        GLSLShader.setFactors(sharpenWeighting, 1.0f / imageData.getWidth(), 1.0f / imageData.getHeight(), 1f);
+        GLSLShader.setFactors(sharpenWeighting, 1.0f / _imageData.getWidth(), 1.0f / _imageData.getHeight(), 1f);
         applyGLLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D);
-        tex.copyImageData2D(gl, imageData, 0, 0, imageData.getWidth(), imageData.getHeight());
+        tex.copyImageData2D(gl, _imageData, 0, 0, _imageData.getWidth(), _imageData.getHeight());
     }
 
     public void setColorMask(boolean redColormask, boolean greenColormask, boolean blueColormask) {
@@ -135,7 +135,7 @@ public abstract class AbstractView implements View {
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
 
-    private void applyRunningDifferenceGL(GL2 gl) {
+    private void applyRunningDifferenceGL(GL2 gl, ImageData _imageData) {
         if (this.baseDifferenceMode || this.differenceMode) {
             if (this.baseDifferenceMode) {
                 if (this.baseDifferenceNoRot) {
@@ -157,7 +157,7 @@ public abstract class AbstractView implements View {
             } else {
                 previousFrame = this.getBaseDifferenceImageData();
             }
-            if (this.differenceMode && this.imageData != previousFrame && previousFrame != null) {
+            if (this.differenceMode && _imageData != previousFrame && previousFrame != null) {
                 GLSLShader.setTruncationValue(this.truncation);
 
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
@@ -317,8 +317,8 @@ public abstract class AbstractView implements View {
         return invertLUT;
     }
 
-    private void copyScreenToTexture(GL2 gl) {
-        Region region = imageData.getRegion();
+    private void copyScreenToTexture(GL2 gl, ImageData _imageData) {
+        Region region = _imageData.getRegion();
 
         double xOffset = region.getLowerLeftCorner().x;
         double yOffset = region.getLowerLeftCorner().y;
@@ -351,8 +351,8 @@ public abstract class AbstractView implements View {
         GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
     }
 
-    public void setImageLayer(RenderableImageLayer imageLayer) {
-        this.imageLayer = imageLayer;
+    public void setImageLayer(RenderableImageLayer _imageLayer) {
+        imageLayer = _imageLayer;
     }
 
     public RenderableImageLayer getImageLayer() {

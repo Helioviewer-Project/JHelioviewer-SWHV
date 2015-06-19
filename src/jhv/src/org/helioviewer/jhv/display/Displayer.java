@@ -104,6 +104,7 @@ public class Displayer implements JHVEventHighlightListener {
                 }
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             }
+            view.getImageLayer().setImageData(imageData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }

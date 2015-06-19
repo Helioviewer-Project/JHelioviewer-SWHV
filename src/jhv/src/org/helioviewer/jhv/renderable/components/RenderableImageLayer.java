@@ -165,7 +165,7 @@ public class RenderableImageLayer implements Renderable {
         mainLayerView.setViewport(layerViewport);
     }
 
-    public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
+    private GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
         if (imageData == null)
             return new GL3DQuatd();
 
@@ -185,7 +185,7 @@ public class RenderableImageLayer implements Renderable {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
 
-            mainLayerView.applyFilters(gl);
+            mainLayerView.applyFilters(gl, imageData);
 
             GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
             if (!RenderableImageLayer.showCorona) {
@@ -197,7 +197,7 @@ public class RenderableImageLayer implements Renderable {
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getImageData()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, imageData));
             if (mainLayerView.getBaseDifferenceMode()) {
                 GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getBaseDifferenceImageData()));
             } else if (mainLayerView.getDifferenceMode()) {
@@ -435,6 +435,12 @@ public class RenderableImageLayer implements Renderable {
         deletePositionVBO(gl);
         deleteIndexVBO(gl);
         mainLayerView.dispose(gl);
+    }
+
+    private ImageData imageData;
+
+    public void setImageData(ImageData _imageData) {
+        imageData = _imageData;
     }
 
 }
