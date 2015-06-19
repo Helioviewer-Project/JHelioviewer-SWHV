@@ -40,9 +40,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     }
 
-    protected Viewport viewport;
-    protected Region region;
-
     // Member related to JP2
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
@@ -143,8 +140,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      * @param readerMode
      * @see #getReaderMode()
      */
-    public void setReaderMode(ReaderMode readerMode) {
-        this.readerMode = readerMode;
+    public void setReaderMode(ReaderMode _readerMode) {
+        readerMode = _readerMode;
     }
 
     /**

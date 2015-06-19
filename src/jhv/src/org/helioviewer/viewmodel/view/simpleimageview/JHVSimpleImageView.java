@@ -8,9 +8,7 @@ import java.net.URI;
 import javax.imageio.ImageIO;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -33,9 +31,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 public class JHVSimpleImageView extends AbstractView {
 
     protected URI uri;
-    protected Viewport viewport;
-    protected Region region;
-    protected BufferedImage bufferedImage;
+    protected BufferedImage image;
     protected PixelBasedMetaData m;
 
     /**
@@ -50,7 +46,7 @@ public class JHVSimpleImageView extends AbstractView {
      */
     public JHVSimpleImageView(URI _uri) throws MalformedURLException, IOException {
         uri = _uri;
-        bufferedImage = ImageIO.read(uri.toURL());
+        image = ImageIO.read(uri.toURL());
         initSimpleImageView();
     }
 
@@ -62,77 +58,25 @@ public class JHVSimpleImageView extends AbstractView {
      * @param uri
      *            Specifies the location of the simple image file.
      */
-    public JHVSimpleImageView(BufferedImage image, URI _uri) {
+    public JHVSimpleImageView(BufferedImage _image, URI _uri) {
         uri = _uri;
-        bufferedImage = image;
+        image = _image;
         initSimpleImageView();
     }
 
-    /**
-     * Initializes global variables.
-     */
     private void initSimpleImageView() {
-        if (bufferedImage.getColorModel().getPixelSize() <= 8) {
-            imageData = new SingleChannelByte8ImageData(bufferedImage);
-        } else if (bufferedImage.getColorModel().getPixelSize() <= 16) {
-            imageData = new SingleChannelShortImageData(bufferedImage.getColorModel().getPixelSize(), bufferedImage);
+        if (image.getColorModel().getPixelSize() <= 8) {
+            imageData = new SingleChannelByte8ImageData(image);
+        } else if (image.getColorModel().getPixelSize() <= 16) {
+            imageData = new SingleChannelShortImageData(image.getColorModel().getPixelSize(), image);
         } else {
-            imageData = new ARGBInt32ImageData(bufferedImage);
+            imageData = new ARGBInt32ImageData(image);
         }
 
-        m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
-        region = new Region(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-        viewport = new Viewport(100, 100);
-
-        updateImageData();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean setViewport(Viewport v) {
-        boolean changed = (viewport == null ? v == null : !viewport.equals(v));
-        viewport = v;
-        return changed;
-    }
-
-    /**
-     * Recalculates the image data by copying the desired region out of the full
-     * image.
-     */
-    protected void updateImageData() {
-        int width = (int) (bufferedImage.getWidth() * region.getWidth() / m.getPhysicalSize().x);
-        int height = (int) (bufferedImage.getHeight() * region.getHeight() / m.getPhysicalSize().y);
-        int x = (int) ((region.getLowerLeftCorner().x - m.getPhysicalLowerLeft().x) / m.getPhysicalSize().x * bufferedImage.getWidth());
-        int y = (int) ((region.getLowerLeftCorner().y - m.getPhysicalLowerLeft().y) / m.getPhysicalSize().y * bufferedImage.getHeight());
-        if (width > 0 && height > 0) {
-            BufferedImage bI = new BufferedImage(width, height, bufferedImage.getType());
-            bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
-
-            if (bI.getColorModel().getPixelSize() <= 8) {
-                imageData = new SingleChannelByte8ImageData(bI);
-            } else if (bI.getColorModel().getPixelSize() <= 16) {
-                imageData = new SingleChannelShortImageData(bI.getColorModel().getPixelSize(), bI);
-            } else {
-                imageData = new ARGBInt32ImageData(bI);
-            }
-            region = new Region(-1.5, -1.5, 3., 3.);
-            imageData.setRegion(region);
-            imageData.setMetaData(m);
-        } else {
-            imageData = null;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean setRegion(Region r) {
-        boolean changed = region == null ? r == null : !region.equals(r);
-        region = r;
-        return changed;
+        m = new PixelBasedMetaData(image.getWidth(), image.getHeight());
+        region = new Region(-1.5, -1.5, 3., 3.);
+        imageData.setRegion(region);
+        imageData.setMetaData(m);
     }
 
     /**

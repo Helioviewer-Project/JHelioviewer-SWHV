@@ -5,17 +5,13 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -30,8 +26,6 @@ import com.jogamp.opengl.GL2;
  * */
 public class JHVFITSView extends AbstractView {
 
-    protected Viewport viewport;
-    protected Region region;
     protected FITSImage fits;
     protected MetaData m;
     private final URI uri;
@@ -44,8 +38,8 @@ public class JHVFITSView extends AbstractView {
      * @throws IOException
      *             when an error occurred during reading the fits file.
      * */
-    public JHVFITSView(URI uri) throws IOException {
-        this.uri = uri;
+    public JHVFITSView(URI _uri) throws IOException {
+        uri = _uri;
         if (!uri.getScheme().equalsIgnoreCase("file"))
             throw new IOException("FITS does not support the " + uri.getScheme() + " protocol");
 
@@ -66,9 +60,9 @@ public class JHVFITSView extends AbstractView {
      * @param uri
      *            Specifies the location of the FITS file.
      * */
-    public JHVFITSView(FITSImage fits, URI uri) {
-        this.uri = uri;
-        this.fits = fits;
+    public JHVFITSView(FITSImage _fits, URI _uri) {
+        uri = _uri;
+        fits = _fits;
         initFITSImageView();
     }
 
@@ -86,39 +80,10 @@ public class JHVFITSView extends AbstractView {
         } else {
             imageData = new ARGBInt32ImageData(bi);
         }
-        imageData.setMetaData(m);
 
         region = new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
-
-        viewport = new Viewport(100, 100);
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public boolean setViewport(Viewport v) {
-        // check if viewport has changed
-        if (viewport != null && viewport.equals(v))
-            return false;
-
-        viewport = v;
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public boolean setRegion(Region r) {
-        // check if region has changed
-        if (region != null && region.equals(r))
-            return false;
-
-        region = r;
-        dataHandler.handleData(this, imageData);
-        return true;
+        imageData.setMetaData(m);
     }
 
     /**
@@ -172,16 +137,6 @@ public class JHVFITSView extends AbstractView {
     @Override
     public URI getDownloadURI() {
         return uri;
-    }
-
-    @Override
-    public boolean getBaseDifferenceMode() {
-        return false;
-    }
-
-    @Override
-    public boolean getDifferenceMode() {
-        return false;
     }
 
     @Override

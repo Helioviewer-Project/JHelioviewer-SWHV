@@ -91,6 +91,8 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
+    private static int idx = 1;
+
     private static class DisplayDataHandler implements AbstractViewDataHandler {
 
         @Override
@@ -106,7 +108,7 @@ public class Displayer implements JHVEventHighlightListener {
             }
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
-            System.out.println(">>> triggered ");
+            System.out.println(">>> triggered " + (idx++));
         }
 
     }

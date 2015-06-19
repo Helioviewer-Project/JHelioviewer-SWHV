@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.opengl.GLSLShader;
@@ -20,6 +21,9 @@ public abstract class AbstractView implements View {
     private RenderableImageLayer imageLayer;
 
     protected ImageData imageData;
+    protected Viewport viewport;
+    protected Region region;
+
     private ColorMask colorMask = new ColorMask(true, true, true);
     private GLTexture tex;
     private GLTexture lutTex;
@@ -251,6 +255,23 @@ public abstract class AbstractView implements View {
     @Override
     public ImageData getPreviousImageData() {
         return imageData;
+    }
+
+    @Override
+    public boolean setRegion(Region r) {
+        boolean changed = region == null ? r == null : !region.equals(r);
+        region = r;
+
+        if (changed)
+            dataHandler.handleData(this, imageData);
+        return changed;
+    }
+
+    @Override
+    public boolean setViewport(Viewport v) {
+        boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
+        viewport = v;
+        return viewportChanged;
     }
 
     // -->
