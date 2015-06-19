@@ -35,7 +35,6 @@ public class JHVSimpleImageView extends AbstractView {
     protected URI uri;
     protected Viewport viewport;
     protected Region region;
-    protected ImageData subImageData;
     protected BufferedImage bufferedImage;
     protected PixelBasedMetaData m;
 
@@ -74,11 +73,11 @@ public class JHVSimpleImageView extends AbstractView {
      */
     private void initSimpleImageView() {
         if (bufferedImage.getColorModel().getPixelSize() <= 8) {
-            subImageData = new SingleChannelByte8ImageData(bufferedImage);
+            imageData = new SingleChannelByte8ImageData(bufferedImage);
         } else if (bufferedImage.getColorModel().getPixelSize() <= 16) {
-            subImageData = new SingleChannelShortImageData(bufferedImage.getColorModel().getPixelSize(), bufferedImage);
+            imageData = new SingleChannelShortImageData(bufferedImage.getColorModel().getPixelSize(), bufferedImage);
         } else {
-            subImageData = new ARGBInt32ImageData(bufferedImage);
+            imageData = new ARGBInt32ImageData(bufferedImage);
         }
 
         m = new PixelBasedMetaData(bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -88,10 +87,6 @@ public class JHVSimpleImageView extends AbstractView {
         updateImageData();
     }
 
-    public BufferedImage getSimpleImage() {
-        return bufferedImage;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -99,7 +94,6 @@ public class JHVSimpleImageView extends AbstractView {
     public boolean setViewport(Viewport v) {
         boolean changed = (viewport == null ? v == null : !viewport.equals(v));
         viewport = v;
-
         return changed;
     }
 
@@ -117,17 +111,17 @@ public class JHVSimpleImageView extends AbstractView {
             bI.getGraphics().drawImage(bufferedImage.getSubimage(x, bufferedImage.getHeight() - height - y, width, height), 0, 0, null);
 
             if (bI.getColorModel().getPixelSize() <= 8) {
-                subImageData = new SingleChannelByte8ImageData(bI);
+                imageData = new SingleChannelByte8ImageData(bI);
             } else if (bI.getColorModel().getPixelSize() <= 16) {
-                subImageData = new SingleChannelShortImageData(bI.getColorModel().getPixelSize(), bI);
+                imageData = new SingleChannelShortImageData(bI.getColorModel().getPixelSize(), bI);
             } else {
-                subImageData = new ARGBInt32ImageData(bI);
+                imageData = new ARGBInt32ImageData(bI);
             }
             region = new Region(-1.5, -1.5, 3., 3.);
-            subImageData.setRegion(region);
-            subImageData.setMetaData(m);
+            imageData.setRegion(region);
+            imageData.setMetaData(m);
         } else {
-            subImageData = null;
+            imageData = null;
         }
     }
 
@@ -166,32 +160,9 @@ public class JHVSimpleImageView extends AbstractView {
         return uri;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isRemote() {
-        return false;
-    }
-
     @Override
     public URI getDownloadURI() {
         return uri;
-    }
-
-    @Override
-    public ImageData getBaseDifferenceImageData() {
-        return subImageData;
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
-        return subImageData;
-    }
-
-    @Override
-    public ImageData getImageData() {
-        return subImageData;
     }
 
 }

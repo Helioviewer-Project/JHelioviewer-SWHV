@@ -207,8 +207,7 @@ public class Layers {
         fireLayerAdded(view);
         setActiveView(view);
 
-        if (view instanceof JHVJP2View)
-            ((JHVJP2View) view).setDataHandler(Displayer.displayJP2Handler);
+        view.setDataHandler(Displayer.displayDataHandler);
     }
 
     // special
@@ -269,10 +268,8 @@ public class Layers {
     public static void removeLayer(AbstractView view) {
         int index = layers.indexOf(view);
 
-        if (view instanceof JHVJP2View)
-            ((JHVJP2View) view).removeDataHandler();
-
         layers.remove(view);
+        view.removeDataHandler();
         view.abolish();
         setActiveView(getLayer(determineNewActiveLayer(index)));
     }

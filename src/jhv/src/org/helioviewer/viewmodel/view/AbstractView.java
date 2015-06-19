@@ -190,6 +190,11 @@ public abstract class AbstractView implements View {
     }
 
     @Override
+    public boolean isRemote() {
+        return false;
+    }
+
+    @Override
     public ImageCacheStatus getImageCacheStatus() {
         return null;
     }
@@ -232,6 +237,22 @@ public abstract class AbstractView implements View {
     public ImmutableDateTime getFrame(int frame) {
         return getMetaData().getDateObs();
     }
+
+    @Override
+    public ImageData getImageData() {
+        return imageData;
+    }
+
+    @Override
+    public ImageData getBaseDifferenceImageData() {
+        return imageData;
+    }
+
+    @Override
+    public ImageData getPreviousImageData() {
+        return imageData;
+    }
+
     // -->
 
     public void setBaseDifferenceNoRot(boolean baseDifferenceNoRot) {
@@ -332,6 +353,16 @@ public abstract class AbstractView implements View {
         tex.delete(gl);
         lutTex.delete(gl);
         diffTex.delete(gl);
+    }
+
+    protected AbstractViewDataHandler dataHandler;
+
+    public void setDataHandler(AbstractViewDataHandler _dataHandler) {
+        dataHandler = _dataHandler;
+    }
+
+    public void removeDataHandler() {
+        dataHandler = null;
     }
 
 }
