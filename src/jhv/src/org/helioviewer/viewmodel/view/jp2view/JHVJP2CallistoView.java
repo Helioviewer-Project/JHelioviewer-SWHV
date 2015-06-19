@@ -12,8 +12,6 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 public class JHVJP2CallistoView extends JHVJP2View {
 
-    private JHVJP2CallistoViewDataHandler dataHandler;
-
     public JHVJP2CallistoView() {
         region = new Region(0, 0, 86400, 380);
         viewport = new Viewport(2700, 12);
@@ -37,11 +35,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
     public void render() {
     }
 
-    public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler _dataHandler) {
-        dataHandler = _dataHandler;
-        addLayer();
-    }
-
     @Override
     protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
         ResolutionSet set = jp2Image.getResolutionSet();
@@ -56,17 +49,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
                                          (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width),
                                          (int) (r.getHeight() / maxHeight * res.getResolutionBounds().height));
         return new JP2ImageParameter(subImage, res, frameNumber);
-    }
-
-    @Override
-    protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
-        if (dataHandler != null) {
-            dataHandler.handleData((JHVJP2CallistoView) aView);
-        }
-    }
-
-    public void removeJHVJP2DataHandler() {
-        dataHandler = null;
     }
 
 }

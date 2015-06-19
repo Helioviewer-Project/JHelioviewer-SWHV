@@ -10,6 +10,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.AbstractView;
@@ -207,7 +208,7 @@ public class Layers {
         setActiveView(view);
 
         if (view instanceof JHVJP2View)
-            ((JHVJP2View) view).addLayer();
+            ((JHVJP2View) view).setDataHandler(Displayer.displayJP2Handler);
     }
 
     // special
@@ -267,6 +268,9 @@ public class Layers {
      */
     public static void removeLayer(AbstractView view) {
         int index = layers.indexOf(view);
+
+        if (view instanceof JHVJP2View)
+            ((JHVJP2View) view).removeDataHandler();
 
         layers.remove(view);
         view.abolish();

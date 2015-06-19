@@ -16,6 +16,8 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JHVJP2ViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -87,18 +89,25 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static void fireFrameChanged(AbstractView view, ImmutableDateTime dateTime) {
-        if (view == Layers.getActiveView()) {
-            lastTimestamp = dateTime.getTime();
-            // fire TimeChanged
-            activeCamera.timeChanged(lastTimestamp);
-            for (final TimeListener listener : timeListeners) {
-                listener.timeChanged(lastTimestamp);
+    public static final DisplayJP2Handler displayJP2Handler = new DisplayJP2Handler();
+
+    private static class DisplayJP2Handler implements JHVJP2ViewDataHandler {
+
+        @Override
+        public void handleData(JHVJP2View view, ImmutableDateTime dateTime) {
+            if (view == Layers.getActiveView()) {
+                lastTimestamp = dateTime.getTime();
+                // fire TimeChanged
+                activeCamera.timeChanged(lastTimestamp);
+                for (final TimeListener listener : timeListeners) {
+                    listener.timeChanged(lastTimestamp);
+                }
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             }
-            ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+            display();
         }
-        ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-        display();
+
     }
 
     public static Date getLastUpdatedTimestamp() {
