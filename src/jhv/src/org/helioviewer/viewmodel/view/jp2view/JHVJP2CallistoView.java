@@ -39,6 +39,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     public void setJHVJP2CallistoViewDataHandler(JHVJP2CallistoViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
+        addLayer();
     }
 
     @Override
