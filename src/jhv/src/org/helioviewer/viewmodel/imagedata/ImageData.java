@@ -3,23 +3,11 @@ package org.helioviewer.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 
-/**
- * Basic representation of an image handled by the view chain.
- *
- * <p>
- * Within the view chain, the image data is given from view to view as an
- * ImageData object. The object provides only methods to read informations, such
- * as dimensions and pixel data. To write data, a new ImageData object has to be
- * created.
- *
- * @author Ludwig Schmidt
- * @author Markus Langenberg
- *
- */
 public interface ImageData {
     /**
      * Returns the width of the image
@@ -59,5 +47,9 @@ public interface ImageData {
     public GL3DQuatd getLocalRotation();
 
     public void setLocalRotation(GL3DQuatd q);
+
+    public ImmutableDateTime getDateObs();
+
+    public void setDateObs(ImmutableDateTime dateTime);
 
 }

@@ -361,6 +361,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         newImageData.setFrameNumber(frame);
         newImageData.setLocalRotation(metaData.getRotationObs());
+        newImageData.setDateObs(metaData.getDateObs());
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
@@ -379,7 +380,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         imageData = newImageData;
 
         if (dataHandler != null) {
-            dataHandler.handleData(this, metaData.getDateObs());
+            dataHandler.handleData(this, imageData);
         }
     }
 

@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 
 /**
@@ -20,6 +21,7 @@ public abstract class AbstractImageData implements ImageData {
 
     private GL3DQuatd quat;
     private Region region;
+    protected ImmutableDateTime dateObs;
 
     private int frameNumber;
 
@@ -87,33 +89,41 @@ public abstract class AbstractImageData implements ImageData {
     protected abstract BufferedImage createBufferedImageFromImageTransport();
 
     @Override
-    public void setFrameNumber(int frameNumber) {
-        this.frameNumber = frameNumber;
+    public void setFrameNumber(int f) {
+        frameNumber = f;
     }
 
     @Override
     public int getFrameNumber() {
-        return this.frameNumber;
+        return frameNumber;
     }
 
     @Override
     public Region getRegion() {
-        return this.region;
+        return region;
     }
 
     @Override
     public void setRegion(Region r) {
-        this.region = r;
+        region = r;
     }
 
     @Override
     public GL3DQuatd getLocalRotation() {
-        return this.quat;
+        return quat;
     }
 
     @Override
     public void setLocalRotation(GL3DQuatd q) {
-        this.quat = q;
+        quat = q;
+    }
+
+    public ImmutableDateTime getDateObs() {
+        return dateObs;
+    }
+
+    public void setDateObs(ImmutableDateTime dateTime) {
+        dateObs = dateTime;
     }
 
 }

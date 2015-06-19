@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
@@ -67,15 +66,6 @@ public class DownloadedJPXData implements JHVJP2ViewDataHandler {
         this.endDate = endDate;
     }
 
-    private DownloadedJPXDataWorkerResult getJPXData(JHVJP2View callistoView) {
-        ImageData imageData = callistoView.getImageData();
-        if (imageData instanceof SingleChannelByte8ImageData) {
-            byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
-            return new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-        }
-        return null;
-    }
-
     public void remove() {
         radioDataManager.finishedDownloadingID(imageID, downloadID);
 
@@ -89,13 +79,6 @@ public class DownloadedJPXData implements JHVJP2ViewDataHandler {
             view.abolish();
         }
         view = null;
-    }
-
-    public void setInitialData() {
-        DownloadedJPXDataWorkerResult result = getJPXData(view);
-        if (result != null) {
-            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
-        }
     }
 
     private class DownloadedJPXDataWorkerResult {
@@ -144,9 +127,11 @@ public class DownloadedJPXData implements JHVJP2ViewDataHandler {
     }
 
     @Override
-    public void handleData(JHVJP2View callistoView, ImmutableDateTime dateTime) {
-        DownloadedJPXDataWorkerResult result = getJPXData(callistoView);
-        if (result != null) {
+    public void handleData(JHVJP2View callistoView, ImageData imageData) {
+        if (imageData instanceof SingleChannelByte8ImageData) {
+            byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
+            DownloadedJPXDataWorkerResult result = new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+
             radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
             radioDataManager.finishedDownloadingID(imageID, downloadID);
         }
