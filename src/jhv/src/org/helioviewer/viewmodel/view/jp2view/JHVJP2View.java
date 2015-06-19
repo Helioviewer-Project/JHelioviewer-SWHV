@@ -66,12 +66,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         Displayer.addRenderListener(this);
     }
 
-    @Override
-    public void setDataHandler(AbstractViewDataHandler _dataHandler) {
-        dataHandler = _dataHandler;
-        renderSignal.signal();
-    }
-
     /**
      * Sets the JPG2000 image used by this class.
      *

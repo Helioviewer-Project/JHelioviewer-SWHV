@@ -261,9 +261,6 @@ public abstract class AbstractView implements View {
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-
-        if (changed)
-            dataHandler.handleData(this, imageData);
         return changed;
     }
 
@@ -380,6 +377,7 @@ public abstract class AbstractView implements View {
 
     public void setDataHandler(AbstractViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
+        dataHandler.handleData(this, imageData);
     }
 
     public void removeDataHandler() {
