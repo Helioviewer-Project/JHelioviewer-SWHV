@@ -61,8 +61,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
 
-    private boolean inLayers = false;
-
     private ImageData previousImageData;
     private ImageData baseDifferenceImageData;
 
@@ -380,20 +378,20 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         imageData = newImageData;
 
-        // prevent fire before added to Layers
-        if (inLayers)
-            fireFrameChanged(this, metaData.getDateObs());
-    }
-
-    protected void fireFrameChanged(JHVJP2View aView, ImmutableDateTime aDateTime) {
-        Displayer.fireFrameChanged(aView, aDateTime);
-    }
-
-    public void addLayer() {
-        if (inLayers == false) {
-            inLayers = true;
-            renderSignal.signal();
+        if (dataHandler != null) {
+            dataHandler.handleData(this, metaData.getDateObs());
         }
+    }
+
+    private JHVJP2ViewDataHandler dataHandler;
+
+    public void setDataHandler(JHVJP2ViewDataHandler _dataHandler) {
+        dataHandler = _dataHandler;
+        renderSignal.signal();
+    }
+
+    public void removeDataHandler() {
+        dataHandler = null;
     }
 
     @Override
