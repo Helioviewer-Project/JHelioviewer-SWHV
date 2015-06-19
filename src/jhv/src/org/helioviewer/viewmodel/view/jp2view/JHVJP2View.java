@@ -360,8 +360,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         MetaData metaData = jp2Image.metaDataList[frame];
 
         newImageData.setFrameNumber(frame);
-        newImageData.setLocalRotation(metaData.getRotationObs());
-        newImageData.setDateObs(metaData.getDateObs());
+        newImageData.setMetaData(metaData);
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
