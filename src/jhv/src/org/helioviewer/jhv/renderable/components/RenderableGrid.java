@@ -33,6 +33,7 @@ public class RenderableGrid implements Renderable {
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
 
+    private boolean showLabels = true;
     private Font font;
     private TextRenderer textRenderer;
     // the height of the text in solar radii
@@ -75,7 +76,7 @@ public class RenderableGrid implements Renderable {
         int pixelsPerSolarRadius = (int) (2 * textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
         float fontSize = Math.max(10, Math.min(288, pixelsPerSolarRadius));
 
-        if (textRenderer == null || fontSize != oldFontSize) {
+        if (showLabels && (textRenderer == null || fontSize != oldFontSize)) {
             oldFontSize = fontSize;
             font = font.deriveFont(fontSize);
 
@@ -95,7 +96,8 @@ public class RenderableGrid implements Renderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            drawText(gl);
+            if (showLabels)
+                drawText(gl);
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl, cameraMatrix);
@@ -359,6 +361,10 @@ public class RenderableGrid implements Renderable {
 
     public void setLatstepDegrees(double latstepDegrees) {
         this.latstepDegrees = (float) latstepDegrees;
+    }
+
+    public void showLabels(boolean show) {
+        showLabels = show;
     }
 
     @Override
