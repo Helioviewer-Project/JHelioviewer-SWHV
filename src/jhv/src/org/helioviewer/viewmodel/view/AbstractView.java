@@ -277,8 +277,16 @@ public abstract class AbstractView implements View {
         this.baseDifferenceNoRot = baseDifferenceNoRot;
     }
 
+    public boolean getBaseDifferenceNoRot() {
+        return baseDifferenceNoRot;
+    }
+
     public void setRunDiffNoRot(boolean runningDifferenceNoRot) {
         this.runningDifferenceNoRot = runningDifferenceNoRot;
+    }
+
+    public boolean getRunDiffNoRot() {
+        return runningDifferenceNoRot;
     }
 
     public void setTruncation(float truncation) {
