@@ -206,9 +206,8 @@ public class Layers {
         fireLayerAdded(view);
         setActiveView(view);
 
-        // sync UI, initial Displayer.fireFrameChanged() happened before adding to UI
         if (view instanceof JHVJP2View)
-            ((JHVJP2View) view).render();
+            ((JHVJP2View) view).addLayer();
     }
 
     // special
