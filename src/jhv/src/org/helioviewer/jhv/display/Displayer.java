@@ -15,6 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2ViewDataHandler;
@@ -94,9 +95,9 @@ public class Displayer implements JHVEventHighlightListener {
     private static class DisplayJP2Handler implements JHVJP2ViewDataHandler {
 
         @Override
-        public void handleData(JHVJP2View view, ImmutableDateTime dateTime) {
+        public void handleData(JHVJP2View view, ImageData imageData) {
             if (view == Layers.getActiveView()) {
-                lastTimestamp = dateTime.getTime();
+                lastTimestamp = imageData.getDateObs().getTime();
                 // fire TimeChanged
                 activeCamera.timeChanged(lastTimestamp);
                 for (final TimeListener listener : timeListeners) {
