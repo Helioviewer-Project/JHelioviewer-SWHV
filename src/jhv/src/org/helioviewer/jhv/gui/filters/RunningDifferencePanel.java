@@ -38,7 +38,7 @@ import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 /**
@@ -226,7 +226,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
         truncateSpinner.setValue(1.f - image.getTruncation());
 
-        final AbstractView view = Layers.getActiveView();
+        final View view = Layers.getActiveView();
 
         downloadLayerAction = new AbstractAction() {
             {
@@ -332,7 +332,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      *
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
-    private static void showMetaInfo(AbstractView view) {
+    private static void showMetaInfo(View view) {
         MetaDataDialog dialog = new MetaDataDialog();
         dialog.setMetaData(view);
         dialog.showDialog();

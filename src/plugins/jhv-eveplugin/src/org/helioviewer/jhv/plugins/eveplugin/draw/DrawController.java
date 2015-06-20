@@ -27,7 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
@@ -254,7 +254,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void layerAdded(AbstractView view) {
+    public void layerAdded(View view) {
         final Interval<Date> interval = new Interval<Date>(Layers.getFirstDate(), Layers.getLastDate());
         if (availableInterval == null || availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             availableInterval = interval;
@@ -267,12 +267,12 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (interval.getEnd().after(end)) {
                 end = interval.getEnd();
             }
-            this.setAvailableInterval(new Interval<Date>(start, end));
+            setAvailableInterval(new Interval<Date>(start, end));
         }
     }
 
     @Override
-    public void activeLayerChanged(AbstractView view) {
+    public void activeLayerChanged(View view) {
         if (view == null) {
             fireRedrawRequestMovieFrameChanged(null);
         }

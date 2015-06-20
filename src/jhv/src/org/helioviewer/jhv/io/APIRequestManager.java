@@ -19,7 +19,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
@@ -58,7 +58,7 @@ public class APIRequestManager {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Date date = new Date();
         boolean readDate = false;
-        AbstractView view = null;
+        View view = null;
 
         try {
             view = loadImage(observatory, instrument, detector, measurement, formatter.format(date), message);
@@ -67,14 +67,14 @@ public class APIRequestManager {
                 readDate = true;
 
                 EventQueue.invokeLater(new Runnable() {
-                    private AbstractView view;
+                    private View view;
 
                     @Override
                     public void run() {
                         view.abolish();
                     }
 
-                    public Runnable init(AbstractView _view) {
+                    public Runnable init(View _view) {
                         view = _view;
                         return this;
                     }
@@ -115,7 +115,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static AbstractView loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    private static View loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -160,7 +160,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static AbstractView loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
+    private static View loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
@@ -207,7 +207,7 @@ public class APIRequestManager {
      * @return The View corresponding to the file whose location was returned by
      *         the server
      */
-    private static AbstractView requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
+    private static View requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8")));
@@ -285,7 +285,7 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static AbstractView requestAndOpenRemoteFile(String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
         if (endTime.equals("")) {
             return loadImage(observatory, instrument, detector, measurement, startTime, message);
         } else {
@@ -310,7 +310,7 @@ public class APIRequestManager {
      *             if anything went wrong (e.g. type not supported, image not
      *             found, etc.)
      */
-    public static AbstractView loadView(URI uri, URI downloadURI) throws IOException {
+    public static View loadView(URI uri, URI downloadURI) throws IOException {
         if (uri == null || uri.getScheme() == null || uri.toString() == null) {
             throw new IOException("Invalid URI");
         }

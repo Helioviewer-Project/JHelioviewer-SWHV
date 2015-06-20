@@ -25,7 +25,7 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 import com.jogamp.common.nio.Buffers;
@@ -51,13 +51,13 @@ public class RenderableImageLayer implements Renderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final AbstractView mainLayerView;
+    private final View mainLayerView;
     private final RenderableType type;
     private boolean isVisible = true;
 
     private final GLImage glImage;
 
-    public RenderableImageLayer(AbstractView view) {
+    public RenderableImageLayer(View view) {
         type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         mainLayerView = view;
@@ -419,7 +419,7 @@ public class RenderableImageLayer implements Renderable {
         return imageData.getMetaData().getDateObs().getCachedDate();
     }
 
-    public AbstractView getMainLayerView() {
+    public View getMainLayerView() {
         return mainLayerView;
     }
 

@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
@@ -72,7 +72,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             if (interpolation) {
                 long tLayerStart = 0, tLayerEnd = 0;
                 // Active layer times
-                AbstractView view = Layers.getActiveView();
+                View view = Layers.getActiveView();
                 if (view != null) {
                     tLayerStart = Layers.getStartDate(view).getTime();
                     tLayerEnd = Layers.getEndDate(view).getTime();
@@ -151,11 +151,11 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     @Override
-    public void layerAdded(AbstractView view) {
+    public void layerAdded(View view) {
     }
 
     @Override
-    public void activeLayerChanged(AbstractView view) {
+    public void activeLayerChanged(View view) {
         if (view != null && !interpolation) {
             positionLoading.setBeginDate(Layers.getStartDate(view), false);
             positionLoading.setEndDate(Layers.getEndDate(view), true);

@@ -8,8 +8,6 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
-import com.jogamp.opengl.GL2;
-
 public abstract class AbstractView implements View {
 
     private RenderableImageLayer imageLayer;
@@ -18,7 +16,6 @@ public abstract class AbstractView implements View {
     protected Viewport viewport;
     protected Region region;
 
-    // <!-- Defaults
     @Override
     public void abolish() {
     }

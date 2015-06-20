@@ -12,7 +12,7 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -38,11 +38,11 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void render(GL2 gl) {
-        AbstractView view;
+        View view;
         if (isVisible && (view = Layers.getActiveView()) != null) {
             PfssData pfssData;
 
-            long millis = view.getMetaData().getDateObs().getMillis();
+            long millis = view.getImageData().getMetaData().getDateObs().getMillis();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);
@@ -97,7 +97,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void layerAdded(AbstractView view) {
+    public void layerAdded(View view) {
         PfssPlugin.getPfsscache().clear();
         Date start = Layers.getFirstDate();
         Date end = Layers.getLastDate();
@@ -106,7 +106,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void activeLayerChanged(AbstractView view) {
+    public void activeLayerChanged(View view) {
     }
 
     @Override

@@ -44,7 +44,7 @@ import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -197,7 +197,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        class LoadRemoteTask extends SwingWorker<AbstractView, Void> {
+        class LoadRemoteTask extends SwingWorker<View, Void> {
 
             private RenderableDummy dummy;
             private boolean image;
@@ -216,9 +216,9 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             }
 
             @Override
-            protected AbstractView doInBackground() {
+            protected View doInBackground() {
                 Thread.currentThread().setName("LoadRemote");
-                AbstractView view = null;
+                View view = null;
 
                 try {
                     if (image)
