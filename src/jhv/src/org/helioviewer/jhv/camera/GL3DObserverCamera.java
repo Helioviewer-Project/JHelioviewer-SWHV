@@ -70,7 +70,7 @@ public class GL3DObserverCamera extends GL3DCamera {
         AbstractView view = Layers.getActiveView();
 
         if (view != null) {
-            MetaData metadata = view.getMetaData();
+            MetaData metadata = view.getImageData().getMetaData();
             localRotation = metadata.getRotationObs();
             d = metadata.getDistanceObs();
         } else {

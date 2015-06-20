@@ -141,7 +141,7 @@ public class RenderableImageLayer implements Renderable {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        MetaData metaData = mainLayerView.getMetaData();
+        MetaData metaData = imageData.getMetaData();
         GL3DVec2d metPhysicalSize = metaData.getPhysicalSize();
         double metLLX = metaData.getPhysicalLowerLeft().x;
         double metLLY = metaData.getPhysicalLowerLeft().y;
@@ -417,7 +417,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public String getTimeString() {
-        return mainLayerView.getMetaData().getDateObs().getCachedDate();
+        return imageData.getMetaData().getDateObs().getCachedDate();
     }
 
     public AbstractView getMainLayerView() {
