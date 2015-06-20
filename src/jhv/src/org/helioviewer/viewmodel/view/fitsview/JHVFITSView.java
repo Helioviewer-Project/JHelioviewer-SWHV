@@ -83,6 +83,7 @@ public class JHVFITSView extends AbstractView {
         region = new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
         imageData.setMetaData(m);
+        imageData.setFrameNumber(0);
     }
 
     /**
