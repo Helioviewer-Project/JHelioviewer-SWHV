@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.view;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -88,16 +89,17 @@ public abstract class AbstractView implements View {
 
     @Override
     public boolean setRegion(Region r) {
-        boolean changed = region == null ? r == null : !region.equals(r);
-        region = r;
-        return changed;
+        return false;
     }
 
     @Override
     public boolean setViewport(Viewport v) {
-        boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
-        viewport = v;
-        return viewportChanged;
+        return false;
+    }
+
+    @Override
+    public LUT getDefaultLUT() {
+        return null;
     }
 
     // -->

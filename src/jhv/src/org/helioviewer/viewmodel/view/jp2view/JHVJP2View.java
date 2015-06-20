@@ -475,7 +475,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         renderSignal.signal();
     }
 
-    public LUT getStartLUT() {
+    public LUT getDefaultLUT() {
         int[] builtIn = jp2Image.getBuiltInLUT();
         if (builtIn != null) {
             return new LUT("built-in", builtIn/* , builtIn */);

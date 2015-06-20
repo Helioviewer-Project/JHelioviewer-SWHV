@@ -39,6 +39,10 @@ public class GLImage {
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
 
+    public GLImage(LUT newLUT) {
+        setLUT(newLUT, false);
+    }
+
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         copyScreenToTexture(gl, imageData, prevImageData, baseImageData);
         applyRunningDifferenceGL(gl, imageData, prevImageData, baseImageData);
