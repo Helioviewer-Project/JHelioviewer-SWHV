@@ -17,7 +17,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.AbstractViewDataHandler;
+import org.helioviewer.viewmodel.view.ViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -91,7 +91,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
-    private static class DisplayDataHandler implements AbstractViewDataHandler {
+    private static class DisplayDataHandler implements ViewDataHandler {
 
         @Override
         public void handleData(AbstractView view, ImageData imageData) {

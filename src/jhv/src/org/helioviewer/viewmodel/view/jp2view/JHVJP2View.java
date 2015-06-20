@@ -16,7 +16,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.AbstractViewDataHandler;
+import org.helioviewer.viewmodel.view.ViewDataHandler;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.view.cache.RemoteImageCacheStatus;

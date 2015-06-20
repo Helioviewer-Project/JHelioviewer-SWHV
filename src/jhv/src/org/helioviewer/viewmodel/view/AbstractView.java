@@ -102,23 +102,25 @@ public abstract class AbstractView implements View {
         return null;
     }
 
-    // -->
-
+    @Override
     public void setImageLayer(RenderableImageLayer _imageLayer) {
         imageLayer = _imageLayer;
     }
 
+    @Override
     public RenderableImageLayer getImageLayer() {
         return imageLayer;
     }
 
-    protected AbstractViewDataHandler dataHandler;
+    protected ViewDataHandler dataHandler;
 
-    public void setDataHandler(AbstractViewDataHandler _dataHandler) {
+    @Override
+    public void setDataHandler(ViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
         dataHandler.handleData(this, imageData);
     }
 
+    @Override
     public void removeDataHandler() {
         dataHandler = null;
     }

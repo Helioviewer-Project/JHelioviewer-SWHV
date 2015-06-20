@@ -9,10 +9,10 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.AbstractViewDataHandler;
+import org.helioviewer.viewmodel.view.ViewDataHandler;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 
-public class DownloadedJPXData implements AbstractViewDataHandler {
+public class DownloadedJPXData implements ViewDataHandler {
 
     private JHVJP2CallistoView view;
     private Long imageID;
