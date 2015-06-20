@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view.cache;
+package org.helioviewer.viewmodel.imagecache;
 
 import org.helioviewer.viewmodel.view.View;
 
