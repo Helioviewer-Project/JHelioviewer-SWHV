@@ -13,8 +13,8 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
-import org.helioviewer.viewmodel.view.cache.ImageCacheStatus.CacheStatus;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPDataSegment;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;

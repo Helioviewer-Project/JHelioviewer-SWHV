@@ -1,4 +1,4 @@
-package org.helioviewer.viewmodel.view.cache;
+package org.helioviewer.viewmodel.imagecache;
 
 /**
  * Interface for keeping track of the caching progress.
