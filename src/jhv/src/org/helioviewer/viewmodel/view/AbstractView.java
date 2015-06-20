@@ -6,12 +6,14 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 public abstract class AbstractView implements View {
 
     private RenderableImageLayer imageLayer;
 
+    protected MetaData[] metaDataArray = new MetaData[1];
     protected ImageData imageData;
     protected Viewport viewport;
     protected Region region;
@@ -65,8 +67,12 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public ImmutableDateTime getFrame(int frame) {
-        return getMetaData().getDateObs();
+    public ImmutableDateTime getFrameDateTime(int frame) {
+        if (frame <= 0)
+            return metaDataArray[0].getDateObs();
+        if (frame >= getMaximumFrameNumber())
+            return metaDataArray[getMaximumFrameNumber()].getDateObs();
+        return metaDataArray[frame].getDateObs();
     }
 
     @Override

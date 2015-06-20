@@ -112,7 +112,7 @@ public class Layers {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        ImmutableDateTime dateTime = activeView.getFrame(frame);
+        ImmutableDateTime dateTime = activeView.getFrameDateTime(frame);
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
          }
@@ -120,11 +120,11 @@ public class Layers {
     }
 
     private static ImmutableDateTime getStartDateImmutable(View view) {
-        return view.getFrame(0);
+        return view.getFrameDateTime(0);
     }
 
     private static ImmutableDateTime getEndDateImmutable(View view) {
-        return view.getFrame(view.getMaximumFrameNumber());
+        return view.getFrameDateTime(view.getMaximumFrameNumber());
     }
 
     private static ImmutableDateTime getStartDateImmutable(int idx) {

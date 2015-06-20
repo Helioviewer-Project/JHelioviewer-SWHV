@@ -11,7 +11,6 @@ import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -32,7 +31,6 @@ public class JHVSimpleImageView extends AbstractView {
 
     protected URI uri;
     protected BufferedImage image;
-    protected PixelBasedMetaData m;
 
     /**
      * Constructor which loads the corresponding image from given URI.
@@ -73,18 +71,10 @@ public class JHVSimpleImageView extends AbstractView {
             imageData = new ARGBInt32ImageData(image);
         }
 
-        m = new PixelBasedMetaData(image.getWidth(), image.getHeight());
+        metaDataArray[0] = new PixelBasedMetaData(image.getWidth(), image.getHeight());
         region = new Region(-1.5, -1.5, 3., 3.);
         imageData.setRegion(region);
-        imageData.setMetaData(m);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetaData getMetaData() {
-        return m;
+        imageData.setMetaData(metaDataArray[0]);
     }
 
     /**

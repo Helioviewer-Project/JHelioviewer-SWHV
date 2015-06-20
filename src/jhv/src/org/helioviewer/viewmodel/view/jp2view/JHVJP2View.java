@@ -82,7 +82,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             throw new Exception("JP2 image already set");
         }
 
-        MetaData metaData = newJP2Image.metaDataList[0];
+        metaDataArray = newJP2Image.metaDataList;
+        MetaData metaData = metaDataArray[0];
         if (region == null) {
             region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
         }
@@ -179,18 +180,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public String getName() {
-        MetaData metaData = jp2Image.metaDataList[getTrueFrameNumber()];
+        MetaData metaData = metaDataArray[getTrueFrameNumber()];
         if (metaData instanceof ObserverMetaData) {
             return ((ObserverMetaData) metaData).getFullName();
         } else {
             String name = jp2Image.getURI().getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
         }
-    }
-
-    @Override
-    public MetaData getMetaData() {
-        return jp2Image.metaDataList[getTrueFrameNumber()];
     }
 
     public String getXMLMetaData() {
@@ -235,6 +231,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             render = null;
         }
         jp2Image.abolish();
+        jp2Image = null;
     }
 
     // Start the J2KReader/J2KRender threads
@@ -263,7 +260,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      * @return Set of parameters used within the jp2-package
      */
     protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
-        MetaData m = jp2Image.metaDataList[frameNumber];
+        MetaData m = metaDataArray[frameNumber];
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
@@ -354,7 +351,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
         int frame = params.compositionLayer;
-        MetaData metaData = jp2Image.metaDataList[frame];
+        MetaData metaData = metaDataArray[frame];
 
         newImageData.setFrameNumber(frame);
         newImageData.setMetaData(metaData);
@@ -450,7 +447,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = jp2Image.metaDataList[++frame].getDateObs().getMillis() - timeMillis;
+            currentDiff = metaDataArray[++frame].getDateObs().getMillis() - timeMillis;
         } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {
@@ -458,16 +455,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         } else {
             return frame;
         }
-    }
-
-    // to be accessed only from Layers
-    @Override
-    public ImmutableDateTime getFrame(int frame) {
-        if (frame <= 0)
-            return jp2Image.metaDataList[0].getDateObs();
-        if (frame >= jp2Image.getMaximumFrameNumber())
-            return jp2Image.metaDataList[jp2Image.getMaximumFrameNumber()].getDateObs();
-        return jp2Image.metaDataList[frame].getDateObs();
     }
 
     @Override
@@ -481,7 +468,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             return new LUT("built-in", builtIn/* , builtIn */);
         }
 
-        MetaData metaData = jp2Image.metaDataList[0];
+        MetaData metaData = metaDataArray[0];
         if (metaData instanceof HelioviewerMetaData) {
             String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
             if (colorKey != null) {

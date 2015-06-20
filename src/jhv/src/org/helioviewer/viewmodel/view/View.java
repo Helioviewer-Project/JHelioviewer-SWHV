@@ -8,7 +8,6 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
 
 /**
@@ -78,8 +77,6 @@ public interface View {
 
     public ImageData getImageData();
 
-    public MetaData getMetaData();
-
     public boolean setRegion(Region r);
 
     public boolean setViewport(Viewport r);
@@ -134,10 +131,11 @@ public interface View {
 
     public void removeDataHandler();
 
+    public ImmutableDateTime getFrameDateTime(int frame);
+
     // <!- only for Layers
     public void setFrame(int frame);
     public int getFrame(ImmutableDateTime time);
-    public ImmutableDateTime getFrame(int frame);
     // -->
 
 }
