@@ -7,7 +7,7 @@ import java.awt.Insets;
 
 import javax.swing.JPanel;
 
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 @SuppressWarnings("serial")
 public class FiltersPanel extends JPanel {
@@ -32,7 +32,6 @@ public class FiltersPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 1;
 
@@ -82,14 +81,14 @@ public class FiltersPanel extends JPanel {
         add(details.getValue(), c);
     }
 
-    public void setActivejp2(AbstractView jp2view) {
-        runningDifferencePanel.setJP2View(jp2view);
-        opacityPanel.setJP2View(jp2view);
-        channelMixerPanel.setJP2View(jp2view);
-        lutPanel.setJP2View(jp2view);
-        gammaCorrectionPanel.setJP2View(jp2view);
-        contrastPanel.setJP2View(jp2view);
-        sharpenPanel.setJP2View(jp2view);
+    public void setActiveImage(GLImage image) {
+        runningDifferencePanel.setGLImage(image);
+        opacityPanel.setGLImage(image);
+        channelMixerPanel.setGLImage(image);
+        lutPanel.setGLImage(image);
+        gammaCorrectionPanel.setGLImage(image);
+        contrastPanel.setGLImage(image);
+        sharpenPanel.setGLImage(image);
     }
 
 }

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 /**
  * Panel containing a combobox for choosing the color table and button to add
@@ -67,7 +67,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         }
 
         LUT newMap = lutMap.get(combobox.getSelectedItem());
-        jp2view.setLUT(newMap, invertButton.isSelected());
+        image.setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }
 
@@ -92,13 +92,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         if (lutMap.put(lut.getName(), lut) == null)
             combobox.addItem(lut.getName());
         combobox.setSelectedItem(lut.getName());
-        jp2view.setLUT(lut, invertButton.isSelected());
-    }
-
-    public void setEnabled(boolean enabled) {
-        title.setEnabled(enabled);
-        combobox.setEnabled(enabled);
-        invertButton.setEnabled(enabled);
+        image.setLUT(lut, invertButton.isSelected());
     }
 
     /**
@@ -124,9 +118,9 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getLUT(), jp2view.getInvertLUT());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getLUT(), image.getInvertLUT());
     }
 
     @Override

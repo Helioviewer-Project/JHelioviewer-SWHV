@@ -11,7 +11,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 /**
  * Panel containing a slider for changing the gamma value of the image.
@@ -52,7 +52,7 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         int sliderValue = gammaSlider.getValue();
 
         double gamma = Math.exp(sliderValue * factor);
-        jp2view.setGamma((float) gamma);
+        image.setGamma((float) gamma);
 
         String text = Double.toString(Math.round(gamma * 10.0) * 0.1);
         if (sliderValue == 100) {
@@ -104,12 +104,6 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
         }
     }
 
-    public void setEnabled(boolean enabled) {
-        gammaSlider.setEnabled(enabled);
-        gammaLabel.setEnabled(enabled);
-        title.setEnabled(enabled);
-    }
-
     /**
      * Sets the panel values.
      *
@@ -124,9 +118,9 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getGamma());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getGamma());
     }
 
     @Override

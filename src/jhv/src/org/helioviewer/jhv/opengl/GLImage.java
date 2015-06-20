@@ -7,7 +7,6 @@ import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.AbstractView;
 
 import com.jogamp.opengl.GL2;
 
@@ -23,7 +22,7 @@ public class GLImage {
     private float sharpen = 0f;
     private ColorMask colorMask = new ColorMask(true, true, true);
 
-    protected LUT lut = gray;
+    private LUT lut = gray;
     private LUT lastLut;
 
     private boolean invertLUT = false;
@@ -32,7 +31,7 @@ public class GLImage {
 
     private boolean lutChanged = true;
 
-    protected static final LUT gray = LUT.getStandardList().get("Gray");
+    private static final LUT gray = LUT.getStandardList().get("Gray");
 
     private boolean differenceMode = false;
     private boolean baseDifferenceMode = false;
@@ -202,9 +201,12 @@ public class GLImage {
     }
 
     public void setLUT(LUT newLUT, boolean invert) {
-        if (newLUT == null || (lut == newLUT && invertLUT == invert)) {
+        if (lut == newLUT && invertLUT == invert) {
             return;
         }
+        if (newLUT == null)
+            newLUT = gray;
+
         lut = newLUT;
         invertLUT = invert;
         lutChanged = true;

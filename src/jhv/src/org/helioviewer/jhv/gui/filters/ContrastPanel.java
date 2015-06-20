@@ -11,7 +11,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 /**
  * Panel containing a slider for changing the contrast of the image.
@@ -42,7 +42,7 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        jp2view.setContrast(contrastSlider.getValue() / sliderToContrastScale);
+        image.setContrast(contrastSlider.getValue() / sliderToContrastScale);
         contrastLabel.setText(Integer.toString(contrastSlider.getValue()));
         Displayer.display();
     }
@@ -71,20 +71,14 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         }
     }
 
-    public void setEnabled(boolean enabled) {
-        contrastSlider.setEnabled(enabled);
-        contrastLabel.setEnabled(enabled);
-        title.setEnabled(enabled);
-    }
-
     void setValue(float contrast) {
         contrastSlider.setValue((int) (contrast * sliderToContrastScale));
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getContrast());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getContrast());
     }
 
     @Override

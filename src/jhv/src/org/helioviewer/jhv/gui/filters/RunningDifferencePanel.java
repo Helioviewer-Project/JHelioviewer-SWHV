@@ -36,6 +36,8 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -111,7 +113,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             c.gridx = 0;
             c.gridwidth = 3;
             topPanel.add(radPanel, c);
-            jp2view.setRunDiffNoRot(!diffRot.isSelected());
+            image.setRunDiffNoRot(!diffRot.isSelected());
         } else
             topPanel.remove(radPanel);
 
@@ -119,8 +121,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
         setDifferenceMode(showExtraPanel, differenceMode, baseDifferenceMode);
-        jp2view.setDifferenceMode(differenceMode);
-        jp2view.setBaseDifferenceMode(baseDifferenceMode);
+        image.setDifferenceMode(differenceMode);
+        image.setBaseDifferenceMode(baseDifferenceMode);
     }
 
     private void setDifferenceModetoChangeCombobox(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
@@ -179,9 +181,9 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (comboBox.getSelectedItem() == combolist[2]) {
-                    jp2view.setBaseDifferenceNoRot(!diffRot.isSelected());
+                    image.setBaseDifferenceNoRot(!diffRot.isSelected());
                 } else {
-                    jp2view.setRunDiffNoRot(!diffRot.isSelected());
+                    image.setRunDiffNoRot(!diffRot.isSelected());
                 }
                 Displayer.display();
             }
@@ -207,26 +209,24 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     @Override
     public void stateChanged(ChangeEvent e) {
         float value = ((SpinnerNumberModel) truncateSpinner.getModel()).getNumber().floatValue();
-        jp2view.setTruncation(1 - value);
+        image.setTruncation(1 - value);
         Displayer.display();
     }
 
-    public void setEnabled(boolean enabled) {
-        diffPanel.setEnabled(enabled);
-    }
-
     @Override
-    public void setJP2View(final AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        boolean differenceMode = jp2view.getDifferenceMode();
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        boolean differenceMode = image.getDifferenceMode();
         if (differenceMode) {
-            boolean baseDifferenceMode = jp2view.getBaseDifferenceMode();
+            boolean baseDifferenceMode = image.getBaseDifferenceMode();
             setDifferenceModetoChangeCombobox(false, differenceMode, baseDifferenceMode);
         } else {
             setDifferenceModetoChangeCombobox(false, false, false);
         }
 
-        truncateSpinner.setValue(1.f - jp2view.getTruncation());
+        truncateSpinner.setValue(1.f - image.getTruncation());
+
+        final AbstractView view = Layers.getActiveView();
 
         downloadLayerAction = new AbstractAction() {
             {
@@ -236,7 +236,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                downloadLayer((JHVJP2View) jp2view);
+                if (view instanceof JHVJP2View)
+                    downloadLayer((JHVJP2View) view);
             }
         };
         downloadLayerButton.setAction(downloadLayerAction);
@@ -248,15 +249,15 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                showMetaInfo(jp2view);
+                showMetaInfo(Layers.getActiveView());
             }
         };
         showMetaButton.setAction(showMetaAction);
         showMetaButton.revalidate();
-        if (jp2view instanceof JHVJP2View) {
-            this.downloadLayerButton.setEnabled(true);
+        if (view instanceof JHVJP2View) {
+            downloadLayerButton.setEnabled(true);
         } else {
-            this.downloadLayerButton.setEnabled(false);
+            downloadLayerButton.setEnabled(false);
         }
     }
 
