@@ -51,7 +51,7 @@ public class RenderableImageLayer implements Renderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final View mainLayerView;
+    private final View layerView;
     private final RenderableType type;
     private boolean isVisible = true;
 
@@ -60,7 +60,7 @@ public class RenderableImageLayer implements Renderable {
     public RenderableImageLayer(View view) {
         type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
-        mainLayerView = view;
+        layerView = view;
 
         glImage = new GLImage(view.getDefaultLUT());
 
@@ -81,8 +81,8 @@ public class RenderableImageLayer implements Renderable {
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
         float opacity = (float) (1. / (1. + Layers.getNumLayers()));
-        if (mainLayerView instanceof JHVJP2View) {
-            JHVJP2View jp2v = (JHVJP2View) mainLayerView;
+        if (layerView instanceof JHVJP2View) {
+            JHVJP2View jp2v = (JHVJP2View) layerView;
             if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
                 opacity = 1.f;
             }
@@ -164,10 +164,10 @@ public class RenderableImageLayer implements Renderable {
         } else {
             newRegion = new Region(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
         }
-        mainLayerView.setRegion(newRegion);
+        layerView.setRegion(newRegion);
 
         Viewport layerViewport = new Viewport(Displayer.getViewportWidth(), Displayer.getViewportHeight());
-        mainLayerView.setViewport(layerViewport);
+        layerView.setViewport(layerViewport);
     }
 
     private GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
@@ -190,7 +190,7 @@ public class RenderableImageLayer implements Renderable {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
 
-            glImage.applyFilters(gl, imageData, mainLayerView.getPreviousImageData(), mainLayerView.getBaseDifferenceImageData());
+            glImage.applyFilters(gl, imageData, layerView.getPreviousImageData(), layerView.getBaseDifferenceImageData());
 
             GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
             if (!RenderableImageLayer.showCorona) {
@@ -204,9 +204,9 @@ public class RenderableImageLayer implements Renderable {
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, imageData));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getBaseDifferenceImageData()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, layerView.getBaseDifferenceImageData()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getPreviousImageData()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, layerView.getPreviousImageData()));
             }
 
             enablePositionVBO(gl);
@@ -267,7 +267,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
-        Layers.removeLayer(mainLayerView);
+        Layers.removeLayer(layerView);
         dispose(gl);
     }
 
@@ -411,7 +411,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public String getName() {
-        return mainLayerView.getName();
+        return layerView.getName();
     }
 
     @Override
@@ -420,7 +420,7 @@ public class RenderableImageLayer implements Renderable {
     }
 
     public View getMainLayerView() {
-        return mainLayerView;
+        return layerView;
     }
 
     @Override
@@ -430,7 +430,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public boolean isActiveImageLayer() {
-        return Layers.getActiveView() == mainLayerView;
+        return Layers.getActiveView() == layerView;
     }
 
     @Override

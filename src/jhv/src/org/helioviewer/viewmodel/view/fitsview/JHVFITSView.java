@@ -9,7 +9,6 @@ import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
@@ -27,7 +26,6 @@ import com.jogamp.opengl.GL2;
 public class JHVFITSView extends AbstractView {
 
     protected FITSImage fits;
-    protected MetaData m;
     private final URI uri;
 
     /**
@@ -70,7 +68,7 @@ public class JHVFITSView extends AbstractView {
      * Initializes global variables.
      */
     private void initFITSImageView() {
-        m = new HelioviewerMetaData(fits);
+        HelioviewerMetaData m = new HelioviewerMetaData(fits);
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
@@ -81,6 +79,7 @@ public class JHVFITSView extends AbstractView {
             imageData = new ARGBInt32ImageData(bi);
         }
 
+        metaDataArray[0] = m;
         region = new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize());
         imageData.setRegion(region);
         imageData.setMetaData(m);
@@ -99,27 +98,9 @@ public class JHVFITSView extends AbstractView {
      * {@inheritDoc}
      * */
     @Override
-    public MetaData getMetaData() {
-        return m;
-    }
-
-    /**
-     * Returns the FITS image managed by this class.
-     *
-     * @return FITS image.
-     */
-    public FITSImage getFITSImage() {
-        return fits;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
     public String getName() {
-        if (m instanceof ObserverMetaData) {
-            ObserverMetaData observerMetaData = (ObserverMetaData) m;
-            return observerMetaData.getFullName();
+        if (metaDataArray[0] instanceof ObserverMetaData) {
+            return ((ObserverMetaData) metaDataArray[0]).getFullName();
         } else {
             String name = uri.getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
