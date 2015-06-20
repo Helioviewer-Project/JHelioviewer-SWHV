@@ -18,6 +18,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -54,10 +55,15 @@ public class RenderableImageLayer implements Renderable {
     private final RenderableType type;
     private boolean isVisible = true;
 
+    private final GLImage glImage;
+
     public RenderableImageLayer(AbstractView view) {
         type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         mainLayerView = view;
+
+        glImage = new GLImage();
+        glImage.setLUT(((JHVJP2View) view).getStartLUT(), false);
 
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
@@ -77,17 +83,17 @@ public class RenderableImageLayer implements Renderable {
 
         float opacity = (float) (1. / (1. + Layers.getNumLayers()));
         if (mainLayerView instanceof JHVJP2View) {
-            JHVJP2View jp2v = ((JHVJP2View) mainLayerView);
+            JHVJP2View jp2v = (JHVJP2View) mainLayerView;
             if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
                 opacity = 1.f;
             }
         }
-        mainLayerView.setOpacity(opacity);
+        glImage.setOpacity(opacity);
     }
 
     @Override
     public void init(GL2 gl) {
-        mainLayerView.init(gl);
+        glImage.init(gl);
         Pair<FloatBuffer, IntBuffer> bufferPair = makeIcosphere(2);
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
@@ -185,7 +191,7 @@ public class RenderableImageLayer implements Renderable {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
 
-            mainLayerView.applyFilters(gl, imageData);
+            glImage.applyFilters(gl, imageData, mainLayerView.getPreviousImageData(), mainLayerView.getBaseDifferenceImageData());
 
             GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
             if (!RenderableImageLayer.showCorona) {
@@ -198,9 +204,9 @@ public class RenderableImageLayer implements Renderable {
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, imageData));
-            if (mainLayerView.getBaseDifferenceMode()) {
+            if (glImage.getBaseDifferenceMode()) {
                 GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getBaseDifferenceImageData()));
-            } else if (mainLayerView.getDifferenceMode()) {
+            } else if (glImage.getDifferenceMode()) {
                 GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, mainLayerView.getPreviousImageData()));
             }
 
@@ -390,7 +396,7 @@ public class RenderableImageLayer implements Renderable {
     @Override
     public Component getOptionsPanel() {
         FiltersPanel fp = ImageViewerGui.getFiltersPanel();
-        fp.setActivejp2(mainLayerView);
+        fp.setActiveImage(glImage);
         return fp;
     }
 
@@ -434,7 +440,7 @@ public class RenderableImageLayer implements Renderable {
         disableIndexVBO(gl);
         deletePositionVBO(gl);
         deleteIndexVBO(gl);
-        mainLayerView.dispose(gl);
+        glImage.dispose(gl);
     }
 
     private ImageData imageData;

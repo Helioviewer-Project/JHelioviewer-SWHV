@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Panel containing three check boxes to modify the color mask of an image.
@@ -53,19 +53,8 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
      */
     @Override
     public void itemStateChanged(ItemEvent e) {
-        jp2view.setColorMask(redCheckBox.isSelected(), greenCheckBox.isSelected(), blueCheckBox.isSelected());
+        image.setColorMask(redCheckBox.isSelected(), greenCheckBox.isSelected(), blueCheckBox.isSelected());
         Displayer.display();
-    }
-
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    public void setEnabled(boolean enabled) {
-        redCheckBox.setEnabled(enabled);
-        greenCheckBox.setEnabled(enabled);
-        blueCheckBox.setEnabled(enabled);
-        title.setEnabled(enabled);
     }
 
     /**
@@ -84,9 +73,9 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getColorMask());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getColorMask());
     }
 
     @Override

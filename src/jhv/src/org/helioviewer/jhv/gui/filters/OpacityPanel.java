@@ -8,8 +8,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.view.AbstractView;
 
 /**
  * Panel containing a spinner for changing the opacity of the image.
@@ -41,15 +41,9 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
      */
     @Override
     public void stateChanged(ChangeEvent e) {
-        jp2view.setOpacity(opacitySlider.getValue() / 100.f);
+        image.setOpacity(opacitySlider.getValue() / 100.f);
         opacityLabel.setText(opacitySlider.getValue() + "%");
         Displayer.display();
-    }
-
-    public void setEnabled(boolean enabled) {
-        opacitySlider.setEnabled(enabled);
-        opacityLabel.setEnabled(enabled);
-        title.setEnabled(enabled);
     }
 
     /**
@@ -66,9 +60,9 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getOpacity());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getOpacity());
     }
 
     @Override

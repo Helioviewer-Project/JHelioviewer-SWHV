@@ -70,10 +70,6 @@ public interface View {
      */
     public URI getDownloadURI();
 
-    public boolean getBaseDifferenceMode();
-
-    public boolean getDifferenceMode();
-
     public ImageData getBaseDifferenceImageData();
 
     public ImageData getPreviousImageData();

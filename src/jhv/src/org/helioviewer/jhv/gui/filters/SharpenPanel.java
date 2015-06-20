@@ -9,7 +9,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 /**
  * Panel containing a slider for changing the weighting of the sharpening.
@@ -40,15 +40,9 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
      */
     @Override
     public void stateChanged(ChangeEvent e) {
-        jp2view.setWeighting(sharpeningSlider.getValue() / 10.f);
+        image.setSharpen(sharpeningSlider.getValue() / 10.f);
         sharpeningLabel.setText(sharpeningSlider.getValue() + "%");
         Displayer.display();
-    }
-
-    public void setEnabled(boolean enabled) {
-        sharpeningSlider.setEnabled(enabled);
-        sharpeningLabel.setEnabled(enabled);
-        title.setEnabled(enabled);
     }
 
     /**
@@ -65,9 +59,9 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     }
 
     @Override
-    public void setJP2View(AbstractView jp2view) {
-        super.setJP2View(jp2view);
-        setValue(jp2view.getSharpen());
+    public void setGLImage(GLImage image) {
+        super.setGLImage(image);
+        setValue(image.getSharpen());
     }
 
     @Override

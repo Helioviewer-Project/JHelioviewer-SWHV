@@ -1,15 +1,13 @@
 package org.helioviewer.jhv.gui.filters;
 
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.jhv.opengl.GLImage;
 
 public abstract class AbstractFilterPanel {
 
-    protected AbstractView jp2view;
+    protected GLImage image;
 
-    protected void setJP2View(AbstractView jp2view) {
-        if (this.jp2view != jp2view) {
-            this.jp2view = jp2view;
-        }
+    protected void setGLImage(GLImage _image) {
+        image = _image;
     }
 
 }

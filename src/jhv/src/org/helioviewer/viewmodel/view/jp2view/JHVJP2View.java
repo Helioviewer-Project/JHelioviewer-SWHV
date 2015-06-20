@@ -105,7 +105,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        setStartLUT();
     }
 
     /**
@@ -476,24 +475,20 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         renderSignal.signal();
     }
 
-    private void setStartLUT() {
+    public LUT getStartLUT() {
         int[] builtIn = jp2Image.getBuiltInLUT();
         if (builtIn != null) {
-            LUT builtInLut = new LUT("built-in", builtIn/* , builtIn */);
-            lut = builtInLut;
-            return;
+            return new LUT("built-in", builtIn/* , builtIn */);
         }
 
         MetaData metaData = jp2Image.metaDataList[0];
         if (metaData instanceof HelioviewerMetaData) {
             String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
             if (colorKey != null) {
-                lut = LUT.getStandardList().get(colorKey);
-                return;
+                return LUT.getStandardList().get(colorKey);
             }
         }
-        // no LUT found, try gray as last resort
-        lut = gray;
+        return null;
     }
 
 }
