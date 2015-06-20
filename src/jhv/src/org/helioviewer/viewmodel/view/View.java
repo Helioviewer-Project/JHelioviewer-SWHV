@@ -5,6 +5,7 @@ import java.net.URI;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -81,6 +82,8 @@ public interface View {
     public boolean setRegion(Region r);
 
     public boolean setViewport(Viewport r);
+
+    public LUT getDefaultLUT();
 
    /**
      * Returns the image cache status.

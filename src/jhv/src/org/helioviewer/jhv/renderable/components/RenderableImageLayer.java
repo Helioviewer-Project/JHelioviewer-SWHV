@@ -62,8 +62,7 @@ public class RenderableImageLayer implements Renderable {
         layerId = nextLayerId++;
         mainLayerView = view;
 
-        glImage = new GLImage();
-        glImage.setLUT(((JHVJP2View) view).getStartLUT(), false);
+        glImage = new GLImage(view.getDefaultLUT());
 
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
