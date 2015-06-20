@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 import com.jogamp.opengl.GL2;
@@ -133,7 +133,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     }
 
     private void exportFrame(GL2 gl) {
-        AbstractView mv = Layers.getActiveView();
+        View mv = Layers.getActiveView();
         if (mv == null) {
             stopExport();
             return;
@@ -178,7 +178,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         this.exportMovieDialog = exportMovieDialog;
         ImageViewerGui.getLeftContentPane().setEnabled(false);
 
-        AbstractView mv = Layers.getActiveView();
+        View mv = Layers.getActiveView();
         if (mv instanceof JHVJP2View) {
             exportMode = true;
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";

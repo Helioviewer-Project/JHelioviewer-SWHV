@@ -8,7 +8,7 @@ import javax.swing.SwingWorker;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
 
@@ -127,7 +127,7 @@ public class DownloadedJPXData implements ViewDataHandler {
     }
 
     @Override
-    public void handleData(AbstractView callistoView, ImageData imageData) {
+    public void handleData(View callistoView, ImageData imageData) {
         if (callistoView instanceof JHVJP2CallistoView && imageData instanceof SingleChannelByte8ImageData) {
             byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
             DownloadedJPXDataWorkerResult result = new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));

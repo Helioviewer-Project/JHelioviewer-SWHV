@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 /**
  * This class intercepts changes of the layers and request data from the
@@ -65,12 +65,12 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void layerAdded(AbstractView view) {
+    public void layerAdded(View view) {
         requestEvents();
     }
 
     @Override
-    public void activeLayerChanged(AbstractView view) {
+    public void activeLayerChanged(View view) {
     }
 
     @Override

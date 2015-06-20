@@ -9,7 +9,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 
 public class GL3DObserverCamera extends GL3DCamera {
 
@@ -67,8 +67,8 @@ public class GL3DObserverCamera extends GL3DCamera {
 
     private void updateRotation(Date date) {
         double d;
-        AbstractView view = Layers.getActiveView();
 
+        View view = Layers.getActiveView();
         if (view != null) {
             MetaData metadata = view.getImageData().getMetaData();
             localRotation = metadata.getRotationObs();

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
@@ -94,7 +94,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static class DisplayDataHandler implements ViewDataHandler {
 
         @Override
-        public void handleData(AbstractView view, ImageData imageData) {
+        public void handleData(View view, ImageData imageData) {
             if (view == Layers.getActiveView()) {
                 lastTimestamp = imageData.getMetaData().getDateObs().getTime();
                 // fire TimeChanged

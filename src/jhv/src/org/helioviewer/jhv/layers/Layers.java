@@ -13,14 +13,14 @@ import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
-import org.helioviewer.viewmodel.view.AbstractView;
+import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
 
-    private static AbstractView activeView;
-    private static final ArrayList<AbstractView> layers = new ArrayList<AbstractView>();
+    private static View activeView;
+    private static final ArrayList<View> layers = new ArrayList<View>();
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -29,7 +29,7 @@ public class Layers {
      *            Position within the stack of layers
      * @return View at given position
      */
-    private static AbstractView getLayer(int index) {
+    private static View getLayer(int index) {
         try {
             return layers.get(index);
         } catch (Exception e) {
@@ -52,11 +52,11 @@ public class Layers {
      *
      * @return View associated with the active Layer
      */
-    public static AbstractView getActiveView() {
+    public static View getActiveView() {
         return activeView;
     }
 
-    public static void setActiveView(AbstractView view) {
+    public static void setActiveView(View view) {
         activeView = view;
         setMasterMovie(view);
         fireActiveLayerChanged(view);
@@ -74,7 +74,7 @@ public class Layers {
         }
     }
 
-    private static void setMasterMovie(AbstractView view) {
+    private static void setMasterMovie(View view) {
         if (view == null || !view.isMultiFrame())
             frameTimer.stop();
         nextFrameCandidateChooser.setMaxFrame();
@@ -102,7 +102,7 @@ public class Layers {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        for (AbstractView view : layers) {
+        for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
          }
         MoviePanel.getSingletonInstance().setFrameSlider(activeView.getFrame(dateTime));
@@ -113,17 +113,17 @@ public class Layers {
             return;
 
         ImmutableDateTime dateTime = activeView.getFrame(frame);
-        for (AbstractView view : layers) {
+        for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
          }
         MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
-    private static ImmutableDateTime getStartDateImmutable(AbstractView view) {
+    private static ImmutableDateTime getStartDateImmutable(View view) {
         return view.getFrame(0);
     }
 
-    private static ImmutableDateTime getEndDateImmutable(AbstractView view) {
+    private static ImmutableDateTime getEndDateImmutable(View view) {
         return view.getFrame(view.getMaximumFrameNumber());
     }
 
@@ -143,7 +143,7 @@ public class Layers {
      *            - View that can be associated with the layer in question
      * @return timestamp of the first available image data
      */
-    public static Date getStartDate(AbstractView view) {
+    public static Date getStartDate(View view) {
         return getStartDateImmutable(view).getTime();
     }
 
@@ -155,7 +155,7 @@ public class Layers {
      *            - View that can be associated with the layer in question
      * @return timestamp of the last available image data
      */
-    public static Date getEndDate(AbstractView view) {
+    public static Date getEndDate(View view) {
         return getEndDateImmutable(view).getTime();
     }
 
@@ -197,7 +197,7 @@ public class Layers {
         return latest == null ? null : latest.getTime();
     }
 
-    public static void addLayer(AbstractView view) {
+    public static void addLayer(View view) {
         if (view == null)
             return;
 
@@ -211,16 +211,16 @@ public class Layers {
     }
 
     // special
-    public static void addLayerFromThread(AbstractView view) {
+    public static void addLayerFromThread(View view) {
         EventQueue.invokeLater(new Runnable() {
-            private AbstractView theView;
+            private View theView;
 
             @Override
             public void run() {
                 addLayer(theView);
             }
 
-            public Runnable init(AbstractView _view) {
+            public Runnable init(View _view) {
                 theView = _view;
                 return this;
             }
@@ -265,7 +265,7 @@ public class Layers {
      * @param view
      *            - View that can be associated with the layer in question
      */
-    public static void removeLayer(AbstractView view) {
+    public static void removeLayer(View view) {
         int index = layers.indexOf(view);
 
         layers.remove(view);
@@ -278,13 +278,13 @@ public class Layers {
         removeLayer(getLayer(idx));
     }
 
-    private static void fireLayerAdded(AbstractView view) {
+    private static void fireLayerAdded(View view) {
         for (LayersListener ll : layerListeners) {
             ll.layerAdded(view);
         }
     }
 
-    private static void fireActiveLayerChanged(AbstractView view) {
+    private static void fireActiveLayerChanged(View view) {
         for (LayersListener ll : layerListeners) {
             ll.activeLayerChanged(view);
         }
