@@ -6,6 +6,7 @@ import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.cache.ImageCacheStatus;
@@ -124,6 +125,14 @@ public interface View {
      * @return maximum accessible frame number
      */
     public int getMaximumAccessibleFrameNumber();
+
+    public void setImageLayer(RenderableImageLayer imageLayer);
+
+    public RenderableImageLayer getImageLayer();
+
+    public void setDataHandler(ViewDataHandler dataHandler);
+
+    public void removeDataHandler();
 
     // <!- only for Layers
     public void setFrame(int frame);
