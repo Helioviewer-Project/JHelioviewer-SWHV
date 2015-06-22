@@ -2,6 +2,9 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.net.URL;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
@@ -14,6 +17,8 @@ public class PfssPlugin implements Plugin {
 
     private static PfssCache pfssCache;
     private PfssRenderable renderable;
+
+    public static final ScheduledExecutorService pfssReaperPool = Executors.newScheduledThreadPool(1);
 
     public PfssPlugin() {
         pfssCache = new PfssCache();
