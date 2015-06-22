@@ -176,7 +176,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             return;
 
         MetaData metaData = v.getImageData().getMetaData();
-
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();

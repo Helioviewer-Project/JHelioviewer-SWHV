@@ -15,16 +15,15 @@ import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
-import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -272,18 +271,20 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void render(GL2 gl) {
-        View view;
-        if (isVisible && (view = Layers.getActiveView()) != null) {
-            Date currentDate = view.getImageData().getMetaData().getDateObs().getTime();
-            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
+        if (isVisible) {
+            Date currentTime = Displayer.getLastUpdatedTimestamp();
+            if (currentTime == null)
+                return;
+
+            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
             for (JHVEvent evt : toDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
-                    drawCactusArc(gl, evt, currentDate);
+                    drawCactusArc(gl, evt, currentTime);
                 } else {
-                    drawPolygon(gl, evt, currentDate);
+                    drawPolygon(gl, evt, currentTime);
 
                     gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIcon(gl, evt, currentDate);
+                    drawIcon(gl, evt, currentTime);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }

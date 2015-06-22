@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -38,11 +39,13 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void render(GL2 gl) {
-        View view;
-        if (isVisible && (view = Layers.getActiveView()) != null) {
-            PfssData pfssData;
+        if (isVisible) {
+            Date currentTime = Displayer.getLastUpdatedTimestamp();
+            if (currentTime == null)
+                return;
 
-            long millis = view.getImageData().getMetaData().getDateObs().getMillis();
+            PfssData pfssData;
+            long millis = currentTime.getTime();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);
