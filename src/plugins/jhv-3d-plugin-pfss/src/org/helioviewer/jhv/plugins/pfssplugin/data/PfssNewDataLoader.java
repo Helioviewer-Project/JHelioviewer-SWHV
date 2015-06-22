@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.plugins.pfssplugin.AbolishTask;
+import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
@@ -96,7 +96,7 @@ public class PfssNewDataLoader implements Runnable {
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
                         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
                         pfssPool.submit(dataLoaderTask);
-                        PfssPlugin.pfssReaperPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
 
