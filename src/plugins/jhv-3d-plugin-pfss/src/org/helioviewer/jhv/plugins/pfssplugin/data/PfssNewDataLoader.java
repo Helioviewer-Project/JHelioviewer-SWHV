@@ -12,9 +12,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.base.Pair;
@@ -27,7 +27,7 @@ import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 public class PfssNewDataLoader implements Runnable {
 
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
-    private final ScheduledExecutorService pfssPool = Executors.newScheduledThreadPool(5);
+    private final ExecutorService pfssPool = Executors.newFixedThreadPool(5);
 
     private final Date start;
     private final Date end;
