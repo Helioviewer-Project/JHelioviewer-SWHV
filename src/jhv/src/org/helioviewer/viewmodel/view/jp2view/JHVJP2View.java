@@ -41,6 +41,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     }
 
+    protected Region region;
+
     // Member related to JP2
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
@@ -149,26 +151,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return readerMode;
     }
 
-    @Override
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
         return setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
-    }
-
-    @Override
-    public boolean setViewport(Viewport v) {
-        boolean viewportChanged = (viewport == null ? v == null : !viewport.equals(v));
-        viewport = v;
-
-        if (setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true)) {
-            return true;
-        } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-            signalRender();
-            return true;
-        }
-
-        return viewportChanged;
     }
 
     private int getTrueFrameNumber() {

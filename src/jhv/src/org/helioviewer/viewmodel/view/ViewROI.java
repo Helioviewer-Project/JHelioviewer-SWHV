@@ -55,8 +55,8 @@ public class ViewROI {
             }
         }
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.025);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.025);
+        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.05);
+        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.05);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;

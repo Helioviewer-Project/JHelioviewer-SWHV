@@ -77,10 +77,6 @@ public interface View {
 
     public ImageData getImageData();
 
-    public boolean setRegion(Region r);
-
-    public boolean setViewport(Viewport r);
-
     public LUT getDefaultLUT();
 
    /**
