@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.SocketException;
@@ -209,6 +210,15 @@ class J2KReader implements Runnable {
         return (socket != null && socket.isConnected());
     }
 
+    private void signalRender() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                parentViewRef.signalRender();
+            }
+        });
+    }
+
     @Override
     public void run() {
         JPIPRequest req = null;
@@ -231,9 +241,9 @@ class J2KReader implements Runnable {
             // If image is not remote image, do nothing and just signal render
             if (parentViewRef.getReaderMode() == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentViewRef.setReaderMode(ReaderMode.NEVERFIRE);
-                parentViewRef.renderSignal.signal();
+                signalRender();
             } else if (!parentImageRef.isRemote() && parentViewRef.getReaderMode() != ReaderMode.NEVERFIRE) {
-                parentViewRef.renderSignal.signal();
+                signalRender();
             } else {
                 // check whether view parameters have changed
                 prevParams = currParams;
@@ -461,11 +471,11 @@ class J2KReader implements Runnable {
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            parentViewRef.renderSignal.signal();
+                                            signalRender();
                                             break;
                                         default:
                                             if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                                parentViewRef.renderSignal.signal();
+                                                signalRender();
                                             }
                                         }
                                     }
