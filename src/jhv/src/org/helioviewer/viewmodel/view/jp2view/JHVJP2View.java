@@ -20,6 +20,7 @@ import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
+import org.helioviewer.viewmodel.view.ViewROI;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -152,7 +153,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     public boolean setRegion(Region r) {
         boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        return changed || setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
+        return setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
     }
 
     @Override
@@ -163,7 +164,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true)) {
             return true;
         } else if (viewportChanged && imageViewParams.resolution.getZoomLevel() == jp2Image.getResolutionSet().getMaxResolutionLevels()) {
-            renderSignal.signal();
+            signalRender();
             return true;
         }
 
@@ -434,7 +435,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                renderSignal.signal();
+                signalRender();
             }
         }
     }
@@ -459,9 +460,15 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public void render() {
+        signalRender();
+    }
+
+    void signalRender() {
+        setRegion(ViewROI.getSingletonInstance().updateROI(metaDataArray[imageViewParams.compositionLayer]));
         renderSignal.signal();
     }
 
+    @Override
     public LUT getDefaultLUT() {
         int[] builtIn = jp2Image.getBuiltInLUT();
         if (builtIn != null) {
