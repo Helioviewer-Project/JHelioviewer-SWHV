@@ -133,14 +133,17 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     public void setBeginDate(Date date, boolean applyChanges) {
         positionLoading.setBeginDate(date, applyChanges);
+        Displayer.render();
     }
 
     public void setEndDate(Date date, boolean applyChanges) {
         positionLoading.setEndDate(date, applyChanges);
+        Displayer.render();
     }
 
     public void setObservingObject(String object, boolean applyChanges) {
         positionLoading.setObserver(object, applyChanges);
+        Displayer.render();
     }
 
     public void setInterpolation(boolean _interpolation) {
@@ -159,6 +162,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         if (view != null && !interpolation) {
             positionLoading.setBeginDate(Layers.getStartDate(view), false);
             positionLoading.setEndDate(Layers.getEndDate(view), true);
+            Displayer.render();
         }
     }
 

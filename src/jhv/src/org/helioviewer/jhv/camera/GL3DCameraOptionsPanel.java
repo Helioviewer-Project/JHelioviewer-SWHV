@@ -78,8 +78,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                         e1.printStackTrace();
                     }
                 }
-                Displayer.display();
-
+                Displayer.render();
             }
         });
 
@@ -168,15 +167,15 @@ public class GL3DCameraOptionsPanel extends JPanel {
         if (Displayer.getActiveCamera() != null)
             Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
-        this.fovSpinner.addChangeListener(new ChangeListener() {
+        fovSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
                 Displayer.display();
             }
         });
-        WheelSupport.installMouseWheelSupport(this.fovSpinner);
-        fovPanel.add(this.fovSpinner);
+        WheelSupport.installMouseWheelSupport(fovSpinner);
+        fovPanel.add(fovSpinner);
 
         fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovPanel.add(Box.createHorizontalGlue());
