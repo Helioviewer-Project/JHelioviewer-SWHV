@@ -135,7 +135,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncWithLayerCurrentTime();
-                Displayer.display();
             }
         });
         buttonPanel = new JPanel();
@@ -195,7 +194,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
                 setBeginTime(true);
-                Displayer.display();
             }
         });
         beginTimePicker = new TimeTextField();
@@ -213,14 +211,12 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
                 setBeginTime(true);
-                Displayer.display();
             }
         });
         beginTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setBeginTime(true);
-                Displayer.display();
             }
         });
         addBeginDatePanel.add(beginDatePicker);
@@ -306,7 +302,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             public void focusLost(FocusEvent arg0) {
                 beginDatePicker.checkDateStringInTextField();
                 setEndTime(true);
-                Displayer.display();
             }
         });
         endTimePicker = new TimeTextField();
@@ -323,14 +318,12 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             @Override
             public void actionPerformed(JHVCalendarEvent e) {
                 setEndTime(true);
-                Displayer.display();
             }
         });
         endTimePicker.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setEndTime(true);
-                Displayer.display();
             }
         });
         addEndDatePanel.add(endDatePicker);
