@@ -2,9 +2,9 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.awt.Component;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.display.Displayer;
@@ -24,7 +24,7 @@ import com.jogamp.opengl.GL2;
  * */
 public class PfssRenderable implements Renderable, LayersListener {
 
-    private final ScheduledExecutorService pfssNewLoadPool = Executors.newScheduledThreadPool(1);
+    private final ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
 
     private boolean isVisible = false;
     private final RenderableType type;
