@@ -29,10 +29,8 @@ public class PfssDataLoader implements Runnable {
 
     @Override
     public void run() {
-        loadFile(url, time);
-    }
+        Thread.currentThread().setName(PfssSettings.THREAD_NAME);
 
-    private void loadFile(String url, long time) {
         InputStream in = null;
         try {
             String cacheFileName = JHVDirectory.PLUGINSCACHE.getPath() + url.replace("/", "_");

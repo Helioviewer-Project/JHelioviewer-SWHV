@@ -12,6 +12,8 @@ public class PfssSettings {
      */
     public final static String PLUGIN_LOCATION = "PfssPlugin";
 
+    public final static String THREAD_NAME = "PFFSLoader";
+
     /**
      * Maximal preload of cache data
      */
