@@ -258,6 +258,13 @@ public abstract class GL3DCamera implements TimeListener {
         return hitPoint;
     }
 
+    public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DQuatd rot) {
+        GL3DQuatd cameraDifferenceRotation = rotation.copy();
+        cameraDifferenceRotation.rotateWithConjugate(rot);
+
+        return cameraDifferenceRotation;
+    }
+
     /**
      * Updates the camera transformation by applying the rotation and
      * translation information.
