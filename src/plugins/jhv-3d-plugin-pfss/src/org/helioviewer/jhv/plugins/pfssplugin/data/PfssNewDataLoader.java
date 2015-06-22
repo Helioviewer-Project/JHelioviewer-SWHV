@@ -12,8 +12,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.datetime.TimeUtils;
@@ -21,8 +23,9 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 public class PfssNewDataLoader implements Runnable {
+    private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
+    private final ScheduledExecutorService pfssPool = Executors.newScheduledThreadPool(6);
 
-    private final static ExecutorService pfssPool = Executors.newFixedThreadPool(5);
     private final Date start;
     private final Date end;
     //Integer is year*1000 + month; to be synchronized across Threads! Prohibited use outside this class.
@@ -88,7 +91,21 @@ public class PfssNewDataLoader implements Runnable {
                     String url = pair.a;
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
                         Thread t = new Thread(new PfssDataLoader(url, dd), "PFFSLoader");
-                        pfssPool.submit(t);
+                        Future<?> ff = pfssPool.submit(t);
+                        Runnable abolishPfssThread = new Runnable() {
+                            private Future<?> ff;
+
+                            public Runnable init(Future<?> ff) {
+                                this.ff = ff;
+                                return this;
+                            }
+
+                            @Override
+                            public void run() {
+                                ff.cancel(true);
+                            }
+                        }.init(ff);
+                        pfssPool.schedule(new Thread(abolishPfssThread, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
 
