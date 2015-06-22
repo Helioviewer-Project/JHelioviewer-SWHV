@@ -6,12 +6,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.helioviewer.base.Pair;
-import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
-import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
-import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
@@ -24,7 +19,6 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -41,11 +35,6 @@ public class RenderableImageLayer implements Renderable {
         return layerId;
     }
 
-    public double minZ = -Sun.Radius;
-    public double maxZ = Sun.Radius;
-
-    private final int resolution = 3;
-    private final GL3DVec2d[] pointlist = new GL3DVec2d[(resolution + 1) * 2 * 2];
     private int positionBufferID;
     private int indexBufferID;
     private int indexBufferSize;
@@ -63,20 +52,6 @@ public class RenderableImageLayer implements Renderable {
         layerView = view;
 
         glImage = new GLImage(view.getDefaultLUT());
-
-        int count = 0;
-        for (int i = 0; i <= resolution; i++) {
-            for (int j = 0; j <= 1; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (1. * i / resolution - 0.5), -2. * (j - 0.5));
-                count++;
-            }
-        }
-        for (int i = 0; i <= 1; i++) {
-            for (int j = 0; j <= resolution; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (i / 1. - 0.5), -2. * (1. * j / resolution - 0.5));
-                count++;
-            }
-        }
 
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
@@ -113,73 +88,6 @@ public class RenderableImageLayer implements Renderable {
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    private void updateROI() {
-        double minPhysicalX = Double.MAX_VALUE;
-        double minPhysicalY = Double.MAX_VALUE;
-        double maxPhysicalX = Double.MIN_VALUE;
-        double maxPhysicalY = Double.MIN_VALUE;
-
-        GL3DCamera activeCamera = Displayer.getActiveCamera();
-        GL3DQuatd camdiff = getCameraDifferenceRotationQuatd(activeCamera, imageData);
-
-        for (int i = 0; i < pointlist.length; i++) {
-            GL3DVec3d hitPoint;
-            hitPoint = activeCamera.getVectorFromSphereOrPlane(pointlist[i], camdiff);
-            if (hitPoint != null) {
-                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-            }
-        }
-
-        double widthxAdd = 0; // Math.abs((maxPhysicalX - minPhysicalX) * 0.025);
-        double widthyAdd = 0; //Math.abs((maxPhysicalY - minPhysicalY) * 0.025);
-        minPhysicalX = minPhysicalX - widthxAdd;
-        maxPhysicalX = maxPhysicalX + widthxAdd;
-        minPhysicalY = minPhysicalY - widthyAdd;
-        maxPhysicalY = maxPhysicalY + widthyAdd;
-
-        MetaData metaData = imageData.getMetaData();
-        GL3DVec2d metPhysicalSize = metaData.getPhysicalSize();
-        double metLLX = metaData.getPhysicalLowerLeft().x;
-        double metLLY = metaData.getPhysicalLowerLeft().y;
-        double metURX = metLLX + metPhysicalSize.x;
-        double metURY = metLLY + metPhysicalSize.y;
-
-        if (minPhysicalX < metLLX)
-            minPhysicalX = metLLX;
-        if (minPhysicalY < metLLY)
-            minPhysicalY = metLLY;
-        if (maxPhysicalX > metURX)
-            maxPhysicalX = metURX;
-        if (maxPhysicalY > metURY)
-            maxPhysicalY = metURY;
-
-        double regionWidth = maxPhysicalX - minPhysicalX;
-        double regionHeight = maxPhysicalY - minPhysicalY;
-        Region newRegion;
-        if (regionWidth > 0 && regionHeight > 0) {
-            newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
-        } else {
-            newRegion = new Region(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
-        }
-        layerView.setRegion(newRegion);
-
-        Viewport layerViewport = new Viewport(Displayer.getViewportWidth(), Displayer.getViewportHeight());
-        layerView.setViewport(layerViewport);
-    }
-
-    private GL3DQuatd getCameraDifferenceRotationQuatd(GL3DCamera camera, ImageData imageData) {
-        if (imageData == null)
-            return new GL3DQuatd();
-
-        GL3DQuatd cameraDifferenceRotation = camera.getRotation().copy();
-        cameraDifferenceRotation.rotateWithConjugate(imageData.getMetaData().getRotationObs());
-
-        return cameraDifferenceRotation;
-    }
-
     @Override
     public void render(GL2 gl) {
         if (!isVisible)
@@ -202,11 +110,11 @@ public class RenderableImageLayer implements Renderable {
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, imageData));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, layerView.getBaseDifferenceImageData()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(layerView.getBaseDifferenceImageData().getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, getCameraDifferenceRotationQuatd(camera, layerView.getPreviousImageData()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(layerView.getPreviousImageData().getMetaData().getRotationObs()));
             }
 
             enablePositionVBO(gl);
@@ -229,8 +137,6 @@ public class RenderableImageLayer implements Renderable {
             gl.glDisable(GL2.GL_CULL_FACE);
         }
         GLSLShader.unbind(gl);
-
-        updateROI();
     }
 
     private int generate(GL2 gl) {
