@@ -72,8 +72,7 @@ public class JHVSimpleImageView extends AbstractView {
         }
 
         metaDataArray[0] = new PixelBasedMetaData(image.getWidth(), image.getHeight());
-        region = new Region(-1.5, -1.5, 3., 3.);
-        imageData.setRegion(region);
+        imageData.setRegion(new Region(-1.5, -1.5, 3., 3.));
         imageData.setMetaData(metaDataArray[0]);
         imageData.setFrameNumber(0);
     }
