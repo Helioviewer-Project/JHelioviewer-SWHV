@@ -21,12 +21,13 @@ import org.helioviewer.base.Pair;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.pfssplugin.AbolishTask;
+import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 public class PfssNewDataLoader implements Runnable {
 
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
-    private final ScheduledExecutorService pfssPool = Executors.newScheduledThreadPool(6);
+    private final ScheduledExecutorService pfssPool = Executors.newScheduledThreadPool(5);
 
     private final Date start;
     private final Date end;
@@ -95,7 +96,7 @@ public class PfssNewDataLoader implements Runnable {
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
                         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
                         pfssPool.submit(dataLoaderTask);
-                        pfssPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                        PfssPlugin.pfssReaperPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
 

@@ -24,7 +24,7 @@ import com.jogamp.opengl.GL2;
  * */
 public class PfssRenderable implements Renderable, LayersListener {
 
-    private final ScheduledExecutorService pfssNewLoadPool = Executors.newScheduledThreadPool(2);
+    private final ScheduledExecutorService pfssNewLoadPool = Executors.newScheduledThreadPool(1);
 
     private boolean isVisible = false;
     private final RenderableType type;
@@ -107,7 +107,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getFirstDate(), Layers.getLastDate()), null);
         pfssNewLoadPool.submit(dataLoaderTask);
-        pfssNewLoadPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), 60 * 5, TimeUnit.SECONDS);
+        PfssPlugin.pfssReaperPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), 60 * 5, TimeUnit.SECONDS);
     }
 
     @Override
