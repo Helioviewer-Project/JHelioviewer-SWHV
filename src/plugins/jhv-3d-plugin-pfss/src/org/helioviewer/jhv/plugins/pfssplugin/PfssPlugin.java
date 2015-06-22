@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 import java.net.URL;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -20,6 +21,8 @@ public class PfssPlugin implements Plugin {
     private PfssRenderable renderable;
 
     public static final ScheduledExecutorService pfssReaperPool = Executors.newSingleThreadScheduledExecutor(new JHVThread.NamedThreadFactory("PFSS Abolish"));
+    public static final ExecutorService pfssNewLoadPool = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("PFSS NewLoad"));
+    public static final ExecutorService pfssDataPool = Executors.newFixedThreadPool(5, new JHVThread.NamedThreadFactory("PFSS DataLoad"));
 
     public PfssPlugin() {
         pfssCache = new PfssCache();

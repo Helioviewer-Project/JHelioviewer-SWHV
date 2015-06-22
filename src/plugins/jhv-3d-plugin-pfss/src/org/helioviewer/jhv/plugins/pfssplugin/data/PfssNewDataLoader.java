@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +26,6 @@ import org.helioviewer.jhv.threads.JHVThread;
 public class PfssNewDataLoader implements Runnable {
 
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
-    private final ExecutorService pfssPool = Executors.newFixedThreadPool(5, new JHVThread.NamedThreadFactory("PFSS DataLoader"));
 
     private final Date start;
     private final Date end;
@@ -94,7 +91,7 @@ public class PfssNewDataLoader implements Runnable {
                     String url = pair.a;
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
                         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
-                        pfssPool.submit(dataLoaderTask);
+                        PfssPlugin.pfssDataPool.submit(dataLoaderTask);
                         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
