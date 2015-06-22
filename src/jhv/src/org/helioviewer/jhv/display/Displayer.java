@@ -95,6 +95,7 @@ public class Displayer implements JHVEventHighlightListener {
 
         @Override
         public void handleData(View view, ImageData imageData) {
+            view.getImageLayer().setImageData(imageData);
             if (view == Layers.getActiveView()) {
                 lastTimestamp = imageData.getMetaData().getDateObs().getTime();
                 // fire TimeChanged
@@ -104,7 +105,6 @@ public class Displayer implements JHVEventHighlightListener {
                 }
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             }
-            view.getImageLayer().setImageData(imageData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }
