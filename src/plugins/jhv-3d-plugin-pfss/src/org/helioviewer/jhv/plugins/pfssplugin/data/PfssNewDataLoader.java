@@ -13,22 +13,23 @@ import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.plugins.pfssplugin.AbolishTask;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 public class PfssNewDataLoader implements Runnable {
+
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
     private final ScheduledExecutorService pfssPool = Executors.newScheduledThreadPool(6);
 
     private final Date start;
     private final Date end;
-    //Integer is year*1000 + month; to be synchronized across Threads! Prohibited use outside this class.
     private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<Integer, ArrayList<Pair<String, Long>>>();
 
     public PfssNewDataLoader(Date start, Date end) {
@@ -39,6 +40,8 @@ public class PfssNewDataLoader implements Runnable {
     @Override
     public void run() {
         if (start != null && end != null && start.before(end)) {
+            Thread.currentThread().setName(PfssSettings.THREAD_NAME);
+
             final Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(start);
 
@@ -90,22 +93,9 @@ public class PfssNewDataLoader implements Runnable {
                     Long dd = pair.b;
                     String url = pair.a;
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
-                        Thread t = new Thread(new PfssDataLoader(url, dd), "PFFSLoader");
-                        Future<?> ff = pfssPool.submit(t);
-                        Runnable abolishPfssThread = new Runnable() {
-                            private Future<?> ff;
-
-                            public Runnable init(Future<?> ff) {
-                                this.ff = ff;
-                                return this;
-                            }
-
-                            @Override
-                            public void run() {
-                                ff.cancel(true);
-                            }
-                        }.init(ff);
-                        pfssPool.schedule(new Thread(abolishPfssThread, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                        FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
+                        pfssPool.submit(dataLoaderTask);
+                        pfssPool.schedule(new AbolishTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
 
