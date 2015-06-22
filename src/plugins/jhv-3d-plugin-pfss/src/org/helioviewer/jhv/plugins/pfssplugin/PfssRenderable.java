@@ -2,8 +2,10 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.awt.Component;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -22,7 +24,7 @@ import com.jogamp.opengl.GL2;
  * */
 public class PfssRenderable implements Renderable, LayersListener {
 
-    private final static ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
+    private final ScheduledExecutorService pfssNewLoadPool = Executors.newScheduledThreadPool(2);
 
     private boolean isVisible = false;
     private final RenderableType type;
@@ -104,9 +106,23 @@ public class PfssRenderable implements Renderable, LayersListener {
         PfssPlugin.getPfsscache().clear();
         Date start = Layers.getFirstDate();
         Date end = Layers.getLastDate();
-        Thread t = new Thread(new PfssNewDataLoader(start, end), "PFFSLoader");
-        pfssNewLoadPool.submit(t);
-    }
+        Thread pfssThread = new Thread(new PfssNewDataLoader(start, end), "PFFSLoader");
+        Future<?> ff = pfssNewLoadPool.submit(pfssThread);
+        Runnable abolishPfssThread = new Runnable() {
+            private Future<?> ff;
+
+            public Runnable init(Future<?> ff) {
+                this.ff = ff;
+                return this;
+            }
+
+            @Override
+            public void run() {
+                ff.cancel(true);
+            }
+        }.init(ff);
+        pfssNewLoadPool.schedule(new Thread(abolishPfssThread, "Abolish PFSS"), 60 * 5, TimeUnit.SECONDS);
+    };
 
     @Override
     public void activeLayerChanged(View view) {
