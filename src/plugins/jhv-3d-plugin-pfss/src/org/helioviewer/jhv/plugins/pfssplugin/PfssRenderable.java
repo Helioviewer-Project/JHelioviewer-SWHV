@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.awt.Component;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -25,8 +23,6 @@ import com.jogamp.opengl.GL2;
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
 public class PfssRenderable implements Renderable, LayersListener {
-
-    private final ExecutorService pfssNewLoadPool = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("PFSS NewDataLoader"));
 
     private boolean isVisible = false;
     private final RenderableType type;
@@ -108,7 +104,7 @@ public class PfssRenderable implements Renderable, LayersListener {
         PfssPlugin.getPfsscache().clear();
 
         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getFirstDate(), Layers.getLastDate()), null);
-        pfssNewLoadPool.submit(dataLoaderTask);
+        PfssPlugin.pfssNewLoadPool.submit(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
     }
 
