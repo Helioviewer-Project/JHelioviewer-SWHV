@@ -16,6 +16,7 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
@@ -25,7 +26,7 @@ import com.jogamp.opengl.GL2;
  * */
 public class PfssRenderable implements Renderable, LayersListener {
 
-    private final ExecutorService pfssNewLoadPool = Executors.newFixedThreadPool(1);
+    private final ExecutorService pfssNewLoadPool = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("PFSS NewDataLoader"));
 
     private boolean isVisible = false;
     private final RenderableType type;
@@ -108,7 +109,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getFirstDate(), Layers.getLastDate()), null);
         pfssNewLoadPool.submit(dataLoaderTask);
-        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask, "Abolish PFSS"), 60 * 5, TimeUnit.SECONDS);
+        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
     }
 
     @Override

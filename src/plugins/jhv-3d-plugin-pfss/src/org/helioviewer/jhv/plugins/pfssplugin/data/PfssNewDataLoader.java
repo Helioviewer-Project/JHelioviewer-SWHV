@@ -20,14 +20,15 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
+import org.helioviewer.jhv.threads.CancelTask;
+import org.helioviewer.jhv.threads.JHVThread;
 
 public class PfssNewDataLoader implements Runnable {
 
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
-    private final ExecutorService pfssPool = Executors.newFixedThreadPool(5);
+    private final ExecutorService pfssPool = Executors.newFixedThreadPool(5, new JHVThread.NamedThreadFactory("PFSS DataLoader"));
 
     private final Date start;
     private final Date end;
@@ -41,8 +42,6 @@ public class PfssNewDataLoader implements Runnable {
     @Override
     public void run() {
         if (start != null && end != null && start.before(end)) {
-            Thread.currentThread().setName(PfssSettings.THREAD_NAME);
-
             final Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(start);
 
@@ -96,7 +95,7 @@ public class PfssNewDataLoader implements Runnable {
                     if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
                         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
                         pfssPool.submit(dataLoaderTask);
-                        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask, "Abolish PFSS"), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
+                        PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
                     }
                 }
 
