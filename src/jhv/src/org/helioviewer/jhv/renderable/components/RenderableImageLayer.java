@@ -448,4 +448,8 @@ public class RenderableImageLayer implements Renderable {
         imageData = _imageData;
     }
 
+    public ImageData getImageData() {
+        return imageData;
+    }
+
 }
