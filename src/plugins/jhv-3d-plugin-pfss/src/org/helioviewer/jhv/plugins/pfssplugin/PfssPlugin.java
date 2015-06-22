@@ -9,6 +9,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
+import org.helioviewer.jhv.threads.JHVThread;
 
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
@@ -18,7 +19,7 @@ public class PfssPlugin implements Plugin {
     private static PfssCache pfssCache;
     private PfssRenderable renderable;
 
-    public static final ScheduledExecutorService pfssReaperPool = Executors.newScheduledThreadPool(1);
+    public static final ScheduledExecutorService pfssReaperPool = Executors.newSingleThreadScheduledExecutor(new JHVThread.NamedThreadFactory("PFSS Abolish"));
 
     public PfssPlugin() {
         pfssCache = new PfssCache();
