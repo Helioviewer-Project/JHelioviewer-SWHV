@@ -1,23 +1,24 @@
 package org.helioviewer.jhv.threads;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
-public class CancelTask extends FutureTask<Void> {
+public class CancelTask extends FutureTask<Boolean> {
 
-    public CancelTask(FutureTask<?> abolishTask) {
-        super(new Runnable() {
-                private FutureTask<?> abolishTask;
+    public CancelTask(FutureTask<?> cancelTask) {
+        super(new Callable<Boolean>() {
+                private FutureTask<?> _cancelTask;
 
-                public Runnable init(FutureTask<?> abolishTask) {
-                    this.abolishTask = abolishTask;
+                public Callable init(FutureTask<?> _cancelTask) {
+                    this._cancelTask = _cancelTask;
                     return this;
                 }
 
                 @Override
-                public void run() {
-                    abolishTask.cancel(true);
+                public Boolean call() {
+                    return _cancelTask.cancel(true);
                 }
-            }.init(abolishTask), null);
+            }.init(cancelTask));
     }
 
 }
