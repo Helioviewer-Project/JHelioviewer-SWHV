@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.Point;
+import java.util.Date;
 
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.logging.Log;
@@ -9,12 +10,11 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class GL3DCamera implements TimeListener {
+public abstract class GL3DCamera {
 
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
@@ -334,5 +334,7 @@ public abstract class GL3DCamera implements TimeListener {
     public abstract String getName();
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
+
+    public abstract void timeChanged(Date date);
 
 }

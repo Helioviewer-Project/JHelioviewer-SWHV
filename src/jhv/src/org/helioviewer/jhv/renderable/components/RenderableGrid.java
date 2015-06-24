@@ -17,6 +17,7 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
@@ -181,7 +182,7 @@ public class RenderableGrid implements Renderable {
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 
             // last: Earth circles - static color, undo rotation
-            Date timestamp = Displayer.getLastUpdatedTimestamp();
+            Date timestamp = Layers.getLastUpdatedTimestamp();
             if (timestamp != null) {
                 gl.glColor4f(1, 1, 0, 1);
 

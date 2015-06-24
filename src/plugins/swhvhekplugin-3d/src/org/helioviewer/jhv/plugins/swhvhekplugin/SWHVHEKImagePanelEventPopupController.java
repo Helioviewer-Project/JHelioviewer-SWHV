@@ -17,6 +17,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
@@ -145,7 +146,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
             return;
 
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-        Date currentDate = Displayer.getLastUpdatedTimestamp();
+        Date currentDate = Layers.getLastUpdatedTimestamp();
 
         GL3DVec3d hitpoint = null;
         mouseOverJHVEvent = null;

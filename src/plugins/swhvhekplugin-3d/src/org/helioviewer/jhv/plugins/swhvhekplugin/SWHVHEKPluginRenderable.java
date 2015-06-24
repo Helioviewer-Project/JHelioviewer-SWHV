@@ -15,7 +15,7 @@ import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -272,7 +272,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void render(GL2 gl) {
         if (isVisible) {
-            Date currentTime = Displayer.getLastUpdatedTimestamp();
+            Date currentTime = Layers.getLastUpdatedTimestamp();
             if (currentTime == null)
                 return;
 

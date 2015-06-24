@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.display;
+package org.helioviewer.jhv.layers;
 
 import java.util.Date;
 

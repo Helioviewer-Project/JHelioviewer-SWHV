@@ -11,6 +11,7 @@ import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
@@ -65,7 +66,7 @@ public class RenderableTimeStamp implements Renderable {
         }
 
         textRenderer.beginRendering(sx * Displayer.getViewportWidth(), sy * Displayer.getViewportHeight(), true);
-        textRenderer.draw(TimeUtils.utcDateFormat.format(Displayer.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
+        textRenderer.draw(TimeUtils.utcDateFormat.format(Layers.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
         textRenderer.endRendering();
     }
 

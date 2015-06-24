@@ -5,7 +5,7 @@ import java.util.Date;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
@@ -22,13 +22,13 @@ public class GL3DEarthCamera extends GL3DCamera {
     public void reset() {
         this.resetCurrentDragRotation();
         super.reset();
-        this.forceTimeChanged(Displayer.getLastUpdatedTimestamp());
+        this.forceTimeChanged(Layers.getLastUpdatedTimestamp());
     }
 
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        this.timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
     @Override

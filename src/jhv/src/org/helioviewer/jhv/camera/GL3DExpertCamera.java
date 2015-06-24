@@ -27,7 +27,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         super();
         followObjectCameraOptionPanel = new GL3DExpertCameraOptionPanel(this);
         positionLoading = new GL3DPositionLoading(this);
-        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        this.timeChanged(Layers.getLastUpdatedTimestamp());
         followObjectCameraOptionPanel.syncWithLayerBeginTime(false);
         followObjectCameraOptionPanel.syncWithLayerEndTime(true);
     }
@@ -41,7 +41,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        this.timeChanged(Displayer.getLastUpdatedTimestamp());
+        this.timeChanged(Layers.getLastUpdatedTimestamp());
         Layers.addLayersListener(this);
     }
 
