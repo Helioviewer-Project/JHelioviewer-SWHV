@@ -176,15 +176,15 @@ public abstract class GL3DCamera {
             return;
         }
 
-        Displayer.render();
-        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
-
         previousCameraWidth = cameraWidth;
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
 
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+
+        Displayer.render();
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
     }
 
     public GL3DMat4d getOrthoMatrixInverse() {
