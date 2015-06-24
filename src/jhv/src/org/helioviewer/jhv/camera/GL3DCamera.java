@@ -58,7 +58,7 @@ public abstract class GL3DCamera {
         this.currentDragRotation = new GL3DQuatd();
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
-        setCameraFOV(INITFOV);
+        this.fov = INITFOV;
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
         this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
@@ -99,6 +99,26 @@ public abstract class GL3DCamera {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
             this.reset();
         }
+    }
+
+    private GL3DQuatd saveRotation;
+    private GL3DQuatd saveLocalRotation;
+    private GL3DVec3d saveTranslation;
+    private GL3DMat4d saveTransformation;
+
+    public void push(Date date, MetaData m) {
+        saveRotation = rotation.copy();
+        saveLocalRotation = localRotation.copy();
+        saveTranslation = translation.copy();
+        saveTransformation = cameraTransformation.copy();
+        updateRotation(date, m);
+    }
+
+    public void pop() {
+        rotation = saveRotation;
+        localRotation = saveLocalRotation;
+        translation = saveTranslation;
+        cameraTransformation = saveTransformation;
     }
 
     public double getFOVAngleToDraw() {
@@ -270,7 +290,7 @@ public abstract class GL3DCamera {
     }
 
     public double getCameraFOV() {
-        return this.fov;
+        return fov;
     }
 
     public void setCameraFOV(double fov) {
