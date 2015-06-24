@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
@@ -60,6 +61,15 @@ public class Layers {
         activeView = view;
         setMasterMovie(view);
         fireActiveLayerChanged(view);
+    }
+
+    private static Date lastTimestamp;
+
+    public static Date getLastUpdatedTimestamp() {
+        if (lastTimestamp == null) {
+            lastTimestamp = getLastDate();
+        }
+        return lastTimestamp;
     }
 
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
@@ -116,10 +126,18 @@ public class Layers {
     }
 
     private static void syncTime(ImmutableDateTime dateTime, int frame) {
-        Displayer.getActiveCamera().timeChanged(dateTime.getTime());
+        lastTimestamp = dateTime.getTime();
+        Displayer.getActiveCamera().timeChanged(lastTimestamp);
+
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
-         }
+        }
+
+        // fire TimeChanged
+        for (final TimeListener listener : timeListeners) {
+            listener.timeChanged(lastTimestamp);
+        }
+
         MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
@@ -294,7 +312,16 @@ public class Layers {
         }
     }
 
+    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
     private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
+
+    public static void addTimeListener(final TimeListener timeListener) {
+        timeListeners.add(timeListener);
+    }
+
+    public static void removeTimeListener(final TimeListener timeListener) {
+        timeListeners.remove(timeListener);
+    }
 
     public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);

@@ -23,7 +23,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static Component displayComponent;
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
-    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
     private static GL3DCamera activeCamera = new GL3DObserverCamera();
     private static int viewportWidth;
@@ -97,24 +96,12 @@ public class Displayer implements JHVEventHighlightListener {
         public void handleData(View view, ImageData imageData) {
             view.getImageLayer().setImageData(imageData);
             if (view == Layers.getActiveView()) {
-                lastTimestamp = imageData.getMetaData().getDateObs().getTime();
-                // fire TimeChanged
-                for (final TimeListener listener : timeListeners) {
-                    listener.timeChanged(lastTimestamp);
-                }
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             }
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }
 
-    }
-
-    public static Date getLastUpdatedTimestamp() {
-        if (lastTimestamp == null) {
-            lastTimestamp = Layers.getLastDate();
-        }
-        return lastTimestamp;
     }
 
     @Override
@@ -132,14 +119,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void removeRenderListener(final RenderListener renderListener) {
         renderListeners.remove(renderListener);
-    }
-
-    public static void addTimeListener(final TimeListener timeListener) {
-        timeListeners.add(timeListener);
-    }
-
-    public static void removeTimeListener(final TimeListener timeListener) {
-        timeListeners.remove(timeListener);
     }
 
     private static final Displayer instance = new Displayer();
