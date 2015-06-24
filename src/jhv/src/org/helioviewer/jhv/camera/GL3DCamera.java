@@ -11,6 +11,7 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 
@@ -336,5 +337,7 @@ public abstract class GL3DCamera {
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
     public abstract void timeChanged(Date date);
+
+    public abstract void updateRotation(Date date, MetaData m);
 
 }
