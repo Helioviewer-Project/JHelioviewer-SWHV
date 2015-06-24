@@ -41,8 +41,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     }
 
-    protected Region region;
-
     // Member related to JP2
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
@@ -85,15 +83,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             throw new Exception("JP2 image already set");
         }
 
-        metaDataArray = newJP2Image.metaDataList;
-        MetaData metaData = metaDataArray[0];
-        if (region == null) {
-            region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
-        }
-
         jp2Image = newJP2Image;
         jp2Image.addReference();
-        imageViewParams = calculateParameter(region, 0);
 
         if (jp2Image.isRemote()) {
             imageCacheStatus = new RemoteImageCacheStatus(this);
@@ -102,6 +93,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
         jp2Image.setImageCacheStatus(imageCacheStatus);
 
+        metaDataArray = jp2Image.metaDataList;
+        MetaData metaData = metaDataArray[0];
+        imageViewParams = calculateParameter(new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize()), 0);
+
         try {
             reader = new J2KReader(this);
             render = new J2KRender(this);
@@ -109,15 +104,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Returns the JPG2000 image managed by this class.
-     *
-     * @return JPG2000 image
-     */
-    public JP2Image getJP2Image() {
-        return jp2Image;
     }
 
     /**
@@ -149,12 +135,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     public ReaderMode getReaderMode() {
         return readerMode;
-    }
-
-    public boolean setRegion(Region r) {
-        boolean changed = region == null ? r == null : !region.equals(r);
-        region = r;
-        return setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
     }
 
     private int getTrueFrameNumber() {
@@ -450,7 +430,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     void signalRender() {
-        setRegion(ViewROI.getSingletonInstance().updateROI(metaDataArray[imageViewParams.compositionLayer]));
+        // from reader on EDT, might come after abolish
+        if (jp2Image == null)
+            return;
+
+        Region r = ViewROI.getSingletonInstance().updateROI(metaDataArray[imageViewParams.compositionLayer]);
+        setImageViewParams(calculateParameter(r, imageViewParams.compositionLayer), true);
         renderSignal.signal();
     }
 

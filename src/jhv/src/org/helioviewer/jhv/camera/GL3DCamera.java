@@ -27,10 +27,10 @@ public abstract class GL3DCamera implements TimeListener {
 
     private GL3DMat4d cameraTransformation;
 
-    protected GL3DQuatd rotation;
-    protected GL3DVec3d translation;
+    private GL3DQuatd rotation;
+    private GL3DVec3d translation;
 
-    protected GL3DQuatd currentDragRotation;
+    private GL3DQuatd currentDragRotation;
 
     protected GL3DQuatd localRotation;
 
@@ -49,7 +49,7 @@ public abstract class GL3DCamera implements TimeListener {
     private final GL3DPanInteraction panInteraction;
     private final GL3DZoomBoxInteraction zoomBoxInteraction;
 
-    protected GL3DInteraction currentInteraction;
+    private GL3DInteraction currentInteraction;
 
     public GL3DCamera() {
         this.cameraTransformation = GL3DMat4d.identity();
@@ -57,7 +57,7 @@ public abstract class GL3DCamera implements TimeListener {
         this.currentDragRotation = new GL3DQuatd();
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
-        this.resetFOV();
+        setCameraFOV(INITFOV);
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
         this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
@@ -65,14 +65,10 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     public void reset() {
-        this.resetFOV();
         this.translation = new GL3DVec3d(0, 0, this.translation.z);
         this.currentDragRotation.clear();
         this.currentInteraction.reset(this);
-    }
-
-    private void resetFOV() {
-        this.fov = INITFOV;
+        setCameraFOV(INITFOV);
     }
 
     /**
@@ -83,11 +79,12 @@ public abstract class GL3DCamera implements TimeListener {
      */
     public void activate(GL3DCamera precedingCamera) {
         if (precedingCamera != null) {
-            this.rotation = precedingCamera.getRotation().copy();
+            this.rotation = precedingCamera.rotation.copy();
             this.translation = precedingCamera.translation.copy();
             this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
             this.updateCameraTransformation();
+            this.updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
             if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
@@ -107,33 +104,26 @@ public abstract class GL3DCamera implements TimeListener {
         return this.FOVangleToDraw;
     }
 
-    protected void setZTranslation(double z) {
-        this.translation.z = z;
-    }
-
     public void setPanning(double x, double y) {
-        this.translation.x = x;
-        this.translation.y = y;
+        translation.x = x;
+        translation.y = y;
     }
 
-    public GL3DVec3d getTranslation() {
-        return this.translation;
-    }
-
-    public GL3DMat4d getCameraTransformation() {
-        return this.cameraTransformation;
+    protected void setZTranslation(double z) {
+        translation.z = z;
+        updateCameraWidthAspect(previousAspect);
     }
 
     public double getZTranslation() {
         return this.translation.z;
     }
 
-    public GL3DQuatd getLocalRotation() {
-        return this.localRotation;
+    public GL3DVec3d getTranslation() {
+        return this.translation;
     }
 
-    public GL3DQuatd getRotation() {
-        return this.rotation;
+    public GL3DQuatd getLocalRotation() {
+        return this.localRotation;
     }
 
     public void resetCurrentDragRotation() {
@@ -152,27 +142,26 @@ public abstract class GL3DCamera implements TimeListener {
         this.updateCameraTransformation();
     }
 
-    public void applyPerspective(GL2 gl) {
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
+    // quantization bits per half width camera
+    private static final int quantFactor = 1 << 8;
 
-        double aspect = Displayer.getViewportWidth() / (double) Displayer.getViewportHeight();
+    public void updateCameraWidthAspect(double aspect) {
         cameraWidth = -translation.z * Math.tan(fov / 2.);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
 
-        cameraWidthTimesAspect = cameraWidth * aspect;
-        gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-
+        cameraWidth = (int) (cameraWidth * quantFactor) / (double) quantFactor;
         if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
             return;
         }
+
+        Displayer.render();
         ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
 
         previousCameraWidth = cameraWidth;
         previousAspect = aspect;
+        cameraWidthTimesAspect = cameraWidth * aspect;
+
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
@@ -181,9 +170,14 @@ public abstract class GL3DCamera implements TimeListener {
         return orthoMatrixInverse.copy();
     }
 
-    public void resumePerspective(GL2 gl) {
+    public void applyPerspective(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glLoadIdentity();
+        gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+
+        // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
     public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec2d normalizedScreenpos, GL3DQuatd cameraDifferenceRotation) {
@@ -217,7 +211,7 @@ public abstract class GL3DCamera implements TimeListener {
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
             hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
-            hitPoint = this.localRotation.rotateInverseVector(this.currentDragRotation.rotateInverseVector(hitPoint));
+            hitPoint = localRotation.rotateInverseVector(currentDragRotation.rotateInverseVector(hitPoint));
             return hitPoint;
         }
         return null;
@@ -252,8 +246,7 @@ public abstract class GL3DCamera implements TimeListener {
         } else {
             hitPoint = new GL3DVec3d(up1x, up1y, Sun.Radius2 / (2. * Math.sqrt(radius2)));
         }
-        GL3DMat4d roti = this.getCurrentDragRotation().toMatrix().inverse();
-        hitPoint = roti.multiply(hitPoint);
+        hitPoint = currentDragRotation.rotateInverseVector(hitPoint);
 
         return hitPoint;
     }
@@ -275,15 +268,11 @@ public abstract class GL3DCamera implements TimeListener {
         cameraTransformation = this.rotation.toMatrix().translate(this.translation);
     }
 
-    public void applyCamera(GL2 gl) {
-        gl.glMultMatrixd(cameraTransformation.m, 0);
-    }
-
     public double getCameraFOV() {
         return this.fov;
     }
 
-    public double setCameraFOV(double fov) {
+    public void setCameraFOV(double fov) {
         if (fov < MIN_FOV) {
             this.fov = MIN_FOV;
         } else if (fov > MAX_FOV) {
@@ -291,7 +280,7 @@ public abstract class GL3DCamera implements TimeListener {
         } else {
             this.fov = fov;
         }
-        return this.fov;
+        updateCameraWidthAspect(previousAspect);
     }
 
     @Override
@@ -299,23 +288,15 @@ public abstract class GL3DCamera implements TimeListener {
         return getName();
     }
 
-    public GL3DQuatd getCurrentDragRotation() {
-        return this.currentDragRotation;
-    }
-
     public void setTrackingMode(boolean trackingMode) {
         this.trackingMode = trackingMode;
     }
 
     public boolean getTrackingMode() {
-        return this.trackingMode;
+        return trackingMode;
     }
 
     public void deactivate() {
-    }
-
-    public void setDefaultFOV() {
-        this.fov = INITFOV;
     }
 
     public double getCameraWidth() {
@@ -323,8 +304,7 @@ public abstract class GL3DCamera implements TimeListener {
     }
 
     public void zoom(int wr) {
-        this.setCameraFOV(this.fov + 0.0005 * wr);
-        Displayer.render();
+        setCameraFOV(fov + 0.0005 * wr);
     }
 
     public void setFOVangleDegrees(double fovAngle) {
@@ -351,9 +331,7 @@ public abstract class GL3DCamera implements TimeListener {
         return this.zoomBoxInteraction;
     }
 
-    public String getName() {
-        return "Solar Rotation Tracking Camera";
-    }
+    public abstract String getName();
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
 

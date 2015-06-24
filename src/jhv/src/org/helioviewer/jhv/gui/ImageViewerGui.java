@@ -113,6 +113,10 @@ public class ImageViewerGui {
         midSplitPane.setDividerSize(6);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
+        // STATUS PANEL
+        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
+        framerateStatus = new FramerateStatusPanel();
+
         TopToolBar topToolBar = new TopToolBar();
         contentPanel.add(topToolBar, BorderLayout.PAGE_START);
 
@@ -145,10 +149,6 @@ public class ImageViewerGui {
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
-
-        // STATUS PANEL
-        zoomStatus = new ZoomStatusPanel();
-        framerateStatus = new FramerateStatusPanel();
 
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);

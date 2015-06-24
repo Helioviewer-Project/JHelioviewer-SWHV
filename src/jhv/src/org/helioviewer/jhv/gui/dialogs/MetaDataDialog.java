@@ -66,7 +66,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     /**
      * The private constructor that sets the fields and the dialog.
      */
-    public MetaDataDialog() {
+    public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
         setAlwaysOnTop(true);
         setLayout(new BorderLayout());
@@ -99,6 +99,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         closeButton.addActionListener(this);
         exportFitsButton.addActionListener(this);
         // exportButton.addActionListener(this);
+
+        setMetaData(view);
     }
 
     /**
@@ -171,11 +173,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            Source to read
      * @see #addDataItem(String)
      */
-    public void setMetaData(View v) {
+    private void setMetaData(View v) {
         if (v == null)
             return;
 
-        MetaData metaData = v.getImageData().getMetaData();
+        MetaData metaData = v.getImageLayer().getImageData().getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();

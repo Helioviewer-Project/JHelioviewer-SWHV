@@ -47,7 +47,7 @@ import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
  * @author Helge Dietert
  *
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
     /**
      * Controlled filter by this panel
@@ -333,8 +333,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
      */
     private static void showMetaInfo(View view) {
-        MetaDataDialog dialog = new MetaDataDialog();
-        dialog.setMetaData(view);
+        MetaDataDialog dialog = new MetaDataDialog(view);
         dialog.showDialog();
     }
 
