@@ -43,15 +43,15 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         }
     }
 
-    public ImmutableDateTime(long seconds) {
-        if (seconds < 0) {
+    public ImmutableDateTime(long millis) {
+        if (millis < 0) {
             throw new IllegalArgumentException("Arguments cannot be negative!");
         }
 
         try {
             calendar = Calendar.getInstance(TimeUtils.UTC);
             calendar.clear();
-            calendar.setTimeInMillis(seconds * 1000);
+            calendar.setTimeInMillis(millis);
             dateFormat.setTimeZone(TimeUtils.UTC);
             timeFormat.setTimeZone(TimeUtils.UTC);
         } catch (Exception e) {
