@@ -13,7 +13,6 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
@@ -109,7 +108,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setViewportSize(getWidth(), getHeight());
+        int w = getWidth();
+        int h = getHeight();
+        Displayer.getActiveCamera().updateCameraWidthAspect(w / (double) h);
+        Displayer.setViewportSize(w, h);
     }
 
     @Override
@@ -119,11 +121,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        GL3DCamera camera = Displayer.getActiveCamera();
-        camera.applyPerspective(gl);
-        camera.applyCamera(gl);
+        Displayer.getActiveCamera().applyPerspective(gl);
         ImageViewerGui.getRenderableContainer().render(gl);
-        camera.resumePerspective(gl);
 
         drawable.swapBuffers();
 
@@ -133,8 +132,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     }
 
     private void exportFrame(GL2 gl) {
-        View mv = Layers.getActiveView();
-        if (mv == null) {
+        View view = Layers.getActiveView();
+        if (view == null) {
             stopExport();
             return;
         }
@@ -142,13 +141,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         BufferedImage screenshot;
         int width = getWidth();
 
-        if (exportMode) {
-            int currentScreenshot = 1;
-            int maxframeno = 1;
-            if (mv instanceof JHVJP2View) {
-                currentScreenshot = ((JHVJP2View) mv).getImageData().getFrameNumber();
-                maxframeno = ((JHVJP2View) mv).getMaximumFrameNumber();
-            }
+        int currentScreenshot = view.getImageLayer().getImageData().getFrameNumber();
+        if (exportMode && currentScreenshot == previousScreenshot + 1) {
+            int maxframeno = view.getMaximumFrameNumber();
 
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
@@ -156,11 +151,11 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 movieWriter.encodeVideo(0, xugScreenshot, (int) (1000 / framerate * currentScreenshot), TimeUnit.MILLISECONDS);
             }
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
+            previousScreenshot = currentScreenshot;
 
-            if ((!(mv instanceof JHVJP2View)) || (mv instanceof JHVJP2View && currentScreenshot < previousScreenshot)) {
+            if (currentScreenshot == maxframeno) {
                 stopExport();
             }
-            previousScreenshot = currentScreenshot;
         }
 
         if (screenshotMode) {
@@ -176,11 +171,11 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     public void startExport(ExportMovieDialog exportMovieDialog) {
         this.exportMovieDialog = exportMovieDialog;
-        ImageViewerGui.getLeftContentPane().setEnabled(false);
 
         View mv = Layers.getActiveView();
         if (mv instanceof JHVJP2View) {
-            exportMode = true;
+            ImageViewerGui.getLeftContentPane().setEnabled(false);
+
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
 
             movieWriter = ToolFactory.makeWriter(moviePath);
@@ -189,6 +184,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             Layers.pauseMovies();
             Layers.setFrame(0);
             Layers.playMovies();
+            exportMode = true;
         } else {
             exportMovieDialog.fail();
             exportMovieDialog = null;

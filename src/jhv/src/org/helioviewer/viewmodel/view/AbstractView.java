@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
@@ -15,8 +13,6 @@ public abstract class AbstractView implements View {
 
     protected MetaData[] metaDataArray = new MetaData[1];
     protected ImageData imageData;
-    protected Viewport viewport;
-    protected Region region;
 
     @Override
     public void abolish() {
@@ -88,16 +84,6 @@ public abstract class AbstractView implements View {
     @Override
     public ImageData getPreviousImageData() {
         return imageData;
-    }
-
-    @Override
-    public boolean setRegion(Region r) {
-        return false;
-    }
-
-    @Override
-    public boolean setViewport(Viewport v) {
-        return false;
     }
 
     @Override

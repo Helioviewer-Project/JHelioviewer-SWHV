@@ -17,7 +17,7 @@ import org.helioviewer.viewmodel.view.View;
 /**
  * Action to zoom such that the active layer fits completely in the viewport.
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {
 
     /**
@@ -42,11 +42,10 @@ public class ZoomOneToOneAction extends AbstractAction {
         View view = Layers.getActiveView();
         if (view != null) {
             GL3DCamera camera = Displayer.getActiveCamera();
-            MetaData metaData = view.getImageData().getMetaData();
+            MetaData metaData = view.getImageLayer().getImageData().getMetaData();
             double imageFraction = Displayer.getViewportHeight() / (double) metaData.getPixelHeight();
-            double fov = 2. * Math.atan(-metaData.getPhysicalSize().y * imageFraction / 2. / camera.getTranslation().z);
+            double fov = 2. * Math.atan(-metaData.getPhysicalSize().y * imageFraction / 2. / camera.getZTranslation());
             camera.setCameraFOV(fov);
-            Displayer.render();
         }
     }
 

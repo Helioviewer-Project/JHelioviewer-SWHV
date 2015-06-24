@@ -36,6 +36,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
  * @author Markus Langenberg
  */
 class J2KReader implements Runnable {
+
     private enum CacheStrategy {
         CURRENTFRAMEONLY, CURRENTFRAMEFIRST, MISSINGFRAMESFIRST, ALLFRAMESEQUALLY
     }
@@ -66,10 +67,10 @@ class J2KReader implements Runnable {
      * the flow control. A negative value means that there is not a previous
      * valid response to take into account.
      */
-    private volatile long lastResponseTime = -1;
+    private long lastResponseTime = -1;
 
     /** The current length in bytes to use for requests */
-    private volatile int JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
+    private int JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
     /**
      * The constructor. Creates and connects the socket if image is remote.

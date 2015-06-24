@@ -31,7 +31,7 @@ import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class GL3DCameraOptionsPanel extends JPanel {
 
     private GL3DCamera previousCamera;
@@ -78,7 +78,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
                         e1.printStackTrace();
                     }
                 }
-                Displayer.render();
             }
         });
 
