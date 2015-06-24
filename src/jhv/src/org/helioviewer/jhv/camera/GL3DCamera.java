@@ -11,7 +11,6 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 
@@ -58,7 +57,7 @@ public abstract class GL3DCamera {
         this.currentDragRotation = new GL3DQuatd();
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
-        this.fov = INITFOV;
+        setCameraFOV(INITFOV);
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
         this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
@@ -78,14 +77,14 @@ public abstract class GL3DCamera {
      *
      * @param precedingCamera
      */
-    public void copy(GL3DCamera precedingCamera, boolean refresh) {
+    public void activate(GL3DCamera precedingCamera) {
         if (precedingCamera != null) {
             this.rotation = precedingCamera.rotation.copy();
             this.translation = precedingCamera.translation.copy();
             this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
             this.updateCameraTransformation();
-            this.updateCameraWidthAspect(precedingCamera.previousAspect, refresh);
+            this.updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
             if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
@@ -101,10 +100,6 @@ public abstract class GL3DCamera {
         }
     }
 
-    public void activate(GL3DCamera precedingCamera) {
-        copy(precedingCamera, true);
-    }
-
     public double getFOVAngleToDraw() {
         return this.FOVangleToDraw;
     }
@@ -116,7 +111,7 @@ public abstract class GL3DCamera {
 
     protected void setZTranslation(double z) {
         translation.z = z;
-        updateCameraWidthAspect(previousAspect, true);
+        updateCameraWidthAspect(previousAspect);
     }
 
     public double getZTranslation() {
@@ -150,7 +145,7 @@ public abstract class GL3DCamera {
     // quantization bits per half width camera
     private static final int quantFactor = 1 << 8;
 
-    public void updateCameraWidthAspect(double aspect, boolean refresh) {
+    public void updateCameraWidthAspect(double aspect) {
         cameraWidth = -translation.z * Math.tan(fov / 2.);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
@@ -160,17 +155,15 @@ public abstract class GL3DCamera {
             return;
         }
 
+        Displayer.render();
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
+
         previousCameraWidth = cameraWidth;
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
 
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-
-        if (refresh) {
-            Displayer.render();
-            ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
-        }
     }
 
     public GL3DMat4d getOrthoMatrixInverse() {
@@ -287,7 +280,7 @@ public abstract class GL3DCamera {
         } else {
             this.fov = fov;
         }
-        updateCameraWidthAspect(previousAspect, true);
+        updateCameraWidthAspect(previousAspect);
     }
 
     @Override
@@ -343,7 +336,5 @@ public abstract class GL3DCamera {
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
     public abstract void timeChanged(Date date);
-
-    public abstract void updateRotation(Date date, MetaData m);
 
 }

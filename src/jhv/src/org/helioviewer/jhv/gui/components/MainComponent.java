@@ -110,7 +110,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         int w = getWidth();
         int h = getHeight();
-        Displayer.getActiveCamera().updateCameraWidthAspect(w / (double) h, true);
+        Displayer.getActiveCamera().updateCameraWidthAspect(w / (double) h);
         Displayer.setViewportSize(w, h);
     }
 
