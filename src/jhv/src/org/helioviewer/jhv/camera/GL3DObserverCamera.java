@@ -70,8 +70,9 @@ public class GL3DObserverCamera extends GL3DCamera {
     public void updateRotation(Date date, MetaData m) {
        if (m == null) {
             View view = Layers.getActiveView();
-            if (view != null)
-                m = view.getMetaData(new ImmutableDateTime(date.getTime()));
+            if (view != null) {
+                m = view.getMetaData(new ImmutableDateTime(date.getTime() / 1000));
+            }
         }
 
         double d;
