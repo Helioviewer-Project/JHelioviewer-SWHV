@@ -41,12 +41,22 @@ public class ViewROI {
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera activeCamera = Displayer.getActiveCamera();
-        GL3DQuatd camdiff = activeCamera.getCameraDifferenceRotationQuatd(metaData.getRotationObs());
+        GL3DCamera camera, activeCamera = Displayer.getActiveCamera();
+
+        try {
+            camera = activeCamera.getClass().getConstructor().newInstance();
+            camera.copy(activeCamera, false);
+            camera.updateRotation(metaData.getDateObs().getTime(), metaData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        GL3DQuatd camdiff = camera.getCameraDifferenceRotationQuatd(metaData.getRotationObs());
 
         for (int i = 0; i < pointlist.length; i++) {
             GL3DVec3d hitPoint;
-            hitPoint = activeCamera.getVectorFromSphereOrPlane(pointlist[i], camdiff);
+            hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camdiff);
             if (hitPoint != null) {
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -55,12 +65,14 @@ public class ViewROI {
             }
         }
 
+        /*
         double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.05);
         double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.05);
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
+        */
 
         GL3DVec2d metPhysicalSize = metaData.getPhysicalSize();
         double metLLX = metaData.getPhysicalLowerLeft().x;
