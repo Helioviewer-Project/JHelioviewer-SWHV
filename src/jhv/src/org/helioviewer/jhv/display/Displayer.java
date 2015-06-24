@@ -99,7 +99,6 @@ public class Displayer implements JHVEventHighlightListener {
             if (view == Layers.getActiveView()) {
                 lastTimestamp = imageData.getMetaData().getDateObs().getTime();
                 // fire TimeChanged
-                activeCamera.timeChanged(lastTimestamp);
                 for (final TimeListener listener : timeListeners) {
                     listener.timeChanged(lastTimestamp);
                 }
