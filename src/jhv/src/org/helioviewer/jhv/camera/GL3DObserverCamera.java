@@ -71,7 +71,7 @@ public class GL3DObserverCamera extends GL3DCamera {
        if (m == null) {
             View view = Layers.getActiveView();
             if (view != null) {
-                m = view.getMetaData(new ImmutableDateTime(date.getTime() / 1000));
+                m = view.getMetaData(new ImmutableDateTime(date.getTime()));
             }
         }
 
