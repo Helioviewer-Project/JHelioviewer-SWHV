@@ -393,6 +393,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public void render() {
+        region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
         signalRender();
     }
 
@@ -401,7 +402,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (jp2Image == null)
             return;
 
-        region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
         JP2ImageParameter newParams = calculateParameter(region, targetFrame);
         if (imageData != null && newParams.equals(imageViewParams)) {
             return;

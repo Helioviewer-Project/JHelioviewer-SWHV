@@ -35,20 +35,6 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    void signalRender() {
-        // from reader on EDT, might come after abolish
-        if (jp2Image == null)
-            return;
-
-        JP2ImageParameter newParams = calculateParameter(region, 0);
-        if (imageData != null && newParams.equals(imageViewParams)) {
-            return;
-        }
-        imageViewParams = newParams;
-        renderSignal.signal();
-    }
-
-    @Override
     public void render() {
     }
 
