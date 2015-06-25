@@ -60,8 +60,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
 
-    private ImageData previousImageData;
-    private ImageData baseDifferenceImageData;
+    private int targetFrame;
 
     public JHVJP2View() {
         Displayer.addRenderListener(this);
@@ -262,37 +261,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return new JP2ImageParameter(subImage, res, frameNumber);
     }
 
-    /**
-     * Sets the image parameters, if the given ones are valid.
-     *
-     * Also, triggers an update of the image using the new set of parameters, if
-     * desired.
-     *
-     * @param newParams
-     *            New set of parameters to use
-     * @param reload
-     *            if true, triggers an update of the image
-     * @return true, if the parameters actually has changed, false otherwise
-     */
-    protected boolean setImageViewParams(JP2ImageParameter newParams, boolean reload) {
-        if (imageViewParams.equals(newParams)) {
-            return false;
-        }
-
-        if (newParams.subImage.width == 0 || newParams.subImage.height == 0) {
-            if (imageData == null) {
-                return false;
-            }
-            return true;
-        }
-        imageViewParams = newParams;
-
-        if (reload) {
-            readerSignal.signal();
-        }
-        return true;
-    }
-
     /*
      * NOTE: The following section is for communications with the two threads,
      * J2KReader and J2KRender. Thus, the visibility is set to "default" (also
@@ -327,31 +295,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (frame == 0) {
-            baseDifferenceImageData = newImageData;
-        }
-
-        if (imageData != null && Math.abs(frame - imageData.getFrameNumber()) == 1) {
-            previousImageData = imageData;
-        } else if (previousImageData != null && previousImageData.getFrameNumber() - frame > 2) {
-            previousImageData = newImageData;
-        }
-
         imageData = newImageData;
 
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
-        return previousImageData;
-    }
-
-    @Override
-    public ImageData getBaseDifferenceImageData() {
-        return baseDifferenceImageData;
     }
 
     @Override
@@ -381,8 +329,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public int getCurrentFrameNumber() {
-        return imageViewParams.compositionLayer;
-        // return getTrueFrameNumber() - synchronous decode
+        return targetFrame;
     }
 
     /**
@@ -395,9 +342,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
-        if (frame != imageViewParams.compositionLayer && // getTrueFrameNumber() - synchronous decode
-            frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
-            imageViewParams.compositionLayer = frame;
+        if (frame != targetFrame && frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
+            targetFrame = frame;
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
@@ -434,8 +380,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (jp2Image == null)
             return;
 
-        Region r = ViewROI.getSingletonInstance().updateROI(metaDataArray[imageViewParams.compositionLayer]);
-        setImageViewParams(calculateParameter(r, imageViewParams.compositionLayer), true);
+        Region r = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
+
+        JP2ImageParameter newParams = calculateParameter(r, targetFrame);
+        if (imageData != null && newParams.equals(imageViewParams)) {
+            return;
+        }
+        imageViewParams = newParams;
         renderSignal.signal();
     }
 

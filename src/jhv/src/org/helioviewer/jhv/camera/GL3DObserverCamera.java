@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.util.Date;
 
 import org.helioviewer.base.astronomy.Sun;
+import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -56,7 +57,7 @@ public class GL3DObserverCamera extends GL3DCamera {
         if (date == null)
             return;
 
-        updateRotation(date);
+        updateRotation(date, null);
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
@@ -65,18 +66,24 @@ public class GL3DObserverCamera extends GL3DCamera {
         }
     }
 
-    private void updateRotation(Date date) {
-        double d;
+    @Override
+    public void updateRotation(Date date, MetaData m) {
+       if (m == null) {
+            View view = Layers.getActiveView();
+            if (view != null) {
+                m = view.getMetaData(new ImmutableDateTime(date.getTime()));
+            }
+        }
 
-        View view = Layers.getActiveView();
-        if (view != null) {
-            MetaData metadata = view.getImageLayer().getImageData().getMetaData();
-            localRotation = metadata.getRotationObs();
-            d = metadata.getDistanceObs();
-        } else {
+        double d;
+        if (m == null) {
             localRotation = GL3DQuatd.ZERO;
             d = Sun.MeanEarthDistance;
+        } else {
+            localRotation = m.getRotationObs();
+            d = m.getDistanceObs();
         }
+
         setZTranslation(-d);
         updateCameraTransformation();
     }

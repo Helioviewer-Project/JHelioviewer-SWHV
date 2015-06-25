@@ -15,7 +15,6 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
 
@@ -102,20 +101,23 @@ public class Layers {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        for (View view : layers) {
-            view.setFrame(view.getFrame(dateTime));
-         }
-        MoviePanel.getSingletonInstance().setFrameSlider(activeView.getFrame(dateTime));
+        int frame = activeView.getFrame(dateTime);
+        dateTime = activeView.getFrameDateTime(frame);
+
+        syncTime(dateTime, frame);
     }
 
     public static void setFrame(int frame) {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        ImmutableDateTime dateTime = activeView.getFrameDateTime(frame);
+        syncTime(activeView.getFrameDateTime(frame), frame);
+    }
+
+    private static void syncTime(ImmutableDateTime dateTime, int frame) {
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
-         }
+        }
         MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
@@ -144,7 +146,7 @@ public class Layers {
      * @return timestamp of the first available image data
      */
     public static Date getStartDate(View view) {
-        return getStartDateImmutable(view).getTime();
+        return getStartDateImmutable(view).getDate();
     }
 
     /**
@@ -156,7 +158,7 @@ public class Layers {
      * @return timestamp of the last available image data
      */
     public static Date getEndDate(View view) {
-        return getEndDateImmutable(view).getTime();
+        return getEndDateImmutable(view).getDate();
     }
 
     /**
@@ -175,7 +177,7 @@ public class Layers {
                 earliest = start;
             }
         }
-        return earliest == null ? null : earliest.getTime();
+        return earliest == null ? null : earliest.getDate();
     }
 
     /**
@@ -194,7 +196,7 @@ public class Layers {
                 latest = end;
             }
         }
-        return latest == null ? null : latest.getTime();
+        return latest == null ? null : latest.getDate();
     }
 
     public static void addLayer(View view) {

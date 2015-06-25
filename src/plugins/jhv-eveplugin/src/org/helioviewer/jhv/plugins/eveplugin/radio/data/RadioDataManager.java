@@ -624,8 +624,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                     hvMetaData.parseXML(image.getXML(i));
                     Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
                     Double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
-                    Date start = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-OBS")).getTime();
-                    Date end = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-END")).getTime();
+                    Date start = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-OBS")).getDate();
+                    Date end = ImmutableDateTime.parseDateTime(hvMetaData.get("DATE-END")).getDate();
                     hvMetaData.destroyXML();
 
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));

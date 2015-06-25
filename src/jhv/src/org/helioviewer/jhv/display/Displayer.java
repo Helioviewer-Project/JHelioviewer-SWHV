@@ -22,10 +22,7 @@ import org.helioviewer.viewmodel.view.ViewDataHandler;
 public class Displayer implements JHVEventHighlightListener {
 
     private static Component displayComponent;
-    private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
-    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
-    private static GL3DCamera activeCamera = new GL3DObserverCamera();
     private static int viewportWidth;
     private static int viewportHeight;
 
@@ -41,18 +38,6 @@ public class Displayer implements JHVEventHighlightListener {
     public static int getViewportWidth() {
         return viewportWidth;
     }
-
-    public static void setActiveCamera(GL3DCamera camera) {
-        activeCamera.deactivate();
-        camera.activate(activeCamera);
-        activeCamera = camera;
-    }
-
-    public static GL3DCamera getActiveCamera() {
-        return activeCamera;
-    }
-
-    private static Date lastTimestamp;
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -89,33 +74,47 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
+    private static GL3DCamera activeCamera = new GL3DObserverCamera();
 
-    private static class DisplayDataHandler implements ViewDataHandler {
-
-        @Override
-        public void handleData(View view, ImageData imageData) {
-            view.getImageLayer().setImageData(imageData);
-            if (view == Layers.getActiveView()) {
-                lastTimestamp = imageData.getMetaData().getDateObs().getTime();
-                // fire TimeChanged
-                activeCamera.timeChanged(lastTimestamp);
-                for (final TimeListener listener : timeListeners) {
-                    listener.timeChanged(lastTimestamp);
-                }
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
-            }
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-            display();
-        }
-
+    public static GL3DCamera getActiveCamera() {
+        return activeCamera;
     }
+
+    public static void setActiveCamera(GL3DCamera camera) {
+        activeCamera.deactivate();
+        camera.activate(activeCamera);
+        activeCamera = camera;
+    }
+
+    private static Date lastTimestamp;
 
     public static Date getLastUpdatedTimestamp() {
         if (lastTimestamp == null) {
             lastTimestamp = Layers.getLastDate();
         }
         return lastTimestamp;
+    }
+
+    public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
+
+    private static class DisplayDataHandler implements ViewDataHandler {
+
+        @Override
+        public void handleData(View view, ImageData imageData) {
+            if (view == Layers.getActiveView()) {
+                lastTimestamp = imageData.getMetaData().getDateObs().getDate();
+                activeCamera.timeChanged(lastTimestamp);
+                for (final TimeListener listener : timeListeners) {
+                    listener.timeChanged(lastTimestamp);
+                }
+
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
+            }
+            view.getImageLayer().setImageData(imageData);
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+            display();
+        }
+
     }
 
     @Override
@@ -126,6 +125,9 @@ public class Displayer implements JHVEventHighlightListener {
     public static void setDisplayComponent(Component component) {
         displayComponent = component;
     }
+
+    private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
+    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
     public static void addRenderListener(final RenderListener renderListener) {
         renderListeners.add(renderListener);

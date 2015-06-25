@@ -467,9 +467,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
-        final long timestamp = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime()) / 1000;
+        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime());
 
-        Layers.setTime(new ImmutableDateTime(timestamp));
+        Layers.setTime(new ImmutableDateTime(millis));
     }
 
     // Mouse Input Listener
