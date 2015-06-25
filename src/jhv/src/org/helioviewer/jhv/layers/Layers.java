@@ -140,7 +140,7 @@ public class Layers {
     }
 
     private static void syncTime(ImmutableDateTime dateTime, int frame) {
-        lastTimestamp = dateTime.getTime();
+        lastTimestamp = dateTime.getDate();
         activeCamera.timeChanged(lastTimestamp);
 
         for (View view : layers) {
@@ -180,7 +180,7 @@ public class Layers {
      * @return timestamp of the first available image data
      */
     public static Date getStartDate(View view) {
-        return getStartDateImmutable(view).getTime();
+        return getStartDateImmutable(view).getDate();
     }
 
     /**
@@ -192,7 +192,7 @@ public class Layers {
      * @return timestamp of the last available image data
      */
     public static Date getEndDate(View view) {
-        return getEndDateImmutable(view).getTime();
+        return getEndDateImmutable(view).getDate();
     }
 
     /**
@@ -211,7 +211,7 @@ public class Layers {
                 earliest = start;
             }
         }
-        return earliest == null ? null : earliest.getTime();
+        return earliest == null ? null : earliest.getDate();
     }
 
     /**
@@ -230,7 +230,7 @@ public class Layers {
                 latest = end;
             }
         }
-        return latest == null ? null : latest.getTime();
+        return latest == null ? null : latest.getDate();
     }
 
     public static void addLayer(View view) {
