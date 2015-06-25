@@ -10,6 +10,8 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -22,6 +24,18 @@ public class Layers {
 
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<View>();
+
+    private static GL3DCamera activeCamera = new GL3DObserverCamera();
+
+    public static GL3DCamera getActiveCamera() {
+        return activeCamera;
+    }
+
+    public static void setActiveCamera(GL3DCamera camera) {
+        activeCamera.deactivate();
+        camera.activate(activeCamera);
+        activeCamera = camera;
+    }
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -127,7 +141,7 @@ public class Layers {
 
     private static void syncTime(ImmutableDateTime dateTime, int frame) {
         lastTimestamp = dateTime.getTime();
-        Displayer.getActiveCamera().timeChanged(lastTimestamp);
+        activeCamera.timeChanged(lastTimestamp);
 
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));

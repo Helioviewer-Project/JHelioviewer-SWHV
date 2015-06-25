@@ -5,26 +5,22 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 
 /**
- * Action that enables the Solar Rotation Tracking, which ultimately changes the
- * current {@link GL3DCamera} to the
- * {@link GL3DSolarRotationTrackingTrackballCamera}
+ * Action that enables the Solar Rotation Tracking, which changes the
+ * current camera to tracking mode
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class ToggleSolarRotationAction extends AbstractAction {
 
     public ToggleSolarRotationAction() {
         super("Track");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera cam = Displayer.getActiveCamera();
+        GL3DCamera cam = Layers.getActiveCamera();
         cam.setTrackingMode(!cam.getTrackingMode());
     }
 

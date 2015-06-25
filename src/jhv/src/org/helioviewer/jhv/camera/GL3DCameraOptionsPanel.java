@@ -30,6 +30,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
 public class GL3DCameraOptionsPanel extends JPanel {
@@ -47,7 +48,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         setLayout(new GridBagLayout());
         comboBoxModel = new CameraComboboxModel();
 
-        Displayer.setActiveCamera(newCamera);
+        Layers.setActiveCamera(newCamera);
         addInitialCameraTypes();
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
@@ -149,7 +150,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         newCamera.setTrackingMode(previousCamera.getTrackingMode());
         this.switchOptionsPanel(newCamera.getOptionPanel());
 
-        Displayer.setActiveCamera(newCamera);
+        Layers.setActiveCamera(newCamera);
         newCamera.reset();
         previousCamera = newCamera;
     }
@@ -163,13 +164,13 @@ public class GL3DCameraOptionsPanel extends JPanel {
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0"));
 
-        if (Displayer.getActiveCamera() != null)
-            Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+        if (Layers.getActiveCamera() != null)
+            Layers.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
         fovSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+                Layers.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
                 Displayer.display();
             }
         });
