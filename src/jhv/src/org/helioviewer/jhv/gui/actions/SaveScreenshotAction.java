@@ -16,22 +16,29 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
- * Action to save a screenshot in default format (png) to default location
+ * Action to save a screenshot in default format (png) to default location.
  *
+ * <p>
  * The default location is {@link org.helioviewer.jhv.JHVDirectory#EXPORTS}. The
  * name of the file will be determined based in the source file.
  *
  * @author Markus Langenberg
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class SaveScreenshotAction extends AbstractAction {
 
+    /**
+     * Default constructor.
+     */
     public SaveScreenshotAction() {
         super("Save screenshot");
         putValue(SHORT_DESCRIPTION, "Save screenshot to default folder");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String filename = new String(JHVDirectory.EXPORTS.getPath() + getDefaultFileName() + ".png");

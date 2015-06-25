@@ -16,21 +16,28 @@ import org.helioviewer.jhv.gui.actions.filefilters.JPGFilter;
 import org.helioviewer.jhv.gui.actions.filefilters.PNGFilter;
 
 /**
- * Action to save a screenshot in desired image format at desired location
- * Therefore opens a save dialog to choose format, name and location
+ * Action to save a screenshot in desired image format at desired location.
+ * 
+ * <p>
+ * Therefore, opens a save dialog to choose format, name and location.
  * 
  * @author Markus Langenberg
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class SaveScreenshotAsAction extends AbstractAction {
 
+    /**
+     * Default constructor.
+     */
     public SaveScreenshotAsAction() {
         super("Save screenshot as...");
         putValue(SHORT_DESCRIPTION, "Save screenshot to chosen folder");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent e) {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setAcceptAllFileFilterUsed(false);
@@ -47,6 +54,7 @@ public class SaveScreenshotAsAction extends AbstractAction {
             if (!fileFilter.accept(selectedFile)) {
                 selectedFile = new File(selectedFile.getPath() + "." + fileFilter.getDefaultExtension());
             }
+
             ImageViewerGui.getMainComponent().saveScreenshot(fileFilter.getDefaultExtension(), selectedFile);
         }
     }

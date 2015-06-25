@@ -163,7 +163,8 @@ public class GL3DCameraOptionsPanel extends JPanel {
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0"));
 
-        Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
+        if (Displayer.getActiveCamera() != null)
+            Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
         fovSpinner.addChangeListener(new ChangeListener() {
             @Override

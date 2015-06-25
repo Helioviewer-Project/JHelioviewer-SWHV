@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.Point;
-import java.util.Date;
 
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.logging.Log;
@@ -10,12 +9,12 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.TimeListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class GL3DCamera {
+public abstract class GL3DCamera implements TimeListener {
 
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
@@ -58,7 +57,7 @@ public abstract class GL3DCamera {
         this.currentDragRotation = new GL3DQuatd();
         this.localRotation = new GL3DQuatd();
         this.translation = new GL3DVec3d();
-        this.fov = INITFOV;
+        setCameraFOV(INITFOV);
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
         this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
@@ -99,26 +98,6 @@ public abstract class GL3DCamera {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
             this.reset();
         }
-    }
-
-    private GL3DQuatd saveRotation;
-    private GL3DQuatd saveLocalRotation;
-    private GL3DVec3d saveTranslation;
-    private GL3DMat4d saveTransformation;
-
-    public void push(Date date, MetaData m) {
-        saveRotation = rotation.copy();
-        saveLocalRotation = localRotation.copy();
-        saveTranslation = translation.copy();
-        saveTransformation = cameraTransformation.copy();
-        updateRotation(date, m);
-    }
-
-    public void pop() {
-        rotation = saveRotation;
-        localRotation = saveLocalRotation;
-        translation = saveTranslation;
-        cameraTransformation = saveTransformation;
     }
 
     public double getFOVAngleToDraw() {
@@ -176,15 +155,15 @@ public abstract class GL3DCamera {
             return;
         }
 
+        Displayer.render();
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
+
         previousCameraWidth = cameraWidth;
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
 
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-
-        Displayer.render();
-        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
     }
 
     public GL3DMat4d getOrthoMatrixInverse() {
@@ -290,7 +269,7 @@ public abstract class GL3DCamera {
     }
 
     public double getCameraFOV() {
-        return fov;
+        return this.fov;
     }
 
     public void setCameraFOV(double fov) {
@@ -355,9 +334,5 @@ public abstract class GL3DCamera {
     public abstract String getName();
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
-
-    public abstract void timeChanged(Date date);
-
-    public abstract void updateRotation(Date date, MetaData m);
 
 }

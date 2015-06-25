@@ -20,12 +20,13 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.layers.Layers;
 
 /**
- * Action to open a local file
+ * Action to open a local file.
+ * <p>
  * Opens a file chooser dialog, opens the selected file. Currently supports the
  * following file extensions: "jpg", "jpeg", "png", "fts", "fits", "jp2" and
  * "jpx"
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class OpenLocalFileAction extends AbstractAction {
 
     public OpenLocalFileAction() {
@@ -34,6 +35,9 @@ public class OpenLocalFileAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         FileDialog fileDialog = new FileDialog(ImageViewerGui.getMainFrame(), "Choose a file", FileDialog.LOAD);
