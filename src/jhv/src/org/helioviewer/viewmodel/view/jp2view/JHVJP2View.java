@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.net.URI;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
 import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.jhv.display.Displayer;
@@ -40,6 +39,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     }
+
+    protected Region region;
 
     // Member related to JP2
     protected JP2Image jp2Image;
@@ -94,7 +95,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         metaDataArray = jp2Image.metaDataList;
         MetaData metaData = metaDataArray[0];
-        imageViewParams = calculateParameter(new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize()), 0);
+
+        if (region == null)
+            region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+
+        imageViewParams = calculateParameter(region, 0);
 
         try {
             reader = new J2KReader(this);
@@ -380,9 +385,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (jp2Image == null)
             return;
 
-        Region r = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
-
-        JP2ImageParameter newParams = calculateParameter(r, targetFrame);
+        region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
+        JP2ImageParameter newParams = calculateParameter(region, targetFrame);
         if (imageData != null && newParams.equals(imageViewParams)) {
             return;
         }
