@@ -34,6 +34,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         component.addMouseWheelListener(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
         GL3DCamera camera = Displayer.getActiveCamera();
@@ -42,11 +45,17 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseExited(MouseEvent e) {
         component.setCursor(Cursor.getDefaultCursor());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mousePressed(MouseEvent e) {
         GL3DCamera camera = Displayer.getActiveCamera();
@@ -59,6 +68,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         camera.getCurrentInteraction().mousePressed(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
@@ -68,6 +80,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseDragged(MouseEvent e) {
         long currentTime = System.currentTimeMillis();

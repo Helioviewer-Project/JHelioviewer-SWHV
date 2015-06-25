@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
@@ -64,7 +63,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         }
     }
 
-    private void forceTimeChanged(Date date) {
+    public void forceTimeChanged(Date date) {
         if (date == null)
             return;
 
@@ -106,7 +105,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             currentB = p.lat;
         }
 
-        updateRotation(date, null);
+        updateRotation(date);
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
@@ -115,8 +114,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         }
     }
 
-    @Override
-    public void updateRotation(Date date, MetaData m) {
+    private void updateRotation(Date date) {
         Position.Latitudinal p = Sun.getEarth(date);
 
         double b = currentB;

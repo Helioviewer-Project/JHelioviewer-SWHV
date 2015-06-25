@@ -8,15 +8,20 @@ import org.helioviewer.jhv.JHVGlobals;
 
 /**
  * Action to open a browser showing any given URL.
+ * 
+ * <p>
  * This function is platform dependent and tries to open the URL in a browser.
+ * 
  * @author Markus Langenberg
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class OpenURLinBrowserAction extends AbstractAction {
 
     private String urlToOpen;
 
     /**
+     * Default constructor.
+     * 
      * @param name
      *            name of the action that should be displayed on a button
      * @param url
@@ -27,7 +32,6 @@ public class OpenURLinBrowserAction extends AbstractAction {
         urlToOpen = url;
     }
 
-    @Override
     public void actionPerformed(ActionEvent e) {
         JHVGlobals.openURL(urlToOpen);
     }

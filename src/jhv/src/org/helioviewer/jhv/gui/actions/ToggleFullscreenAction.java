@@ -9,12 +9,12 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
- * Action to switch fullscreen mode on and off
- * "fullscreen" means hiding the panel at left side of the window
+ * Action to switch fullscreen mode on and off.
+ * In this case, "fullscreen" means hiding the panel at left side of the window.
  * 
  * @author Markus Langenberg
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class ToggleFullscreenAction extends AbstractAction {
 
     public ToggleFullscreenAction() {
@@ -24,7 +24,9 @@ public class ToggleFullscreenAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.ALT_MASK));
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent e) {
         ImageViewerGui.toggleShowSidePanel();
     }

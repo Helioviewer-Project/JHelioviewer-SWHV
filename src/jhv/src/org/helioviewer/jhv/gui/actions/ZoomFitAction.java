@@ -14,12 +14,14 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * Action to zoom such that the active layer fits completely in the viewport
+ * Action to zoom such that the active layer fits completely in the viewport.
  */
 @SuppressWarnings("serial")
 public class ZoomFitAction extends AbstractAction {
 
     /**
+     * Constructor
+     *
      * @param small
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
@@ -31,6 +33,9 @@ public class ZoomFitAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.ALT_MASK));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();

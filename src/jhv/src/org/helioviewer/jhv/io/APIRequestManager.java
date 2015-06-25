@@ -63,7 +63,7 @@ public class APIRequestManager {
         try {
             view = loadImage(observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
-                date = view.getFrameDateTime(0).getDate();
+                date = view.getFrameDateTime(0).getTime();
                 readDate = true;
 
                 EventQueue.invokeLater(new Runnable() {
