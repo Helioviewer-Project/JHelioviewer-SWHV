@@ -332,11 +332,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             baseDifferenceImageData = newImageData;
         }
 
-        if (imageData != null && Math.abs(frame - imageData.getFrameNumber()) == 1) {
-            previousImageData = imageData;
-        } else if (previousImageData != null && previousImageData.getFrameNumber() - frame > 2) {
+       if (previousImageData != null && previousImageData.getFrameNumber() - frame > 2) {
             previousImageData = newImageData;
-        }
+        } else
+            previousImageData = imageData;
 
         imageData = newImageData;
 
