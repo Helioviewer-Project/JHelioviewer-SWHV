@@ -19,7 +19,7 @@ public class JP2ImageParameter {
     public final ResolutionLevel resolution;
 
     /** Zero based frame number */
-    public int compositionLayer;
+    public final int compositionLayer;
 
     /** This constructor assigns all variables... throw NPE if any args are null */
     public JP2ImageParameter(SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
