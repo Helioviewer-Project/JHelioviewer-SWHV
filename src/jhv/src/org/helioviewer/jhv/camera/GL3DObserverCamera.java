@@ -24,14 +24,14 @@ public class GL3DObserverCamera extends GL3DCamera {
     @Override
     public void reset() {
         super.reset();
-        this.forceTimeChanged(Layers.getLastUpdatedTimestamp());
+        this.forceTimeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        if (Layers.getLastUpdatedTimestamp() != null)
-            this.timeChanged(Layers.getLastUpdatedTimestamp());
+        if (Displayer.getLastUpdatedTimestamp() != null)
+            this.timeChanged(Displayer.getLastUpdatedTimestamp());
         else
             this.timeChanged(new Date());
     }

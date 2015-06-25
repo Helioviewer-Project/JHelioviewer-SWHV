@@ -5,9 +5,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.layers.Layers;
 
 /**
  * Action that resets the view transformation of the current camera
@@ -26,7 +26,7 @@ public class ResetCameraAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Layers.getActiveCamera().reset();
+        Displayer.getActiveCamera().reset();
     }
 
 }

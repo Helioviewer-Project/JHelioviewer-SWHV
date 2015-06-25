@@ -9,6 +9,8 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -20,7 +22,6 @@ import org.helioviewer.viewmodel.view.ViewDataHandler;
 public class Displayer implements JHVEventHighlightListener {
 
     private static Component displayComponent;
-    private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
 
     private static int viewportWidth;
     private static int viewportHeight;
@@ -73,16 +74,43 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
+    private static GL3DCamera activeCamera = new GL3DObserverCamera();
+
+    public static GL3DCamera getActiveCamera() {
+        return activeCamera;
+    }
+
+    public static void setActiveCamera(GL3DCamera camera) {
+        activeCamera.deactivate();
+        camera.activate(activeCamera);
+        activeCamera = camera;
+    }
+
+    private static Date lastTimestamp;
+
+    public static Date getLastUpdatedTimestamp() {
+        if (lastTimestamp == null) {
+            lastTimestamp = Layers.getLastDate();
+        }
+        return lastTimestamp;
+    }
+
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
     private static class DisplayDataHandler implements ViewDataHandler {
 
         @Override
         public void handleData(View view, ImageData imageData) {
-            view.getImageLayer().setImageData(imageData);
             if (view == Layers.getActiveView()) {
+                lastTimestamp = imageData.getMetaData().getDateObs().getDate();
+                activeCamera.timeChanged(lastTimestamp);
+                for (final TimeListener listener : timeListeners) {
+                    listener.timeChanged(lastTimestamp);
+                }
+
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
             }
+            view.getImageLayer().setImageData(imageData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }
@@ -98,12 +126,23 @@ public class Displayer implements JHVEventHighlightListener {
         displayComponent = component;
     }
 
+    private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
+    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
+
     public static void addRenderListener(final RenderListener renderListener) {
         renderListeners.add(renderListener);
     }
 
     public static void removeRenderListener(final RenderListener renderListener) {
         renderListeners.remove(renderListener);
+    }
+
+    public static void addTimeListener(final TimeListener timeListener) {
+        timeListeners.add(timeListener);
+    }
+
+    public static void removeTimeListener(final TimeListener timeListener) {
+        timeListeners.remove(timeListener);
     }
 
     private static final Displayer instance = new Displayer();

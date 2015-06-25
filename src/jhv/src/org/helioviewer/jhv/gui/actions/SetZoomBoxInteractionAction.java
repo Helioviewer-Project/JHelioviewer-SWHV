@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.display.Displayer;
 
 /**
  * Sets the interaction of the current camera to Zoom Box Interaction
@@ -19,7 +19,7 @@ public class SetZoomBoxInteractionAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera cam = Layers.getActiveCamera();
+        GL3DCamera cam = Displayer.getActiveCamera();
         cam.setCurrentInteraction(cam.getZoomInteraction());
     }
 

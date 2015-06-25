@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
@@ -72,7 +73,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
                 EventModel.getSingletonInstance().activateEvents();
 
                 Layers.addLayersListener(DrawController.getSingletonInstance());
-                Layers.addTimeListener(DrawController.getSingletonInstance());
+                Displayer.addTimeListener(DrawController.getSingletonInstance());
             }
         };
         installPlugin.execute();
@@ -80,7 +81,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void uninstallPlugin() {
-        Layers.removeTimeListener(DrawController.getSingletonInstance());
+        Displayer.removeTimeListener(DrawController.getSingletonInstance());
         Layers.removeLayersListener(DrawController.getSingletonInstance());
 
         ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());

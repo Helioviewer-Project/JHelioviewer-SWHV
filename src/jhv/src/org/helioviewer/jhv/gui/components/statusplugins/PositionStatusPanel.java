@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JLabel;
 
 import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
@@ -36,7 +36,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         if (position == lastPosition)
             return;
 
-        GL3DVec3d computedposition = Layers.getActiveCamera().getVectorFromSphereAlt(position);
+        GL3DVec3d computedposition = Displayer.getActiveCamera().getVectorFromSphereAlt(position);
 
         if (computedposition == null) {
             //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");

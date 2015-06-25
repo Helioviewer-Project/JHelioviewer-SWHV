@@ -110,7 +110,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         int w = getWidth();
         int h = getHeight();
-        Layers.getActiveCamera().updateCameraWidthAspect(w / (double) h);
+        Displayer.getActiveCamera().updateCameraWidthAspect(w / (double) h);
         Displayer.setViewportSize(w, h);
     }
 
@@ -121,7 +121,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        Layers.getActiveCamera().applyPerspective(gl);
+        Displayer.getActiveCamera().applyPerspective(gl);
         ImageViewerGui.getRenderableContainer().render(gl);
 
         drawable.swapBuffers();

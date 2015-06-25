@@ -83,8 +83,6 @@ public class RenderableImageLayer implements Renderable {
         indexBufferSize = indexBuffer.capacity();
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-
-        Layers.getActiveCamera().updateCameraTransformation();
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
@@ -106,7 +104,7 @@ public class RenderableImageLayer implements Renderable {
             }
             GLSLShader.filter(gl);
 
-            GL3DCamera camera = Layers.getActiveCamera();
+            GL3DCamera camera = Displayer.getActiveCamera();
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
