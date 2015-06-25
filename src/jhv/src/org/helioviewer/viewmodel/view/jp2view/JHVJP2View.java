@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -234,7 +235,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = Displayer.getViewportHeight() / Displayer.getActiveCamera().getCameraWidth();
+        double ratio = Displayer.getViewportHeight() / Layers.getActiveCamera().getCameraWidth();
         int w = (int) (rWidth * ratio);
         int h = (int) (rHeight * ratio);
 

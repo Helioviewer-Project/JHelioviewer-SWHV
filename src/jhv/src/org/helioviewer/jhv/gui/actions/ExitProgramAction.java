@@ -21,11 +21,10 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 
 /**
- * Action to terminate the application.
- *
+ * Action to terminate the application
  * @author Markus Langenberg
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class ExitProgramAction extends AbstractAction {
 
     public ExitProgramAction() {
@@ -34,9 +33,6 @@ public class ExitProgramAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (Layers.getNumLayers() > 0) {

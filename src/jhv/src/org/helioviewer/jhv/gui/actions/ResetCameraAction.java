@@ -5,15 +5,15 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.layers.Layers;
 
 /**
- * Action that resets the view transformation of the current {@link GL3DCamera}
- * to its default settings.
+ * Action that resets the view transformation of the current camera
+ * to its default settings
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class ResetCameraAction extends AbstractAction {
 
     public ResetCameraAction(boolean small, boolean useIcon) {
@@ -26,7 +26,7 @@ public class ResetCameraAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Displayer.getActiveCamera().reset();
+        Layers.getActiveCamera().reset();
     }
 
 }

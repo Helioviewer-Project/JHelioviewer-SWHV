@@ -9,8 +9,6 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -24,7 +22,6 @@ public class Displayer implements JHVEventHighlightListener {
     private static Component displayComponent;
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
 
-    private static GL3DCamera activeCamera = new GL3DObserverCamera();
     private static int viewportWidth;
     private static int viewportHeight;
 
@@ -40,18 +37,6 @@ public class Displayer implements JHVEventHighlightListener {
     public static int getViewportWidth() {
         return viewportWidth;
     }
-
-    public static void setActiveCamera(GL3DCamera camera) {
-        activeCamera.deactivate();
-        camera.activate(activeCamera);
-        activeCamera = camera;
-    }
-
-    public static GL3DCamera getActiveCamera() {
-        return activeCamera;
-    }
-
-    private static Date lastTimestamp;
 
     private static boolean torender = false;
     private static boolean todisplay = false;

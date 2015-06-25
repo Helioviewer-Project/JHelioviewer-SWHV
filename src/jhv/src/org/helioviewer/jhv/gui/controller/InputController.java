@@ -12,10 +12,10 @@ import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
+import org.helioviewer.jhv.layers.Layers;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -34,31 +34,22 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         component.addMouseWheelListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
-        GL3DCamera camera = Displayer.getActiveCamera();
+        GL3DCamera camera = Layers.getActiveCamera();
         if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
             component.setCursor(buttonDown ? closedHandCursor : openHandCursor);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseExited(MouseEvent e) {
         component.setCursor(Cursor.getDefaultCursor());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DCamera camera = Displayer.getActiveCamera();
+        GL3DCamera camera = Layers.getActiveCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
                 component.setCursor(closedHandCursor);
@@ -68,43 +59,37 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         camera.getCurrentInteraction().mousePressed(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             component.setCursor(openHandCursor);
             buttonDown = false;
         }
-        Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);
+        Layers.getActiveCamera().getCurrentInteraction().mouseReleased(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseDragged(MouseEvent e) {
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-            Displayer.getActiveCamera().getCurrentInteraction().mouseDragged(e);
+            Layers.getActiveCamera().getCurrentInteraction().mouseDragged(e);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseClicked(e);
+        Layers.getActiveCamera().getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
+        Layers.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseMoved(e);
+        Layers.getActiveCamera().getCurrentInteraction().mouseMoved(e);
     }
 
     private final LinkedList<InputControllerPlugin> plugins = new LinkedList<InputControllerPlugin>();

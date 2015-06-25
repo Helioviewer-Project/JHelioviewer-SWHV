@@ -15,14 +15,12 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
 /**
- * Action to zoom such that the active layer fits completely in the viewport.
+ * Action to zoom such that the active layer fits completely in the viewport
  */
 @SuppressWarnings("serial")
 public class ZoomOneToOneAction extends AbstractAction {
 
     /**
-     * Constructor
-     *
      * @param small
      *            - if true, chooses a small (16x16), otherwise a large (24x24)
      *            icon for the action
@@ -34,14 +32,11 @@ public class ZoomOneToOneAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_MASK));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();
         if (view != null) {
-            GL3DCamera camera = Displayer.getActiveCamera();
+            GL3DCamera camera = Layers.getActiveCamera();
             MetaData metaData = view.getImageLayer().getImageData().getMetaData();
             double imageFraction = Displayer.getViewportHeight() / (double) metaData.getPixelHeight();
             double fov = 2. * Math.atan(-metaData.getPhysicalSize().y * imageFraction / 2. / camera.getZTranslation());
