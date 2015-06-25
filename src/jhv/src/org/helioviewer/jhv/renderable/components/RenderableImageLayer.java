@@ -83,8 +83,6 @@ public class RenderableImageLayer implements Renderable {
         indexBufferSize = indexBuffer.capacity();
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
-
-        Displayer.getActiveCamera().updateCameraTransformation();
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
@@ -98,7 +96,7 @@ public class RenderableImageLayer implements Renderable {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
 
-            glImage.applyFilters(gl, imageData, layerView.getPreviousImageData(), layerView.getBaseDifferenceImageData());
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
             GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
             if (!RenderableImageLayer.showCorona) {
@@ -112,9 +110,9 @@ public class RenderableImageLayer implements Renderable {
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(layerView.getBaseDifferenceImageData().getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(layerView.getPreviousImageData().getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
             }
 
             enablePositionVBO(gl);
@@ -174,6 +172,7 @@ public class RenderableImageLayer implements Renderable {
     @Override
     public void remove(GL2 gl) {
         Layers.removeLayer(layerView);
+        imageData = prevImageData = baseImageData = null;
         dispose(gl);
     }
 
@@ -349,9 +348,21 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private ImageData imageData;
+    private ImageData prevImageData;
+    private ImageData baseImageData;
 
-    public void setImageData(ImageData _imageData) {
-        imageData = _imageData;
+    public void setImageData(ImageData newImageData) {
+        int frame = newImageData.getFrameNumber();
+        if (frame == 0) {
+            baseImageData = newImageData;
+        }
+
+        if (imageData == null || (prevImageData != null && prevImageData.getFrameNumber() - frame > 2)) {
+            prevImageData = newImageData;
+        } else
+            prevImageData = imageData;
+
+        imageData = newImageData;
     }
 
     public ImageData getImageData() {

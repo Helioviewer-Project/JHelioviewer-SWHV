@@ -10,19 +10,16 @@ import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
- * Action to show any given dialog.
- *
+ * Action to show any given dialog
  * @author Markus Langenberg
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class ShowDialogAction extends AbstractAction {
 
     private final Class<ShowableDialog> dialogToShow;
     private ShowableDialog dialog;
 
     /**
-     * Default constructor.
-     *
      * @param name
      *            name of the action that shall be displayed on a button
      * @param dialog
@@ -38,9 +35,6 @@ public class ShowDialogAction extends AbstractAction {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         try {

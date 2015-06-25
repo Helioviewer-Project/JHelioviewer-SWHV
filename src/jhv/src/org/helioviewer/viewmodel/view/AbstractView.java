@@ -63,6 +63,11 @@ public abstract class AbstractView implements View {
     }
 
     @Override
+    public MetaData getMetaData(ImmutableDateTime time) {
+        return metaDataArray[getFrame(time)];
+    }
+
+    @Override
     public ImmutableDateTime getFrameDateTime(int frame) {
         if (frame <= 0)
             return metaDataArray[0].getDateObs();
@@ -73,16 +78,6 @@ public abstract class AbstractView implements View {
 
     @Override
     public ImageData getImageData() {
-        return imageData;
-    }
-
-    @Override
-    public ImageData getBaseDifferenceImageData() {
-        return imageData;
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
         return imageData;
     }
 

@@ -8,6 +8,7 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
+import org.helioviewer.viewmodel.metadata.MetaData;
 
 public class GL3DEarthCamera extends GL3DCamera {
 
@@ -48,11 +49,11 @@ public class GL3DEarthCamera extends GL3DCamera {
         }
     }
 
-    public void forceTimeChanged(Date date) {
+    private void forceTimeChanged(Date date) {
         if (date == null)
             return;
 
-        updateRotation(date);
+        updateRotation(date, null);
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
@@ -61,7 +62,8 @@ public class GL3DEarthCamera extends GL3DCamera {
         }
     }
 
-    private void updateRotation(Date date) {
+    @Override
+    public void updateRotation(Date date, MetaData m) {
         Position.Latitudinal p = Sun.getEarth(date);
 
         this.localRotation = new GL3DQuatd(p.lat, p.lon);

@@ -9,6 +9,7 @@ import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 
 /**
  * View to manage an image data source.
@@ -71,11 +72,6 @@ public interface View {
      */
     public URI getDownloadURI();
 
-    public ImageData getBaseDifferenceImageData();
-
-    public ImageData getPreviousImageData();
-
-    public ImageData getImageData();
 
     public LUT getDefaultLUT();
 
@@ -132,6 +128,10 @@ public interface View {
     // <!- only for Layers
     public void setFrame(int frame);
     public int getFrame(ImmutableDateTime time);
+    public MetaData getMetaData(ImmutableDateTime time);
     // -->
+
+    // only for APIRequestManager.loadView() to detect load
+    public ImageData getImageData();
 
 }
