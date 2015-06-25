@@ -63,8 +63,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     private int targetFrame;
 
+    private int frameCount = 0;
+    private long frameCountStart;
+    private float frameRate;
+
     public JHVJP2View() {
         Displayer.addRenderListener(this);
+        frameCountStart = System.currentTimeMillis();
     }
 
     /**
@@ -314,7 +319,18 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public float getActualFramerate() {
-        return render.getActualMovieFramerate();
+        frameCount++;
+
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - frameCountStart;
+
+        if (delta > 1000) {
+            frameRate = 1000.f * frameCount / delta;
+            frameCount = 0;
+            frameCountStart = currentTime;
+        }
+
+        return frameRate;
     }
 
     @Override
