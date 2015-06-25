@@ -172,6 +172,7 @@ public class RenderableImageLayer implements Renderable {
     @Override
     public void remove(GL2 gl) {
         Layers.removeLayer(layerView);
+        imageData = prevImageData = baseImageData = null;
         dispose(gl);
     }
 
