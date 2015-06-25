@@ -60,9 +60,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
     public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
 
-    private ImageData previousImageData;
-    private ImageData baseDifferenceImageData;
-
     public JHVJP2View() {
         Displayer.addRenderListener(this);
     }
@@ -327,30 +324,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (frame == 0) {
-            baseDifferenceImageData = newImageData;
-        }
-
-       if (previousImageData != null && previousImageData.getFrameNumber() - frame > 2) {
-            previousImageData = newImageData;
-        } else
-            previousImageData = imageData;
-
         imageData = newImageData;
 
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
-        return previousImageData;
-    }
-
-    @Override
-    public ImageData getBaseDifferenceImageData() {
-        return baseDifferenceImageData;
     }
 
     @Override

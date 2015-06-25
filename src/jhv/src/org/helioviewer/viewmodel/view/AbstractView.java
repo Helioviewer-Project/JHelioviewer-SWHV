@@ -82,16 +82,6 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public ImageData getBaseDifferenceImageData() {
-        return imageData;
-    }
-
-    @Override
-    public ImageData getPreviousImageData() {
-        return imageData;
-    }
-
-    @Override
     public LUT getDefaultLUT() {
         return null;
     }

@@ -72,11 +72,6 @@ public interface View {
      */
     public URI getDownloadURI();
 
-    public ImageData getBaseDifferenceImageData();
-
-    public ImageData getPreviousImageData();
-
-    public ImageData getImageData();
 
     public LUT getDefaultLUT();
 
@@ -135,5 +130,8 @@ public interface View {
     public int getFrame(ImmutableDateTime time);
     public MetaData getMetaData(ImmutableDateTime time);
     // -->
+
+    // only for APIRequestManager.loadView() to detect load
+    public ImageData getImageData();
 
 }
