@@ -15,14 +15,14 @@ import java.util.TimeZone;
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
     /** Default DateFormat used to format the date. */
-    protected static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 
     /** Default DateFormat used to format the time. */
-    protected static final DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+    private static final DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 
     /** Internal class that holds date/time information. */
-    protected Calendar calendar;
-    protected String cachedDate;
+    private Calendar calendar;
+    private String cachedDate;
 
     /**
      * The constructor that populates the fields of the internal Calendar
@@ -102,7 +102,7 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         return timeFormat.format(calendar.getTime());
     }
 
-    public Date getTime() {
+    public Date getDate() {
         return calendar.getTime();
     }
 

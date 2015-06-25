@@ -43,7 +43,7 @@ public class ViewROI {
 
         GL3DCamera activeCamera = Layers.getActiveCamera();
 
-        activeCamera.push(m.getDateObs().getTime(), m);
+        activeCamera.push(m.getDateObs().getDate(), m);
 
         GL3DQuatd camDiff = activeCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {

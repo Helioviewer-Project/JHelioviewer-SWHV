@@ -142,7 +142,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePosition(MetaDataContainer m) {
-        Date obsDate = dateObs.getTime();
+        Date obsDate = dateObs.getDate();
         Position.Latitudinal p = Sun.getEarth(obsDate);
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
