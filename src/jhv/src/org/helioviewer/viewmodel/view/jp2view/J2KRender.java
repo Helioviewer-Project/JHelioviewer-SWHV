@@ -44,21 +44,16 @@ class J2KRender implements Runnable {
     /** A reference to the compositor used by this JP2Image. */
     private final Kdu_region_compositor compositorRef;
 
-    private final static int NUM_BUFFERS = 1;
-
     /** An integer buffer used in the run method. */
     private int[] localIntBuffer = new int[0];
-    private int[][] intBuffer = new int[NUM_BUFFERS][0];
-    private int currentIntBuffer = 0;
+    private int[] intBuffer = new int[0];
 
     /** A byte buffer used in the run method. */
-    private byte[][] byteBuffer = new byte[NUM_BUFFERS][0];
-    private int currentByteBuffer = 0;
+    private byte[] byteBuffer = new byte[0];
 
     /** Maximum of samples to process per rendering iteration */
     private final int MAX_RENDER_SAMPLES = 50000;
 
-    private float actualMovieFramerate = 0.0f;
     private int lastCompositionLayerRendered = -1;
 
     J2KRender(JHVJP2View _parentViewRef) {
@@ -90,10 +85,6 @@ class J2KRender implements Runnable {
         localIntBuffer = null;
         intBuffer = null;
         byteBuffer = null;
-    }
-
-    public float getActualMovieFramerate() {
-        return actualMovieFramerate;
     }
 
     private static final Object renderLock = new Object();
@@ -139,11 +130,9 @@ class J2KRender implements Runnable {
                 Kdu_dims newRegion = new Kdu_dims();
 
                 if (parentImageRef.getNumComponents() < 2) {
-                    currentByteBuffer = (currentByteBuffer + 1) % NUM_BUFFERS;
-                    byteBuffer[currentByteBuffer] = new byte[roi.getNumPixels()];
+                    byteBuffer = new byte[roi.getNumPixels()];
                 } else {
-                    currentIntBuffer = (currentIntBuffer + 1) % NUM_BUFFERS;
-                    intBuffer[currentIntBuffer] = new int[roi.getNumPixels()];
+                    intBuffer = new int[roi.getNumPixels()];
                 }
 
                 while (!compositorRef.Is_processing_complete()) {
@@ -170,12 +159,12 @@ class J2KRender implements Runnable {
                     if (parentImageRef.getNumComponents() < 2) {
                         for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                             for (int col = 0; col < newWidth; ++col) {
-                                byteBuffer[currentByteBuffer][destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                                byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                             }
                         }
                     } else {
                         for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                            System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
+                            System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                         }
                     }
                 }
@@ -206,10 +195,8 @@ class J2KRender implements Runnable {
 
                         for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                             for (int col = 0; col < newWidth; ++col) {
-                                // long unsignedValue =
-                                // (intBuffer[currentByteBuffer][destIdx + col] &
-                                // 0xffffffffl) >> 24;
-                                intBuffer[currentByteBuffer][destIdx + col] = (intBuffer[currentByteBuffer][destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
+                                // long unsignedValue = (intBuffer[destIdx + col] & 0xffffffffl) >> 24;
+                                intBuffer[destIdx + col] = (intBuffer[destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
                             }
                         }
                     }
@@ -227,10 +214,6 @@ class J2KRender implements Runnable {
 
     @Override
     public void run() {
-        int numFrames = 0;
-        int lastFrame = -1;
-        long tnow, tini = System.currentTimeMillis();
-
         while (!stop) {
             try {
                 parentViewRef.renderSignal.waitForSignal();
@@ -258,28 +241,15 @@ class J2KRender implements Runnable {
             ImageData imdata = null;
 
             if (parentImageRef.getNumComponents() < 2) {
-                imdata = new SingleChannelByte8ImageData(width, height, byteBuffer[currentByteBuffer]);
+                imdata = new SingleChannelByte8ImageData(width, height, byteBuffer);
             } else {
                 boolean singleChannel = false;
                 if (parentImageRef.getNumComponents() == 2) {
                     singleChannel = true;
                 }
-                imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer[currentIntBuffer]);
+                imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer);
             }
             setImageData(imdata, currParams);
-
-            if (lastFrame > curLayer)
-                numFrames -= curLayer - lastFrame;
-            else
-                numFrames += curLayer - lastFrame;
-            lastFrame = curLayer;
-
-            tnow = System.currentTimeMillis();
-            if ((tnow - tini) >= 200) {
-                actualMovieFramerate = (numFrames * 1000.0f) / (tnow - tini);
-                tini = tnow;
-                numFrames = 0;
-            }
         }
     }
 
