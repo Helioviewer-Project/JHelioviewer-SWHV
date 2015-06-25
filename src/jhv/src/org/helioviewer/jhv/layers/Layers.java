@@ -10,32 +10,16 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 public class Layers {
 
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<View>();
-
-    private static GL3DCamera activeCamera = new GL3DObserverCamera();
-
-    public static GL3DCamera getActiveCamera() {
-        return activeCamera;
-    }
-
-    public static void setActiveCamera(GL3DCamera camera) {
-        activeCamera.deactivate();
-        camera.activate(activeCamera);
-        activeCamera = camera;
-    }
 
     /**
      * Returns the view at a given position within the stack of layers.
@@ -75,15 +59,6 @@ public class Layers {
         activeView = view;
         setMasterMovie(view);
         fireActiveLayerChanged(view);
-    }
-
-    private static Date lastTimestamp;
-
-    public static Date getLastUpdatedTimestamp() {
-        if (lastTimestamp == null) {
-            lastTimestamp = getLastDate();
-        }
-        return lastTimestamp;
     }
 
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
@@ -140,18 +115,9 @@ public class Layers {
     }
 
     private static void syncTime(ImmutableDateTime dateTime, int frame) {
-        lastTimestamp = dateTime.getDate();
-        activeCamera.timeChanged(lastTimestamp);
-
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
         }
-
-        // fire TimeChanged
-        for (final TimeListener listener : timeListeners) {
-            listener.timeChanged(lastTimestamp);
-        }
-
         MoviePanel.getSingletonInstance().setFrameSlider(frame);
     }
 
@@ -326,16 +292,7 @@ public class Layers {
         }
     }
 
-    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
     private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
-
-    public static void addTimeListener(final TimeListener timeListener) {
-        timeListeners.add(timeListener);
-    }
-
-    public static void removeTimeListener(final TimeListener timeListener) {
-        timeListeners.remove(timeListener);
-    }
 
     public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);

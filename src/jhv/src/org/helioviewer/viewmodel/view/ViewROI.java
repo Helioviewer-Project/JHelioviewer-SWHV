@@ -5,7 +5,7 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 public class ViewROI {
@@ -41,7 +41,7 @@ public class ViewROI {
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera activeCamera = Layers.getActiveCamera();
+        GL3DCamera activeCamera = Displayer.getActiveCamera();
 
         activeCamera.push(m.getDateObs().getDate(), m);
 

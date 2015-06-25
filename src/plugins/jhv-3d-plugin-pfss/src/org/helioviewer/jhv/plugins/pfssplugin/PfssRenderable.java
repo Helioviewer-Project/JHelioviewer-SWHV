@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -39,7 +40,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void render(GL2 gl) {
         if (isVisible) {
-            Date currentTime = Layers.getLastUpdatedTimestamp();
+            Date currentTime = Displayer.getLastUpdatedTimestamp();
             if (currentTime == null)
                 return;
 

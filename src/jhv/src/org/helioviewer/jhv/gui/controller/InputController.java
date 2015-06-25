@@ -12,10 +12,10 @@ import java.awt.event.MouseWheelListener;
 import java.util.LinkedList;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
-import org.helioviewer.jhv.layers.Layers;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -36,7 +36,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        GL3DCamera camera = Layers.getActiveCamera();
+        GL3DCamera camera = Displayer.getActiveCamera();
         if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
             component.setCursor(buttonDown ? closedHandCursor : openHandCursor);
         }
@@ -49,7 +49,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DCamera camera = Layers.getActiveCamera();
+        GL3DCamera camera = Displayer.getActiveCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
                 component.setCursor(closedHandCursor);
@@ -65,7 +65,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             component.setCursor(openHandCursor);
             buttonDown = false;
         }
-        Layers.getActiveCamera().getCurrentInteraction().mouseReleased(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);
     }
 
     @Override
@@ -73,23 +73,23 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-            Layers.getActiveCamera().getCurrentInteraction().mouseDragged(e);
+            Displayer.getActiveCamera().getCurrentInteraction().mouseDragged(e);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Layers.getActiveCamera().getCurrentInteraction().mouseClicked(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        Layers.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Layers.getActiveCamera().getCurrentInteraction().mouseMoved(e);
+        Displayer.getActiveCamera().getCurrentInteraction().mouseMoved(e);
     }
 
     private final LinkedList<InputControllerPlugin> plugins = new LinkedList<InputControllerPlugin>();

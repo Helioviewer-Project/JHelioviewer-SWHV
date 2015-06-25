@@ -30,7 +30,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.Layers;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private final JLabel loadedLabel;
@@ -264,7 +264,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     private void syncWithLayerCurrentTime() {
-        Date lastDate = Layers.getLastUpdatedTimestamp();
+        Date lastDate = Displayer.getLastUpdatedTimestamp();
         Date currentDate = null;
         if (lastDate != null) {
             currentDate = lastDate;

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 /**
@@ -145,7 +145,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
             return;
 
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-        Date currentDate = Layers.getLastUpdatedTimestamp();
+        Date currentDate = Displayer.getLastUpdatedTimestamp();
 
         GL3DVec3d hitpoint = null;
         mouseOverJHVEvent = null;
@@ -192,7 +192,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        return Layers.getActiveCamera().getVectorFromSphere(e.getPoint());
+        return Displayer.getActiveCamera().getVectorFromSphere(e.getPoint());
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.Date;
 import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 
@@ -33,7 +33,7 @@ public class RenderableCamera implements Renderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        this.optionsPanel = new GL3DCameraOptionsPanel(Layers.getActiveCamera());
+        this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getActiveCamera());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RenderableCamera implements Renderable {
         if (!isVisible)
             return;
 
-        GL3DCamera activeCamera = Layers.getActiveCamera();
+        GL3DCamera activeCamera = Displayer.getActiveCamera();
         double width = activeCamera.getZTranslation() * Math.tan(activeCamera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
