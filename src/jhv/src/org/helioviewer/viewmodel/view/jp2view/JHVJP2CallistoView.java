@@ -12,7 +12,6 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 public class JHVJP2CallistoView extends JHVJP2View {
 
-    private Region region;
     private Viewport viewport;
 
     public JHVJP2CallistoView() {
@@ -26,14 +25,27 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     public boolean setViewport(Viewport v) {
         viewport = v;
-        renderSignal.signal();
+        signalRender();
         return true;
     }
 
     public boolean setRegion(Region r) {
         region = r;
-        setImageViewParams(calculateParameter(region, imageViewParams.compositionLayer), true);
         return true;
+    }
+
+    @Override
+    void signalRender() {
+        // from reader on EDT, might come after abolish
+        if (jp2Image == null)
+            return;
+
+        JP2ImageParameter newParams = calculateParameter(region, 0);
+        if (imageData != null && newParams.equals(imageViewParams)) {
+            return;
+        }
+        imageViewParams = newParams;
+        renderSignal.signal();
     }
 
     @Override
