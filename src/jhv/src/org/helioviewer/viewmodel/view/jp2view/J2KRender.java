@@ -40,11 +40,9 @@ class J2KRender implements Runnable {
     /** An integer buffer used in the run method. */
     static private int[] localIntBuffer = new int[0];
     private int[] intBuffer;
-    private int currentIntBuffer = 0;
 
     /** A byte buffer used in the run method. */
     private byte[] byteBuffer;
-    private int currentByteBuffer = 0;
 
     /** Maximum of samples to process per rendering iteration */
     private final int MAX_RENDER_SAMPLES = 50000;
@@ -97,10 +95,8 @@ class J2KRender implements Runnable {
             Kdu_dims newRegion = new Kdu_dims();
 
             if (parentImageRef.getNumComponents() < 2) {
-                currentByteBuffer = (currentByteBuffer + 1);
                 byteBuffer = new byte[roi.getNumPixels()];
             } else {
-                currentIntBuffer = (currentIntBuffer + 1);
                 intBuffer = new int[roi.getNumPixels()];
             }
 
@@ -133,7 +129,7 @@ class J2KRender implements Runnable {
                     }
                 } else {
                     for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        System.arraycopy(localIntBuffer, srcIdx, intBuffer[currentIntBuffer], destIdx, newWidth);
+                        System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                     }
                 }
             }
