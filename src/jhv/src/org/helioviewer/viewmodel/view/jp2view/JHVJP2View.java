@@ -307,6 +307,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         imageData = newImageData;
 
+        frameCount++;
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }
@@ -319,8 +320,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public float getActualFramerate() {
-        frameCount++;
-
         long currentTime = System.currentTimeMillis();
         long delta = currentTime - frameCountStart;
 
