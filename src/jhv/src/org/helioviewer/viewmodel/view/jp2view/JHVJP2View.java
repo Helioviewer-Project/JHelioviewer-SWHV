@@ -1,7 +1,14 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.net.URI;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.datetime.ImmutableDateTime;
@@ -36,6 +43,18 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
  */
 public class JHVJP2View extends AbstractView implements RenderListener {
 
+    static private class RejectExecution implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            //System.out.println(Thread.currentThread().getName());
+        }
+    }
+
+    BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
+    RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution();//new ThreadPoolExecutor.CallerRunsPolicy();
+    int numOfThread = 1;
+    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, rejectedExecutionHandler);
+
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
     }
@@ -54,18 +73,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
     final BooleanSignal readerSignal = new BooleanSignal(false);
 
-    // Renderer
-    protected J2KRender render;
-    final BooleanSignal renderSignal = new BooleanSignal(false);
-
-    // Renderer-ThreadGroup - This group is necessary to identify all renderer threads
-    public static final ThreadGroup renderGroup = new ThreadGroup("J2KRenderGroup");
-
     private int targetFrame;
 
     private int frameCount = 0;
     private long frameCountStart;
     private float frameRate;
+
+    private boolean stopRender = false;
 
     public JHVJP2View() {
         Displayer.addRenderListener(this);
@@ -108,7 +122,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         try {
             reader = new J2KReader(this);
-            render = new J2KRender(this);
             startDecoding();
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,18 +206,46 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return reader.isConnected();
     }
 
+    private class AbolishThread extends Thread {
+        private JHVJP2View view;
+
+        public Runnable init(JHVJP2View view) {
+            this.view = view;
+            return this;
+        }
+
+        @Override
+        public void run() {
+            EventQueue.invokeLater(new Runnable() {
+                private JHVJP2View view;
+
+                @Override
+                public void run() {
+                    view.abolishExternal();
+                }
+
+                public Runnable init(JHVJP2View view) {
+                    this.view = view;
+                    return this;
+                }
+            }.init(this.view));
+        }
+    }
+
     // Destroy the resources associated with this object
     @Override
     public void abolish() {
-        Displayer.removeRenderListener(this);
+        AbolishThread thread = new AbolishThread();
+        stopRender = true;
+        thread.init(this);
+        exec.submit(thread);
+    }
 
+    public void abolishExternal() {
+        Displayer.removeRenderListener(this);
         if (reader != null) {
             reader.abolish();
             reader = null;
-        }
-        if (render != null) {
-            render.abolish();
-            render = null;
         }
         jp2Image.abolish();
         jp2Image = null;
@@ -212,7 +253,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     // Start the J2KReader/J2KRender threads
     protected void startDecoding() {
-        render.start();
         reader.start();
         readerSignal.signal();
     }
@@ -398,7 +438,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     void signalRender() {
         // from reader on EDT, might come after abolish
-        if (jp2Image == null)
+        if (stopRender == true || jp2Image == null)
             return;
 
         JP2ImageParameter newParams = calculateParameter(region, targetFrame);
@@ -406,7 +446,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             return;
         }
         imageViewParams = newParams;
-        renderSignal.signal();
+
+        J2KRender task = new J2KRender(this, jp2Image, imageViewParams);
+        {
+            blockingQueue.poll();
+            blockingQueue.add(task);
+        }
+        exec.submit(task, Boolean.TRUE);
     }
 
     @Override
