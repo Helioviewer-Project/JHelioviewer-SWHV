@@ -30,8 +30,9 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     public boolean setRegion(Region r) {
+        boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        return true;
+        return changed;
     }
 
     @Override
