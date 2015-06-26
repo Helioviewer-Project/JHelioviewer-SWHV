@@ -345,9 +345,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        imageData = newImageData;
+        if (imageData != null && imageData.getFrameNumber() != frame)
+            ++frameCount;
 
-        frameCount++;
+        imageData = newImageData;
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }
