@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Sign app, comment next line if you don't know the password
-codesign -f -s "SWHV" --keychain "$RESOURCES/swhv.keychain" "$TEMP/JHelioviewer.app"
+#codesign -f -s "SWHV" --keychain "$RESOURCES/swhv.keychain" "$TEMP/JHelioviewer.app"
+codesign -f -s "Developer ID" "$TEMP/JHelioviewer.app"
 
 # Setting up the dir to bundle
 ln -s /Applications "$TEMP/Applications"
