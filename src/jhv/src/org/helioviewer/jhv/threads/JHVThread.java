@@ -13,9 +13,7 @@ public class JHVThread {
         }
 
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName(name);
-            return t;
+            return new Thread(r, name);
         }
     }
 
