@@ -14,7 +14,6 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.threads.CancelTask;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
@@ -106,6 +105,7 @@ public class PfssRenderable implements Renderable, LayersListener {
         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getFirstDate(), Layers.getLastDate()), null);
         PfssPlugin.pfssNewLoadPool.submit(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
+
     }
 
     @Override
