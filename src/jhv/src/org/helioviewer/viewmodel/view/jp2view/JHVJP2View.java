@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
@@ -52,7 +53,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
     RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution();//new ThreadPoolExecutor.CallerRunsPolicy();
     int numOfThread = 1;
-    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, rejectedExecutionHandler);
+    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
     public enum ReaderMode {
         NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
