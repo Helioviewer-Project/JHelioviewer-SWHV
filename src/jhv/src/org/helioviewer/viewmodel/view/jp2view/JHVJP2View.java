@@ -407,7 +407,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                signalRender();
+                signalRender(false);
             }
         }
     }
@@ -433,16 +433,16 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     @Override
     public void render() {
         region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
-        signalRender();
+        signalRender(false);
     }
 
-    void signalRender() {
+    void signalRender(boolean hasExtraData) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;
 
         JP2ImageParameter newParams = calculateParameter(region, targetFrame);
-        if (imageData != null && newParams.equals(imageViewParams)) {
+        if (!hasExtraData && imageData != null && newParams.equals(imageViewParams)) {
             return;
         }
         imageViewParams = newParams;

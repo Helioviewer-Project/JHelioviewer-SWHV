@@ -215,7 +215,7 @@ class J2KReader implements Runnable {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parentViewRef.signalRender();
+                parentViewRef.signalRender(true);
             }
         });
     }
@@ -277,9 +277,9 @@ class J2KReader implements Runnable {
                         // Displayer.display();
                         // Send signal to try again
                         parentViewRef.readerSignal.signal();
-                    }/* catch (JHV_KduException e) {
-                        e.printStackTrace();
-                    } */
+                    }/*
+                      * catch (JHV_KduException e) { e.printStackTrace(); }
+                      */
                 }
 
                 // if socket is open, get image data
@@ -292,11 +292,9 @@ class J2KReader implements Runnable {
                             // contrary to the above comment, last query was spuriously resent
                             req = null;
                             /*
-                            if (req != null && req.getQuery() != null) {
-                                socket.send(req);
-                                socket.receive();
-                            }
-                            */
+                             * if (req != null && req.getQuery() != null) {
+                             * socket.send(req); socket.receive(); }
+                             */
                             // keep socket open as we may need more data
                             //socket.close();
 
@@ -350,7 +348,9 @@ class J2KReader implements Runnable {
                                 if ((num_layers % JPIPConstants.MAX_REQ_LAYERS) != 0)
                                     num_steps++;
 
-                                int lpf = 0, lpi = 0, max_layers = num_layers - 1;
+                                int lpf = 0,
+                                lpi = 0,
+                                max_layers = num_layers - 1;
                                 stepQuerys = new JPIPQuery[num_steps];
 
                                 // create queries for packages containing
@@ -398,15 +398,13 @@ class J2KReader implements Runnable {
                                 socket.send(req);
 
                                 /*
-                                if (Boolean.parseBoolean(System.getProperty("export.movie.debug.on"))) {
-                                    try {
-                                        Thread.sleep(5000);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    throw new IOException();
-                                }
-                                */
+                                 * if (Boolean.parseBoolean(System.getProperty(
+                                 * "export.movie.debug.on"))) { try {
+                                 * Thread.sleep(5000); } catch
+                                 * (InterruptedException e) {
+                                 * e.printStackTrace(); } throw new
+                                 * IOException(); }
+                                 */
 
                                 // long start = System.currentTimeMillis();
                                 res = socket.receive();
