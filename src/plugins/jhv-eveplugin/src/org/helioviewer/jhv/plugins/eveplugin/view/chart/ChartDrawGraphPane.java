@@ -18,8 +18,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -61,7 +59,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
  */
 // Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
-public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener, WindowFocusListener {
+public class ChartDrawGraphPane extends JComponent implements MouseInputListener, ComponentListener, DrawControllerListener, MouseWheelListener {
 
     private final DrawController drawController;
     private Map<YAxisElement, Double> yRatios;
@@ -100,15 +98,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        // addKeyListener(this);
         yRatios = new HashMap<YAxisElement, Double>();
         drawController.addDrawControllerListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         eventModel = EventModel.getSingletonInstance();
-        // ImageViewerGui.getMainFrame().addWindowFocusListener(this);
         timer = new Timer("ChartDrawGraphPane redraw timer");
         timer.schedule(new RedrawTimerTask(), 0, (long) (1000.0 / 20));
-        // timer.schedule(new RedrawTimerTask(), 0, (long) (3000.0));
         setChartInformation();
     }
 
@@ -723,7 +718,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         int scrollValue = e.getWheelRotation();
         double zoomTimeFactor = 10;
-        double zoomValueFactor = 1;
+        double zoomValueFactor = 5;
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getScrollAmount();
             final int mouseX = e.getX();
@@ -781,24 +776,15 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
+                        // startTime >= myPlotAreaSpace.getScaledMinTime()
+                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                        // <= myPlotAreaSpace.getScaledMaxTime()
+                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                        ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 }
             }
         }
-    }
-
-    @Override
-    public void windowGainedFocus(WindowEvent e) {
-        this.requestFocusInWindow();
-    }
-
-    @Override
-    public void windowLostFocus(WindowEvent e) {
     }
 
     private class RedrawTimerTask extends TimerTask {
