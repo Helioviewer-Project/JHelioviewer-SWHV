@@ -407,12 +407,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        signalRender();
-                    }
-                });
+                signalRender();
             }
         }
     }
