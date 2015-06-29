@@ -17,15 +17,14 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
-import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
-import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.view.AbstractView;
-import org.helioviewer.viewmodel.view.ViewDataHandler;
 import org.helioviewer.viewmodel.view.ViewROI;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -408,7 +407,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
             readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
-                signalRender();
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        signalRender();
+                    }
+                });
             }
         }
     }
