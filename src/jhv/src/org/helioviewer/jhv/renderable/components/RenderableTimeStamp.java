@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.datetime.TimeUtils;
@@ -48,7 +49,9 @@ public class RenderableTimeStamp implements Renderable {
     public void render(GL2 gl) {
         if (!isVisible)
             return;
-
+        Date date = Displayer.getLastUpdatedTimestamp();
+        if (date == null)
+            return;
         int sx = GLInfo.pixelScale[0];
         int sy = GLInfo.pixelScale[1];
 
@@ -65,7 +68,7 @@ public class RenderableTimeStamp implements Renderable {
         }
 
         textRenderer.beginRendering(sx * Displayer.getViewportWidth(), sy * Displayer.getViewportHeight(), true);
-        textRenderer.draw(TimeUtils.utcDateFormat.format(Displayer.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
+        textRenderer.draw(TimeUtils.utcDateFormat.format(date), 5 * sx, 5 * sy);
         textRenderer.endRendering();
     }
 
