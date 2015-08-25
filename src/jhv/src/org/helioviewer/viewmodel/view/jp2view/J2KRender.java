@@ -6,6 +6,7 @@ import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
 
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
@@ -58,29 +59,24 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer() {
-
         try {
             int numLayer = currParams.compositionLayer;
 
-            // see TODO below
-            // compositorRef.Refresh();
-            // compositorRef.Remove_compositing_layer(-1, true);
+            compositorRef.Refresh();
+            compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
-            // not needed: the raw component is extracted from codestream
-            // parentImageRef.deactivateColorLookupTable(numLayer);
+            parentImageRef.deactivateColorLookupTable(numLayer);
 
-            // TODO: figure out for getNumComponents() > 2
-            // Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-            // compositorRef.Add_compositing_layer(numLayer, dimsRef1,
-            // dimsRef2);
+            Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
-            parentImageRef.updateResolutionSet(numLayer);
+            compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
 
-            compositorRef.Set_surface_initialization_mode(false);
+            //if (lastCompositionLayerRendered != numLayer) {
+                //lastCompositionLayerRendered = numLayer;
+                parentImageRef.updateResolutionSet(numLayer);
+            //}
+
             compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
-            if (parentImageRef.getNumComponents() <= 2) {
-                compositorRef.Set_single_component(numLayer, 0, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
-            }
 
             SubImage roi = currParams.subImage;
             Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
@@ -94,7 +90,7 @@ class J2KRender implements Runnable {
 
             Kdu_dims newRegion = new Kdu_dims();
 
-            if (parentImageRef.getNumComponents() < 2) {
+            if (parentImageRef.getNumComponents() < 3) {
                 byteBuffer = new byte[roi.getNumPixels()];
             } else {
                 intBuffer = new int[roi.getNumPixels()];
@@ -121,7 +117,7 @@ class J2KRender implements Runnable {
                 int srcIdx = 0;
                 int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
-                if (parentImageRef.getNumComponents() < 2) {
+                if (parentImageRef.getNumComponents() < 3) {
                     for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                         for (int col = 0; col < newWidth; ++col) {
                             byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
@@ -134,46 +130,12 @@ class J2KRender implements Runnable {
                 }
             }
 
-            if (parentImageRef.getNumComponents() == 2) {
-                // extract alpha component
-                compositorRef.Set_single_component(numLayer, 1, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS);
-                while (!compositorRef.Is_processing_complete()) {
-                    compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
-                    Kdu_coords newOffset = newRegion.Access_pos();
-                    Kdu_coords newSize = newRegion.Access_size();
-
-                    newOffset.Subtract(actualOffset);
-
-                    int newWidth = newSize.Get_x();
-                    int newHeight = newSize.Get_y();
-                    int newPixels = newWidth * newHeight;
-
-                    if (newPixels == 0) {
-                        continue;
-                    }
-
-                    localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-                    compositorBuf.Get_region(newRegion, localIntBuffer);
-
-                    int srcIdx = 0;
-                    int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
-
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            intBuffer[destIdx + col] = (intBuffer[destIdx + col] & 0x00FFFFFF) | ((localIntBuffer[srcIdx + col] & 0x00FF0000) << 8);
-                        }
-                    }
-                }
-            }
-
             if (compositorBuf != null) {
                 compositorBuf.Native_destroy();
             }
-
         } catch (KduException e) {
             e.printStackTrace();
         }
-
     }
 
     private static final Object renderLock = new Object();
@@ -188,17 +150,12 @@ class J2KRender implements Runnable {
         int height = roi.height;
         ImageData imdata = null;
 
-        if (parentImageRef.getNumComponents() < 2) {
+        if (parentImageRef.getNumComponents() < 3) {
             imdata = new SingleChannelByte8ImageData(width, height, byteBuffer);
         } else {
-            boolean singleChannel = false;
-            if (parentImageRef.getNumComponents() == 2) {
-                singleChannel = true;
-            }
-            imdata = new ARGBInt32ImageData(singleChannel, width, height, intBuffer);
+            imdata = new ARGBInt32ImageData(false, width, height, intBuffer);
         }
         setImageData(imdata, currParams);
-
     }
 
     private void setImageData(ImageData newImdata, JP2ImageParameter newParams) {
