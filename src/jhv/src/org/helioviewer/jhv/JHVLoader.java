@@ -35,7 +35,9 @@ public class JHVLoader {
         ArrayList<String> kduLibs = new ArrayList<String>();
 
         if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-64")) {
-            kduLibs.add("libkdu_jni-mac-x86-64.jnilib");
+            kduLibs.add("libkdu_v76R.so");
+            kduLibs.add("libkdu_a76R.so");
+            kduLibs.add("libkdu_jni.jnilib");
             pathlib = "macosx-universal/";
         /* obsolete computer
         } else if (System.getProperty("jhv.os").equals("mac") && System.getProperty("jhv.arch").equals("x86-32")) {

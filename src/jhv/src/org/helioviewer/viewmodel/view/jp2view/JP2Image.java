@@ -16,6 +16,8 @@ import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_ilayer_ref;
+import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_tile;
 
@@ -249,14 +251,14 @@ public class JP2Image {
             // I don't know if I should be using the codestream in a persistent
             // mode or not...
             compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
-            compositor.Set_thread_env(JHV_Kdu_thread_env.getThreadEnv(), 0);
+            compositor.Set_thread_env(JHV_Kdu_thread_env.getThreadEnv(), null);
 
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
             Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
 
             // A layer must be added to determine the image parameters
-            compositor.Add_compositing_layer(0, ref1, ref2);
+            compositor.Add_ilayer(0, ref1, ref2);
 
             {
                 // Retrieve the number of composition layers
@@ -266,7 +268,7 @@ public class JP2Image {
                     frameCount = tempVar[0];
                 }
 
-                Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_codestream(0, false, true));
+                Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
 
                 // Retrieve the number of components
                 {
@@ -296,7 +298,7 @@ public class JP2Image {
 
             updateResolutionSet(0);
             // Remove the layer that was added
-            compositor.Remove_compositing_layer(-1, true);
+            compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
         } catch (KduException ex) {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
@@ -408,7 +410,7 @@ public class JP2Image {
 
         try {
             if (compositor != null) {
-                compositor.Remove_compositing_layer(-1, true);
+                compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
                 compositor.Native_destroy();
             }
             if (jpxSrc != null) {
@@ -440,7 +442,7 @@ public class JP2Image {
         resolutionSetCompositionLayer = compositionLayerCurrentlyInUse;
 
         try {
-            Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_codestream(0, false, true));
+            Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
 
             int maxDWT = stream.Get_min_dwt_levels();
 
