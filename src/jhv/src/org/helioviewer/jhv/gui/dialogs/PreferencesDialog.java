@@ -8,12 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -31,12 +29,10 @@ import javax.swing.table.TableModel;
 
 import org.apache.log4j.Level;
 import org.helioviewer.base.logging.LogSettings;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
  * Dialog that allows the user to change default preferences and settings.
@@ -53,10 +49,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JRadioButton loadDefaultMovieOnStartUp;
     private JRadioButton doNothingOnStartUp;
     private JPanel paramsPanel;
-    private final JCheckBox limitMaxSize = new JCheckBox("Limit size");
-    private final JLabel occupiedSizeLabel = new JLabel();
-    private final JTextField maxCacheBox = new JTextField("0.0");
-    private final JLabel maxCacheBoxLabel = new JLabel("Mbytes");
     private JComboBox debugFileCombo = null;
     private JComboBox debugConsoleCombo = null;
     private JTextField debugFileTextField = null;
@@ -86,7 +78,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         JPanel jpipSupPanel = new JPanel(new BorderLayout());
         jpipSupPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        jpipSupPanel.add(createJPIPCachePanel(), BorderLayout.CENTER);
 
         panel.add(paramsSubPanel, BorderLayout.NORTH);
         panel.add(defaultsSubPanel, BorderLayout.CENTER);
@@ -104,16 +95,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         acceptBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if (limitMaxSize.isSelected() && !(Double.parseDouble(maxCacheBox.getText()) > 0.0)) {
-                        Message.err("Invalid value", "The value for the maximal cache size must be greater than 0.", false);
-                        return;
-                    }
-                } catch (NumberFormatException ex) {
-                    Message.err("Invalid value", "The value for the maximal cache size is not a number.", false);
-                    return;
-                }
-
                 saveSettings();
                 dispose();
             }
@@ -132,7 +113,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 if (JOptionPane.showConfirmDialog(null, "Do you really want to reset the setting values?", "Attention", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     defaultsPanel.resetSettings();
                     loadDefaultMovieOnStartUp.setSelected(true);
-                    maxCacheBox.setText("0.0");
 
                     LogSettings logSettings = LogSettings.getSingletonInstance();
 
@@ -189,8 +169,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         // Start up
         loadDefaultMovieOnStartUp.setSelected(Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
         doNothingOnStartUp.setSelected(!Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
-        // The current cache size
-        occupiedSizeLabel.setText(getCacheSizeText());
+
         // Debug options
         LogSettings logSettings = LogSettings.getSingletonInstance();
         if (debugFileCombo != null) {
@@ -203,18 +182,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Default values
         defaultsPanel.loadSettings();
-        // Maximum JPIP cache size
-        maxCacheBox.setText(settings.getProperty("jpip.cache.size"));
-
-        try {
-            limitMaxSize.setSelected(Double.parseDouble(maxCacheBox.getText()) > 0);
-        } catch (NumberFormatException e) {
-            maxCacheBox.setText("0.0");
-            limitMaxSize.setSelected(false);
-        }
-
-        maxCacheBox.setVisible(limitMaxSize.isSelected());
-        maxCacheBoxLabel.setVisible(limitMaxSize.isSelected());
     }
 
     /**
@@ -239,76 +206,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         // Default values
         defaultsPanel.saveSettings();
-        // Maximum JPIP cache size
-        if (limitMaxSize.isSelected())
-            settings.setProperty("jpip.cache.size", maxCacheBox.getText());
-        else
-            settings.setProperty("jpip.cache.size", "0.0");
-
-        // Update and save settings
-        settings.update();
         settings.save();
         LogSettings.getSingletonInstance().update();
-    }
-
-    /**
-     * Builds the string showing the size of the cache currently used.
-     *
-     * @return String showing the size of the cache currently used
-     */
-    private String getCacheSizeText() {
-        long len = 0;
-        File[] list = JHV_Kdu_cache.getCacheFiles(JHVDirectory.CACHE.getFile());
-
-        for (File f : list)
-            len += f.length();
-
-        if (len < 1024)
-            return ("Current size: " + len + " bytes");
-        else if (len < 1048576)
-            return ("Current size: " + (Math.round((len / 1024.0) * 100.0) / 100.0) + " Kbytes");
-        else
-            return ("Current size: " + (Math.round((len / 1048576.0) * 100.0) / 100.0) + " Mbytes");
-    }
-
-    /**
-     * Creates the JPIP cache panel.
-     *
-     * @return JPIP cache panel
-     */
-    private JPanel createJPIPCachePanel() {
-        JPanel cachePanel = new JPanel(new GridLayout(0, 1));
-        cachePanel.setBorder(BorderFactory.createTitledBorder(" JPIP Cache "));
-
-        // cache location
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row1.add(new JLabel("Cache location: " + JHVDirectory.CACHE.getFile().getAbsolutePath()));
-
-        // used cache size
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row2.add(occupiedSizeLabel);
-
-        // maximum cache size
-        maxCacheBox.setPreferredSize(new Dimension(80, maxCacheBox.getPreferredSize().height));
-
-        limitMaxSize.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                maxCacheBox.setVisible(limitMaxSize.isSelected());
-                maxCacheBoxLabel.setVisible(limitMaxSize.isSelected());
-            }
-        });
-
-        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row3.add(limitMaxSize);
-        row3.add(maxCacheBox);
-        row3.add(maxCacheBoxLabel);
-
-        cachePanel.add(row1);
-        cachePanel.add(row2);
-        cachePanel.add(row3);
-
-        return cachePanel;
     }
 
     /**
