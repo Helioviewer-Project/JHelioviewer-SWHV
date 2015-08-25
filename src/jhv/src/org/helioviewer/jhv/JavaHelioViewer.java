@@ -14,7 +14,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduEngine;
 
 /**
@@ -95,10 +94,6 @@ public class JavaHelioViewer {
             return;
         }
 
-        // Apply settings after kakadu engine has been initialized
-        Log.info("Use cache directory: " + JHVDirectory.CACHE.getPath());
-        JP2Image.setCachePath(JHVDirectory.CACHE.getFile());
-        Settings.getSingletonInstance().update();
         FileUtils.deleteDir(JHVDirectory.PLUGINSCACHE.getFile());
         JHVDirectory.PLUGINSCACHE.getFile().mkdirs();
         EventQueue.invokeLater(new Runnable() {
