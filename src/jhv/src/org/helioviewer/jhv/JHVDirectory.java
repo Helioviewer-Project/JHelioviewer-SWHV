@@ -25,18 +25,6 @@ public enum JHVDirectory {
             return new File(getPath());
         }
     },
-    /** The image cache directory. */
-    CACHE {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Cache" + File.separator;
-        }
-
-        @Override
-        public File getFile() {
-            return new File(getPath());
-        }
-    },
     /** The shared library directory. */
     LIBS {
         @Override

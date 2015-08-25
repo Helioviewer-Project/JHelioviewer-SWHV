@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 
 /**
  * A class that stores and reads default values in a settings file.
@@ -86,28 +85,6 @@ public class Settings {
             userProperties.store(fileOutput, null);
             fileOutput.close();
         } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * The new property values are updated.
-     */
-    public void update() {
-        try {
-            double size = 0;
-            String val = getProperty("jpip.cache.size");
-            if (val != null) {
-                try {
-                    size = Double.valueOf(val);
-                } catch (NumberFormatException ex) {
-                    Log.error(">> Settings.update(boolean) > Invalid jpip cache size: " + val);
-                }
-                setProperty("jpip.cache.size", Double.toString(size));
-            }
-
-            JHV_Kdu_cache.updateCacheDirectory(JHVDirectory.CACHE.getFile(), size);
-        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
