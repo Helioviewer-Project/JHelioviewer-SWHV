@@ -37,14 +37,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
     private final String targetID;
 
     /**
-     * The amount of new data placed in this object via the addDataSegment
-     * method starting after the initial readCacheFromFile method.
-     */
-    private volatile int newData;
-
-    private static long maxCacheSize = 0;
-
-    /**
      * Main constructor used when you want to use a cache file.
      * 
      * @param _targetID
@@ -53,7 +45,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
     public JHV_Kdu_cache(String _targetID) {
         super();
         targetID = _targetID;
-        newData = 0;
     }
 
     /**
@@ -62,32 +53,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
      */
     public void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
         status = imageCacheStatus;
-    }
-
-    /**
-     * Returns the amount of new data.
-     * 
-     * @return Amount of new data.
-     */
-    public int getNewDataSize() {
-        return newData;
-    }
-
-    /**
-     * Returns the total amount of data in the cache object.
-     * 
-     * @return Total amount of data in the cache object.
-     * @throws JHV_KduException
-     */
-    public int getTotalDataSize() throws JHV_KduException {
-        int totalSize = 0;
-        try {
-            for (JPIPDatabinClass databinClass : JPIPDatabinClass.values())
-                totalSize += Get_transferred_bytes(databinClass.getKakaduClassID());
-        } catch (KduException ex) {
-            throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
-        }
-        return totalSize;
     }
 
     /**
@@ -135,8 +100,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
         } catch (KduException ex) {
             ex.printStackTrace();
         }
-
-        newData = 0;
         return true;
     }
 
@@ -177,21 +140,15 @@ public class JHV_Kdu_cache extends Kdu_cache {
     public void addDataSegment(JPIPDataSegment _data) throws JHV_KduException {
         try {
             Add_to_databin(_data.classID.getKakaduClassID(), _data.codestreamID, _data.binID, _data.data, _data.offset, _data.length, _data.isFinal, true, false);
-
-            newData += _data.length;
-
         } catch (KduException ex) {
             throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
         }
 
         if (status != null) {
             int compositionLayer = (int) _data.codestreamID;
-
             if (compositionLayer >= 0) {
-
                 if (_data.classID.getKakaduClassID() == KakaduConstants.KDU_PRECINCT_DATABIN && status.getImageStatus(compositionLayer) == CacheStatus.HEADER)
                     status.setImageStatus(compositionLayer, CacheStatus.PARTIAL);
-
                 else if (_data.classID.getKakaduClassID() == KakaduConstants.KDU_MAIN_HEADER_DATABIN && _data.isFinal)
                     status.setImageStatus(compositionLayer, CacheStatus.HEADER);
             }
