@@ -457,30 +457,4 @@ public class KakaduUtils {
         }
     }
 
-    /**
-     * This method updates the server cache model. The JPIPSocket object should
-     * be connected already.
-     *
-     * @param _socket
-     * @param _cache
-     * @throws IOException
-     * @throws JHV_KduException
-     */
-    public static void updateServerCacheModel(JPIPSocket _socket, JHV_Kdu_cache _cache, boolean force) throws IOException, JHV_KduException {
-        String cModel = _cache.buildCacheModelUpdateString(force);
-        if (cModel == null)
-            return;
-
-        JPIPQuery cacheUpdateQuery = new JPIPQuery();
-        cacheUpdateQuery.setField("model", cModel);
-
-        JPIPRequest req = new JPIPRequest(JPIPRequest.Method.POST);
-        req.setQuery(cacheUpdateQuery.toString());
-
-        _socket.send(req);
-        JPIPResponse res = _socket.receive();
-
-        _cache.addJPIPResponseData(res);
-    }
-
 }

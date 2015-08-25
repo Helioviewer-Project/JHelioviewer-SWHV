@@ -50,11 +50,7 @@ public class JP2Image {
     /** This is the URI from whch the whole file can be downloaded via http */
     private final URI downloadURI;
 
-    /**
-     * This is the object in which all transmitted data is stored. It has the
-     * ability to write itself to disk, and read a relevant cache file from
-     * disk.
-     */
+    /** This is the object in which all transmitted data is stored */
     private JHV_Kdu_cache cache;
 
     /**
@@ -86,9 +82,6 @@ public class JP2Image {
      * multiple frames
      */
     private boolean isJpx = false;
-
-    /** cache path */
-    private static File cachePath;
 
     protected MetaData[] metaDataList;
 
@@ -176,28 +169,25 @@ public class JP2Image {
             }
 
             // Creates the cache object and adds the first response to it.
-            cache = new JHV_Kdu_cache(jpipTargetID, cachePath, !isJpx);
+            cache = new JHV_Kdu_cache(jpipTargetID);
             cache.addJPIPResponseData(res);
 
-            // Download the necessary initial data if there isn't any cache file
-            // yet
-            if ((cache.getCacheFile() == null) || !cache.getCacheFile().exists()) {
-                boolean initialDataLoaded = false;
-                int numTries = 0;
+            // Download the necessary initial data
+            boolean initialDataLoaded = false;
+            int numTries = 0;
 
-                do {
-                    try {
-                        KakaduUtils.downloadInitialData(socket, cache);
-                        initialDataLoaded = true;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        numTries++;
-                        socket.close();
-                        socket = new JPIPSocket();
-                        socket.connect(uri);
-                    }
-                } while (!initialDataLoaded && numTries < 5);
-            }
+            do {
+                try {
+                    KakaduUtils.downloadInitialData(socket, cache);
+                    initialDataLoaded = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    numTries++;
+                    socket.close();
+                    socket = new JPIPSocket();
+                    socket.connect(uri);
+                }
+            } while (!initialDataLoaded && numTries < 5);
 
             familySrc.Open(cache);
 
@@ -390,14 +380,6 @@ public class JP2Image {
         return resolutionSet;
     }
 
-    public static void setCachePath(File newCachePath) {
-        cachePath = newCachePath;
-    }
-
-    public static File getCachePath() {
-        return cachePath;
-    }
-
     /**
      * Increases the reference counter.
      *
@@ -440,8 +422,6 @@ public class JP2Image {
             if (cache != null) {
                 cache.Close();
                 cache.Native_destroy();
-
-                JHV_Kdu_cache.updateCacheDirectory(cachePath);
             }
         } catch (KduException ex) {
             ex.printStackTrace();
