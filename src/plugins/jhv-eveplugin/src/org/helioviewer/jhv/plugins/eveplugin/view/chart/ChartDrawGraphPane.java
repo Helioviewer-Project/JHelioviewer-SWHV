@@ -36,8 +36,8 @@ import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.IconBank;

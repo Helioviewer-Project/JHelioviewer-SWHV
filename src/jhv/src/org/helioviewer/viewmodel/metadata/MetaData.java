@@ -1,8 +1,8 @@
 package org.helioviewer.viewmodel.metadata;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
+import org.helioviewer.base.time.ImmutableDateTime;
 
 /**
  * Basic interface for meta data.

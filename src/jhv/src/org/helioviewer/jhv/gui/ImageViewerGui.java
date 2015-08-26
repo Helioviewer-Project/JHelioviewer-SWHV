@@ -168,7 +168,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        mainComponent.display();
+        // mainComponent.display();
     }
 
     private static JFrame createMainFrame() {

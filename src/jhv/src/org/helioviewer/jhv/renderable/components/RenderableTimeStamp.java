@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;

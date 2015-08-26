@@ -11,8 +11,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.base.Region;
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DVec2d;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;

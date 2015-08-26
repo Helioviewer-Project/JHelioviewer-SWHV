@@ -27,8 +27,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;

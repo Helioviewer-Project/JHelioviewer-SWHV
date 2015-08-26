@@ -5,10 +5,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;

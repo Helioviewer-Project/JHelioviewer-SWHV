@@ -1,4 +1,4 @@
-package org.helioviewer.base.datetime;
+package org.helioviewer.base.time;
 
 import java.text.DateFormat;
 import java.util.Calendar;

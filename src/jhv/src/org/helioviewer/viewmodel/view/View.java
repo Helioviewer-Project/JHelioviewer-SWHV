@@ -4,7 +4,7 @@ import java.net.URI;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;

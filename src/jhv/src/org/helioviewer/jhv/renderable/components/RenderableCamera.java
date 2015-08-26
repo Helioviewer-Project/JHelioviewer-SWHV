@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.Date;
 
-import org.helioviewer.base.datetime.TimeUtils;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;

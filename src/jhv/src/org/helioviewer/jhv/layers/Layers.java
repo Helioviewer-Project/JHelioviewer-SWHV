@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
