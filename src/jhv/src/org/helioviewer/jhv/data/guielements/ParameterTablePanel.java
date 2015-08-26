@@ -56,8 +56,10 @@ public class ParameterTablePanel extends JPanel {
         table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setPreferredWidth(180);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
+        table.getColumnModel().getColumn(0).setResizable(false);
+        table.getColumnModel().getColumn(0).setMaxWidth(180);
         table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         table.setRowSorter(sorter);
 

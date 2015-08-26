@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
@@ -145,8 +146,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         allTablePanelConstraint.weightx = 1;
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
-        // this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
-        this.add(allTablePanel, allTablePanelConstraint);
+        this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
+        // this.add(allTablePanel, allTablePanelConstraint);
     }
 
     /**
