@@ -181,24 +181,21 @@ public class RenderableGrid implements Renderable {
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 
             // last: Earth circles - static color, undo rotation
-            Date timestamp = Displayer.getLastUpdatedTimestamp();
-            if (timestamp != null) {
-                gl.glColor4f(1, 1, 0, 1);
+            gl.glColor4f(1, 1, 0, 1);
 
-                gl.glPushMatrix();
-                gl.glRotatef(-90, 0, 1, 0);
-                gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-                {
-                    Position.Latitudinal p = Sun.getEarth(timestamp);
-                    gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
-                    gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+            gl.glPushMatrix();
+            gl.glRotatef(-90, 0, 1, 0);
+            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+            {
+                Position.Latitudinal p = Sun.getEarth(Displayer.getLastUpdatedTimestamp());
+                gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
+                gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
+                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
 
-                    gl.glRotatef(90, 1, 0, 0);
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
-                }
-                gl.glPopMatrix();
+                gl.glRotatef(90, 1, 0, 0);
+                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
             }
+            gl.glPopMatrix();
         }
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);

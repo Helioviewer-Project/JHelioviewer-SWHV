@@ -30,10 +30,7 @@ public class GL3DObserverCamera extends GL3DCamera {
     @Override
     public void activate(GL3DCamera precedingCamera) {
         super.activate(precedingCamera);
-        if (Displayer.getLastUpdatedTimestamp() != null)
-            this.timeChanged(Displayer.getLastUpdatedTimestamp());
-        else
-            this.timeChanged(new Date());
+        this.timeChanged(Displayer.getLastUpdatedTimestamp());
     }
 
     @Override

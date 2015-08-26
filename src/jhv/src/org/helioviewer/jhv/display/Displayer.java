@@ -9,6 +9,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.datetime.ImmutableDateTime;
+import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -86,12 +87,9 @@ public class Displayer implements JHVEventHighlightListener {
         activeCamera = camera;
     }
 
-    private static Date lastTimestamp;
+    private static Date lastTimestamp = TimeUtils.epoch.getDate();
 
     public static Date getLastUpdatedTimestamp() {
-        if (lastTimestamp == null) {
-            lastTimestamp = Layers.getLastDate();
-        }
         return lastTimestamp;
     }
 
