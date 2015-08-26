@@ -4,8 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.helioviewer.base.datetime.JulianDay;
 import org.helioviewer.base.math.MathUtils;
+import org.helioviewer.base.time.JulianDay;
 
 import org.apache.commons.lang3.time.DateUtils;
 

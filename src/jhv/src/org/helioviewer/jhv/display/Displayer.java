@@ -8,8 +8,8 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.datetime.ImmutableDateTime;
-import org.helioviewer.base.datetime.TimeUtils;
+import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;

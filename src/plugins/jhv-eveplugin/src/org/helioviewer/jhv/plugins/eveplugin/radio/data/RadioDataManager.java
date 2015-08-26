@@ -9,9 +9,9 @@ import java.util.Map;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;

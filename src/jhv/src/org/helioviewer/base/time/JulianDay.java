@@ -1,4 +1,4 @@
-package org.helioviewer.base.datetime;
+package org.helioviewer.base.time;
 
 // derived from SOFA (http://www.iausofa.org)
 public class JulianDay {

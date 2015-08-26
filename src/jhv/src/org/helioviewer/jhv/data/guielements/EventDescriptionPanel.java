@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.datetime.TimeUtils;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**

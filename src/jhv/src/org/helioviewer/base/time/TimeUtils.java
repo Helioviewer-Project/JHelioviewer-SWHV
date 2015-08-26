@@ -1,4 +1,4 @@
-package org.helioviewer.base.datetime;
+package org.helioviewer.base.time;
 
 import java.util.TimeZone;
 

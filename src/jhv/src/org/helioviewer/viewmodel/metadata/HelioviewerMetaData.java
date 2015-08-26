@@ -5,12 +5,12 @@ import java.util.Date;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 /**

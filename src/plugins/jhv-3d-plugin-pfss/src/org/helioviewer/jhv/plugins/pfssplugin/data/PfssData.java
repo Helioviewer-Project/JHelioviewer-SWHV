@@ -12,7 +12,7 @@ import nom.tam.fits.Header;
 
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.datetime.TimeUtils;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;

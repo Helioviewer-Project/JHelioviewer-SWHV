@@ -30,8 +30,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;

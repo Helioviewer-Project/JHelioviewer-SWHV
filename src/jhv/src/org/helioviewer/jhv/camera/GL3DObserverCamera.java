@@ -3,8 +3,8 @@ package org.helioviewer.jhv.camera;
 import java.util.Date;
 
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.datetime.ImmutableDateTime;
 import org.helioviewer.base.math.GL3DQuatd;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;

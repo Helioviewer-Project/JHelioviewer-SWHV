@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;

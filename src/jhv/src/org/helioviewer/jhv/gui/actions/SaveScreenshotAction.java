@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.base.datetime.TimeUtils;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 

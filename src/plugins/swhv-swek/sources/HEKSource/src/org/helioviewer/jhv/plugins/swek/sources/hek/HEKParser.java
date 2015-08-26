@@ -15,9 +15,9 @@ import java.util.Scanner;
 
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.datetime.TimeUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
