@@ -195,7 +195,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
-        coronaVisibilityButton.setToolTipText("Show off-disk corona");
+        coronaVisibilityButton.setToolTipText("Toggle off-disk corona");
         addButton(coronaVisibilityButton);
 
         addSeparator();
