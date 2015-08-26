@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
-import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -34,7 +33,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.RemoveCellRenderer;
-import org.helioviewer.jhv.renderable.gui.TableRowTransferHandler;
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
@@ -160,9 +158,9 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
                 repaint();
             }
         });
-        grid.setDragEnabled(true);
-        grid.setDropMode(DropMode.INSERT_ROWS);
-        grid.setTransferHandler(new TableRowTransferHandler(grid));
+        // grid.setDragEnabled(true);
+        // grid.setDropMode(DropMode.INSERT_ROWS);
+        // grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         optionsPanelWrapper = new JPanel();
         optionsPanelWrapper.setLayout(new BorderLayout());
