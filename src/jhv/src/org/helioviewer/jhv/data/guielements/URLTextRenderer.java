@@ -21,6 +21,12 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     private int row = -1;
     private int col = -1;
     private boolean isRollover;
+    private final Pattern pattern;
+
+    public URLTextRenderer() {
+        String patternString = "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
+        pattern = Pattern.compile(patternString);
+    }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -43,8 +49,6 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
             String strValue = (String) value;
             strValue = strValue.trim();
             strValue = strValue.toLowerCase();
-            String patternString = "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
-            Pattern pattern = Pattern.compile(patternString);
             Matcher matcher = pattern.matcher(strValue);
             return matcher.matches();
         } else {
