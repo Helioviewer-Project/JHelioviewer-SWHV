@@ -8,11 +8,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 
 /**
  * The model for parameter table panel.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class ParameterTableModel extends AbstractTableModel {
 
     /** The parameters in this model */
@@ -20,7 +20,7 @@ public class ParameterTableModel extends AbstractTableModel {
 
     /**
      * Creates a parameter model for the given parameters.
-     * 
+     *
      * @param parameters
      *            the parameters
      */
@@ -37,6 +37,15 @@ public class ParameterTableModel extends AbstractTableModel {
     @Override
     public int getColumnCount() {
         return 2;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == 1) {
+            return String.class;
+        } else {
+            return super.getColumnClass(columnIndex);
+        }
     }
 
     @Override
