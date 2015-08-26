@@ -36,7 +36,7 @@ public class EventsSelectorElement implements LineDataSelectorElement {
 
     @Override
     public Color getDataColor() {
-        return Color.black;
+        return null;
     }
 
     @Override

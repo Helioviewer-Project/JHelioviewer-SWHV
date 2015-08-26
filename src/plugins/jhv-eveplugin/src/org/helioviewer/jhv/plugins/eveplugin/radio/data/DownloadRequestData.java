@@ -74,7 +74,7 @@ public class DownloadRequestData implements LineDataSelectorElement {
 
     @Override
     public Color getDataColor() {
-        return Color.black;
+        return null;
     }
 
     @Override
