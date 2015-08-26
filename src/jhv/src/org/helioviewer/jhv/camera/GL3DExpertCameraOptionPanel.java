@@ -248,6 +248,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
         if (startDate == null) {
             startDate = new Date(System.currentTimeMillis());
         }
+
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate));
         setBeginTime(applyChanges);
@@ -255,27 +256,28 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
 
     private void syncBothLayerNow() {
         Date nowDate = new Date(System.currentTimeMillis());
-        beginDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
+        Date syncDate = new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000));
+
+        beginDatePicker.setDate(syncDate);
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(nowDate));
-        endDatePicker.setDate(new Date(nowDate.getTime() - nowDate.getTime() % (60 * 60 * 24 * 1000)));
+
+        endDatePicker.setDate(syncDate);
         endTimePicker.setText(TimeUtils.timeDateFormat.format(nowDate));
+
         setBeginTime(false);
         setEndTime(true);
     }
 
     private void syncWithLayerCurrentTime() {
-        Date lastDate = Displayer.getLastUpdatedTimestamp();
-        Date currentDate = null;
-        if (lastDate != null) {
-            currentDate = lastDate;
-        }
-        if (currentDate == null) {
-            currentDate = new Date(System.currentTimeMillis());
-        }
-        endDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
+        Date currentDate = Displayer.getLastUpdatedTimestamp();
+        Date syncDate = new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000));
+
+        endDatePicker.setDate(syncDate);
         endTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate));
-        beginDatePicker.setDate(new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000)));
+
+        beginDatePicker.setDate(syncDate);
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(currentDate));
+
         setBeginTime(false);
         setEndTime(true);
     }

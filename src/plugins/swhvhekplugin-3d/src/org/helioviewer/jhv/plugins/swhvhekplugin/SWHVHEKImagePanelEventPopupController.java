@@ -153,41 +153,38 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
         hitpoint = this.getHitPoint(e);
 
-        if (currentDate != null) {
-            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
+        ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
+        for (JHVEvent evt : toDraw) {
+            HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
-            for (JHVEvent evt : toDraw) {
-                HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+            if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
 
-                if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-                    JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
-
-                    if (pt != null) {
-                        if (hitpoint != null) {
-                            double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
-                            double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
-                            double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
-                            if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                                mouseOverJHVEvent = evt;
-                                mouseOverPosition = new Point(e.getX(), e.getY());
-                            }
+                if (pt != null) {
+                    if (hitpoint != null) {
+                        double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
+                        double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
+                        double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
+                        if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
+                            mouseOverJHVEvent = evt;
+                            mouseOverPosition = new Point(e.getX(), e.getY());
                         }
                     }
                 }
             }
+        }
 
-            if (mouseOverJHVEvent != null) {
-                mouseOverJHVEvent.highlight(true, this);
-            }
-            if (lastJHVEvent != mouseOverJHVEvent && lastJHVEvent != null) {
-                lastJHVEvent.highlight(false, this);
-            }
-            if (lastJHVEvent == null && mouseOverJHVEvent != null) {
-                lastCursor = component.getCursor();
-                component.setCursor(helpCursor);
-            } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
-                component.setCursor(lastCursor);
-            }
+        if (mouseOverJHVEvent != null) {
+            mouseOverJHVEvent.highlight(true, this);
+        }
+        if (lastJHVEvent != mouseOverJHVEvent && lastJHVEvent != null) {
+            lastJHVEvent.highlight(false, this);
+        }
+        if (lastJHVEvent == null && mouseOverJHVEvent != null) {
+            lastCursor = component.getCursor();
+            component.setCursor(helpCursor);
+        } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
+            component.setCursor(lastCursor);
         }
     }
 

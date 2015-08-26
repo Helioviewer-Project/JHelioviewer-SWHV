@@ -39,12 +39,8 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void render(GL2 gl) {
         if (isVisible) {
-            Date currentTime = Displayer.getLastUpdatedTimestamp();
-            if (currentTime == null)
-                return;
-
             PfssData pfssData;
-            long millis = currentTime.getTime();
+            long millis = Displayer.getLastUpdatedTimestamp().getTime();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);

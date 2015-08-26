@@ -273,9 +273,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
     public void render(GL2 gl) {
         if (isVisible) {
             Date currentTime = Displayer.getLastUpdatedTimestamp();
-            if (currentTime == null)
-                return;
-
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
             for (JHVEvent evt : toDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
