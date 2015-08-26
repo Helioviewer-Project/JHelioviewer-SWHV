@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -41,7 +43,10 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
             String strValue = (String) value;
             strValue = strValue.trim();
             strValue = strValue.toLowerCase();
-            return strValue.startsWith("http");
+            String patternString = "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
+            Pattern pattern = Pattern.compile(patternString);
+            Matcher matcher = pattern.matcher(strValue);
+            return matcher.matches();
         } else {
             return false;
         }
