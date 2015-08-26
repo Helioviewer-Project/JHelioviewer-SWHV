@@ -1,20 +1,22 @@
 package org.helioviewer.jhv.plugins.eveplugin.view.linedataselector;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
-public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener {
+public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener, DrawControllerListener {
     private final List<LineDataSelectorModelListener> listeners;
     private final List<LineDataSelectorElement> elements;
-    public final static int NUMBEROFCOLUMNS = 4;
+    public final static int NUMBEROFCOLUMNS = 5;
     private final List<TableModelListener> tableListeners;
 
     private static LineDataSelectorModel instance;
@@ -188,6 +190,18 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener 
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void drawRequest() {
+        fireListeners();
+
+    }
+
+    @Override
+    public void drawMovieLineRequest(Date time) {
         // TODO Auto-generated method stub
 
     }

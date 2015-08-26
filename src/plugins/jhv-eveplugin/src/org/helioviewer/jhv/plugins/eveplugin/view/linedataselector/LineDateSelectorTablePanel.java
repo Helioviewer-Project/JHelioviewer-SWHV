@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataVisibleCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LoadingCellRenderer;
@@ -48,8 +49,9 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
     private static final int VISIBLE_ROW = 0;
     private static final int TITLE_ROW = 1;
-    public static final int LOADING_ROW = 2;
-    private static final int REMOVE_ROW = 3;
+    private static final int LOADING_ROW = 2;
+    private static final int LINECOLOR_ROW = 3;
+    private static final int REMOVE_ROW = 4;
 
     private final JTable grid;
 
@@ -97,6 +99,10 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
         // grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
         // grid.getColumnModel().getColumn(TITLE_ROW).setMaxWidth(80);
+
+        grid.getColumnModel().getColumn(LINECOLOR_ROW).setCellRenderer(new LineColorRenderer());
+        grid.getColumnModel().getColumn(LINECOLOR_ROW).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LINECOLOR_ROW).setMaxWidth(20);
 
         grid.getColumnModel().getColumn(LOADING_ROW).setCellRenderer(new LoadingCellRenderer());
         grid.getColumnModel().getColumn(LOADING_ROW).setPreferredWidth(20);
