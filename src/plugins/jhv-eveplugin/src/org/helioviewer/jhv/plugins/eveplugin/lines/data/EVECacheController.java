@@ -117,4 +117,8 @@ public class EVECacheController {
         return cache.getValuesInInterval(band, interval, plotArea);
     }
 
+    public boolean hasDataInSelectedInterval(Band band, Interval<Date> selectedInterval) {
+        return cache.hasDataInInterval(band, selectedInterval);
+    }
+
 }

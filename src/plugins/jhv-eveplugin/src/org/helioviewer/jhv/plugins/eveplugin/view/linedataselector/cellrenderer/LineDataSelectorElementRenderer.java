@@ -18,9 +18,15 @@ public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
         if (value != null) { // In some case this can be called with value null
             // (getAccessibleChild(int i) of JTable )
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            String layerName = ((LineDataSelectorElement) value).getName();
-            label.setText(layerName);
-            label.setToolTipText(layerName);
+            LineDataSelectorElement ldse = (LineDataSelectorElement) value;
+            String layerName = ldse.getName();
+            if (ldse.hasData()) {
+                label.setText(layerName);
+                label.setToolTipText(layerName);
+            } else {
+                label.setText("<html><font color='red'>" + layerName);
+                label.setToolTipText(layerName + ": No data for selected interval");
+            }
             label.setBorder(LineDateSelectorTablePanel.commonBorder);
             return label;
         } else {

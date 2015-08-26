@@ -42,4 +42,13 @@ public class EVEBandCache {
 
     }
 
+    public boolean hasDataInInterval(Band band, Interval<Date> selectedInterval) {
+        EVECache cache = cacheMap.get(band);
+        if (cache == null) {
+            return false;
+        } else {
+            return cache.hasDataInInterval(selectedInterval);
+        }
+    }
+
 }

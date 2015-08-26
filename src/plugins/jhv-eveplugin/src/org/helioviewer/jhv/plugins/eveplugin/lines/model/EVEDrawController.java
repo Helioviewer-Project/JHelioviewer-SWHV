@@ -358,4 +358,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         fireRedrawRequest(false);
     }
 
+    public boolean hasDataInSelectedInterval(Band band) {
+        return EVECacheController.getSingletonInstance().hasDataInSelectedInterval(band, DrawController.getSingletonInstance().getSelectedInterval());
+    }
+
 }
