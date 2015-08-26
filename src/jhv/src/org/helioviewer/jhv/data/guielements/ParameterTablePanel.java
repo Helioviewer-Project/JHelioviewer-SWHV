@@ -21,11 +21,11 @@ import org.helioviewer.jhv.data.guielements.model.ParameterTableModel;
 /**
  * Represents a panel with a table containing all the parameters from the given
  * list.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class ParameterTablePanel extends JPanel {
 
     /** the table */
@@ -39,7 +39,7 @@ public class ParameterTablePanel extends JPanel {
 
     /**
      * Creates a table panel for the given parameters.
-     * 
+     *
      * @param parameters
      *            the parameters
      */
@@ -60,6 +60,12 @@ public class ParameterTablePanel extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         table.setRowSorter(sorter);
+
+        URLTextRenderer renderer = new URLTextRenderer();
+        table.setDefaultRenderer(String.class, renderer);
+        table.addMouseMotionListener(renderer);
+        table.addMouseListener(renderer);
+
         nullValue = new JCheckBox();
         JPanel nullValuePanel = new JPanel();
         JLabel nullValueLabel = new JLabel("Show Empty Parameters");
