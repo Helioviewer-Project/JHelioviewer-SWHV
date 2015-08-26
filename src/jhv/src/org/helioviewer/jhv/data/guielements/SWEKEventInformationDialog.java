@@ -5,10 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.util.Map;
 import java.util.SortedSet;
@@ -43,7 +40,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  *
  */
 @SuppressWarnings({ "serial" })
-public class SWEKEventInformationDialog extends JDialog implements WindowFocusListener, FocusListener, WindowListener, DataCollapsiblePanelModelListener {
+public class SWEKEventInformationDialog extends JDialog implements WindowListener, DataCollapsiblePanelModelListener {
 
     private JPanel allTablePanel;
 
@@ -64,8 +61,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
 
     private final DataCollapsiblePanelModel model;
 
-    // CollapsiblePanels
-
     /**
      *
      *
@@ -84,30 +79,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowFocusLi
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(event);
-    }
-
-    @Override
-    public void windowGainedFocus(WindowEvent e) {
-    }
-
-    @Override
-    public void windowLostFocus(WindowEvent e) {
-        if (nrOfWindowsOpened == 0) {
-            this.setVisible(false);
-            this.dispose();
-        }
-    }
-
-    @Override
-    public void focusGained(FocusEvent arg0) {
-    }
-
-    @Override
-    public void focusLost(FocusEvent arg0) {
-        if (nrOfWindowsOpened == 0) {
-            this.setVisible(false);
-            this.dispose();
-        }
     }
 
     @Override
