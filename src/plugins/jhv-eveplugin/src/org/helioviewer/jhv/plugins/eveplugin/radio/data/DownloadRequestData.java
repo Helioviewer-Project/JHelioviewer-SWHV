@@ -121,4 +121,10 @@ public class DownloadRequestData implements LineDataSelectorElement {
         return new RadioOptionsPanel();
     }
 
+    @Override
+    public boolean hasData() {
+        // TODO maybe implement this too.
+        return true;
+    }
+
 }

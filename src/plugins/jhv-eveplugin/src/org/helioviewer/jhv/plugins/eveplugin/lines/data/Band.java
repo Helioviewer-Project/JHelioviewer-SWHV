@@ -109,4 +109,9 @@ public class Band implements LineDataSelectorElement {
         return new LineColorOptionPanel(this);
     }
 
+    @Override
+    public boolean hasData() {
+        return EVEDrawController.getSingletonInstance().hasDataInSelectedInterval(this);
+    }
+
 }

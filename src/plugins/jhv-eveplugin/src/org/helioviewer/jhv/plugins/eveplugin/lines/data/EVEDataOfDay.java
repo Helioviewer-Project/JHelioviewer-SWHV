@@ -145,4 +145,8 @@ public class EVEDataOfDay {
         result.addValues(dates, values);
     }
 
+    public boolean hasData() {
+        return posMax != -1 && posMin != -1;
+    }
+
 }

@@ -7,9 +7,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
-public class LineDataSelectorModel implements TableModel {
+public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener {
     private final List<LineDataSelectorModelListener> listeners;
     private final List<LineDataSelectorElement> elements;
     public final static int NUMBEROFCOLUMNS = 4;
@@ -21,11 +23,13 @@ public class LineDataSelectorModel implements TableModel {
         listeners = new ArrayList<LineDataSelectorModelListener>();
         elements = new ArrayList<LineDataSelectorElement>();
         tableListeners = new ArrayList<TableModelListener>();
+
     }
 
     public static LineDataSelectorModel getSingletonInstance() {
         if (instance == null) {
             instance = new LineDataSelectorModel();
+            PlotAreaSpace.getSingletonInstance().addPlotAreaSpaceListener(instance);
         }
         return instance;
     }
@@ -175,5 +179,16 @@ public class LineDataSelectorModel implements TableModel {
     public void removeRow(int row) {
         LineDataSelectorElement el = elements.get(row);
         el.removeLineData();
+    }
+
+    @Override
+    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+        fireListeners();
+    }
+
+    @Override
+    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+        // TODO Auto-generated method stub
+
     }
 }

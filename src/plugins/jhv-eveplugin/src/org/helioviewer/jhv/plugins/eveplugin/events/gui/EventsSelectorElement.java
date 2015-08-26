@@ -63,4 +63,9 @@ public class EventsSelectorElement implements LineDataSelectorElement {
         return null;
     }
 
+    @Override
+    public boolean hasData() {
+        return true;
+    }
+
 }

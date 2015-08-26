@@ -21,6 +21,8 @@ public interface LineDataSelectorElement {
 
     public abstract boolean isAvailable();
 
+    public abstract boolean hasData();
+
     public abstract String getUnitLabel();
 
     public abstract Component getOptionsPanel();
