@@ -334,13 +334,27 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                 Date start = newSelectedInterval.getStart();
                 Date end = newSelectedInterval.getEnd();
 
-                start = availableInterval.containsPointInclusive(start) ? start : availableInterval.getStart();
-                end = availableInterval.containsPointInclusive(end) ? end : availableInterval.getEnd();
+                // start = availableInterval.containsPointInclusive(start) ?
+                // start : availableInterval.getStart();
+                // end = availableInterval.containsPointInclusive(end) ? end :
+                // availableInterval.getEnd();
+                Date availableStart = availableInterval.getStart();
+                Date availableEnd = availableInterval.getEnd();
+                boolean changeAvailableInterval = false;
+
+                if (!availableInterval.containsPointInclusive(start) && !availableInterval.containsPointInclusive(end)) {
+                    changeAvailableInterval = true;
+                    availableStart = start;
+                    availableEnd = end;
+                }
 
                 if (start.equals(end)) {
-                    selectedInterval = availableInterval;
+                    selectedInterval = new Interval<Date>(availableStart, availableEnd);
                 } else {
                     selectedInterval = new Interval<Date>(start, end);
+                }
+                if (changeAvailableInterval) {
+                    setAvailableInterval(new Interval<Date>(availableStart, availableEnd));
                 }
             }
             if (updatePlotAreaSpace) {
