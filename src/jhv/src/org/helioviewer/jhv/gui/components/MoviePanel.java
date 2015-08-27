@@ -107,7 +107,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     // Status
     private static boolean isAdvanced = false;
-    private static boolean isPlaying = false;
+    private static boolean wasPlaying = false;
 
     // Gui elements
     private static TimeSlider timeSlider;
@@ -310,13 +310,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             Layers.toggleMovie();
             // Previous frame
         } else if (e.getSource() == previousFrameButton) {
-            if (isPlaying) {
+            if (Layers.isMoviePlaying()) {
                 Layers.toggleMovie();
             }
             if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
-            if (isPlaying) {
+            if (Layers.isMoviePlaying()) {
                 Layers.toggleMovie();
             }
             if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
@@ -380,7 +380,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
-        if (isPlaying) {
+        wasPlaying = Layers.isMoviePlaying();
+        if (wasPlaying) {
             Layers.pauseMovie();
         }
     }
@@ -404,17 +405,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (isPlaying) {
+        if (wasPlaying) {
             Layers.playMovie();
         }
         someoneIsDragging = false;
     }
 
+    // only for Layers
     public static void playStateChanged(boolean playing) {
-        if (playing != isPlaying && !someoneIsDragging) {
-            isPlaying = playing;
-
-            if (!isPlaying) {
+        if (!someoneIsDragging) {
+            if (!playing) {
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
                 playPauseButton.setIcon(playIcon);
                 playPauseButton.setToolTipText("Play movie");
