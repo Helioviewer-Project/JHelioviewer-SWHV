@@ -146,7 +146,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         if (view == null || !view.isMultiFrame()) {
             setEnabled(false);
-            setPlaying(false, false);
+            Layers.pauseMovie();
 
             // reset timeSlider
             timeSlider.setPartialCachedUntil(0);
@@ -283,33 +283,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     /**
-     * Toggles between playing and not playing the animation.
-     */
-    private static void togglePlayPause() {
-        if (playPauseButton.isEnabled())
-            setPlaying(!isPlaying, false);
-    }
-
-    private static void setPlaying(boolean playing, boolean onlyGUI) {
-        isPlaying = playing;
-
-        if (!isPlaying) {
-            ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
-            playPauseButton.setIcon(playIcon);
-            playPauseButton.setToolTipText("Play movie");
-            if (!onlyGUI) {
-                Layers.pauseMovies();
-            }
-        } else {
-            playPauseButton.setIcon(pauseIcon);
-            playPauseButton.setToolTipText("Pause movie");
-            if (!onlyGUI) {
-                Layers.playMovies();
-            }
-        }
-    }
-
-    /**
      * Updates the speed of the animation. This function is called when changing
      * the speed of the animation or the its unit.
      */
@@ -334,17 +307,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             setAdvanced(!isAdvanced);
             // Toggle play/pause
         } else if (e.getSource() == playPauseButton) {
-            togglePlayPause();
+            Layers.toggleMovie();
             // Previous frame
         } else if (e.getSource() == previousFrameButton) {
             if (isPlaying) {
-                togglePlayPause();
+                Layers.toggleMovie();
             }
             if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (isPlaying) {
-                togglePlayPause();
+                Layers.toggleMovie();
             }
             if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
             // Change animation speed
@@ -408,7 +381,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mousePressed(MouseEvent e) {
         someoneIsDragging = true;
         if (isPlaying) {
-            Layers.pauseMovies();
+            Layers.pauseMovie();
         }
     }
 
@@ -432,14 +405,23 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isPlaying) {
-            Layers.playMovies();
+            Layers.playMovie();
         }
         someoneIsDragging = false;
     }
 
     public static void playStateChanged(boolean playing) {
         if (playing != isPlaying && !someoneIsDragging) {
-            setPlaying(playing, true);
+            isPlaying = playing;
+
+            if (!isPlaying) {
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
+                playPauseButton.setIcon(playIcon);
+                playPauseButton.setToolTipText("Play movie");
+            } else {
+                playPauseButton.setIcon(pauseIcon);
+                playPauseButton.setToolTipText("Pause movie");
+            }
         }
     }
 
@@ -473,7 +455,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            togglePlayPause();
+            Layers.toggleMovie();
             putValue(NAME, playPauseButton.getToolTipText());
         }
 

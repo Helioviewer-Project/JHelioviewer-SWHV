@@ -181,9 +181,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             movieWriter = ToolFactory.makeWriter(moviePath);
             movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, getWidth(), getHeight());
 
-            Layers.pauseMovies();
+            Layers.pauseMovie();
             Layers.setFrame(0);
-            Layers.playMovies();
+            Layers.playMovie();
             exportMode = true;
         } else {
             exportMovieDialog.fail();

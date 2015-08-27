@@ -85,16 +85,24 @@ public class Layers {
         return frameTimer.isRunning();
     }
 
-    public static void playMovies() {
+    public static void playMovie() {
         if (activeView != null && activeView.isMultiFrame()) {
             frameTimer.restart();
             MoviePanel.playStateChanged(true);
         }
     }
 
-    public static void pauseMovies() {
+    public static void pauseMovie() {
         frameTimer.stop();
         MoviePanel.playStateChanged(false);
+    }
+
+    public static void toggleMovie() {
+        if (isMoviePlaying()) {
+            pauseMovie();
+        } else {
+            playMovie();
+        }
     }
 
     public static void setTime(ImmutableDateTime dateTime) {
@@ -368,7 +376,7 @@ public class Layers {
         @Override
         public int getNextCandidate(int lastCandidate) {
             if (++lastCandidate > maxFrame) {
-                pauseMovies();
+                pauseMovie();
                 resetStartTime(0);
                 return 0;
             }
