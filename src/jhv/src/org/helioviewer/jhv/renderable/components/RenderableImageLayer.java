@@ -359,8 +359,9 @@ public class RenderableImageLayer implements Renderable {
 
         if (imageData == null || (prevImageData != null && prevImageData.getFrameNumber() - frame > 2)) {
             prevImageData = newImageData;
-        } else
+        } else if (frame != imageData.getFrameNumber()) {
             prevImageData = imageData;
+        }
 
         imageData = newImageData;
     }
