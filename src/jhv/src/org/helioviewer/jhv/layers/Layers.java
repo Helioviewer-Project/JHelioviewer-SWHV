@@ -80,7 +80,6 @@ public class Layers {
         MoviePanel.getSingletonInstance().setActiveMovie(view);
     }
 
-    // accessed from reader thread, tbd
     public static boolean isMoviePlaying() {
         return frameTimer.isRunning();
     }
