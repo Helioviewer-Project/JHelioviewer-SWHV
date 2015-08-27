@@ -24,7 +24,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     public boolean setViewport(Viewport v) {
         viewport = v;
-        signalRender(false);
+        signalRender(true);
         return true;
     }
 
