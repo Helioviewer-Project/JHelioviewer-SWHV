@@ -7,7 +7,6 @@ import java.net.SocketException;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
@@ -262,9 +261,6 @@ class J2KReader implements Runnable {
                     try {
                         socket = new JPIPSocket();
                         socket.connect(parentImageRef.getURI());
-                        //if (!parentImageRef.isMultiFrame()) {
-                        //    KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
-                        //}
                     } catch (IOException e) {
                         if (verbose) {
                             e.printStackTrace();
@@ -327,7 +323,7 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (!Layers.isMoviePlaying() && parentViewRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (parentViewRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
                             } else if (parentViewRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
