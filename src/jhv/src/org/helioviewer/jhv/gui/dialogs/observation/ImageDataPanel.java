@@ -209,7 +209,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 // due to CacheStrategy, layers load significantly faster when movie is paused
                 wasPlaying = Layers.isMoviePlaying();
                 if (wasPlaying)
-                    Layers.pauseMovies();
+                    Layers.pauseMovie();
 
                 dummy = new RenderableDummy();
                 ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
@@ -239,7 +239,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 try {
                     Layers.addLayer(get());
                     if (wasPlaying)
-                        Layers.playMovies();
+                        Layers.playMovie();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
