@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.data.guielements;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -82,8 +83,10 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
         if (isRollover) {
             Rectangle r = table.getCellRect(row, col, false);
             repaintRect = prevRollover ? r.union(table.getCellRect(prevRow, prevCol, false)) : r;
+            table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else {
             repaintRect = table.getCellRect(prevRow, prevCol, false);
+            table.setCursor(Cursor.getDefaultCursor());
         }
         table.repaint(repaintRect);
     }
@@ -96,6 +99,7 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
             row = -1;
             col = -1;
             isRollover = false;
+            table.setCursor(Cursor.getDefaultCursor());
         }
     }
 
