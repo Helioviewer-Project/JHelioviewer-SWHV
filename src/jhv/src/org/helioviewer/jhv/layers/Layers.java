@@ -90,13 +90,13 @@ public class Layers {
     public static void playMovie() {
         if (activeView != null && activeView.isMultiFrame()) {
             frameTimer.restart();
-            MoviePanel.playStateChanged(true);
+            MoviePanel.setPlayState(true);
         }
     }
 
     public static void pauseMovie() {
         frameTimer.stop();
-        MoviePanel.playStateChanged(false);
+        MoviePanel.setPlayState(false);
     }
 
     public static void toggleMovie() {
