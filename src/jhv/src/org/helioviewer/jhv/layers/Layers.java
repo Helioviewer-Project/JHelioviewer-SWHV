@@ -74,8 +74,9 @@ public class Layers {
     }
 
     private static void setMasterMovie(View view) {
-        if (view == null || !view.isMultiFrame())
-            frameTimer.stop();
+        if (view == null || !view.isMultiFrame()) {
+            pauseMovie();
+        }
         nextFrameCandidateChooser.setMaxFrame();
         MoviePanel.getSingletonInstance().setActiveMovie(view);
     }

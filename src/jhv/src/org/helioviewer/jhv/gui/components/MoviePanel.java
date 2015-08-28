@@ -143,8 +143,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void setActiveMovie(View view) {
         if (view == null || !view.isMultiFrame()) {
             setEnabled(false);
-            Layers.pauseMovie();
-
             // reset timeSlider
             timeSlider.setPartialCachedUntil(0);
             timeSlider.setCompleteCachedUntil(0);
@@ -204,8 +202,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(secondLine);
 
-        // The speed panel has some distinction from above as it is one of the
-        // advanced options
+        // The speed panel has some distinction from above as it is one of the advanced options
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
