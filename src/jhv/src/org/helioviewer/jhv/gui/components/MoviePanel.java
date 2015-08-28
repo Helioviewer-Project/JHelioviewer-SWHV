@@ -129,7 +129,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
-    private static View activeMovie;
     private static boolean someoneIsDragging = false;
 
     private static MoviePanel instance;
@@ -142,8 +141,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public void setActiveMovie(View view) {
-        activeMovie = view;
-
         if (view == null || !view.isMultiFrame()) {
             setEnabled(false);
             Layers.pauseMovie();
@@ -251,10 +248,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     @Override
     public void setEnabled(boolean enabled) {
-        if (activeMovie == null) {
-            enabled = false;
-        }
-
         super.setEnabled(enabled);
         animationModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
@@ -287,15 +280,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * the speed of the animation or the its unit.
      */
     private static void updateMovieSpeed() {
-        if (activeMovie != null) {
-            if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
-                Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-            } /* else {
-                activeMovie.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
-                                                   ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
-            }
-            */
+        if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
+            Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
+        } /* else {
+            Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
+                                           ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
         }
+        */
     }
 
     /**
@@ -313,13 +304,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             if (Layers.isMoviePlaying()) {
                 Layers.toggleMovie();
             }
-            if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
+            Layers.previousFrame();
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (Layers.isMoviePlaying()) {
                 Layers.toggleMovie();
             }
-            if (activeMovie != null) timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
+            Layers.nextFrame();
             // Change animation speed
         } else if (e.getSource() == ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField()) {
             try {
@@ -393,9 +384,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (isEnabled()) {
             if (e.getWheelRotation() < 0) {
-                timeSlider.setValue(activeMovie.getCurrentFrameNumber() + 1);
+                Layers.nextFrame();
             } else if (e.getWheelRotation() > 0) {
-                timeSlider.setValue(activeMovie.getCurrentFrameNumber() - 1);
+                Layers.previousFrame();
             }
         }
     }
@@ -426,7 +417,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void cacheStatusChanged(View view, boolean complete, int until) {
-        if (view == activeMovie) {
+        if (view == Layers.getActiveView()) {
             if (complete) {
                 timeSlider.setCompleteCachedUntil(until);
             } else {
