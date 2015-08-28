@@ -108,24 +108,33 @@ public class Layers {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        int frame = activeView.getFrame(dateTime);
-        dateTime = activeView.getFrameDateTime(frame);
-
-        syncTime(dateTime, frame);
+        syncTime(activeView.getFrameDateTime(activeView.getFrame(dateTime)));
     }
 
     public static void setFrame(int frame) {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
-        syncTime(activeView.getFrameDateTime(frame), frame);
+        syncTime(activeView.getFrameDateTime(frame));
     }
 
-    private static void syncTime(ImmutableDateTime dateTime, int frame) {
+    public static void nextFrame() {
+        if (activeView != null) {
+            setFrame(activeView.getCurrentFrameNumber() + 1);
+        }
+    }
+
+    public static void previousFrame() {
+        if (activeView != null) {
+            setFrame(activeView.getCurrentFrameNumber() - 1);
+        }
+    }
+
+    private static void syncTime(ImmutableDateTime dateTime) {
         for (View view : layers) {
             view.setFrame(view.getFrame(dateTime));
         }
-        MoviePanel.getSingletonInstance().setFrameSlider(frame);
+        MoviePanel.getSingletonInstance().setFrameSlider(activeView.getCurrentFrameNumber());
     }
 
     private static ImmutableDateTime getStartDateImmutable(View view) {
