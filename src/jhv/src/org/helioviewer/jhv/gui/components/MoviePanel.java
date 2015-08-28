@@ -111,11 +111,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     // Gui elements
     private static TimeSlider timeSlider;
-    private final JLabel frameNumberLabel;
+    private static JLabel frameNumberLabel;
     private static JButton previousFrameButton;
     private static JButton nextFrameButton;
     private static JButton playPauseButton;
-    private final JButton advancedButton;
+    private static JButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
@@ -140,23 +140,20 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         return instance;
     }
 
-    public void setActiveMovie(View view) {
-        if (view == null || !view.isMultiFrame()) {
-            setEnabled(false);
-            // reset timeSlider
-            timeSlider.setPartialCachedUntil(0);
-            timeSlider.setCompleteCachedUntil(0);
-            timeSlider.setMaximum(0);
-            timeSlider.setValue(0);
-            return;
-        }
+    public static void unsetMovie() {
+        timeSlider.setPartialCachedUntil(0);
+        timeSlider.setCompleteCachedUntil(0);
+        timeSlider.setMaximum(0);
+        timeSlider.setValue(0);
+        setStatus(false);
+    }
 
+    public static void setMovie(View view) {
         timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
         timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
-
-        setEnabled(true);
+        setStatus(true);
     }
 
     private MoviePanel() {
@@ -235,17 +232,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        setEnabled(false);
+        setStatus(false);
         setAdvanced(isAdvanced);
     }
 
-    /**
-     * Override the setEnabled method in order to keep the containing
-     * components' enabledState synced with the enabledState of this component.
-     */
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
+    private static void setStatus(boolean enabled) {
         animationModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
         playPauseButton.setEnabled(enabled);
