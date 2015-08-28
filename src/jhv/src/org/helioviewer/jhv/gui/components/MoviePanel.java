@@ -114,7 +114,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JLabel frameNumberLabel;
     private static JButton previousFrameButton;
     private static JButton nextFrameButton;
-    private static JButton playPauseButton;
+    private static JButton playButton;
     private static JButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
@@ -145,7 +145,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setCompleteCachedUntil(0);
         timeSlider.setMaximum(0);
         timeSlider.setValue(0);
-        setStatus(false);
+        setState(false);
     }
 
     public static void setMovie(View view) {
@@ -153,7 +153,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
-        setStatus(true);
+        setState(true);
     }
 
     private MoviePanel() {
@@ -180,8 +180,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         previousFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.BACK), "Step to previous frame", this);
         buttonPanel.add(previousFrameButton);
 
-        playPauseButton = ButtonCreator.createButton(playIcon, "Play movie", this);
-        buttonPanel.add(playPauseButton);
+        playButton = ButtonCreator.createButton(playIcon, "Play movie", this);
+        buttonPanel.add(playButton);
 
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
@@ -232,14 +232,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        setStatus(false);
+        setState(false);
         setAdvanced(isAdvanced);
     }
 
-    private static void setStatus(boolean enabled) {
+    private static void setState(boolean enabled) {
         animationModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
-        playPauseButton.setEnabled(enabled);
+        playButton.setEnabled(enabled);
         nextFrameButton.setEnabled(enabled);
         previousFrameButton.setEnabled(enabled);
         speedSpinner.setEnabled(enabled);
@@ -285,7 +285,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         if (e.getSource() == advancedButton) {
             setAdvanced(!isAdvanced);
             // Toggle play/pause
-        } else if (e.getSource() == playPauseButton) {
+        } else if (e.getSource() == playButton) {
             Layers.toggleMovie();
             // Previous frame
         } else if (e.getSource() == previousFrameButton) {
@@ -391,15 +391,15 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     // only for Layers
-    public static void playStateChanged(boolean playing) {
+    public static void setPlayState(boolean play) {
         if (!someoneIsDragging) {
-            if (!playing) {
+            if (!play) {
                 ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
-                playPauseButton.setIcon(playIcon);
-                playPauseButton.setToolTipText("Play movie");
+                playButton.setIcon(playIcon);
+                playButton.setToolTipText("Play movie");
             } else {
-                playPauseButton.setIcon(pauseIcon);
-                playPauseButton.setToolTipText("Pause movie");
+                playButton.setIcon(pauseIcon);
+                playButton.setToolTipText("Pause movie");
             }
         }
     }
@@ -435,7 +435,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         public void actionPerformed(ActionEvent e) {
             Layers.toggleMovie();
-            putValue(NAME, playPauseButton.getToolTipText());
+            putValue(NAME, playButton.getToolTipText());
         }
 
     }
