@@ -146,7 +146,6 @@ class J2KRender implements Runnable {
                 // attempt to recover (tbd)
                 try {
                     compositorRef.Set_thread_env(null, null);
-                    JHV_Kdu_thread_env.setFailed();
                 } catch (Exception ex) {}
 
                 e.printStackTrace();
