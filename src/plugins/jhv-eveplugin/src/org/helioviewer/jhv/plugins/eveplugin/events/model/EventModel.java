@@ -96,6 +96,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         this.events = events;
+        // Log.debug("Events changed");
+        // printEventReferences();
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
         if (selectedInterval != null && availableInterval != null) {
@@ -103,9 +105,24 @@ public class EventModel implements TimingListener, EventRequesterListener {
         }
     }
 
+    private void printEventReferences() {
+        Log.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        for (NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> m1 : events.values()) {
+            for (NavigableMap<Date, List<JHVEvent>> m2 : m1.values()) {
+                for (List<JHVEvent> events : m2.values()) {
+                    for (JHVEvent event : events) {
+                        Log.debug("event :" + event + " color :" + event.getEventRelationShip().getRelationshipColor() + " " + event.getStartDate() + " - " + event.getEndDate());
+                    }
+                }
+            }
+        }
+        Log.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+    }
+
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
 
         if (eventPlotConfiguration != null) {
+            // printEventReferences();
             return eventPlotConfiguration;
         } else {
             return new EventTypePlotConfiguration();
@@ -158,6 +175,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     private void createEventPlotConfiguration() {
 
         if (currentSwingWorker != null) {
+            // Log.debug("Stop current swingworker " + currentSwingWorker);
             currentSwingWorker.cancel(true);
         }
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
@@ -182,7 +200,9 @@ public class EventModel implements TimingListener, EventRequesterListener {
 
             @Override
             public EventTypePlotConfiguration doInBackground() {
-                Thread.currentThread().setName("EventModel--EVE");
+                // Thread.currentThread().setName("EventModel--EVE");
+                // Log.debug("Do in background " + this);
+                // printEventReferences();
                 if (events.size() > 0) {
                     for (String eventType : events.keySet()) {
                         endDates = new ArrayList<Date>();
@@ -197,7 +217,12 @@ public class EventModel implements TimingListener, EventRequesterListener {
                         for (Date sDate : events.get(eventType).keySet()) {
                             for (Date eDate : events.get(eventType).get(sDate).keySet()) {
                                 for (JHVEvent event : events.get(eventType).get(sDate).get(eDate)) {
-                                    handleEvent(event, relatedEventPosition, 0);
+                                    if (Thread.currentThread().isInterrupted()) {
+                                        // Log.debug("Thread is interrupted return");
+                                        return new EventTypePlotConfiguration();
+                                    } else {
+                                        handleEvent(event, relatedEventPosition, 0);
+                                    }
                                 }
                             }
                             linesPerEventType.put(eventType, maxEventLines);
@@ -215,6 +240,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
             private boolean handleEvent(JHVEvent event, int relatedEventPosition, int relationNr) {
                 if (!uniqueIDs.contains(event.getUniqueID())) {
                     EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
+                    // Log.debug("handled event " + event + " swingworker " +
+                    // this);
                     plotConfig.add(epc);
                     relatedEventPosition = epc.getEventPosition();
                     int localRelationNr = 0;
@@ -234,6 +261,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
                     }
                     return true;
                 } else {
+                    // Log.debug("Events contained unique event " + event);
                     return false;
                 }
 
@@ -328,6 +356,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 try {
                     if (!isCancelled()) {
                         eventPlotConfiguration = get();
+                        // Log.debug("Created plot configuration " +
+                        // eventPlotConfiguration);
                         if (eventPlotConfiguration.getEventPlotConfigurations().size() != 0 && prevNoPlotConfig) {
                             prevNoPlotConfig = false;
                         }
@@ -356,6 +386,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 }
             }
         };
+        // Log.debug("Created swingworker  " + currentSwingWorker);
         currentSwingWorker.execute();
     }
 
