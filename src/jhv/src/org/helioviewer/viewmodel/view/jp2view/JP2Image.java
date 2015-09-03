@@ -75,6 +75,9 @@ public class JP2Image {
     /** The number of composition layers for the image. */
     private int frameCount;
 
+    private int numLUTs = 0;
+    private int[] builtinLUT = null;
+
     /** An object with all the resolution layer information. */
     private ResolutionSet resolutionSet;
     private int resolutionSetCompositionLayer = -1;
@@ -235,6 +238,28 @@ public class JP2Image {
         }
     }
 
+    private void configureLUT() throws KduException {
+        Jp2_palette palette = jpxSrc.Access_codestream(0).Access_palette();
+
+        numLUTs = palette.Get_num_luts();
+        if (numLUTs == 0)
+            return;
+
+        int[] lut = new int[palette.Get_num_entries()];
+        float[] red = new float[lut.length];
+        float[] green = new float[lut.length];
+        float[] blue = new float[lut.length];
+
+        palette.Get_lut(0, red);
+        palette.Get_lut(1, green);
+        palette.Get_lut(2, blue);
+
+        for (int i = 0; i < lut.length; i++) {
+            lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
+        }
+        builtinLUT = lut;
+    }
+
     /**
      * Creates the Kakadu objects and sets all the data-members in this object.
      *
@@ -252,6 +277,7 @@ public class JP2Image {
             // mode or not...
             compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
             compositor.Set_thread_env(JHV_Kdu_thread_env.getThreadEnv(), null);
+            // compositor.Set_surface_initialization_mode(false);
 
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
@@ -299,6 +325,8 @@ public class JP2Image {
             updateResolutionSet(0);
             // Remove the layer that was added
             compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+
+            configureLUT();
         } catch (KduException ex) {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
@@ -489,13 +517,9 @@ public class JP2Image {
      */
     void deactivateColorLookupTable(int numLayer) {
         try {
-            Jpx_codestream_source jpxStream = jpxSrc.Access_codestream(0);
-            Jp2_palette palette = jpxStream.Access_palette();
-
-            for (int i = 0; i < palette.Get_num_luts(); i++) {
+            for (int i = 0; i < numLUTs; i++) {
                 jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
             }
-
         } catch (KduException e) {
             e.printStackTrace();
         }
@@ -519,29 +543,7 @@ public class JP2Image {
 
     // Returns the built-in color lookup table.
     int[] getBuiltInLUT() {
-        try {
-            Jp2_palette palette = jpxSrc.Access_codestream(0).Access_palette();
-            if (palette.Get_num_luts() == 0) {
-                return null;
-            }
-
-            int[] lut = new int[palette.Get_num_entries()];
-            float[] red = new float[lut.length];
-            float[] green = new float[lut.length];
-            float[] blue = new float[lut.length];
-
-            palette.Get_lut(0, red);
-            palette.Get_lut(1, green);
-            palette.Get_lut(2, blue);
-
-            for (int i = 0; i < lut.length; i++) {
-                lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
-            }
-            return lut;
-        } catch (KduException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return builtinLUT;
     }
 
     public String getXML(int boxNumber) {
