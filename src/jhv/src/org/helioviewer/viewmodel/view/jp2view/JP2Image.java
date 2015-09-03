@@ -515,13 +515,9 @@ public class JP2Image {
      * @param numLayer
      *            composition layer to deactivate internal color lookup for
      */
-    void deactivateColorLookupTable(int numLayer) {
-        try {
-            for (int i = 0; i < numLUTs; i++) {
-                jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
-            }
-        } catch (KduException e) {
-            e.printStackTrace();
+    void deactivateColorLookupTable(int numLayer) throws KduException {
+        for (int i = 0; i < numLUTs; i++) {
+            jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
         }
     }
 

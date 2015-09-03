@@ -15,6 +15,7 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -142,6 +143,12 @@ class J2KRender implements Runnable {
             try {
                 renderLayer();
             } catch (KduException e) {
+                // attempt to recover (tbd)
+                try {
+                    compositorRef.Set_thread_env(null, null);
+                    JHV_Kdu_thread_env.setFailed();
+                } catch (Exception ex) {}
+
                 e.printStackTrace();
                 return;
             }
