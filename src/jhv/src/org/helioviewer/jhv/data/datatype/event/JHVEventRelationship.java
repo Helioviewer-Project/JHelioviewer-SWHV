@@ -80,11 +80,15 @@ public class JHVEventRelationship {
 
     public void setRelationshipColor(Color color) {
         relationshipColor = color;
-        for (JHVEventRelation er : getNextEvents().values()) {
-            if (er.getTheEvent() != null) {
-                er.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
-            }
-        }
+        // Log.debug("new color for " + this + "    color: " +
+        // color.toString());
+        // Thread.dumpStack();
+        /*
+         * for (JHVEventRelation er : getNextEvents().values()) { if
+         * (er.getTheEvent() != null) {
+         * er.getTheEvent().getEventRelationShip().setRelationshipColor
+         * (relationshipColor); } }
+         */
     }
 
     public void merge(JHVEventRelationship eventRelationShip) {
@@ -101,9 +105,11 @@ public class JHVEventRelationship {
             if (!currentList.containsKey(identifier)) {
                 JHVEventRelation newRelatedEvent = newList.get(identifier);
                 currentList.put(identifier, newRelatedEvent);
+
                 if (newRelatedEvent.getTheEvent() != null) {
                     newRelatedEvent.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
                 }
+
             }
         }
     }
