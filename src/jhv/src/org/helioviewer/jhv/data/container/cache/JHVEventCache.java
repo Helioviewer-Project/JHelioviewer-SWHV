@@ -84,28 +84,30 @@ public class JHVEventCache {
     public void add(JHVEvent event) {
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
-            Log.debug("-------------------------------------------------------------------------------");
-            Log.debug("received event " + event.getUniqueID() + " object id " + event);
-            Log.debug("%%%%%%%%% Relationship start %%%%%%%%%%%");
-            printRelationships(event, new HashSet<String>());
-            Log.debug("%%%%%%%%% Relationship end %%%%%%%%%%%");
-            printColorPerId();
+            // Log.debug("-------------------------------------------------------------------------------");
+            // Log.debug("received event " + event.getUniqueID() + " object id "
+            // + event);
+            // Log.debug("%%%%%%%%% Relationship start %%%%%%%%%%%");
+            // printRelationships(event, new HashSet<JHVEvent>());
+            // Log.debug("%%%%%%%%% Relationship end %%%%%%%%%%%");
+            // printColorPerId();
             allEvents.put(event.getUniqueID(), event);
             Date startDate = DateUtil.getCurrentDate(event.getStartDate());
             Date endDate = DateUtil.getNextDate(event.getEndDate());
             addToList(startDate, endDate, event);
             eventIDs.add(event.getUniqueID());
             checkAndFixRelationShip(event);
-            Log.debug("-------------------------------------------------------------------------------");
+            // Log.debug("-------------------------------------------------------------------------------");
         } else {
             JHVEvent savedEvent = allEvents.get(event.getUniqueID());
             savedEvent.merge(event);
+            checkAndFixRelationShip(savedEvent);
         }
     }
 
-    private void printRelationships(JHVEvent event, HashSet<String> handledEvents) {
-        if (!handledEvents.contains(event.getUniqueID())) {
-            handledEvents.add(event.getUniqueID());
+    private void printRelationships(JHVEvent event, HashSet<JHVEvent> handledEvents) {
+        if (!handledEvents.contains(event)) {
+            handledEvents.add(event);
             Log.debug(event.getUniqueID() + "  " + event + " " + colorPerId.get(event.getUniqueID()));
             Log.debug("Next events");
             printRelationships(event.getEventRelationShip().getNextEvents(), handledEvents);
@@ -114,7 +116,7 @@ public class JHVEventCache {
         }
     }
 
-    private void printRelationships(Map<String, JHVEventRelation> eventrel, HashSet<String> handledEvents) {
+    private void printRelationships(Map<String, JHVEventRelation> eventrel, HashSet<JHVEvent> handledEvents) {
         for (JHVEventRelation rel : eventrel.values()) {
             if (rel.getTheEvent() != null) {
                 printRelationships(rel.getTheEvent(), handledEvents);
@@ -269,7 +271,7 @@ public class JHVEventCache {
          * idsPerColor.get(c); } ids.add(event.getUniqueID());
          * idsPerColor.put(event.getEventRelationShip().getRelationshipColor(),
          * ids); addRelatedEvents(event, new HashSet<String>());
-         * 
+         *
          * } } } else { // Color not present add the color and add all the
          * preceding and // following event unique identifiers. Check the color
          * of them. HashSet<String> ids = new HashSet<String>();
@@ -282,9 +284,11 @@ public class JHVEventCache {
         Color c = containsColoredRelation(event, new HashSet<String>());
         if (c == null) {
             c = JHVCacheColors.getNextColor();
-            Log.debug("No color found for " + event.getUniqueID() + " given color " + c);
+            // Log.debug("No color found for " + event.getUniqueID() +
+            // " given color " + c);
         } else {
-            Log.debug("Color " + c + " was found recoloring all related events");
+            // Log.debug("Color " + c +
+            // " was found recoloring all related events");
         }
         colorRelationship(event, c, new HashSet<String>());
     }
@@ -292,7 +296,8 @@ public class JHVEventCache {
     private void colorRelationship(JHVEvent event, Color c, HashSet<String> handledEvents) {
         if (!handledEvents.contains(event.getUniqueID())) {
             handledEvents.add(event.getUniqueID());
-            Log.debug("Give event " + event + " unique id " + event.getUniqueID() + "  " + c);
+            // Log.debug("Give event " + event + " unique id " +
+            // event.getUniqueID() + "  " + c);
             event.getEventRelationShip().setRelationshipColor(c);
             colorPerId.put(event.getUniqueID(), c);
             colorRelationship(event.getEventRelationShip().getNextEvents().values(), c, handledEvents);
