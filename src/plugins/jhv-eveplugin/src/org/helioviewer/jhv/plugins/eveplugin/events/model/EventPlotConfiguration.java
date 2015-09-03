@@ -81,6 +81,11 @@ public class EventPlotConfiguration {
         // + " * 2 * ( " + nrPreviousLines + " + " + yPosition + " )");
         // g.setColor(event.getColor());
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
+
+        // Log.debug("event: " + event + " drawPosition : " + drawPosition +
+        // " color :" + event.getEventRelationShip().getRelationshipColor() +
+        // " " + event.getStartDate() + " - " + event.getEndDate() +
+        // " unique id: " + event.getUniqueID());
         // minimal width is 1
         if (drawPosition.width < 5) {
             drawPosition.x = drawPosition.x - (5 / drawPosition.width);
