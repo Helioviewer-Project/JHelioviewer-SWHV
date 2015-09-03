@@ -58,83 +58,79 @@ class J2KRender implements Runnable {
         compositorRef = parentImageRef.getCompositorRef();
     }
 
-    private void renderLayer() {
-        try {
-            int numLayer = currParams.compositionLayer;
+    private void renderLayer() throws KduException {
+        int numLayer = currParams.compositionLayer;
 
-            compositorRef.Refresh();
-            compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        compositorRef.Refresh();
+        compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
-            parentImageRef.deactivateColorLookupTable(numLayer);
+        parentImageRef.deactivateColorLookupTable(numLayer);
 
-            Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
+        Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
-            compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+        compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
 
-            //if (lastCompositionLayerRendered != numLayer) {
-                //lastCompositionLayerRendered = numLayer;
-                parentImageRef.updateResolutionSet(numLayer);
-            //}
+        //if (lastCompositionLayerRendered != numLayer) {
+            //lastCompositionLayerRendered = numLayer;
+            parentImageRef.updateResolutionSet(numLayer);
+        //}
 
-            compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
+        compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
 
-            SubImage roi = currParams.subImage;
-            Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
-            compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
+        SubImage roi = currParams.subImage;
+        Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
+        compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
 
-            Kdu_dims actualBufferedRegion = new Kdu_dims();
-            Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
+        Kdu_dims actualBufferedRegion = new Kdu_dims();
+        Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
 
-            Kdu_coords actualOffset = new Kdu_coords();
-            actualOffset.Assign(actualBufferedRegion.Access_pos());
+        Kdu_coords actualOffset = new Kdu_coords();
+        actualOffset.Assign(actualBufferedRegion.Access_pos());
 
-            Kdu_dims newRegion = new Kdu_dims();
+        Kdu_dims newRegion = new Kdu_dims();
+
+        if (parentImageRef.getNumComponents() < 3) {
+            byteBuffer = new byte[roi.getNumPixels()];
+        } else {
+            intBuffer = new int[roi.getNumPixels()];
+        }
+
+        while (!compositorRef.Is_processing_complete()) {
+            compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
+            Kdu_coords newOffset = newRegion.Access_pos();
+            Kdu_coords newSize = newRegion.Access_size();
+
+            newOffset.Subtract(actualOffset);
+
+            int newWidth = newSize.Get_x();
+            int newHeight = newSize.Get_y();
+            int newPixels = newWidth * newHeight;
+
+            if (newPixels == 0) {
+                continue;
+            }
+
+            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
+            compositorBuf.Get_region(newRegion, localIntBuffer);
+
+            int srcIdx = 0;
+            int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
             if (parentImageRef.getNumComponents() < 3) {
-                byteBuffer = new byte[roi.getNumPixels()];
+                for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                    for (int col = 0; col < newWidth; ++col) {
+                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                    }
+                }
             } else {
-                intBuffer = new int[roi.getNumPixels()];
-            }
-
-            while (!compositorRef.Is_processing_complete()) {
-                compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
-                Kdu_coords newOffset = newRegion.Access_pos();
-                Kdu_coords newSize = newRegion.Access_size();
-
-                newOffset.Subtract(actualOffset);
-
-                int newWidth = newSize.Get_x();
-                int newHeight = newSize.Get_y();
-                int newPixels = newWidth * newHeight;
-
-                if (newPixels == 0) {
-                    continue;
-                }
-
-                localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-                compositorBuf.Get_region(newRegion, localIntBuffer);
-
-                int srcIdx = 0;
-                int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
-
-                if (parentImageRef.getNumComponents() < 3) {
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        for (int col = 0; col < newWidth; ++col) {
-                            byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
-                        }
-                    }
-                } else {
-                    for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                        System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
-                    }
+                for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                 }
             }
+        }
 
-            if (compositorBuf != null) {
-                compositorBuf.Native_destroy();
-            }
-        } catch (KduException e) {
-            e.printStackTrace();
+        if (compositorBuf != null) {
+            compositorBuf.Native_destroy();
         }
     }
 
@@ -143,8 +139,14 @@ class J2KRender implements Runnable {
     @Override
     public void run() {
         synchronized (renderLock) {
-            renderLayer();
+            try {
+                renderLayer();
+            } catch (KduException e) {
+                e.printStackTrace();
+                return;
+            }
         }
+
         SubImage roi = currParams.subImage;
         int width = roi.width;
         int height = roi.height;
