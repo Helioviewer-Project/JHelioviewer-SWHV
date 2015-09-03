@@ -7,9 +7,10 @@ import kdu_jni.Kdu_thread_env;
 public class JHV_Kdu_thread_env {
 
     private static Kdu_thread_env threadEnv;
+    private static boolean failed = true;
 
     public static Kdu_thread_env getThreadEnv() throws KduException {
-        if (threadEnv == null) {
+        if (threadEnv == null && failed == false) {
             int numThreads = Kdu_global.Kdu_get_num_processors();
             threadEnv = new Kdu_thread_env();
             threadEnv.Create();
@@ -17,6 +18,10 @@ public class JHV_Kdu_thread_env {
                 threadEnv.Add_thread();
         }
         return threadEnv;
+    }
+
+    public static void setFailed() { // called by render thread
+        failed = true;
     }
 
 }
