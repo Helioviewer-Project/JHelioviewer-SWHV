@@ -306,7 +306,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public String getName() {
-        return "HEK events";
+        return "SWEK events";
     }
 
     @Override
