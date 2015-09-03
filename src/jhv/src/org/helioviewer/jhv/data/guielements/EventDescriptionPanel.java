@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -20,7 +22,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  *
  */
 @SuppressWarnings({ "serial" })
-public class EventDescriptionPanel extends JPanel {
+public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     /** The event */
     private final JHVEvent event;
@@ -60,7 +62,7 @@ public class EventDescriptionPanel extends JPanel {
 
     private void initVisualComponents() {
         initDescriptionText();
-
+        addMouseListener(this);
         setLayout(new GridBagLayout());
 
         labelIcon = new JLabel(event.getIcon());
@@ -85,8 +87,8 @@ public class EventDescriptionPanel extends JPanel {
 
         this.addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
         this.addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
-        // this.addLineToSummaryPanel(summaryPanel, 2, "object_id", new
-        // JTextArea(event.toString()));
+        this.addLineToSummaryPanel(summaryPanel, 2, "object_id", new JTextArea(event.toString()));
+        this.addLineToSummaryPanel(summaryPanel, 4, "event_id", new JTextArea(event.getUniqueID()));
 
         GridBagConstraints colorLabelConstraint = new GridBagConstraints();
         colorLabelConstraint.gridx = 2;
@@ -170,6 +172,34 @@ public class EventDescriptionPanel extends JPanel {
         shortPanelLabelConstraint.weightx = 1;
         shortPanelLabelConstraint.fill = GridBagConstraints.BOTH;
         panel.add(component, shortPanelLabelConstraint);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        event.highlight(true, this);
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        event.highlight(false, this);
     }
 
 }
