@@ -127,4 +127,9 @@ public class DownloadRequestData implements LineDataSelectorElement {
         return true;
     }
 
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
+
 }

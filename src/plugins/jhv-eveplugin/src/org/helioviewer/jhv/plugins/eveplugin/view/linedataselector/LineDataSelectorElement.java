@@ -27,4 +27,6 @@ public interface LineDataSelectorElement {
 
     public abstract Component getOptionsPanel();
 
+    public abstract boolean isDeletable();
+
 }

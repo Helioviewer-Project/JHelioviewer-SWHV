@@ -68,4 +68,9 @@ public class EventsSelectorElement implements LineDataSelectorElement {
         return true;
     }
 
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
+
 }

@@ -68,6 +68,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
         currentSwingWorker = null;
         eventSelectorElement = new EventsSelectorElement(this);
         eventsActivated = false;
+        LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
     }
 
     /**
@@ -78,6 +79,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     public static EventModel getSingletonInstance() {
         if (instance == null) {
             instance = new EventModel();
+
         }
         return instance;
     }
