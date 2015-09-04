@@ -36,7 +36,6 @@ public class EventPanel implements DrawableElement {
             float dash1[] = { 10.0f };
             BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
             Stroke normalStroke = g.getStroke();
-            // Log.debug("#######################################################");
             for (String eventType : epcs.keySet()) {
                 boolean first = true;
                 int spacePerLine = 0;
@@ -50,7 +49,6 @@ public class EventPanel implements DrawableElement {
                     }
                     first = false;
                 }
-                // Log.debug("#######################################################");
                 previousLine += etpc.getMaxLinesPerEventType().get(eventType).intValue();
                 if (eventTypeNr != epcs.size() - 1) {
                     g.setStroke(dashed);

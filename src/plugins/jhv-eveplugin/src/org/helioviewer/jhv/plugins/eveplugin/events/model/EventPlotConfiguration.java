@@ -77,15 +77,7 @@ public class EventPlotConfiguration {
     public void draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
         int spacePerLine = Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue()));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition);
-        // Log.debug("Start position : " + startPosition + " = " + spacePerLine
-        // + " * 2 * ( " + nrPreviousLines + " + " + yPosition + " )");
-        // g.setColor(event.getColor());
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
-
-        // Log.debug("event: " + event + " drawPosition : " + drawPosition +
-        // " color :" + event.getEventRelationShip().getRelationshipColor() +
-        // " " + event.getStartDate() + " - " + event.getEndDate() +
-        // " unique id: " + event.getUniqueID());
         // minimal width is 1
         if (drawPosition.width < 5) {
             drawPosition.x = drawPosition.x - (5 / drawPosition.width);
