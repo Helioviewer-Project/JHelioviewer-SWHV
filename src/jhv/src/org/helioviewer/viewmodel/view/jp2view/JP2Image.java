@@ -44,8 +44,9 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 public class JP2Image {
 
     /** An array of the file extensions this class currently supports */
-    public static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
-    int[] localIntBuffer = new int[0];
+    private static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
+
+    protected int[] localIntBuffer = new int[0];
 
     /** This is the URI that uniquely identifies the image. */
     private final URI uri;
@@ -349,7 +350,7 @@ public class JP2Image {
      *
      * @return True if the image is remote image, false otherwise
      */
-    public boolean isRemote() {
+    protected boolean isRemote() {
         return cache != null;
     }
 
@@ -360,7 +361,7 @@ public class JP2Image {
      *
      * @return True, if the image contains multiple frames, false otherwise
      */
-    public boolean isMultiFrame() {
+    protected boolean isMultiFrame() {
         return isJpx && frameCount > 1;
     }
 
@@ -369,7 +370,7 @@ public class JP2Image {
      *
      * @return URI representing the location of the image.
      */
-    public URI getURI() {
+    protected URI getURI() {
         return uri;
     }
 
@@ -381,7 +382,7 @@ public class JP2Image {
      *
      * @return download uri
      */
-    public URI getDownloadURI() {
+    protected URI getDownloadURI() {
         return downloadURI;
     }
 
@@ -393,7 +394,7 @@ public class JP2Image {
      *
      * @return Socket connected to the server
      */
-    public JPIPSocket getSocket() {
+    protected JPIPSocket getSocket() {
         if (socket == null)
             return null;
 
@@ -403,7 +404,7 @@ public class JP2Image {
     }
 
     // Returns the number of output components
-    public int getNumComponents() {
+    protected int getNumComponents() {
         return numComponents;
     }
 
@@ -426,7 +427,7 @@ public class JP2Image {
      * their data source. The counter is decreased when calling
      * {@link #abolish()}.
      */
-    public synchronized void addReference() {
+    protected synchronized void addReference() {
         referenceCounter++;
     }
 
@@ -435,7 +436,7 @@ public class JP2Image {
      * operations. I use the 'abolish' name to distinguish it from what the
      * Kakadu library uses.
      */
-    public synchronized void abolish() {
+    protected synchronized void abolish() {
         referenceCounter--;
         if (referenceCounter > 0)
             return;
@@ -526,30 +527,32 @@ public class JP2Image {
      * @param numLayer
      *            composition layer to deactivate internal color lookup for
      */
+    /* in preservation - not needed
     void deactivateColorLookupTable(int numLayer) throws KduException {
         for (int i = 0; i < numLUTs; i++) {
             jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
         }
     }
+    */
 
     // Returns the cache reference
-    JHV_Kdu_cache getCacheRef() {
+    protected JHV_Kdu_cache getCacheRef() {
         return cache;
     }
 
     // Sets the ImageCacheStatus
-    void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
+    protected void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
         if (cache != null)
             cache.setImageCacheStatus(imageCacheStatus);
     }
 
     // Returns the compositor reference
-    Kdu_region_compositor getCompositorRef() {
+    protected Kdu_region_compositor getCompositorRef() {
         return compositor;
     }
 
     // Returns the built-in color lookup table.
-    int[] getBuiltInLUT() {
+    protected int[] getBuiltInLUT() {
         return builtinLUT;
     }
 
