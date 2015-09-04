@@ -80,15 +80,6 @@ public class JHVEventRelationship {
 
     public void setRelationshipColor(Color color) {
         relationshipColor = color;
-        // Log.debug("new color for " + this + "    color: " +
-        // color.toString());
-        // Thread.dumpStack();
-        /*
-         * for (JHVEventRelation er : getNextEvents().values()) { if
-         * (er.getTheEvent() != null) {
-         * er.getTheEvent().getEventRelationShip().setRelationshipColor
-         * (relationshipColor); } }
-         */
     }
 
     public void merge(JHVEventRelationship eventRelationShip) {
