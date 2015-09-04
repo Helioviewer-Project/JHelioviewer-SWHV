@@ -96,10 +96,10 @@ public class EventPlotConfiguration {
             endpointsMarkWidth = 5;
             eventWasHightlighted = true;
             drawPosition.x = drawPosition.x - 10;
-            drawPosition.y = drawPosition.y - 3;
-            startPosition = startPosition - 3;
+            drawPosition.y = drawPosition.y - 1;
+            startPosition = startPosition - 1;
             drawPosition.width = drawPosition.width + 20;
-            drawPosition.height = drawPosition.height + 6;
+            drawPosition.height = drawPosition.height + 2;
             shouldRedraw = true;
             spacePerLine = drawPosition.height;
             if (!event.isHighlighted()) {
