@@ -236,6 +236,15 @@ public class EventModel implements TimingListener, EventRequesterListener {
                             }
                         }
                     }
+                    for (JHVEventRelation jer : event.getEventRelationShip().getRelatedEventsByRule().values()) {
+                        if (jer.getTheEvent() != null) {
+                            if (jer.getTheEvent().getJHVEventType().equals(event.getJHVEventType())) {
+                                if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
+                                    localRelationNr++;
+                                }
+                            }
+                        }
+                    }
                     return true;
                 } else {
                     return false;
