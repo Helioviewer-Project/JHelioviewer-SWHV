@@ -105,12 +105,12 @@ public class EventPlotConfiguration {
             shouldRedraw = true;
             spacePerLine = drawPosition.height;
             if (!event.isHighlighted()) {
-                event.highlight(true, this);
+                event.highlight(true, EventModel.getSingletonInstance());
             }
         }
         if (!containsMouse && event.isHighlighted()) {
             shouldRedraw = false;
-            event.highlight(false, this);
+            event.highlight(false, EventModel.getSingletonInstance());
         }
         if (containsMouse || eventWasHightlighted) {
 
