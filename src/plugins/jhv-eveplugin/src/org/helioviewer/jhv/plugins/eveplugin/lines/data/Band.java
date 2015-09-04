@@ -114,4 +114,9 @@ public class Band implements LineDataSelectorElement {
         return EVEDrawController.getSingletonInstance().hasDataInSelectedInterval(this);
     }
 
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
+
 }
