@@ -221,6 +221,7 @@ public class JHVEventCache {
             colorPerId.put(event.getUniqueID(), c);
             colorRelationship(event.getEventRelationShip().getNextEvents().values(), c, handledEvents);
             colorRelationship(event.getEventRelationShip().getPrecedingEvents().values(), c, handledEvents);
+            colorRelationship(event.getEventRelationShip().getRelatedEventsByRule().values(), c, handledEvents);
         }
     }
 
@@ -241,6 +242,10 @@ public class JHVEventCache {
             return c;
         }
         c = containsColoredRelation(event.getEventRelationShip().getPrecedingEvents().values(), handledEvents);
+        if (c != null) {
+            return c;
+        }
+        c = containsColoredRelation(event.getEventRelationShip().getRelatedEventsByRule().values(), handledEvents);
         return c;
     }
 
