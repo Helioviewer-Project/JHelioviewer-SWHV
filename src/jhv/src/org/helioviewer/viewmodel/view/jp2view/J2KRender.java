@@ -62,24 +62,23 @@ class J2KRender implements Runnable {
     private void renderLayer() throws KduException {
         int numLayer = currParams.compositionLayer;
 
-        compositorRef.Refresh();
-        compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        // compositorRef.Refresh();
+        // compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
-
         int numComponents = parentImageRef.getNumComponents();
+        Kdu_ilayer_ref iLayer;
         // parentImageRef.deactivateColorLookupTable(numLayer);
         if (numComponents < 3) {
             // alpha tbd
-            compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            iLayer = compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
-            compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+            iLayer = compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
-        //if (lastCompositionLayerRendered != numLayer) {
-        //lastCompositionLayerRendered = numLayer;
-        parentImageRef.updateResolutionSet(numLayer);
-        //}
+        if (compositorRef.Refresh() == false) {
+            parentImageRef.updateResolutionSet(numLayer);
+        }
 
         compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
 
@@ -137,6 +136,8 @@ class J2KRender implements Runnable {
         if (compositorBuf != null) {
             compositorBuf.Native_destroy();
         }
+
+        compositorRef.Remove_ilayer(iLayer, false);
 
         ImageData imdata = null;
         if (numComponents < 3) {
