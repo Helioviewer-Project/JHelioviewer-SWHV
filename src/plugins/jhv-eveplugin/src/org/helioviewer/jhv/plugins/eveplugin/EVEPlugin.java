@@ -9,9 +9,9 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
@@ -123,7 +123,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public String getTabName() {
-        return "1D and 2D Time Series";
+        return "Timelines";
     }
 
     @Override

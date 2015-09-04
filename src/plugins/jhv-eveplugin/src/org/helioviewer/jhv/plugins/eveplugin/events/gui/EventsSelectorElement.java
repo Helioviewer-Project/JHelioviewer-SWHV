@@ -31,7 +31,7 @@ public class EventsSelectorElement implements LineDataSelectorElement {
 
     @Override
     public String getName() {
-        return "Events";
+        return "SWEK Events";
     }
 
     @Override
