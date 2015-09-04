@@ -9,17 +9,17 @@ import java.util.TimerTask;
 
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
-import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
-import kdu_jni.Kdu_tile;
+import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
@@ -31,11 +31,11 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
- * This class can open JPEG2000 images. Modified to improve the JPIP communication.
+ * This class can open JPEG2000 images. Modified to improve the JPIP
+ * communication.
  *
  * @author caplins
  * @author Benjamin Wamsler
@@ -45,6 +45,7 @@ public class JP2Image {
 
     /** An array of the file extensions this class currently supports */
     public static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
+    int[] localIntBuffer = new int[0];
 
     /** This is the URI that uniquely identifies the image. */
     private final URI uri;
@@ -99,6 +100,8 @@ public class JP2Image {
      * to grayscale and RGB images).
      */
     private int numComponents;
+
+    private Kdu_thread_env threadEnv;
 
     /**
      * Constructor
@@ -276,8 +279,14 @@ public class JP2Image {
             // I don't know if I should be using the codestream in a persistent
             // mode or not...
             compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
-            compositor.Set_thread_env(JHV_Kdu_thread_env.getThreadEnv(), null);
-            // compositor.Set_surface_initialization_mode(false);
+            int numThreads = Kdu_global.Kdu_get_num_processors();
+            threadEnv = new Kdu_thread_env();
+            threadEnv.Create();
+            for (int i = 1; i < numThreads; i++)
+                threadEnv.Add_thread();
+
+            compositor.Set_thread_env(threadEnv, null);
+            compositor.Set_surface_initialization_mode(false);
 
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
@@ -438,8 +447,10 @@ public class JP2Image {
 
         try {
             if (compositor != null) {
+                compositor.Halt_processing();
                 compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
                 compositor.Native_destroy();
+                threadEnv.Native_destroy();
             }
             if (jpxSrc != null) {
                 jpxSrc.Close();

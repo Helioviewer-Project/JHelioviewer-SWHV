@@ -14,8 +14,6 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
-import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_thread_env;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -40,7 +38,6 @@ class J2KRender implements Runnable {
     private final Kdu_region_compositor compositorRef;
 
     /** An integer buffer used in the run method. */
-    static private int[] localIntBuffer = new int[0];
     private int[] intBuffer;
 
     /** A byte buffer used in the run method. */
@@ -72,8 +69,8 @@ class J2KRender implements Runnable {
         compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
 
         //if (lastCompositionLayerRendered != numLayer) {
-            //lastCompositionLayerRendered = numLayer;
-            parentImageRef.updateResolutionSet(numLayer);
+        //lastCompositionLayerRendered = numLayer;
+        parentImageRef.updateResolutionSet(numLayer);
         //}
 
         compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
@@ -111,8 +108,8 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
-            compositorBuf.Get_region(newRegion, localIntBuffer);
+            parentImageRef.localIntBuffer = newPixels > parentImageRef.localIntBuffer.length ? new int[newPixels << 1] : parentImageRef.localIntBuffer;
+            compositorBuf.Get_region(newRegion, parentImageRef.localIntBuffer);
 
             int srcIdx = 0;
             int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
@@ -120,12 +117,12 @@ class J2KRender implements Runnable {
             if (parentImageRef.getNumComponents() < 3) {
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                        byteBuffer[destIdx + col] = (byte) (parentImageRef.localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
+                    System.arraycopy(parentImageRef.localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                 }
             }
         }
@@ -135,22 +132,19 @@ class J2KRender implements Runnable {
         }
     }
 
-    private static final Object renderLock = new Object();
-
     @Override
     public void run() {
-        synchronized (renderLock) {
+        try {
+            renderLayer();
+        } catch (KduException e) {
+            // attempt to recover (tbd)
             try {
-                renderLayer();
-            } catch (KduException e) {
-                // attempt to recover (tbd)
-                try {
-                    compositorRef.Set_thread_env(null, null);
-                } catch (Exception ex) {}
-
-                e.printStackTrace();
-                return;
+                compositorRef.Set_thread_env(null, null);
+            } catch (Exception ex) {
             }
+
+            e.printStackTrace();
+            return;
         }
 
         SubImage roi = currParams.subImage;
