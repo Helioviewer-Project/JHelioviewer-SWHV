@@ -67,8 +67,9 @@ class J2KRender implements Runnable {
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
+        int numComponents = parentImageRef.getNumComponents();
         // parentImageRef.deactivateColorLookupTable(numLayer);
-        if (parentImageRef.getNumComponents() < 3) {
+        if (numComponents < 3) {
             // alpha tbd
             compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
@@ -94,7 +95,7 @@ class J2KRender implements Runnable {
 
         Kdu_dims newRegion = new Kdu_dims();
 
-        if (parentImageRef.getNumComponents() < 3) {
+        if (numComponents < 3) {
             byteBuffer = new byte[roi.getNumPixels()];
         } else {
             intBuffer = new int[roi.getNumPixels()];
@@ -110,7 +111,6 @@ class J2KRender implements Runnable {
             int newWidth = newSize.Get_x();
             int newHeight = newSize.Get_y();
             int newPixels = newWidth * newHeight;
-
             if (newPixels == 0) {
                 continue;
             }
@@ -121,7 +121,7 @@ class J2KRender implements Runnable {
             int srcIdx = 0;
             int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
-            if (parentImageRef.getNumComponents() < 3) {
+            if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
                         byteBuffer[destIdx + col] = (byte) (parentImageRef.localIntBuffer[srcIdx + col] & 0xFF);
@@ -137,32 +137,12 @@ class J2KRender implements Runnable {
         if (compositorBuf != null) {
             compositorBuf.Native_destroy();
         }
-    }
 
-    @Override
-    public void run() {
-        try {
-            renderLayer();
-        } catch (KduException e) {
-            // attempt to recover (tbd)
-            try {
-                compositorRef.Set_thread_env(null, null);
-            } catch (Exception ex) {
-            }
-
-            e.printStackTrace();
-            return;
-        }
-
-        SubImage roi = currParams.subImage;
-        int width = roi.width;
-        int height = roi.height;
         ImageData imdata = null;
-
-        if (parentImageRef.getNumComponents() < 3) {
-            imdata = new SingleChannelByte8ImageData(width, height, byteBuffer);
+        if (numComponents < 3) {
+            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, byteBuffer);
         } else {
-            imdata = new ARGBInt32ImageData(false, width, height, intBuffer);
+            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, intBuffer);
         }
         setImageData(imdata, currParams);
     }
@@ -183,6 +163,20 @@ class J2KRender implements Runnable {
                 return this;
             }
         }.init(newImdata, newParams));
+    }
+
+    @Override
+    public void run() {
+        try {
+            renderLayer();
+        } catch (KduException e) {
+            // attempt to recover (tbd)
+            try {
+                compositorRef.Set_thread_env(null, null);
+            } catch (Exception ex) {
+            }
+            e.printStackTrace();
+        }
     }
 
 }
