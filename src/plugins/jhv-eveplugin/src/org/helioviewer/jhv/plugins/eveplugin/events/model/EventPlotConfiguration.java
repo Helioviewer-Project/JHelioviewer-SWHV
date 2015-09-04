@@ -30,6 +30,8 @@ public class EventPlotConfiguration {
     /** The click position */
     private Rectangle clickPosition;
 
+    private boolean shouldRedraw;
+
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
@@ -54,6 +56,7 @@ public class EventPlotConfiguration {
             this.scaledX1 = scaledX0;
         }
         this.yPosition = yPosition;
+        shouldRedraw = false;
     }
 
     /**
@@ -87,31 +90,35 @@ public class EventPlotConfiguration {
         clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
 
         boolean containsMouse = containsPoint(mousePosition);
+        boolean eventWasHightlighted = false;
+        int endpointsMarkWidth = 0;
         if (containsMouse || event.isHighlighted()) {
-            drawPosition.x = drawPosition.x - 5;
-            drawPosition.y = drawPosition.y - 5;
-            drawPosition.width = drawPosition.width + 10;
-            drawPosition.height = drawPosition.height + 10;
+            endpointsMarkWidth = 5;
+            eventWasHightlighted = true;
+            drawPosition.x = drawPosition.x - 10;
+            drawPosition.y = drawPosition.y - 10;
+            drawPosition.width = drawPosition.width + 20;
+            drawPosition.height = drawPosition.height + 20;
+            shouldRedraw = true;
             if (!event.isHighlighted()) {
                 event.highlight(true, this);
             }
         }
         if (!containsMouse && event.isHighlighted()) {
+            shouldRedraw = false;
             event.highlight(false, this);
         }
-        int endpointsMarkWidth = 2;
-        if (drawPosition.width > 10) {
+        if (containsMouse || eventWasHightlighted) {
+
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
-            g.setColor(event.getEventRelationShip().getRelationshipColor());
-            g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
+        }
+        g.setColor(event.getEventRelationShip().getRelationshipColor());
+        g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
+        if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x + drawPosition.width - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
-        } else {
-            g.setColor(event.getEventRelationShip().getRelationshipColor());
-            g.fillRect(drawPosition.x, startPosition, drawPosition.width, spacePerLine);
         }
-
     }
 
     /**
@@ -149,6 +156,10 @@ public class EventPlotConfiguration {
 
     public int getEventPosition() {
         return yPosition;
+    }
+
+    public boolean shouldRedraw() {
+        return shouldRedraw;
     }
 
 }
