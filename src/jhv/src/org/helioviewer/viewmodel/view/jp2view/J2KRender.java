@@ -14,6 +14,7 @@ import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -46,6 +47,8 @@ class J2KRender implements Runnable {
     /** Maximum of samples to process per rendering iteration */
     private final int MAX_RENDER_SAMPLES = 50000;
 
+    private final int[] firstComponent = new int[] { 0 };
+
     private final JP2ImageParameter currParams;
 
     J2KRender(JHVJP2View _parentViewRef, JP2Image _parentImageRef, JP2ImageParameter _currParams) {
@@ -62,11 +65,15 @@ class J2KRender implements Runnable {
         compositorRef.Refresh();
         compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
-        parentImageRef.deactivateColorLookupTable(numLayer);
-
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
 
-        compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+        // parentImageRef.deactivateColorLookupTable(numLayer);
+        if (parentImageRef.getNumComponents() < 3) {
+            // alpha tbd
+            compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+        } else {
+            compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+        }
 
         //if (lastCompositionLayerRendered != numLayer) {
         //lastCompositionLayerRendered = numLayer;
