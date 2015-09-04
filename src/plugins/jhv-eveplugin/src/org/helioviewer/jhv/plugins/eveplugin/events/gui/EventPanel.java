@@ -39,8 +39,12 @@ public class EventPanel implements DrawableElement {
             for (String eventType : epcs.keySet()) {
                 boolean first = true;
                 int spacePerLine = 0;
+                EventPlotConfiguration shouldRedraw = null;
                 for (EventPlotConfiguration epc : epcs.get(eventType)) {
                     epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
+                    if (epc.shouldRedraw()) {
+                        shouldRedraw = epc;
+                    }
                     if (first) {
                         spacePerLine = 2 * Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / etpc.getTotalNrLines() / 2))).intValue()));
                         int spaceNeeded = spacePerLine * etpc.getMaxLinesPerEventType().get(eventType).intValue();
@@ -48,6 +52,9 @@ public class EventPanel implements DrawableElement {
                         leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
                     }
                     first = false;
+                }
+                if (shouldRedraw != null) {
+                    shouldRedraw.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
                 }
                 previousLine += etpc.getMaxLinesPerEventType().get(eventType).intValue();
                 if (eventTypeNr != epcs.size() - 1) {
