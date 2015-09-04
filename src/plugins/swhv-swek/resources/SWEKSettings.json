@@ -815,6 +815,15 @@
                     "parameter_with" : "ar_noaanum" 
                 }
             ]
+        },{
+            "event_name"    : "Active Region",
+            "related_with"  : "Active Region",
+            "related_on"    : [
+                {
+                    "parameter_from" : "ar_noaanum",
+                    "parameter_with" : "ar_noaanum" 
+                }
+            ]
         }
     ]
 }
