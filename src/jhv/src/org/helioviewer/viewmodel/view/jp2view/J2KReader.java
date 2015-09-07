@@ -10,6 +10,7 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
+import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -71,6 +72,8 @@ class J2KReader implements Runnable {
     /** The current length in bytes to use for requests */
     private int JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
+    private final BooleanSignal readerSignal;
+
     /**
      * The constructor. Creates and connects the socket if image is remote.
      *
@@ -78,11 +81,11 @@ class J2KReader implements Runnable {
      * @throws IOException
      * @throws JHV_KduException
      */
-    J2KReader(JHVJP2View _imageViewRef) throws IOException, JHV_KduException {
+    J2KReader(JHVJP2View _imageViewRef, JP2Image _jp2ImageRef, BooleanSignal _readerSignal) throws IOException, JHV_KduException {
         parentViewRef = _imageViewRef;
+        parentImageRef = _jp2ImageRef;
+        readerSignal = _readerSignal;
 
-        // These two vars are only here for convenience sake.
-        parentImageRef = parentViewRef.jp2Image;
         cacheRef = parentImageRef.getCacheRef();
 
         // Attempts to connect socket if image is remote.
@@ -93,12 +96,6 @@ class J2KReader implements Runnable {
                 JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
                 cacheRef.addJPIPResponseData(res);
             }
-            // Somehow it seems we need to update the server cache model for
-            // movies too
-            // otherwise there can be a weird bug where the meta data seems
-            // missing
-            // if (!parentImageRef.isMultiFrame())
-            // KakaduUtils.updateServerCacheModel(socket, cacheRef, true);
         } else {
             socket = null;
         }
@@ -233,7 +230,7 @@ class J2KReader implements Runnable {
         while (!stop) {
             // Wait for signal
             try {
-                parentViewRef.readerSignal.waitForSignal();
+                readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
@@ -272,7 +269,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // Send signal to try again
-                        parentViewRef.readerSignal.signal();
+                        readerSignal.signal();
                     }/*
                       * catch (JHV_KduException e) { e.printStackTrace(); }
                       */
@@ -492,7 +489,7 @@ class J2KReader implements Runnable {
                                 Thread.yield();
 
                                 // Check, whether caching has to be interrupted
-                                if (parentViewRef.readerSignal.isSignaled() || Thread.interrupted()) {
+                                if (readerSignal.isSignaled() || Thread.interrupted()) {
                                     stopReading = true;
                                 }
                             }
@@ -502,7 +499,7 @@ class J2KReader implements Runnable {
                             // If current frame first -> signal again, to go on
                             // reading
                             if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
-                                parentViewRef.readerSignal.signal();
+                                readerSignal.signal();
                             }
                         }
                     } catch (IOException e) {
@@ -522,7 +519,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // Send signal to try again
-                        parentViewRef.readerSignal.signal();
+                        readerSignal.signal();
                     } catch (JHV_KduException e) {
                         e.printStackTrace();
                     }

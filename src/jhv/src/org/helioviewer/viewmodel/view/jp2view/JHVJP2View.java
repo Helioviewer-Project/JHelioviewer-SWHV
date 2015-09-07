@@ -64,9 +64,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected JP2ImageParameter imageViewParams;
 
     // Reader
-    protected J2KReader reader;
-    protected ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
-    final BooleanSignal readerSignal = new BooleanSignal(false);
+    private J2KReader _reader;
+    private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     private int targetFrame;
 
@@ -110,8 +109,9 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         imageViewParams = calculateParameter(region, 0);
 
         try {
-            reader = new J2KReader(this);
-            startDecoding();
+            BooleanSignal readerSignal = new BooleanSignal(false);
+            _reader = new J2KReader(this, jp2Image, readerSignal);
+            startDecoding(_reader, readerSignal);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -186,15 +186,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.isRemote();
     }
 
-    /**
-     * Returns whether the reader is connected to a JPIP server or not.
-     *
-     * @return True if connected to a JPIP server, false otherwise
-     */
-    public boolean isConnectedToJPIP() {
-        return reader.isConnected();
-    }
-
     private class AbolishThread extends Thread {
         private JHVJP2View view;
 
@@ -232,16 +223,16 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     public void abolishExternal() {
         Displayer.removeRenderListener(this);
-        if (reader != null) {
-            reader.abolish();
-            reader = null;
+        if (_reader != null) {
+            _reader.abolish();
+            _reader = null;
         }
         jp2Image.abolish();
         jp2Image = null;
     }
 
     // Start the J2KReader/J2KRender threads
-    protected void startDecoding() {
+    protected void startDecoding(J2KReader reader, BooleanSignal readerSignal) {
         reader.start();
         readerSignal.signal();
     }
@@ -390,7 +381,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (frame != targetFrame && frame >= 0 && frame <= jp2Image.getMaximumAccessibleFrameNumber()) {
             targetFrame = frame;
 
-            readerSignal.signal();
+            // readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                 signalRender(false);
             }
