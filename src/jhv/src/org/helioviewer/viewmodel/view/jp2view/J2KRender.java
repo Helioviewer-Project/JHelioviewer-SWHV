@@ -62,7 +62,8 @@ class J2KRender implements Runnable {
     private void renderLayer() throws KduException {
         int numLayer = currParams.compositionLayer;
 
-        // compositorRef.Refresh();
+        compositorRef.Refresh();
+        parentImageRef.updateResolutionSet(numLayer);
         // compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -74,10 +75,6 @@ class J2KRender implements Runnable {
             iLayer = compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
             iLayer = compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
-        }
-
-        if (compositorRef.Refresh() == false) {
-            parentImageRef.updateResolutionSet(numLayer);
         }
 
         compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
