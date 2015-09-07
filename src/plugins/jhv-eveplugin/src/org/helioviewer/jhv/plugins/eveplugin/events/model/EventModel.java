@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -236,14 +237,19 @@ public class EventModel implements TimingListener, EventRequesterListener {
                             }
                         }
                     }
+                    TreeMap<Date, JHVEvent> sortedRelatedEvents = new TreeMap<Date, JHVEvent>();
                     for (JHVEventRelation jer : event.getEventRelationShip().getRelatedEventsByRule().values()) {
                         if (jer.getTheEvent() != null) {
-                            if (jer.getTheEvent().getJHVEventType().equals(event.getJHVEventType())) {
-                                if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
-                                    localRelationNr++;
-                                }
+                            sortedRelatedEvents.put(jer.getTheEvent().getStartDate(), jer.getTheEvent());
+                        }
+                    }
+                    for (JHVEvent relEvent : sortedRelatedEvents.values()) {
+                        if (relEvent.getJHVEventType().equals(event.getJHVEventType())) {
+                            if (!uniqueIDs.contains(relEvent.getUniqueID())) {
+                                plotConfig.add(creatEventPlotConfiguration(relEvent, relatedEventPosition, localRelationNr));
                             }
                         }
+
                     }
                     return true;
                 } else {
