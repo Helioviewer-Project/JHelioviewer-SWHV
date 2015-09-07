@@ -75,6 +75,8 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal;
 
+    private final ImageCacheStatus cacheStatusRef;
+
     /**
      * The constructor. Creates and connects the socket if image is remote.
      *
@@ -88,8 +90,9 @@ class J2KReader implements Runnable {
         readerSignal = _readerSignal;
 
         cacheRef = parentImageRef.getCacheRef();
+        cacheStatusRef = parentImageRef.getImageCacheStatus();
 
-        // Attempts to connect socket if image is remote.
+        // attempts to connect socket if image is remote
         if (parentImageRef.isRemote()) {
             socket = parentImageRef.getSocket();
             if (socket == null) {
@@ -152,8 +155,7 @@ class J2KReader implements Runnable {
     /**
      * This method perfoms the flow control, that is, adjusts dynamically the
      * value of the variable <code>JPIP_REQUEST_LEN</code>. The used algorithm
-     * is the same as the used one by the viewer kdu_show of Kakadu (if
-     * something works... why not to use it?)
+     * is the same as the used one by the viewer kdu_show of Kakadu
      */
     private void flowControl() {
         int adjust = 0;
@@ -230,14 +232,14 @@ class J2KReader implements Runnable {
         JP2ImageParameter currParams = null;
 
         while (!stop) {
-            // Wait for signal
+            // wait for signal
             try {
                 readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
 
-            // If image is not remote image, do nothing and just signal render
+            // if image is not remote image, do nothing and just signal render
             if (parentViewRef.getReaderMode() == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentViewRef.setReaderMode(ReaderMode.NEVERFIRE);
                 signalRender();
@@ -280,8 +282,7 @@ class J2KReader implements Runnable {
                 // if socket is open, get image data
                 if (socket != null && !socket.isClosed()) {
                     try {
-                        // If nothing to do, check whether there are some
-                        // queries left
+                        // if nothing to do, check whether there are some queries left
                         // (actually, I do not know when this might happen...)
                         if (complete) {
                             // contrary to the above comment, last query was spuriously resent
@@ -322,7 +323,7 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (parentImageRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
                             } else if (parentImageRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
@@ -330,7 +331,7 @@ class J2KReader implements Runnable {
                                 strategy = CacheStrategy.ALLFRAMESEQUALLY;
                             }
 
-                            // build query, based on strategy:
+                            // build query based on strategy
                             switch (strategy) {
                             case CURRENTFRAMEONLY:
                             case CURRENTFRAMEFIRST:
@@ -348,8 +349,7 @@ class J2KReader implements Runnable {
                                 max_layers = num_layers - 1;
                                 stepQuerys = new JPIPQuery[num_steps];
 
-                                // create queries for packages containing
-                                // several frames
+                                // create queries for packages containing several frames
                                 for (int i = 0; i < num_steps; i++) {
                                     lpf += JPIPConstants.MAX_REQ_LAYERS;
                                     if (lpf > max_layers)
@@ -361,7 +361,7 @@ class J2KReader implements Runnable {
                                     if (lpi > max_layers)
                                         lpi = 0;
                                 }
-                                // select current step based on strategy:
+                                // select current step based on strategy
                                 if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
                                     current_step = parentImageRef.getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
                                 } else {
@@ -373,19 +373,18 @@ class J2KReader implements Runnable {
 
                             // long time = System.currentTimeMillis();
 
-                            // send queries, until everything is complete or
-                            // caching is interrupted
+                            // send queries until everything is complete or caching is interrupted
                             while ((complete_steps < stepQuerys.length) && !stopReading) {
                                 if (current_step >= stepQuerys.length)
                                     current_step = 0;
 
-                                // If query is already complete, to to next step
+                                // if query is already complete, go to next step
                                 if (stepQuerys[current_step] == null) {
                                     current_step++;
                                     continue;
                                 }
 
-                                // Update requested package size
+                                // update requested package size
                                 stepQuerys[current_step].setField(JPIPRequestField.LEN.toString(), String.valueOf(JpipRequestLen));
 
                                 req.setQuery(stepQuerys[current_step]);
@@ -408,20 +407,17 @@ class J2KReader implements Runnable {
 
                                 // receive data
                                 if (res != null) {
-                                    // Update optimal package size
+                                    // update optimal package size
                                     flowControl();
 
-                                    // Downgrade, if necessary
+                                    // downgrade if necessary
                                     if (downgradeNecessary && res.getResponseSize() > 0) {
-                                        ImageCacheStatus cacheStatus = parentImageRef.getImageCacheStatus();
-
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
                                             for (int i = 0; i < num_layers; i++) {
-                                                cacheStatus.downgradeImageStatus(i);
+                                                cacheStatusRef.downgradeImageStatus(i);
                                             }
-                                            MoviePanel.cacheStatusChanged(parentViewRef);
                                             break;
 
                                         default:
@@ -430,34 +426,31 @@ class J2KReader implements Runnable {
                                                     continue;
                                                 }
                                                 for (int j = i * JPIPConstants.MAX_REQ_LAYERS; j < Math.min((i + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers); j++) {
-                                                    cacheStatus.downgradeImageStatus(j);
+                                                    cacheStatusRef.downgradeImageStatus(j);
                                                 }
                                             }
-                                            MoviePanel.cacheStatusChanged(parentViewRef);
                                         }
+                                        MoviePanel.cacheStatusChanged(parentViewRef);
 
                                         downgradeNecessary = false;
                                     }
 
-                                    // add response to cache - if query
-                                    // complete, react
+                                    // add response to cache - react if query complete
                                     if (cacheRef.addJPIPResponseData(res)) {
                                         // mark query as complete
                                         complete_steps++;
                                         stepQuerys[current_step] = null;
 
                                         // tell the cache status
-                                        ImageCacheStatus cacheStatus = parentImageRef.getImageCacheStatus();
-
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            cacheStatus.setImageStatus(curLayer, CacheStatus.COMPLETE);
+                                            cacheStatusRef.setImageStatus(curLayer, CacheStatus.COMPLETE);
                                             break;
 
                                         default:
                                             for (int j = Math.min((current_step + 1) * JPIPConstants.MAX_REQ_LAYERS, num_layers) - 1; j >= current_step * JPIPConstants.MAX_REQ_LAYERS; j--) {
-                                                cacheStatus.setImageStatus(j, CacheStatus.COMPLETE);
+                                                cacheStatusRef.setImageStatus(j, CacheStatus.COMPLETE);
                                             }
                                         }
                                     }
@@ -478,7 +471,7 @@ class J2KReader implements Runnable {
                                     }
                                 }
 
-                                // select next query, based on strategy
+                                // select next query based on strategy
                                 switch (strategy) {
                                 case MISSINGFRAMESFIRST:
                                     current_step++;
@@ -493,16 +486,15 @@ class J2KReader implements Runnable {
                                 // let others do their work, too
                                 Thread.yield();
 
-                                // Check, whether caching has to be interrupted
+                                // check whether caching has to be interrupted
                                 if (readerSignal.isSignaled() || Thread.interrupted()) {
                                     stopReading = true;
                                 }
                             }
 
-                            // Check whether all queries are complete
+                            // check whether all queries are complete
                             complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
-                            // If current frame first -> signal again, to go on
-                            // reading
+                            // if current frame first -> signal again, to go on reading
                             if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
                                 readerSignal.signal();
                             }
@@ -523,7 +515,7 @@ class J2KReader implements Runnable {
                             }
                         }
                         // Displayer.display();
-                        // Send signal to try again
+                        // send signal to try again
                         readerSignal.signal();
                     } catch (JHV_KduException e) {
                         e.printStackTrace();
