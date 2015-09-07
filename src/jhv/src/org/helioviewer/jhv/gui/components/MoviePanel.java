@@ -141,16 +141,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void unsetMovie() {
-        timeSlider.setPartialCachedUntil(0);
-        timeSlider.setCompleteCachedUntil(0);
         timeSlider.setMaximum(0);
         timeSlider.setValue(0);
         setState(false);
     }
 
     public static void setMovie(View view) {
-        timeSlider.setPartialCachedUntil(view.getImageCacheStatus().getImageCachedPartiallyUntil());
-        timeSlider.setCompleteCachedUntil(view.getImageCacheStatus().getImageCachedCompletelyUntil());
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
         setState(true);
@@ -404,13 +400,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    public static void cacheStatusChanged(View view, boolean complete, int until) {
+    public static void cacheStatusChanged(View view) {
         if (view == Layers.getActiveView()) {
-            if (complete) {
-                timeSlider.setCompleteCachedUntil(until);
-            } else {
-                timeSlider.setPartialCachedUntil(until);
-            }
             timeSlider.repaint();
         }
     }
@@ -502,9 +493,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         private static final Color partialCachedColor = new Color(0x8080FF);
         private static final Color completeCachedColor = new Color(0x4040FF);
 
-        private static int partialCachedUntil = 0;
-        private static int completeCachedUntil = 0;
-
         /**
          * Default constructor
          *
@@ -527,37 +515,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void updateUI() {
-        }
-
-        /**
-         * Sets the frame number, to which partial information is loaded.
-         *
-         * Partial information means, that the image already can be shown, but
-         * not yet in full quality.
-         *
-         * @param cachedUntil
-         *            Frame number, to which partial information is loaded.
-         */
-        protected void setPartialCachedUntil(int cachedUntil) {
-            partialCachedUntil = cachedUntil;
-            repaint();
-        }
-
-        /**
-         * Sets the frame number, to which complete information is loaded.
-         *
-         * Complete information means, that the image can be shown in full
-         * quality.
-         *
-         * @param cachedUntil
-         *            Frame number, to which complete information is loaded.
-         */
-        protected void setCompleteCachedUntil(int cachedUntil) {
-            completeCachedUntil = cachedUntil;
-            if (partialCachedUntil < cachedUntil) {
-                partialCachedUntil = cachedUntil;
-            }
-            repaint();
         }
 
         /**
@@ -614,6 +571,15 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
              */
             @Override
             public void paintTrack(Graphics g) {
+                int partialCachedUntil = 0;
+                int completeCachedUntil = 0;
+
+                View view = Layers.getActiveView();
+                if (view != null) {
+                    partialCachedUntil = view.getImageCacheStatus().getImageCachedPartiallyUntil();
+                    completeCachedUntil = view.getImageCacheStatus().getImageCachedCompletelyUntil();
+                }
+
                 int height = getSize().height / 4;
                 int offset = (getSize().height - height) / 2;
                 int partialCachedOffset = (int) ((float) (partialCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
