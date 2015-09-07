@@ -3,7 +3,6 @@ package org.helioviewer.base.time;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Class that holds Date and Time information. The data is stored in a Calendar

@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +30,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -42,9 +40,7 @@ import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.io.DataSourcesListener;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.components.RenderableDummy;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.io.LoadRemoteTask;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -197,57 +193,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     private void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        class LoadRemoteTask extends SwingWorker<View, Void> {
-
-            private RenderableDummy dummy;
-            private boolean image;
-            private boolean wasPlaying;
-
-            LoadRemoteTask(boolean _image) {
-                image = _image;
-
-                // due to CacheStrategy, layers load significantly faster when movie is paused
-                wasPlaying = Layers.isMoviePlaying();
-                if (wasPlaying)
-                    Layers.pauseMovie();
-
-                dummy = new RenderableDummy();
-                ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
-            }
-
-            @Override
-            protected View doInBackground() {
-                Thread.currentThread().setName("LoadRemote");
-                View view = null;
-
-                try {
-                    if (image)
-                        view = APIRequestManager.requestAndOpenRemoteFile(null, getStartTime(), "", getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                    else
-                        view = APIRequestManager.requestAndOpenRemoteFile(getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement(), true);
-                } catch (IOException e) {
-                    Log.error("An error occured while opening the remote file!", e);
-                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                }
-
-                return view;
-            }
-
-            @Override
-            protected void done() {
-                ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
-                try {
-                    Layers.addLayer(get());
-                    if (wasPlaying)
-                        Layers.playMovie();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage);
+        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
         remoteTask.execute();
     }
 
