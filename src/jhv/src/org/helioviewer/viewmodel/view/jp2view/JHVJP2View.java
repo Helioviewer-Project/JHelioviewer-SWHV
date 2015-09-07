@@ -19,8 +19,6 @@ import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
-import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
-import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -65,9 +63,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
 
-    // Caching
-    private ImageCacheStatus imageCacheStatus;
-
     // Reader
     protected J2KReader reader;
     protected ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
@@ -104,13 +99,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         jp2Image = newJP2Image;
         jp2Image.addReference();
-
-        if (jp2Image.isRemote()) {
-            imageCacheStatus = new RemoteImageCacheStatus(this);
-        } else {
-            imageCacheStatus = new LocalImageCacheStatus(this);
-        }
-        jp2Image.setImageCacheStatus(imageCacheStatus);
+        jp2Image.setImageCacheStatus(this);
 
         metaDataArray = jp2Image.metaDataList;
         MetaData metaData = metaDataArray[0];
@@ -356,7 +345,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public ImageCacheStatus getImageCacheStatus() {
-        return imageCacheStatus;
+        return jp2Image.getImageCacheStatus();
     }
 
     @Override
@@ -383,10 +372,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.getMaximumFrameNumber();
     }
 
-    protected int getMaximumAccessibleFrameNumber() {
-        return imageCacheStatus.getImageCachedPartiallyUntil();
-    }
-
     @Override
     public int getCurrentFrameNumber() {
         return targetFrame;
@@ -402,7 +387,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
-        if (frame != targetFrame && frame >= 0 && frame <= getMaximumAccessibleFrameNumber()) {
+        if (frame != targetFrame && frame >= 0 && frame <= jp2Image.getMaximumAccessibleFrameNumber()) {
             targetFrame = frame;
 
             readerSignal.signal();
