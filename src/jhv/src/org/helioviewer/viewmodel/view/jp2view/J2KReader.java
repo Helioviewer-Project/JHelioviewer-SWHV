@@ -323,9 +323,9 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (parentViewRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (parentImageRef.getImageCacheStatus().getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                            } else if (parentViewRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
+                            } else if (parentImageRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
                             } else {
                                 strategy = CacheStrategy.ALLFRAMESEQUALLY;
@@ -364,7 +364,7 @@ class J2KReader implements Runnable {
                                 }
                                 // select current step based on strategy:
                                 if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
-                                    current_step = parentViewRef.getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
+                                    current_step = parentImageRef.getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
                                 } else {
                                     current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
                                 }
@@ -414,7 +414,7 @@ class J2KReader implements Runnable {
 
                                     // Downgrade, if necessary
                                     if (downgradeNecessary && res.getResponseSize() > 0) {
-                                        ImageCacheStatus cacheStatus = parentViewRef.getImageCacheStatus();
+                                        ImageCacheStatus cacheStatus = parentImageRef.getImageCacheStatus();
 
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
@@ -446,7 +446,7 @@ class J2KReader implements Runnable {
                                         stepQuerys[current_step] = null;
 
                                         // tell the cache status
-                                        ImageCacheStatus cacheStatus = parentViewRef.getImageCacheStatus();
+                                        ImageCacheStatus cacheStatus = parentImageRef.getImageCacheStatus();
 
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:

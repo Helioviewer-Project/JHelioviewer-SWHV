@@ -25,6 +25,8 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
@@ -103,6 +105,8 @@ public class JP2Image {
     private int numComponents;
 
     private Kdu_thread_env threadEnv;
+
+    private ImageCacheStatus imageCacheStatus;
 
     /**
      * Constructor
@@ -541,9 +545,21 @@ public class JP2Image {
     }
 
     // Sets the ImageCacheStatus
-    protected void setImageCacheStatus(ImageCacheStatus imageCacheStatus) {
-        if (cache != null)
+    protected void setImageCacheStatus(JHVJP2View view) {
+        if (cache != null) {
+            imageCacheStatus = new RemoteImageCacheStatus(view, getMaximumFrameNumber());
             cache.setImageCacheStatus(imageCacheStatus);
+        } else {
+            imageCacheStatus = new LocalImageCacheStatus(view, getMaximumFrameNumber());
+        }
+    }
+
+    protected ImageCacheStatus getImageCacheStatus() {
+        return imageCacheStatus;
+    }
+
+    protected int getMaximumAccessibleFrameNumber() {
+        return imageCacheStatus.getImageCachedPartiallyUntil();
     }
 
     // Returns the compositor reference

@@ -16,6 +16,7 @@ import org.helioviewer.viewmodel.view.View;
 public class RemoteImageCacheStatus implements ImageCacheStatus {
 
     private final View parent;
+    private final int maxFrameNumber;
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
     private int imageCompleteUntil = -1;
@@ -28,9 +29,10 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      * @param _parent
      *            JP2Image, whose cache status is managed
      */
-    public RemoteImageCacheStatus(View _parent) {
+    public RemoteImageCacheStatus(View _parent, int _maxFrameNumber) {
         parent = _parent;
-        imageStatus = new CacheStatus[parent.getMaximumFrameNumber() + 1];
+        maxFrameNumber = _maxFrameNumber;
+        imageStatus = new CacheStatus[maxFrameNumber + 1];
     }
 
     /**
@@ -49,7 +51,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                 imageStatus[compositionLayer] = CacheStatus.PARTIAL;
 
                 int tempImagePartialUntil = 0;
-                while (tempImagePartialUntil <= parent.getMaximumFrameNumber() && (imageStatus[tempImagePartialUntil] == CacheStatus.PARTIAL || imageStatus[tempImagePartialUntil] == CacheStatus.COMPLETE)) {
+                while (tempImagePartialUntil <= maxFrameNumber && (imageStatus[tempImagePartialUntil] == CacheStatus.PARTIAL || imageStatus[tempImagePartialUntil] == CacheStatus.COMPLETE)) {
                     tempImagePartialUntil++;
                 }
                 tempImagePartialUntil--;
@@ -63,7 +65,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                 imageStatus[compositionLayer] = CacheStatus.COMPLETE;
 
                 int tempImageCompleteUntil = 0;
-                while (tempImageCompleteUntil <= parent.getMaximumFrameNumber() && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
+                while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
                     tempImageCompleteUntil++;
                 }
                 tempImageCompleteUntil--;
@@ -98,7 +100,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
             imageStatus[compositionLayer] = CacheStatus.PARTIAL;
 
             int tempImageCompleteUntil = 0;
-            while (tempImageCompleteUntil <= parent.getMaximumFrameNumber() && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
+            while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
                 tempImageCompleteUntil++;
             }
 

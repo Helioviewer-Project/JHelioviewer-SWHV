@@ -12,13 +12,15 @@ import org.helioviewer.viewmodel.view.View;
  */
 public class LocalImageCacheStatus implements ImageCacheStatus {
 
-    private View parent;
+    private final View parent;
+    private final int maxFrameNumber;
 
     /**
      * Default constructor.
      */
-    public LocalImageCacheStatus(View _parent) {
+    public LocalImageCacheStatus(View _parent, int _maxFrameNumber) {
         parent = _parent;
+        maxFrameNumber = _maxFrameNumber;
     }
 
     /**
@@ -54,7 +56,7 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public int getImageCachedPartiallyUntil() {
-        return parent.getMaximumFrameNumber();
+        return maxFrameNumber;
     }
 
     /**
@@ -62,7 +64,7 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public int getImageCachedCompletelyUntil() {
-        return parent.getMaximumFrameNumber();
+        return maxFrameNumber;
     }
 
 }
