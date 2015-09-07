@@ -37,6 +37,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
@@ -748,8 +749,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                         startTime = plotAreaSpace.getScaledSelectedMinTime() - zoomTimeFactor * scrollDistance * ratioXLeft / ratioTime;
                         endTime = plotAreaSpace.getScaledSelectedMaxTime() + zoomTimeFactor * scrollDistance * ratioXRight / ratioTime;
                     }
-                    startTime = Math.max(plotAreaSpace.getScaledMinTime(), startTime);
-                    endTime = Math.min(plotAreaSpace.getScaledMaxTime(), endTime);
+                    // startTime = Math.max(plotAreaSpace.getScaledMinTime(),
+                    // startTime);
+                    // endTime = Math.min(plotAreaSpace.getScaledMaxTime(),
+                    // endTime);
                 } else if (e.isShiftDown()) {
                     double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
                     startTime = plotAreaSpace.getScaledMinTime();
@@ -784,6 +787,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
                 ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
+                } else {
+                    Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= plotAreaSpace.getScaledMinValue()) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= plotAreaSpace.getScaledMaxValue()) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= plotAreaSpace.getScaledMinValue()) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= plotAreaSpace.getScaledMaxValue()));
                 }
             } else if (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && (mouseY <= graphArea.y || mouseY >= graphArea.y + graphArea.height)) {
                 // In the x-axes or above the graph (only scroll in time)
