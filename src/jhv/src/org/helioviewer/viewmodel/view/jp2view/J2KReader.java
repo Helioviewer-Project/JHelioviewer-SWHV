@@ -7,6 +7,7 @@ import java.net.SocketException;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
@@ -95,6 +96,7 @@ class J2KReader implements Runnable {
                 socket = new JPIPSocket();
                 JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
                 cacheRef.addJPIPResponseData(res);
+                MoviePanel.cacheStatusChanged(parentViewRef);
             }
         } else {
             socket = null;
@@ -419,6 +421,7 @@ class J2KReader implements Runnable {
                                             for (int i = 0; i < num_layers; i++) {
                                                 cacheStatus.downgradeImageStatus(i);
                                             }
+                                            MoviePanel.cacheStatusChanged(parentViewRef);
                                             break;
 
                                         default:
@@ -430,6 +433,7 @@ class J2KReader implements Runnable {
                                                     cacheStatus.downgradeImageStatus(j);
                                                 }
                                             }
+                                            MoviePanel.cacheStatusChanged(parentViewRef);
                                         }
 
                                         downgradeNecessary = false;
@@ -457,6 +461,7 @@ class J2KReader implements Runnable {
                                             }
                                         }
                                     }
+                                    MoviePanel.cacheStatusChanged(parentViewRef);
 
                                     if ((parentViewRef.getReaderMode() == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || parentViewRef.getReaderMode() == ReaderMode.ALWAYSFIREONNEWDATA) {
                                         // if package belongs to current frame tell the render-thread

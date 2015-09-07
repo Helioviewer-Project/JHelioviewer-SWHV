@@ -58,7 +58,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
                 if (tempImagePartialUntil > imagePartialUntil) {
                     imagePartialUntil = tempImagePartialUntil;
-                    updateUI(parent);
                 }
             // COMPLETE
             } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
@@ -75,7 +74,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                     if (imagePartialUntil < imageCompleteUntil) {
                         imagePartialUntil = imageCompleteUntil;
                     }
-                    updateUI(parent);
                 }
             // HEADER
             } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
@@ -110,7 +108,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
             if (tempImageCompleteUntil < imageCompleteUntil) {
                 imageCompleteUntil = tempImageCompleteUntil;
-                updateUI(parent);
             }
         } finally {
             lock.unlock();
@@ -143,22 +140,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
     @Override
     public int getImageCachedCompletelyUntil() {
         return imageCompleteUntil;
-    }
-
-    private static void updateUI(View view) {
-        EventQueue.invokeLater(new Runnable() {
-            private View view;
-
-            @Override
-            public void run() {
-                MoviePanel.cacheStatusChanged(view);
-            }
-
-            public Runnable init(View _view) {
-                view = _view;
-                return this;
-            }
-        }.init(view));
     }
 
 }

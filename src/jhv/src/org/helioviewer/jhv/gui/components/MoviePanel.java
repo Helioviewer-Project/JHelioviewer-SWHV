@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -400,10 +401,23 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
+    // called from other threads
     public static void cacheStatusChanged(View view) {
-        if (view == Layers.getActiveView()) {
-            timeSlider.repaint();
-        }
+        EventQueue.invokeLater(new Runnable() {
+            private View view;
+
+            @Override
+            public void run() {
+               if (view == Layers.getActiveView()) {
+                    timeSlider.repaint();
+                }
+            }
+
+            public Runnable init(View _view) {
+                view = _view;
+                return this;
+            }
+        }.init(view));
     }
 
     /**
