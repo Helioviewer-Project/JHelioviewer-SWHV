@@ -49,11 +49,6 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public int getMaximumAccessibleFrameNumber() {
-        return 0;
-    }
-
-    @Override
     public void setFrame(int frame) {
     }
 
