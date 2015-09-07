@@ -1,11 +1,6 @@
 package org.helioviewer.viewmodel.imagecache;
 
-import java.awt.EventQueue;
-
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.viewmodel.view.View;
 
 /**
  * Implementation of JP2CacheStatus for remote movies.
@@ -15,7 +10,6 @@ import org.helioviewer.viewmodel.view.View;
  */
 public class RemoteImageCacheStatus implements ImageCacheStatus {
 
-    private final View parent;
     private final int maxFrameNumber;
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
@@ -29,8 +23,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      * @param _parent
      *            JP2Image, whose cache status is managed
      */
-    public RemoteImageCacheStatus(View _parent, int _maxFrameNumber) {
-        parent = _parent;
+    public RemoteImageCacheStatus(int _maxFrameNumber) {
         maxFrameNumber = _maxFrameNumber;
         imageStatus = new CacheStatus[maxFrameNumber + 1];
     }

@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.imagecache;
 
-import org.helioviewer.viewmodel.view.View;
-
 /**
  * Implementation of JP2CacheStatus for local movies.
  * 
@@ -12,14 +10,12 @@ import org.helioviewer.viewmodel.view.View;
  */
 public class LocalImageCacheStatus implements ImageCacheStatus {
 
-    private final View parent;
     private final int maxFrameNumber;
 
     /**
      * Default constructor.
      */
-    public LocalImageCacheStatus(View _parent, int _maxFrameNumber) {
-        parent = _parent;
+    public LocalImageCacheStatus(int _maxFrameNumber) {
         maxFrameNumber = _maxFrameNumber;
     }
 

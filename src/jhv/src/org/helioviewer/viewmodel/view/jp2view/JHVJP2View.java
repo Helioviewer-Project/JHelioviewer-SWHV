@@ -99,7 +99,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         jp2Image = newJP2Image;
         jp2Image.addReference();
-        jp2Image.setImageCacheStatus(this);
 
         metaDataArray = jp2Image.metaDataList;
         MetaData metaData = metaDataArray[0];

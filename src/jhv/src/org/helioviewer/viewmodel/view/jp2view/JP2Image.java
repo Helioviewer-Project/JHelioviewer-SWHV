@@ -148,6 +148,13 @@ public class JP2Image {
 
         createKakaduMachinery();
 
+        if (cache != null) {
+            imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
+            cache.setImageCacheStatus(imageCacheStatus);
+        } else {
+            imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
+        }
+
         metaDataList = new MetaData[frameCount];
         KakaduUtils.cacheMetaData(familySrc, metaDataList);
     }
@@ -528,16 +535,6 @@ public class JP2Image {
     // Returns the cache reference
     protected JHV_Kdu_cache getCacheRef() {
         return cache;
-    }
-
-    // Sets the ImageCacheStatus
-    protected void setImageCacheStatus(JHVJP2View view) {
-        if (cache != null) {
-            imageCacheStatus = new RemoteImageCacheStatus(view, getMaximumFrameNumber());
-            cache.setImageCacheStatus(imageCacheStatus);
-        } else {
-            imageCacheStatus = new LocalImageCacheStatus(view, getMaximumFrameNumber());
-        }
     }
 
     protected ImageCacheStatus getImageCacheStatus() {
