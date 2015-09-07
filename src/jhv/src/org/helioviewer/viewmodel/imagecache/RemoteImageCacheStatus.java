@@ -58,7 +58,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
                 if (tempImagePartialUntil > imagePartialUntil) {
                     imagePartialUntil = tempImagePartialUntil;
-                    updateUI(parent, false, imagePartialUntil);
+                    updateUI(parent);
                 }
             // COMPLETE
             } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
@@ -75,7 +75,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
                     if (imagePartialUntil < imageCompleteUntil) {
                         imagePartialUntil = imageCompleteUntil;
                     }
-                    updateUI(parent, true, imageCompleteUntil);
+                    updateUI(parent);
                 }
             // HEADER
             } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
@@ -110,7 +110,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
 
             if (tempImageCompleteUntil < imageCompleteUntil) {
                 imageCompleteUntil = tempImageCompleteUntil;
-                updateUI(parent, true, imageCompleteUntil);
+                updateUI(parent);
             }
         } finally {
             lock.unlock();
@@ -145,24 +145,20 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         return imageCompleteUntil;
     }
 
-    private static void updateUI(View view, boolean complete, int until) {
+    private static void updateUI(View view) {
         EventQueue.invokeLater(new Runnable() {
             private View view;
-            private boolean complete;
-            private int until;
 
             @Override
             public void run() {
-                MoviePanel.cacheStatusChanged(view, complete, until);
+                MoviePanel.cacheStatusChanged(view);
             }
 
-            public Runnable init(View _view, boolean _complete, int _until) {
+            public Runnable init(View _view) {
                 view = _view;
-                complete = _complete;
-                until = _until;
                 return this;
             }
-        }.init(view, complete, until));
+        }.init(view));
     }
 
 }

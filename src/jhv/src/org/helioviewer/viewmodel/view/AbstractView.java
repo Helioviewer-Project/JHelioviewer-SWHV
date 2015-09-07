@@ -4,12 +4,14 @@ import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 public abstract class AbstractView implements View {
 
     private RenderableImageLayer imageLayer;
+    private LocalImageCacheStatus cacheStatus;
 
     protected MetaData[] metaDataArray = new MetaData[1];
     protected ImageData imageData;
@@ -25,7 +27,10 @@ public abstract class AbstractView implements View {
 
     @Override
     public ImageCacheStatus getImageCacheStatus() {
-        return null;
+        if (cacheStatus == null) {
+            cacheStatus = new LocalImageCacheStatus(this, getMaximumFrameNumber());
+        }
+        return cacheStatus;
     }
 
     @Override
