@@ -383,8 +383,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.getMaximumFrameNumber();
     }
 
-    @Override
-    public int getMaximumAccessibleFrameNumber() {
+    protected int getMaximumAccessibleFrameNumber() {
         return imageCacheStatus.getImageCachedPartiallyUntil();
     }
 

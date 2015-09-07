@@ -108,13 +108,6 @@ public interface View {
      */
     public int getMaximumFrameNumber();
 
-    /**
-     * Returns the last accessible frame number.
-     *
-     * @return maximum accessible frame number
-     */
-    public int getMaximumAccessibleFrameNumber();
-
     public void setImageLayer(RenderableImageLayer imageLayer);
 
     public RenderableImageLayer getImageLayer();
