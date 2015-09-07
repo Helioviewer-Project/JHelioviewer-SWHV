@@ -30,24 +30,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
     private ImageCacheStatus status;
 
     /**
-     * The targetID for the image as given by the JPIP server. Should be a
-     * unique hash for the image and thus serves as a good way of naming the
-     * cache file.
-     */
-    private final String targetID;
-
-    /**
-     * Main constructor used when you want to use a cache file.
-     * 
-     * @param _targetID
-     * @param _cachePath
-     */
-    public JHV_Kdu_cache(String _targetID) {
-        super();
-        targetID = _targetID;
-    }
-
-    /**
      * Sets the ImageCacheStatus
      * 
      */
@@ -89,21 +71,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
     }
 
     /**
-     * Used to destroy the object at the end of its life cycle. If a path was
-     * specified in the constructor then the cache attempts to save itself to a
-     * file there before closure. Once this method is called this object should
-     * not be used again.
-     */
-    public boolean Close() {
-        try {
-            super.Close();
-        } catch (KduException ex) {
-            ex.printStackTrace();
-        }
-        return true;
-    }
-
-    /**
      * Sets the read scope to the state that it needs to be in in order to pass
      * this object around for further use.
      * 
@@ -137,7 +104,7 @@ public class JHV_Kdu_cache extends Kdu_cache {
      * @param _data
      * @throws JHV_KduException
      */
-    public void addDataSegment(JPIPDataSegment _data) throws JHV_KduException {
+    private void addDataSegment(JPIPDataSegment _data) throws JHV_KduException {
         try {
             Add_to_databin(_data.classID.getKakaduClassID(), _data.codestreamID, _data.binID, _data.data, _data.offset, _data.length, _data.isFinal, true, false);
         } catch (KduException ex) {
