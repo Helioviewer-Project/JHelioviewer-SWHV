@@ -28,7 +28,7 @@ public abstract class AbstractView implements View {
     @Override
     public ImageCacheStatus getImageCacheStatus() {
         if (cacheStatus == null) {
-            cacheStatus = new LocalImageCacheStatus(this, getMaximumFrameNumber());
+            cacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
         }
         return cacheStatus;
     }
