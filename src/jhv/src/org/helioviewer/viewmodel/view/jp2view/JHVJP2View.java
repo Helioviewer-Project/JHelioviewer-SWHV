@@ -65,6 +65,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     // Reader
     private J2KReader _reader;
+    private BooleanSignal _readerSignal = new BooleanSignal(false);
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     private int targetFrame;
@@ -109,9 +110,9 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         imageViewParams = calculateParameter(region, 0);
 
         try {
-            BooleanSignal readerSignal = new BooleanSignal(false);
-            _reader = new J2KReader(this, jp2Image, readerSignal);
-            startDecoding(_reader, readerSignal);
+            _reader = new J2KReader(this, jp2Image, _readerSignal);
+            _reader.start();
+            _readerSignal.signal();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -229,12 +230,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
         jp2Image.abolish();
         jp2Image = null;
-    }
-
-    // Start the J2KReader/J2KRender threads
-    protected void startDecoding(J2KReader reader, BooleanSignal readerSignal) {
-        reader.start();
-        readerSignal.signal();
     }
 
     /**
@@ -381,7 +376,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (frame != targetFrame && frame >= 0 && frame <= jp2Image.getMaximumAccessibleFrameNumber()) {
             targetFrame = frame;
 
-            // readerSignal.signal();
+            // necessary for fov change
+            _readerSignal.signal();
             if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
                 signalRender(false);
             }
