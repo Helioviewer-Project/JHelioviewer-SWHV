@@ -160,29 +160,15 @@ public class JP2Image {
      * @throws IOException
      */
     private void initRemote() throws JHV_KduException {
-        // Creates the JPIP-socket necessary for communications
+        // Create the JPIP-socket necessary for communications
         JPIPResponse res;
         socket = new JPIPSocket();
 
         try {
-            // Connects to the JPIP server, stores the first response in the res
-            // variable
+            // Connect to the JPIP server
             res = (JPIPResponse) socket.connect(uri);
-
-            // Parses the first JPIP response for the JPIP target-ID
-            String jpipTargetID;
-
-            if (res.getHeader("JPIP-tid") == null)
-                throw new JHV_KduException("The target id was not sent by the server");
-            else
-                jpipTargetID = res.getHeader("JPIP-tid");
-
-            if (jpipTargetID.contains("/")) {
-                jpipTargetID = jpipTargetID.substring(jpipTargetID.lastIndexOf("/") + 1);
-            }
-
-            // Creates the cache object and adds the first response to it.
-            cache = new JHV_Kdu_cache(jpipTargetID);
+            // Create the cache object and add the first response to it
+            cache = new JHV_Kdu_cache();
             cache.addJPIPResponseData(res);
 
             // Download the necessary initial data
