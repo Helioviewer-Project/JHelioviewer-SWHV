@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view.kakadu;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 
@@ -12,20 +10,10 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 
 /**
- * Class extends the Kdu_cache class so as to implement the virtual acquire and
- * release lock function needed for a multithreaded enviroment. It prevents the
- * reader thread and the render thread from accessing the cache at the same
- * time.
- * 
  * @author caplins
  * @author Juan Pablo
  */
 public class JHV_Kdu_cache extends Kdu_cache {
-
-    /**
-     * I chose to use a ReentrantLock as the mutex of choice.
-     */
-    private ReentrantLock cacheMutex = new ReentrantLock(true);
 
     private ImageCacheStatus status;
 
@@ -54,34 +42,6 @@ public class JHV_Kdu_cache extends Kdu_cache {
             throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
         }
         return complete[0];
-    }
-
-    /**
-     * Overridden virtual method using a ReentrantLock to back it.
-     */
-    public void Acquire_lock() throws KduException {
-        cacheMutex.lock();
-    }
-
-    /**
-     * Overridden virtual method using a ReentrantLock to back it.
-     */
-    public void Release_lock() throws KduException {
-        cacheMutex.unlock();
-    }
-
-    /**
-     * Sets the read scope to the state that it needs to be in in order to pass
-     * this object around for further use.
-     * 
-     * @throws JHV_KduException
-     */
-    public void setInitialScope() throws JHV_KduException {
-        try {
-            Set_read_scope(JPIPDatabinClass.MAIN_HEADER_DATABIN.getKakaduClassID(), 0, 0);
-        } catch (KduException ex) {
-            throw new JHV_KduException("Internal Kakadu error: " + ex.getMessage());
-        }
     }
 
     /**
