@@ -379,7 +379,7 @@ public class JP2Image {
      * @param readerMode
      * @see #getReaderMode()
      */
-    protected void setReaderMode(ReaderMode _readerMode) {
+    public void setReaderMode(ReaderMode _readerMode) {
         readerMode = _readerMode;
     }
 
@@ -492,8 +492,8 @@ public class JP2Image {
             throw new IllegalStateException("JP2Image abolished more than once: " + uri);
         }
 
-       if (reader != null) {
-           reader.abolish();
+        if (reader != null) {
+            reader.abolish();
             reader = null;
         }
 
@@ -580,13 +580,12 @@ public class JP2Image {
      * @param numLayer
      *            composition layer to deactivate internal color lookup for
      */
-    /* in preservation - not needed
-    void deactivateColorLookupTable(int numLayer) throws KduException {
-        for (int i = 0; i < numLUTs; i++) {
-            jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0, -1, numLayer);
-        }
-    }
-    */
+    /*
+     * in preservation - not needed void deactivateColorLookupTable(int
+     * numLayer) throws KduException { for (int i = 0; i < numLUTs; i++) {
+     * jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0,
+     * -1, numLayer); } }
+     */
 
     // Returns the cache reference
     protected JHV_Kdu_cache getCacheRef() {
