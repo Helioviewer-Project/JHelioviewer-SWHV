@@ -39,7 +39,6 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -591,8 +590,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 if (view == null)
                     return;
 
-                ImageCacheStatus cacheStatus = view.getImageCacheStatus();
-                int len = view.getMaximumFrameNumber();
+                CacheStatus[] cacheStatus = view.getImageCacheStatus().getImageStatus();
+                int len = cacheStatus.length;
 
                 int height = getSize().height / 4;
                 int offset = (getSize().height - height) / 2;
@@ -600,18 +599,16 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setStroke(new BasicStroke(4));
 
-                for (int i = 0; i <= len; i++) {
-                    int begin = (int) ((float) (i) / (len) * trackRect.width);
-                    int end = (int) ((float) (i + 1) / (len) * trackRect.width);
+                for (int i = 0; i < len; i++) {
+                    int begin = (int) ((float) i / len * trackRect.width);
+                    int end = (int) ((float) (i + 1) / len * trackRect.width);
 
                     if (end == begin)
                         end++;
-                    if (end > trackRect.width)
-                        end = trackRect.width;
 
-                    if (cacheStatus.getImageStatus(i) == CacheStatus.PARTIAL) {
+                    if (cacheStatus[i] == CacheStatus.PARTIAL) {
                         g2d.setColor(partialCachedColor);
-                    } else if (cacheStatus.getImageStatus(i) == CacheStatus.COMPLETE) {
+                    } else if (cacheStatus[i] == CacheStatus.COMPLETE) {
                         g2d.setColor(completeCachedColor);
                     } else {
                         g2d.setColor(notCachedColor);

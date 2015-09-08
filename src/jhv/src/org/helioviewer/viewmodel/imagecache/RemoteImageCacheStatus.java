@@ -119,6 +119,16 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         return res;
     }
 
+    @Override
+    public CacheStatus[] getImageStatus() {
+        lock.lock();
+        CacheStatus[] ret = new CacheStatus[imageStatus.length];
+        System.arraycopy(imageStatus, 0, ret, 0, imageStatus.length);
+        lock.unlock();
+
+        return ret;
+    }
+
     /**
      * {@inheritDoc}
      */
