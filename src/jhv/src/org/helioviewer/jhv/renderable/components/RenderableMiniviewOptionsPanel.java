@@ -51,7 +51,7 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int val = (int) xSpinner.getValue();
+                Integer val = (Integer) xSpinner.getValue();
                 Displayer.getMiniview().setViewportSize(val, val);
                 Displayer.display();
             }
