@@ -7,7 +7,6 @@ import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
-import java.util.Date;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.astronomy.Position;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -66,14 +66,14 @@ public class RenderableGrid implements Renderable {
     private int colorBufferID;
 
     @Override
-    public void render(GL2 gl) {
+    public void render(GL2 gl, GL3DViewport vp) {
         if (!isVisible)
             return;
 
         GL3DCamera activeCamera = Displayer.getActiveCamera();
 
         // cameraWidth ever changes so slightly with distance to Sun; 4x pix/Rsun
-        int pixelsPerSolarRadius = (int) (2 * textScale * Displayer.getViewportHeight() / activeCamera.getCameraWidth());
+        int pixelsPerSolarRadius = (int) (2 * textScale * vp.getHeight() / activeCamera.getCameraWidth());
         float fontSize = Math.max(10, Math.min(288, pixelsPerSolarRadius));
 
         if (showLabels && (textRenderer == null || fontSize != oldFontSize)) {

@@ -207,7 +207,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = Displayer.getViewportHeight() / Displayer.getActiveCamera().getCameraWidth();
+        double ratio = Displayer.getActiveViewport().getHeight() / Displayer.getActiveCamera().getCameraWidth();
         int w = (int) (rWidth * ratio);
         int h = (int) (rHeight * ratio);
 

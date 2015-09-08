@@ -8,6 +8,7 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.components.RenderableImageType;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -48,12 +49,12 @@ public class RenderableContainer implements TableModel, Reorderable {
         Displayer.display();
     }
 
-    public void render(GL2 gl) {
+    public void render(GL2 gl, GL3DViewport vp) {
         removeRenderables(gl);
         initRenderables(gl);
 
         for (Renderable renderable : renderables) {
-            renderable.render(gl);
+            renderable.render(gl, vp);
         }
     }
 

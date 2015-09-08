@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
 import java.awt.Component;
-import java.util.Date;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +12,7 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.viewmodel.view.View;
 
@@ -37,7 +37,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     }
 
     @Override
-    public void render(GL2 gl) {
+    public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible) {
             PfssData pfssData;
             long millis = Displayer.getLastUpdatedTimestamp().getTime();
