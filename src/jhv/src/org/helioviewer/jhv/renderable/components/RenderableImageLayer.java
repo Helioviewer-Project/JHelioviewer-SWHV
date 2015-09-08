@@ -98,7 +98,7 @@ public class RenderableImageLayer implements Renderable {
 
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
-            GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight());
+            GLSLShader.setViewport(GLInfo.pixelScale[0] * Displayer.getViewportWidth(), GLInfo.pixelScale[1] * Displayer.getViewportHeight(), Displayer.getViewportOffsetX(), Displayer.getViewportOffsetY());
             if (!RenderableImageLayer.showCorona) {
                 GLSLShader.setOuterCutOffRadius(1.);
             }

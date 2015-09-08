@@ -26,6 +26,7 @@ uniform vec4 cameraDifferenceRotationQuat;
 uniform vec4 diffcameraDifferenceRotationQuat;
 uniform float physicalImageWidth;
 uniform vec2 viewport;
+uniform vec2 viewportOffset;
 
 vec3 rotate_vector_inverse( vec4 quat, vec3 vec )
 {
@@ -56,7 +57,7 @@ float intersectPlanediff(vec4 vecin)
 void main(void)
 {  
     float tmpConvolutionSum = 0.;
-    vec2 normalizedScreenpos = 2.*((gl_FragCoord.xy/viewport)-0.5);
+    vec2 normalizedScreenpos = 2.*(((gl_FragCoord.xy-viewportOffset)/viewport)-0.5);
     vec4 up1 =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec4 color;
     vec2 texcoord; 
