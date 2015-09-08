@@ -42,7 +42,7 @@ public class RenderableCamera implements Renderable {
         if (!isVisible)
             return;
 
-        GL3DCamera activeCamera = Displayer.getActiveCamera();
+        GL3DCamera activeCamera = vp.getCamera();
         double width = activeCamera.getZTranslation() * Math.tan(activeCamera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
