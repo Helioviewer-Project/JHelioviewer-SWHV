@@ -1,7 +1,5 @@
 package org.helioviewer.viewmodel.imagecache;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * Implementation of JP2CacheStatus for remote movies.
  *
@@ -10,12 +8,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class RemoteImageCacheStatus implements ImageCacheStatus {
 
-    private final int maxFrameNumber;
+    // accessed from LoadRemote (JP2Image.initRemote()) and J2KReader threads, never concurrently, no need to lock
     private final CacheStatus[] imageStatus;
+
+    private final int maxFrameNumber;
     private int imagePartialUntil = -1;
     private int imageCompleteUntil = -1;
-
-    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Default constructor
@@ -33,47 +31,42 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
-        lock.lock();
-        try {
-            if (imageStatus[compositionLayer] == newStatus) {
-                return;
+        if (imageStatus[compositionLayer] == newStatus) {
+            return;
+        }
+
+        // PARTIAL
+        if (compositionLayer >= imagePartialUntil && newStatus == CacheStatus.PARTIAL && imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
+            imageStatus[compositionLayer] = CacheStatus.PARTIAL;
+
+            int tempImagePartialUntil = 0;
+            while (tempImagePartialUntil <= maxFrameNumber && (imageStatus[tempImagePartialUntil] == CacheStatus.PARTIAL || imageStatus[tempImagePartialUntil] == CacheStatus.COMPLETE)) {
+                tempImagePartialUntil++;
             }
+            tempImagePartialUntil--;
 
-            // PARTIAL
-            if (compositionLayer >= imagePartialUntil && newStatus == CacheStatus.PARTIAL && imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
-                imageStatus[compositionLayer] = CacheStatus.PARTIAL;
-
-                int tempImagePartialUntil = 0;
-                while (tempImagePartialUntil <= maxFrameNumber && (imageStatus[tempImagePartialUntil] == CacheStatus.PARTIAL || imageStatus[tempImagePartialUntil] == CacheStatus.COMPLETE)) {
-                    tempImagePartialUntil++;
-                }
-                tempImagePartialUntil--;
-
-                if (tempImagePartialUntil > imagePartialUntil) {
-                    imagePartialUntil = tempImagePartialUntil;
-                }
-            // COMPLETE
-            } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
-                imageStatus[compositionLayer] = CacheStatus.COMPLETE;
-
-                int tempImageCompleteUntil = 0;
-                while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
-                    tempImageCompleteUntil++;
-                }
-                tempImageCompleteUntil--;
-
-                if (tempImageCompleteUntil > imageCompleteUntil) {
-                    imageCompleteUntil = tempImageCompleteUntil;
-                    if (imagePartialUntil < imageCompleteUntil) {
-                        imagePartialUntil = imageCompleteUntil;
-                    }
-                }
-            // HEADER
-            } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
-                imageStatus[compositionLayer] = CacheStatus.HEADER;
+            if (tempImagePartialUntil > imagePartialUntil) {
+                imagePartialUntil = tempImagePartialUntil;
             }
-        } finally {
-            lock.unlock();
+        // COMPLETE
+        } else if (compositionLayer >= imageCompleteUntil && newStatus == CacheStatus.COMPLETE) {
+            imageStatus[compositionLayer] = CacheStatus.COMPLETE;
+
+            int tempImageCompleteUntil = 0;
+            while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
+                tempImageCompleteUntil++;
+            }
+            tempImageCompleteUntil--;
+
+            if (tempImageCompleteUntil > imageCompleteUntil) {
+                imageCompleteUntil = tempImageCompleteUntil;
+                if (imagePartialUntil < imageCompleteUntil) {
+                    imagePartialUntil = imageCompleteUntil;
+                }
+            }
+        // HEADER
+        } else if (newStatus == CacheStatus.HEADER && imageStatus[compositionLayer] == null) {
+            imageStatus[compositionLayer] = CacheStatus.HEADER;
         }
     }
 
@@ -82,28 +75,23 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public void downgradeImageStatus(int compositionLayer) {
-        lock.lock();
-        try {
-            if (imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
-                return;
-            }
+        if (imageStatus[compositionLayer] != CacheStatus.COMPLETE) {
+            return;
+        }
 
-            imageStatus[compositionLayer] = CacheStatus.PARTIAL;
+        imageStatus[compositionLayer] = CacheStatus.PARTIAL;
 
-            int tempImageCompleteUntil = 0;
-            while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
-                tempImageCompleteUntil++;
-            }
+        int tempImageCompleteUntil = 0;
+        while (tempImageCompleteUntil <= maxFrameNumber && imageStatus[tempImageCompleteUntil] == CacheStatus.COMPLETE) {
+            tempImageCompleteUntil++;
+        }
 
-            if (tempImageCompleteUntil > 0) {
-                tempImageCompleteUntil--;
-            }
+        if (tempImageCompleteUntil > 0) {
+            tempImageCompleteUntil--;
+        }
 
-            if (tempImageCompleteUntil < imageCompleteUntil) {
-                imageCompleteUntil = tempImageCompleteUntil;
-            }
-        } finally {
-            lock.unlock();
+        if (tempImageCompleteUntil < imageCompleteUntil) {
+            imageCompleteUntil = tempImageCompleteUntil;
         }
     }
 
@@ -112,11 +100,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      */
     @Override
     public CacheStatus getImageStatus(int compositionLayer) {
-        lock.lock();
-        CacheStatus res = imageStatus[compositionLayer];
-        lock.unlock();
-
-        return res;
+        return imageStatus[compositionLayer];
     }
 
     /**
