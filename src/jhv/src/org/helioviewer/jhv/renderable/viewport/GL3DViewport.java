@@ -3,10 +3,10 @@ package org.helioviewer.jhv.renderable.viewport;
 import org.helioviewer.jhv.camera.GL3DCamera;
 
 public class GL3DViewport {
-    private final int w;
-    private final int h;
-    private final int x;
-    private final int y;
+    private int w;
+    private int h;
+    private int x;
+    private int y;
     private GL3DCamera camera;
 
     public GL3DViewport(int _x, int _y, int _w, int _h, GL3DCamera _camera) {
@@ -41,4 +41,13 @@ public class GL3DViewport {
         return y;
     }
 
+    public void setViewportSize(int width, int height) {
+        w = width;
+        h = height;
+    }
+
+    public void setViewportOffset(int offsetX, int offsetY) {
+        x = offsetX;
+        y = offsetY;
+    }
 }

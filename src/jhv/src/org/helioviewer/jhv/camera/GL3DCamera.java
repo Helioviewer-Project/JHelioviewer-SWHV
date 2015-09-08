@@ -31,7 +31,7 @@ public abstract class GL3DCamera {
     private GL3DQuatd rotation;
     private GL3DVec3d translation;
 
-    private GL3DQuatd currentDragRotation;
+    private final GL3DQuatd currentDragRotation;
 
     protected GL3DQuatd localRotation;
 
@@ -223,8 +223,8 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getActiveViewport().getWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getActiveViewport().getHeight() - 0.5);
         double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
         double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
 
@@ -239,8 +239,8 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getActiveViewport().getWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getActiveViewport().getHeight() - 0.5);
         double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
         double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
 
@@ -255,8 +255,8 @@ public abstract class GL3DCamera {
     }
 
     public GL3DVec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewportWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewportHeight() - 0.5);
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getActiveViewport().getWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getActiveViewport().getHeight() - 0.5);
         double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
         double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
 

@@ -2,11 +2,13 @@ package org.helioviewer.jhv.renderable.gui;
 
 import java.awt.Component;
 
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
+
 import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    public void render(GL2 gl);
+    void render(GL2 gl, GL3DViewport vp);
 
     public void remove(GL2 gl);
 

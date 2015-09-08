@@ -111,33 +111,31 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         int w = getWidth();
         int h = getHeight();
         Displayer.getActiveCamera().updateCameraWidthAspect(w / (double) h);
-        Displayer.setViewportSize(w, h);
+        Displayer.getActiveViewport().setViewportSize(w, h);
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(this);
-        int w = Displayer.getViewportWidth();
-        int h = Displayer.getViewportHeight();
-        Displayer.setViewportSize(w, h);
+        int w = Displayer.getActiveViewport().getWidth();
+        int h = Displayer.getActiveViewport().getHeight();
+        Displayer.getActiveViewport().setViewportSize(w, h);
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl.glViewport(0, 0, w * 2, h * 2);
         Displayer.getActiveCamera().applyPerspective(gl);
-        ImageViewerGui.getRenderableContainer().render(gl);
-
-        Displayer.setViewportSize(300, 300 * h / w);
-        int offsetX = 10;
-        int offsetY = 2 * h - 310;
-        Displayer.setViewportOffset(offsetX, offsetY);
-
-        gl.glViewport(offsetX, offsetY, Displayer.getViewportWidth() * 2, Displayer.getViewportHeight() * 2);
-        Displayer.getActiveCamera().applyPerspective(gl);
-        ImageViewerGui.getRenderableContainer().render(gl);
-        Displayer.setViewportSize(w, h);
-        Displayer.setViewportOffset(0, 0);
-
+        ImageViewerGui.getRenderableContainer().render(gl, Displayer.getActiveViewport());
+        /*
+         * Displayer.setViewportSize(300, 300 * h / w); int offsetX = 10; int
+         * offsetY = 2 * h - 310; Displayer.setViewportOffset(offsetX, offsetY);
+         * 
+         * gl.glViewport(offsetX, offsetY, Displayer.getViewportWidth() * 2,
+         * Displayer.getViewportHeight() * 2);
+         * Displayer.getActiveCamera().applyPerspective(gl);
+         * ImageViewerGui.getRenderableContainer().render(gl);
+         * Displayer.setViewportSize(w, h); Displayer.setViewportOffset(0, 0);
+         */
         drawable.swapBuffers();
 
         if (exportMode || screenshotMode) {

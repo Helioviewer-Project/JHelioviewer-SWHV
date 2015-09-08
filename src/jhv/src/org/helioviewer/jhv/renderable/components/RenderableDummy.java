@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -16,7 +17,7 @@ public class RenderableDummy implements Renderable {
     }
 
     @Override
-    public void render(GL2 gl) {
+    public void render(GL2 gl, GL3DViewport vp) {
     }
 
     @Override

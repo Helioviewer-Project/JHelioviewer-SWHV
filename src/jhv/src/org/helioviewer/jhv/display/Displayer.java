@@ -15,6 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
@@ -23,37 +24,11 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static Component displayComponent;
 
-    private static int viewportWidth;
-    private static int viewportHeight;
+    private static GL3DViewport viewport = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera());
 
-    private static int viewportOffsetX = 0;
-    private static int viewportOffsetY = 0;
-
-    public static void setViewportSize(int width, int height) {
-        viewportWidth = width;
-        viewportHeight = height;
-    }
-
-    public static void setViewportOffset(int offsetX, int offsetY) {
-        viewportOffsetX = offsetX;
-        viewportOffsetY = offsetY;
-    }
-
-    public static int getViewportOffsetX() {
-        return viewportOffsetX;
-    }
-
-    public static int getViewportOffsetY() {
-        return viewportOffsetY;
-    }
-
-    public static int getViewportHeight() {
-        return viewportHeight;
-    }
-
-    public static int getViewportWidth() {
-        return viewportWidth;
-    }
+    public static GL3DViewport getActiveViewport() {
+        return viewport;
+    };
 
     private static boolean torender = false;
     private static boolean todisplay = false;
@@ -90,16 +65,19 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    private static GL3DCamera activeCamera = new GL3DObserverCamera();
+    public static GL3DViewport getViewport() {
+        return viewport;
+    }
 
     public static GL3DCamera getActiveCamera() {
-        return activeCamera;
+        return viewport.getCamera();
     }
 
     public static void setActiveCamera(GL3DCamera camera) {
+        GL3DCamera activeCamera = viewport.getCamera();
         activeCamera.deactivate();
         camera.activate(activeCamera);
-        activeCamera = camera;
+        viewport.setCamera(camera);
     }
 
     private static Date lastTimestamp = TimeUtils.epoch.getDate();
@@ -116,7 +94,7 @@ public class Displayer implements JHVEventHighlightListener {
         public void handleData(View view, ImageData imageData) {
             if (view == Layers.getActiveView()) {
                 lastTimestamp = imageData.getMetaData().getDateObs().getDate();
-                activeCamera.timeChanged(lastTimestamp);
+                viewport.getCamera().timeChanged(lastTimestamp);
                 for (final TimeListener listener : timeListeners) {
                     listener.timeChanged(lastTimestamp);
                 }
