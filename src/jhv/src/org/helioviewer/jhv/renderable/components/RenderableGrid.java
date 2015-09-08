@@ -390,4 +390,7 @@ public class RenderableGrid implements Renderable {
         oldFontSize = -1;
     }
 
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    }
 }

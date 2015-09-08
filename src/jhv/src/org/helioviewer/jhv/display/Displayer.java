@@ -24,6 +24,11 @@ import org.helioviewer.viewmodel.view.ViewDataHandler;
 public class Displayer implements JHVEventHighlightListener {
 
     private static Component displayComponent;
+    private static GL3DViewport miniview = new GL3DViewport(0, 0, 250, 250, new GL3DObserverCamera());
+
+    public static GL3DViewport getMiniview() {
+        return miniview;
+    }
 
     private static GL3DViewport viewport = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera());
 
