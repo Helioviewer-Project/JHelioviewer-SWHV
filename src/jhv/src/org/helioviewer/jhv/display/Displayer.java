@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
@@ -27,9 +26,25 @@ public class Displayer implements JHVEventHighlightListener {
     private static int viewportWidth;
     private static int viewportHeight;
 
+    private static int viewportOffsetX = 0;
+    private static int viewportOffsetY = 0;
+
     public static void setViewportSize(int width, int height) {
         viewportWidth = width;
         viewportHeight = height;
+    }
+
+    public static void setViewportOffset(int offsetX, int offsetY) {
+        viewportOffsetX = offsetX;
+        viewportOffsetY = offsetY;
+    }
+
+    public static int getViewportOffsetX() {
+        return viewportOffsetX;
+    }
+
+    public static int getViewportOffsetY() {
+        return viewportOffsetY;
     }
 
     public static int getViewportHeight() {

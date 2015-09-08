@@ -33,6 +33,8 @@ public class GLSLShader {
     public static int rectRef;
     public static int differenceRectRef;
     public static int viewportRef;
+    public static int viewportOffsetRef;
+
     private static int cameraTransformationInverseRef;
     private static int cameraDifferenceRotationQuatRef;
     private static int diffCameraDifferenceRotationQuatRef;
@@ -50,6 +52,7 @@ public class GLSLShader {
     public static final float[] rectVertex = new float[4];
     public static final float[] differencerect = new float[4];
     public static final float[] viewport = new float[2];
+    public static final float[] viewportOffset = new float[2];
 
     public static ColorMask colorMask = new ColorMask();
 
@@ -77,6 +80,8 @@ public class GLSLShader {
         rectRef = gl.glGetUniformLocation(progID, "rect");
         differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
         viewportRef = gl.glGetUniformLocation(progID, "viewport");
+        viewportOffsetRef = gl.glGetUniformLocation(progID, "viewportOffset");
+
         cameraTransformationInverseRef = gl.glGetUniformLocation(progID, "cameraTransformationInverse");
         cameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "cameraDifferenceRotationQuat");
         diffCameraDifferenceRotationQuatRef = gl.glGetUniformLocation(progID, "diffcameraDifferenceRotationQuat");
@@ -284,6 +289,8 @@ public class GLSLShader {
         gl.glUniform1fv(GLSLShader.cutOffRadiusRef, 1, GLSLShader.cutOffRadiusFloat, 0);
         gl.glUniform1fv(GLSLShader.outerCutOffRadiusRef, 1, GLSLShader.outerCutOffRadiusFloat, 0);
         gl.glUniform2fv(GLSLShader.viewportRef, 1, GLSLShader.viewport, 0);
+        gl.glUniform2fv(GLSLShader.viewportOffsetRef, 1, GLSLShader.viewportOffset, 0);
+
     }
 
     public static void bindIsDisc(GL2 gl, int isDisc) {
@@ -326,9 +333,12 @@ public class GLSLShader {
         truncationValueFloat[0] = truncationValue;
     }
 
-    public static void setViewport(float width, float height) {
+    public static void setViewport(float width, float height, float offsetX, float offsetY) {
         viewport[0] = width;
         viewport[1] = height;
+        viewportOffset[0] = offsetX;
+        viewportOffset[1] = offsetY;
+
     }
 
 }
