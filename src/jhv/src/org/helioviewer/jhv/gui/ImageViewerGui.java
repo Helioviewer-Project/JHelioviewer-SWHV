@@ -43,6 +43,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableGridType;
+import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.jhv.renderable.components.RenderableMiniviewType;
 import org.helioviewer.jhv.renderable.components.RenderableSolarAxes;
 import org.helioviewer.jhv.renderable.components.RenderableSolarAxesType;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
@@ -135,7 +137,7 @@ public class ImageViewerGui {
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
         renderableContainer.addRenderable(new RenderableTimeStamp(new RenderableTimeStampType("Timestamp")));
-
+        renderableContainer.addRenderable(new RenderableMiniview(new RenderableMiniviewType("Miniview")));
         RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
         leftPane.add("Image Layers", renderableContainerPanel, true);

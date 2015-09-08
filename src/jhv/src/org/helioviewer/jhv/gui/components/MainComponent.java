@@ -122,21 +122,15 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         for (GL3DViewport vp : Displayer.getViewports()) {
-            vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * 2, vp.getHeight() * 2);
-            vp.getCamera().applyPerspective(gl);
-            ImageViewerGui.getRenderableContainer().render(gl, vp);
+            if (vp.isVisible()) {
+                vp.getCamera().activate(Displayer.getActiveCamera());
+                vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
+                vp.getCamera().applyPerspective(gl);
+                ImageViewerGui.getRenderableContainer().render(gl, vp);
+            }
         }
-        /*
-         * Displayer.setViewportSize(300, 300 * h / w); int offsetX = 10; int
-         * offsetY = 2 * h - 310; Displayer.setViewportOffset(offsetX, offsetY);
-         *
-         * gl.glViewport(offsetX, offsetY, Displayer.getViewportWidth() * 2,
-         * Displayer.getViewportHeight() * 2);
-         * Displayer.getActiveCamera().applyPerspective(gl);
-         * ImageViewerGui.getRenderableContainer().render(gl);
-         * Displayer.setViewportSize(w, h); Displayer.setViewportOffset(0, 0);
-         */
+
         drawable.swapBuffers();
 
         if (exportMode || screenshotMode) {

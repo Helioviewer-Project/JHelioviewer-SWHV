@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -25,17 +26,28 @@ public class Displayer implements JHVEventHighlightListener {
     private static Component displayComponent;
 
     private static GL3DViewport viewport = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera());
-    private static GL3DViewport miniviewViewport = new GL3DViewport(10, 10, 100, 100, new GL3DObserverCamera());
 
-    private static GL3DViewport[] viewports = new GL3DViewport[] { viewport, miniviewViewport };
+    private static ArrayList<GL3DViewport> viewports = new ArrayList<GL3DViewport>() {
+        {
+            add(viewport);
+        }
+    };
 
-    public static GL3DViewport[] getViewports() {
+    public static ArrayList<GL3DViewport> getViewports() {
         return viewports;
     }
 
     public static GL3DViewport getActiveViewport() {
         return viewport;
     };
+
+    public static void addViewport(GL3DViewport vp) {
+        viewports.add(vp);
+    }
+
+    public static void removeViewport(GL3DViewport vp) {
+        viewports.remove(vp);
+    }
 
     private static boolean torender = false;
     private static boolean todisplay = false;
