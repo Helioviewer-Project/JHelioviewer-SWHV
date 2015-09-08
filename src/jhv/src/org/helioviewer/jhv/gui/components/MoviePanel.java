@@ -586,36 +586,37 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
              */
             @Override
             public void paintTrack(Graphics g) {
-                View view = Layers.getActiveView();
-                if (view == null)
-                    return;
-
-                CacheStatus[] cacheStatus = view.getImageCacheStatus().getImageStatus();
-                int len = cacheStatus.length;
-
                 int height = getSize().height / 4;
                 int offset = (getSize().height - height) / 2;
 
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setStroke(new BasicStroke(4));
 
-                for (int i = 0; i < len; i++) {
-                    int begin = (int) ((float) i / len * trackRect.width);
-                    int end = (int) ((float) (i + 1) / len * trackRect.width);
+                View view = Layers.getActiveView();
+                if (view == null) {
+                    g2d.setColor(notCachedColor);
+                    g2d.drawLine(trackRect.x, offset + getSize().height / 8, trackRect.x + trackRect.width, offset + getSize().height / 8);
+                } else {
+                    CacheStatus[] cacheStatus = view.getImageCacheStatus().getImageStatus();
+                    int len = cacheStatus.length;
 
-                    if (end == begin)
-                        end++;
+                    for (int i = 0; i < len; i++) {
+                        int begin = (int) ((float) i / len * trackRect.width);
+                        int end = (int) ((float) (i + 1) / len * trackRect.width);
 
-                    if (cacheStatus[i] == CacheStatus.PARTIAL) {
-                        g2d.setColor(partialCachedColor);
-                    } else if (cacheStatus[i] == CacheStatus.COMPLETE) {
-                        g2d.setColor(completeCachedColor);
-                    } else {
-                        g2d.setColor(notCachedColor);
+                        if (end == begin)
+                            end++;
+
+                        if (cacheStatus[i] == CacheStatus.PARTIAL) {
+                            g2d.setColor(partialCachedColor);
+                        } else if (cacheStatus[i] == CacheStatus.COMPLETE) {
+                            g2d.setColor(completeCachedColor);
+                        } else {
+                            g2d.setColor(notCachedColor);
+                        }
+                        g2d.drawLine(trackRect.x + begin, offset + getSize().height / 8, trackRect.x + end, offset + getSize().height / 8);
                     }
-                    g2d.drawLine(trackRect.x + begin, offset + getSize().height / 8, trackRect.x + end, offset + getSize().height / 8);
                 }
-
                 g2d.setStroke(new BasicStroke(1));
             }
 
