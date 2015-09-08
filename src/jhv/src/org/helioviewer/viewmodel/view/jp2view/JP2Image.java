@@ -28,6 +28,7 @@ import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
@@ -107,6 +108,15 @@ public class JP2Image {
     private Kdu_thread_env threadEnv;
 
     private ImageCacheStatus imageCacheStatus;
+
+    // Reader
+    public enum ReaderMode {
+        NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
+    }
+
+    private J2KReader reader;
+    protected BooleanSignal readerSignal = new BooleanSignal(false);
+    private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     /**
      * Constructor
@@ -342,6 +352,47 @@ public class JP2Image {
         }
     }
 
+    protected void startReader(JHVJP2View view) {
+        try {
+            reader = new J2KReader(view, this);
+            reader.start();
+            readerSignal.signal();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sets the reader mode.
+     *
+     * <p>
+     * The options are:
+     * <ul>
+     * <li>NEVERFIRE: The reader basically is disabled and never fires a
+     * ChangeEvent.</li>
+     * <li>ONLYFIREONCOMPLETE: The reader only fires a ChangeEvent, when the
+     * current frame is loaded completely.</li>
+     * <li>ALWAYSFIREONNEWDATA: Whenever new data is received, the reader fires
+     * a ChangeEvent. This is the default value.</li>
+     * </ul>
+     *
+     * @param readerMode
+     * @see #getReaderMode()
+     */
+    protected void setReaderMode(ReaderMode _readerMode) {
+        readerMode = _readerMode;
+    }
+
+    /**
+     * Returns the reader mode.
+     *
+     * @return Current reader mode.
+     * @see #setReaderMode(ReaderMode)
+     */
+    protected ReaderMode getReaderMode() {
+        return readerMode;
+    }
+
     /**
      * Returns true if the image is remote or if image is note open.
      *
@@ -439,6 +490,11 @@ public class JP2Image {
             return;
         if (referenceCounter < 0) {
             throw new IllegalStateException("JP2Image abolished more than once: " + uri);
+        }
+
+       if (reader != null) {
+           reader.abolish();
+            reader = null;
         }
 
         APIResponseDump.getSingletonInstance().removeResponse(uri);
