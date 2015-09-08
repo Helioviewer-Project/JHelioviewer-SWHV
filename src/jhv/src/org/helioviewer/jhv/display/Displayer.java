@@ -25,6 +25,13 @@ public class Displayer implements JHVEventHighlightListener {
     private static Component displayComponent;
 
     private static GL3DViewport viewport = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera());
+    private static GL3DViewport miniviewViewport = new GL3DViewport(10, 10, 100, 100, new GL3DObserverCamera());
+
+    private static GL3DViewport[] viewports = new GL3DViewport[] { viewport, miniviewViewport };
+
+    public static GL3DViewport[] getViewports() {
+        return viewports;
+    }
 
     public static GL3DViewport getActiveViewport() {
         return viewport;
