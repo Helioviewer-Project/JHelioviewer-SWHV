@@ -39,6 +39,8 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
 
@@ -585,31 +587,38 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
              */
             @Override
             public void paintTrack(Graphics g) {
-                int partialCachedUntil = 0;
-                int completeCachedUntil = 0;
-
                 View view = Layers.getActiveView();
-                if (view != null) {
-                    partialCachedUntil = view.getImageCacheStatus().getImageCachedPartiallyUntil();
-                    completeCachedUntil = view.getImageCacheStatus().getImageCachedCompletelyUntil();
-                }
+                if (view == null)
+                    return;
+
+                ImageCacheStatus cacheStatus = view.getImageCacheStatus();
+                int len = view.getMaximumFrameNumber();
 
                 int height = getSize().height / 4;
                 int offset = (getSize().height - height) / 2;
-                int partialCachedOffset = (int) ((float) (partialCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
-                int completeCachedOffset = (int) ((float) (completeCachedUntil) / (getMaximum() - getMinimum()) * trackRect.width);
 
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setStroke(new BasicStroke(4));
 
-                g2d.setColor(notCachedColor);
-                g2d.drawLine(trackRect.x + partialCachedOffset, offset + getSize().height / 8, trackRect.x + trackRect.width - 0, offset + getSize().height / 8);
+                for (int i = 0; i <= len; i++) {
+                    int begin = (int) ((float) (i) / (len) * trackRect.width);
+                    int end = (int) ((float) (i + 1) / (len) * trackRect.width);
 
-                g2d.setColor(partialCachedColor);
-                g2d.drawLine(trackRect.x + completeCachedOffset, offset + getSize().height / 8, trackRect.x + partialCachedOffset, offset + getSize().height / 8);
+                    if (end == begin)
+                        end++;
+                    if (end > trackRect.width)
+                        end = trackRect.width;
 
-                g2d.setColor(completeCachedColor);
-                g2d.drawLine(trackRect.x, offset + getSize().height / 8, trackRect.x + completeCachedOffset, offset + getSize().height / 8);
+                    if (cacheStatus.getImageStatus(i) == CacheStatus.PARTIAL) {
+                        g2d.setColor(partialCachedColor);
+                    } else if (cacheStatus.getImageStatus(i) == CacheStatus.COMPLETE) {
+                        g2d.setColor(completeCachedColor);
+                    } else {
+                        g2d.setColor(notCachedColor);
+                    }
+                    g2d.drawLine(trackRect.x + begin, offset + getSize().height / 8, trackRect.x + end, offset + getSize().height / 8);
+                }
+
                 g2d.setStroke(new BasicStroke(1));
             }
 
