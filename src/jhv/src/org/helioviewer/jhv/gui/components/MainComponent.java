@@ -19,6 +19,7 @@ import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
@@ -118,18 +119,18 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(this);
-        int w = Displayer.getActiveViewport().getWidth();
-        int h = Displayer.getActiveViewport().getHeight();
-        Displayer.getActiveViewport().setViewportSize(w, h);
-
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        gl.glViewport(0, 0, w * 2, h * 2);
-        Displayer.getActiveCamera().applyPerspective(gl);
-        ImageViewerGui.getRenderableContainer().render(gl, Displayer.getActiveViewport());
+
+        for (GL3DViewport vp : Displayer.getViewports()) {
+            vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * 2, vp.getHeight() * 2);
+            vp.getCamera().applyPerspective(gl);
+            ImageViewerGui.getRenderableContainer().render(gl, vp);
+        }
         /*
          * Displayer.setViewportSize(300, 300 * h / w); int offsetX = 10; int
          * offsetY = 2 * h - 310; Displayer.setViewportOffset(offsetX, offsetY);
-         * 
+         *
          * gl.glViewport(offsetX, offsetY, Displayer.getViewportWidth() * 2,
          * Displayer.getViewportHeight() * 2);
          * Displayer.getActiveCamera().applyPerspective(gl);
