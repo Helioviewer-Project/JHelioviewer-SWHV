@@ -97,6 +97,15 @@ void main(void)
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
         color.r = (color.r + 1.0)/2.0;
+        if( difftexcoord.x<0.||
+            difftexcoord.y<0.||
+            difftexcoord.x>1.|| 
+            difftexcoord.y>1.||
+            dot(diffrotatedHitPoint.xy,diffrotatedHitPoint.xy) > outerCutOffRadius*outerCutOffRadius ||
+            dot(diffrotatedHitPoint.xy,diffrotatedHitPoint.xy) < cutOffRadius*cutOffRadius
+        ) {
+            discard;
+        }
     }
     if(isdifference != NODIFFERENCE){
         vec4 diffcolor;
