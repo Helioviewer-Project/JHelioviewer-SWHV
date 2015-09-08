@@ -53,6 +53,8 @@ public interface ImageCacheStatus {
      */
     public CacheStatus getImageStatus(int compositionLayer);
 
+    public CacheStatus[] getImageStatus();
+
     /**
      * Returns the highest frame, until which the status is at least PARTIAL.
      * 

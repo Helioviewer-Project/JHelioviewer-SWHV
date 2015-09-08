@@ -11,12 +11,15 @@ package org.helioviewer.viewmodel.imagecache;
 public class LocalImageCacheStatus implements ImageCacheStatus {
 
     private final int maxFrameNumber;
+    private final CacheStatus[] imageStatus;
 
     /**
      * Default constructor.
      */
     public LocalImageCacheStatus(int _maxFrameNumber) {
         maxFrameNumber = _maxFrameNumber;
+        imageStatus = new CacheStatus[maxFrameNumber + 1];
+        java.util.Arrays.fill(imageStatus, CacheStatus.COMPLETE);
     }
 
     /**
@@ -27,6 +30,11 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
     @Override
     public CacheStatus getImageStatus(int compositionLayer) {
         return CacheStatus.COMPLETE;
+    }
+
+    @Override
+    public CacheStatus[] getImageStatus() {
+        return imageStatus;
     }
 
     /**
