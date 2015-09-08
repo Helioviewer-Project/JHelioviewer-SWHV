@@ -36,8 +36,7 @@ public class ZoomFitAction extends AbstractAction {
         View view = Layers.getActiveView();
         if (view != null) {
             GL3DCamera camera = Displayer.getActiveCamera();
-            double fov = 2. * Math.atan(-view.getImageLayer().getImageData().getMetaData().getPhysicalSize().y / 2. / camera.getZTranslation());
-            camera.setCameraFOV(fov);
+            camera.zoomToFit(view);
         }
     }
 
