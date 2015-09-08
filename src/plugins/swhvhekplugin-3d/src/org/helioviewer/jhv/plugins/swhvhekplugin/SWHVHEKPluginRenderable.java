@@ -347,4 +347,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         iconCacheId.clear();
     }
 
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    }
 }

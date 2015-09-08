@@ -32,4 +32,6 @@ public interface Renderable {
 
     public void dispose(GL2 gl);
 
+    void renderMiniview(GL2 gl, GL3DViewport vp);
+
 }

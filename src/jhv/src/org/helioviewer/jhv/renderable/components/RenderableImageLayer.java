@@ -370,4 +370,55 @@ public class RenderableImageLayer implements Renderable {
         return imageData;
     }
 
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+        if (!isVisible)
+            return;
+
+        GLSLShader.bind(gl);
+        {
+            gl.glEnable(GL2.GL_CULL_FACE);
+            gl.glCullFace(GL2.GL_BACK);
+
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
+
+            GLSLShader.setViewport(GLInfo.pixelScale[0] * vp.getWidth(), GLInfo.pixelScale[1] * vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
+            if (!RenderableImageLayer.showCorona) {
+                GLSLShader.setOuterCutOffRadius(1.);
+            }
+            GLSLShader.filter(gl);
+
+            GL3DCamera camera = vp.getCamera();
+            GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
+            vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
+            GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
+            if (glImage.getBaseDifferenceMode()) {
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
+            } else if (glImage.getDifferenceMode()) {
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
+            }
+
+            enablePositionVBO(gl);
+            enableIndexVBO(gl);
+            {
+                gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
+                GLSLShader.bindIsDisc(gl, 0);
+
+                gl.glDepthRange(0.f, 0.f);
+                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
+
+                GLSLShader.bindIsDisc(gl, 1);
+                gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+                gl.glDepthRange(0.f, 1.f);
+
+            }
+            disableIndexVBO(gl);
+            disablePositionVBO(gl);
+
+            gl.glColorMask(true, true, true, true);
+            gl.glDisable(GL2.GL_CULL_FACE);
+        }
+        GLSLShader.unbind(gl);
+    }
 }

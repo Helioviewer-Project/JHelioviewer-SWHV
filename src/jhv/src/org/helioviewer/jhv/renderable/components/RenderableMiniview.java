@@ -2,24 +2,24 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
-import org.helioviewer.jhv.camera.GL3DObserverCamera;
+import org.helioviewer.base.Region;
+import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
+import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
 public class RenderableMiniview implements Renderable {
-    private final GL3DViewport miniviewViewport = new GL3DViewport(10, 10, 250, 250, new GL3DObserverCamera());
 
     private final RenderableType type;
     private boolean isVisible = true;
 
     public RenderableMiniview(RenderableMiniviewType renderableMiniviewType) {
         type = renderableMiniviewType;
-        Displayer.addViewport(miniviewViewport);
-
     }
 
     private void drawCircle(GL2 gl, double x, double y, double r, int segments) {
@@ -36,14 +36,45 @@ public class RenderableMiniview implements Renderable {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
+    private void drawRectangle(GL2 gl, double x0, double y0, double w, double h) {
+        double x1 = x0 + w;
+        double y1 = y0 + h;
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        {
+            gl.glBegin(GL2.GL_QUADS);
+            gl.glVertex2d(x0, -y0);
+            gl.glVertex2d(x0, -y1);
+            gl.glVertex2d(x1, -y1);
+            gl.glVertex2d(x1, -y0);
+            gl.glEnd();
+        }
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+    }
+
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        if (vp == this.miniviewViewport) {
-            gl.glColor4d(1, 0, 0, 1);
-            drawCircle(gl, 0, 0, 1, 100);
+    }
+
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+        GL3DMat4d cameraMatrix = vp.getCamera().getLocalRotation().toMatrix();
+        gl.glDepthRange(0.f, 0.f);
+        gl.glPushMatrix();
+        {
+            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             gl.glColor4d(0, 0, 0, 1);
             drawCircle(gl, 0, 0, 10, 100);
+            gl.glColor4d(1, 0, 0, 1);
+            drawCircle(gl, 0, 0, 1, 100);
+            gl.glColor4d(0, 1, 0, 0.5);
+            View v = Layers.getActiveView();
+            if (v != null) {
+                Region r = v.getImageData().getRegion();
+                drawRectangle(gl, r.getLowerLeftCorner().x, r.getLowerLeftCorner().y, r.getWidth(), r.getHeight());
+            }
         }
+        gl.glPopMatrix();
+        gl.glDepthRange(0.f, 1.f);
     }
 
     @Override
@@ -74,7 +105,7 @@ public class RenderableMiniview implements Renderable {
     @Override
     public void setVisible(boolean isVisible) {
         this.isVisible = isVisible;
-        miniviewViewport.setVisible(isVisible);
+        Displayer.getMiniview().setVisible(isVisible);
     }
 
     @Override

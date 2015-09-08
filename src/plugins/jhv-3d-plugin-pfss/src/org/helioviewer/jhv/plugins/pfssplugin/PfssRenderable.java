@@ -127,4 +127,8 @@ public class PfssRenderable implements Renderable, LayersListener {
         PfssPlugin.getPfsscache().destroy(gl);
     }
 
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    }
+
 }

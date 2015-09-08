@@ -168,6 +168,14 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
             }
         }
+        GL3DViewport vp = Displayer.getMiniview();
+        if (vp.isVisible()) {
+            vp.getCamera().activate(Displayer.getActiveCamera());
+            vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
+            vp.getCamera().applyPerspective(gl);
+            ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
+        }
 
         drawable.swapBuffers();
 
