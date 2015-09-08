@@ -127,5 +127,5 @@ void main(void)
     color.r = 0.5 * sign(2.0 * color.r - 1.0) * pow(abs(2.0 * color.r - 1.0), pow(1.5, -contrast)) + 0.5;
     color.rgb = texture1D(lut, color.r).rgb;
     color.a = alpha;
-    gl_FragColor = color;
+    gl_FragData[0] = color;
 }
