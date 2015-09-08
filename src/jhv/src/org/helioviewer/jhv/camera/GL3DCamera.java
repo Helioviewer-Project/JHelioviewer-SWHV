@@ -9,9 +9,12 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -19,7 +22,7 @@ public abstract class GL3DCamera {
 
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
-    public static final double MAX_FOV = INITFOV * 10;
+    public static final double MAX_FOV = INITFOV * 30;
     private final double clipNear = Sun.Radius * 3;
     private final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
@@ -69,7 +72,11 @@ public abstract class GL3DCamera {
         this.translation = new GL3DVec3d(0, 0, this.translation.z);
         this.currentDragRotation.clear();
         this.currentInteraction.reset(this);
-        setCameraFOV(INITFOV);
+        View vw = Layers.getActiveView();
+        if (vw != null)
+            zoomToFit(vw);
+        else
+            setCameraFOV(INITFOV);
     }
 
     /**
@@ -360,4 +367,8 @@ public abstract class GL3DCamera {
 
     public abstract void updateRotation(Date date, MetaData m);
 
+    public void zoomToFit(View view) {
+        double fov = 2. * Math.atan(-view.getMetaData(new ImmutableDateTime(0)).getPhysicalSize().y / 2. / this.getZTranslation());
+        this.setCameraFOV(fov);
+    }
 }
