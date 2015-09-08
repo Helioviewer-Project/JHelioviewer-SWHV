@@ -18,7 +18,7 @@ import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -279,8 +279,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     }
 
     @Override
-    public ImageCacheStatus getImageCacheStatus() {
-        return jp2Image.getImageCacheStatus();
+    public CacheStatus getImageCacheStatus(int frame) {
+        return jp2Image.getImageCacheStatus().getImageStatus(frame);
     }
 
     @Override

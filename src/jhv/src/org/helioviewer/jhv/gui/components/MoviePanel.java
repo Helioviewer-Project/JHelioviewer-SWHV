@@ -597,8 +597,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                     g2d.setColor(notCachedColor);
                     g2d.drawLine(trackRect.x, offset + getSize().height / 8, trackRect.x + trackRect.width, offset + getSize().height / 8);
                 } else {
-                    CacheStatus[] cacheStatus = view.getImageCacheStatus().getImageStatus();
-                    int len = cacheStatus.length;
+                    int len = view.getMaximumFrameNumber();
 
                     for (int i = 0; i < len; i++) {
                         int begin = (int) ((float) i / len * trackRect.width);
@@ -607,9 +606,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                         if (end == begin)
                             end++;
 
-                        if (cacheStatus[i] == CacheStatus.PARTIAL) {
+                        CacheStatus cacheStatus = view.getImageCacheStatus(i);
+
+                        if (cacheStatus == CacheStatus.PARTIAL) {
                             g2d.setColor(partialCachedColor);
-                        } else if (cacheStatus[i] == CacheStatus.COMPLETE) {
+                        } else if (cacheStatus == CacheStatus.COMPLETE) {
                             g2d.setColor(completeCachedColor);
                         } else {
                             g2d.setColor(notCachedColor);
