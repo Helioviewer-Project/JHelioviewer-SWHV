@@ -106,12 +106,6 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         return imageStatus[compositionLayer];
     }
 
-    // not threadsafe
-    @Override
-    public CacheStatus[] getImageStatus() {
-        return imageStatus;
-    }
-
     /**
      * {@inheritDoc}
      */

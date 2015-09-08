@@ -7,7 +7,7 @@ import org.helioviewer.base.Viewport;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
@@ -75,12 +75,7 @@ public interface View {
 
     public LUT getDefaultLUT();
 
-   /**
-     * Returns the image cache status.
-     *
-     * @return image cache status
-     */
-    public ImageCacheStatus getImageCacheStatus();
+    public CacheStatus getImageCacheStatus(int frame);
 
     /**
      * Returns the frame rate on which the View is operating right now.
