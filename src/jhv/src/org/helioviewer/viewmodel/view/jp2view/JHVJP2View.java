@@ -25,7 +25,7 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewROI;
-import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
+import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -53,20 +53,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     int numOfThread = 1;
     private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
-    public enum ReaderMode {
-        NEVERFIRE, ONLYFIREONCOMPLETE, ALWAYSFIREONNEWDATA, SIGNAL_RENDER_ONCE
-    }
-
     protected Region region;
 
     // Member related to JP2
     protected JP2Image jp2Image;
     protected JP2ImageParameter imageViewParams;
-
-    // Reader
-    private J2KReader _reader;
-    private BooleanSignal _readerSignal = new BooleanSignal(false);
-    private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     private int targetFrame;
 
@@ -108,44 +99,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         imageViewParams = calculateParameter(region, 0);
 
-        try {
-            _reader = new J2KReader(this, jp2Image, _readerSignal);
-            _reader.start();
-            _readerSignal.signal();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Sets the reader mode.
-     *
-     * <p>
-     * The options are:
-     * <ul>
-     * <li>NEVERFIRE: The reader basically is disabled and never fires a
-     * ChangeEvent.</li>
-     * <li>ONLYFIREONCOMPLETE: The reader only fires a ChangeEvent, when the
-     * current frame is loaded completely.</li>
-     * <li>ALWAYSFIREONNEWDATA: Whenever new data is received, the reader fires
-     * a ChangeEvent. This is the default value.</li>
-     * </ul>
-     *
-     * @param readerMode
-     * @see #getReaderMode()
-     */
-    public void setReaderMode(ReaderMode _readerMode) {
-        readerMode = _readerMode;
-    }
-
-    /**
-     * Returns the reader mode.
-     *
-     * @return Current reader mode.
-     * @see #setReaderMode(ReaderMode)
-     */
-    public ReaderMode getReaderMode() {
-        return readerMode;
+        jp2Image.startReader(this);
     }
 
     private int getTrueFrameNumber() {
@@ -223,10 +177,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     public void abolishExternal() {
         Displayer.removeRenderListener(this);
-        if (_reader != null) {
-            _reader.abolish();
-            _reader = null;
-        }
         jp2Image.abolish();
         jp2Image = null;
     }
@@ -376,8 +326,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             targetFrame = frame;
 
             // necessary for fov change
-            _readerSignal.signal();
-            if (readerMode != ReaderMode.ONLYFIREONCOMPLETE) {
+            jp2Image.readerSignal.signal();
+            if (jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
                 signalRender(false);
             }
         }
