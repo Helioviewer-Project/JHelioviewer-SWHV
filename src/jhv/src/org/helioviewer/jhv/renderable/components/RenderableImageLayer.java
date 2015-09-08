@@ -98,7 +98,7 @@ public class RenderableImageLayer implements Renderable {
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
 
-        if (!isVisible)
+        if (!isVisible || imageData == null)
             return;
 
         GLSLShader.bind(gl);
@@ -130,8 +130,9 @@ public class RenderableImageLayer implements Renderable {
                 gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                 GLSLShader.bindIsDisc(gl, 0);
                 gl.glDepthRange(depthrange[0], depthrange[1]);
+
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                gl.glDepthRange(depthrange[1], depthrange[2]);
+                gl.glDepthRange(depthrange[2], depthrange[3]);
 
                 GLSLShader.bindIsDisc(gl, 1);
                 gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
@@ -332,6 +333,9 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public String getTimeString() {
+        if (imageData == null) {
+            return "N/A";
+        }
         return imageData.getMetaData().getDateObs().getCachedDate();
     }
 
