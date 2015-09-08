@@ -21,8 +21,8 @@ import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
 /**
@@ -612,7 +612,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, Long downloadID, double ratioX, double ratioY) {
         JHVJP2CallistoView jp2CallistoView = djd.getView();
         if (jp2CallistoView != null) {
-            jp2CallistoView.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
+            jp2CallistoView.getJP2Image().setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             JP2Image image = jp2CallistoView.getJP2Image();
             ResolutionSet rs = image.getResolutionSet();
             int maximumFrameNumber = image.getMaximumFrameNumber();
