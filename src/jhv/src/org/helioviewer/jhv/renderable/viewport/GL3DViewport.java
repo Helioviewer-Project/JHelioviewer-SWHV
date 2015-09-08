@@ -49,6 +49,14 @@ public class GL3DViewport {
         h = height;
     }
 
+    public void setWidth(int width) {
+        w = width;
+    }
+
+    public void setHeight(int height) {
+        h = height;
+    }
+
     public void setViewportOffset(int offsetX, int offsetY) {
         x = offsetX;
         y = offsetY;
