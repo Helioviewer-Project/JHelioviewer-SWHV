@@ -23,6 +23,7 @@ import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -98,11 +99,48 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         GLSLShader.init(gl);
         ImageViewerGui.getRenderableContainer().init(gl);
+        initFrameBuffer(gl);
+    }
+
+    private final int[] framebufferName = new int[1];
+    private final int[] renderedTexture = new int[1];
+    private final int[] depthrenderbuffer = new int[1];
+    private final int buffs[] = { GL.GL_COLOR_ATTACHMENT0 };
+
+    private void initFrameBuffer(GL2 gl) {
+        gl.glGenFramebuffers(1, framebufferName, 0);
+        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, framebufferName[0]);
+        gl.glGenTextures(1, renderedTexture, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, renderedTexture[0]);
+
+        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGB, 1024, 768, 0, GL2.GL_RGB, GL2.GL_UNSIGNED_BYTE, null);
+
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+
+        gl.glGenRenderbuffers(1, depthrenderbuffer, 0);
+        gl.glBindRenderbuffer(GL2.GL_RENDERBUFFER, depthrenderbuffer[0]);
+        gl.glRenderbufferStorage(GL2.GL_RENDERBUFFER, GL2.GL_DEPTH_COMPONENT, 1024, 768);
+        gl.glFramebufferRenderbuffer(GL2.GL_FRAMEBUFFER, GL2.GL_DEPTH_ATTACHMENT, GL2.GL_RENDERBUFFER, depthrenderbuffer[0]);
+        gl.glFramebufferTexture2D(GL2.GL_FRAMEBUFFER, GL2.GL_COLOR_ATTACHMENT0, GL2.GL_TEXTURE_2D, renderedTexture[0], 0);
+        gl.glDrawBuffers(1, buffs, 0);
+        if (gl.glCheckFramebufferStatus(GL2.GL_FRAMEBUFFER) != GL2.GL_FRAMEBUFFER_COMPLETE) {
+            System.out.println("CANNOT CONFIGURE FRAMEBUFFERS");
+            System.exit(2);
+        }
+
+    }
+
+    private void disposeFrameBuffer(GL2 gl) {
+        gl.glDeleteRenderbuffers(1, depthrenderbuffer, 0);
+        gl.glDeleteTextures(1, renderedTexture, 0);
+        gl.glDeleteFramebuffers(1, framebufferName, 0);
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
+        disposeFrameBuffer(gl);
         ImageViewerGui.getRenderableContainer().dispose(gl);
         GLSLShader.dispose(gl);
     }
