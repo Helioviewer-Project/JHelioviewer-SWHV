@@ -123,7 +123,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Displayer.setViewportSize(w, h);
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        gl.glViewport(0, 0, Displayer.getViewportWidth() * 2, Displayer.getViewportHeight() * 2);
+        gl.glViewport(0, 0, w * 2, h * 2);
         Displayer.getActiveCamera().applyPerspective(gl);
         ImageViewerGui.getRenderableContainer().render(gl);
 
