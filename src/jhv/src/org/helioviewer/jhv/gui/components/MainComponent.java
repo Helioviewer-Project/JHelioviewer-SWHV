@@ -99,7 +99,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         GLSLShader.init(gl);
         ImageViewerGui.getRenderableContainer().init(gl);
-        initFrameBuffer(gl);
+        //initFrameBuffer(gl);
     }
 
     private final int[] framebufferName = new int[1];
@@ -140,7 +140,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
-        disposeFrameBuffer(gl);
+        //disposeFrameBuffer(gl);
         ImageViewerGui.getRenderableContainer().dispose(gl);
         GLSLShader.dispose(gl);
     }
