@@ -1,7 +1,7 @@
 package org.helioviewer.viewmodel.imagecache;
 
 /**
- * Implementation of JP2CacheStatus for remote movies.
+ * Implementation of ImageCacheStatus for remote movies
  *
  * @author Markus Langenberg
  *
@@ -19,7 +19,7 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
      * Default constructor
      *
      * @param _parent
-     *            JP2Image, whose cache status is managed
+     *            JP2Image whose cache status is managed
      */
     public RemoteImageCacheStatus(int _maxFrameNumber) {
         maxFrameNumber = _maxFrameNumber;

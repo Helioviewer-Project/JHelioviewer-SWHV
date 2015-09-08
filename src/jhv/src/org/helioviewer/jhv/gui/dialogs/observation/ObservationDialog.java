@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
@@ -33,7 +32,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Stephan Pagel
  * */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class ObservationDialog extends JDialog implements ActionListener, ShowableDialog {
 
     private final HashMap<String, ObservationDialogPanel> uiMap = new HashMap<String, ObservationDialogPanel>();
@@ -203,7 +202,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         pack();
-        SwingUtilities.getRootPane(btnImages).setDefaultButton(btnImages);
+        getRootPane().setDefaultButton(btnImages);
 
         setVisible(true);
     }
