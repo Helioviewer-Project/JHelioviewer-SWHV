@@ -88,6 +88,16 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
+        _render(gl, vp, new double[] { 1., 1., 0., 1. });
+    }
+
+    @Override
+    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+        _render(gl, vp, new double[] { 0., 0., 0., 0. });
+    }
+
+    private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
+
         if (!isVisible)
             return;
 
@@ -95,7 +105,6 @@ public class RenderableImageLayer implements Renderable {
         {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
-
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
             GLSLShader.setViewport(GLInfo.pixelScale[0] * vp.getWidth(), GLInfo.pixelScale[1] * vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
@@ -120,13 +129,15 @@ public class RenderableImageLayer implements Renderable {
             {
                 gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
                 GLSLShader.bindIsDisc(gl, 0);
-
-                gl.glDepthRange(1.f, 1.f);
+                gl.glDepthRange(depthrange[0], depthrange[1]);
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
-                gl.glDepthRange(0.f, 1.f);
+                gl.glDepthRange(depthrange[1], depthrange[2]);
 
                 GLSLShader.bindIsDisc(gl, 1);
                 gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
+
+                gl.glDepthRange(0.f, 1.f);
+
             }
             disableIndexVBO(gl);
             disablePositionVBO(gl);
@@ -370,55 +381,4 @@ public class RenderableImageLayer implements Renderable {
         return imageData;
     }
 
-    @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
-        if (!isVisible)
-            return;
-
-        GLSLShader.bind(gl);
-        {
-            gl.glEnable(GL2.GL_CULL_FACE);
-            gl.glCullFace(GL2.GL_BACK);
-
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
-
-            GLSLShader.setViewport(GLInfo.pixelScale[0] * vp.getWidth(), GLInfo.pixelScale[1] * vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
-            if (!RenderableImageLayer.showCorona) {
-                GLSLShader.setOuterCutOffRadius(1.);
-            }
-            GLSLShader.filter(gl);
-
-            GL3DCamera camera = vp.getCamera();
-            GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
-            vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
-            GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
-            if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
-            } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
-            }
-
-            enablePositionVBO(gl);
-            enableIndexVBO(gl);
-            {
-                gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-                GLSLShader.bindIsDisc(gl, 0);
-
-                gl.glDepthRange(0.f, 0.f);
-                gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
-
-                GLSLShader.bindIsDisc(gl, 1);
-                gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
-                gl.glDepthRange(0.f, 1.f);
-
-            }
-            disableIndexVBO(gl);
-            disablePositionVBO(gl);
-
-            gl.glColorMask(true, true, true, true);
-            gl.glDisable(GL2.GL_CULL_FACE);
-        }
-        GLSLShader.unbind(gl);
-    }
 }
