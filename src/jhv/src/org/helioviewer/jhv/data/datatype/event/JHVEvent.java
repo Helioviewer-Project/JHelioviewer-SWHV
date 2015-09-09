@@ -3,7 +3,7 @@ package org.helioviewer.jhv.data.datatype.event;
 import java.awt.Color;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -59,14 +59,14 @@ public interface JHVEvent {
      *
      * @return a list with all the event parameters
      */
-    public abstract List<JHVEventParameter> getAllEventParameters();
+    public abstract Map<String, JHVEventParameter> getAllEventParameters();
 
     /**
      * Gets a list with all the visible configured event parameters.
      *
      * @return a list with all the visible event parameters
      */
-    public abstract List<JHVEventParameter> getVisibleEventParameters();
+    public abstract Map<String, JHVEventParameter> getVisibleEventParameters();
 
     /**
      * Gets a list with all the visible configured parameters that were not
@@ -74,21 +74,21 @@ public interface JHVEvent {
      *
      * @return a list with visible parameters that are not null
      */
-    public abstract List<JHVEventParameter> getVisibleNotNullEventParameters();
+    public abstract Map<String, JHVEventParameter> getVisibleNotNullEventParameters();
 
     /**
      * Gets a list with all the visible configured parameters that were null.
      *
      * @return a list with all the visible null parameters
      */
-    public abstract List<JHVEventParameter> getVisibleNullEventParameters();
+    public abstract Map<String, JHVEventParameter> getVisibleNullEventParameters();
 
     /**
      * Gets a list with all the non visible configured parameters.
      *
      * @return a list with all the non visible parameters
      */
-    public abstract List<JHVEventParameter> getNonVisibleEventParameters();
+    public abstract Map<String, JHVEventParameter> getNonVisibleEventParameters();
 
     /**
      * Gets a list with all the non visible configured parameters that were not
@@ -96,7 +96,7 @@ public interface JHVEvent {
      *
      * @return a list with all not null non visible parameters
      */
-    public abstract List<JHVEventParameter> getNonVisibleNotNullEventParameters();
+    public abstract Map<String, JHVEventParameter> getNonVisibleNotNullEventParameters();
 
     /**
      * Gets a list with all the non visible configured parameters that were
@@ -104,7 +104,7 @@ public interface JHVEvent {
      *
      * @return a list with all null non visible parameters
      */
-    public abstract List<JHVEventParameter> getNonVisibleNullEventParameters();
+    public abstract Map<String, JHVEventParameter> getNonVisibleNullEventParameters();
 
     /**
      * Gets the event type of the event.

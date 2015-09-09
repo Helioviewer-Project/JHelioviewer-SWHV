@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.data.guielements.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -24,9 +26,10 @@ public class ParameterTableModel extends AbstractTableModel {
      * @param parameters
      *            the parameters
      */
-    public ParameterTableModel(List<JHVEventParameter> parameters) {
+    public ParameterTableModel(Collection<JHVEventParameter> parameters) {
         super();
-        this.parameters = parameters;
+        this.parameters = new ArrayList<JHVEventParameter>();
+        this.parameters.addAll(parameters);
     }
 
     @Override

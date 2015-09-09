@@ -1,10 +1,9 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -43,25 +42,25 @@ public class ComesepEvent extends AbstractJHVEvent {
     private final String description;
 
     /** all the parameters */
-    private List<JHVEventParameter> allParameters;
+    private Map<String, JHVEventParameter> allParameters;
 
     /** all the visible parameters */
-    private List<JHVEventParameter> allVisibleParameters;
+    private Map<String, JHVEventParameter> allVisibleParameters;
 
     /** all the visible not null parameters */
-    private List<JHVEventParameter> allVisibleNotNullParameters;
+    private Map<String, JHVEventParameter> allVisibleNotNullParameters;
 
     /** all the visible null parameters */
-    private List<JHVEventParameter> allVisibleNullParameters;
+    private Map<String, JHVEventParameter> allVisibleNullParameters;
 
     /** all the non visible parameters */
-    private List<JHVEventParameter> allNonVisibleParameters;
+    private Map<String, JHVEventParameter> allNonVisibleParameters;
 
     /** all the non visible not null parameters */
-    private List<JHVEventParameter> allNonVisibleNotNullParameters;
+    private Map<String, JHVEventParameter> allNonVisibleNotNullParameters;
 
     /** all the non visible null parameters */
-    private List<JHVEventParameter> allNonVisibleNullParameters;
+    private Map<String, JHVEventParameter> allNonVisibleNullParameters;
 
     /** The event type */
     private final JHVEventType eventType;
@@ -144,37 +143,37 @@ public class ComesepEvent extends AbstractJHVEvent {
     }
 
     @Override
-    public List<JHVEventParameter> getAllEventParameters() {
+    public Map<String, JHVEventParameter> getAllEventParameters() {
         return allParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getVisibleEventParameters() {
+    public Map<String, JHVEventParameter> getVisibleEventParameters() {
         return allVisibleParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getVisibleNotNullEventParameters() {
+    public Map<String, JHVEventParameter> getVisibleNotNullEventParameters() {
         return allVisibleNotNullParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getVisibleNullEventParameters() {
+    public Map<String, JHVEventParameter> getVisibleNullEventParameters() {
         return allVisibleNullParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getNonVisibleEventParameters() {
+    public Map<String, JHVEventParameter> getNonVisibleEventParameters() {
         return allNonVisibleParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getNonVisibleNotNullEventParameters() {
+    public Map<String, JHVEventParameter> getNonVisibleNotNullEventParameters() {
         return allNonVisibleNotNullParameters;
     }
 
     @Override
-    public List<JHVEventParameter> getNonVisibleNullEventParameters() {
+    public Map<String, JHVEventParameter> getNonVisibleNullEventParameters() {
         return allNonVisibleNullParameters;
     }
 
@@ -219,21 +218,21 @@ public class ComesepEvent extends AbstractJHVEvent {
      *            was the event in the configuration file
      */
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
-        allParameters.add(parameter);
+        allParameters.put(parameter.getParameterName(), parameter);
         if (configured) {
             if (visible) {
-                allVisibleParameters.add(parameter);
+                allVisibleParameters.put(parameter.getParameterName(), parameter);
                 if (parameter.getParameterValue() == null) {
-                    allVisibleNullParameters.add(parameter);
+                    allVisibleNullParameters.put(parameter.getParameterName(), parameter);
                 } else {
-                    allVisibleNotNullParameters.add(parameter);
+                    allVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
                 }
             } else {
-                allNonVisibleParameters.add(parameter);
+                allNonVisibleParameters.put(parameter.getParameterName(), parameter);
                 if (parameter.getParameterValue() == null) {
-                    allNonVisibleNullParameters.add(parameter);
+                    allNonVisibleNullParameters.put(parameter.getParameterName(), parameter);
                 } else {
-                    allNonVisibleNotNullParameters.add(parameter);
+                    allNonVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
                 }
             }
         }
@@ -283,13 +282,13 @@ public class ComesepEvent extends AbstractJHVEvent {
      * Initialize all the lists.
      */
     private void initLists() {
-        allParameters = new ArrayList<JHVEventParameter>();
-        allVisibleParameters = new ArrayList<JHVEventParameter>();
-        allVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
-        allVisibleNullParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleNotNullParameters = new ArrayList<JHVEventParameter>();
-        allNonVisibleNullParameters = new ArrayList<JHVEventParameter>();
+        allParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
         positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
     }
 }
