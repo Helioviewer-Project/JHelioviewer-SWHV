@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
-        List<JHVEventParameter> params = evt.getAllEventParameters();
+        Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
         double principleAngle = 0;
         double angularWidth = 0;
         double distSun = 1.;
@@ -92,8 +93,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double phi = -Math.PI / 2. - p.lon;
 
         Color color = evt.getEventRelationShip().getRelationshipColor();
-        if (color == null)
+        if (color == null) {
             color = evt.getColor();
+        }
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {
@@ -170,8 +172,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
 
         Color color = evt.getEventRelationShip().getRelationshipColor();
-        if (color == null)
+        if (color == null) {
             color = evt.getColor();
+        }
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         if (evt.isHighlighted()) {

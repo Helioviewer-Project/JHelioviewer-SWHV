@@ -165,14 +165,14 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
      * initialize collapsible panels
      */
     private void initParameterCollapsiblePanels() {
-        ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
+        ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters().values());
         expandedPanels = 1;
         standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
 
-        ParameterTablePanel advancedParameterPanel = new ParameterTablePanel(event.getNonVisibleEventParameters());
+        ParameterTablePanel advancedParameterPanel = new ParameterTablePanel(event.getNonVisibleEventParameters().values());
         advancedParameters = new DataCollapsiblePanel("Advanced Parameters", advancedParameterPanel, false, model);
 
-        ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
+        ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
 
         Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();

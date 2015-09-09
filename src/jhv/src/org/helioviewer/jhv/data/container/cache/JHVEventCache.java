@@ -195,24 +195,21 @@ public class JHVEventCache {
                     int foundCorrespondinParameters = 0;
                     for (JHVRelatedOn relatedOn : rule.getRelatedOn()) {
                         // Check all the related on parameters
-                        for (JHVEventParameter p : candidate.getAllEventParameters()) {
-                            // Loop over candidate parameters
-                            if (relatedOn.getRelatedOnWith().getParameterName().toLowerCase().equals(p.getParameterName().toLowerCase())) {
-                                // Candidate has the related on parameter
-                                for (JHVEventParameter eventP : event.getAllEventParameters()) {
-                                    // Loop over the event parameter to find the
-                                    // value of the related on parameter
-                                    if (eventP.getParameterName().toLowerCase().equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
-                                        // Parameter found in the event
-                                        if (eventP.getParameterValue() != null && p.getParameterValue() != null && eventP.getParameterValue().equals(p.getParameterValue())) {
-                                            // at least one of the related on
-                                            // parameters found
-                                            foundCorrespondinParameters++;
-                                        }
-                                    } else {
-                                        // parameter not found in the event skip
-                                        // rule.
+                        if (candidate.getAllEventParameters().containsKey(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
+                            JHVEventParameter p = candidate.getAllEventParameters().get(relatedOn.getRelatedOnWith().getParameterName().toLowerCase());
+                            // Candidate has the related on parameter
+                            if (event.getAllEventParameters().containsKey(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
+                                JHVEventParameter eventP = event.getAllEventParameters().get(relatedOn.getRelatedOnWith().getParameterName().toLowerCase());
+                                if (eventP.getParameterName().toLowerCase().equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
+                                    // Parameter found in the event
+                                    if (eventP.getParameterValue() != null && p.getParameterValue() != null && eventP.getParameterValue().equals(p.getParameterValue())) {
+                                        // at least one of the related on
+                                        // parameters found
+                                        foundCorrespondinParameters++;
                                     }
+                                } else {
+                                    // parameter not found in the event skip
+                                    // rule.
                                 }
                             }
                         }
