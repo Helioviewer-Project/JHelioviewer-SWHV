@@ -111,15 +111,14 @@ public class GLImage {
                 }
             }
 
-            ImageData prevFrame;
+            ImageData prevFrame = imageData;
             if (!baseDifferenceMode) {
                 prevFrame = prevImageData;
             } else {
                 prevFrame = baseImageData;
             }
-            if (differenceMode && imageData != prevFrame && prevFrame != null) {
+            if (differenceMode && prevFrame != null) {
                 GLSLShader.setTruncationValue(truncation);
-
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 diffTex.bind(gl, GL2.GL_TEXTURE_2D);
                 diffTex.copyImageData2D(gl, prevFrame, 0, 0, prevFrame.getWidth(), prevFrame.getHeight());
@@ -170,7 +169,7 @@ public class GLImage {
         gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
 
-   public void init(GL2 gl) {
+    public void init(GL2 gl) {
         tex = new GLTexture(gl);
         lutTex = new GLTexture(gl);
         diffTex = new GLTexture(gl);
