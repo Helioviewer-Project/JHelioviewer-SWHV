@@ -15,7 +15,6 @@ import java.util.TreeMap;
 
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -81,8 +80,8 @@ public class JHVEventCache {
      *            the event to add
      */
     public void add(JHVEvent event) {
-        Log.debug("All events size : " + allEvents.size());
-        Log.debug("Add event called " + addEventCalled + " times");
+        // Log.debug("All events size : " + allEvents.size());
+        // Log.debug("Add event called " + addEventCalled + " times");
         Long start = System.currentTimeMillis();
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
@@ -95,12 +94,12 @@ public class JHVEventCache {
         } else {
             JHVEvent savedEvent = allEvents.get(event.getUniqueID());
             savedEvent.merge(event);
-            Log.debug("merge added new links");
+            // Log.debug("merge added new links");
             checkAndFixRelationShip(savedEvent);
 
         }
         addEventCalled++;
-        Log.debug("Add event took " + (System.currentTimeMillis() - start));
+        // Log.debug("Add event took " + (System.currentTimeMillis() - start));
     }
 
     /**
@@ -166,22 +165,27 @@ public class JHVEventCache {
     private void checkAndFixRelationShip(JHVEvent event) {
         long start = System.currentTimeMillis();
         checkMissingRelations(event);
-        Log.debug("Missing relations : " + (System.currentTimeMillis() - start));
+        // Log.debug("Missing relations : " + (System.currentTimeMillis() -
+        // start));
         start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getNextEvents().values());
-        Log.debug("checkAndFix next : " + (System.currentTimeMillis() - start));
+        // Log.debug("checkAndFix next : " + (System.currentTimeMillis() -
+        // start));
         start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getPrecedingEvents().values());
-        Log.debug("checkAndFix prec : " + (System.currentTimeMillis() - start));
+        // Log.debug("checkAndFix prec : " + (System.currentTimeMillis() -
+        // start));
         start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getRelatedEventsByRule().values());
-        Log.debug("checkAndFix byru : : " + (System.currentTimeMillis() - start));
+        // Log.debug("checkAndFix byru : : " + (System.currentTimeMillis() -
+        // start));
         start = System.currentTimeMillis();
         executeRelationshipRules(event);
-        Log.debug("execute rel rules : " + (System.currentTimeMillis() - start));
+        // Log.debug("execute rel rules : " + (System.currentTimeMillis() -
+        // start));
         start = System.currentTimeMillis();
         checkRelationColor(event);
-        Log.debug("color : " + (System.currentTimeMillis() - start));
+        // Log.debug("color : " + (System.currentTimeMillis() - start));
     }
 
     private void executeRelationshipRules(JHVEvent event) {
