@@ -164,6 +164,14 @@ public class PlotAreaSpace {
             this.scaledSelectedMinValue = scaledSelectedMinValue;
             this.scaledSelectedMaxValue = scaledSelectedMaxValue;
             if (this.scaledSelectedMinTime < scaledMinTime || this.scaledSelectedMaxTime > scaledMaxTime || this.scaledSelectedMinValue < scaledMinValue || this.scaledSelectedMaxValue > scaledMaxValue) {
+                // Log.debug("setScaledSelectedTimeAndValue part 1 executed : this.scaledSelectedMinTime < scaledMinTime "
+                // + (this.scaledSelectedMinTime < scaledMinTime) +
+                // " this.scaledSelectedMaxTime > scaledMaxTime " +
+                // (this.scaledSelectedMaxTime > scaledMaxTime) +
+                // " this.scaledSelectedMinValue < scaledMinValue " +
+                // (this.scaledSelectedMinValue < scaledMinValue) +
+                // " this.scaledSelectedMaxValue > scaledMaxValue " +
+                // (this.scaledSelectedMaxValue > scaledMaxValue));
                 double oldScaledMinTime = scaledMinTime;
                 double oldScaledMaxTime = scaledMaxTime;
                 double oldScaledMinValue = scaledMinValue;
@@ -173,8 +181,26 @@ public class PlotAreaSpace {
                 scaledMinValue = Math.min(this.scaledSelectedMinValue, scaledMinValue);
                 scaledMaxValue = Math.max(this.scaledSelectedMaxValue, scaledMaxValue);
                 fireAvailableAreaSpaceChanged(oldScaledMinValue, oldScaledMaxValue, oldScaledMinTime, oldScaledMaxTime, scaledMinValue, scaledMaxValue, scaledMinTime, scaledMaxTime);
+            } else {
+                // Log.debug("setScaledSelectedTimeAndValue part 1 not executed : this.scaledSelectedMinTime < scaledMinTime "
+                // + (this.scaledSelectedMinTime < scaledMinTime) +
+                // " this.scaledSelectedMaxTime > scaledMaxTime " +
+                // (this.scaledSelectedMaxTime > scaledMaxTime) +
+                // " this.scaledSelectedMinValue < scaledMinValue " +
+                // (this.scaledSelectedMinValue < scaledMinValue) +
+                // " this.scaledSelectedMaxValue > scaledMaxValue " +
+                // (this.scaledSelectedMaxValue > scaledMaxValue));
             }
             firePlotAreaSpaceChanged(false);
+        } else {
+            // Log.debug("setScaledSelectedTimeAndValue not executed: this.scaledSelectedMinTime == scaledSelectedMinTime "
+            // + (this.scaledSelectedMinTime == scaledSelectedMinTime) +
+            // " this.scaledSelectedMaxTime == scaledSelectedMaxTime " +
+            // (this.scaledSelectedMaxTime == scaledSelectedMaxTime) +
+            // " this.scaledSelectedMinValue == scaledSelectedMinValue " +
+            // (this.scaledSelectedMinValue == scaledSelectedMinValue) +
+            // " this.scaledSelectedMaxValue == scaledSelectedMaxValue" +
+            // (this.scaledSelectedMaxValue == scaledSelectedMaxValue));
         }
     }
 

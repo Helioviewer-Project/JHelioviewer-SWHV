@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.helioviewer.base.cache.RequestCache;
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -44,6 +45,8 @@ public class JHVEventCache {
     private final Map<JHVEventType, RequestCache> downloadedCache;
 
     private final Map<String, Color> colorPerId;
+
+    private final long addEventCalled = 0;
 
     /**
      * private default constructor
@@ -78,6 +81,8 @@ public class JHVEventCache {
      *            the event to add
      */
     public void add(JHVEvent event) {
+        Log.debug("Add event called " + addEventCalled + " times");
+        Long start = System.currentTimeMillis();
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
             allEvents.put(event.getUniqueID(), event);
@@ -91,6 +96,7 @@ public class JHVEventCache {
             savedEvent.merge(event);
             checkAndFixRelationShip(savedEvent);
         }
+        Log.debug("Add event took " + (System.currentTimeMillis() - start));
     }
 
     /**
