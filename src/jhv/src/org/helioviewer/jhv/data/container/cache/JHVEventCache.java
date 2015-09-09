@@ -45,8 +45,6 @@ public class JHVEventCache {
 
     private final Map<String, Color> colorPerId;
 
-    private long addEventCalled = 0;
-
     /**
      * private default constructor
      */
@@ -80,9 +78,6 @@ public class JHVEventCache {
      *            the event to add
      */
     public void add(JHVEvent event) {
-        // Log.debug("All events size : " + allEvents.size());
-        // Log.debug("Add event called " + addEventCalled + " times");
-        Long start = System.currentTimeMillis();
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
             allEvents.put(event.getUniqueID(), event);
@@ -94,12 +89,9 @@ public class JHVEventCache {
         } else {
             JHVEvent savedEvent = allEvents.get(event.getUniqueID());
             savedEvent.merge(event);
-            // Log.debug("merge added new links");
             checkAndFixRelationShip(savedEvent);
 
         }
-        addEventCalled++;
-        // Log.debug("Add event took " + (System.currentTimeMillis() - start));
     }
 
     /**
@@ -163,29 +155,12 @@ public class JHVEventCache {
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
-        long start = System.currentTimeMillis();
         checkMissingRelations(event);
-        // Log.debug("Missing relations : " + (System.currentTimeMillis() -
-        // start));
-        start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getNextEvents().values());
-        // Log.debug("checkAndFix next : " + (System.currentTimeMillis() -
-        // start));
-        start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getPrecedingEvents().values());
-        // Log.debug("checkAndFix prec : " + (System.currentTimeMillis() -
-        // start));
-        start = System.currentTimeMillis();
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getRelatedEventsByRule().values());
-        // Log.debug("checkAndFix byru : : " + (System.currentTimeMillis() -
-        // start));
-        start = System.currentTimeMillis();
         executeRelationshipRules(event);
-        // Log.debug("execute rel rules : " + (System.currentTimeMillis() -
-        // start));
-        start = System.currentTimeMillis();
         checkRelationColor(event);
-        // Log.debug("color : " + (System.currentTimeMillis() - start));
     }
 
     private void executeRelationshipRules(JHVEvent event) {
