@@ -135,11 +135,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         return jp2Image.getDownloadURI();
     }
 
-    @Override
-    public boolean isRemote() {
-        return jp2Image.isRemote();
-    }
-
     private class AbolishThread extends Thread {
         private JHVJP2View view;
 
