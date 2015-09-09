@@ -60,6 +60,7 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer() throws KduException {
+        parentImageRef.localIntBuffer = new int[0];
         int numLayer = currParams.compositionLayer;
 
         compositorRef.Refresh();

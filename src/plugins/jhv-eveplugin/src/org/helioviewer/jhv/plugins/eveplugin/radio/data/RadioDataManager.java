@@ -612,8 +612,8 @@ public class RadioDataManager implements RadioDownloaderListener {
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, Long downloadID, double ratioX, double ratioY) {
         JHVJP2CallistoView jp2CallistoView = djd.getView();
         if (jp2CallistoView != null) {
-            jp2CallistoView.getJP2Image().setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             JP2Image image = jp2CallistoView.getJP2Image();
+            image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             ResolutionSet rs = image.getResolutionSet();
             int maximumFrameNumber = image.getMaximumFrameNumber();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);

@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -35,8 +34,7 @@ public class ZoomFitAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();
         if (view != null) {
-            GL3DCamera camera = Displayer.getActiveCamera();
-            camera.zoomToFit(view);
+            Displayer.getActiveCamera().zoomToFit(view);
         }
     }
 
