@@ -49,8 +49,6 @@ public class JP2Image {
     /** An array of the file extensions this class currently supports */
     private static final String[] SUPPORTED_EXTENSIONS = { ".JP2", ".JPX" };
 
-    protected int[] localIntBuffer = new int[0];
-
     /** This is the URI that uniquely identifies the image. */
     private final URI uri;
 
