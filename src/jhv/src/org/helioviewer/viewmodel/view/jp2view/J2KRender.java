@@ -60,11 +60,11 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer() throws KduException {
-        parentImageRef.localIntBuffer = new int[0];
+        int[] localIntBuffer = new int[2048 * 1024];
         int numLayer = currParams.compositionLayer;
 
-        compositorRef.Refresh();
-        parentImageRef.updateResolutionSet(numLayer);
+        // compositorRef.Refresh();
+        // tbd - parentImageRef.updateResolutionSet(numLayer);
         // compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
@@ -82,7 +82,7 @@ class J2KRender implements Runnable {
 
         SubImage roi = currParams.subImage;
         Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
-        compositorRef.Set_buffer_surface(requestedBufferedRegion, 0);
+        compositorRef.Set_buffer_surface(requestedBufferedRegion);
 
         Kdu_dims actualBufferedRegion = new Kdu_dims();
         Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
@@ -112,8 +112,8 @@ class J2KRender implements Runnable {
                 continue;
             }
 
-            parentImageRef.localIntBuffer = newPixels > parentImageRef.localIntBuffer.length ? new int[newPixels << 1] : parentImageRef.localIntBuffer;
-            compositorBuf.Get_region(newRegion, parentImageRef.localIntBuffer);
+            localIntBuffer = newPixels > localIntBuffer.length ? new int[newPixels << 1] : localIntBuffer;
+            compositorBuf.Get_region(newRegion, localIntBuffer);
 
             int srcIdx = 0;
             int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
@@ -121,12 +121,12 @@ class J2KRender implements Runnable {
             if (numComponents < 3) {
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[destIdx + col] = (byte) (parentImageRef.localIntBuffer[srcIdx + col] & 0xFF);
+                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                    System.arraycopy(parentImageRef.localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
+                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                 }
             }
         }
