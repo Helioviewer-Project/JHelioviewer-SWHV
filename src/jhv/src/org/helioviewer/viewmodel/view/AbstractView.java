@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
