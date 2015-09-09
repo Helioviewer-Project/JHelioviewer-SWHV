@@ -57,12 +57,6 @@ public interface View {
      */
     public String getName();
     /**
-     * Returns, whether the image is a remote image (e.g. jpip).
-     *
-     * @return true, if the image is accessed remotely, false otherwise
-     */
-    public boolean isRemote();
-    /**
      * Returns the download uri the image.
      *
      * This is the uri from which the whole file can be downloaded and stored

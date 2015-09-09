@@ -21,11 +21,6 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public boolean isRemote() {
-        return false;
-    }
-
-    @Override
     public CacheStatus getImageCacheStatus(int frame) {
         if (cacheStatus == null) {
             cacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
