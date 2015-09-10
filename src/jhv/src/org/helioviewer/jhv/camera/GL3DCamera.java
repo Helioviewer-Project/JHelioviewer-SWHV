@@ -373,4 +373,8 @@ public abstract class GL3DCamera {
         double fov = 2. * Math.atan(-view.getMetaData(new ImmutableDateTime(0)).getPhysicalSize().y / 2. / this.getZTranslation());
         this.setCameraFOV(fov);
     }
+
+    public GL3DMat4d getRotation() {
+        return this.rotation.toMatrix();
+    }
 }

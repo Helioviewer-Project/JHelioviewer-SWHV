@@ -19,6 +19,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.common.nio.Buffers;
@@ -67,10 +68,11 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
+        GL3DCamera activeCamera = vp.getCamera();
+
+        renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
         if (!isVisible)
             return;
-
-        GL3DCamera activeCamera = vp.getCamera();
 
         // cameraWidth ever changes so slightly with distance to Sun; 4x pix/Rsun
         int pixelsPerSolarRadius = (int) (2 * textScale * vp.getHeight() / activeCamera.getCameraWidth());
@@ -90,17 +92,30 @@ public class RenderableGrid implements Renderable {
             // textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
         }
-
         GL3DMat4d cameraMatrix = activeCamera.getLocalRotation().toMatrix();
-
+        double[] matrix = cameraMatrix.transpose().m;
         gl.glPushMatrix();
-        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+        gl.glMultMatrixd(matrix, 0);
         {
             if (showLabels)
                 drawText(gl);
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl, cameraMatrix);
+            gl.glEnable(GL2.GL_TEXTURE_2D);
+        }
+        gl.glPopMatrix();
+    }
+
+    private void renderBlackCircle(GL2 gl, double[] matrix) {
+
+        gl.glPushMatrix();
+        gl.glMultMatrixd(matrix, 0);
+        {
+            gl.glDisable(GL2.GL_TEXTURE_2D);
+            gl.glColor3d(0., 0., 0.);
+            RenderableHelper.drawCircle(gl, 0, 0, 0.95, 25);
+
             gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
