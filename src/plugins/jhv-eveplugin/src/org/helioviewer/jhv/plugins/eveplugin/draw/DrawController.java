@@ -511,7 +511,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
         List<YAxisElement> all = new ArrayList<YAxisElement>();
         for (YAxisElement el : yAxisSet) {
-            if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
+            if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
                 all.add(el);
             }
         }
