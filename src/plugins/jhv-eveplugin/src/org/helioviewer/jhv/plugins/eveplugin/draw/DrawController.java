@@ -50,6 +50,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
 
+    // private final Map<YAxisElement, String> axisUnitMap;
+
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
@@ -64,6 +66,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         pas.addPlotAreaSpaceListener(this);
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
+        // axisUnitMap = new HashMap<YAxisElement, String>();
     }
 
     public static DrawController getSingletonInstance() {
@@ -483,4 +486,39 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         yAxisSet = tempSet;
     }
 
+    public boolean hasAxisAvailable() {
+        return yAxisSet.size() < 2;
+    }
+
+    public boolean canBePutOnAxis(String unit) {
+        for (YAxisElement el : yAxisSet) {
+            if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public YAxisElement getYAxisElementForUnit(String unit) {
+        for (YAxisElement el : yAxisSet) {
+            if (el.getOriginalLabel().toLowerCase().equals(unit.toLowerCase())) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    public List<YAxisElement> getAllYAxisElementsForUnit(String unit) {
+        List<YAxisElement> all = new ArrayList<YAxisElement>();
+        for (YAxisElement el : yAxisSet) {
+            if (el.getLabel().toLowerCase().equals(unit.toLowerCase())) {
+                all.add(el);
+            }
+        }
+        return all;
+    }
+
+    public boolean canChangeAxis(String unitLabel) {
+        return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxisSet.size() < 2;
+    }
 }
