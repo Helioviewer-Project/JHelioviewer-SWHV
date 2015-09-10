@@ -402,7 +402,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     public void changeAxis(Band band) {
         YAxisElement currentYAxisElement = yAxisElementMap2.get(band);
-        if (bandsPerYAxis.get(currentYAxisElement).size() > 1 && drawController.canChangeAxis(band.getUnitLabel())) {
+        if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
             YAxisElement otherYAxisElement = getOtherAxisElement(currentYAxisElement);
             if (otherYAxisElement != null) {
                 yAxisElementMap2.put(band, otherYAxisElement);
