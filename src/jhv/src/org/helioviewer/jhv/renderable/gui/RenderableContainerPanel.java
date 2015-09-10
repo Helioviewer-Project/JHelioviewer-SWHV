@@ -56,6 +56,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     private static final int REMOVEROW = 3;
     public static final int NUMBEROFCOLUMNS = 4;
 
+    public static final int NUMBEROFVISIBLEROWS = 7;
+
     private final Action addLayerAction = new AbstractAction() {
         /**
          * {@inheritDoc}
@@ -109,7 +111,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 6));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS));
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
