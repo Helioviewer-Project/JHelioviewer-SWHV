@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.helioviewer.jhv.plugins.eveplugin.lines.gui.LineColorOptionPanel;
+import org.helioviewer.jhv.plugins.eveplugin.lines.gui.LineOptionPanel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -106,7 +106,7 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public Component getOptionsPanel() {
-        return new LineColorOptionPanel(this);
+        return new LineOptionPanel(this);
     }
 
     @Override
