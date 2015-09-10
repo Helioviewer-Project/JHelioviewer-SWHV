@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -400,7 +401,45 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     public void changeAxis(Band band) {
+        YAxisElement currentYAxisElement = yAxisElementMap2.get(band);
+        if (bandsPerYAxis.get(currentYAxisElement).size() > 1 && drawController.canChangeAxis(band.getUnitLabel())) {
+            YAxisElement otherYAxisElement = getOtherAxisElement(currentYAxisElement);
+            if (otherYAxisElement != null) {
+                yAxisElementMap2.put(band, otherYAxisElement);
+                List<Band> bandsPerList = new ArrayList<Band>();
+                if (bandsPerYAxis.containsKey(otherYAxisElement)) {
+                    bandsPerList = bandsPerYAxis.get(otherYAxisElement);
+                }
+                bandsPerList.add(band);
+                bandsPerYAxis.put(otherYAxisElement, bandsPerList);
+                bandsPerYAxis.get(currentYAxisElement).remove(band);
+                Map<Band, EVEValues> valuesPerBand = new HashMap<Band, EVEValues>();
+                if (!dataMapPerUnitLabel2.containsKey(otherYAxisElement)) {
+                    dataMapPerUnitLabel2.put(otherYAxisElement, valuesPerBand);
+                }
+                dataMapPerUnitLabel2.get(otherYAxisElement).put(band, dataMapPerUnitLabel2.get(currentYAxisElement).get(band));
+                dataMapPerUnitLabel2.get(currentYAxisElement).remove(band);
+                if (!eveDrawableElementMap2.containsKey(otherYAxisElement)) {
+                    eveDrawableElementMap2.put(otherYAxisElement, new EVEDrawableElement());
+                }
+                updateBand(band, false);
+            }
+        }
+    }
 
+    private YAxisElement getOtherAxisElement(YAxisElement currentYAxisElement) {
+        if (drawController.canChangeAxis(currentYAxisElement.getOriginalLabel())) {
+            Set<YAxisElement> allYAxisElements = bandsPerYAxis.keySet();
+            if (allYAxisElements.size() == 2) {
+                for (YAxisElement el : allYAxisElements) {
+                    if (!el.equals(currentYAxisElement)) {
+                        return el;
+                    }
+                }
+            }
+            return new YAxisElement();
+        }
+        return null;
     }
 
     public boolean canChangeAxis(Band band) {
