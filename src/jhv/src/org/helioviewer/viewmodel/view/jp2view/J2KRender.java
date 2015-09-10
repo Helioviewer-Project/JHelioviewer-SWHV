@@ -51,11 +51,11 @@ class J2KRender implements Runnable {
 
     private final JP2ImageParameter currParams;
 
-    J2KRender(JHVJP2View _parentViewRef, JP2Image _parentImageRef, JP2ImageParameter _currParams) {
+    J2KRender(JHVJP2View _parentViewRef, JP2ImageParameter _currParams) {
         currParams = _currParams;
 
         parentViewRef = _parentViewRef;
-        parentImageRef = _parentImageRef;
+        parentImageRef = currParams.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
     }
 

@@ -15,14 +15,12 @@ import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
-import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 import org.helioviewer.viewmodel.view.ViewROI;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
@@ -44,19 +42,19 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     static private class RejectExecution implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            //System.out.println(Thread.currentThread().getName());
+            // System.out.println(Thread.currentThread().getName());
         }
     }
 
     BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
-    RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution();//new ThreadPoolExecutor.CallerRunsPolicy();
+    RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
     int numOfThread = 1;
     private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
     protected Region region;
 
     // Member related to JP2
-    protected JP2Image jp2Image;
+    protected JP2Image _jp2Image;
     protected JP2ImageParameter imageViewParams;
 
     private int targetFrame;
@@ -84,22 +82,22 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      * @param newJP2Image
      */
     public void setJP2Image(JP2Image newJP2Image) throws Exception {
-        if (jp2Image != null) {
+        if (_jp2Image != null) {
             throw new Exception("JP2 image already set");
         }
 
-        jp2Image = newJP2Image;
-        jp2Image.addReference();
+        _jp2Image = newJP2Image;
+        _jp2Image.addReference();
 
-        metaDataArray = jp2Image.metaDataList;
-        MetaData metaData = metaDataArray[0];
+        metaDataArray = _jp2Image.metaDataList;
+        MetaData metaData = _jp2Image.metaDataList[0];
 
         if (region == null)
             region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
 
-        imageViewParams = calculateParameter(region, 0);
+        imageViewParams = calculateParameter(_jp2Image, region, 0);
 
-        jp2Image.startReader(this);
+        _jp2Image.startReader(this);
     }
 
     private int getTrueFrameNumber() {
@@ -112,27 +110,21 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public String getName() {
-        MetaData metaData = metaDataArray[getTrueFrameNumber()];
-        if (metaData instanceof ObserverMetaData) {
-            return ((ObserverMetaData) metaData).getFullName();
-        } else {
-            String name = jp2Image.getURI().getPath();
-            return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-        }
+        return _jp2Image.getName(getTrueFrameNumber());
     }
 
     public String getXMLMetaData() {
-        return jp2Image.getXML(getTrueFrameNumber() + 1);
+        return _jp2Image.getXML(getTrueFrameNumber() + 1);
     }
 
     @Override
     public URI getUri() {
-        return jp2Image.getURI();
+        return _jp2Image.getURI();
     }
 
     @Override
     public URI getDownloadURI() {
-        return jp2Image.getDownloadURI();
+        return _jp2Image.getDownloadURI();
     }
 
     private class AbolishThread extends Thread {
@@ -172,8 +164,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     public void abolishExternal() {
         Displayer.removeRenderListener(this);
-        jp2Image.abolish();
-        jp2Image = null;
+        _jp2Image.abolish();
+        _jp2Image = null;
     }
 
     /**
@@ -194,8 +186,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      *            Frame number to show (has to be 0 for single images)
      * @return Set of parameters used within the jp2-package
      */
-    protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
-        MetaData m = metaDataArray[frameNumber];
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Region r, int frameNumber) {
+        MetaData m = jp2Image.metaDataList[frameNumber];
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
@@ -227,7 +219,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight);
 
-        return new JP2ImageParameter(subImage, res, frameNumber);
+        return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
     }
 
     /*
@@ -238,7 +230,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
 
     JP2ImageParameter getImageViewParams() {
-        return new JP2ImageParameter(imageViewParams.subImage, imageViewParams.resolution, imageViewParams.compositionLayer);
+        return new JP2ImageParameter(imageViewParams.jp2Image, imageViewParams.subImage, imageViewParams.resolution, imageViewParams.compositionLayer);
     }
 
     /**
@@ -255,7 +247,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
         int frame = params.compositionLayer;
-        MetaData metaData = metaDataArray[frame];
+        MetaData metaData = params.jp2Image.metaDataList[frame];
 
         newImageData.setFrameNumber(frame);
         newImageData.setMetaData(metaData);
@@ -275,7 +267,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public CacheStatus getImageCacheStatus(int frame) {
-        return jp2Image.getImageCacheStatus().getImageStatus(frame);
+        return _jp2Image.getImageCacheStatus().getImageStatus(frame);
     }
 
     @Override
@@ -294,12 +286,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public boolean isMultiFrame() {
-        return jp2Image.isMultiFrame();
+        return _jp2Image.isMultiFrame();
     }
 
     @Override
     public int getMaximumFrameNumber() {
-        return jp2Image.getMaximumFrameNumber();
+        return _jp2Image.getMaximumFrameNumber();
     }
 
     @Override
@@ -317,13 +309,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
-        if (frame != targetFrame && frame >= 0 && frame <= jp2Image.getMaximumAccessibleFrameNumber()) {
+        if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumAccessibleFrameNumber()) {
             targetFrame = frame;
 
             // necessary for fov change
-            jp2Image.readerSignal.signal();
-            if (jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
-                signalRender(false);
+            _jp2Image.readerSignal.signal();
+            if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
+                signalRender(_jp2Image, false);
             }
         }
     }
@@ -337,7 +329,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         do {
             lastDiff = currentDiff;
             currentDiff = metaDataArray[++frame].getDateObs().getMillis() - timeMillis;
-        } while (currentDiff < 0 && frame < jp2Image.getMaximumFrameNumber());
+        } while (currentDiff < 0 && frame < _jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {
             return frame - 1;
@@ -349,21 +341,21 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     @Override
     public void render() {
         region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
-        signalRender(false);
+        signalRender(_jp2Image, false);
     }
 
-    void signalRender(boolean hasExtraData) {
+    void signalRender(JP2Image jp2Image, boolean hasExtraData) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter newParams = calculateParameter(region, targetFrame);
+        JP2ImageParameter newParams = calculateParameter(jp2Image, region, targetFrame);
         if (!hasExtraData && imageData != null && newParams.equals(imageViewParams)) {
             return;
         }
         imageViewParams = newParams;
 
-        J2KRender task = new J2KRender(this, jp2Image, imageViewParams);
+        J2KRender task = new J2KRender(this, imageViewParams);
         {
             blockingQueue.poll();
             blockingQueue.add(task);
@@ -373,19 +365,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public LUT getDefaultLUT() {
-        int[] builtIn = jp2Image.getBuiltInLUT();
+        int[] builtIn = _jp2Image.getBuiltinLUT();
         if (builtIn != null) {
             return new LUT("built-in", builtIn/* , builtIn */);
         }
 
-        MetaData metaData = metaDataArray[0];
-        if (metaData instanceof HelioviewerMetaData) {
-            String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
-            if (colorKey != null) {
-                return LUT.getStandardList().get(colorKey);
-            }
-        }
-        return null;
+        return _jp2Image.getAssociatedLUT();
     }
 
 }

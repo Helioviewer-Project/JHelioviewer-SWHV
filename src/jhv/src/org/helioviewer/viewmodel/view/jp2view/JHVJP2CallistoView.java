@@ -19,12 +19,12 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     public JP2Image getJP2Image() {
-        return jp2Image;
+        return _jp2Image;
     }
 
     public boolean setViewport(Viewport v) {
         viewport = v;
-        signalRender(true);
+        signalRender(_jp2Image, true);
         return true;
     }
 
@@ -39,14 +39,14 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(Region r, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Region r, int frameNumber) {
         ResolutionSet set = jp2Image.getResolutionSet();
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
         ResolutionLevel res = set.getClosestResolutionLevel(new Dimension((int) Math.ceil(viewport.getWidth() / r.getWidth() * maxWidth), 2 * (int) Math.ceil(viewport.getHeight() / r.getHeight() * maxHeight)));
 
         SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width), (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height), (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (r.getHeight() / maxHeight * res.getResolutionBounds().height));
-        return new JP2ImageParameter(subImage, res, frameNumber);
+        return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
     }
 
 }
