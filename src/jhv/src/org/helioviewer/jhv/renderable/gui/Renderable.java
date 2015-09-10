@@ -12,8 +12,6 @@ public interface Renderable {
 
     public void remove(GL2 gl);
 
-    public RenderableType getType();
-
     public Component getOptionsPanel();
 
     public String getName();

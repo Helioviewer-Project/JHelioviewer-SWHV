@@ -11,7 +11,6 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.viewmodel.view.View;
@@ -24,7 +23,6 @@ import com.jogamp.opengl.GL2;
 public class PfssRenderable implements Renderable, LayersListener {
 
     private boolean isVisible = false;
-    private final RenderableType type;
     private final PfssPluginPanel optionsPanel;
     private PfssData previousPfssData = null;
 
@@ -32,7 +30,6 @@ public class PfssRenderable implements Renderable, LayersListener {
      * Default constructor.
      */
     public PfssRenderable() {
-        type = new RenderableType("PFSS plugin");
         optionsPanel = new PfssPluginPanel();
     }
 
@@ -60,11 +57,6 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return type;
     }
 
     @Override

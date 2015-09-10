@@ -16,7 +16,6 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.View;
@@ -41,13 +40,11 @@ public class RenderableImageLayer implements Renderable {
 
     private int positionBufferSize;
     private final View layerView;
-    private final RenderableType type;
     private boolean isVisible = true;
 
     private final GLImage glImage;
 
     public RenderableImageLayer(View view) {
-        type = new RenderableImageType(view.getName());
         layerId = nextLayerId++;
         layerView = view;
 
@@ -302,11 +299,6 @@ public class RenderableImageLayer implements Renderable {
 
     public static void toggleCorona() {
         showCorona = !showCorona;
-    }
-
-    @Override
-    public RenderableType getType() {
-        return type;
     }
 
     @Override

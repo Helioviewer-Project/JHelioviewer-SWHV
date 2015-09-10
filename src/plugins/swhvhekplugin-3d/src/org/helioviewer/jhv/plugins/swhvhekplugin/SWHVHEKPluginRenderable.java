@@ -24,7 +24,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
@@ -36,11 +35,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private boolean isVisible = true;
-    private final RenderableType type;
-
-    public SWHVHEKPluginRenderable() {
-        type = new RenderableType("HEK plugin");
-    }
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -296,11 +290,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return type;
     }
 
     @Override
