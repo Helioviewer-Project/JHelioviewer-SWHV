@@ -89,8 +89,10 @@ public class RenderableGrid implements Renderable {
             // textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
         }
+
         GL3DMat4d cameraMatrix = activeCamera.getLocalRotation().toMatrix();
         double[] matrix = cameraMatrix.transpose().m;
+
         gl.glPushMatrix();
         gl.glMultMatrixd(matrix, 0);
         {
@@ -105,15 +107,11 @@ public class RenderableGrid implements Renderable {
     }
 
     private void renderBlackCircle(GL2 gl, double[] matrix) {
-
         gl.glPushMatrix();
         gl.glMultMatrixd(matrix, 0);
         {
-            gl.glDisable(GL2.GL_TEXTURE_2D);
-            gl.glColor3d(0., 0., 0.);
+            gl.glColor3f(0f, 0f, 0f);
             RenderableHelper.drawCircle(gl, 0, 0, 0.95, 25);
-
-            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
     }
