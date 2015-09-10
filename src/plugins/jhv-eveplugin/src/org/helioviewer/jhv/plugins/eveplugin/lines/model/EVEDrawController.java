@@ -422,7 +422,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 if (!eveDrawableElementMap2.containsKey(otherYAxisElement)) {
                     eveDrawableElementMap2.put(otherYAxisElement, new EVEDrawableElement());
                 }
-                updateBand(band, false);
+                for (YAxisElement yAxisElement : availableRangeMap2.keySet()) {
+                    availableRangeMap2.put(yAxisElement, new Range());
+                }
+                updateBand(band, true);
             }
         }
     }
