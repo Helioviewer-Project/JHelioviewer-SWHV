@@ -131,6 +131,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                     bandsPerYAxis.remove(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
+                resetAvailableRange();
                 fireRedrawRequest(true);
             }
         }
@@ -422,11 +423,15 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 if (!eveDrawableElementMap2.containsKey(otherYAxisElement)) {
                     eveDrawableElementMap2.put(otherYAxisElement, new EVEDrawableElement());
                 }
-                for (YAxisElement yAxisElement : availableRangeMap2.keySet()) {
-                    availableRangeMap2.put(yAxisElement, new Range());
-                }
+                resetAvailableRange();
                 updateBand(band, true);
             }
+        }
+    }
+
+    private void resetAvailableRange() {
+        for (YAxisElement yAxisElement : availableRangeMap2.keySet()) {
+            availableRangeMap2.put(yAxisElement, new Range());
         }
     }
 
