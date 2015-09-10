@@ -9,6 +9,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.gui.RenderableType;
+import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
@@ -27,35 +28,6 @@ public class RenderableMiniview implements Renderable, LayersListener {
         optionsPanel = new RenderableMiniviewOptionsPanel();
     }
 
-    private void drawCircle(GL2 gl, double x, double y, double r, int segments) {
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        {
-            gl.glBegin(GL2.GL_TRIANGLE_FAN);
-            gl.glVertex2d(x, y);
-            for (int n = 0; n <= segments; ++n) {
-                double t = 2 * Math.PI * n / segments;
-                gl.glVertex2d(x + Math.sin(t) * r, y + Math.cos(t) * r);
-            }
-            gl.glEnd();
-        }
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-    }
-
-    private void drawRectangle(GL2 gl, double x0, double y0, double w, double h) {
-        double x1 = x0 + w;
-        double y1 = y0 + h;
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        {
-            gl.glBegin(GL2.GL_QUADS);
-            gl.glVertex2d(x0, -y0);
-            gl.glVertex2d(x0, -y1);
-            gl.glVertex2d(x1, -y1);
-            gl.glVertex2d(x1, -y0);
-            gl.glEnd();
-        }
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-    }
-
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
     }
@@ -68,14 +40,14 @@ public class RenderableMiniview implements Renderable, LayersListener {
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             gl.glColor4d(0, 0, 0, 1);
-            drawRectangle(gl, -30, -30, 60, 60);
+            RenderableHelper.drawRectangle(gl, -30, -30, 60, 60);
             gl.glColor4d(1, 0, 0, 1);
-            drawCircle(gl, 0, 0, 1, 100);
+            RenderableHelper.drawCircle(gl, 0, 0, 1, 100);
             gl.glColor4d(0, 1, 0, 0.2);
             View v = Layers.getActiveView();
             if (v != null) {
                 MetaData m = v.getMetaData(new ImmutableDateTime(0));
-                drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
+                RenderableHelper.drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
             }
         }
         gl.glPopMatrix();
