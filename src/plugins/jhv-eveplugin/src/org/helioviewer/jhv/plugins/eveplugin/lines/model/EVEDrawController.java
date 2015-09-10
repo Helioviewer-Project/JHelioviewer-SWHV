@@ -2,9 +2,11 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.model;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
@@ -32,15 +34,23 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
 
-    private final Map<String, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<String, Map<Band, EVEValues>>();
+    // private final Map<String, Map<Band, EVEValues>> dataMapPerUnitLabel = new
+    // HashMap<String, Map<Band, EVEValues>>();
+    private final Map<YAxisElement, Map<Band, EVEValues>> dataMapPerUnitLabel2 = new HashMap<YAxisElement, Map<Band, EVEValues>>();
 
-    private final Map<String, Range> selectedRangeMap = new HashMap<String, Range>();
-    private final Map<String, Range> availableRangeMap = new HashMap<String, Range>();
+    // private final Map<String, Range> selectedRangeMap = new HashMap<String,
+    // Range>();
+    private final Map<YAxisElement, Range> selectedRangeMap2 = new HashMap<YAxisElement, Range>();
+    // private final Map<String, Range> availableRangeMap = new HashMap<String,
+    // Range>();
+    private final Map<YAxisElement, Range> availableRangeMap2 = new HashMap<YAxisElement, Range>();
     private final DrawController drawController;
 
-    private final Map<String, EVEDrawableElement> eveDrawableElementMap;
-    private final Map<String, YAxisElement> yAxisElementMap;
-
+    // private final Map<String, EVEDrawableElement> eveDrawableElementMap;
+    private final Map<YAxisElement, EVEDrawableElement> eveDrawableElementMap2;
+    // private final Map<String, YAxisElement> yAxisElementMap;
+    private final Map<Band, YAxisElement> yAxisElementMap2;
+    private final Map<YAxisElement, List<Band>> bandsPerYAxis;
     private final PlotAreaSpace plotAreaSpace;
     private static EVEDrawController instance;
 
@@ -55,12 +65,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         EVECacheController.getSingletonInstance().addControllerListener(this);
 
         drawController = DrawController.getSingletonInstance();
-        eveDrawableElementMap = new HashMap<String, EVEDrawableElement>();
-        yAxisElementMap = new HashMap<String, YAxisElement>();
-        selectedRangeMap.put("", new Range());
-        availableRangeMap.put("", new Range());
-        yAxisElementMap.put("", new YAxisElement());
-        eveDrawableElementMap.put("", new EVEDrawableElement());
+        eveDrawableElementMap2 = new HashMap<YAxisElement, EVEDrawableElement>();
+        yAxisElementMap2 = new HashMap<Band, YAxisElement>();
+        bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
+        // selectedRangeMap.put("", new Range());
+        // availableRangeMap.put("", new Range());
+        // yAxisElementMap.put("", new YAxisElement());
+        // eveDrawableElementMap.put("", new EVEDrawableElement());
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
     }
@@ -75,25 +86,48 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private void addToMap(final Band band) {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        EVEValues data = retrieveData(band, interval, plotArea);
-        if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
+        YAxisElement yAxisElement = drawController.getYAxisElementForUnit(band.getUnitLabel());
+        if (yAxisElement == null && drawController.hasAxisAvailable()) {
+            yAxisElement = new YAxisElement();
         }
-        if (data != null) {
-            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
+        if (yAxisElement != null) {
+            yAxisElementMap2.put(band, yAxisElement);
+            addToBandsPerYAxis(yAxisElement, band);
+            EVEValues data = retrieveData(band, interval, plotArea);
+            if (!dataMapPerUnitLabel2.containsKey(yAxisElement)) {
+                dataMapPerUnitLabel2.put(yAxisElement, new HashMap<Band, EVEValues>());
+            }
+            if (data != null) {
+                dataMapPerUnitLabel2.get(yAxisElement).put(band, data);
+            }
+            fireRedrawRequest(true);
+        } else {
+            Log.debug("band could not be added. No Yaxis Available ");
         }
-        fireRedrawRequest(true);
+    }
+
+    private void addToBandsPerYAxis(YAxisElement yAxisElement, Band band) {
+        List<Band> bands = new ArrayList<Band>();
+        if (bandsPerYAxis.containsKey(yAxisElement)) {
+            bands = bandsPerYAxis.get(yAxisElement);
+        }
+        bands.add(band);
+        bandsPerYAxis.put(yAxisElement, bands);
     }
 
     private void removeFromMap(final Band band) {
-        if (dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-            if (dataMapPerUnitLabel.get(band.getUnitLabel()).containsKey(band)) {
-                dataMapPerUnitLabel.get(band.getUnitLabel()).remove(band);
-                if (dataMapPerUnitLabel.get(band.getUnitLabel()).isEmpty()) {
-                    EVEDrawableElement removed = eveDrawableElementMap.remove(band.getUnitLabel());
-                    availableRangeMap.remove(band.getUnitLabel());
-                    selectedRangeMap.remove(band.getUnitLabel());
-                    yAxisElementMap.remove(band.getUnitLabel());
+        YAxisElement yAxisElement = yAxisElementMap2.get(band);
+        if (dataMapPerUnitLabel2.containsKey(yAxisElement)) {
+            if (dataMapPerUnitLabel2.get(yAxisElement).containsKey(band)) {
+                dataMapPerUnitLabel2.get(yAxisElement).remove(band);
+                List<Band> bands = bandsPerYAxis.get(yAxisElement);
+                bands.remove(band);
+                if (bands.isEmpty()) {
+                    EVEDrawableElement removed = eveDrawableElementMap2.remove(yAxisElement);
+                    availableRangeMap2.remove(yAxisElement);
+                    selectedRangeMap2.remove(yAxisElement);
+                    yAxisElementMap2.remove(band);
+                    bandsPerYAxis.remove(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
                 fireRedrawRequest(true);
@@ -106,52 +140,52 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
         boolean isLog = band.getBandType().isLogScale();
-        if (!availableRangeMap.containsKey(band.getUnitLabel())) {
-            availableRangeMap.put(band.getUnitLabel(), new Range());
-            selectedRangeMap.put(band.getUnitLabel(), new Range());
-            dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
+        YAxisElement yAxisElement = yAxisElementMap2.get(band);
+        if (!availableRangeMap2.containsKey(yAxisElement)) {
+            availableRangeMap2.put(yAxisElement, new Range());
+            selectedRangeMap2.put(yAxisElement, new Range());
+            dataMapPerUnitLabel2.put(yAxisElement, new HashMap<Band, EVEValues>());
         }
-        Range oldAvailableRange = new Range(availableRangeMap.get(band.getUnitLabel()));
-        for (EVEValues v : dataMapPerUnitLabel.get(band.getUnitLabel()).values()) {
+        Range oldAvailableRange = new Range(availableRangeMap2.get(yAxisElement));
+        for (EVEValues v : dataMapPerUnitLabel2.get(yAxisElement).values()) {
             if (v != null) {
-                availableRangeMap.get(band.getUnitLabel()).setMin(v.getMinimumValue());
-                availableRangeMap.get(band.getUnitLabel()).setMax(v.getMaximumValue());
+                availableRangeMap2.get(yAxisElement).setMin(v.getMinimumValue());
+                availableRangeMap2.get(yAxisElement).setMax(v.getMaximumValue());
             }
-
         }
-        availableRangeMap.get(band.getUnitLabel()).setMin(data.getMinimumValue());
-        availableRangeMap.get(band.getUnitLabel()).setMax(data.getMaximumValue());
-        double avMin = availableRangeMap.get(band.getUnitLabel()).min;
-        double avMax = availableRangeMap.get(band.getUnitLabel()).max;
+        availableRangeMap2.get(yAxisElement).setMin(data.getMinimumValue());
+        availableRangeMap2.get(yAxisElement).setMax(data.getMaximumValue());
+        double avMin = availableRangeMap2.get(yAxisElement).min;
+        double avMax = availableRangeMap2.get(yAxisElement).max;
         if (avMin == avMax) {
             if (avMin == 0) {
-                availableRangeMap.get(band.getUnitLabel()).setMin(-1.0);
-                availableRangeMap.get(band.getUnitLabel()).setMax(1.0);
+                availableRangeMap2.get(yAxisElement).setMin(-1.0);
+                availableRangeMap2.get(yAxisElement).setMax(1.0);
             } else {
-                availableRangeMap.get(band.getUnitLabel()).setMin(avMin - avMin / 10);
-                availableRangeMap.get(band.getUnitLabel()).setMax(avMax + avMax / 10);
+                availableRangeMap2.get(yAxisElement).setMin(avMin - avMin / 10);
+                availableRangeMap2.get(yAxisElement).setMax(avMax + avMax / 10);
             }
         }
-        if (oldAvailableRange.min != availableRangeMap.get(band.getUnitLabel()).min || oldAvailableRange.max != availableRangeMap.get(band.getUnitLabel()).max) {
+        if (oldAvailableRange.min != availableRangeMap2.get(yAxisElement).min || oldAvailableRange.max != availableRangeMap2.get(yAxisElement).max) {
             // Log.trace("update band available range changed so we change the plotareaSpace");
-            checkSelectedRange(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()));
-            updatePlotAreaSpace(availableRangeMap.get(band.getUnitLabel()), selectedRangeMap.get(band.getUnitLabel()), keepFullValueRange, isLog);
+            checkSelectedRange(availableRangeMap2.get(yAxisElement), selectedRangeMap2.get(yAxisElement));
+            updatePlotAreaSpace(availableRangeMap2.get(yAxisElement), selectedRangeMap2.get(yAxisElement), keepFullValueRange, isLog);
         } else {
             // Log.trace("Same available range");
         }
-        dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, data);
+        dataMapPerUnitLabel2.get(yAxisElement).put(band, data);
     }
 
     private void updateBands(boolean keepFullValueRange) {
-        for (String unit : dataMapPerUnitLabel.keySet()) {
-            for (final Band band : dataMapPerUnitLabel.get(unit).keySet()) {
+        for (YAxisElement yAxisElement : dataMapPerUnitLabel2.keySet()) {
+            for (final Band band : dataMapPerUnitLabel2.get(yAxisElement).keySet()) {
                 updateBand(band, keepFullValueRange);
             }
         }
     }
 
-    public void setSelectedRange(final Range newSelectedRange, String unitLabel) {
-        selectedRangeMap.put(unitLabel, new Range(newSelectedRange));
+    public void setSelectedRange(final Range newSelectedRange, YAxisElement yAxisElement) {
+        selectedRangeMap2.put(yAxisElement, new Range(newSelectedRange));
         drawController.setSelectedRange(newSelectedRange);
         fireRedrawRequest(false);
     }
@@ -162,8 +196,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private void fireRedrawRequest(final boolean maxRange) {
         Interval<Date> interval = drawController.getSelectedInterval();
-        for (String unit : dataMapPerUnitLabel.keySet()) {
-            final Band[] bands = dataMapPerUnitLabel.get(unit).keySet().toArray(new Band[0]);
+        for (YAxisElement yAxisElement : dataMapPerUnitLabel2.keySet()) {
+            final Band[] bands = dataMapPerUnitLabel2.get(yAxisElement).keySet().toArray(new Band[0]);
             final LinkedList<EVEValues> values = new LinkedList<EVEValues>();
 
             String unitLabel = "";
@@ -173,46 +207,48 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 isLog = bands[0].getBandType().isLogScale();
             }
 
-            if (!availableRangeMap.containsKey(unitLabel)) {
-                availableRangeMap.put(unitLabel, new Range());
-                selectedRangeMap.put(unitLabel, new Range());
-                eveDrawableElementMap.put(unitLabel, new EVEDrawableElement());
+            if (!availableRangeMap2.containsKey(yAxisElement)) {
+                availableRangeMap2.put(yAxisElement, new Range());
+                selectedRangeMap2.put(yAxisElement, new Range());
+                eveDrawableElementMap2.put(yAxisElement, new EVEDrawableElement());
             }
 
-            Range oldAvailableRange = new Range(availableRangeMap.get(unitLabel));
+            Range oldAvailableRange = new Range(availableRangeMap2.get(yAxisElement));
 
-            for (EVEValues v : dataMapPerUnitLabel.get(unit).values()) {
+            for (EVEValues v : dataMapPerUnitLabel2.get(yAxisElement).values()) {
                 if (v != null) {
-                    availableRangeMap.get(unitLabel).setMin(v.getMinimumValue());
-                    availableRangeMap.get(unitLabel).setMax(v.getMaximumValue());
+                    availableRangeMap2.get(yAxisElement).setMin(v.getMinimumValue());
+                    availableRangeMap2.get(yAxisElement).setMax(v.getMaximumValue());
                     values.add(v);
                 }
             }
 
             if (maxRange) {
-                selectedRangeMap.put(unitLabel, new Range());
+                selectedRangeMap2.put(yAxisElement, new Range());
             }
-            checkSelectedRange(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel));
-            if (oldAvailableRange.min != availableRangeMap.get(unitLabel).min || oldAvailableRange.max != availableRangeMap.get(unitLabel).max) {
+            checkSelectedRange(availableRangeMap2.get(yAxisElement), selectedRangeMap2.get(yAxisElement));
+            if (oldAvailableRange.min != availableRangeMap2.get(yAxisElement).min || oldAvailableRange.max != availableRangeMap2.get(yAxisElement).max) {
                 Log.error("Available range changed in redraw request. So update plotAreaSpace");
                 Log.error("old range : " + oldAvailableRange.toString());
-                Log.error("new available range : " + availableRangeMap.get(unitLabel).toString());
-                updatePlotAreaSpace(availableRangeMap.get(unitLabel), selectedRangeMap.get(unitLabel), false, isLog);
+                Log.error("new available range : " + availableRangeMap2.get(yAxisElement).toString());
+                updatePlotAreaSpace(availableRangeMap2.get(yAxisElement), selectedRangeMap2.get(yAxisElement), false, isLog);
 
             }
 
-            YAxisElement yAxisElement = new YAxisElement();
-            if (yAxisElementMap.containsKey(unitLabel)) {
-                yAxisElement = yAxisElementMap.get(unitLabel);
-            }
-            yAxisElement.set(selectedRangeMap.get(unitLabel), availableRangeMap.get(unitLabel), unitLabel, selectedRangeMap.get(unitLabel).min, selectedRangeMap.get(unitLabel).max, Color.PINK, isLog, yAxisElement.getActivationTime());
-            yAxisElementMap.put(unitLabel, yAxisElement);
-            eveDrawableElementMap.get(unitLabel).set(interval, bands, yAxisElement);
+            /*
+             * YAxisElement yAxisElement = new YAxisElement(); if
+             * (yAxisElementMap.containsKey(unitLabel)) { yAxisElement =
+             * yAxisElementMap.get(unitLabel); }
+             */
+
+            yAxisElement.set(selectedRangeMap2.get(yAxisElement), availableRangeMap2.get(yAxisElement), unitLabel, selectedRangeMap2.get(yAxisElement).min, selectedRangeMap2.get(yAxisElement).max, Color.PINK, isLog, yAxisElement.getActivationTime());
+            eveDrawableElementMap2.get(yAxisElement).set(interval, bands, yAxisElement);
             if (bands.length > 0) {
-                drawController.updateDrawableElement(eveDrawableElementMap.get(unitLabel));
+                drawController.updateDrawableElement(eveDrawableElementMap2.get(yAxisElement));
             } else {
-                drawController.removeDrawableElement(eveDrawableElementMap.get(unitLabel));
+                drawController.removeDrawableElement(eveDrawableElementMap2.get(yAxisElement));
             }
+
         }
     }
 
@@ -300,15 +336,16 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void bandGroupChanged() {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        dataMapPerUnitLabel.clear();
+        dataMapPerUnitLabel2.clear();
 
         final Band[] activeBands = BandController.getSingletonInstance().getBands();
 
         for (final Band band : activeBands) {
-            if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-                dataMapPerUnitLabel.put(band.getUnitLabel(), new HashMap<Band, EVEValues>());
+            YAxisElement yAxisElement = yAxisElementMap2.get(band);
+            if (!dataMapPerUnitLabel2.containsKey(band.getUnitLabel())) {
+                dataMapPerUnitLabel2.put(yAxisElement, new HashMap<Band, EVEValues>());
             }
-            dataMapPerUnitLabel.get(band.getUnitLabel()).put(band, retrieveData(band, interval, plotArea));
+            dataMapPerUnitLabel2.get(yAxisElement).put(band, retrieveData(band, interval, plotArea));
         }
 
         fireRedrawRequest(true);
@@ -320,8 +357,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void dataAdded(final Band band) {
-        if (dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
-            if (dataMapPerUnitLabel.get(band.getUnitLabel()).containsKey(band)) {
+        if (dataMapPerUnitLabel2.containsKey(band)) {
+            if (dataMapPerUnitLabel2.get(band).containsKey(band)) {
                 updateBand(band, false);
                 fireRedrawRequest(true);
             }
@@ -330,15 +367,15 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        for (String unitLabel : yAxisElementMap.keySet()) {
+        for (YAxisElement yAxisElement : bandsPerYAxis.keySet()) {
             double diffScaledAvailable = scaledMaxValue - scaledMinValue;
-            double diffAvaliable = Math.log10(availableRangeMap.get(unitLabel).max) - Math.log10(availableRangeMap.get(unitLabel).min);
+            double diffAvaliable = Math.log10(availableRangeMap2.get(yAxisElement).max) - Math.log10(availableRangeMap2.get(yAxisElement).min);
             double diffSelectedStart = scaledSelectedMinValue - scaledMinValue;
             double diffSelectedEnd = scaledSelectedMaxValue - scaledMinValue;
-            double selectedStart = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedStart / diffScaledAvailable * diffAvaliable);
-            double selectedEnd = Math.pow(10, Math.log10(availableRangeMap.get(unitLabel).min) + diffSelectedEnd / diffScaledAvailable * diffAvaliable);
-            if (selectedStart != selectedRangeMap.get(unitLabel).min || selectedEnd != selectedRangeMap.get(unitLabel).max) {
-                setSelectedRange(new Range(selectedStart, selectedEnd), unitLabel);
+            double selectedStart = Math.pow(10, Math.log10(availableRangeMap2.get(yAxisElement).min) + diffSelectedStart / diffScaledAvailable * diffAvaliable);
+            double selectedEnd = Math.pow(10, Math.log10(availableRangeMap2.get(yAxisElement).min) + diffSelectedEnd / diffScaledAvailable * diffAvaliable);
+            if (selectedStart != selectedRangeMap2.get(yAxisElement).min || selectedEnd != selectedRangeMap2.get(yAxisElement).max) {
+                setSelectedRange(new Range(selectedStart, selectedEnd), yAxisElement);
             } else {
                 fireRedrawRequest(false);
             }
@@ -360,6 +397,14 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     public boolean hasDataInSelectedInterval(Band band) {
         return EVECacheController.getSingletonInstance().hasDataInSelectedInterval(band, DrawController.getSingletonInstance().getSelectedInterval());
+    }
+
+    public void changeAxis(Band band) {
+
+    }
+
+    public boolean canChangeAxis(Band band) {
+        return DrawController.getSingletonInstance().canChangeAxis(band.getUnitLabel());
     }
 
 }
