@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.renderable.gui;
 
+import java.awt.image.renderable.RenderableImage;
 import java.util.ArrayList;
 
 import javax.swing.event.TableModelEvent;
@@ -7,7 +8,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.renderable.components.RenderableImageType;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
@@ -28,7 +28,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         int lastImagelayerIndex = -1;
         int size = renderables.size();
         for (int i = 0; i < size; i++) {
-            if (renderables.get(i).getType() instanceof RenderableImageType) {
+            if (renderables.get(i) instanceof RenderableImage) {
                 lastImagelayerIndex = i;
             }
         }

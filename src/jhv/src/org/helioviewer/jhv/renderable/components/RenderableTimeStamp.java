@@ -13,7 +13,6 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
@@ -26,12 +25,10 @@ public class RenderableTimeStamp implements Renderable {
     private float fontSize;
     private TextRenderer textRenderer;
 
-    private final RenderableType renderableType;
     private final String name = "Timestamp";
     private boolean isVisible = false;
 
-    public RenderableTimeStamp(RenderableType renderableType) {
-        this.renderableType = renderableType;
+    public RenderableTimeStamp() {
 
         InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
@@ -76,11 +73,6 @@ public class RenderableTimeStamp implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return renderableType;
     }
 
     @Override

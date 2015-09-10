@@ -18,7 +18,6 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
@@ -40,13 +39,11 @@ public class RenderableGrid implements Renderable {
     // the height of the text in solar radii
     private final float textScale = 0.08f;
 
-    private final RenderableType renderableType;
     private final Component optionsPanel;
     private final String name = "Grid";
     private boolean isVisible = true;
 
-    public RenderableGrid(RenderableType renderableType) {
-        this.renderableType = renderableType;
+    public RenderableGrid() {
 
         InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
@@ -332,11 +329,6 @@ public class RenderableGrid implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return this.renderableType;
     }
 
     @Override

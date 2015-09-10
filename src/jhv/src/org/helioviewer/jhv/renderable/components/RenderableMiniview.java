@@ -8,7 +8,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -18,12 +17,10 @@ import com.jogamp.opengl.GL2;
 
 public class RenderableMiniview implements Renderable, LayersListener {
 
-    private final RenderableType type;
     private boolean isVisible = true;
     RenderableMiniviewOptionsPanel optionsPanel;
 
-    public RenderableMiniview(RenderableMiniviewType renderableMiniviewType) {
-        type = renderableMiniviewType;
+    public RenderableMiniview() {
         Layers.addLayersListener(this);
         optionsPanel = new RenderableMiniviewOptionsPanel();
     }
@@ -57,11 +54,6 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return type;
     }
 
     @Override

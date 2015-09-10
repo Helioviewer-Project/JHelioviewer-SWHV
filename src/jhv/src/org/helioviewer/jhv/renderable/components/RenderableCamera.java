@@ -9,7 +9,6 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
@@ -17,7 +16,6 @@ import com.jogamp.opengl.GL2;
 public class RenderableCamera implements Renderable {
 
     private final Component optionsPanel;
-    private final RenderableType type = new RenderableType("Camera");
     private static final double epsilon = 0.01;
 
     private static final Color firstcolor = Color.BLUE;
@@ -128,11 +126,6 @@ public class RenderableCamera implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return this.type;
     }
 
     @Override

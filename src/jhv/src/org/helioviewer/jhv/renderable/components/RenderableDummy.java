@@ -3,17 +3,13 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Component;
 
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
 
 public class RenderableDummy implements Renderable {
 
-    private final RenderableType type;
-
     public RenderableDummy() {
-        type = new RenderableType("Loading image layer");
     }
 
     @Override
@@ -23,11 +19,6 @@ public class RenderableDummy implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return type;
     }
 
     @Override

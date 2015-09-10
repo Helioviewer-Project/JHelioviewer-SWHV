@@ -3,19 +3,16 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Component;
 
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.gui.RenderableType;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
 
 public class RenderableSolarAxes implements Renderable {
 
-    private final RenderableType renderableType;
     private final String name = "Solar axes";
     private boolean isVisible = true;
 
-    public RenderableSolarAxes(RenderableType renderableType) {
-        this.renderableType = renderableType;
+    public RenderableSolarAxes() {
     }
 
     @Override
@@ -42,11 +39,6 @@ public class RenderableSolarAxes implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-    }
-
-    @Override
-    public RenderableType getType() {
-        return renderableType;
     }
 
     @Override
