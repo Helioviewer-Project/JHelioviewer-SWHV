@@ -220,6 +220,11 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
             double solarRadiusPixel = solarRadiusArcSec / arcSecPerPixel;
             newSolarPixelRadius = solarRadiusPixel;
+        // pixel based
+        } else if (instrument.equals("CALLISTO")) {
+            setPhysicalLowerLeftCorner(new GL3DVec2d(0, 0));
+            setPhysicalSize(new GL3DVec2d(pixelWidth, pixelHeight));
+            return;
         }
 
         double sunX = m.tryGetDouble("CRPIX1") - 1;
