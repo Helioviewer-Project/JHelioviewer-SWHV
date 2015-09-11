@@ -11,6 +11,9 @@ import org.helioviewer.jhv.plugins.eveplugin.base.Range;
  */
 
 public class YAxisElement {
+    public enum YAxisLocation {
+        LEFT, RIGHT;
+    }
 
     /** The current selected range */
     private Range selectedRange;
@@ -28,6 +31,8 @@ public class YAxisElement {
     private boolean isLogScale;
 
     private long activationTime;
+
+    private YAxisLocation location;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
@@ -248,5 +253,13 @@ public class YAxisElement {
 
     public void setActivationTime(long activationTime) {
         this.activationTime = activationTime;
+    }
+
+    public YAxisLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(YAxisLocation location) {
+        this.location = location;
     }
 }
