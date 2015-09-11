@@ -14,6 +14,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
 public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener, DrawControllerListener {
+
     private final List<LineDataSelectorModelListener> listeners;
     private final List<LineDataSelectorElement> elements;
     public final static int NUMBEROFCOLUMNS = 5;
@@ -191,18 +192,16 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void drawRequest() {
         fireListeners();
-
     }
 
     @Override
     public void drawMovieLineRequest(Date time) {
         // TODO Auto-generated method stub
-
     }
+
 }
