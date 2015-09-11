@@ -11,12 +11,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 public class JHVJP2CallistoView extends JHVJP2View {
 
-    private Viewport viewport;
-
-    public JHVJP2CallistoView() {
-        region = new Region(0, 0, 86400, 380);
-        viewport = new Viewport(2700, 12);
-    }
+    private Viewport viewport = new Viewport(86400, 380);
 
     public JP2Image getJP2Image() {
         return _jp2Image;
