@@ -22,16 +22,14 @@ public class JHVJP2CallistoView extends JHVJP2View {
         return _jp2Image;
     }
 
-    public boolean setViewport(Viewport v) {
+    public void setViewport(Viewport v) {
         viewport = v;
-        signalRender(_jp2Image, true);
-        return true;
     }
 
     public boolean setRegion(Region r) {
-        boolean changed = region == null ? r == null : !region.equals(r);
         region = r;
-        return changed;
+        signalRender(_jp2Image, true);
+        return true;
     }
 
     @Override
