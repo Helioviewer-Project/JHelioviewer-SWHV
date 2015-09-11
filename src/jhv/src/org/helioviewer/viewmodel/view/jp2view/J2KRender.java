@@ -45,7 +45,7 @@ class J2KRender implements Runnable {
     private byte[] byteBuffer;
 
     /** Maximum of samples to process per rendering iteration */
-    private final int MAX_RENDER_SAMPLES = 50000;
+    private final int MAX_RENDER_SAMPLES = 1024 * 1024;
 
     private final int[] firstComponent = new int[] { 0 };
 
