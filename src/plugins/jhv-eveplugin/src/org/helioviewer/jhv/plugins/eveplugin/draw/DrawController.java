@@ -46,7 +46,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     // private Rectangle leftAxisArea;
     private final List<GraphDimensionListener> gdListeners;
 
-    private Set<YAxisElement> yAxisSet;
+    private List<YAxisElement> yAxisSet;
+
     private final Map<DrawableType, Set<DrawableElement>> drawableElements;
     private final List<DrawControllerListener> listeners;
 
@@ -55,7 +56,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     private DrawController() {
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
-        yAxisSet = new HashSet<YAxisElement>();
+        yAxisSet = new ArrayList<YAxisElement>();
 
         tListeners = new ArrayList<TimingListener>();
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
@@ -107,10 +108,10 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
         elements.add(element);
 
-        Set<YAxisElement> tempSet = new HashSet<YAxisElement>(yAxisSet);
         if (element.getYAxisElement() != null) {
-            tempSet.add(element.getYAxisElement());
-            yAxisSet = tempSet;
+            if (!yAxisSet.contains(element.getYAxisElement())) {
+                yAxisSet.add(element.getYAxisElement());
+            }
         }
         if (redraw) {
             this.fireRedrawRequest();
@@ -132,7 +133,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         removeDrawableElement(element, true);
     }
 
-    public Set<YAxisElement> getYAxisElements() {
+    public List<YAxisElement> getYAxisElements() {
         return yAxisSet;
     }
 
@@ -475,15 +476,24 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void createYAxisSet() {
-        Set<YAxisElement> tempSet = new HashSet<YAxisElement>();
+        YAxisElement[] tempArray = new YAxisElement[2];
         for (Set<DrawableElement> elementsSet : drawableElements.values()) {
             for (DrawableElement de : elementsSet) {
                 if (de.getYAxisElement() != null) {
-                    tempSet.add(de.getYAxisElement());
+                    if (yAxisSet.contains(de.getYAxisElement())) {
+                        tempArray[yAxisSet.indexOf(de.getYAxisElement())] = de.getYAxisElement();
+                    }
                 }
             }
         }
-        yAxisSet = tempSet;
+        List<YAxisElement> newYAxisList = new ArrayList<YAxisElement>();
+        for (int i = 0; i < 2; i++) {
+            if (tempArray[i] != null) {
+                newYAxisList.add(tempArray[i]);
+            }
+        }
+
+        yAxisSet = newYAxisList;
     }
 
     public boolean hasAxisAvailable() {
@@ -520,5 +530,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public boolean canChangeAxis(String unitLabel) {
         return getAllYAxisElementsForUnit(unitLabel).size() == 2 || yAxisSet.size() < 2;
+    }
+
+    public YAxisElement.YAxisLocation getYAxisLocation(YAxisElement yAxisElement) {
+        switch (yAxisSet.indexOf(yAxisElement)) {
+        case 0:
+            return YAxisElement.YAxisLocation.LEFT;
+        case 1:
+            return YAxisElement.YAxisLocation.RIGHT;
+        }
+        return null;
     }
 }

@@ -454,4 +454,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         return DrawController.getSingletonInstance().canChangeAxis(band.getUnitLabel());
     }
 
+    public int getAxisLocation(Band band) {
+        return drawController.getYAxisLocation(yAxisElementMap2.get(band)) == YAxisElement.YAxisLocation.LEFT ? 0 : 1;
+    }
+
 }
