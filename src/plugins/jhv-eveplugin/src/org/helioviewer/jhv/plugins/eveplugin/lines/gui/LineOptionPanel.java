@@ -63,7 +63,7 @@ public class LineOptionPanel extends JPanel {
         add(yAxis, c);
 
         String[] options = { "Left", "Right" };
-        JComboBox<String> changeAxis = new JComboBox<String>(options);
+        JComboBox changeAxis = new JComboBox(options);
         changeAxis.setToolTipText("Switch the axis");
         changeAxis.setSelectedIndex(EVEDrawController.getSingletonInstance().getAxisLocation(band));
         changeAxis.addActionListener(new ActionListener() {
