@@ -89,11 +89,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         _jp2Image = newJP2Image;
         _jp2Image.addReference();
 
-        metaDataArray = _jp2Image.metaDataList;
         MetaData metaData = _jp2Image.metaDataList[0];
+        region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
 
-        if (region == null)
-            region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+        metaDataArray = _jp2Image.metaDataList;
 
         imageViewParams = calculateParameter(_jp2Image, region, 0);
 
@@ -252,12 +251,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         newImageData.setFrameNumber(frame);
         newImageData.setMetaData(metaData);
 
-        if (metaData instanceof HelioviewerMetaData) {
+        if (metaData instanceof HelioviewerMetaData && !((HelioviewerMetaData) metaData).getInstrument().equals("CALLISTO")) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
+            if (imageData != null && imageData.getFrameNumber() != frame)
+                ++frameCount;
         }
-
-        if (imageData != null && imageData.getFrameNumber() != frame)
-            ++frameCount;
 
         imageData = newImageData;
         if (dataHandler != null) {

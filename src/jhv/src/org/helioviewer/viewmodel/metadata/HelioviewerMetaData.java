@@ -177,7 +177,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         double newSolarPixelRadius = -1.0;
 
-        if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha") || instrument.contains("CALLISTO")) {
+        if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha")) {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
             double arcsecPerPixelY = m.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
