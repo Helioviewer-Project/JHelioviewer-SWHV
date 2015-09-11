@@ -20,7 +20,7 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
         if (value != null) { // In some case this can be called with value null
             // (getAccessibleChild(int i) of JTable )
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
-            JLabel label = new JLabel();
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (lineDataElement.isDeletable()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
                 label.setText(null);
@@ -28,8 +28,9 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
                 label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
                 return label;
             } else {
-                label.setBorder(LineDateSelectorTablePanel.commonBorder);
+                label.setIcon(null);
                 label.setText(null);
+                label.setBorder(LineDateSelectorTablePanel.commonBorder);
                 return label;
             }
         } else {
