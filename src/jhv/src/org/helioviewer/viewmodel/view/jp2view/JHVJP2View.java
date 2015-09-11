@@ -251,11 +251,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         newImageData.setFrameNumber(frame);
         newImageData.setMetaData(metaData);
 
-        if (metaData instanceof HelioviewerMetaData && !((HelioviewerMetaData) metaData).getInstrument().equals("CALLISTO")) {
+        if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
-            if (imageData != null && imageData.getFrameNumber() != frame)
-                ++frameCount;
         }
+
+        if (imageData != null && imageData.getFrameNumber() != frame)
+            ++frameCount;
 
         imageData = newImageData;
         if (dataHandler != null) {
