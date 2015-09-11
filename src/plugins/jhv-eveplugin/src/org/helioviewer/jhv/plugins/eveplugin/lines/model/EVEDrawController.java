@@ -243,7 +243,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
              * yAxisElementMap.get(unitLabel); }
              */
 
-            yAxisElement.set(selectedRangeMap2.get(yAxisElement), availableRangeMap2.get(yAxisElement), unitLabel, selectedRangeMap2.get(yAxisElement).min, selectedRangeMap2.get(yAxisElement).max, Color.PINK, isLog, yAxisElement.getActivationTime());
+            yAxisElement.set(selectedRangeMap2.get(yAxisElement), availableRangeMap2.get(yAxisElement), unitLabel, selectedRangeMap2.get(yAxisElement).min, selectedRangeMap2.get(yAxisElement).max, Color.PINK, isLog);
             eveDrawableElementMap2.get(yAxisElement).set(interval, bands, yAxisElement);
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElementMap2.get(yAxisElement));
