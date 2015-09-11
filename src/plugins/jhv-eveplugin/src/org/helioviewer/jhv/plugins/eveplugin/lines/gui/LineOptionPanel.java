@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -51,9 +52,10 @@ public class LineOptionPanel extends JPanel {
         });
         add(pickColor, c);
 
-        JButton changeAxis = new JButton("Change axis");
-        changeAxis.setMargin(new Insets(0, 0, 0, 0));
-        changeAxis.setToolTipText("Change the color of the current line");
+        String[] options = { "Left", "Right" };
+        JComboBox<String> changeAxis = new JComboBox<String>(options);
+        changeAxis.setToolTipText("Switch the axis");
+        changeAxis.setSelectedIndex(EVEDrawController.getSingletonInstance().getAxisLocation(band));
         changeAxis.addActionListener(new ActionListener() {
 
             @Override

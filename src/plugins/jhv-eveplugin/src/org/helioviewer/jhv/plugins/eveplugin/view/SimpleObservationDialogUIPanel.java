@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -34,7 +34,7 @@ import org.helioviewer.viewmodel.view.View;
 //Java 6 does not support generics for JComboBox and DefaultComboBoxModel
 //Should be removed if support for Java 6 is not needed anymore
 //Class will not be serialized so we suppress the warnings
-@SuppressWarnings({"unchecked","rawtypes","serial"})
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
     protected boolean enableLoadButton = true;
@@ -174,7 +174,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          * "", JOptionPane.ERROR_MESSAGE); return false; }
          */
         ObservationDialogDateModel.getInstance().setStartDate(getDate(), true);
-        Set<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
+        List<YAxisElement> yAxisElements = DrawController.getSingletonInstance().getYAxisElements();
         boolean downloadOK = false;
         if (yAxisElements.size() >= 2) {
             for (YAxisElement el : yAxisElements) {
