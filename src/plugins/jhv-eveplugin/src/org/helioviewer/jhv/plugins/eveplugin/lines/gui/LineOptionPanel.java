@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -52,6 +53,15 @@ public class LineOptionPanel extends JPanel {
         });
         add(pickColor, c);
 
+        JLabel yAxis = new JLabel("Y-axis");
+        c.anchor = GridBagConstraints.EAST;
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.NONE;
+        add(yAxis, c);
+
         String[] options = { "Left", "Right" };
         JComboBox<String> changeAxis = new JComboBox<String>(options);
         changeAxis.setToolTipText("Switch the axis");
@@ -66,9 +76,9 @@ public class LineOptionPanel extends JPanel {
         changeAxis.setEnabled(EVEDrawController.getSingletonInstance().canChangeAxis(band));
 
         c.anchor = GridBagConstraints.EAST;
-        c.gridx = 1;
+        c.gridx = 2;
         c.gridy = 0;
-        c.weightx = 1;
+        c.weightx = 0;
         c.weighty = 1;
         c.fill = GridBagConstraints.NONE;
         add(changeAxis, c);
