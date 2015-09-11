@@ -4,6 +4,7 @@ import java.awt.Dimension;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -29,6 +30,13 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     public void render() {
+    }
+
+    @Override
+    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
+        if (dataHandler != null) {
+            dataHandler.handleData(this, newImageData);
+        }
     }
 
     @Override
