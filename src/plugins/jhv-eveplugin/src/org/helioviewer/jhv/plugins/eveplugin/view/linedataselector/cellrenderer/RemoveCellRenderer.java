@@ -20,7 +20,7 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
         if (value != null) { // In some case this can be called with value null
             // (getAccessibleChild(int i) of JTable )
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            JLabel label = new JLabel();
             if (lineDataElement.isDeletable()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
                 label.setText(null);
