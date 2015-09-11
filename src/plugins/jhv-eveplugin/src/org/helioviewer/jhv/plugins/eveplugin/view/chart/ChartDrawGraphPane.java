@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -227,7 +226,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // Log.debug("Draw Labels");
         // Thread.dumpStack();
         List<YAxisElement> yAxisElements = drawController.getYAxisElements();
-        // List<YAxisElement> orderedList = orderYAxes(yAxisElements);
         Interval<Date> interval = drawController.getSelectedInterval();
         if (!drawController.getIntervalAvailable()) {
             return;
@@ -306,24 +304,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
         // start) + " total time: " + drawLabelsOperarionTime +
         // " total time over running time : " + timeOverTotalTime);
-    }
-
-    private List<YAxisElement> orderYAxes(Set<YAxisElement> yAxisElements) {
-        LinkedList<YAxisElement> orderedList = new LinkedList<YAxisElement>();
-        for (YAxisElement element : yAxisElements) {
-            boolean added = false;
-            for (int i = 0; i < orderedList.size(); i++) {
-                if (orderedList.get(i).getActivationTime() > element.getActivationTime()) {
-                    orderedList.add(i, element);
-                    added = true;
-                    break;
-                }
-            }
-            if (!added) {
-                orderedList.add(orderedList.size(), element);
-            }
-        }
-        return orderedList;
     }
 
     private void drawVerticalLabels(Graphics2D g, YAxisElement yAxisElement, int leftSide) {
@@ -781,11 +761,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 }
                 if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
 
-                        // startTime >= myPlotAreaSpace.getScaledMinTime()
-                        // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                        // <= myPlotAreaSpace.getScaledMaxTime()
-                        // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                        ) {
+                // startTime >= myPlotAreaSpace.getScaledMinTime()
+                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
+                // <= myPlotAreaSpace.getScaledMaxTime()
+                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                ) {
                     plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
                 } else {
                     Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= plotAreaSpace.getScaledMinValue()) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= plotAreaSpace.getScaledMaxValue()) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= plotAreaSpace.getScaledMinValue()) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= plotAreaSpace.getScaledMaxValue()));

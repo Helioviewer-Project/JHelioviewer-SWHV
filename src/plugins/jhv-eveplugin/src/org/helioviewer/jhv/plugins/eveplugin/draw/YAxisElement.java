@@ -30,8 +30,6 @@ public class YAxisElement {
 
     private boolean isLogScale;
 
-    private long activationTime;
-
     private YAxisLocation location;
 
     /**
@@ -86,7 +84,6 @@ public class YAxisElement {
         maxValue = 0.0;
         color = Color.BLACK;
         isLogScale = true;
-        activationTime = System.currentTimeMillis();
     }
 
     /**
@@ -226,7 +223,7 @@ public class YAxisElement {
      * @param color
      *            The color
      */
-    public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color, boolean isLogScale, long activationTime) {
+    public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color, boolean isLogScale) {
         this.availableRange = availableRange;
         this.selectedRange = selectedRange;
         this.label = label;
@@ -234,7 +231,6 @@ public class YAxisElement {
         this.minValue = minValue;
         this.color = color;
         this.isLogScale = isLogScale;
-        this.activationTime = activationTime;
         checkMinMax();
     }
 
@@ -245,14 +241,6 @@ public class YAxisElement {
     public void setIsLogScale(boolean isLogScale) {
         this.isLogScale = isLogScale;
 
-    }
-
-    public long getActivationTime() {
-        return activationTime;
-    }
-
-    public void setActivationTime(long activationTime) {
-        this.activationTime = activationTime;
     }
 
     public YAxisLocation getLocation() {
