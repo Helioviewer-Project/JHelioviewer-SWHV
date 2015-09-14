@@ -60,7 +60,6 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer() throws KduException {
-        int[] localIntBuffer = new int[2048 * 1024];
         int numLayer = currParams.compositionLayer;
 
         // compositorRef.Refresh();
@@ -99,6 +98,7 @@ class J2KRender implements Runnable {
             intBuffer = new int[roi.getNumPixels()];
         }
 
+        int[] localIntBuffer = new int[MAX_RENDER_SAMPLES];
         while (!compositorRef.Is_processing_complete()) {
             compositorRef.Process(MAX_RENDER_SAMPLES, newRegion);
             Kdu_coords newOffset = newRegion.Access_pos();
