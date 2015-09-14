@@ -57,7 +57,7 @@ public class RenderableGridOptionsPanel extends JPanel {
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.EAST;
-        JCheckBox labels = new JCheckBox("Labels", true);
+        JCheckBox labels = new JCheckBox("Grid labels", true);
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
         labels.setPreferredSize(new Dimension(labels.getPreferredSize().width, 22));
         labels.addItemListener(new ItemListener() {
