@@ -51,7 +51,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     private int numOfThread = 1;
     private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
-    protected Region region;
+    protected Region targetRegion;
 
     // Member related to JP2
     protected JP2Image _jp2Image;
@@ -90,12 +90,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         _jp2Image.addReference();
 
         MetaData metaData = _jp2Image.metaDataList[0];
-        region = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+        targetRegion = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
 
         metaDataArray = _jp2Image.metaDataList;
 
-        imageViewParams = calculateParameter(_jp2Image, region, 0);
-
+        imageViewParams = calculateParameter(_jp2Image, targetRegion, 0);
         _jp2Image.startReader(this, imageViewParams);
     }
 
@@ -333,7 +332,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     @Override
     public void render() {
-        region = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
+        targetRegion = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
         signalRender(_jp2Image, false);
     }
 
@@ -342,7 +341,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter newParams = calculateParameter(jp2Image, region, targetFrame);
+        JP2ImageParameter newParams = calculateParameter(jp2Image, targetRegion, targetFrame);
         if (!hasExtraData && imageData != null && newParams.equals(imageViewParams)) {
             return;
         }

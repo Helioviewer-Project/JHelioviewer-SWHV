@@ -23,8 +23,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
     }
 
     public boolean setRegion(Region r) {
-        region = r;
-        signalRender(_jp2Image, true);
+        targetRegion = r;
+        signalRender(_jp2Image, false);
         return true;
     }
 
