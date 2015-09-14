@@ -46,16 +46,16 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         }
     }
 
-    BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
-    RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
-    int numOfThread = 1;
+    private BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
+    private RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
+    private int numOfThread = 1;
     private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
     protected Region region;
 
     // Member related to JP2
     protected JP2Image _jp2Image;
-    protected JP2ImageParameter imageViewParams;
+    private JP2ImageParameter imageViewParams;
 
     private int targetFrame;
 
@@ -96,7 +96,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         imageViewParams = calculateParameter(_jp2Image, region, 0);
 
-        _jp2Image.startReader(this);
+        _jp2Image.startReader(this, imageViewParams);
     }
 
     private int getTrueFrameNumber() {
@@ -228,10 +228,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      * class.
      */
 
-    JP2ImageParameter getImageViewParams() {
-        return new JP2ImageParameter(imageViewParams.jp2Image, imageViewParams.subImage, imageViewParams.resolution, imageViewParams.compositionLayer);
-    }
-
     /**
      * Sets the new image data for the given region.
      *
@@ -311,8 +307,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumAccessibleFrameNumber()) {
             targetFrame = frame;
 
-            // necessary for fov change
-            _jp2Image.readerSignal.signal();
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
                 signalRender(_jp2Image, false);
             }
@@ -353,6 +347,9 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             return;
         }
         imageViewParams = newParams;
+
+        // ping reader
+        _jp2Image.readerSignal.signal(imageViewParams);
 
         J2KRender task = new J2KRender(this, imageViewParams);
         {

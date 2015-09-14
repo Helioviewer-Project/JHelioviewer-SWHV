@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view.concurrency;
 
+import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
+
 /**
  * Very simple way of signaling between threads. Has no sense of ownership and
  * thus any thread can signal or wait for a signal. In general it is not a
@@ -17,6 +19,8 @@ public class BooleanSignal {
     /** Signal flag */
     private boolean isSignaled;
 
+    private JP2ImageParameter params;
+
     /**
      * Default constructor. Assigns the initial value of the isSignaled flag.
      * 
@@ -33,12 +37,13 @@ public class BooleanSignal {
      * 
      * @throws InterruptedException
      */
-    public void waitForSignal() throws InterruptedException {
+    public JP2ImageParameter waitForSignal() throws InterruptedException {
         synchronized (lock) {
             while (!isSignaled) {
                 lock.wait();
             }
             isSignaled = false;
+            return params;
         }
     }
 
@@ -46,9 +51,10 @@ public class BooleanSignal {
      * Sets the isSignaled flag and wakes up one waiting thread. Doesn't bother
      * to notifyAll since the first thread woken up resets the flag anyway.
      */
-    public void signal() {
+    public void signal(JP2ImageParameter newParams) {
         synchronized (lock) {
             isSignaled = true;
+            params = newParams;
             lock.notify();
         }
     }

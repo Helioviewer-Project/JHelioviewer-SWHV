@@ -33,6 +33,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
+import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
@@ -354,11 +355,11 @@ public class JP2Image {
         }
     }
 
-    protected void startReader(JHVJP2View view) {
+    protected void startReader(JHVJP2View view, JP2ImageParameter params) {
         try {
             reader = new J2KReader(view, this);
             reader.start();
-            readerSignal.signal();
+            readerSignal.signal(params);
         } catch (Exception e) {
             e.printStackTrace();
         }
