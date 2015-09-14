@@ -425,6 +425,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 }
                 resetAvailableRange();
                 updateBand(band, true);
+                fireRedrawRequest(true);
             }
         }
     }
