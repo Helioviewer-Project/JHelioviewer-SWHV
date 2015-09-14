@@ -116,6 +116,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                     EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
                     availableRangeMap.remove(yAxisElement);
                     selectedRangeMap.remove(yAxisElement);
+                    scaledAvailableRangeMap.remove(yAxisElement);
+                    scaledSelectedRangeMap.remove(yAxisElement);
                     yAxisElementMap.remove(band);
                     bandsPerYAxis.remove(yAxisElement);
                     drawController.removeDrawableElement(removed);
