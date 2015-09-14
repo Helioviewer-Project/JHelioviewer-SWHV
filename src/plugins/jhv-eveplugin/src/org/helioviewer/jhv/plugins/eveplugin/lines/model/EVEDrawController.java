@@ -180,8 +180,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     public void setSelectedRange(final Range newSelectedRange, YAxisElement yAxisElement) {
-        Log.debug("Set selected range");
-        Thread.dumpStack();
         selectedRangeMap.put(yAxisElement, new Range(newSelectedRange));
         drawController.setSelectedRange(newSelectedRange);
         fireRedrawRequest(false);
@@ -273,8 +271,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private void checkSelectedRange(final Range availableRange, final Range selectedRange, final Range scaledAvailable, final Range scaledSelected) {
         if (selectedRange.min > availableRange.max || selectedRange.max < availableRange.min) {
-            Log.debug("CheckSelectedRange 1");
-            Thread.dumpStack();
             selectedRange.min = availableRange.min;
             selectedRange.max = availableRange.max;
             scaledSelected.min = scaledAvailable.min;
@@ -285,15 +281,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         if (selectedRange.min < availableRange.min) {
             selectedRange.min = availableRange.min;
             scaledSelected.min = scaledAvailable.min;
-            Log.debug("CheckSelectedRange 2");
-            Thread.dumpStack();
         }
 
         if (selectedRange.max > availableRange.max) {
             selectedRange.max = availableRange.max;
             scaledSelected.max = scaledAvailable.max;
-            Log.debug("CheckSelectedRange 3");
-            Thread.dumpStack();
         }
     }
 
