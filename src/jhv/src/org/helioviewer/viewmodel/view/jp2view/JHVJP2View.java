@@ -27,6 +27,7 @@ import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 
 /**
  * Implementation of View for JPG2000 images.
@@ -62,6 +63,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     private int frameCount = 0;
     private long frameCountStart;
     private float frameRate;
+
+    protected final int[] localIntBuffer = new int[KakaduConstants.MAX_RENDER_SAMPLES];
 
     private boolean stopRender = false;
 
