@@ -121,4 +121,5 @@ public class RenderableTimeStamp implements Renderable {
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
     }
+
 }
