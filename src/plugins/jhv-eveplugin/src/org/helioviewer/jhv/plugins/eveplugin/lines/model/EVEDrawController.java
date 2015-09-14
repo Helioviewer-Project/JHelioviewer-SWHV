@@ -101,10 +101,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             if (data != null) {
                 dataMapPerUnitLabel2.get(yAxisElement).put(band, data);
             }
-            fireRedrawRequest(true);
         } else {
             Log.debug("band could not be added. No Yaxis Available ");
         }
+        fireRedrawRequest(true);
     }
 
     private void addToBandsPerYAxis(YAxisElement yAxisElement, Band band) {
@@ -359,8 +359,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void dataAdded(final Band band) {
-        if (dataMapPerUnitLabel2.containsKey(band)) {
-            if (dataMapPerUnitLabel2.get(band).containsKey(band)) {
+        if (yAxisElementMap2.containsKey(band)) {
+            if (dataMapPerUnitLabel2.get(yAxisElementMap2.get(band)).containsKey(band)) {
                 updateBand(band, false);
                 fireRedrawRequest(true);
             }
