@@ -58,4 +58,5 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
         });
         WheelSupport.installMouseWheelSupport(xSpinner);
     }
+
 }

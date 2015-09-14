@@ -33,6 +33,7 @@ public class RenderableGrid implements Renderable {
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
 
+    private boolean showAxes = true;
     private boolean showLabels = true;
     private Font font;
     private TextRenderer textRenderer;
@@ -101,6 +102,8 @@ public class RenderableGrid implements Renderable {
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl, cameraMatrix);
+            if (showAxes)
+                drawAxes(gl);
             gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
@@ -114,6 +117,21 @@ public class RenderableGrid implements Renderable {
             RenderableHelper.drawCircle(gl, 0, 0, 0.95, 25);
         }
         gl.glPopMatrix();
+    }
+
+    private void drawAxes(GL2 gl) {
+        gl.glLineWidth(2f);
+
+        gl.glBegin(GL2.GL_LINES);
+        {
+            gl.glColor4f(0, 0, 1, 1);
+            gl.glVertex3f(0, -1.2f, 0);
+            gl.glVertex3f(0, -1, 0);
+            gl.glColor4f(1, 0, 0, 1);
+            gl.glVertex3f(0, 1.2f, 0);
+            gl.glVertex3f(0, 1, 0);
+        }
+        gl.glEnd();
     }
 
     private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {
@@ -369,6 +387,10 @@ public class RenderableGrid implements Renderable {
         showLabels = show;
     }
 
+    public void showAxes(boolean show) {
+        showAxes = show;
+    }
+
     @Override
     public String getTimeString() {
         return null;
@@ -398,4 +420,5 @@ public class RenderableGrid implements Renderable {
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
     }
+
 }
