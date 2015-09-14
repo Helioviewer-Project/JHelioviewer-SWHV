@@ -228,9 +228,10 @@ class J2KReader implements Runnable {
         JP2ImageParameter currParams = null;
 
         while (!stop) {
+            prevParams = currParams;
             // wait for signal
             try {
-                parentImageRef.readerSignal.waitForSignal();
+                currParams = parentImageRef.readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
@@ -243,8 +244,6 @@ class J2KReader implements Runnable {
                 signalRender();
             } else {
                 // check whether view parameters have changed
-                prevParams = currParams;
-                currParams = parentViewRef.getImageViewParams();
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
 
                 // if view has changed downgrade caching status
@@ -269,7 +268,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // Send signal to try again
-                        parentImageRef.readerSignal.signal();
+                        parentImageRef.readerSignal.signal(currParams);
                     }/*
                       * catch (JHV_KduException e) { e.printStackTrace(); }
                       */
@@ -492,7 +491,7 @@ class J2KReader implements Runnable {
                             complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
                             // if current frame first -> signal again, to go on reading
                             if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
-                                parentImageRef.readerSignal.signal();
+                                parentImageRef.readerSignal.signal(currParams);
                             }
                         }
                     } catch (IOException e) {
@@ -512,7 +511,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // send signal to try again
-                        parentImageRef.readerSignal.signal();
+                        parentImageRef.readerSignal.signal(currParams);
                     } catch (JHV_KduException e) {
                         e.printStackTrace();
                     }
