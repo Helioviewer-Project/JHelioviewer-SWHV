@@ -44,17 +44,15 @@ public class JHVLoader {
             kduLibs.add("libkdu_jni-mac-x86-32.jnilib");
             pathlib = "macosx-universal/"; */
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-64")) {
-            kduLibs.add("libgcc_s_seh-1.dll");
-            kduLibs.add("libstdc++-6.dll");
-            kduLibs.add("libkdu_v77R.dll");
-            kduLibs.add("libkdu_a77R.dll");
+            kduLibs.add("msvcr120.dll");
+            kduLibs.add("kdu_v77R.dll");
+            kduLibs.add("kdu_a77R.dll");
             kduLibs.add("kdu_jni.dll");
             pathlib = "windows-amd64/";
         } else if (System.getProperty("jhv.os").equals("windows") && System.getProperty("jhv.arch").equals("x86-32")) {
-            kduLibs.add("libgcc_s_dw2-1.dll");
-            kduLibs.add("libstdc++-6.dll");
-            kduLibs.add("libkdu_v77R.dll");
-            kduLibs.add("libkdu_a77R.dll");
+            kduLibs.add("msvcr120.dll");
+            kduLibs.add("kdu_v77R.dll");
+            kduLibs.add("kdu_a77R.dll");
             kduLibs.add("kdu_jni.dll");
             pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
