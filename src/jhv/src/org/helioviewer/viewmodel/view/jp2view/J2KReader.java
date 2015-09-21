@@ -211,7 +211,7 @@ class J2KReader implements Runnable {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parentViewRef.doRender();
+                parentViewRef.signalRender(parentImageRef);
             }
         });
     }

@@ -344,22 +344,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter newParams = calculateParameter(jp2Image, targetRegion, targetFrame);
-        if (imageData != null && newParams.equals(imageViewParams)) {
-            setSubimageData(imageData, imageViewParams);
-            return;
-        }
-        imageViewParams = newParams;
+        imageViewParams = calculateParameter(jp2Image, targetRegion, targetFrame);
 
         // ping reader
         _jp2Image.readerSignal.signal(imageViewParams);
-
-        doRender();
-    }
-
-    void doRender() {
-        if (stopRender == true)
-            return;
 
         J2KRender task = new J2KRender(this, imageViewParams);
         {
