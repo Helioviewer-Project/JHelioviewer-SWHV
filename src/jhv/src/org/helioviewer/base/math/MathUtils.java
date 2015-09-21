@@ -4,9 +4,9 @@ import org.helioviewer.base.interval.Interval;
 
 /**
  * A collection of useful static methods.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class MathUtils {
 
@@ -15,7 +15,7 @@ public class MathUtils {
     /**
      * Returns the integer, x, closest on the number line such that
      * min(_side1,_side2) <= x <= max(_side1,_side2).
-     * 
+     *
      * @param _val
      *            the value to squeee into the interval
      * @param _side1
@@ -39,7 +39,7 @@ public class MathUtils {
     /**
      * Returns a random integer from the interval. If the interval is 2->4 then
      * there is a equal chance that the return would be 2,3, or 4.
-     * 
+     *
      * @param _interval
      *            the interval from which to draw the random number
      * @return a random numbe wihtin the given interval
@@ -56,7 +56,7 @@ public class MathUtils {
 
     /**
      * Takes and returns the maximum value from the given args.
-     * 
+     *
      * @param _is
      *            the values to compare
      * @return the maximum of the given values
@@ -71,7 +71,7 @@ public class MathUtils {
 
     /**
      * Takes and returns the minimum value from the given args.
-     * 
+     *
      * @param _is
      *            the values to compare
      * @return the minimum of the given values
@@ -93,4 +93,13 @@ public class MathUtils {
         }
     }
 
+    public static double mapToMinus180To180(double phi) {
+        while (phi > 180.) {
+            phi = phi - 360.;
+        }
+        while (phi < -180.) {
+            phi = phi + 360.;
+        }
+        return phi;
+    }
 }
