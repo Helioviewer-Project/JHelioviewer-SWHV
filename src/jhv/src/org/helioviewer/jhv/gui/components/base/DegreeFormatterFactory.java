@@ -5,7 +5,9 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
 
-@SuppressWarnings({"serial"})
+import org.helioviewer.base.logging.Log;
+
+@SuppressWarnings({ "serial" })
 public class DegreeFormatterFactory extends AbstractFormatterFactory {
 
     private final String format;
@@ -20,10 +22,24 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
         return new DefaultFormatter() {
             @Override
             public Object stringToValue(String string) {
-                if (string == null || string.length() == 0) {
-                    return new Double(0.);
+                Double value = new Double(0.);
+                if (string != null && string.length() != 0) {
+                    if (string.charAt(string.length() - 1) == '\u00B0') {
+
+                        try {
+                            value = Double.parseDouble(string.substring(0, string.length() - 1));
+                        } catch (NumberFormatException ex2) {
+                            Log.warn("Could not parse number");
+                        }
+                    } else {
+                        try {
+                            value = Double.parseDouble(string);
+                        } catch (NumberFormatException ex) {
+                            Log.warn("Could not parse number");
+                        }
+                    }
                 }
-                return Double.parseDouble(string.substring(0, string.length() - 1));
+                return value;
             }
 
             @Override
@@ -37,5 +53,4 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
             }
         };
     }
-
 }
