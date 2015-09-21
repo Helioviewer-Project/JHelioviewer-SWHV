@@ -171,14 +171,14 @@ public abstract class GL3DCamera {
     }
 
     // quantization bits per half width camera
-    private static final int quantFactor = 1 << 8;
+    private static final int quantFactor = 1 << 12;
 
     public void updateCameraWidthAspect(double aspect) {
         cameraWidth = -translation.z * Math.tan(fov / 2.);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
 
-        cameraWidth = (int) (cameraWidth * quantFactor) / (double) quantFactor;
+        cameraWidth = (long) (cameraWidth * quantFactor) / (double) quantFactor;
         if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
             return;
         }
