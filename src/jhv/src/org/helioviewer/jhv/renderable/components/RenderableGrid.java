@@ -154,7 +154,7 @@ public class RenderableGrid implements Renderable {
             {
                 float rotation = 0;
                 while (rotation <= 90) {
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                    gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     gl.glRotatef(lonstepDegrees, 0, 1, 0);
                     rotation += lonstepDegrees;
                 }
@@ -168,7 +168,7 @@ public class RenderableGrid implements Renderable {
                 gl.glRotatef(-lonstepDegrees, 0, 1, 0);
 
                 while (rotation >= -90) {
-                    gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                    gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     gl.glRotatef(-lonstepDegrees, 0, 1, 0);
                     rotation -= lonstepDegrees;
                 }
@@ -180,14 +180,14 @@ public class RenderableGrid implements Renderable {
                 float rotation = 0;
                 gl.glRotatef(90, 1, 0, 0);
 
-                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                 while (rotation < 90) {
                     gl.glPushMatrix();
                     {
                         gl.glTranslatef(0, 0, (float) Math.sin(Math.PI / 180. * rotation));
                         float scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
-                        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     }
                     gl.glPopMatrix();
                     rotation += latstepDegrees;
@@ -200,12 +200,12 @@ public class RenderableGrid implements Renderable {
                         gl.glTranslatef(0, 0, -(float) Math.sin(Math.PI / 180. * rotation));
                         float scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
-                        gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     }
                     gl.glPopMatrix();
                     rotation += latstepDegrees;
                 }
-                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
             }
             gl.glPopMatrix();
 
@@ -221,10 +221,10 @@ public class RenderableGrid implements Renderable {
                 Position.Latitudinal p = Sun.getEarth(Displayer.getLastUpdatedTimestamp());
                 gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
                 gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
-                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
 
                 gl.glRotatef(90, 1, 0, 0);
-                gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, SUBDIVISIONS);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
             }
             gl.glPopMatrix();
         }
