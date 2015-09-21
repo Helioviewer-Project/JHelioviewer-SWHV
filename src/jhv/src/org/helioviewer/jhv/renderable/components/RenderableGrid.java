@@ -153,8 +153,8 @@ public class RenderableGrid implements Renderable {
             gl.glPushMatrix();
             {
                 float rotation = 0;
-                while (rotation <= 90) {
-                    gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+                while (rotation <= 180) {
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, SUBDIVISIONS / 4, SUBDIVISIONS / 2 + 1);
                     gl.glRotatef(lonstepDegrees, 0, 1, 0);
                     rotation += lonstepDegrees;
                 }
@@ -165,11 +165,13 @@ public class RenderableGrid implements Renderable {
             {
                 float rotation = 0;
                 rotation -= lonstepDegrees;
+
                 gl.glRotatef(-lonstepDegrees, 0, 1, 0);
 
-                while (rotation >= -90) {
-                    gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+                while (rotation >= -180) {
+                    gl.glDrawArrays(GL2.GL_LINE_STRIP, SUBDIVISIONS / 4, SUBDIVISIONS / 2 + 1);
                     gl.glRotatef(-lonstepDegrees, 0, 1, 0);
+
                     rotation -= lonstepDegrees;
                 }
             }
@@ -308,10 +310,10 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void init(GL2 gl) {
-        FloatBuffer positionBuffer = FloatBuffer.allocate(SUBDIVISIONS * 2);
-        FloatBuffer colorBuffer = FloatBuffer.allocate(SUBDIVISIONS * 3);
+        FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
+        FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
 
-        for (int i = 0; i < SUBDIVISIONS; i++) {
+        for (int i = 0; i <= SUBDIVISIONS; i++) {
             positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
             positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
             if (i % 2 == 0) {
