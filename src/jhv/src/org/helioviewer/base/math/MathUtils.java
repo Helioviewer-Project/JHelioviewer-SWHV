@@ -85,21 +85,21 @@ public class MathUtils {
     }
 
     public static double mapTo0To360(double x) {
-        double tmp = x % 360.0;
-        if (tmp < 0) {
-            return tmp + 360.0;
-        } else {
-            return tmp;
-        }
+        x %= 360.;
+        if (x < 0)
+            x += 360.;
+
+        return x;
     }
 
-    public static double mapToMinus180To180(double phi) {
-        while (phi > 180.) {
-            phi = phi - 360.;
-        }
-        while (phi < -180.) {
-            phi = phi + 360.;
-        }
-        return phi;
+    public static double mapToMinus180To180(double x) {
+        x %= 360.;
+        if (x > 180.)
+            x -= 360.;
+        else if (x < -180.)
+            x += 360;
+
+        return x;
     }
+
 }
