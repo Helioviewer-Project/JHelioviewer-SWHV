@@ -17,6 +17,7 @@ import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
@@ -63,9 +64,11 @@ public class RenderableGrid implements Renderable {
     private float oldFontSize = -1;
     private int positionBufferID;
     private int colorBufferID;
+    private GridChoiceType gridChoice = GridChoiceType.OBSERVER;
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
+
         GL3DCamera activeCamera = vp.getCamera();
 
         renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
@@ -94,7 +97,20 @@ public class RenderableGrid implements Renderable {
             textRenderer.setColor(Color.WHITE);
         }
 
-        GL3DMat4d cameraMatrix = activeCamera.getLocalRotation().toMatrix();
+        GL3DMat4d cameraMatrix;
+        switch (gridChoice) {
+        case OBSERVER:
+            cameraMatrix = activeCamera.getLocalRotation().toMatrix();
+            break;
+        case HCI:
+            //TBD
+            cameraMatrix = GL3DMat4d.identity();
+            break;
+        default:
+            cameraMatrix = GL3DMat4d.identity();
+            break;
+        }
+
         double[] matrix = cameraMatrix.transpose().m;
 
         gl.glPushMatrix();
@@ -424,6 +440,10 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    }
+
+    public void setCoordinates(GridChoiceType gridChoice) {
+        this.gridChoice = gridChoice;
     }
 
 }
