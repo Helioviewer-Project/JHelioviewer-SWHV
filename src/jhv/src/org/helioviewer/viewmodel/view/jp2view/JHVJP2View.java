@@ -56,7 +56,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     // Member related to JP2
     protected JP2Image _jp2Image;
-    private JP2ImageParameter imageViewParams;
 
     private int targetFrame;
 
@@ -97,8 +96,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         metaDataArray = _jp2Image.metaDataList;
 
-        imageViewParams = calculateParameter(_jp2Image, targetRegion, 0);
-        _jp2Image.startReader(this, imageViewParams);
+        _jp2Image.startReader(this, calculateParameter(_jp2Image, targetRegion, 0));
     }
 
     private int getTrueFrameNumber() {
@@ -344,7 +342,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (stopRender == true || jp2Image == null)
             return;
 
-        imageViewParams = calculateParameter(jp2Image, targetRegion, targetFrame);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetRegion, targetFrame);
 
         // ping reader
         _jp2Image.readerSignal.signal(imageViewParams);
