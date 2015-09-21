@@ -308,10 +308,10 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void init(GL2 gl) {
-        FloatBuffer positionBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 2);
-        FloatBuffer colorBuffer = FloatBuffer.allocate((SUBDIVISIONS + 1) * 3);
+        FloatBuffer positionBuffer = FloatBuffer.allocate(SUBDIVISIONS * 2);
+        FloatBuffer colorBuffer = FloatBuffer.allocate(SUBDIVISIONS * 3);
 
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
+        for (int i = 0; i < SUBDIVISIONS; i++) {
             positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
             positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
             if (i % 2 == 0) {
