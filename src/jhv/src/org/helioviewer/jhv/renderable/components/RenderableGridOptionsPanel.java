@@ -3,10 +3,14 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,9 +26,23 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
 public class RenderableGridOptionsPanel extends JPanel {
+    enum GridChoiceType {
+        OBSERVER("Observer grid"), HCI("HCI grid");
+        private final String display;
+
+        private GridChoiceType(String s) {
+            display = s;
+        }
+
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
+    JComboBox gridChoiceBox;
     RenderableGrid grid;
 
     public RenderableGridOptionsPanel(RenderableGrid renderableGrid) {
@@ -98,6 +116,40 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
         add(gridResolutionYSpinner, c0);
+
+        //TBD
+        c0.gridy = 2;
+        c0.gridx = 0;
+        c0.anchor = GridBagConstraints.EAST;
+        //add(new JLabel("Grid type", JLabel.RIGHT), c0);
+        c0.gridx = 1;
+        c0.anchor = GridBagConstraints.WEST;
+        createGridChoiceBox(renderableGrid);
+        //add(gridChoiceBox, c0);
+    }
+
+    public void createGridChoiceBox(final RenderableGrid renderableGrid) {
+        gridChoiceBox = new JComboBox();
+        gridChoiceBox.setModel(new DefaultComboBoxModel(GridChoiceType.values()));
+        gridChoiceBox.setToolTipText("Choose grid options");
+        gridChoiceBox.setSelectedItem(GridChoiceType.OBSERVER);
+        gridChoiceBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GridChoiceType t = (GridChoiceType) gridChoiceBox.getSelectedItem();
+                switch (t) {
+                case OBSERVER:
+                    renderableGrid.setCoordinates(t);
+                    break;
+                case HCI:
+                    renderableGrid.setCoordinates(t);
+                    break;
+                default:
+                    break;
+                }
+                Displayer.display();
+            }
+        });
     }
 
     public void createGridResolutionX(RenderableGrid renderableGrid) {
