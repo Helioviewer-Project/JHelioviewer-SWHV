@@ -128,7 +128,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         //add(gridChoiceBox, c0);
     }
 
-    public void createGridChoiceBox(final RenderableGrid renderableGrid) {
+    public void createGridChoiceBox(RenderableGrid renderableGrid) {
         gridChoiceBox = new JComboBox();
         gridChoiceBox.setModel(new DefaultComboBoxModel(GridChoiceType.values()));
         gridChoiceBox.setToolTipText("Choose grid options");
@@ -139,10 +139,10 @@ public class RenderableGridOptionsPanel extends JPanel {
                 GridChoiceType t = (GridChoiceType) gridChoiceBox.getSelectedItem();
                 switch (t) {
                 case OBSERVER:
-                    renderableGrid.setCoordinates(t);
+                    grid.setCoordinates(t);
                     break;
                 case HCI:
-                    renderableGrid.setCoordinates(t);
+                    grid.setCoordinates(t);
                     break;
                 default:
                     break;
