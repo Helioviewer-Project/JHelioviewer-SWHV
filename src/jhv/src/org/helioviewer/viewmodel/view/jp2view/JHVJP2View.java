@@ -346,6 +346,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         JP2ImageParameter newParams = calculateParameter(jp2Image, targetRegion, targetFrame);
         if (imageData != null && newParams.equals(imageViewParams)) {
+            setSubimageData(imageData, imageViewParams);
             return;
         }
         imageViewParams = newParams;
