@@ -362,7 +362,9 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
                 }
             }
         }
-
     }
 
+    public YAxisElement getYAxisElement() {
+        return yAxisElement;
+    }
 }
