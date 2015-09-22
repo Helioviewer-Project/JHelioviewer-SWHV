@@ -476,7 +476,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mousePressed(final MouseEvent e) {
-        final Rectangle movieFrame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
+        final Rectangle movieFrame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
 
         mousePressedOnMovieFrame = movieFrame.contains(e.getPoint());
         // mousePressedPosition = graphArea.contains(e.getPoint()) ?
@@ -602,7 +602,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseMoved(final MouseEvent e) {
         mousePosition = new Point(e.getPoint().x - ChartConstants.getGraphLeftSpace(), e.getPoint().y - ChartConstants.getGraphTopSpace());
-        final Rectangle frame = new Rectangle(movieLinePosition - 1, graphArea.y, 3, graphArea.height);
+        final Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
 
         if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
