@@ -252,7 +252,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
              * updateScaledValues(yAxisElement,
              * availableRangeMap.get(yAxisElement),
              * selectedRangeMap.get(yAxisElement), false, isLog);
-             *
+             * 
              * }
              */
 
@@ -289,7 +289,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
      * diffSelMinAvaiMin = selectedRange.min - availableRange.min; }
      * scaledAvailable.min = scaledSelected.min - diffSelMinAvaiMin * ratio;
      * scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio;
-     * 
+     *
      * Log.debug("//////////////////////////////////");
      * Log.debug("old scaled available: " + oldScaledAvailable);
      * Log.debug("old scaled selected: " + oldScaledSelected);
@@ -330,7 +330,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
      * "scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio   =>   "
      * + scaledSelected.max + "+" + diffSelMaxAvaiMax + " * " + ratio + " = " +
      * scaledAvailable.max); Log.debug("//////////////////////////////////");
-     * 
+     *
      * } else { //
      * plotAreaSpace.setScaledSelectedValue(plotAreaSpace.getScaledMinValue(),
      * // plotAreaSpace.getScaledMaxValue(), true); scaledSelected.min =
@@ -356,7 +356,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
      * Math.log10(selectedRange.max) + "] scaled selected range: " +
      * scaledSelected + " scaled available range: " + scaledAvailable); return;
      * }
-     * 
+     *
      * if (selectedRange.min < availableRange.min) {
      * Log.debug("Check selected range 2 before. available range: [" +
      * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
@@ -370,7 +370,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
      * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
      * Math.log10(selectedRange.max) + "] scaled selected range: " +
      * scaledSelected + " scaled available range: " + scaledAvailable); }
-     * 
+     *
      * if (selectedRange.max > availableRange.max) {
      * Log.debug("Check selected range 3 before. available range: [" +
      * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
@@ -478,7 +478,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
          * scaledSelectedMaxValue - scaledMinValue; double scLoSelE =
          * diffPASelEAvaiS / diffPAAvai * diffLoScAvai +
          * scaledAvailableRangeMap.get(yAxisElement).min;
-         * 
+         *
          * double diffLoAvai =
          * Math.log10(availableRangeMap.get(yAxisElement).max) -
          * Math.log10(availableRangeMap.get(yAxisElement).min); // Local
@@ -641,6 +641,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         if (((bandsPerYAxis.size() == 1 && bandsPerYAxis.get(currentYAxisElement).size() > 1) || bandsPerYAxis.size() == 2) && drawController.canChangeAxis(band.getUnitLabel())) {
             YAxisElement otherYAxisElement = getOtherAxisElement(currentYAxisElement);
             if (otherYAxisElement != null) {
+                plotAreaSpace.addValueSpace(otherYAxisElement);
                 yAxisElementMap.put(band, otherYAxisElement);
                 List<Band> bandsPerList = new ArrayList<Band>();
                 if (bandsPerYAxis.containsKey(otherYAxisElement)) {
