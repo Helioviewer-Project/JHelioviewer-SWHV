@@ -298,6 +298,10 @@ public class ImageViewerGui {
         return leftPane;
     }
 
+    public static JScrollPane getLeftScrollPane() {
+        return leftScrollPane;
+    }
+
     public static MainComponent getMainComponent() {
         return mainComponent;
     }

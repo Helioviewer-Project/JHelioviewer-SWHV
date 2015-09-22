@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.swing.JComponent;
+
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;
@@ -126,6 +128,10 @@ public class JavaHelioViewer {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
+                // after loading plugins fix the minimum width of left pane
+                JComponent leftPane = ImageViewerGui.getLeftScrollPane();
+                leftPane.setMinimumSize(leftPane.getPreferredSize());
             }
 
             private String[] theArgs;
