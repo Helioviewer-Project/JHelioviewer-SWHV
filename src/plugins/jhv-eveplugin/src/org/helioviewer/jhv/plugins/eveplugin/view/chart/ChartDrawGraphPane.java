@@ -44,12 +44,14 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 
@@ -499,10 +501,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             double distanceX = -1 * (mouseX - mousePressedPosition.x);
             double distanceY = mouseY - mousePressedPosition.y;
             double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double ratioValue = graphArea.height / (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledSelectedMinValue());
-            double startValue = plotAreaSpace.getScaledSelectedMinValue() + distanceY / ratioValue;
             double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
-            double endValue = startValue + graphArea.height / ratioValue;
+
             double endTime = startTime + graphArea.width / ratioTime;
 
             /*
@@ -510,21 +510,32 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
              * myPlotAreaSpace.getScaledMinTime(); endTime = startTime +
              * graphArea.width / ratioTime; }
              */
-            if (startValue < plotAreaSpace.getScaledMinValue()) {
-                startValue = plotAreaSpace.getScaledMinValue();
-                endValue = startValue + graphArea.height / ratioValue;
-            }
-            if (endValue > plotAreaSpace.getScaledMaxValue()) {
-                endValue = plotAreaSpace.getScaledMaxValue();
-                startValue = endValue - graphArea.height / ratioValue;
-            }
+
             /*
              * if (endTime > myPlotAreaSpace.getScaledMaxTime()) { endTime =
              * myPlotAreaSpace.getScaledMaxTime(); startTime = endTime -
              * graphArea.width / ratioTime; }
              */
 
-            plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
+            plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
+            Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
+            for (ValueSpace vs : valueSpaces) {
+                Range selectedRange = vs.getScaledSelectedRange();
+                Range availableRange = vs.getScaledAvailableRange();
+                double ratioValue = graphArea.height / (selectedRange.max - selectedRange.min);
+                double startValue = selectedRange.min + distanceY / ratioValue;
+                double endValue = startValue + graphArea.height / ratioValue;
+                if (startValue < availableRange.min) {
+                    startValue = availableRange.min;
+                    endValue = startValue + graphArea.height / ratioValue;
+                }
+                if (endValue > availableRange.max) {
+                    endValue = availableRange.max;
+                    startValue = endValue - graphArea.height / ratioValue;
+                }
+
+                vs.setScaledSelectedRange(new Range(startValue, endValue));
+            }
         }
 
         mousePressedPosition = null;
@@ -548,10 +559,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             double distanceX = -1 * (mouseX - mousePressedPosition.x);
             double distanceY = mouseY - mousePressedPosition.y;
             double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            double ratioValue = graphArea.height / (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledSelectedMinValue());
-            double startValue = plotAreaSpace.getScaledSelectedMinValue() + distanceY / ratioValue;
             double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
-            double endValue = startValue + graphArea.height / ratioValue;
             double endTime = startTime + graphArea.width / ratioTime;
 
             /*
@@ -559,21 +567,34 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
              * myPlotAreaSpace.getScaledMinTime(); endTime = startTime +
              * graphArea.width / ratioTime; }
              */
-            if (startValue < plotAreaSpace.getScaledMinValue()) {
-                startValue = plotAreaSpace.getScaledMinValue();
-                endValue = startValue + graphArea.height / ratioValue;
-            }
-            if (endValue > plotAreaSpace.getScaledMaxValue()) {
-                endValue = plotAreaSpace.getScaledMaxValue();
-                startValue = endValue - graphArea.height / ratioValue;
-            }
+
             /*
              * if (endTime > myPlotAreaSpace.getScaledMaxTime()) { endTime =
              * myPlotAreaSpace.getScaledMaxTime(); startTime = endTime -
              * graphArea.width / ratioTime; }
              */
 
-            plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
+            plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
+
+            Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
+
+            for (ValueSpace vs : valueSpaces) {
+                Range selectedRange = vs.getScaledSelectedRange();
+                Range availableRange = vs.getScaledAvailableRange();
+                double ratioValue = graphArea.height / (selectedRange.max - selectedRange.min);
+                double startValue = selectedRange.min + distanceY / ratioValue;
+                double endValue = startValue + graphArea.height / ratioValue;
+
+                if (startValue < availableRange.min) {
+                    startValue = availableRange.min;
+                    endValue = startValue + graphArea.height / ratioValue;
+                }
+                if (endValue > availableRange.max) {
+                    endValue = availableRange.max;
+                    startValue = endValue - graphArea.height / ratioValue;
+                }
+                vs.setScaledSelectedRange(new Range(startValue, endValue));
+            }
         }
         mousePressedPosition = e.getPoint();
     }
@@ -700,6 +721,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int scrollValue = e.getWheelRotation();
         double zoomTimeFactor = 10;
         double zoomValueFactor = 5;
+        Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getScrollAmount();
             final int mouseX = e.getX();
@@ -713,8 +735,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double ratioYBottom = (1.0 * (graphArea.y + graphArea.height - mouseY)) / graphArea.height;
                 double startTime = plotAreaSpace.getScaledSelectedMinTime();
                 double endTime = plotAreaSpace.getScaledSelectedMaxTime();
-                double startValue = plotAreaSpace.getScaledSelectedMinValue();
-                double endValue = plotAreaSpace.getScaledSelectedMaxValue();
 
                 // zoom in
                 if (!e.isAltDown() && !e.isShiftDown()) {
@@ -747,28 +767,38 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
                 }
 
-                if ((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) {
-                    double ratioValue = graphArea.height / (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledSelectedMinValue());
-                    if (scrollValue < 0) {
-                        endValue = plotAreaSpace.getScaledSelectedMaxValue() - zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
-                        startValue = plotAreaSpace.getScaledSelectedMinValue() + zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                    } else {
-                        endValue = plotAreaSpace.getScaledSelectedMaxValue() + zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
-                        startValue = plotAreaSpace.getScaledSelectedMinValue() - zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                    }
-                    startValue = Math.max(plotAreaSpace.getScaledMinValue(), startValue);
-                    endValue = Math.min(plotAreaSpace.getScaledMaxValue(), endValue);
-                }
-                if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue() // &&
+                plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
 
-                // startTime >= myPlotAreaSpace.getScaledMinTime()
-                // && endTime <= myPlotAreaSpace.getScaledMaxTime() && startTime
-                // <= myPlotAreaSpace.getScaledMaxTime()
-                // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                ) {
-                    plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
-                } else {
-                    Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= plotAreaSpace.getScaledMinValue()) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= plotAreaSpace.getScaledMaxValue()) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= plotAreaSpace.getScaledMinValue()) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= plotAreaSpace.getScaledMaxValue()));
+                for (ValueSpace vs : valueSpaces) {
+                    Range selectedRange = vs.getScaledSelectedRange();
+                    Range availableRange = vs.getScaledAvailableRange();
+                    double startValue = selectedRange.min;
+                    double endValue = selectedRange.max;
+
+                    if ((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) {
+                        double ratioValue = graphArea.height / (selectedRange.max - selectedRange.min);
+                        if (scrollValue < 0) {
+                            endValue = selectedRange.max - zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
+                            startValue = selectedRange.min + zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
+                        } else {
+                            endValue = selectedRange.max + zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
+                            startValue = selectedRange.min - zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
+                        }
+                        startValue = Math.max(availableRange.min, startValue);
+                        endValue = Math.min(availableRange.max, endValue);
+                    }
+                    if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
+
+                            // startTime >= myPlotAreaSpace.getScaledMinTime()
+                            // && endTime <= myPlotAreaSpace.getScaledMaxTime() &&
+                            // startTime
+                            // <= myPlotAreaSpace.getScaledMaxTime()
+                            // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                            ) {
+                        vs.setScaledSelectedRange(new Range(startValue, endValue));
+                    } else {
+                        Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= availableRange.min) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= availableRange.max) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= availableRange.max) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= availableRange.max));
+                    }
                 }
             } else if (mouseX >= graphArea.x && mouseX <= graphArea.x + graphArea.width && (mouseY <= graphArea.y || mouseY >= graphArea.y + graphArea.height)) {
                 // In the x-axes or above the graph (only scroll in time)
@@ -777,8 +807,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
                 double startTime = plotAreaSpace.getScaledSelectedMinTime();
                 double endTime = plotAreaSpace.getScaledSelectedMaxTime();
-                double startValue = plotAreaSpace.getScaledSelectedMinValue();
-                double endValue = plotAreaSpace.getScaledSelectedMaxValue();
 
                 double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
                 startTime = plotAreaSpace.getScaledMinTime();
@@ -794,32 +822,32 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 startTime = Math.max(plotAreaSpace.getScaledMinTime(), startTime);
                 endTime = Math.min(plotAreaSpace.getScaledMaxTime(), endTime);
 
-                if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue()) {
-                    plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
-                }
+                plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
 
             } else if (mouseX < graphArea.x || mouseX > graphArea.x + graphArea.width && mouseY > graphArea.y && mouseY <= graphArea.y + graphArea.height) {
                 // In the axis (only zoom in value)
                 final double ratioYTop = (1.0 * (mouseY - graphArea.y)) / graphArea.height;
                 final double ratioYBottom = (1.0 * (graphArea.y + graphArea.height - mouseY)) / graphArea.height;
-                double startTime = plotAreaSpace.getScaledSelectedMinTime();
-                double endTime = plotAreaSpace.getScaledSelectedMaxTime();
-                double startValue = plotAreaSpace.getScaledSelectedMinValue();
-                double endValue = plotAreaSpace.getScaledSelectedMaxValue();
+                for (ValueSpace vs : valueSpaces) {
+                    Range selectedRange = vs.getScaledSelectedRange();
+                    Range availableRange = vs.getScaledAvailableRange();
+                    double startValue = selectedRange.min;
+                    double endValue = selectedRange.max;
 
-                double ratioValue = graphArea.height / (plotAreaSpace.getScaledSelectedMaxValue() - plotAreaSpace.getScaledSelectedMinValue());
-                if (scrollValue < 0) {
-                    endValue = plotAreaSpace.getScaledSelectedMaxValue() - zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
-                    startValue = plotAreaSpace.getScaledSelectedMinValue() + zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                } else {
-                    endValue = plotAreaSpace.getScaledSelectedMaxValue() + zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
-                    startValue = plotAreaSpace.getScaledSelectedMinValue() - zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
-                }
-                startValue = Math.max(plotAreaSpace.getScaledMinValue(), startValue);
-                endValue = Math.min(plotAreaSpace.getScaledMaxValue(), endValue);
+                    double ratioValue = graphArea.height / (selectedRange.max - selectedRange.min);
+                    if (scrollValue < 0) {
+                        endValue = selectedRange.max - zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
+                        startValue = selectedRange.min + zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
+                    } else {
+                        endValue = selectedRange.max + zoomValueFactor * scrollDistance * ratioYTop / ratioValue;
+                        startValue = selectedRange.min - zoomValueFactor * scrollDistance * ratioYBottom / ratioValue;
+                    }
+                    startValue = Math.max(availableRange.min, startValue);
+                    endValue = Math.min(availableRange.max, endValue);
 
-                if (startValue <= endValue /* && startTime <= endTime */&& startValue >= plotAreaSpace.getScaledMinValue() && startValue <= plotAreaSpace.getScaledMaxValue() && endValue >= plotAreaSpace.getScaledMinValue() && endValue <= plotAreaSpace.getScaledMaxValue()) {
-                    plotAreaSpace.setScaledSelectedTimeAndValue(startTime, endTime, startValue, endValue);
+                    if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max) {
+                        vs.setScaledSelectedRange(new Range(startValue, endValue));
+                    }
                 }
             }
         }
