@@ -65,7 +65,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void render() {
         torender = true;
-        todisplay = true;
+        // todisplay = true;
     }
 
     public static void display() {
@@ -116,17 +116,28 @@ public class Displayer implements JHVEventHighlightListener {
 
         @Override
         public void handleData(View view, ImageData imageData) {
+            boolean timeChanged = false;
+
             if (view == Layers.getActiveView()) {
-                lastTimestamp = imageData.getMetaData().getDateObs().getDate();
-                viewport.getCamera().timeChanged(lastTimestamp);
-                for (final TimeListener listener : timeListeners) {
-                    listener.timeChanged(lastTimestamp);
+                Date timestamp = imageData.getMetaData().getDateObs().getDate();
+                if (timestamp.getTime() != lastTimestamp.getTime()) {
+                    timeChanged = true;
+                    lastTimestamp = timestamp;
                 }
 
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
+                if (timeChanged) {
+                    viewport.getCamera().timeChanged(lastTimestamp);
+                    for (final TimeListener listener : timeListeners) {
+                        listener.timeChanged(lastTimestamp);
+                    }
+                    ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
+                }
             }
             view.getImageLayer().setImageData(imageData);
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+
+            if (timeChanged)
+                ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+
             display();
         }
 
