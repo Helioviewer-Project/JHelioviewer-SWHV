@@ -10,7 +10,7 @@ import org.helioviewer.jhv.plugins.eveplugin.base.Range;
  * @author Bram.Bourgoignie@oma.be
  */
 
-public class YAxisElement {
+public class YAxisElement extends AbstractValueSpace {
     public enum YAxisLocation {
         LEFT, RIGHT;
     }
@@ -21,11 +21,17 @@ public class YAxisElement {
     private Range availableRange;
     /** The label of the y-axis */
     private String label;
+    /** The scaled selected range */
+    private Range scaledSelectedRange;
+    /** The scaled available range */
+    private Range scaledAvailableRange;
+
     /** The minimum value of the y-axis */
     private double minValue;
     /** The maximum value o the y-axis */
     private double maxValue;
     /**  */
+
     private Color color;
 
     private boolean isLogScale;
@@ -52,22 +58,14 @@ public class YAxisElement {
     public YAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color, boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
+        scaledSelectedRange = new Range(0, 1);
+        scaledAvailableRange = new Range(0, 1);
         this.label = label;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.color = color;
         this.isLogScale = isLogScale;
         checkMinMax();
-    }
-
-    private void checkMinMax() {
-        if (minValue == 0.0 && maxValue == 0.0) {
-            minValue = -1.0;
-            maxValue = 1.0;
-        } else if (minValue == maxValue) {
-            minValue = minValue - minValue / 10;
-            maxValue = maxValue + maxValue / 10;
-        }
     }
 
     /**
@@ -84,6 +82,18 @@ public class YAxisElement {
         maxValue = 0.0;
         color = Color.BLACK;
         isLogScale = true;
+        scaledSelectedRange = new Range(0, 1);
+        scaledAvailableRange = new Range(0, 1);
+    }
+
+    private void checkMinMax() {
+        if (minValue == 0.0 && maxValue == 0.0) {
+            minValue = -1.0;
+            maxValue = 1.0;
+        } else if (minValue == maxValue) {
+            minValue = minValue - minValue / 10;
+            maxValue = maxValue + maxValue / 10;
+        }
     }
 
     /**
@@ -103,6 +113,22 @@ public class YAxisElement {
      */
     public void setSelectedRange(Range selectedRange) {
         this.selectedRange = selectedRange;
+        adaptScaledSelectedRange();
+    }
+
+    private void adaptScaledSelectedRange() {
+        double diffAvailable = availableRange.max - availableRange.min;
+        double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
+
+        double ratio = diffScaledAvailable / diffAvailable;
+
+        double diffSelStartAvaiStart = selectedRange.min - availableRange.min;
+        double diffSelEndAvailStart = selectedRange.max - availableRange.min;
+
+        double scaledSelectedStart = scaledAvailableRange.min + ratio * diffSelStartAvaiStart;
+        double scaledSelectedEnd = scaledAvailableRange.min + ratio * diffSelEndAvailStart;
+
+        scaledSelectedRange = new Range(scaledSelectedStart, scaledSelectedEnd);
     }
 
     /**
@@ -120,8 +146,42 @@ public class YAxisElement {
      * @param availableRange
      *            The available range
      */
-    public void setAvailableRange(Range availableRange) {
-        this.availableRange = availableRange;
+    public void setAvailableRange(Range newAvailableRange) {
+        Range dummyRange = new Range();
+        if (availableRange.min != dummyRange.min && availableRange.max != dummyRange.max) {
+            if (availableRange.min != newAvailableRange.min || availableRange.max != newAvailableRange.max) {
+                availableRange = new Range(newAvailableRange);
+                checkSelectedRange();
+                adaptScaledAvailableRange();
+            }
+        } else {
+            availableRange = new Range(newAvailableRange);
+            selectedRange = new Range(newAvailableRange);
+            scaledAvailableRange = new Range(0, 1);
+            scaledSelectedRange = new Range(0, 1);
+        }
+    }
+
+    private void checkSelectedRange() {
+        if (selectedRange.min < availableRange.min || selectedRange.max > availableRange.max || selectedRange.min > selectedRange.max) {
+            selectedRange = new Range(availableRange);
+        }
+    }
+
+    private void adaptScaledAvailableRange() {
+        double diffSelectedRange = selectedRange.max - selectedRange.min;
+        double diffScaledSelectedRange = scaledSelectedRange.max - scaledSelectedRange.min;
+
+        double ratio = diffScaledSelectedRange / diffSelectedRange;
+
+        double diffSelStartAvailStart = selectedRange.min - availableRange.min;
+        double diffSelEndAvailEnd = availableRange.max - selectedRange.max;
+
+        double scaledAvailableStart = scaledSelectedRange.min - diffSelStartAvailStart * ratio;
+        double scaledAvailableEnd = scaledSelectedRange.max + diffSelEndAvailEnd * ratio;
+
+        scaledAvailableRange = new Range(scaledAvailableStart, scaledAvailableEnd);
+
     }
 
     /**
@@ -155,7 +215,7 @@ public class YAxisElement {
      * @return The minimum value
      */
     public double getMinValue() {
-        return minValue;
+        return selectedRange.min;
     }
 
     /**
@@ -174,7 +234,7 @@ public class YAxisElement {
      * @return The maximum value
      */
     public double getMaxValue() {
-        return maxValue;
+        return selectedRange.max;
     }
 
     /**
@@ -210,26 +270,11 @@ public class YAxisElement {
      * Sets the available range, selected range, label minimum value, maximum
      * value and color of the y-axis element.
      *
-     * @param availableRange
-     *            The available range
-     * @param selectedRange
-     *            The selected range
      * @param label
      *            The label
-     * @param minValue
-     *            The minimum value
-     * @param maxValue
-     *            The maximum value
-     * @param color
-     *            The color
      */
-    public void set(Range availableRange, Range selectedRange, String label, double minValue, double maxValue, Color color, boolean isLogScale) {
-        this.availableRange = availableRange;
-        this.selectedRange = selectedRange;
+    public void set(String label, boolean isLogScale) {
         this.label = label;
-        this.maxValue = maxValue;
-        this.minValue = minValue;
-        this.color = color;
         this.isLogScale = isLogScale;
         checkMinMax();
     }
@@ -249,5 +294,47 @@ public class YAxisElement {
 
     public void setLocation(YAxisLocation location) {
         this.location = location;
+    }
+
+    @Override
+    public Range getScaledSelectedRange() {
+        return scaledSelectedRange;
+    }
+
+    @Override
+    public Range getScaledAvailableRange() {
+        return scaledAvailableRange;
+    }
+
+    @Override
+    public void setScaledSelectedRange(Range newScaledSelectedRange) {
+        double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
+        double diffAvail = availableRange.max - availableRange.min;
+
+        double ratio = diffAvail / diffScaledAvailable;
+
+        double diffScSelStartScAvaiStart = newScaledSelectedRange.min - scaledAvailableRange.min;
+        double diffscSelEndScAvailStart = newScaledSelectedRange.max - scaledAvailableRange.min;
+
+        double selectedStart = availableRange.min + diffScSelStartScAvaiStart * ratio;
+        double selectedEnd = availableRange.min + diffscSelEndScAvailStart * ratio;
+
+        selectedRange = new Range(selectedStart, selectedEnd);
+        scaledSelectedRange = new Range(newScaledSelectedRange);
+
+        fireSelectedRangeChanged();
+    }
+
+    private void fireSelectedRangeChanged() {
+        for (ValueSpaceListener vsl : listeners) {
+            vsl.valueSpaceChanged(availableRange, selectedRange);
+        }
+    }
+
+    public void reset() {
+        availableRange = new Range();
+        selectedRange = new Range();
+        scaledAvailableRange = new Range(0, 1);
+        scaledSelectedRange = new Range(0, 1);
     }
 }
