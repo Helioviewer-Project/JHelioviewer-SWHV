@@ -29,8 +29,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableGrid implements Renderable {
 
     private static final int SUBDIVISIONS = 120;
-    private float lonstepDegrees = 13.2f;
-    private float latstepDegrees = 20.f;
+    private float lonstepDegrees = 15f;
+    private float latstepDegrees = 20f;
     private final Color firstColor = Color.RED;
     private final Color secondColor = Color.GREEN;
 
