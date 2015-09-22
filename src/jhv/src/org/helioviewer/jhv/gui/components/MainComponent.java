@@ -64,7 +64,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         // GUI events can lead to context destruction and invalidation of GL objects and state
         setSharedAutoDrawable(sharedDrawable);
-        setMinimumSize(new Dimension());
         setAutoSwapBufferMode(false);
 
         addGLEventListener(this);
