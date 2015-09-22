@@ -56,10 +56,14 @@ public class JHVLoader {
             kduLibs.add("kdu_jni.dll");
             pathlib = "windows-i586/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-64")) {
-            kduLibs.add("libkdu_jni-linux-x86-64-glibc-2-7.so");
+            kduLibs.add("libkdu_v77R.so");
+            kduLibs.add("libkdu_a77R.so");
+            kduLibs.add("libkdu_jni.so");
             pathlib = "linux-amd64/";
         } else if (System.getProperty("jhv.os").equals("linux") && System.getProperty("jhv.arch").equals("x86-32")) {
-            kduLibs.add("libkdu_jni-linux-x86-32-glibc-2-7.so");
+            kduLibs.add("libkdu_v77R.so");
+            kduLibs.add("libkdu_a77R.so");
+            kduLibs.add("libkdu_jni.so");
             pathlib = "linux-i586/";
         }
 
