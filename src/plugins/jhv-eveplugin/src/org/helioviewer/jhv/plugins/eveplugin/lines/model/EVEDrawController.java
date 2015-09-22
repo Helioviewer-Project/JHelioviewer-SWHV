@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.model;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +16,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandController;
@@ -29,17 +29,21 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, TimingListener, EVECacheControllerListener, PlotAreaSpaceListener {
+public class EVEDrawController implements BandControllerListener, TimingListener, EVECacheControllerListener, PlotAreaSpaceListener, ValueSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
     // //////////////////////////////////////////////////////////////////////////////
 
     private final Map<YAxisElement, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<YAxisElement, Map<Band, EVEValues>>();
-    private final Map<YAxisElement, Range> selectedRangeMap = new HashMap<YAxisElement, Range>();
-    private final Map<YAxisElement, Range> availableRangeMap = new HashMap<YAxisElement, Range>();
-    private final Map<YAxisElement, Range> scaledSelectedRangeMap = new HashMap<YAxisElement, Range>();
-    private final Map<YAxisElement, Range> scaledAvailableRangeMap = new HashMap<YAxisElement, Range>();
+    // private final Map<YAxisElement, Range> selectedRangeMap = new
+    // HashMap<YAxisElement, Range>();
+    // private final Map<YAxisElement, Range> availableRangeMap = new
+    // HashMap<YAxisElement, Range>();
+    // private final Map<YAxisElement, Range> scaledSelectedRangeMap = new
+    // HashMap<YAxisElement, Range>();
+    // private final Map<YAxisElement, Range> scaledAvailableRangeMap = new
+    // HashMap<YAxisElement, Range>();
     private final DrawController drawController;
 
     private final Map<YAxisElement, EVEDrawableElement> eveDrawableElementMap;
@@ -79,8 +83,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         YAxisElement yAxisElement = drawController.getYAxisElementForUnit(band.getUnitLabel());
         if (yAxisElement == null && drawController.hasAxisAvailable()) {
             yAxisElement = new YAxisElement();
+            yAxisElement.addValueSpaceListener(this);
         }
         if (yAxisElement != null) {
+            plotAreaSpace.addValueSpace(yAxisElement);
             yAxisElementMap.put(band, yAxisElement);
             addToBandsPerYAxis(yAxisElement, band);
             EVEValues data = retrieveData(band, interval, plotArea);
@@ -114,12 +120,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 bands.remove(band);
                 if (bands.isEmpty()) {
                     EVEDrawableElement removed = eveDrawableElementMap.remove(yAxisElement);
-                    availableRangeMap.remove(yAxisElement);
-                    selectedRangeMap.remove(yAxisElement);
-                    scaledAvailableRangeMap.remove(yAxisElement);
-                    scaledSelectedRangeMap.remove(yAxisElement);
+                    // availableRangeMap.remove(yAxisElement);
+                    // selectedRangeMap.remove(yAxisElement);
+                    // scaledAvailableRangeMap.remove(yAxisElement);
+                    // scaledSelectedRangeMap.remove(yAxisElement);
                     yAxisElementMap.remove(band);
                     bandsPerYAxis.remove(yAxisElement);
+                    plotAreaSpace.removeValueSpace(yAxisElement);
                     drawController.removeDrawableElement(removed);
                 }
                 resetAvailableRange();
@@ -135,40 +142,34 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         EVEValues data = retrieveData(band, interval, plotArea);
         boolean isLog = band.getBandType().isLogScale();
         YAxisElement yAxisElement = yAxisElementMap.get(band);
-        if (!availableRangeMap.containsKey(yAxisElement)) {
-            availableRangeMap.put(yAxisElement, new Range());
-            selectedRangeMap.put(yAxisElement, new Range());
-            scaledSelectedRangeMap.put(yAxisElement, new Range(0.0, 1.0));
-            scaledAvailableRangeMap.put(yAxisElement, new Range(0.0, 1.0));
+        if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
+            // availableRangeMap.put(yAxisElement, new Range());
+            // selectedRangeMap.put(yAxisElement, new Range());
+            // scaledSelectedRangeMap.put(yAxisElement, new Range(0.0, 1.0));
+            // scaledAvailableRangeMap.put(yAxisElement, new Range(0.0, 1.0));
             dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
         }
-        Range oldAvailableRange = new Range(availableRangeMap.get(yAxisElement));
+        Range newAvailableRange = new Range(yAxisElement.getAvailableRange());
         for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
             if (v != null) {
-                availableRangeMap.get(yAxisElement).setMin(v.getMinimumValue());
-                availableRangeMap.get(yAxisElement).setMax(v.getMaximumValue());
+                newAvailableRange.setMin(v.getMinimumValue());
+                newAvailableRange.setMax(v.getMaximumValue());
             }
         }
-        availableRangeMap.get(yAxisElement).setMin(data.getMinimumValue());
-        availableRangeMap.get(yAxisElement).setMax(data.getMaximumValue());
-        double avMin = availableRangeMap.get(yAxisElement).min;
-        double avMax = availableRangeMap.get(yAxisElement).max;
+        newAvailableRange.setMin(data.getMinimumValue());
+        newAvailableRange.setMax(data.getMaximumValue());
+        double avMin = newAvailableRange.min;
+        double avMax = newAvailableRange.max;
         if (avMin == avMax) {
             if (avMin == 0) {
-                availableRangeMap.get(yAxisElement).setMin(-1.0);
-                availableRangeMap.get(yAxisElement).setMax(1.0);
+                yAxisElement.getAvailableRange().setMin(-1.0);
+                yAxisElement.getAvailableRange().setMax(1.0);
             } else {
-                availableRangeMap.get(yAxisElement).setMin(avMin - avMin / 10);
-                availableRangeMap.get(yAxisElement).setMax(avMax + avMax / 10);
+                yAxisElement.getAvailableRange().setMin(avMin - avMin / 10);
+                yAxisElement.getAvailableRange().setMax(avMax + avMax / 10);
             }
         }
-        if (oldAvailableRange.min != availableRangeMap.get(yAxisElement).min || oldAvailableRange.max != availableRangeMap.get(yAxisElement).max) {
-            // Log.trace("update band available range changed so we change the plotareaSpace");
-            checkSelectedRange(availableRangeMap.get(yAxisElement), selectedRangeMap.get(yAxisElement), scaledAvailableRangeMap.get(yAxisElement), scaledSelectedRangeMap.get(yAxisElement));
-            updateScaledValues(yAxisElement, availableRangeMap.get(yAxisElement), selectedRangeMap.get(yAxisElement), keepFullValueRange, isLog);
-        } else {
-            // Log.trace("Same available range");
-        }
+        yAxisElement.setAvailableRange(newAvailableRange);
         dataMapPerUnitLabel.get(yAxisElement).put(band, data);
         Log.debug("<<<<< Update band end >>>>>  ");
         Log.debug("");
@@ -182,15 +183,18 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    public void setSelectedRange(final Range newSelectedRange, YAxisElement yAxisElement) {
-        Log.debug("set selected range");
-        Log.debug("old selected range : [" + Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " + Math.log10(selectedRangeMap.get(yAxisElement).max) + "]");
-        Log.debug("new selected range : [" + Math.log10(newSelectedRange.min) + " , " + Math.log10(newSelectedRange.max) + "]");
-        // Thread.dumpStack();
-        selectedRangeMap.put(yAxisElement, new Range(newSelectedRange));
-        drawController.setSelectedRange(newSelectedRange);
-        fireRedrawRequest(false);
-    }
+    /*
+     * public void setSelectedRange(final Range newSelectedRange, YAxisElement
+     * yAxisElement) { Log.debug("set selected range");
+     * Log.debug("old selected range : [" +
+     * Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " +
+     * Math.log10(selectedRangeMap.get(yAxisElement).max) + "]");
+     * Log.debug("new selected range : [" + Math.log10(newSelectedRange.min) +
+     * " , " + Math.log10(newSelectedRange.max) + "]"); // Thread.dumpStack();
+     * selectedRangeMap.put(yAxisElement, new Range(newSelectedRange));
+     * drawController.setSelectedRange(newSelectedRange);
+     * fireRedrawRequest(false); }
+     */
 
     public void setSelectedRangeMaximal() {
         fireRedrawRequest(true);
@@ -210,41 +214,49 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 isLog = bands[0].getBandType().isLogScale();
             }
 
-            if (!availableRangeMap.containsKey(yAxisElement)) {
-                availableRangeMap.put(yAxisElement, new Range());
-                selectedRangeMap.put(yAxisElement, new Range());
-                scaledAvailableRangeMap.put(yAxisElement, new Range(0.0, 1.0));
-                scaledSelectedRangeMap.put(yAxisElement, new Range(0.0, 1.0));
+            if (!eveDrawableElementMap.containsKey(yAxisElement)) {
+                // availableRangeMap.put(yAxisElement, new Range());
+                // selectedRangeMap.put(yAxisElement, new Range());
+                // scaledAvailableRangeMap.put(yAxisElement, new Range(0.0,
+                // 1.0));
+                // scaledSelectedRangeMap.put(yAxisElement, new Range(0.0,
+                // 1.0));
                 eveDrawableElementMap.put(yAxisElement, new EVEDrawableElement());
             }
 
-            Range oldAvailableRange = new Range(availableRangeMap.get(yAxisElement));
+            Range newAvailableRange = new Range(yAxisElement.getAvailableRange());
 
             for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
                 if (v != null) {
-                    availableRangeMap.get(yAxisElement).setMin(v.getMinimumValue());
-                    availableRangeMap.get(yAxisElement).setMax(v.getMaximumValue());
+                    newAvailableRange.setMin(v.getMinimumValue());
+                    newAvailableRange.setMax(v.getMaximumValue());
                     values.add(v);
                 }
             }
-
+            yAxisElement.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
-                selectedRangeMap.put(yAxisElement, new Range());
-                Range availableRange = scaledAvailableRangeMap.get(yAxisElement);
-                Log.debug("Set scaled selected range to " + availableRange);
-                // Thread.dumpStack();
-                scaledSelectedRangeMap.put(yAxisElement, new Range(availableRange.min, availableRange.max));
+                yAxisElement.setSelectedRange(new Range(newAvailableRange));
             }
-            checkSelectedRange(availableRangeMap.get(yAxisElement), selectedRangeMap.get(yAxisElement), scaledAvailableRangeMap.get(yAxisElement), scaledSelectedRangeMap.get(yAxisElement));
-            if (oldAvailableRange.min != availableRangeMap.get(yAxisElement).min || oldAvailableRange.max != availableRangeMap.get(yAxisElement).max) {
-                Log.error("Available range changed in redraw request. So update plotAreaSpace");
-                Log.error("old range : " + oldAvailableRange.toString());
-                Log.error("new available range : " + availableRangeMap.get(yAxisElement).toString());
-                updateScaledValues(yAxisElement, availableRangeMap.get(yAxisElement), selectedRangeMap.get(yAxisElement), false, isLog);
+            // checkSelectedRange(availableRangeMap.get(yAxisElement),
+            // selectedRangeMap.get(yAxisElement),
+            // scaledAvailableRangeMap.get(yAxisElement),
+            // scaledSelectedRangeMap.get(yAxisElement));
+            /*
+             * if (oldAvailableRange.min !=
+             * availableRangeMap.get(yAxisElement).min || oldAvailableRange.max
+             * != availableRangeMap.get(yAxisElement).max) { Log.error(
+             * "Available range changed in redraw request. So update plotAreaSpace"
+             * ); Log.error("old range : " + oldAvailableRange.toString());
+             * Log.error("new available range : " +
+             * availableRangeMap.get(yAxisElement).toString());
+             * updateScaledValues(yAxisElement,
+             * availableRangeMap.get(yAxisElement),
+             * selectedRangeMap.get(yAxisElement), false, isLog);
+             *
+             * }
+             */
 
-            }
-
-            yAxisElement.set(selectedRangeMap.get(yAxisElement), availableRangeMap.get(yAxisElement), unitLabel, selectedRangeMap.get(yAxisElement).min, selectedRangeMap.get(yAxisElement).max, Color.PINK, isLog);
+            yAxisElement.set(unitLabel, isLog);
             eveDrawableElementMap.get(yAxisElement).set(interval, bands, yAxisElement);
             if (bands.length > 0) {
                 drawController.updateDrawableElement(eveDrawableElementMap.get(yAxisElement));
@@ -257,89 +269,122 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         Log.debug("");
     }
 
-    private void updateScaledValues(YAxisElement yAxisElement, Range availableRange, Range selectedRange, boolean keepFullValueSpace, boolean isLog) {
-        Range scaledAvailable = scaledAvailableRangeMap.get(yAxisElement);
-        Range scaledSelected = scaledSelectedRangeMap.get(yAxisElement);
-        Range oldScaledAvailable = new Range(scaledAvailable);
-        Range oldScaledSelected = new Range(scaledSelected);
-        if (!keepFullValueSpace) {
-            double diffSelected = 0;
-            if (isLog) {
-                diffSelected = Math.log10(selectedRange.max) - Math.log10(selectedRange.min);
-            } else {
-                diffSelected = selectedRange.max - selectedRange.min;
-            }
-            double diffScaledSelected = scaledSelected.max - scaledSelected.min;
-            double ratio = diffScaledSelected / diffSelected;
-            double diffSelMaxAvaiMax = 0;
-            if (isLog) {
-                diffSelMaxAvaiMax = Math.log10(availableRange.max) - Math.log10(selectedRange.max);
-            } else {
-                diffSelMaxAvaiMax = availableRange.max - selectedRange.max;
-            }
-            double diffSelMinAvaiMin = 0;
-            if (isLog) {
-                diffSelMinAvaiMin = Math.log10(selectedRange.min) - Math.log10(availableRange.min);
-            } else {
-                diffSelMinAvaiMin = selectedRange.min - availableRange.min;
-            }
-            scaledAvailable.min = scaledSelected.min - diffSelMinAvaiMin * ratio;
-            scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio;
+    /*
+     * private void updateScaledValues(YAxisElement yAxisElement, Range
+     * availableRange, Range selectedRange, boolean keepFullValueSpace, boolean
+     * isLog) { Range scaledAvailable =
+     * scaledAvailableRangeMap.get(yAxisElement); Range scaledSelected =
+     * scaledSelectedRangeMap.get(yAxisElement); Range oldScaledAvailable = new
+     * Range(scaledAvailable); Range oldScaledSelected = new
+     * Range(scaledSelected); if (!keepFullValueSpace) { double diffSelected =
+     * 0; if (isLog) { diffSelected = Math.log10(selectedRange.max) -
+     * Math.log10(selectedRange.min); } else { diffSelected = selectedRange.max
+     * - selectedRange.min; } double diffScaledSelected = scaledSelected.max -
+     * scaledSelected.min; double ratio = diffScaledSelected / diffSelected;
+     * double diffSelMaxAvaiMax = 0; if (isLog) { diffSelMaxAvaiMax =
+     * Math.log10(availableRange.max) - Math.log10(selectedRange.max); } else {
+     * diffSelMaxAvaiMax = availableRange.max - selectedRange.max; } double
+     * diffSelMinAvaiMin = 0; if (isLog) { diffSelMinAvaiMin =
+     * Math.log10(selectedRange.min) - Math.log10(availableRange.min); } else {
+     * diffSelMinAvaiMin = selectedRange.min - availableRange.min; }
+     * scaledAvailable.min = scaledSelected.min - diffSelMinAvaiMin * ratio;
+     * scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio;
+     * 
+     * Log.debug("//////////////////////////////////");
+     * Log.debug("old scaled available: " + oldScaledAvailable);
+     * Log.debug("old scaled selected: " + oldScaledSelected);
+     * Log.debug("Available range:(log10) [" +
+     * Math.log10(availableRangeMap.get(yAxisElement).min) + " , " +
+     * Math.log10(availableRangeMap.get(yAxisElement).max) + "]; (normal) [" +
+     * availableRangeMap.get(yAxisElement).min + ", " +
+     * availableRangeMap.get(yAxisElement).max + "]");
+     * Log.debug("Selected range: (log10) [" +
+     * Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " +
+     * Math.log10(selectedRangeMap.get(yAxisElement).max) + "]; (normal) [" +
+     * selectedRangeMap.get(yAxisElement).min + ", " +
+     * selectedRangeMap.get(yAxisElement).max + "]");
+     * Log.debug("New Available range:(log10) [" +
+     * Math.log10(availableRange.min) + " , " + Math.log10(availableRange.max) +
+     * "]; (normal) [" + availableRange.min + ", " + availableRange.max + "]");
+     * Log.debug("New Selected range: (log10) [" + Math.log10(selectedRange.min)
+     * + " , " + Math.log10(selectedRange.max) + "]; (normal) [" +
+     * selectedRange.min + ", " + selectedRange.max + "]"); Log.debug(
+     * "diffSelected = Math.log10(selectedRange.max) - Math.log10(selectedRange.min)   =>   "
+     * + Math.log10(selectedRange.max) + " - " + Math.log10(selectedRange.min) +
+     * " = " + diffSelected); Log.debug(
+     * "diffScaledSelected = scaledSelected.max - scaledSelected.min   =>   " +
+     * scaledSelected.max + " - " + scaledSelected.min + " = " +
+     * diffScaledSelected);
+     * Log.debug("ratio = diffScaledSelected / diffSelected   =>   " +
+     * diffScaledSelected + " / " + diffSelected + " = " + ratio);
+     * Log.debug("-------- MIN ----------"); Log.debug(
+     * "diffSelMinAvaiMin = log10(selectedRange.min) - log10(availableRange.min)   =>   "
+     * + Math.log10(availableRange.min) + " - " + Math.log10(selectedRange.min)
+     * + " = " + diffSelMinAvaiMin); Log.debug(
+     * "scaledAvailable.min = scaledSelected.min - diffSelMinAvaiMin * ratio   =>   "
+     * + scaledSelected.min + " - " + diffSelMinAvaiMin + " * " + ratio + " = "
+     * + scaledAvailable.min); Log.debug("-------- MAX ----------"); Log.debug(
+     * "diffSelMaxAvaiMax = availableRange.max - selectedRange.max   =>   " +
+     * Math.log10(availableRange.max) + " - " + Math.log10(selectedRange.max) +
+     * " = " + diffSelMaxAvaiMax); Log.debug(
+     * "scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio   =>   "
+     * + scaledSelected.max + "+" + diffSelMaxAvaiMax + " * " + ratio + " = " +
+     * scaledAvailable.max); Log.debug("//////////////////////////////////");
+     * 
+     * } else { //
+     * plotAreaSpace.setScaledSelectedValue(plotAreaSpace.getScaledMinValue(),
+     * // plotAreaSpace.getScaledMaxValue(), true); scaledSelected.min =
+     * scaledAvailable.min; scaledSelected.max = scaledAvailable.max; } }
+     */
 
-            Log.debug("//////////////////////////////////");
-            Log.debug("old scaled available: " + oldScaledAvailable);
-            Log.debug("old scaled selected: " + oldScaledSelected);
-            Log.debug("Available range:(log10) [" + Math.log10(availableRangeMap.get(yAxisElement).min) + " , " + Math.log10(availableRangeMap.get(yAxisElement).max) + "]; (normal) [" + availableRangeMap.get(yAxisElement).min + ", " + availableRangeMap.get(yAxisElement).max + "]");
-            Log.debug("Selected range: (log10) [" + Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " + Math.log10(selectedRangeMap.get(yAxisElement).max) + "]; (normal) [" + selectedRangeMap.get(yAxisElement).min + ", " + selectedRangeMap.get(yAxisElement).max + "]");
-            Log.debug("New Available range:(log10) [" + Math.log10(availableRange.min) + " , " + Math.log10(availableRange.max) + "]; (normal) [" + availableRange.min + ", " + availableRange.max + "]");
-            Log.debug("New Selected range: (log10) [" + Math.log10(selectedRange.min) + " , " + Math.log10(selectedRange.max) + "]; (normal) [" + selectedRange.min + ", " + selectedRange.max + "]");
-            Log.debug("diffSelected = Math.log10(selectedRange.max) - Math.log10(selectedRange.min)   =>   " + Math.log10(selectedRange.max) + " - " + Math.log10(selectedRange.min) + " = " + diffSelected);
-            Log.debug("diffScaledSelected = scaledSelected.max - scaledSelected.min   =>   " + scaledSelected.max + " - " + scaledSelected.min + " = " + diffScaledSelected);
-            Log.debug("ratio = diffScaledSelected / diffSelected   =>   " + diffScaledSelected + " / " + diffSelected + " = " + ratio);
-            Log.debug("-------- MIN ----------");
-            Log.debug("diffSelMinAvaiMin = log10(selectedRange.min) - log10(availableRange.min)   =>   " + Math.log10(availableRange.min) + " - " + Math.log10(selectedRange.min) + " = " + diffSelMinAvaiMin);
-            Log.debug("scaledAvailable.min = scaledSelected.min - diffSelMinAvaiMin * ratio   =>   " + scaledSelected.min + " - " + diffSelMinAvaiMin + " * " + ratio + " = " + scaledAvailable.min);
-            Log.debug("-------- MAX ----------");
-            Log.debug("diffSelMaxAvaiMax = availableRange.max - selectedRange.max   =>   " + Math.log10(availableRange.max) + " - " + Math.log10(selectedRange.max) + " = " + diffSelMaxAvaiMax);
-            Log.debug("scaledAvailable.max = scaledSelected.max + diffSelMaxAvaiMax * ratio   =>   " + scaledSelected.max + "+" + diffSelMaxAvaiMax + " * " + ratio + " = " + scaledAvailable.max);
-            Log.debug("//////////////////////////////////");
-
-        } else {
-            // plotAreaSpace.setScaledSelectedValue(plotAreaSpace.getScaledMinValue(),
-            // plotAreaSpace.getScaledMaxValue(), true);
-            scaledSelected.min = scaledAvailable.min;
-            scaledSelected.max = scaledAvailable.max;
-        }
-    }
-
-    private void checkSelectedRange(final Range availableRange, final Range selectedRange, final Range scaledAvailable, final Range scaledSelected) {
-        if (selectedRange.min > availableRange.max || selectedRange.max < availableRange.min) {
-            Log.debug("Check selected range 1 before. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-            // Thread.dumpStack();
-            selectedRange.min = availableRange.min;
-            selectedRange.max = availableRange.max;
-            scaledSelected.min = scaledAvailable.min;
-            scaledSelected.max = scaledAvailable.max;
-            Log.debug("Check selected range 1 after. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-            return;
-        }
-
-        if (selectedRange.min < availableRange.min) {
-            Log.debug("Check selected range 2 before. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-            // Thread.dumpStack();
-            selectedRange.min = availableRange.min;
-            scaledSelected.min = scaledAvailable.min;
-            Log.debug("Check selected range 2 after. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-        }
-
-        if (selectedRange.max > availableRange.max) {
-            Log.debug("Check selected range 3 before. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-            // Thread.dumpStack();
-            selectedRange.max = availableRange.max;
-            scaledSelected.max = scaledAvailable.max;
-            Log.debug("Check selected range 3 after. available range: [" + Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) + "] , selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] scaled selected range: " + scaledSelected + " scaled available range: " + scaledAvailable);
-        }
-    }
+    /*
+     * private void checkSelectedRange(final Range availableRange, final Range
+     * selectedRange, final Range scaledAvailable, final Range scaledSelected) {
+     * if (selectedRange.min > availableRange.max || selectedRange.max <
+     * availableRange.min) {
+     * Log.debug("Check selected range 1 before. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); //
+     * Thread.dumpStack(); selectedRange.min = availableRange.min;
+     * selectedRange.max = availableRange.max; scaledSelected.min =
+     * scaledAvailable.min; scaledSelected.max = scaledAvailable.max;
+     * Log.debug("Check selected range 1 after. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); return;
+     * }
+     * 
+     * if (selectedRange.min < availableRange.min) {
+     * Log.debug("Check selected range 2 before. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); //
+     * Thread.dumpStack(); selectedRange.min = availableRange.min;
+     * scaledSelected.min = scaledAvailable.min;
+     * Log.debug("Check selected range 2 after. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); }
+     * 
+     * if (selectedRange.max > availableRange.max) {
+     * Log.debug("Check selected range 3 before. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); //
+     * Thread.dumpStack(); selectedRange.max = availableRange.max;
+     * scaledSelected.max = scaledAvailable.max;
+     * Log.debug("Check selected range 3 after. available range: [" +
+     * Math.log10(availableRange.min) + ", " + Math.log10(availableRange.max) +
+     * "] , selected range: [" + Math.log10(selectedRange.min) + ", " +
+     * Math.log10(selectedRange.max) + "] scaled selected range: " +
+     * scaledSelected + " scaled available range: " + scaledAvailable); } }
+     */
 
     private final EVEValues retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
         return EVECacheController.getSingletonInstance().downloadData(band, interval, plotArea);
@@ -419,124 +464,162 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         Log.debug("<<<<< Plot area changed start >>>>>  ");
-        for (YAxisElement yAxisElement : bandsPerYAxis.keySet()) {
-            double diffPAAvai = scaledMaxValue - scaledMinValue;
-            double diffLoScAvai = scaledAvailableRangeMap.get(yAxisElement).max - scaledAvailableRangeMap.get(yAxisElement).min;
-            // Local scaled selected start
-            double diffPASelSAvaiS = scaledSelectedMinValue - scaledMinValue;
-            double scLoSelS = diffPASelSAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min;
-            // Local scaled selected end
-            double diffPASelEAvaiS = scaledSelectedMaxValue - scaledMinValue;
-            double scLoSelE = diffPASelEAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min;
-
-            double diffLoAvai = Math.log10(availableRangeMap.get(yAxisElement).max) - Math.log10(availableRangeMap.get(yAxisElement).min);
-            // Local selected start
-            double diffLoScSelSScAS = scLoSelS - scaledSelectedRangeMap.get(yAxisElement).min;
-            double localSelectedStart = Math.pow(10, diffLoScSelSScAS / diffLoScAvai * diffLoAvai + Math.log10(availableRangeMap.get(yAxisElement).min));
-            // Local selected end
-            double diffLoScSelEScAs = scLoSelE - scaledSelectedRangeMap.get(yAxisElement).min;
-            double localSelectedEnd = Math.pow(10, diffLoScSelEScAs / diffLoScAvai * diffLoAvai + Math.log10(availableRangeMap.get(yAxisElement).min));
-            if (localSelectedStart != selectedRangeMap.get(yAxisElement).min || localSelectedEnd != selectedRangeMap.get(yAxisElement).max) {
-                Log.debug("----------------------------------------");
-                Log.debug("Available range:(log10) [" + Math.log10(availableRangeMap.get(yAxisElement).min) + " , " + Math.log10(availableRangeMap.get(yAxisElement).max) + "]; (normal) [" + availableRangeMap.get(yAxisElement).min + ", " + availableRangeMap.get(yAxisElement).max + "]");
-                Log.debug("Selected range: (log10) [" + Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " + Math.log10(selectedRangeMap.get(yAxisElement).max) + "]; (normal) [" + selectedRangeMap.get(yAxisElement).min + ", " + selectedRangeMap.get(yAxisElement).max + "]");
-                Log.debug("diffPAAvai = scaledMaxValue - scaledMinValue   =>   " + scaledMaxValue + " - " + scaledMinValue + " = " + diffPAAvai);
-                Log.debug("diffLoScAvai = scaledAvailableRangeMap.get(yAxisElement).max - scaledAvailableRangeMap.get(yAxisElement).min   =>   " + scaledAvailableRangeMap.get(yAxisElement).max + " - " + scaledAvailableRangeMap.get(yAxisElement).min + " = " + diffLoScAvai);
-                Log.debug("--------- LOCAL SCALED SELECTED START ---------");
-                Log.debug("diffPASelSAvaiS = scaledSelectedMinValue - scaledMinValue   =>   " + scaledSelectedMinValue + " - " + scaledMinValue + " = " + diffPASelSAvaiS);
-                Log.debug("scLoSelS = diffPASelSAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min   =>   " + diffPASelSAvaiS + " / " + diffPAAvai + " * " + diffLoScAvai + " + " + scaledAvailableRangeMap.get(yAxisElement).min + " = " + scLoSelS);
-                Log.debug("--------- LOCAL SCALED SELECTED END ---------");
-                Log.debug("diffPASelEAvaiS = scaledSelectedMaxValue - scaledMinValue   =>   " + scaledSelectedMaxValue + " - " + scaledMinValue + " = " + diffPASelEAvaiS);
-                Log.debug("scLoSelE = diffPASelEAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min   =>   " + diffPASelEAvaiS + " / " + diffPAAvai + " * " + diffLoScAvai + " + " + scaledAvailableRangeMap.get(yAxisElement).min + " = " + scLoSelE);
-                Log.debug("diffLoAvai = log10(availableRangeMap.get(yAxisElement).max) - log10(availableRangeMap.get(yAxisElement).min)   =>   " + Math.log10(availableRangeMap.get(yAxisElement).max) + " - " + Math.log10(availableRangeMap.get(yAxisElement).min) + " = " + diffLoAvai);
-                Log.debug("--------- LOCAL SELECTED START ---------");
-                Log.debug("diffLoScSelSScAS = scLoSelS - scaledSelectedRangeMap.get(yAxisElement).min   =>   " + scLoSelS + " - " + scaledSelectedRangeMap.get(yAxisElement).min + " = " + diffLoScSelSScAS);
-                Log.debug("localSelectedStart = (diffLoScSelSScAS / diffLoScAvai * diffLoAvai + Math.log10(availableRangeMap.get(yAxisElement).min))^10   =>   (" + diffLoScSelSScAS + " / " + diffLoScAvai + " * " + diffLoAvai + " + " + Math.log10(availableRangeMap.get(yAxisElement).min) + ")^10 = " + localSelectedStart);
-                Log.debug("--------- LOCAL SELECTED END ---------");
-                Log.debug("diffLoScSelEScAs = scLoSelE - scaledSelectedRangeMap.get(yAxisElement).min   =>   " + scLoSelE + " - " + scaledSelectedRangeMap.get(yAxisElement).min + " = " + diffLoScSelEScAs);
-                Log.debug("localSelectedEnd = (diffLoScSelEScAs / diffLoScAvai * diffLoAvai + log10(availableRangeMap.get(yAxisElement).min))^10   =>   ( " + diffLoScSelEScAs + " / " + diffLoScAvai + " * " + diffLoAvai + " + " + Math.log10(availableRangeMap.get(yAxisElement).min) + ")^10 = " + localSelectedEnd);
-                Log.debug("new selected range: [ " + Math.log10(localSelectedStart) + ", " + Math.log10(localSelectedEnd) + " ]");
-                Log.debug("----------------------------------------");
-                setSelectedRange(new Range(localSelectedStart, localSelectedEnd), yAxisElement);
-            } else {
-                fireRedrawRequest(false);
-            }
-            /*
-             * double diffScaledAvailablePA = scaledMaxValue - scaledMinValue;
-             * double diffAvailable =
-             * Math.log10(availableRangeMap.get(yAxisElement).max) -
-             * Math.log10(availableRangeMap.get(yAxisElement).min); double
-             * diffScaledAvai = scaledAvailableRangeMap.get(yAxisElement).max -
-             * scaledAvailableRangeMap.get(yAxisElement).min; double
-             * diffSelectedStartPA = scaledSelectedMinValue - scaledMinValue;
-             * double diffSelectedEndPA = scaledSelectedMaxValue -
-             * scaledMinValue; double diffScaledSelectedStart =
-             * diffSelectedStartPA * diffScaledAvai / diffScaledAvailablePA;
-             * double diffScaledSelectedEnd = diffSelectedEndPA * diffScaledAvai
-             * / diffScaledAvailablePA; double selectedStart = Math.pow(10,
-             * Math.log10(availableRangeMap.get(yAxisElement).min) +
-             * diffScaledSelectedStart * diffAvailable); double selectedEnd =
-             * Math.pow(10, Math.log10(availableRangeMap.get(yAxisElement).min)
-             * + diffScaledSelectedEnd * diffAvailable); if (selectedStart !=
-             * selectedRangeMap.get(yAxisElement).min || selectedEnd !=
-             * selectedRangeMap.get(yAxisElement).max) {
-             * Log.debug("---------------------------------------");
-             * Log.debug("Available range: [" +
-             * Math.log10(availableRangeMap.get(yAxisElement).min) + " , " +
-             * Math.log10(availableRangeMap.get(yAxisElement).max) + "]");
-             * Log.debug("Selected range: [" +
-             * Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " +
-             * Math.log10(selectedRangeMap.get(yAxisElement).max) + "]");
-             * Log.debug
-             * ("diffScaledAvailablePA = scaledMaxValue - scaledMinValue   =>   "
-             * + scaledMaxValue + " - " + scaledMinValue + " = " +
-             * diffScaledAvailablePA); Log.debug(
-             * "diffScaledAvai = scaledAvailableRangeMap.max - scaledAvailableRangeMap.min   =>   "
-             * + scaledAvailableRangeMap.get(yAxisElement).max + " - " +
-             * scaledAvailableRangeMap.get(yAxisElement).min + " = " +
-             * diffScaledAvai); Log.debug(
-             * "diffAvailable = log10(availableRangeMap_max) - log10(availableRangeMap_min)   =>   "
-             * + Math.log10(availableRangeMap.get(yAxisElement).max) + " - " +
-             * Math.log10(availableRangeMap.get(yAxisElement).min) + " = " +
-             * diffAvailable); Log.debug("---- START ----"); Log.debug(
-             * "diffSelectedStartPA = scaledSelectedMinValue - scaledMinValue   =>   "
-             * + scaledSelectedMinValue + " - " + scaledMinValue + " = " +
-             * diffSelectedStartPA); Log.debug(
-             * "diffScaledSelectedStart = diffSelectedStartPA * diffScaledAvai / diffScaledAvailablePA   =>   "
-             * + diffSelectedStartPA + " * " + diffScaledAvai + " / " +
-             * diffScaledAvailablePA + " = " + diffScaledSelectedStart);
-             * Log.debug(
-             * "selecteStart = (log10( available_min ) + diffScaledSelectedStart * diffAvailable ) ^ 10   =>    ("
-             * + Math.log10(availableRangeMap.get(yAxisElement).min) + " + " +
-             * diffScaledSelectedStart + " * " + diffAvailable + ") ^ 10 = " +
-             * selectedStart); Log.debug("log10(selectedStart)   =>   " +
-             * Math.log10(selectedStart)); Log.debug("---- END ----");
-             * Log.debug(
-             * "diffSelectedEndPA = scaledSelectedMaxValue - scaledMinValue   =>   "
-             * + scaledSelectedMaxValue + " - " + scaledMinValue + " = " +
-             * diffSelectedEndPA); Log.debug(
-             * "diffScaledSelectedEnd = diffSelectedEndPA * diffScaledAvai / diffScaledAvailablePA   =>   "
-             * + diffSelectedEndPA + " * " + diffScaledAvai + "/" +
-             * diffScaledAvailablePA + " = " + diffScaledSelectedEnd);
-             * Log.debug(
-             * "selectedEnd = (log10(available_min) + diffScaledSelectedEnd * diffAvailable) ^ 10   =>   ("
-             * + Math.log10(availableRangeMap.get(yAxisElement).min) + " + " +
-             * diffScaledSelectedEnd + " * " + diffAvailable + ") ^ 10 = " +
-             * selectedEnd); Log.debug("log10(selectedEnd)   =>   " +
-             * Math.log10(selectedEnd));
-             * Log.debug("---------------------------------------");
-             * setSelectedRange(new Range(selectedStart, selectedEnd),
-             * yAxisElement); } else { fireRedrawRequest(false); }
-             */
-        }
+        /*
+         * for (YAxisElement yAxisElement : bandsPerYAxis.keySet()) { double
+         * diffPAAvai = scaledMaxValue - scaledMinValue; double diffLoScAvai =
+         * scaledAvailableRangeMap.get(yAxisElement).max -
+         * scaledAvailableRangeMap.get(yAxisElement).min; // Local scaled
+         * selected start double diffPASelSAvaiS = scaledSelectedMinValue -
+         * scaledMinValue; double scLoSelS = diffPASelSAvaiS / diffPAAvai *
+         * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min; //
+         * Local scaled selected end double diffPASelEAvaiS =
+         * scaledSelectedMaxValue - scaledMinValue; double scLoSelE =
+         * diffPASelEAvaiS / diffPAAvai * diffLoScAvai +
+         * scaledAvailableRangeMap.get(yAxisElement).min;
+         * 
+         * double diffLoAvai =
+         * Math.log10(availableRangeMap.get(yAxisElement).max) -
+         * Math.log10(availableRangeMap.get(yAxisElement).min); // Local
+         * selected start double diffLoScSelSScAS = scLoSelS -
+         * scaledSelectedRangeMap.get(yAxisElement).min; double
+         * localSelectedStart = Math.pow(10, diffLoScSelSScAS / diffLoScAvai *
+         * diffLoAvai + Math.log10(availableRangeMap.get(yAxisElement).min)); //
+         * Local selected end double diffLoScSelEScAs = scLoSelE -
+         * scaledSelectedRangeMap.get(yAxisElement).min; double localSelectedEnd
+         * = Math.pow(10, diffLoScSelEScAs / diffLoScAvai * diffLoAvai +
+         * Math.log10(availableRangeMap.get(yAxisElement).min)); if
+         * (localSelectedStart != selectedRangeMap.get(yAxisElement).min ||
+         * localSelectedEnd != selectedRangeMap.get(yAxisElement).max) {
+         * Log.debug("----------------------------------------");
+         * Log.debug("Available range:(log10) [" +
+         * Math.log10(availableRangeMap.get(yAxisElement).min) + " , " +
+         * Math.log10(availableRangeMap.get(yAxisElement).max) + "]; (normal) ["
+         * + availableRangeMap.get(yAxisElement).min + ", " +
+         * availableRangeMap.get(yAxisElement).max + "]");
+         * Log.debug("Selected range: (log10) [" +
+         * Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " +
+         * Math.log10(selectedRangeMap.get(yAxisElement).max) + "]; (normal) ["
+         * + selectedRangeMap.get(yAxisElement).min + ", " +
+         * selectedRangeMap.get(yAxisElement).max + "]");
+         * Log.debug("diffPAAvai = scaledMaxValue - scaledMinValue   =>   " +
+         * scaledMaxValue + " - " + scaledMinValue + " = " + diffPAAvai);
+         * Log.debug(
+         * "diffLoScAvai = scaledAvailableRangeMap.get(yAxisElement).max - scaledAvailableRangeMap.get(yAxisElement).min   =>   "
+         * + scaledAvailableRangeMap.get(yAxisElement).max + " - " +
+         * scaledAvailableRangeMap.get(yAxisElement).min + " = " +
+         * diffLoScAvai);
+         * Log.debug("--------- LOCAL SCALED SELECTED START ---------");
+         * Log.debug
+         * ("diffPASelSAvaiS = scaledSelectedMinValue - scaledMinValue   =>   "
+         * + scaledSelectedMinValue + " - " + scaledMinValue + " = " +
+         * diffPASelSAvaiS); Log.debug(
+         * "scLoSelS = diffPASelSAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min   =>   "
+         * + diffPASelSAvaiS + " / " + diffPAAvai + " * " + diffLoScAvai + " + "
+         * + scaledAvailableRangeMap.get(yAxisElement).min + " = " + scLoSelS);
+         * Log.debug("--------- LOCAL SCALED SELECTED END ---------");
+         * Log.debug(
+         * "diffPASelEAvaiS = scaledSelectedMaxValue - scaledMinValue   =>   " +
+         * scaledSelectedMaxValue + " - " + scaledMinValue + " = " +
+         * diffPASelEAvaiS); Log.debug(
+         * "scLoSelE = diffPASelEAvaiS / diffPAAvai * diffLoScAvai + scaledAvailableRangeMap.get(yAxisElement).min   =>   "
+         * + diffPASelEAvaiS + " / " + diffPAAvai + " * " + diffLoScAvai + " + "
+         * + scaledAvailableRangeMap.get(yAxisElement).min + " = " + scLoSelE);
+         * Log.debug(
+         * "diffLoAvai = log10(availableRangeMap.get(yAxisElement).max) - log10(availableRangeMap.get(yAxisElement).min)   =>   "
+         * + Math.log10(availableRangeMap.get(yAxisElement).max) + " - " +
+         * Math.log10(availableRangeMap.get(yAxisElement).min) + " = " +
+         * diffLoAvai); Log.debug("--------- LOCAL SELECTED START ---------");
+         * Log.debug(
+         * "diffLoScSelSScAS = scLoSelS - scaledSelectedRangeMap.get(yAxisElement).min   =>   "
+         * + scLoSelS + " - " + scaledSelectedRangeMap.get(yAxisElement).min +
+         * " = " + diffLoScSelSScAS); Log.debug(
+         * "localSelectedStart = (diffLoScSelSScAS / diffLoScAvai * diffLoAvai + Math.log10(availableRangeMap.get(yAxisElement).min))^10   =>   ("
+         * + diffLoScSelSScAS + " / " + diffLoScAvai + " * " + diffLoAvai +
+         * " + " + Math.log10(availableRangeMap.get(yAxisElement).min) +
+         * ")^10 = " + localSelectedStart);
+         * Log.debug("--------- LOCAL SELECTED END ---------"); Log.debug(
+         * "diffLoScSelEScAs = scLoSelE - scaledSelectedRangeMap.get(yAxisElement).min   =>   "
+         * + scLoSelE + " - " + scaledSelectedRangeMap.get(yAxisElement).min +
+         * " = " + diffLoScSelEScAs); Log.debug(
+         * "localSelectedEnd = (diffLoScSelEScAs / diffLoScAvai * diffLoAvai + log10(availableRangeMap.get(yAxisElement).min))^10   =>   ( "
+         * + diffLoScSelEScAs + " / " + diffLoScAvai + " * " + diffLoAvai +
+         * " + " + Math.log10(availableRangeMap.get(yAxisElement).min) +
+         * ")^10 = " + localSelectedEnd); Log.debug("new selected range: [ " +
+         * Math.log10(localSelectedStart) + ", " + Math.log10(localSelectedEnd)
+         * + " ]"); Log.debug("----------------------------------------");
+         * setSelectedRange(new Range(localSelectedStart, localSelectedEnd),
+         * yAxisElement); } else { fireRedrawRequest(false); } /* double
+         * diffScaledAvailablePA = scaledMaxValue - scaledMinValue; double
+         * diffAvailable = Math.log10(availableRangeMap.get(yAxisElement).max) -
+         * Math.log10(availableRangeMap.get(yAxisElement).min); double
+         * diffScaledAvai = scaledAvailableRangeMap.get(yAxisElement).max -
+         * scaledAvailableRangeMap.get(yAxisElement).min; double
+         * diffSelectedStartPA = scaledSelectedMinValue - scaledMinValue; double
+         * diffSelectedEndPA = scaledSelectedMaxValue - scaledMinValue; double
+         * diffScaledSelectedStart = diffSelectedStartPA * diffScaledAvai /
+         * diffScaledAvailablePA; double diffScaledSelectedEnd =
+         * diffSelectedEndPA * diffScaledAvai / diffScaledAvailablePA; double
+         * selectedStart = Math.pow(10,
+         * Math.log10(availableRangeMap.get(yAxisElement).min) +
+         * diffScaledSelectedStart * diffAvailable); double selectedEnd =
+         * Math.pow(10, Math.log10(availableRangeMap.get(yAxisElement).min) +
+         * diffScaledSelectedEnd * diffAvailable); if (selectedStart !=
+         * selectedRangeMap.get(yAxisElement).min || selectedEnd !=
+         * selectedRangeMap.get(yAxisElement).max) {
+         * Log.debug("---------------------------------------");
+         * Log.debug("Available range: [" +
+         * Math.log10(availableRangeMap.get(yAxisElement).min) + " , " +
+         * Math.log10(availableRangeMap.get(yAxisElement).max) + "]");
+         * Log.debug("Selected range: [" +
+         * Math.log10(selectedRangeMap.get(yAxisElement).min) + " , " +
+         * Math.log10(selectedRangeMap.get(yAxisElement).max) + "]"); Log.debug
+         * ("diffScaledAvailablePA = scaledMaxValue - scaledMinValue   =>   " +
+         * scaledMaxValue + " - " + scaledMinValue + " = " +
+         * diffScaledAvailablePA); Log.debug(
+         * "diffScaledAvai = scaledAvailableRangeMap.max - scaledAvailableRangeMap.min   =>   "
+         * + scaledAvailableRangeMap.get(yAxisElement).max + " - " +
+         * scaledAvailableRangeMap.get(yAxisElement).min + " = " +
+         * diffScaledAvai); Log.debug(
+         * "diffAvailable = log10(availableRangeMap_max) - log10(availableRangeMap_min)   =>   "
+         * + Math.log10(availableRangeMap.get(yAxisElement).max) + " - " +
+         * Math.log10(availableRangeMap.get(yAxisElement).min) + " = " +
+         * diffAvailable); Log.debug("---- START ----"); Log.debug(
+         * "diffSelectedStartPA = scaledSelectedMinValue - scaledMinValue   =>   "
+         * + scaledSelectedMinValue + " - " + scaledMinValue + " = " +
+         * diffSelectedStartPA); Log.debug(
+         * "diffScaledSelectedStart = diffSelectedStartPA * diffScaledAvai / diffScaledAvailablePA   =>   "
+         * + diffSelectedStartPA + " * " + diffScaledAvai + " / " +
+         * diffScaledAvailablePA + " = " + diffScaledSelectedStart); Log.debug(
+         * "selecteStart = (log10( available_min ) + diffScaledSelectedStart * diffAvailable ) ^ 10   =>    ("
+         * + Math.log10(availableRangeMap.get(yAxisElement).min) + " + " +
+         * diffScaledSelectedStart + " * " + diffAvailable + ") ^ 10 = " +
+         * selectedStart); Log.debug("log10(selectedStart)   =>   " +
+         * Math.log10(selectedStart)); Log.debug("---- END ----"); Log.debug(
+         * "diffSelectedEndPA = scaledSelectedMaxValue - scaledMinValue   =>   "
+         * + scaledSelectedMaxValue + " - " + scaledMinValue + " = " +
+         * diffSelectedEndPA); Log.debug(
+         * "diffScaledSelectedEnd = diffSelectedEndPA * diffScaledAvai / diffScaledAvailablePA   =>   "
+         * + diffSelectedEndPA + " * " + diffScaledAvai + "/" +
+         * diffScaledAvailablePA + " = " + diffScaledSelectedEnd); Log.debug(
+         * "selectedEnd = (log10(available_min) + diffScaledSelectedEnd * diffAvailable) ^ 10   =>   ("
+         * + Math.log10(availableRangeMap.get(yAxisElement).min) + " + " +
+         * diffScaledSelectedEnd + " * " + diffAvailable + ") ^ 10 = " +
+         * selectedEnd); Log.debug("log10(selectedEnd)   =>   " +
+         * Math.log10(selectedEnd));
+         * Log.debug("---------------------------------------");
+         * setSelectedRange(new Range(selectedStart, selectedEnd),
+         * yAxisElement); } else { fireRedrawRequest(false); }
+         */
+        // }
+        fireRedrawRequest(false);
         Log.debug("<<<<< Plot area changed end >>>>>  ");
         Log.debug("");
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
     }
 
@@ -585,8 +668,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     private void resetAvailableRange() {
-        for (YAxisElement yAxisElement : availableRangeMap.keySet()) {
-            availableRangeMap.put(yAxisElement, new Range());
+        for (YAxisElement yAxisElement : dataMapPerUnitLabel.keySet()) {
+            yAxisElement.reset();
         }
     }
 
@@ -600,7 +683,9 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                     }
                 }
             }
-            return new YAxisElement();
+            YAxisElement other = new YAxisElement();
+            other.addValueSpaceListener(this);
+            return other;
         }
         return null;
     }
@@ -611,6 +696,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     public int getAxisLocation(Band band) {
         return drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.LEFT ? 0 : 1;
+    }
+
+    @Override
+    public void valueSpaceChanged(Range availableRange, Range selectedRange) {
+        fireRedrawRequest(false);
     }
 
 }
