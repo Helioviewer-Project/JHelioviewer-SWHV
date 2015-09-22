@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 
-public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListener {
+public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListener, ValueSpaceListener {
     private Date minX;
     private Date maxX;
     private Rectangle displaySize;
@@ -23,6 +25,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         this.minX = minX;
         yValueModel = YValueModel.getSingletonInstance();
         this.displaySize = displaySize;
+        RadioPlotModel.getSingletonInstance().getYAxisElement().addValueSpaceListener(this);
         if (displaySize != null) {
             requestData();
         }
@@ -115,5 +118,10 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void valueSpaceChanged(Range availableRange, Range selectedRange) {
+        requestData();
     }
 }
