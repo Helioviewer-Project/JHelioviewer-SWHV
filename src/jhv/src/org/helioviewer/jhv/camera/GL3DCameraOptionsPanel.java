@@ -155,13 +155,15 @@ public class GL3DCameraOptionsPanel extends JPanel {
     }
 
     private void createFOV(GridBagConstraints c) {
+        double min = 0, max = 180;
+
         fovPanel = new JPanel();
         fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         fovPanel.add(new JLabel("FOV angle"));
         fovSpinner = new JSpinner();
-        fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(0.0), new Double(180.), new Double(0.01)));
+        fovSpinner.setModel(new SpinnerNumberModel(new Double(0.8), new Double(min), new Double(max), new Double(0.01)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0"));
+        f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0", min, max));
 
         Displayer.getActiveCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 

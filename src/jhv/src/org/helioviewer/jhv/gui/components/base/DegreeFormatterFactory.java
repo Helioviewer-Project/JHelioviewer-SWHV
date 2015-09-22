@@ -7,14 +7,21 @@ import javax.swing.text.DefaultFormatter;
 
 import org.helioviewer.base.logging.Log;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class DegreeFormatterFactory extends AbstractFormatterFactory {
 
     private final String format;
+    private final double min, max;
 
-    public DegreeFormatterFactory(String format) {
+    public DegreeFormatterFactory(String format, double min, double max) {
         super();
         this.format = format;
+
+        if (min > max)
+            max = min;
+
+        this.min = min;
+        this.max = max;
     }
 
     @Override
@@ -25,7 +32,6 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
                 Double value = new Double(0.);
                 if (string != null && string.length() != 0) {
                     if (string.charAt(string.length() - 1) == '\u00B0') {
-
                         try {
                             value = Double.parseDouble(string.substring(0, string.length() - 1));
                         } catch (NumberFormatException ex2) {
@@ -39,6 +45,12 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
                         }
                     }
                 }
+
+                if (value < min)
+                    value = min;
+                else if (value > max)
+                    value = max;
+
                 return value;
             }
 
@@ -53,4 +65,5 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
             }
         };
     }
+
 }
