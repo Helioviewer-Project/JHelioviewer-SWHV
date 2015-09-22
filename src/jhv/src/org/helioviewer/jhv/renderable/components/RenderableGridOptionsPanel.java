@@ -26,8 +26,10 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
 public class RenderableGridOptionsPanel extends JPanel {
+
     enum GridChoiceType {
         OBSERVER("Observer grid"), HCI("HCI grid");
+
         private final String display;
 
         private GridChoiceType(String s) {
@@ -39,6 +41,8 @@ public class RenderableGridOptionsPanel extends JPanel {
             return display;
         }
     }
+
+    private final double min = 5, max = 90;
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;
@@ -97,7 +101,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
-        fx.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
+        fx.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0", min, max));
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.WEST;
@@ -111,7 +115,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
-        fy.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0"));
+        fy.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0", min, max));
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
@@ -154,7 +158,7 @@ public class RenderableGridOptionsPanel extends JPanel {
 
     public void createGridResolutionX(RenderableGrid renderableGrid) {
         gridResolutionXSpinner = new JSpinner();
-        gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLonstepDegrees()), new Double(1), new Double(90), new Double(0.1)));
+        gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLonstepDegrees()), new Double(min), new Double(max), new Double(0.1)));
         gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -167,7 +171,7 @@ public class RenderableGridOptionsPanel extends JPanel {
 
     public void createGridResolutionY(RenderableGrid renderableGrid) {
         gridResolutionYSpinner = new JSpinner();
-        gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLatstepDegrees()), new Double(1), new Double(90), new Double(0.1)));
+        gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLatstepDegrees()), new Double(min), new Double(max), new Double(0.1)));
         gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
