@@ -3,15 +3,16 @@
  */
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
+import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
 /**
  * Keeps the y value information for one plot identifier.
  *
  * @author Bram.Bourgoignie@oma.be
  */
-public class YValueModel implements PlotAreaSpaceListener {
+public class YValueModel implements ValueSpaceListener {
 
     /** The available minimum y-value. */
     private double availableYMin;
@@ -25,21 +26,19 @@ public class YValueModel implements PlotAreaSpaceListener {
     /** The selected maximum y-value. */
     private double selectedYMax;
 
-    /** The plot area space corresponding with the y-value model */
-    private final PlotAreaSpace pas;
-
     private static YValueModel singletonInstance;
 
     /**
      * Constructor
      */
     private YValueModel() {
-        pas = PlotAreaSpace.getSingletonInstance();
+
     }
 
     public static YValueModel getSingletonInstance() {
         if (singletonInstance == null) {
             singletonInstance = new YValueModel();
+            RadioPlotModel.getSingletonInstance().getYAxisElement().addValueSpaceListener(singletonInstance);
         }
         return singletonInstance;
     }
@@ -121,34 +120,28 @@ public class YValueModel implements PlotAreaSpaceListener {
         this.selectedYMax = selectedYMax;
     }
 
-    /*
-     * PlotAreaSpaceListener
-     */
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        double scaledDiff = scaledMaxValue - scaledMinValue;
-        double absDiff = availableYMax - availableYMin;
-        double freqPerScaled = absDiff / scaledDiff;
-        selectedYMin = (1.0 * availableYMin + (scaledMaxValue - scaledSelectedMaxValue) * freqPerScaled);
-        selectedYMax = (1.0 * availableYMin + (scaledMaxValue - scaledSelectedMinValue) * freqPerScaled);
-    }
-
     /**
      * Recalculates the selected interval based on the plot area space
      * corresponding with this y-value model.
      */
     private void recalculateSelectedInterval() {
-        double scaledDiff = pas.getScaledMaxValue() - pas.getScaledMinValue();
+        YAxisElement yAxisElement = RadioPlotModel.getSingletonInstance().getYAxisElement();
+        Range scaledAvailableRange = yAxisElement.getScaledAvailableRange();
+        Range scaledSelectedRange = yAxisElement.getScaledSelectedRange();
+        double scaledDiff = scaledAvailableRange.max - scaledAvailableRange.min;
         double absDiff = availableYMax - availableYMin;
         double freqPerScaled = absDiff / scaledDiff;
-        selectedYMin = (1.0 * availableYMin + (pas.getScaledSelectedMinValue() - pas.getScaledMinValue()) * freqPerScaled);
-        selectedYMax = (1.0 * availableYMin + (pas.getScaledSelectedMaxValue() - pas.getScaledMinValue()) * freqPerScaled);
+        selectedYMin = (1.0 * availableYMin + (scaledSelectedRange.min - scaledAvailableRange.min) * freqPerScaled);
+        selectedYMax = (1.0 * availableYMin + (scaledSelectedRange.max - scaledAvailableRange.min) * freqPerScaled);
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
-
+    public void valueSpaceChanged(Range availableRange, Range selectedRange) {
+        double scaledDiff = availableRange.max - availableRange.min;
+        double absDiff = availableYMax - availableYMin;
+        double freqPerScaled = absDiff / scaledDiff;
+        selectedYMin = (1.0 * availableYMin + (selectedRange.min - availableRange.min) * freqPerScaled);
+        selectedYMax = (1.0 * availableYMin + (selectedRange.max - availableRange.min) * freqPerScaled);
     }
 
 }

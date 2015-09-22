@@ -11,10 +11,9 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 
-public class ZoomManager implements TimingListener, PlotAreaSpaceListener, GraphDimensionListener {
+public class ZoomManager implements TimingListener, GraphDimensionListener {
     private static ZoomManager instance;
     private final DrawController drawController;
     private final PlotAreaSpace plotAreaSpace;
@@ -196,10 +195,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener, Graph
 
     }
 
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-    }
-
     /**
      * Remove the zoom manager data from the zoom manager.
      *
@@ -213,10 +208,6 @@ public class ZoomManager implements TimingListener, PlotAreaSpaceListener, Graph
         PlotAreaSpace.getSingletonInstance().removePlotAreaSpaceListener(zoomDataConfigMap.get(downloadID));
         zoomDataConfigMap.remove(downloadID);
 
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
     }
 
     public void addZoomManagerListener(ZoomManagerListener listener) {

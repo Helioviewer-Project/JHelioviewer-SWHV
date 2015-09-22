@@ -3,10 +3,8 @@ package org.helioviewer.jhv.plugins.eveplugin.lines.model;
 import java.util.List;
 
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 
-public class EVEValueRangeModel implements PlotAreaSpaceListener {
+public class EVEValueRangeModel {
 
     private static EVEValueRangeModel singletonInstance;
 
@@ -14,10 +12,7 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
     private Range selectedInterval;
     private Range availableInterval;
 
-    private PlotAreaSpace plotAreaSpace;
-
     private EVEValueRangeModel() {
-        plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
     public static EVEValueRangeModel getInstance() {
@@ -101,18 +96,4 @@ public class EVEValueRangeModel implements PlotAreaSpaceListener {
         }
     }
 
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
-            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
-            boolean forced) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
-            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
-
-    }
 }
