@@ -95,7 +95,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawRequest()
      */
@@ -105,7 +105,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawMovieLineRequest(java.util.Date)
      */
@@ -155,7 +155,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * availableIntervalChanged(org.helioviewer.base.math.Interval)
      */
@@ -169,7 +169,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */
@@ -178,12 +178,12 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     }
 
     @Override
-    public void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime, double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
+    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
         selectedSpaceWidth = scaledSelectedMaxTime - scaledSelectedMinTime;
     }
 
     @Override
-    public void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime, double newMinValue, double newMaxValue, double newMinTime, double newMaxTime) {
+    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
         // TODO Auto-generated method stub
 
     }

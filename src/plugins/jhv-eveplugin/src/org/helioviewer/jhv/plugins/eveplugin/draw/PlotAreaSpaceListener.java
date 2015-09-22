@@ -2,10 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 public interface PlotAreaSpaceListener {
 
-    public abstract void plotAreaSpaceChanged(double scaledMinValue, double scaledMaxValue, double scaledMinTime, double scaledMaxTime,
-            double scaledSelectedMinValue, double scaledSelectedMaxValue, double scaledSelectedMinTime, double scaledSelectedMaxTime,
-            boolean forced);
+    public abstract void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced);
 
-    public abstract void availablePlotAreaSpaceChanged(double oldMinValue, double oldMaxValue, double oldMinTime, double oldMaxTime,
-            double newMinValue, double newMaxValue, double newMinTime, double newMaxTime);
+    public abstract void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime);
 }
