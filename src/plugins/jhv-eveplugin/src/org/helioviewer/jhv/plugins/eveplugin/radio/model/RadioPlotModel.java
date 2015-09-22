@@ -20,6 +20,7 @@ import java.util.Set;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
+import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.FrequencyInterval;
@@ -57,6 +58,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
+        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
         radioImagePane = new RadioImagePane();
         radioImagePane.setYAxisElement(yAxisElement);
         downloadRequestData = new HashMap<Long, DownloadRequestData>();
