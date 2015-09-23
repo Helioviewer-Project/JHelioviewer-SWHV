@@ -29,7 +29,6 @@ public class RenderableTimeStamp implements Renderable {
     private boolean isVisible = false;
 
     public RenderableTimeStamp() {
-
         InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, is);

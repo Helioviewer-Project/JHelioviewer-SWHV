@@ -6,6 +6,7 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
@@ -41,6 +42,7 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
 
         dummy = new RenderableDummy();
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
+        Displayer.display(); // ensures the dummy text is displayed
     }
 
     @Override
