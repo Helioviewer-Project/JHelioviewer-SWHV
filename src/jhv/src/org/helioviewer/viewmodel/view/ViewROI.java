@@ -41,7 +41,7 @@ public class ViewROI {
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera activeCamera = Displayer.getActiveCamera();
+        GL3DCamera activeCamera = Displayer.getViewport().getCamera();
 
 //      activeCamera.push(m.getDateObs().getDate(), m);
 

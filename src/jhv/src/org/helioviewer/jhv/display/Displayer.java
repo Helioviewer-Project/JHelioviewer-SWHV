@@ -42,9 +42,9 @@ public class Displayer implements JHVEventHighlightListener {
         return viewports;
     }
 
-    public static GL3DViewport getActiveViewport() {
+    public static GL3DViewport getViewport() {
         return viewport;
-    };
+    }
 
     public static void addViewport(GL3DViewport vp) {
         viewports.add(vp);
@@ -87,14 +87,6 @@ public class Displayer implements JHVEventHighlightListener {
                 }
             }
         }
-    }
-
-    public static GL3DViewport getViewport() {
-        return viewport;
-    }
-
-    public static GL3DCamera getActiveCamera() {
-        return viewport.getCamera();
     }
 
     public static void setActiveCamera(GL3DCamera camera) {

@@ -31,7 +31,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         Point p = e.getPoint();
         int x = p.x - lastMousePoint.x;
         int y = p.y - lastMousePoint.y;
-        double m = 2. * camera.getCameraWidth() / Displayer.getActiveViewport().getHeight();
+        double m = 2. * camera.getCameraWidth() / Displayer.getViewport().getHeight();
 
         GL3DVec3d tran = camera.getTranslation();
         tran.x += x * m;

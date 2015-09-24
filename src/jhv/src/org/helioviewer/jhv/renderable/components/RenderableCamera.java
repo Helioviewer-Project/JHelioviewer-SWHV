@@ -32,7 +32,7 @@ public class RenderableCamera implements Renderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getActiveCamera());
+        this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getViewport().getCamera());
     }
 
     @Override

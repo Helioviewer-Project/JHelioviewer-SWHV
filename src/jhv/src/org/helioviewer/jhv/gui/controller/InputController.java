@@ -36,7 +36,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        GL3DCamera camera = Displayer.getActiveCamera();
+        GL3DCamera camera = Displayer.getViewport().getCamera();
         if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
             component.setCursor(buttonDown ? closedHandCursor : openHandCursor);
         }
@@ -49,7 +49,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DCamera camera = Displayer.getActiveCamera();
+        GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
                 component.setCursor(closedHandCursor);
@@ -65,7 +65,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             component.setCursor(openHandCursor);
             buttonDown = false;
         }
-        Displayer.getActiveCamera().getCurrentInteraction().mouseReleased(e);
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseReleased(e);
     }
 
     @Override
@@ -73,23 +73,23 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-            Displayer.getActiveCamera().getCurrentInteraction().mouseDragged(e);
+            Displayer.getViewport().getCamera().getCurrentInteraction().mouseDragged(e);
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseClicked(e);
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseWheelMoved(e);
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Displayer.getActiveCamera().getCurrentInteraction().mouseMoved(e);
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseMoved(e);
     }
 
     private final LinkedList<InputControllerPlugin> plugins = new LinkedList<InputControllerPlugin>();
