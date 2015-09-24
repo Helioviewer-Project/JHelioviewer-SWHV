@@ -72,11 +72,6 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public ImageData getImageData() {
-        return imageData;
-    }
-
-    @Override
     public LUT getDefaultLUT() {
         return null;
     }
