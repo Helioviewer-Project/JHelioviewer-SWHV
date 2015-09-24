@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
@@ -24,8 +23,6 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.JHVCursors;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -55,8 +52,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private final PlotAreaSpace plotAreaSpace;
     private final EVEState eveState;
-
-    private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
 
     public ChartDrawIntervalPane() {
         initVisualComponents();
@@ -528,7 +523,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
         if (mouseOverInterval && !mouseOverLeftGraspPoint && !mouseOverRightGraspPoint) {
-            setCursor(closedHandCursor);
+            setCursor(JHVCursors.closedHandCursor);
         }
     }
 
