@@ -3,6 +3,8 @@ package org.helioviewer.viewmodel.view.jp2view;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -66,8 +68,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected final int[] localIntBuffer = new int[KakaduConstants.MAX_RENDER_SAMPLES];
 
     private boolean stopRender = false;
+    Deque<J2KRender> stack = new ArrayDeque<J2KRender>();
 
     public JHVJP2View() {
+        stack.push(new J2KRender(this));
+        stack.push(new J2KRender(this));
+
         Displayer.addRenderListener(this);
         frameCountStart = System.currentTimeMillis();
     }
@@ -347,12 +353,20 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         // ping reader
         _jp2Image.readerSignal.signal(imageViewParams);
 
-        J2KRender task = new J2KRender(this, imageViewParams);
+        Runnable not_rendered = blockingQueue.poll();
+        if (not_rendered instanceof J2KRender) {
+            stack.push((J2KRender) not_rendered);
+        }
+        J2KRender task = stack.pop();
+        task.setParams(imageViewParams);
         {
-            blockingQueue.poll();
             blockingQueue.add(task);
         }
         exec.submit(task, Boolean.TRUE);
+    }
+
+    void returnTask(J2KRender render) {
+        stack.push(render);
     }
 
     @Override
