@@ -140,14 +140,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    long called = 0;
-
     private void updateBand(final Band band, boolean keepFullValueRange) {
-        long start = System.currentTimeMillis();
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
-        boolean isLog = band.getBandType().isLogScale();
         YAxisElement yAxisElement = yAxisElementMap.get(band);
         if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
             dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
@@ -174,7 +170,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
         yAxisElement.setAvailableRange(newAvailableRange);
         dataMapPerUnitLabel.get(yAxisElement).put(band, data);
-        Log.debug("update bands took: " + (System.currentTimeMillis() - start) + " called : " + called++);
     }
 
     private void updateBands(boolean keepFullValueRange) {
@@ -241,11 +236,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void availableIntervalChanged() {
     }
 
-    private long selIntCount = 0;
-
     @Override
     public void selectedIntervalChanged() {
-        Log.debug("Selected interval count : " + selIntCount++);
         selectedIntervalChanged = true;
     }
 
@@ -294,11 +286,9 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // //////////////////////////////////////////////////////////////////////////////
     // EVE Cache Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
-    private long da = 0;
 
     @Override
     public void dataAdded(final Band band) {
-        Log.debug("Data added count " + da++);
         addedDataForBand.add(band);
         dataAdded = true;
     }
@@ -391,15 +381,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         fireRedrawRequest(false);
     }
 
-    private long datt = 0;
-
     private class DataAddedTimerTask implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
             if (dataAdded) {
-                Log.debug("Data added timertask " + datt++);
                 dataAdded = false;
                 boolean update = false;
                 for (Band b : addedDataForBand) {
@@ -418,15 +405,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    private long sitt = 0;
-
     private class SelectedIntervalTimerTask implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
             if (selectedIntervalChanged) {
-                Log.debug("Selected interval timertask " + sitt++);
                 selectedIntervalChanged = false;
 
                 updateBands(drawController.keepfullValueRange());

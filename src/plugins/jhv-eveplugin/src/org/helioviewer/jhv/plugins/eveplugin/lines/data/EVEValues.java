@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
-
 public class EVEValues {
     static int MINIMUMDISTANCEFORTIMEGAP = 60000;
     public final long[] dates;
@@ -33,11 +32,7 @@ public class EVEValues {
         maxValues = new float[0];
     }
 
-    static int count = 0;
-
     public void addValues(final long[] indates, final float[] invalues) {
-        // Log.debug(count++);
-        // Thread.dumpStack();
         int j = 0;
         long tg = Math.max(MINIMUMDISTANCEFORTIMEGAP, timePerBin / 2);
         for (int i = 0; i < maxValues.length; i++) {
