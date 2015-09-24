@@ -37,7 +37,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         if (position == lastPosition)
             return;
 
-        GL3DVec3d computedposition = Displayer.getActiveCamera().getVectorFromSphereAlt(position);
+        GL3DVec3d computedposition = Displayer.getViewport().getCamera().getVectorFromSphereAlt(position);
 
         if (computedposition == null) {
             //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");

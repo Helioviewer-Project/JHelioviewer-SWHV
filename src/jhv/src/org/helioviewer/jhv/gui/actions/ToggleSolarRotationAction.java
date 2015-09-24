@@ -20,7 +20,7 @@ public class ToggleSolarRotationAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GL3DCamera cam = Displayer.getActiveCamera();
+        GL3DCamera cam = Displayer.getViewport().getCamera();
         cam.setTrackingMode(!cam.getTrackingMode());
     }
 

@@ -36,9 +36,9 @@ public class ZoomOneToOneAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();
         if (view != null) {
-            GL3DCamera camera = Displayer.getActiveCamera();
+            GL3DCamera camera = Displayer.getViewport().getCamera();
             MetaData metaData = view.getImageLayer().getImageData().getMetaData();
-            double imageFraction = Displayer.getActiveViewport().getHeight() / (double) metaData.getPixelHeight();
+            double imageFraction = Displayer.getViewport().getHeight() / (double) metaData.getPixelHeight();
             double fov = 2. * Math.atan(-metaData.getPhysicalSize().y * imageFraction / 2. / camera.getZTranslation());
             camera.setCameraFOV(fov);
         }

@@ -41,7 +41,7 @@ public class GL3DViewport {
     }
 
     public int getOffsetY() {
-        return Displayer.getActiveViewport().getHeight() * GLInfo.pixelScale[1] - GLInfo.pixelScale[0] * y - GLInfo.pixelScale[1] * getHeight();
+        return Displayer.getViewport().getHeight() * GLInfo.pixelScale[1] - GLInfo.pixelScale[0] * y - GLInfo.pixelScale[1] * getHeight();
     }
 
     public void setViewportSize(int width, int height) {

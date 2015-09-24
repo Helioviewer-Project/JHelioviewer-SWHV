@@ -189,7 +189,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        return Displayer.getActiveCamera().getVectorFromSphere(e.getPoint());
+        return Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
     }
 
 }
