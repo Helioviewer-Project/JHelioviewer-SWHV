@@ -48,9 +48,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
     private final PlotAreaSpace plotAreaSpace;
     private static EVEDrawController instance;
-    private final Timer timer;
+    private final Timer addDataTimer;
+    private final Timer selectedIntervalChangedTimer;
     private boolean dataAdded;
     private final Set<Band> addedDataForBand;
+    private boolean selectedIntervalChanged;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -69,9 +71,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
         dataAdded = false;
+        selectedIntervalChanged = false;
         addedDataForBand = new HashSet<Band>();
-        timer = new Timer(200, new DataAddedTimerTask());
-        timer.start();
+        addDataTimer = new Timer(200, new DataAddedTimerTask());
+        addDataTimer.start();
+        selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
+        selectedIntervalChangedTimer.start();
     }
 
     public static EVEDrawController getSingletonInstance() {
@@ -241,8 +246,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     @Override
     public void selectedIntervalChanged() {
         Log.debug("Selected interval count : " + selIntCount++);
-        updateBands(drawController.keepfullValueRange());
-        fireRedrawRequest(false);
+        selectedIntervalChanged = true;
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -290,10 +294,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // //////////////////////////////////////////////////////////////////////////////
     // EVE Cache Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
+    private long da = 0;
 
     @Override
     public void dataAdded(final Band band) {
-        Log.debug("Data added");
+        Log.debug("Data added count " + da++);
         addedDataForBand.add(band);
         dataAdded = true;
     }
@@ -308,12 +313,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         // TODO Auto-generated method stub
     }
 
-    private long gvc = 0;
-
     public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {
-        Log.debug("Get value Count: " + gvc++);
-        // return EVECacheController.getSingletonInstance().downloadData(band,
-        // interval, graphArea);
         return dataMapPerUnitLabel.get(yAxisElementMap.get(band)).get(band);
     }
 
@@ -391,12 +391,15 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         fireRedrawRequest(false);
     }
 
+    private long datt = 0;
+
     private class DataAddedTimerTask implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if (dataAdded) {
-                Log.debug("data added timer task");
+                Log.debug("Data added timertask " + datt++);
                 dataAdded = false;
                 boolean update = false;
                 for (Band b : addedDataForBand) {
@@ -414,4 +417,23 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             }
         }
     }
+
+    private long sitt = 0;
+
+    private class SelectedIntervalTimerTask implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            if (selectedIntervalChanged) {
+                Log.debug("Selected interval timertask " + sitt++);
+                selectedIntervalChanged = false;
+
+                updateBands(drawController.keepfullValueRange());
+                fireRedrawRequest(false);
+
+            }
+        }
+    }
+
 }
