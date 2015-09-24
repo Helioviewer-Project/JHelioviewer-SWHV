@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.SwingWorker;
+
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -19,10 +21,13 @@ public class RenderableDummy implements Renderable {
     private final float baseFontSize = 16;
     private float fontSize;
     private TextRenderer textRenderer;
+    private boolean removed = false;
+    SwingWorker<?,?> worker;
 
     private final String name = "Loading...";
 
-    public RenderableDummy() {
+    public RenderableDummy(SwingWorker<?,?> _worker) {
+        worker = _worker;
     }
 
     @Override
@@ -50,6 +55,8 @@ public class RenderableDummy implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
+        removed = true;
+        worker.cancel(true);
     }
 
     @Override
@@ -64,7 +71,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public boolean isVisible() {
-        return false;
+        return true;
     }
 
     @Override
@@ -78,7 +85,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public boolean isDeletable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -100,6 +107,10 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 
 }
