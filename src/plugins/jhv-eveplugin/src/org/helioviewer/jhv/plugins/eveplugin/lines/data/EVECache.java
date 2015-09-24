@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.helioviewer.base.interval.Interval;
+import org.helioviewer.base.logging.Log;
 
 /**
  *
@@ -44,6 +45,7 @@ public class EVECache {
     // public EVEValues getValuesInInterval(final Interval<Date> interval,
     // double multiplier) {
     public EVEValues getValuesInInterval(final Interval<Date> interval, Rectangle space) {
+        long start = System.currentTimeMillis();
         long intervalWidth = interval.getEnd().getTime() - interval.getStart().getTime();
         int spaceWidth = space.width;
         long binStart;
@@ -88,6 +90,8 @@ public class EVECache {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
         }
+
+        Log.debug("Get values in interval took " + (System.currentTimeMillis() - start));
 
         return result;
     }

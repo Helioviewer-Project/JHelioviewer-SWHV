@@ -220,9 +220,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void availableIntervalChanged() {
     }
 
+    private long selIntCount = 0;
+
     @Override
     public void selectedIntervalChanged() {
-
+        Log.debug("Selected interval count : " + selIntCount++);
         updateBands(drawController.keepfullValueRange());
         fireRedrawRequest(false);
     }
@@ -275,6 +277,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void dataAdded(final Band band) {
+        Log.debug("Data added");
         if (yAxisElementMap.containsKey(band)) {
             if (dataMapPerUnitLabel.get(yAxisElementMap.get(band)).containsKey(band)) {
                 updateBand(band, false);
@@ -293,8 +296,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         // TODO Auto-generated method stub
     }
 
+    private long gvc = 0;
+
     public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {
-        return EVECacheController.getSingletonInstance().downloadData(band, interval, graphArea);
+        Log.debug("Get value Count: " + gvc++);
+        // return EVECacheController.getSingletonInstance().downloadData(band,
+        // interval, graphArea);
+        return dataMapPerUnitLabel.get(yAxisElementMap.get(band)).get(band);
     }
 
     public void bandColorChanged(Band band) {
