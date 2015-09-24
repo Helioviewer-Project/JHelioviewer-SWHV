@@ -3,6 +3,7 @@ package org.helioviewer.viewmodel.metadata;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.base.time.TimeUtils;
 
@@ -20,6 +21,10 @@ public abstract class AbstractMetaData implements MetaData {
     protected double innerRadius = 0.;
     protected double outerRadius = 40.;
     protected double unitPerPixel = 1.;
+
+    //Serves only for LASCO cutOff edges
+    protected float cutOffValue = -1;
+    protected GL3DVec3d cutOffDirection;
 
     public AbstractMetaData() {
         lowerLeftCorner = null;
@@ -111,6 +116,16 @@ public abstract class AbstractMetaData implements MetaData {
     @Override
     public double getOuterCutOffRadius() {
         return outerRadius;
+    }
+
+    @Override
+    public float getCutOffValue() {
+        return cutOffValue;
+    }
+
+    @Override
+    public GL3DVec3d getCutOffDirection() {
+        return cutOffDirection;
     }
 
 }

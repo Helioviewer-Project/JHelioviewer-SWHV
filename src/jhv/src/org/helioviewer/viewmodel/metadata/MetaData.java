@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.metadata;
 
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.time.ImmutableDateTime;
 
 /**
@@ -26,6 +27,7 @@ public interface MetaData {
      * @return Physical image size
      */
     public GL3DVec2d getPhysicalSize();
+
     /**
      * Returns the physical position of the lower left corner of the
      * corresponding image.
@@ -35,6 +37,7 @@ public interface MetaData {
     public GL3DVec2d getPhysicalLowerLeft();
 
     public GL3DVec2d getPhysicalUpperLeft();
+
     /**
      * Returns the width of the image in pixels.
      *
@@ -58,5 +61,9 @@ public interface MetaData {
     public double getInnerCutOffRadius();
 
     public double getOuterCutOffRadius();
+
+    float getCutOffValue();
+
+    GL3DVec3d getCutOffDirection();
 
 }

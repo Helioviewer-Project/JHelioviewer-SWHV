@@ -30,6 +30,9 @@ public class GLSLShader {
     public static int alphaParamRef;
     public static int cutOffRadiusRef;
     public static int outerCutOffRadiusRef;
+    public static int cutOffDirectionRef;
+    public static int cutOffValueRef;
+
     public static int rectRef;
     public static int differenceRectRef;
     public static int viewportRef;
@@ -49,6 +52,9 @@ public class GLSLShader {
     public static final float[] alphaParamFloat = new float[1];
     public static final float[] cutOffRadiusFloat = new float[1];
     public static final float[] outerCutOffRadiusFloat = new float[1];
+    public static final float[] cutOffDirectionFloat = new float[3];
+    public static final float[] cutOffValueFloat = new float[3];
+
     public static final float[] rectVertex = new float[4];
     public static final float[] differencerect = new float[4];
     public static final float[] viewport = new float[2];
@@ -76,6 +82,8 @@ public class GLSLShader {
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
         cutOffRadiusRef = gl.glGetUniformLocation(progID, "cutOffRadius");
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
+        cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
+        cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
 
         rectRef = gl.glGetUniformLocation(progID, "rect");
         differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
@@ -94,7 +102,7 @@ public class GLSLShader {
         setTextureUnit(gl, "lut", 1);
         setTextureUnit(gl, "differenceImage", 2);
         unbind(gl);
-
+        setCutOffValue(-1f);
     }
 
     public static void dispose(GL2 gl) {
@@ -290,7 +298,8 @@ public class GLSLShader {
         gl.glUniform1fv(GLSLShader.outerCutOffRadiusRef, 1, GLSLShader.outerCutOffRadiusFloat, 0);
         gl.glUniform2fv(GLSLShader.viewportRef, 1, GLSLShader.viewport, 0);
         gl.glUniform2fv(GLSLShader.viewportOffsetRef, 1, GLSLShader.viewportOffset, 0);
-
+        gl.glUniform3fv(GLSLShader.cutOffDirectionRef, 1, GLSLShader.cutOffDirectionFloat, 0);
+        gl.glUniform1fv(GLSLShader.cutOffValueRef, 1, GLSLShader.cutOffValueFloat, 0);
     }
 
     public static void bindIsDisc(GL2 gl, int isDisc) {
@@ -338,7 +347,15 @@ public class GLSLShader {
         viewport[1] = height;
         viewportOffset[0] = offsetX;
         viewportOffset[1] = offsetY;
-
     }
 
+    public static void setCutOffValue(float val) {
+        cutOffValueFloat[0] = val;
+    }
+
+    public static void setCutOffDirection(float x, float y, float z) {
+        cutOffDirectionFloat[0] = x;
+        cutOffDirectionFloat[1] = y;
+        cutOffDirectionFloat[2] = z;
+    }
 }

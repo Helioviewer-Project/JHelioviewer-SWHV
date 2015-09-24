@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.IntBuffer;
 
 import org.helioviewer.base.Region;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.viewmodel.imagedata.ColorMask;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -93,6 +94,13 @@ public class GLImage {
 
         MetaData metadata = imageData.getMetaData();
         GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
+        if (metadata.getCutOffValue() > 0) {
+            GL3DVec3d cdir = metadata.getCutOffDirection();
+            GLSLShader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0f);
+            GLSLShader.setCutOffValue(metadata.getCutOffValue());
+        } else {
+            GLSLShader.setCutOffValue(-1f);
+        }
     }
 
     private void applyRunningDifferenceGL(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
