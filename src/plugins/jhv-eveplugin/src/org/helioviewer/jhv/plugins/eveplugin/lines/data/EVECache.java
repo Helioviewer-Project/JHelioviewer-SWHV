@@ -44,6 +44,8 @@ public class EVECache {
 
     // public EVEValues getValuesInInterval(final Interval<Date> interval,
     // double multiplier) {
+    long count = 0;
+
     public EVEValues getValuesInInterval(final Interval<Date> interval, Rectangle space) {
         long start = System.currentTimeMillis();
         long intervalWidth = interval.getEnd().getTime() - interval.getStart().getTime();
@@ -91,7 +93,7 @@ public class EVECache {
             key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
         }
 
-        Log.debug("Get values in interval took " + (System.currentTimeMillis() - start));
+        Log.debug("Get values in interval took " + (System.currentTimeMillis() - start) + " called " + count++);
 
         return result;
     }
