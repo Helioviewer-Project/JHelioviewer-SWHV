@@ -21,8 +21,7 @@ public class RenderableDummy implements Renderable {
     private final float baseFontSize = 16;
     private float fontSize;
     private TextRenderer textRenderer;
-    private boolean removed = false;
-    SwingWorker<?,?> worker;
+    private SwingWorker<?,?> worker;
 
     private final String name = "Loading...";
 
@@ -55,7 +54,6 @@ public class RenderableDummy implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
-        removed = true;
         worker.cancel(true);
     }
 
@@ -107,10 +105,6 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
-    }
-
-    public boolean isRemoved() {
-        return removed;
     }
 
 }
