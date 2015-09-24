@@ -61,6 +61,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected JP2Image _jp2Image;
 
     private int targetFrame;
+    private int trueFrame;
 
     private int frameCount = 0;
     private long frameCountStart;
@@ -69,7 +70,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     protected final int[] localIntBuffer = new int[KakaduConstants.MAX_RENDER_SAMPLES];
 
     private boolean stopRender = false;
-    Deque<J2KRender> stack = new ArrayDeque<J2KRender>();
+    private Deque<J2KRender> stack = new ArrayDeque<J2KRender>();
 
     public JHVJP2View() {
         stack.push(new J2KRender(this));
@@ -106,21 +107,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         _jp2Image.startReader(this, calculateParameter(_jp2Image, targetRegion, 0));
     }
 
-    private int getTrueFrameNumber() {
-        int frameNumber = 0;
-        if (imageData != null) {
-            frameNumber = imageData.getFrameNumber();
-        }
-        return frameNumber;
-    }
-
     @Override
     public String getName() {
-        return _jp2Image.getName(getTrueFrameNumber());
+        return _jp2Image.getName(0);
     }
 
     public String getXMLMetaData() {
-        return _jp2Image.getXML(getTrueFrameNumber() + 1);
+        return _jp2Image.getXML(trueFrame + 1);
     }
 
     @Override
@@ -256,12 +249,13 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (imageData != null && imageData.getFrameNumber() != frame)
+        if (frame != trueFrame) {
+            trueFrame = frame;
             ++frameCount;
+        }
 
-        imageData = newImageData;
         if (dataHandler != null) {
-            dataHandler.handleData(this, imageData);
+            dataHandler.handleData(this, newImageData);
         }
     }
 
@@ -374,7 +368,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         if (builtIn != null) {
             return new LUT("built-in", builtIn/* , builtIn */);
         }
-
         return _jp2Image.getAssociatedLUT();
     }
 
