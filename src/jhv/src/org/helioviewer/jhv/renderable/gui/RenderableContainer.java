@@ -102,6 +102,11 @@ public class RenderableContainer implements TableModel, Reorderable {
             return;
         }
         Renderable toMove = this.renderables.get(fromIndex);
+        Renderable moveTo = this.renderables.get(Math.max(0, toIndex - 1));
+
+        if (!(toMove instanceof RenderableImageLayer) || !(moveTo instanceof RenderableImageLayer)) {
+            return;
+        }
         renderables.remove(fromIndex);
         if (fromIndex < toIndex) {
             this.insertRow(toIndex - 1, toMove);
