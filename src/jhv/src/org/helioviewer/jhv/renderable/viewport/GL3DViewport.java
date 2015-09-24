@@ -5,6 +5,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 public class GL3DViewport {
+
     private int w;
     private int h;
     private int x;
@@ -41,7 +42,7 @@ public class GL3DViewport {
     }
 
     public int getOffsetY() {
-        return Displayer.getViewport().getHeight() * GLInfo.pixelScale[1] - GLInfo.pixelScale[0] * y - GLInfo.pixelScale[1] * getHeight();
+        return GLInfo.pixelScale[1] * (Displayer.getViewport().getHeight() - h - y); // broken if this == Displayer.getViewport()
     }
 
     public void setViewportSize(int width, int height) {
@@ -61,4 +62,5 @@ public class GL3DViewport {
     public void setVisible(boolean _isVisible) {
         isVisible = _isVisible;
     }
+
 }
