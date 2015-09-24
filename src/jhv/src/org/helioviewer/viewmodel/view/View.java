@@ -113,7 +113,4 @@ public interface View {
     public MetaData getMetaData(ImmutableDateTime time);
     // -->
 
-    // only for APIRequestManager.loadView() to detect load
-    public ImageData getImageData();
-
 }

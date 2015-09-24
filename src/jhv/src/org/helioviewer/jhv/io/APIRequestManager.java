@@ -314,47 +314,31 @@ public class APIRequestManager {
             throw new IOException("Invalid URI");
         }
 
-        if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
-            try {
+        try {
+            if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
                 return new JHVFITSView(uri);
-            } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
-                throw new IOException(e.getMessage());
-            }
-        } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
-            try {
-                return new JHVSimpleImageView(uri);
-            } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
-                throw new IOException(e.getMessage());
-            }
-        } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
-            try {
+            } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
+                 return new JHVSimpleImageView(uri);
+            } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
                 JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
                 jp2CallistoView.setJP2Image(jp2Image);
 
                 return jp2CallistoView;
-            } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
-                throw new IOException(e.getMessage());
-            }
-        } else {
-            try {
+            } else {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
                 JHVJP2View jp2View = new JHVJP2View();
                 jp2View.setJP2Image(jp2Image);
 
-                // wait until there is something to show before adding to the UI
-                while (jp2View.getImageData() == null) {
-                    Thread.sleep(100);
-                }
                 return jp2View;
-            } catch (Exception e) {
-                Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
-                throw new IOException(e.getMessage());
             }
+        } catch (InterruptedException e) {
+            // nothing
+        } catch (Exception e) {
+            Log.debug("APIRequestManager.loadView(\"" + uri + "\", \"" + downloadURI + "\") ", e);
+            throw new IOException(e.getMessage());
         }
+        return null;
     }
 
 }
