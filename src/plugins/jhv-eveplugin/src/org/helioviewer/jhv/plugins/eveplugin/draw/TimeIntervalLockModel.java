@@ -95,7 +95,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawRequest()
      */
@@ -105,7 +105,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawMovieLineRequest(java.util.Date)
      */
@@ -155,7 +155,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * availableIntervalChanged(org.helioviewer.base.math.Interval)
      */
@@ -169,12 +169,12 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
     }
 
     @Override

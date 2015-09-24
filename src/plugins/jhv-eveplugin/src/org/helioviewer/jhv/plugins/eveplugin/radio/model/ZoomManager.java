@@ -184,7 +184,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     }
 
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
         Interval<Date> newInterval = drawController.getSelectedInterval();
 
         for (ZoomDataConfig zdc : zoomDataConfigMap.values()) {

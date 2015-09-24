@@ -53,6 +53,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private boolean dataAdded;
     private final Set<Band> addedDataForBand;
     private boolean selectedIntervalChanged;
+    private boolean keepFullValueRange;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -237,8 +238,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     }
 
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
+        this.keepFullValueRange = keepFullValueRange;
         selectedIntervalChanged = true;
+
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -392,13 +395,13 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 for (Band b : addedDataForBand) {
                     if (yAxisElementMap.containsKey(b)) {
                         if (dataMapPerUnitLabel.get(yAxisElementMap.get(b)).containsKey(b)) {
-                            updateBand(b, false);
+                            updateBand(b, keepFullValueRange);
                             update = true;
                         }
                     }
                 }
                 if (update) {
-                    fireRedrawRequest(false);
+                    fireRedrawRequest(keepFullValueRange);
                 }
                 addedDataForBand.clear();
             }
@@ -413,8 +416,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             if (selectedIntervalChanged) {
                 selectedIntervalChanged = false;
 
-                updateBands(drawController.keepfullValueRange());
-                fireRedrawRequest(false);
+                updateBands(keepFullValueRange);
+                fireRedrawRequest(keepFullValueRange);
 
             }
         }

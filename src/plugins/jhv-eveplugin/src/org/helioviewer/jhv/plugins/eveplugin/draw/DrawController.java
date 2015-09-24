@@ -365,7 +365,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             if (updatePlotAreaSpace) {
                 updatePlotAreaSpace(selectedInterval);
             }
-            fireSelectedIntervalChanged();
+            fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
         } else {
             Log.debug("Start was after end. Set by: ");
@@ -378,9 +378,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return selectedInterval;
     }
 
-    private void fireSelectedIntervalChanged() {
+    private void fireSelectedIntervalChanged(boolean keepFullValueRange) {
         for (TimingListener listener : tListeners) {
-            listener.selectedIntervalChanged();
+            listener.selectedIntervalChanged(keepFullValueRange);
         }
     }
 

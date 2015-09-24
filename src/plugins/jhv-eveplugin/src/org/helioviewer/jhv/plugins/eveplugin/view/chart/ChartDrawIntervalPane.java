@@ -438,7 +438,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
         repaint();
     }
 
