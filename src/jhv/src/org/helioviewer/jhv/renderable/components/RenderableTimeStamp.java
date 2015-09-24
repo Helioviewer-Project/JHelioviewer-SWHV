@@ -3,14 +3,11 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.FontFormatException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.geom.Rectangle2D;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
@@ -29,16 +26,6 @@ public class RenderableTimeStamp implements Renderable {
     private boolean isVisible = false;
 
     public RenderableTimeStamp() {
-        InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, is);
-        } catch (FontFormatException e) {
-            Log.warn("Font not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, 20);
-        } catch (IOException e) {
-            Log.warn("Font not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, 20);
-        }
     }
 
     @Override
@@ -50,7 +37,7 @@ public class RenderableTimeStamp implements Renderable {
         int sy = GLInfo.pixelScale[1];
         if (textRenderer == null || fontSize != sy * baseFontSize) {
             fontSize = sy * baseFontSize;
-            font = font.deriveFont(fontSize);
+            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             if (textRenderer != null) {
                 textRenderer.dispose();
             }

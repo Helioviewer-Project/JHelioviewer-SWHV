@@ -2,11 +2,15 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+
+import org.helioviewer.base.FileUtils;
+import org.helioviewer.base.logging.Log;
 
 public class UIGlobals {
 
@@ -20,9 +24,15 @@ public class UIGlobals {
         if (instance == null) {
             instance = new UIGlobals();
 
-            if (System.getProperty("jhv.os").equals("mac")) {
-                Font font;
+            InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
+            try {
+                UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
+            } catch (Exception e) {
+                Log.warn("Font not loaded correctly, fallback to default");
+                UIFontRoboto = new Font("SansSerif", Font.PLAIN, 20);
+            }
 
+            if (System.getProperty("jhv.os").equals("mac")) {
                 Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
                 map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
                 map.put(TextAttribute.FAMILY, "HelveticaNeue");
@@ -30,7 +40,7 @@ public class UIGlobals {
                 map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
                 map.put(TextAttribute.SIZE, 12);
 
-                font = new Font(map);
+                Font font = new Font(map);
                 if (font == null)
                     return instance;
 
@@ -70,5 +80,7 @@ public class UIGlobals {
     public static Font UIFontSmallBold = new Font("SansSerif", Font.BOLD, 9);
 
     public static Font UIFontMono = new Font("Courier", Font.PLAIN, 12);
+
+    public static Font UIFontRoboto;
 
 }

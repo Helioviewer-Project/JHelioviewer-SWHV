@@ -3,19 +3,15 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.FontFormatException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.FloatBuffer;
 
-import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -46,18 +42,6 @@ public class RenderableGrid implements Renderable {
     private boolean isVisible = true;
 
     public RenderableGrid() {
-
-        InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, is);
-        } catch (FontFormatException e) {
-            Log.warn("Font not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, 20);
-        } catch (IOException e) {
-            Log.warn("Font not loaded correctly, fallback to default");
-            font = new Font("SansSerif", Font.PLAIN, 20);
-        }
-
         optionsPanel = new RenderableGridOptionsPanel(this);
     }
 
@@ -68,7 +52,6 @@ public class RenderableGrid implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-
         GL3DCamera activeCamera = vp.getCamera();
 
         renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
@@ -84,7 +67,7 @@ public class RenderableGrid implements Renderable {
 
         if (showLabels && (textRenderer == null || fontSize != oldFontSize)) {
             oldFontSize = fontSize;
-            font = font.deriveFont(fontSize);
+            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
 
             if (textRenderer != null) {
                 textRenderer.dispose();
