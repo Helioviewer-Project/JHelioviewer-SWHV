@@ -26,6 +26,7 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.JHVCursors;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
@@ -56,7 +57,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private final EVEState eveState;
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
-    private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 0), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
 
     public ChartDrawIntervalPane() {
         initVisualComponents();
@@ -540,7 +540,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             resizeSelectedInterval(e.getPoint(), true);
         } else if (mouseOverInterval) {
             moveSelectedInterval(e.getPoint(), true);
-            setCursor(openHandCursor);
+            setCursor(JHVCursors.openHandCursor);
         }
         mousePressed = null;
 
@@ -566,7 +566,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // is mouse cursor above selected interval?
         if (e.getPoint().x >= leftIntervalBorderPosition && e.getPoint().x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
-            setCursor(openHandCursor);
+            setCursor(JHVCursors.openHandCursor);
         }
 
         // reset cursor if it does not point to the interval area
