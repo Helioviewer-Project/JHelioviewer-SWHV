@@ -30,13 +30,13 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 class J2KRender implements Runnable {
 
     /** A reference to the JP2Image this object is owned by. */
-    private JP2Image parentImageRef;
+    private final JP2Image parentImageRef;
 
     /** A reference to the JP2ImageView this object is owned by. */
     private final JHVJP2View parentViewRef;
 
     /** A reference to the compositor used by this JP2Image. */
-    private Kdu_region_compositor compositorRef;
+    private final Kdu_region_compositor compositorRef;
 
     /** An integer buffer used in the run method. */
     private int[] intBuffer;
@@ -49,13 +49,11 @@ class J2KRender implements Runnable {
 
     private final int[] firstComponent = new int[] { 0 };
 
-    private JP2ImageParameter currParams;
+    private final JP2ImageParameter currParams;
 
-    J2KRender(JHVJP2View _parentViewRef) {
+    J2KRender(JHVJP2View _parentViewRef, JP2ImageParameter _currParams) {
         parentViewRef = _parentViewRef;
-    }
 
-    public void setParams(JP2ImageParameter _currParams) {
         currParams = _currParams;
         parentImageRef = currParams.jp2Image;
         compositorRef = parentImageRef.getCompositorRef();
@@ -176,8 +174,6 @@ class J2KRender implements Runnable {
             } catch (Exception ex) {
             }
             e.printStackTrace();
-        } finally {
-            parentViewRef.returnTask(this);
         }
 
     }
