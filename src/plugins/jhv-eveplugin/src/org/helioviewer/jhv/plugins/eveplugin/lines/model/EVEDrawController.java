@@ -202,7 +202,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 eveDrawableElementMap.put(yAxisElement, new EVEDrawableElement());
             }
 
-            Range newAvailableRange = new Range(yAxisElement.getAvailableRange());
+            Range newAvailableRange = new Range();
 
             for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
                 if (v != null) {
