@@ -27,6 +27,8 @@ uniform vec4 diffcameraDifferenceRotationQuat;
 uniform float physicalImageWidth;
 uniform vec2 viewport;
 uniform vec2 viewportOffset;
+uniform vec3 cutOffDirection;
+uniform float cutOffValue;
 
 vec3 rotate_vector_inverse( vec4 quat, vec3 vec )
 {
@@ -68,14 +70,18 @@ void main(void)
     if(radius2>=1. || dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))<=0.) {
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
-    } 
+    }
+    float geometryFlatDist = abs(dot(rotatedHitPoint, cutOffDirection));
+    vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
+    float geometryFlatDistAlt = abs(dot(rotatedHitPoint, cutOffDirectionAlt));
     texcoord = vec2((rotatedHitPoint.x - rect.x) * rect.z, (-rotatedHitPoint.y - rect.y) * rect.w);
     if( texcoord.x<0.||
         texcoord.y<0.||
         texcoord.x>1.|| 
         texcoord.y>1.||
         dot(rotatedHitPoint.xy,rotatedHitPoint.xy) > outerCutOffRadius*outerCutOffRadius ||
-        dot(rotatedHitPoint.xy,rotatedHitPoint.xy) < cutOffRadius*cutOffRadius
+        dot(rotatedHitPoint.xy,rotatedHitPoint.xy) < cutOffRadius*cutOffRadius||
+        (cutOffValue>=0. && (geometryFlatDist>cutOffValue||geometryFlatDistAlt>cutOffValue))
     ) {
         discard;
     }

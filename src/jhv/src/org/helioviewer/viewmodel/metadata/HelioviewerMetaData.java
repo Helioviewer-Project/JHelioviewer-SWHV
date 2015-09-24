@@ -8,6 +8,7 @@ import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
@@ -48,6 +49,16 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         retrievePosition(m);
         retrievePixelParameters(m);
         retrieveOcculterRadii(m);
+        retrieveOcculterLinearCutOff(m);
+
+    }
+
+    private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
+        if (detector.equals("C2")) {
+            cutOffValue = (float) this.getPhysicalUpperLeft().y;
+            double maskRotation = 2 * Math.toRadians(m.tryGetDouble("CROTA")) / MathUtils.radeg;
+            cutOffDirection = new GL3DVec3d(Math.sin(maskRotation), Math.cos(maskRotation), 0);
+        }
     }
 
     private void retrieveOcculterRadii(MetaDataContainer m) {
