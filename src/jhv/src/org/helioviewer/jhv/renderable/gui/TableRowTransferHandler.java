@@ -98,7 +98,7 @@ public class TableRowTransferHandler extends TransferHandler {
 
     @Override
     protected void exportDone(JComponent c, Transferable t, int act) {
-        if (act == TransferHandler.MOVE) {
+        if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
         Displayer.display();
