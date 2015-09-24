@@ -18,6 +18,7 @@ import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -193,21 +194,19 @@ public class JHVJP2View extends AbstractView implements RenderListener {
      */
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Region r, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
-
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = Displayer.getViewport().getHeight() / Displayer.getViewport().getCamera().getCameraWidth();
-        int w = (int) (rWidth * ratio);
-        int h = (int) (rHeight * ratio);
+        //solar_radii per pixel needed
+        double ratio = Math.min(mWidth, Displayer.getViewport().getCamera().getCameraWidth() * 2) / (Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
+        int totalHeight = (int) (mHeight / ratio);
 
-        ratio = mWidth / rWidth;
-        int totalWidth = (int) (w * ratio);
-        int totalHeight = (int) (h * ratio);
+        //TBD choose between both
+        //ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension(totalHeight, totalHeight));
+        ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalHeight, totalHeight));
 
-        ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalWidth, totalHeight));
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
