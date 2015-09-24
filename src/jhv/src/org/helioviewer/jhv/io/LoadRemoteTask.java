@@ -40,7 +40,7 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
         if (wasPlaying)
             Layers.pauseMovie();
 
-        dummy = new RenderableDummy();
+        dummy = new RenderableDummy(this);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
         Displayer.display(); // ensures the dummy text is displayed
     }
@@ -65,13 +65,15 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
 
     @Override
     protected void done() {
-        ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
-        try {
-            Layers.addLayer(get());
-            if (wasPlaying)
-                Layers.playMovie();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!dummy.isRemoved()) {
+            ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
+            try {
+                Layers.addLayer(get());
+                if (wasPlaying)
+                    Layers.playMovie();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
