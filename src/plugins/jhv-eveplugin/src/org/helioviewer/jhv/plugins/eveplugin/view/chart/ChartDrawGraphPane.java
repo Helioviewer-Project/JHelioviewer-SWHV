@@ -42,6 +42,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.JHVCursors;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
@@ -80,7 +81,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     private Rectangle leftAxisArea;
 
     private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
-    private static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
     private boolean reschedule = false;
     private Point mousePosition;
     private boolean mouseOverEvent;
@@ -490,7 +490,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseReleased(final MouseEvent e) {
         if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
-            setCursor(openHandCursor);
+            setCursor(JHVCursors.openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -612,7 +612,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             updateGraph();
             mouseOverEvent = true;
         } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
-            setCursor(openHandCursor);
+            setCursor(JHVCursors.openHandCursor);
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -789,12 +789,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
 
-                    // startTime >= myPlotAreaSpace.getScaledMinTime()
-                    // && endTime <= myPlotAreaSpace.getScaledMaxTime() &&
-                    // startTime
-                    // <= myPlotAreaSpace.getScaledMaxTime()
-                    // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                    ) {
+                            // startTime >= myPlotAreaSpace.getScaledMinTime()
+                            // && endTime <= myPlotAreaSpace.getScaledMaxTime() &&
+                            // startTime
+                            // <= myPlotAreaSpace.getScaledMaxTime()
+                            // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                            ) {
                         vs.setScaledSelectedRange(new Range(startValue, endValue));
                     } else {
                         Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= availableRange.min) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= availableRange.max) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= availableRange.max) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= availableRange.max));
