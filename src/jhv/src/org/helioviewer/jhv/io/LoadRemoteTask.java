@@ -65,7 +65,7 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
 
     @Override
     protected void done() {
-        if (!dummy.isRemoved()) {
+        if (!isCancelled()) {
             ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
             try {
                 Layers.addLayer(get());
