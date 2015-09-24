@@ -80,7 +80,7 @@ public class EventRequester implements TimingListener, JHVEventHandler {
     }
 
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         JHVEventContainer.getSingletonInstance().requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }

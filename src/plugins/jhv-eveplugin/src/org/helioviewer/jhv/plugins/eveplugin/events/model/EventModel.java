@@ -90,7 +90,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     }
 
     @Override
-    public void selectedIntervalChanged() {
+    public void selectedIntervalChanged(boolean keepFullValueRange) {
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
             createEventPlotConfiguration();
         }
