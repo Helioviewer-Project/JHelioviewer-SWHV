@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,6 +34,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.JHVCursors;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -193,7 +195,17 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 }
             }
         });
-
+        grid.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent arg0) {
+                int row = grid.rowAtPoint(arg0.getPoint());
+                if (grid.getValueAt(row, 0) instanceof RenderableImageLayer) {
+                    grid.setCursor(JHVCursors.openHandCursor);
+                } else {
+                    grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        });
         grid.setDragEnabled(true);
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));

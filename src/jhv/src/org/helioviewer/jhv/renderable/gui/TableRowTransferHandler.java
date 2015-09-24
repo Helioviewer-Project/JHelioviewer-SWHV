@@ -17,11 +17,12 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 /**
  * Handles drag & drop row reordering
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class TableRowTransferHandler extends TransferHandler {
 
     private final DataFlavor integerObjectFlavor = new ActivationDataFlavor(Integer.class, "Integer Row Index");
@@ -50,7 +51,12 @@ public class TableRowTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
         assert (c == grid);
-        createImageOfRow(grid.getSelectedRow());
+        int row = grid.getSelectedRow();
+        Object el = grid.getModel().getValueAt(row, 0);
+        if (!(el instanceof RenderableImageLayer)) {
+            return null;
+        }
+        createImageOfRow(row);
         return new DataHandler(new Integer(grid.getSelectedRow()), integerObjectFlavor.getMimeType());
     }
 
