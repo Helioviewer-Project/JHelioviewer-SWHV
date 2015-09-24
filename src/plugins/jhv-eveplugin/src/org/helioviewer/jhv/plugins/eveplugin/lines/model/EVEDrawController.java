@@ -1,13 +1,18 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.model;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.Timer;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
@@ -43,6 +48,9 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
     private final PlotAreaSpace plotAreaSpace;
     private static EVEDrawController instance;
+    private final Timer timer;
+    private boolean dataAdded;
+    private final Set<Band> addedDataForBand;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -60,6 +68,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
+        dataAdded = false;
+        addedDataForBand = new HashSet<Band>();
+        timer = new Timer(200, new DataAddedTimerTask());
+        timer.start();
     }
 
     public static EVEDrawController getSingletonInstance() {
@@ -123,7 +135,10 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
+    long called = 0;
+
     private void updateBand(final Band band, boolean keepFullValueRange) {
+        long start = System.currentTimeMillis();
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
@@ -154,6 +169,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
         yAxisElement.setAvailableRange(newAvailableRange);
         dataMapPerUnitLabel.get(yAxisElement).put(band, data);
+        Log.debug("update bands took: " + (System.currentTimeMillis() - start) + " called : " + called++);
     }
 
     private void updateBands(boolean keepFullValueRange) {
@@ -278,12 +294,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     @Override
     public void dataAdded(final Band band) {
         Log.debug("Data added");
-        if (yAxisElementMap.containsKey(band)) {
-            if (dataMapPerUnitLabel.get(yAxisElementMap.get(band)).containsKey(band)) {
-                updateBand(band, false);
-                fireRedrawRequest(true);
-            }
-        }
+        addedDataForBand.add(band);
+        dataAdded = true;
     }
 
     @Override
@@ -379,4 +391,27 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         fireRedrawRequest(false);
     }
 
+    private class DataAddedTimerTask implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (dataAdded) {
+                Log.debug("data added timer task");
+                dataAdded = false;
+                boolean update = false;
+                for (Band b : addedDataForBand) {
+                    if (yAxisElementMap.containsKey(b)) {
+                        if (dataMapPerUnitLabel.get(yAxisElementMap.get(b)).containsKey(b)) {
+                            updateBand(b, false);
+                            update = true;
+                        }
+                    }
+                }
+                if (update) {
+                    fireRedrawRequest(false);
+                }
+                addedDataForBand.clear();
+            }
+        }
+    }
 }
