@@ -2,8 +2,6 @@ package org.helioviewer.jhv.gui.controller;
 
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -13,14 +11,10 @@ import java.util.LinkedList;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.JHVCursors;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
-
-    private static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(9, 9), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
 
     private static Component component;
 
@@ -38,7 +32,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     public void mouseEntered(MouseEvent e) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
-            component.setCursor(buttonDown ? closedHandCursor : JHVCursors.openHandCursor);
+            component.setCursor(buttonDown ? JHVCursors.closedHandCursor : JHVCursors.openHandCursor);
         }
     }
 
@@ -52,7 +46,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
-                component.setCursor(closedHandCursor);
+                component.setCursor(JHVCursors.closedHandCursor);
             }
             buttonDown = true;
         }
