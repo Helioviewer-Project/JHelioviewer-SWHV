@@ -14,14 +14,15 @@ public class JHVThread {
 
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, name);
+            return new BagThread(r, name);
         }
     }
 
-    public static class J2KRenderThread extends Thread {
+    public static class BagThread extends Thread {
+
         private Object var;
 
-        public J2KRenderThread(Runnable r, String name) {
+        public BagThread(Runnable r, String name) {
             super(r, name);
         }
 
@@ -34,17 +35,4 @@ public class JHVThread {
         }
     }
 
-    public static class J2KRenderThreadFactory implements ThreadFactory {
-
-        private final String name;
-
-        public J2KRenderThreadFactory(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new J2KRenderThread(r, name);
-        }
-    }
 }

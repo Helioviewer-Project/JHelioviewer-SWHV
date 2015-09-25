@@ -61,7 +61,7 @@ class J2KRender implements Runnable {
 
     private void renderLayer() throws KduException {
 
-        //J2KRenderThread t = (JHVThread.J2KRenderThread) Thread.currentThread();
+        // BagThread t = (JHVThread.BagThread) Thread.currentThread();
 
         int numLayer = currParams.compositionLayer;
 
