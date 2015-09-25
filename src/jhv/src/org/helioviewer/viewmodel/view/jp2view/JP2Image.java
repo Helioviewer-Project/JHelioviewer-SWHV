@@ -39,6 +39,7 @@ import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
+import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -275,12 +276,9 @@ public class JP2Image {
         builtinLUT = lut;
     }
 
-    // The amount of cache to allocate to each codestream
-    private final int CODESTREAM_CACHE_THRESHOLD = 1024 * 256;
-
     private Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
         Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(jpx, CODESTREAM_CACHE_THRESHOLD);
+        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
 
         int numThreads = Kdu_global.Kdu_get_num_processors();
         threadEnv = new Kdu_thread_env();
