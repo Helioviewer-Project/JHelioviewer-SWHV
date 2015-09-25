@@ -272,9 +272,6 @@ public class RadioDownloader {
     }
 
     public void addRadioDownloaderListener(RadioDownloaderListener l) {
-        Log.debug("Add radio download listener");
-        Log.debug("adding " + l);
-        Thread.dumpStack();
         listeners.add(l);
     }
 

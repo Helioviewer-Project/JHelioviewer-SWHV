@@ -8,7 +8,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
@@ -61,8 +60,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     }
 
     public void addLineData(LineDataSelectorElement element) {
-        Log.debug("Add linedata");
-        Thread.dumpStack();
         elements.add(element);
         element.setDataColor(BandColors.getNextColor());
         fireLineDataSelectorElementAdded(element);
