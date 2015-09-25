@@ -129,9 +129,7 @@ public class Displayer implements JHVEventHighlightListener {
                 }
             }
             view.getImageLayer().setImageData(imageData);
-
-            if (timeChanged)
-                ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
 
             display();
         }
