@@ -262,7 +262,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickGreg.setTime(tickValue);
                 GregorianCalendar previousGreg = new GregorianCalendar();
                 previousGreg.setTime(previousDate);
-                if (tickGreg.get(GregorianCalendar.DAY_OF_MONTH) == previousGreg.get(GregorianCalendar.DAY_OF_MONTH)) {
+                if (tickGreg.get(GregorianCalendar.DAY_OF_MONTH) == previousGreg.get(GregorianCalendar.DAY_OF_MONTH) && tickGreg.get(GregorianCalendar.MONTH) == previousGreg.get(GregorianCalendar.MONTH) && tickGreg.get(GregorianCalendar.YEAR) == previousGreg.get(GregorianCalendar.YEAR)) {
                     tickText = ChartConstants.HOUR_TIME_FORMAT.format(tickValue);
                 } else {
                     tickText = ChartConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
@@ -785,12 +785,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
 
-                    // startTime >= myPlotAreaSpace.getScaledMinTime()
-                    // && endTime <= myPlotAreaSpace.getScaledMaxTime() &&
-                    // startTime
-                    // <= myPlotAreaSpace.getScaledMaxTime()
-                    // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
-                    ) {
+                            // startTime >= myPlotAreaSpace.getScaledMinTime()
+                            // && endTime <= myPlotAreaSpace.getScaledMaxTime() &&
+                            // startTime
+                            // <= myPlotAreaSpace.getScaledMaxTime()
+                            // && endTime >= myPlotAreaSpace.getScaledMinTime()) {
+                            ) {
                         vs.setScaledSelectedRange(new Range(startValue, endValue));
                     } else {
                         Log.debug("Event not processed: startValue <= endValue: " + (startValue <= endValue) + " startValue >= plotAreaSpace.getScaledMinValue() " + (startValue >= availableRange.min) + " startValue <= plotAreaSpace.getScaledMaxValue() " + (startValue <= availableRange.max) + " endValue >= plotAreaSpace.getScaledMinValue() " + (endValue >= availableRange.max) + " endValue <= plotAreaSpace.getScaledMaxValue()" + (endValue <= availableRange.max));
