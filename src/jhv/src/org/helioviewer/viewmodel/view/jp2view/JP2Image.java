@@ -189,6 +189,7 @@ public class JP2Image {
             res = (JPIPResponse) socket.connect(uri);
             // Create the cache object and add the first response to it
             cache = new JHV_Kdu_cache();
+            // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
             cache.addJPIPResponseData(res);
 
             // Download the necessary initial data
@@ -274,31 +275,36 @@ public class JP2Image {
         builtinLUT = lut;
     }
 
+    // The amount of cache to allocate to each codestream
+    private final int CODESTREAM_CACHE_THRESHOLD = 1024 * 256;
+
+    private Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
+        Kdu_region_compositor krc = new Kdu_region_compositor();
+        krc.Create(jpx, CODESTREAM_CACHE_THRESHOLD);
+
+        int numThreads = Kdu_global.Kdu_get_num_processors();
+        threadEnv = new Kdu_thread_env();
+        threadEnv.Create();
+        for (int i = 1; i < numThreads; i++)
+            threadEnv.Add_thread();
+
+        krc.Set_thread_env(threadEnv, null);
+        krc.Set_surface_initialization_mode(false);
+
+        return krc;
+    }
+
     /**
      * Creates the Kakadu objects and sets all the data-members in this object.
      *
      * @throws JHV_KduException
      */
     private void createKakaduMachinery() throws JHV_KduException {
-        // The amount of cache to allocate to each codestream
-        final int CODESTREAM_CACHE_THRESHOLD = 1024 * 256;
-
         try {
             // Open the jpx source from the family source
             jpxSrc.Open(familySrc, false);
 
-            // I don't know if I should be using the codestream in a persistent
-            // mode or not...
-            compositor.Create(jpxSrc, CODESTREAM_CACHE_THRESHOLD);
-            int numThreads = Kdu_global.Kdu_get_num_processors();
-            threadEnv = new Kdu_thread_env();
-            threadEnv.Create();
-            for (int i = 1; i < numThreads; i++)
-                threadEnv.Add_thread();
-
-            compositor.Set_thread_env(threadEnv, null);
-            compositor.Set_surface_initialization_mode(false);
-
+            compositor = createCompositor(jpxSrc);
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
             Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
@@ -541,46 +547,45 @@ public class JP2Image {
         }
     }
 
-    protected boolean updateResolutionSet(int compositionLayerCurrentlyInUse) {
+    protected boolean updateResolutionSet(int compositionLayerCurrentlyInUse) throws KduException {
         if (resolutionSetCompositionLayer == compositionLayerCurrentlyInUse)
             return false;
 
-        resolutionSetCompositionLayer = compositionLayerCurrentlyInUse;
-
-        try {
-            Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
-
-            int maxDWT = stream.Get_min_dwt_levels();
-
-            compositor.Set_scale(false, false, false, 1.0f);
-            Kdu_dims dims = new Kdu_dims();
-            if (!compositor.Get_total_composition_dims(dims))
-                return false;
-
-            if (resolutionSet != null) {
-                int pixelWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
-                int pixelHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
-
-                Kdu_coords size = dims.Access_size();
-                if (size.Get_x() == pixelWidth && size.Get_y() == pixelHeight)
-                    return false;
-            }
-
-            resolutionSet = new ResolutionSet(maxDWT + 1);
-            resolutionSet.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
-
-            for (int i = 1; i <= maxDWT; i++) {
-                compositor.Set_scale(false, false, false, 1.0f / (1 << i));
-                dims = new Kdu_dims();
-                if (!compositor.Get_total_composition_dims(dims))
-                    break;
-                resolutionSet.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
-            }
-        } catch (KduException e) {
-            e.printStackTrace();
+        Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
+        if (!stream.Exists()) {
+            throw new KduException(">>> stream doesn't exist " + compositionLayerCurrentlyInUse);
         }
 
-        return true;
+        resolutionSetCompositionLayer = compositionLayerCurrentlyInUse;
+
+        int maxDWT = stream.Get_min_dwt_levels();
+
+        compositor.Set_scale(false, false, false, 1.0f);
+        Kdu_dims dims = new Kdu_dims();
+        if (!compositor.Get_total_composition_dims(dims))
+            return false;
+
+        if (resolutionSet != null) {
+            int pixelWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
+            int pixelHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
+
+            Kdu_coords size = dims.Access_size();
+            if (size.Get_x() == pixelWidth && size.Get_y() == pixelHeight)
+                return false;
+        }
+
+        resolutionSet = new ResolutionSet(maxDWT + 1);
+        resolutionSet.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
+
+        for (int i = 1; i <= maxDWT; i++) {
+            compositor.Set_scale(false, false, false, 1.0f / (1 << i));
+            dims = new Kdu_dims();
+            if (!compositor.Get_total_composition_dims(dims))
+                break;
+            resolutionSet.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
+        }
+
+        return false;
     }
 
     /**
