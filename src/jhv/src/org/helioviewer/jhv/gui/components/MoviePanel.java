@@ -30,6 +30,7 @@ import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -232,6 +233,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         setState(false);
         setAdvanced(isAdvanced);
+        sliderTimer.start();
     }
 
     private static void setState(boolean enabled) {
@@ -402,23 +404,23 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    // called from other threads
-    public static void cacheStatusChanged(View view) {
-        EventQueue.invokeLater(new Runnable() {
-            private View view;
+    private static final Timer sliderTimer = new Timer(1000 / 10, new CacheChangedListener());
 
-            @Override
-            public void run() {
-               if (view == Layers.getActiveView()) {
-                    timeSlider.repaint();
-                }
-            }
+    private static boolean cacheChanged = false;
 
-            public Runnable init(View _view) {
-                view = _view;
-                return this;
+    // accessed from J2KReader threads, safe
+    public static void cacheStatusChanged() {
+        cacheChanged = true;
+    }
+
+    private static class CacheChangedListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (cacheChanged == true) {
+                cacheChanged = false;
+                timeSlider.repaint();
             }
-        }.init(view));
+        }
     }
 
     /**
