@@ -111,7 +111,8 @@ public class ImageViewerGui {
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         // STATUS PANEL
-        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
+        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised
+                                            // before topToolBar
         framerateStatus = new FramerateStatusPanel();
 
         TopToolBar topToolBar = new TopToolBar();
@@ -164,7 +165,7 @@ public class ImageViewerGui {
         mainFrame.setVisible(true);
 
         // force GLCanvas initialisation for pixel scale
-        // mainComponent.display();
+        mainComponent.display();
     }
 
     private static JFrame createMainFrame() {
