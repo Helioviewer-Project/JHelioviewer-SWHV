@@ -38,15 +38,16 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
             return;
 
         GL3DVec3d computedposition = Displayer.getViewport().getCamera().getVectorFromSphereAlt(position);
+        double radius = Displayer.getViewport().getCamera().getRadiusFromSphereAlt(position);
 
         if (computedposition == null) {
             //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");
-            setText("(\u03B8, \u03C6) =( --\u00B0, --\u00B0)");
+            setText(String.format("%.2f", radius) + " R\u2299; ( \u03B8, \u03C6) =(--\u00B0, --\u00B0)");
         } else {
             double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
             double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
             phi = MathUtils.mapToMinus180To180(phi);
-            setText("(\u03B8, \u03C6) = " + "(" + String.format("%.2f\u00B0", theta) + "," + String.format("%.2f\u00B0", phi) + ")");
+            setText(String.format("%.2f", radius) + " R\u2299; ( \u03B8, \u03C6) = " + "(" + String.format("%.2f\u00B0", theta) + "," + String.format("%.2f\u00B0", phi) + ")");
         }
         lastPosition = position;
     }

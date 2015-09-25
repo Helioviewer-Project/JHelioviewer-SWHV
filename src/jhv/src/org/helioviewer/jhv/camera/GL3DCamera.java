@@ -263,6 +263,16 @@ public abstract class GL3DCamera {
         return null;
     }
 
+    public double getRadiusFromSphereAlt(Point viewportCoordinates) {
+        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
+        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
+        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
+        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+
+        double radius2 = Math.sqrt(up1x * up1x + up1y * up1y);
+        return radius2;
+    }
+
     public GL3DVec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
         double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
         double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
