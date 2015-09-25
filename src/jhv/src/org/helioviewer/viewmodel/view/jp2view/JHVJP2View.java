@@ -50,7 +50,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     private final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
     private final RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
     private final int numOfThread = 1;
-    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
+    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.J2KRenderThreadFactory("Render"), rejectedExecutionHandler);
 
     protected Region targetRegion;
 
