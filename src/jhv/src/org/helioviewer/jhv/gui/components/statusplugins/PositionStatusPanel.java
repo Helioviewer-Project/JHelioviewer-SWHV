@@ -41,13 +41,12 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         double radius = Displayer.getViewport().getCamera().getRadiusFromSphereAlt(position);
 
         if (computedposition == null) {
-            //setText("(x, y) = " + "(" + String.format("%.2fR\u2609", computedposition.x) + "," + String.format("%.2fR\u2609", computedposition.y) + ")");
-            setText(String.format("%.2f", radius) + " R\u2299; ( \u03B8, \u03C6) =(--\u00B0, --\u00B0)");
+            setText("(\u03B8, \u03C6) : (--\u00B0, --\u00B0)" + String.format(" | \u03c1 : %.2f R\u2299", radius));
         } else {
             double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
             double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
             phi = MathUtils.mapToMinus180To180(phi);
-            setText(String.format("%.2f", radius) + " R\u2299; ( \u03B8, \u03C6) = " + "(" + String.format("%.2f\u00B0", theta) + "," + String.format("%.2f\u00B0", phi) + ")");
+            setText(String.format("(\u03B8, \u03C6) : (%.2f\u00B0,%.2f\u00B0)", theta, phi) +  String.format(" | \u03c1 : %.2f R\u2299", radius));
         }
         lastPosition = position;
     }
