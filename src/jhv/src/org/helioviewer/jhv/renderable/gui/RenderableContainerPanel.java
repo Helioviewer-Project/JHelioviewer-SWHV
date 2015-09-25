@@ -185,7 +185,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 }
                 if (col == TITLEROW || col == VISIBLEROW || col == TIMEROW) {
                     if (renderable instanceof RenderableImageLayer) {
-                        Layers.setActiveView(((RenderableImageLayer) renderable).getMainLayerView());
+                        Layers.setActiveView(((RenderableImageLayer) renderable).getView());
                     }
                     setOptionsPanel(renderable);
                 }

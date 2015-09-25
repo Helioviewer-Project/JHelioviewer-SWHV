@@ -19,7 +19,6 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -39,26 +38,24 @@ public class RenderableImageLayer implements Renderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final View layerView;
+    private final View view;
     private boolean isVisible = true;
 
     private final GLImage glImage;
 
-    public RenderableImageLayer(View view) {
+    public RenderableImageLayer(View _view) {
         layerId = nextLayerId++;
-        layerView = view;
+        view = _view;
 
         glImage = new GLImage(view.getDefaultLUT());
 
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
-        float opacity = (float) (1. / (1. + Layers.getNumLayers()));
-        if (layerView instanceof JHVJP2View) {
-            JHVJP2View jp2v = (JHVJP2View) layerView;
-            if (jp2v.getName().contains("LASCO") || jp2v.getName().contains("COR")) {
-                opacity = 1.f;
-            }
-        }
+        float opacity;
+        if (view.getName().contains("LASCO") || view.getName().contains("COR"))
+            opacity = 1.f;
+        else
+            opacity = (float) (1. / (1. + Layers.getNumLayers()));
         glImage.setOpacity(opacity);
     }
 
@@ -94,8 +91,7 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
-
-        if (!isVisible || imageData == null)
+        if (!isVisible)
             return;
 
         GLSLShader.bind(gl);
@@ -180,7 +176,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public void remove(GL2 gl) {
-        Layers.removeLayer(layerView);
+        Layers.removeLayer(view);
         imageData = prevImageData = baseImageData = null;
         dispose(gl);
     }
@@ -320,7 +316,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public String getName() {
-        return layerView.getName();
+        return view.getName();
     }
 
     @Override
@@ -331,8 +327,8 @@ public class RenderableImageLayer implements Renderable {
         return imageData.getMetaData().getDateObs().getCachedDate();
     }
 
-    public View getMainLayerView() {
-        return layerView;
+    public View getView() {
+        return view;
     }
 
     @Override
@@ -342,7 +338,7 @@ public class RenderableImageLayer implements Renderable {
 
     @Override
     public boolean isActiveImageLayer() {
-        return Layers.getActiveView() == layerView;
+        return Layers.getActiveView() == view;
     }
 
     @Override
