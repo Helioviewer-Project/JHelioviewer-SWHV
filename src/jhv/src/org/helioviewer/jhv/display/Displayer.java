@@ -111,9 +111,8 @@ public class Displayer implements JHVEventHighlightListener {
             if (imageData == null) // null on load
                 return;
 
-            boolean timeChanged = false;
-
             if (view == Layers.getActiveView()) {
+                boolean timeChanged = false;
                 Date timestamp = imageData.getMetaData().getDateObs().getDate();
                 if (timestamp.getTime() != lastTimestamp.getTime()) {
                     timeChanged = true;

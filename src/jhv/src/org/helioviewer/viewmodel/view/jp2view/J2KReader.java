@@ -95,7 +95,7 @@ class J2KReader implements Runnable {
                 socket = new JPIPSocket();
                 JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
                 cacheRef.addJPIPResponseData(res);
-                MoviePanel.cacheStatusChanged(parentViewRef);
+                MoviePanel.cacheStatusChanged();
             }
         } else {
             socket = null;
@@ -109,7 +109,7 @@ class J2KReader implements Runnable {
     void start() {
         if (myThread != null)
             stop();
-        myThread = new Thread(this, "J2KReader " + parentViewRef.getName());
+        myThread = new Thread(this, "J2KReader " + parentImageRef.getName(0));
         stop = false;
         myThread.start();
     }
@@ -416,7 +416,7 @@ class J2KReader implements Runnable {
                                                 }
                                             }
                                         }
-                                        MoviePanel.cacheStatusChanged(parentViewRef);
+                                        MoviePanel.cacheStatusChanged();
 
                                         downgradeNecessary = false;
                                     }
@@ -440,7 +440,7 @@ class J2KReader implements Runnable {
                                             }
                                         }
                                     }
-                                    MoviePanel.cacheStatusChanged(parentViewRef);
+                                    MoviePanel.cacheStatusChanged();
 
                                     if ((parentImageRef.getReaderMode() == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || parentImageRef.getReaderMode() == ReaderMode.ALWAYSFIREONNEWDATA) {
                                         // if package belongs to current frame tell the render-thread
