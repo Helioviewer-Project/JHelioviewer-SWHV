@@ -10,7 +10,7 @@ public class ZoomStatusPanel extends JLabel {
     }
 
     public void updateZoomLevel(double cameraWidth) {
-        setText(String.format("Zoom: %.2f R\u2299", cameraWidth));
+        setText(String.format("Zoom: %.2f R\u2299", 2 * cameraWidth));
     }
 
 }
