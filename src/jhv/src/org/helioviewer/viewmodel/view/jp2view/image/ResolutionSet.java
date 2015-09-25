@@ -8,9 +8,9 @@ import org.helioviewer.base.interval.Interval;
 /**
  * A class describing the available resolution levels for a given image. It
  * supplies several simple methods to aid in selecting appropriate zoom levels.
- * 
+ *
  * @author caplins
- * 
+ *
  */
 public class ResolutionSet {
 
@@ -29,7 +29,7 @@ public class ResolutionSet {
     /**
      * Constructor. Takes the number of resolution levels in the associated
      * image.
-     * 
+     *
      * @param _numResolutions
      */
     public ResolutionSet(int _numResolutions) {
@@ -45,7 +45,7 @@ public class ResolutionSet {
      * some situations this might not be true though, and for extendability I
      * use a rectangle object instead of a Dimension object (even though I don't
      * think I ever explicitly use the origin).
-     * 
+     *
      * @param _discardLayer
      * @param _dims
      */
@@ -57,7 +57,7 @@ public class ResolutionSet {
      * Returns a resolution level zoomed by _delta levels. Useful for zooming in
      * and out operations. Also can be used for zoom min/max by using
      * Integer.MAX_VALUE and INTEGER.MIN_VALUE.
-     * 
+     *
      * @param _currRes
      * @param _delta
      * @return Requested resolution level
@@ -74,15 +74,15 @@ public class ResolutionSet {
      * Returns the smallest Resolution level that fits within the _bounds (or
      * just the smallest if none fit in the _bounds). Useful for zoomfit
      * operations.
-     * 
+     *
      * @param _bounds
      * @return Closest resolution level
      */
-    public ResolutionLevel getClosestResolutionLevel(Dimension _bounds) {
+    public ResolutionLevel getClosestResolutionLevel(int w, int h) {
         int idx = 0;
         for (int i = 0; i < resolutions.length; i++) {
             idx = i;
-            if (resolutions[i].dims.width <= _bounds.width && resolutions[i].dims.height <= _bounds.height)
+            if (resolutions[i].dims.width <= w && resolutions[i].dims.height <= h)
                 break;
         }
         return resolutions[idx];
@@ -106,6 +106,14 @@ public class ResolutionSet {
         return resolutions[resolutions.length - 1];
     }
 
+    public ResolutionLevel getNextResolutionLevelAlt(double ratio, double mHeight) {
+        for (int i = 1; i < resolutions.length; ++i) {
+            if (mHeight / (resolutions[i].dims.width) >= ratio)
+                return resolutions[i - 1];
+        }
+        return resolutions[resolutions.length - 1];
+    }
+
     public int getMaxResolutionLevels() {
         return resolutionRange.getEnd();
     }
@@ -115,9 +123,9 @@ public class ResolutionSet {
      * though this class is public it's constructor is private. The
      * ResolutionSet object can be considered to be the ResolutionLevel
      * 'factory'. The ResolutionLevel object is also immutable.
-     * 
+     *
      * @author caplins
-     * 
+     *
      */
     public class ResolutionLevel {
 
@@ -160,6 +168,7 @@ public class ResolutionSet {
          * paranoid I overridden the equals method.
          */
 
+        @Override
         public boolean equals(Object _obj) {
             if (_obj == null)
                 return false;
@@ -171,16 +180,18 @@ public class ResolutionSet {
 
         /**
          * Clone is NOT supported.
-         * 
+         *
          * @throws CloneNotSupportedException
          */
 
+        @Override
         public Object clone() throws CloneNotSupportedException {
             throw new CloneNotSupportedException();
         }
 
         /** The toString method */
 
+        @Override
         public String toString() {
             String ret = "[";
             ret += " [ZoomPercent=" + getZoomPercent() + "]";

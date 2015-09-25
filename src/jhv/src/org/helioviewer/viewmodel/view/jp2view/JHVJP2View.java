@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -187,13 +186,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        //solar_radii per pixel needed
-        double ratio = Math.min(mWidth, Displayer.getViewport().getCamera().getCameraWidth() * 2) / (Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
+        double ratio = (Displayer.getViewport().getCamera().getCameraWidth() * 2) / (Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
         int totalHeight = (int) (mHeight / ratio);
 
-        //TBD choose between both
-        //ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(new Dimension(totalHeight, totalHeight));
-        ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(new Dimension(totalHeight, totalHeight));
+        ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(totalHeight, totalHeight);
 
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
