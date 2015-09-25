@@ -41,31 +41,31 @@ public class RadioDataManager implements RadioDownloaderListener {
     private static RadioDataManager instance;
 
     /** A list collecting all the radio data manager listeners. */
-    private final List<RadioDataManagerListener> listeners;
+    private List<RadioDataManagerListener> listeners;
 
     /** A map keeping the download request data. */
-    private final Map<Long, DownloadRequestData> downloadRequestData;
+    private Map<Long, DownloadRequestData> downloadRequestData;
 
     /** Instance of the radio downloader */
-    private final RadioDownloader downloader;
+    private RadioDownloader downloader;
 
     /** A buffer holding all the requests for data. */
-    private final RequestForDataBuffer requestBuffer;
+    private RequestForDataBuffer requestBuffer;
 
     /** The instance of the line data selector model */
-    private final LineDataSelectorModel lineDataSelectorModel;
+    private LineDataSelectorModel lineDataSelectorModel;
 
     /** Instance of the radio image cache */
-    private final RadioImageCache cache;
+    private RadioImageCache cache;
 
     /** Instance of the zoom manager */
-    private final ZoomManager zoomManager;
+    private ZoomManager zoomManager;
 
     /** Id for identifying the requests for data. */
     private final long id = 0;
 
     /** Instance of eve state */
-    private final EVEState eveState;
+    private EVEState eveState;
 
     /** Is there a request for data busy */
     private boolean requestForDataBusy;
@@ -76,16 +76,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *
      */
     private RadioDataManager() {
-        listeners = new ArrayList<RadioDataManagerListener>();
-        downloadRequestData = new HashMap<Long, DownloadRequestData>();
-        downloader = RadioDownloader.getSingletonInstance();
-        downloader.addRadioDownloaderListener(this);
-        lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
-        cache = RadioImageCache.getInstance();
-        requestBuffer = new RequestForDataBuffer();
-        zoomManager = ZoomManager.getSingletonInstance();
-        eveState = EVEState.getSingletonInstance();
-        requestForDataBusy = false;
+
     }
 
     /**
@@ -96,8 +87,22 @@ public class RadioDataManager implements RadioDownloaderListener {
     public static RadioDataManager getSingletonInstance() {
         if (instance == null) {
             instance = new RadioDataManager();
+            instance.init();
         }
         return instance;
+    }
+
+    private void init() {
+        listeners = new ArrayList<RadioDataManagerListener>();
+        downloadRequestData = new HashMap<Long, DownloadRequestData>();
+        downloader = RadioDownloader.getSingletonInstance();
+        downloader.addRadioDownloaderListener(this);
+        lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
+        cache = RadioImageCache.getInstance();
+        requestBuffer = new RequestForDataBuffer();
+        zoomManager = ZoomManager.getSingletonInstance();
+        eveState = EVEState.getSingletonInstance();
+        requestForDataBusy = false;
     }
 
     /**

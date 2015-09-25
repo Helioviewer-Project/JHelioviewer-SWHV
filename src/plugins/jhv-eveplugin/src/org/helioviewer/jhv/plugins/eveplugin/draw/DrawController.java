@@ -31,12 +31,11 @@ import org.helioviewer.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 
-    private static final DrawController instance = new DrawController();
-
+    private static DrawController instance;
     private Interval<Date> selectedInterval = new Interval<Date>(null, null);
     private Interval<Date> availableInterval = new Interval<Date>(null, null);
 
-    private final PlotAreaSpace pas;
+    private PlotAreaSpace pas;
 
     private final List<TimingListener> tListeners;
     private boolean keepFullValueRange;
@@ -57,21 +56,26 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new ArrayList<YAxisElement>();
-
         tListeners = new ArrayList<TimingListener>();
-        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
-        addDrawControllerListener(LineDataSelectorModel.getSingletonInstance());
-
         keepFullValueRange = false;
-        pas = PlotAreaSpace.getSingletonInstance();
-        pas.addPlotAreaSpaceListener(this);
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
         // axisUnitMap = new HashMap<YAxisElement, String>();
     }
 
     public static DrawController getSingletonInstance() {
+        if (instance == null) {
+            instance = new DrawController();
+            instance.init();
+        }
         return instance;
+    }
+
+    private void init() {
+        LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
+        pas = PlotAreaSpace.getSingletonInstance();
+        pas.addPlotAreaSpaceListener(this);
+        addDrawControllerListener(LineDataSelectorModel.getSingletonInstance());
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {

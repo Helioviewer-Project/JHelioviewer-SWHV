@@ -58,7 +58,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
-        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
         radioImagePane = new RadioImagePane();
         radioImagePane.setYAxisElement(yAxisElement);
         downloadRequestData = new HashMap<Long, DownloadRequestData>();
@@ -71,8 +70,13 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     public static RadioPlotModel getSingletonInstance() {
         if (instance == null) {
             instance = new RadioPlotModel();
+            instance.init();
         }
         return instance;
+    }
+
+    private void init() {
+        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }
 
     public void addRadioPlotModelListener(RadioPlotModelListener listener, String plotIdentifier) {
