@@ -16,7 +16,6 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
 
     private final RenderableDummy dummy;
     private final boolean image;
-    private final boolean wasPlaying;
     private final String cadence;
     private final String instrument;
     private final String measurement;
@@ -34,11 +33,6 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
         this.instrument = instrument;
         this.measurement = measurement;
         this.detector = detector;
-
-        // due to CacheStrategy, layers load significantly faster when movie is paused
-        wasPlaying = Layers.isMoviePlaying();
-        if (wasPlaying)
-            Layers.pauseMovie();
 
         dummy = new RenderableDummy(this);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
@@ -69,8 +63,6 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
             ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
             try {
                 Layers.addLayer(get());
-                if (wasPlaying)
-                    Layers.playMovie();
             } catch (Exception e) {
                 e.printStackTrace();
             }
