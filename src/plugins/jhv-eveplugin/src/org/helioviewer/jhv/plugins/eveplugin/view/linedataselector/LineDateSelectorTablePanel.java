@@ -21,6 +21,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -36,7 +38,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
-public class LineDateSelectorTablePanel extends JPanel implements TableModelListener {
+public class LineDateSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     public static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -59,13 +61,15 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
     private Component optionsPanel = new JPanel();
     private final IntervalOptionPanel intervalOptionPanel;
 
+    private int lastSelectedIndex = -1;
+
     public LineDateSelectorTablePanel() {
         intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
         tableModel = LineDataSelectorModel.getSingletonInstance();
         grid = new JTable(tableModel);
         tableModel.addTableModelListener(grid);
-
+        grid.getSelectionModel().addListSelectionListener(this);
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
@@ -206,6 +210,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
+
     }
 
     @Override
@@ -222,4 +227,16 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         }
     }
 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (grid.getSelectedRow() == -1 && lastSelectedIndex > -1) {
+            if (tableModel.getRowCount() > lastSelectedIndex) {
+                grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
+            } else {
+                lastSelectedIndex = grid.getSelectedRow();
+            }
+        } else {
+            lastSelectedIndex = grid.getSelectedRow();
+        }
+    }
 }
