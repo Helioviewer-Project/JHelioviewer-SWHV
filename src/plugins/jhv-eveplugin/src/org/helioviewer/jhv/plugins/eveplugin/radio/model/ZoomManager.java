@@ -15,9 +15,9 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 
 public class ZoomManager implements TimingListener, GraphDimensionListener {
     private static ZoomManager instance;
-    private final DrawController drawController;
-    private final PlotAreaSpace plotAreaSpace;
-    private final YValueModel yValueModel;
+    private DrawController drawController;
+    private PlotAreaSpace plotAreaSpace;
+    private YValueModel yValueModel;
 
     private final Map<Long, ZoomDataConfig> zoomDataConfigMap;
     private boolean isAreaInitialized;
@@ -26,12 +26,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
 
     private ZoomManager() {
         // currentInterval = new Interval<Date>(new Date(), new Date());
-        drawController = DrawController.getSingletonInstance();
-        drawController.addTimingListener(this);
-        drawController.addGraphDimensionListener(this);
-        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        yValueModel = YValueModel.getSingletonInstance();
-
         zoomDataConfigMap = new HashMap<Long, ZoomDataConfig>();
         listeners = new ArrayList<ZoomManagerListener>();
         isAreaInitialized = false;
@@ -42,8 +36,17 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     public static ZoomManager getSingletonInstance() {
         if (instance == null) {
             instance = new ZoomManager();
+            instance.init();
         }
         return instance;
+    }
+
+    private void init() {
+        drawController = DrawController.getSingletonInstance();
+        drawController.addTimingListener(this);
+        drawController.addGraphDimensionListener(this);
+        plotAreaSpace = PlotAreaSpace.getSingletonInstance();
+        yValueModel = YValueModel.getSingletonInstance();
     }
 
     public void calculateZoomXDirection() {
