@@ -14,7 +14,7 @@ public abstract class AbstractView implements View {
     private LocalImageCacheStatus cacheStatus;
 
     protected MetaData[] metaDataArray = new MetaData[1];
-    protected ImageData imageData;
+    protected ImageData imageData = null;
 
     @Override
     public void abolish() {
@@ -91,7 +91,9 @@ public abstract class AbstractView implements View {
     @Override
     public void setDataHandler(ViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
-        dataHandler.handleData(this, imageData);
+        // null/not used by JHVJP2View
+        if (imageData != null)
+            dataHandler.handleData(this, imageData);
     }
 
     @Override

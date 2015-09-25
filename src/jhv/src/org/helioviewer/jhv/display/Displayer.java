@@ -108,9 +108,6 @@ public class Displayer implements JHVEventHighlightListener {
 
         @Override
         public void handleData(View view, ImageData imageData) {
-            if (imageData == null) // null on load
-                return;
-
             if (view == Layers.getActiveView()) {
                 boolean timeChanged = false;
                 Date timestamp = imageData.getMetaData().getDateObs().getDate();
