@@ -151,7 +151,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
                     LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
                     renderable.setVisibility(!renderable.isVisible());
                 }
-                if (col == TITLE_ROW || col == VISIBLE_ROW || col == LOADING_ROW) {
+                if (col == TITLE_ROW || col == VISIBLE_ROW || col == LOADING_ROW || col == LINECOLOR_ROW) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
@@ -215,6 +215,27 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
     @Override
     public void tableChanged(TableModelEvent e) {
+        if (tableModel.getRowCount() > 0) {
+            grid.setRowSelectionInterval(tableModel.getRowCount() - 1, tableModel.getRowCount() - 1);
+        }
+        checkOptionPanel();
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (grid.getSelectedRow() == -1 && lastSelectedIndex > -1) {
+            if (tableModel.getRowCount() > lastSelectedIndex) {
+                grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
+                checkOptionPanel();
+            } else {
+                lastSelectedIndex = grid.getSelectedRow();
+            }
+        } else {
+            lastSelectedIndex = grid.getSelectedRow();
+        }
+    }
+
+    private void checkOptionPanel() {
         int[] sr = grid.getSelectedRows();
         if (sr.length > 0) {
             setOptionsPanel((LineDataSelectorElement) tableModel.getValueAt(sr[0], 0));
@@ -224,19 +245,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
             } else {
                 setOptionsPanel(null);
             }
-        }
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (grid.getSelectedRow() == -1 && lastSelectedIndex > -1) {
-            if (tableModel.getRowCount() > lastSelectedIndex) {
-                grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
-            } else {
-                lastSelectedIndex = grid.getSelectedRow();
-            }
-        } else {
-            lastSelectedIndex = grid.getSelectedRow();
         }
     }
 }
