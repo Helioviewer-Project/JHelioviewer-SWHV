@@ -34,7 +34,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.JHVCursors;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -200,7 +200,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             public void mouseMoved(MouseEvent arg0) {
                 int row = grid.rowAtPoint(arg0.getPoint());
                 if (grid.getValueAt(row, 0) instanceof RenderableImageLayer) {
-                    grid.setCursor(JHVCursors.openHandCursor);
+                    grid.setCursor(UIGlobals.openHandCursor);
                 } else {
                     grid.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
