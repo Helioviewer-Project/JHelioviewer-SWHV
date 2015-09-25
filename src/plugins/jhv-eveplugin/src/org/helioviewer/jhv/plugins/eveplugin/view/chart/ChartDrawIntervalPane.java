@@ -23,7 +23,7 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.gui.JHVCursors;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
@@ -523,7 +523,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
         if (mouseOverInterval && !mouseOverLeftGraspPoint && !mouseOverRightGraspPoint) {
-            setCursor(JHVCursors.closedHandCursor);
+            setCursor(UIGlobals.closedHandCursor);
         }
     }
 
@@ -535,7 +535,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             resizeSelectedInterval(e.getPoint(), true);
         } else if (mouseOverInterval) {
             moveSelectedInterval(e.getPoint(), true);
-            setCursor(JHVCursors.openHandCursor);
+            setCursor(UIGlobals.openHandCursor);
         }
         mousePressed = null;
 
@@ -561,7 +561,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         // is mouse cursor above selected interval?
         if (e.getPoint().x >= leftIntervalBorderPosition && e.getPoint().x <= rightIntervalBorderPosition) {
             mouseOverInterval = true;
-            setCursor(JHVCursors.openHandCursor);
+            setCursor(UIGlobals.openHandCursor);
         }
 
         // reset cursor if it does not point to the interval area

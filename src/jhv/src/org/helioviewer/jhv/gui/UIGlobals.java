@@ -1,6 +1,9 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -11,6 +14,7 @@ import javax.swing.plaf.FontUIResource;
 
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 public class UIGlobals {
 
@@ -82,5 +86,8 @@ public class UIGlobals {
     public static Font UIFontMono = new Font("Courier", Font.PLAIN, 12);
 
     public static Font UIFontRoboto;
+
+    public static final Cursor openHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.OPEN_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.OPEN_HAND).toString());
+    public static final Cursor closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(IconBank.getIcon(JHVIcon.CLOSED_HAND).getImage(), new Point(16, 8), IconBank.getIcon(JHVIcon.CLOSED_HAND).toString());
 
 }
