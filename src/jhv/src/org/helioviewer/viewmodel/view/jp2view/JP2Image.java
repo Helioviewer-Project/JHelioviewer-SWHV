@@ -19,13 +19,13 @@ import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
-import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
@@ -73,13 +73,7 @@ public class JP2Image {
     private Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src();
 
     /** The Jpx_source object is capable of opening jp2 and jpx sources. */
-    private Jpx_source jpxSrc = new Jpx_source();
-
-    /**
-     * The compositor object takes care of all the rendering via its process
-     * function.
-     */
-    private Kdu_region_compositor compositor = new Kdu_region_compositor();
+    protected Jpx_source jpxSrc = new Jpx_source();
 
     /** The number of composition layers for the image. */
     private int frameCount;
@@ -108,8 +102,6 @@ public class JP2Image {
      * to grayscale and RGB images).
      */
     private int numComponents;
-
-    private Kdu_thread_env threadEnv;
 
     private ImageCacheStatus imageCacheStatus;
 
@@ -276,22 +268,6 @@ public class JP2Image {
         builtinLUT = lut;
     }
 
-    private Kdu_region_compositor createCompositor(Jpx_source jpx) throws KduException {
-        Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-
-        int numThreads = Kdu_global.Kdu_get_num_processors();
-        threadEnv = new Kdu_thread_env();
-        threadEnv.Create();
-        for (int i = 1; i < numThreads; i++)
-            threadEnv.Add_thread();
-
-        krc.Set_thread_env(threadEnv, null);
-        krc.Set_surface_initialization_mode(false);
-
-        return krc;
-    }
-
     /**
      * Creates the Kakadu objects and sets all the data-members in this object.
      *
@@ -302,7 +278,9 @@ public class JP2Image {
             // Open the jpx source from the family source
             jpxSrc.Open(familySrc, false);
 
-            compositor = createCompositor(jpxSrc);
+            Kdu_region_compositor compositor = new Kdu_region_compositor();
+            compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
             Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
@@ -346,9 +324,10 @@ public class JP2Image {
                 stream = null;
             }
 
-            updateResolutionSet(0);
+            updateResolutionSet(compositor, 0);
             // Remove the layer that was added
             compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+            compositor.Native_destroy();
 
             configureLUT();
         } catch (KduException ex) {
@@ -517,12 +496,6 @@ public class JP2Image {
         APIResponseDump.getSingletonInstance().removeResponse(uri);
 
         try {
-            if (compositor != null) {
-                compositor.Halt_processing();
-                compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-                compositor.Native_destroy();
-                threadEnv.Native_destroy();
-            }
             if (jpxSrc != null) {
                 jpxSrc.Close();
                 jpxSrc.Native_destroy();
@@ -538,14 +511,13 @@ public class JP2Image {
         } catch (KduException ex) {
             ex.printStackTrace();
         } finally {
-            compositor = null;
             jpxSrc = null;
             familySrc = null;
             cache = null;
         }
     }
 
-    protected boolean updateResolutionSet(int compositionLayerCurrentlyInUse) throws KduException {
+    protected boolean updateResolutionSet(Kdu_region_compositor compositor, int compositionLayerCurrentlyInUse) throws KduException {
         if (resolutionSetCompositionLayer == compositionLayerCurrentlyInUse)
             return false;
 
@@ -614,11 +586,6 @@ public class JP2Image {
 
     protected int getMaximumAccessibleFrameNumber() {
         return imageCacheStatus.getImageCachedPartiallyUntil();
-    }
-
-    // Returns the compositor reference
-    protected Kdu_region_compositor getCompositorRef() {
-        return compositor;
     }
 
     // Returns the built-in color lookup table.

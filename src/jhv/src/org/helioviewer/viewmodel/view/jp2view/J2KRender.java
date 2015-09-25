@@ -2,13 +2,17 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 
+import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
+import kdu_jni.Kdu_global;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_region_compositor;
+import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -35,9 +39,6 @@ class J2KRender implements Runnable {
     /** A reference to the JP2ImageView this object is owned by. */
     private final JHVJP2View parentViewRef;
 
-    /** A reference to the compositor used by this JP2Image. */
-    private final Kdu_region_compositor compositorRef;
-
     /** An integer buffer used in the run method. */
     private int[] intBuffer;
 
@@ -56,17 +57,13 @@ class J2KRender implements Runnable {
 
         currParams = _currParams;
         parentImageRef = currParams.jp2Image;
-        compositorRef = parentImageRef.getCompositorRef();
     }
 
-    private void renderLayer() throws KduException {
-
-        // BagThread t = (JHVThread.BagThread) Thread.currentThread();
-
+    private void renderLayer(Kdu_region_compositor compositor) throws KduException {
         int numLayer = currParams.compositionLayer;
 
-        // compositorRef.Refresh();
-        compositorRef.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        // compositor.Refresh();
+        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
         int numComponents = parentImageRef.getNumComponents();
@@ -74,21 +71,21 @@ class J2KRender implements Runnable {
         // parentImageRef.deactivateColorLookupTable(numLayer);
         if (numComponents < 3) {
             // alpha tbd
-            compositorRef.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            compositor.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
-            compositorRef.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+            compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
-        parentImageRef.updateResolutionSet(numLayer);
+        parentImageRef.updateResolutionSet(compositor, numLayer);
 
-        compositorRef.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
+        compositor.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
 
         SubImage roi = currParams.subImage;
         Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
-        compositorRef.Set_buffer_surface(requestedBufferedRegion);
+        compositor.Set_buffer_surface(requestedBufferedRegion);
 
         Kdu_dims actualBufferedRegion = new Kdu_dims();
-        Kdu_compositor_buf compositorBuf = compositorRef.Get_composition_buffer(actualBufferedRegion);
+        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(actualBufferedRegion);
 
         Kdu_coords actualOffset = new Kdu_coords();
         actualOffset.Assign(actualBufferedRegion.Access_pos());
@@ -102,8 +99,8 @@ class J2KRender implements Runnable {
         }
 
         int[] localIntBuffer = parentViewRef.localIntBuffer;
-        while (!compositorRef.Is_processing_complete()) {
-            compositorRef.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion);
+        while (!compositor.Is_processing_complete()) {
+            compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion);
             Kdu_coords newOffset = newRegion.Access_pos();
             Kdu_coords newSize = newRegion.Access_size();
 
@@ -166,19 +163,60 @@ class J2KRender implements Runnable {
         }.init(newImdata, newParams));
     }
 
+    public static class JHV_Kdu_compositor {
+        private Kdu_region_compositor compositor;
+        private Kdu_thread_env threadEnv;
+
+        JHV_Kdu_compositor(Jpx_source jpx) throws KduException {
+            compositor = new Kdu_region_compositor();
+            compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+
+            int numThreads = Kdu_global.Kdu_get_num_processors();
+            threadEnv = new Kdu_thread_env();
+            threadEnv.Create();
+            for (int i = 1; i < numThreads; i++)
+                threadEnv.Add_thread();
+
+            compositor.Set_thread_env(threadEnv, null);
+            compositor.Set_surface_initialization_mode(false);
+        }
+
+        public Kdu_region_compositor getCompositor() {
+            return compositor;
+        }
+
+        public void destroy() throws KduException {
+            compositor.Halt_processing();
+            compositor.Set_thread_env(null, null);
+            compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+            compositor.Native_destroy();
+            threadEnv.Native_destroy();
+            compositor = null;
+            threadEnv = null;
+        }
+
+    }
+
     @Override
     public void run() {
+        JHVThread.BagThread t = (JHVThread.BagThread) Thread.currentThread();
+        JHV_Kdu_compositor compositorObj = (JHV_Kdu_compositor) t.getVar();
+
         try {
-            renderLayer();
+            if (compositorObj == null) {
+                compositorObj = new JHV_Kdu_compositor(parentImageRef.jpxSrc);
+                t.setVar(compositorObj);
+            }
+            renderLayer(compositorObj.getCompositor());
         } catch (KduException e) {
-            // attempt to recover (tbd)
+            // reboot the compositor
             try {
-                compositorRef.Set_thread_env(null, null);
+                compositorObj.destroy();
+                t.setVar(null);
             } catch (Exception ex) {
             }
             e.printStackTrace();
         }
-
     }
 
 }

@@ -130,6 +130,18 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         @Override
         public void run() {
+            JHVThread.BagThread t = (JHVThread.BagThread) Thread.currentThread();
+            J2KRender.JHV_Kdu_compositor compositorObj = (J2KRender.JHV_Kdu_compositor) t.getVar();
+
+            if (compositorObj != null) {
+                try {
+                    compositorObj.destroy();
+                } catch (Exception e) {
+                }
+                t.setVar(null);
+            }
+
+
             EventQueue.invokeLater(new Runnable() {
                 private JHVJP2View view;
 
@@ -294,7 +306,11 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
-        if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumAccessibleFrameNumber()) {
+        if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
+            CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
+            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
+                return;
+
             targetFrame = frame;
 
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
