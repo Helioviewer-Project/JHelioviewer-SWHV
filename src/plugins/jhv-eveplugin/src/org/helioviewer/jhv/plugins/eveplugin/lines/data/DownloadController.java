@@ -288,17 +288,19 @@ public class DownloadController {
                     sb.append(str);
                 }
                 in.close();
+                try {
+                    final JSONObject jo = new JSONObject(sb.toString());
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            addDataToCache(jo, band);
 
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            addDataToCache(new JSONObject(sb.toString()), band);
-                        } catch (JSONException e) {
-                            Log.error("Error Parsing the EVE Response.", e);
                         }
-                    }
-                });
+                    });
+                } catch (JSONException e) {
+                    Log.error("Error Parsing the EVE Response.", e);
+                }
+
             } catch (final IOException e1) {
                 Log.error("Error Parsing the EVE Response.", e1);
             }

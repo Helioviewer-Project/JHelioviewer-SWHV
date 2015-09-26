@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.settings;
 
-/**
- * @author Freek Verstringe
- * 
- */
 public abstract class APIAbstract {
     private String baseUrl;
 
