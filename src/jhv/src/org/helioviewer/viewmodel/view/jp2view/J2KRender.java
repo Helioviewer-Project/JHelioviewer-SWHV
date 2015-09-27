@@ -136,7 +136,7 @@ class J2KRender implements Runnable {
             compositorBuf.Native_destroy();
         }
 
-        compositor.Remove_ilayer(iLayer, false);
+        compositor.Remove_ilayer(iLayer, true);
 
         ImageData imdata = null;
         if (numComponents < 3) {
