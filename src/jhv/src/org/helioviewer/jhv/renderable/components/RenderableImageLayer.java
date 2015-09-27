@@ -91,7 +91,7 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
-        if (!isVisible)
+        if (!isVisible || imageData == null)
             return;
 
         GLSLShader.bind(gl);
