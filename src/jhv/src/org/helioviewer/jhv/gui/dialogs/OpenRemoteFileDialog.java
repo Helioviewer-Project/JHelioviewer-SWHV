@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -31,9 +30,8 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.DynamicModel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
-import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.io.LoadURIDownloadTask;
+import org.helioviewer.jhv.io.LoadURITask;
 
 /**
  * Dialog that is used to open user defined JPIP images.
@@ -41,7 +39,7 @@ import org.helioviewer.jhv.layers.Layers;
  * @author Stephan Pagel
  * @author Andreas Hoelzl
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, ActionListener {
 
     // whether the advanced or the normal options are currently displayed
@@ -165,7 +163,6 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
             imageAddress.setText(null);
             add(panel);
             this.setResizable(true);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,7 +259,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
     }
 
     /**
-     * When the the refresh ("Connect") button is pressed a new JTree is loaded
+     * When the refresh ("Connect") button is pressed a new JTree is loaded
      */
     private void refresh() {
         String http = imageAddress.getText();
@@ -350,23 +347,10 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         setVisible(false);
 
         try {
-            final URI uri = new URI(srv + img);
-
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    FileDownloader filedownloader = new FileDownloader();
-                    URI newUri = filedownloader.downloadFromHTTP(uri, true);
-
-                    try {
-                        Layers.addLayerFromThread(APIRequestManager.loadView(newUri, uri));
-                        dispose();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, "OpenRemoteFile1");
-            thread.start();
+            URI uri = new URI(srv + img);
+            LoadURIDownloadTask uriTask = new LoadURIDownloadTask(uri, uri);
+            uriTask.execute();
+            dispose();
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
@@ -408,7 +392,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         if (!img.startsWith("/"))
             img = "/" + img;
 
-        final String httpPath;
+        String httpPath;
 
         if (advancedOptions) {
             httpPath = Settings.getSingletonInstance().getProperty("default.httpRemote.path") + img;
@@ -417,27 +401,11 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         }
 
         try {
-            final URI uri = new URI(srv + img);
-            final OpenRemoteFileDialog parent = this;
-
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Layers.addLayerFromThread(APIRequestManager.loadView(uri, new URI(httpPath)));
-                        if (advancedOptions == false) {
-                            Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
-                        }
-                    } catch (IOException e) {
-                        JOptionPane.showMessageDialog(buttonShow, e.getMessage(), "File not found on streaming server!", JOptionPane.ERROR_MESSAGE);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } finally {
-                        parent.dispose();
-                    }
-                }
-            }, "OpenRemoteFile2");
-            thread.start();
+            LoadURITask uriTask = new LoadURITask(new URI(srv + img), new URI(httpPath));
+            uriTask.execute();
+            if (advancedOptions == false) {
+                Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
+            }
         } catch (URISyntaxException e) {
             e.printStackTrace();
             setVisible(true);

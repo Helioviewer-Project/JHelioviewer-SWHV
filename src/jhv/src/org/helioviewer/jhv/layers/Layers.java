@@ -231,23 +231,6 @@ public class Layers {
         view.setDataHandler(Displayer.displayDataHandler);
     }
 
-    // special
-    public static void addLayerFromThread(View view) {
-        EventQueue.invokeLater(new Runnable() {
-            private View theView;
-
-            @Override
-            public void run() {
-                addLayer(theView);
-            }
-
-            public Runnable init(View _view) {
-                theView = _view;
-                return this;
-            }
-        }.init(view));
-    }
-
     /**
      * Check if the given index is valid, given the current state of the
      * ViewChain
