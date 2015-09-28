@@ -65,7 +65,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void render() {
         torender = true;
-        // todisplay = true;
+        todisplay = true;
     }
 
     public static void display() {
