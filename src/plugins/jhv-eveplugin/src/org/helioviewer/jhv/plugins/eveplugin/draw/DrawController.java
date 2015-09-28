@@ -94,7 +94,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void updateDrawableElement(DrawableElement drawableElement) {
-        removeDrawableElement(drawableElement, false);
+        removeDrawableElement(drawableElement, false, true);
         this.addDrawableElement(drawableElement, false);
 
         if (drawableElement.hasElementsToDraw()) {
@@ -121,9 +121,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void removeDrawableElement(DrawableElement element, boolean redraw) {
+    private void removeDrawableElement(DrawableElement element, boolean redraw, boolean keepYAxisElement) {
         Set<DrawableElement> elements = drawableElements.get(element.getDrawableElementType().getLevel());
-        if (elements != null) {
+        if (elements != null && !keepYAxisElement) {
             elements.remove(element);
             createYAxisSet();
         }
@@ -133,7 +133,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void removeDrawableElement(DrawableElement element) {
-        removeDrawableElement(element, true);
+        removeDrawableElement(element, true, false);
     }
 
     public List<YAxisElement> getYAxisElements() {
