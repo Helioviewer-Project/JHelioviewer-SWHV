@@ -95,10 +95,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         MetaData metaData = _jp2Image.metaDataList[0];
         targetRegion = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
+        targetFrame = 0;
 
         metaDataArray = _jp2Image.metaDataList;
 
-        _jp2Image.startReader(this, calculateParameter(_jp2Image, targetRegion, 0));
+        _jp2Image.startReader(this);
+        signalRender(_jp2Image);
     }
 
     @Override
@@ -351,7 +353,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetRegion, targetFrame);
 
         // ping reader
-        _jp2Image.readerSignal.signal(imageViewParams);
+        _jp2Image.signalReader(imageViewParams);
 
         J2KRender task = new J2KRender(this, imageViewParams);
         {
