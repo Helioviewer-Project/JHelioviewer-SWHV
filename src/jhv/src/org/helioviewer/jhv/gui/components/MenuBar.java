@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
-import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
+//import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
 
@@ -42,7 +42,7 @@ public class MenuBar extends JMenuBar {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new OpenLocalFileAction());
-        fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
+        // fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
         fileMenu.addSeparator();
 
         fileMenu.add(new SaveScreenshotAction());
