@@ -91,17 +91,12 @@ class J2KReader implements Runnable {
         cacheRef = parentImageRef.getCacheRef();
         cacheStatusRef = parentImageRef.getImageCacheStatus();
 
-        // attempts to connect socket if image is remote
-        if (parentImageRef.isRemote()) {
-            socket = parentImageRef.getSocket();
-            if (socket == null) {
-                socket = new JPIPSocket();
-                JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
-                cacheRef.addJPIPResponseData(res);
-                MoviePanel.cacheStatusChanged();
-            }
-        } else {
-            socket = null;
+        socket = parentImageRef.getSocket();
+        if (socket == null) {
+            socket = new JPIPSocket();
+            JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
+            cacheRef.addJPIPResponseData(res);
+            MoviePanel.cacheStatusChanged();
         }
 
         myThread = null;
@@ -243,11 +238,11 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            // if image is not remote image, do nothing and just signal render
-            if (parentImageRef.getReaderMode() == ReaderMode.SIGNAL_RENDER_ONCE) {
+            ReaderMode readerMode = parentImageRef.getReaderMode();
+            if (readerMode == ReaderMode.NEVERFIRE) {
+                // nothing
+            } else if (readerMode == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentImageRef.setReaderMode(ReaderMode.NEVERFIRE);
-                signalRender();
-            } else if (!parentImageRef.isRemote() && parentImageRef.getReaderMode() != ReaderMode.NEVERFIRE) {
                 signalRender();
             } else {
                 // check whether view parameters have changed
@@ -449,7 +444,7 @@ class J2KReader implements Runnable {
                                     }
                                     MoviePanel.cacheStatusChanged();
 
-                                    if ((parentImageRef.getReaderMode() == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || parentImageRef.getReaderMode() == ReaderMode.ALWAYSFIREONNEWDATA) {
+                                    if ((readerMode == ReaderMode.ONLYFIREONCOMPLETE && stepQuerys[current_step] == null) || readerMode == ReaderMode.ALWAYSFIREONNEWDATA) {
                                         // if package belongs to current frame tell the render-thread
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
