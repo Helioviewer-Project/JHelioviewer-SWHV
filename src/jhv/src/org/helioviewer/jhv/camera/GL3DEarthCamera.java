@@ -46,6 +46,8 @@ public class GL3DEarthCamera extends GL3DCamera {
     public void timeChanged(Date date) {
         if (!this.getTrackingMode()) {
             forceTimeChanged(date);
+        } else {
+            Displayer.render();
         }
     }
 

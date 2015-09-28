@@ -61,6 +61,8 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     public void timeChanged(Date date) {
         if (!this.getTrackingMode()) {
             forceTimeChanged(date);
+        } else {
+            Displayer.render();
         }
     }
 

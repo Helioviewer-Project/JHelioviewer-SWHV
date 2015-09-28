@@ -33,7 +33,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
         }
         camera.rotateCurrentDragRotation(currentDragRotation);
         this.camera.updateCameraTransformation();
-
         Displayer.render();
     }
 

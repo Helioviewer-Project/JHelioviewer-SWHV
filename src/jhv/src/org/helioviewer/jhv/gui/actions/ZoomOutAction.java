@@ -28,6 +28,7 @@ public class ZoomOutAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         Displayer.getViewport().getCamera().zoom(+1);
+        Displayer.render();
     }
 
 }

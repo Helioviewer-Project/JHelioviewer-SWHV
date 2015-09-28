@@ -191,7 +191,7 @@ public abstract class GL3DCamera {
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
         if (this == Displayer.getViewport().getCamera()) {
-            Displayer.render();
+            // Displayer.render();
             ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
         }
     }

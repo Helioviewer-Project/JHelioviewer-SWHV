@@ -47,6 +47,8 @@ public class GL3DObserverCamera extends GL3DCamera {
     public void timeChanged(Date date) {
         if (!this.getTrackingMode()) {
             forceTimeChanged(date);
+        } else {
+            Displayer.render();
         }
     }
 

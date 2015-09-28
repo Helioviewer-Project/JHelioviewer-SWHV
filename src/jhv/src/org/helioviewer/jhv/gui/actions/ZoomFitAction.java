@@ -35,6 +35,7 @@ public class ZoomFitAction extends AbstractAction {
         View view = Layers.getActiveView();
         if (view != null) {
             Displayer.getViewport().getCamera().zoomToFit(view);
+            Displayer.render();
         }
     }
 

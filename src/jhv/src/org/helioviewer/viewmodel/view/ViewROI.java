@@ -43,7 +43,7 @@ public class ViewROI {
 
         GL3DCamera activeCamera = Displayer.getViewport().getCamera();
 
-//      activeCamera.push(m.getDateObs().getDate(), m);
+        activeCamera.push(m.getDateObs().getDate(), m);
 
         GL3DQuatd camDiff = activeCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
@@ -57,7 +57,7 @@ public class ViewROI {
             }
         }
 
-//      activeCamera.pop();
+        activeCamera.pop();
 
         double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.05);
         double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.05);
