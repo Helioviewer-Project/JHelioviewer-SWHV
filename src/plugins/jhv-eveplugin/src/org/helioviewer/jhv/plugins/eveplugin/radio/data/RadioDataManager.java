@@ -291,8 +291,6 @@ public class RadioDataManager implements RadioDownloaderListener {
         drd.setDownloading(true);
         if (!oldDownloading) {
             lineDataSelectorModel.downloadStarted(drd);
-        } else {
-            Log.debug("was already downloading");
         }
         for (DownloadedJPXData djd : jpxFiles) {
             handleDownloadedJPXData(djd, drd, downloadID, ratioX, ratioY);
