@@ -337,7 +337,7 @@ public class JP2Image {
     }
 
     protected void startReader(JHVJP2View view) {
-        if (isRemote()) {
+        if (cache != null) { // remote
             try {
                 reader = new J2KReader(view, this);
                 reader.start();
@@ -381,15 +381,6 @@ public class JP2Image {
      */
     protected ReaderMode getReaderMode() {
         return readerMode;
-    }
-
-    /**
-     * Returns true if the image is remote or if image is note open.
-     *
-     * @return True if the image is remote image, false otherwise
-     */
-    protected boolean isRemote() {
-        return cache != null;
     }
 
     /**
