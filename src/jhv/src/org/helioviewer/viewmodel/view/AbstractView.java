@@ -91,9 +91,7 @@ public abstract class AbstractView implements View {
     @Override
     public void setDataHandler(ViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
-        // null/not used by JHVJP2View
-        if (imageData != null)
-            dataHandler.handleData(this, imageData);
+        dataHandler.handleData(this, imageData);
     }
 
     @Override

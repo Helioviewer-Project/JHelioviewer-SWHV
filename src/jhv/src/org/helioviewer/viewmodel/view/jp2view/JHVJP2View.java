@@ -260,6 +260,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
             ++frameCount;
         }
 
+        imageData = newImageData; // tbd
         if (dataHandler != null) {
             dataHandler.handleData(this, newImageData);
         }
