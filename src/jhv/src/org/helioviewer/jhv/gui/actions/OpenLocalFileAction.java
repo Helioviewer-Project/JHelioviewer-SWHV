@@ -1,23 +1,19 @@
 package org.helioviewer.jhv.gui.actions;
 
-import java.awt.Frame;
 import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
-import org.helioviewer.jhv.io.APIRequestManager;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.io.LoadURITask;
 
 /**
  * Action to open a local file
@@ -53,19 +49,9 @@ public class OpenLocalFileAction extends AbstractAction {
                 Settings.getSingletonInstance().setProperty("default.local.path", directory);
                 Settings.getSingletonInstance().save();
 
-                final URI uri = selectedFile.toURI();
-                // Load image in new thread
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Layers.addLayerFromThread(APIRequestManager.loadView(uri, uri));
-                        } catch (IOException e) {
-                            Message.err("An error occured while opening the file!", e.getMessage(), false);
-                        }
-                    }
-                }, "OpenLocalFile");
-                thread.start();
+                URI uri = selectedFile.toURI();
+                LoadURITask uriTask = new LoadURITask(uri, uri);
+                uriTask.execute();
             }
         }
     }

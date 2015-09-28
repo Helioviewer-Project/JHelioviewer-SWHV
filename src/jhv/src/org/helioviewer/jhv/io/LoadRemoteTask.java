@@ -2,19 +2,12 @@ package org.helioviewer.jhv.io;
 
 import java.io.IOException;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.viewmodel.view.View;
 
-public class LoadRemoteTask extends SwingWorker<View, Void> {
+public class LoadRemoteTask extends LoadURITask {
 
-    private final RenderableDummy dummy;
     private final boolean image;
     private final String cadence;
     private final String instrument;
@@ -24,19 +17,17 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
     private final String starttime;
     private final String endtime;
 
-    public LoadRemoteTask(boolean _image, String cadence, String starttime, String endtime, String observation, String instrument, String measurement, String detector) {
-        image = _image;
-        this.cadence = cadence;
-        this.starttime = starttime;
-        this.endtime = endtime;
-        this.observation = observation;
-        this.instrument = instrument;
-        this.measurement = measurement;
-        this.detector = detector;
+    public LoadRemoteTask(boolean _image, String _cadence, String _starttime, String _endtime, String _observation, String _instrument, String _measurement, String _detector) {
+        super(null, null);
 
-        dummy = new RenderableDummy(this);
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
-        Displayer.display(); // ensures the dummy text is displayed
+        image = _image;
+        cadence = _cadence;
+        starttime = _starttime;
+        endtime = _endtime;
+        observation = _observation;
+        instrument = _instrument;
+        measurement = _measurement;
+        detector = _detector;
     }
 
     @Override
@@ -53,20 +44,7 @@ public class LoadRemoteTask extends SwingWorker<View, Void> {
             Log.error("An error occured while opening the remote file!", e);
             Message.err("An error occured while opening the remote file!", e.getMessage(), false);
         }
-
         return view;
-    }
-
-    @Override
-    protected void done() {
-        if (!isCancelled()) {
-            ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
-            try {
-                Layers.addLayer(get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }

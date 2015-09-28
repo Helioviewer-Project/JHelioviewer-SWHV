@@ -107,7 +107,7 @@ public class JavaHelioViewer {
 
                 Log.info("Start main window");
                 ImageViewerGui.getSingletonInstance(); // build UI
-                ImageViewerGui.loadAtStart();
+                ImageViewerGui.loadImagesAtStartup();
 
                 Log.info("Load plugin settings");
                 PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());

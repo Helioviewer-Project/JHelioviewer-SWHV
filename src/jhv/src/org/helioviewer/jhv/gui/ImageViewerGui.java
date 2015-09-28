@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainComponent;
@@ -36,10 +35,9 @@ import org.helioviewer.jhv.gui.controller.InputController;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
-import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.io.LoadURIDownloadTask;
+import org.helioviewer.jhv.io.LoadURITask;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
@@ -212,16 +210,6 @@ public class ImageViewerGui {
         }
     }
 
-    public static void loadAtStart() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                loadImagesAtStartup();
-            }
-        }, "LoadImagesOnStartUp");
-        thread.start();
-    }
-
     /**
      * Loads the images which have to be displayed when the program starts.
      *
@@ -229,7 +217,7 @@ public class ImageViewerGui {
      * tries to load this images. Otherwise it tries to load a default image
      * which is defined by the default entries of the observation panel.
      * */
-    private static void loadImagesAtStartup() {
+    public static void loadImagesAtStartup() {
         // get values for different command line options
         AbstractList<URI> jpipUris = CommandLineProcessor.getJPIPOptionValues();
         AbstractList<URI> downloadAddresses = CommandLineProcessor.getDownloadOptionValues();
@@ -243,36 +231,22 @@ public class ImageViewerGui {
         // -jpx
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
-                try {
-                    Layers.addLayerFromThread(APIRequestManager.loadView(jpxUrl, jpxUrl));
-                } catch (IOException e) {
-                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                }
+                LoadURITask uriTask = new LoadURITask(jpxUrl, jpxUrl);
+                uriTask.execute();
             }
         }
         // -jpip
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
-                try {
-                    Layers.addLayerFromThread(APIRequestManager.loadView(jpipUri, jpipUri));
-                } catch (IOException e) {
-                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                }
+                LoadURITask uriTask = new LoadURITask(jpipUri, jpipUri);
+                uriTask.execute();
             }
         }
         // -download
         for (URI downloadAddress : downloadAddresses) {
             if (downloadAddress != null) {
-                try {
-                    FileDownloader fileDownloader = new FileDownloader();
-                    File downloadFile = fileDownloader.getDefaultDownloadLocation(downloadAddress);
-                    fileDownloader.get(downloadAddress, downloadFile);
-                    URI uri = downloadFile.toURI();
-
-                    Layers.addLayerFromThread(APIRequestManager.loadView(uri, uri));
-                } catch (IOException e) {
-                    Message.err("An error occured while opening the remote file!", e.getMessage(), false);
-                }
+                LoadURIDownloadTask uriTask = new LoadURIDownloadTask(downloadAddress, downloadAddress);
+                uriTask.execute();
             }
         }
     }
