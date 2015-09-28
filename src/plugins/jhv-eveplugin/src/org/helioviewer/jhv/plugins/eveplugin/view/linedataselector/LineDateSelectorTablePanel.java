@@ -226,7 +226,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         if (grid.getSelectedRow() == -1 && lastSelectedIndex > -1) {
             if (tableModel.getRowCount() > lastSelectedIndex) {
                 grid.setRowSelectionInterval(lastSelectedIndex, lastSelectedIndex);
-                checkOptionPanel();
             } else {
                 lastSelectedIndex = grid.getSelectedRow();
             }

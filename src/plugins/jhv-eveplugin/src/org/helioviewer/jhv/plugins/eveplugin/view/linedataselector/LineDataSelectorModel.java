@@ -9,7 +9,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawControllerListener;
-import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 
@@ -32,7 +31,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     public static LineDataSelectorModel getSingletonInstance() {
         if (instance == null) {
             instance = new LineDataSelectorModel();
-            PlotAreaSpace.getSingletonInstance().addPlotAreaSpaceListener(instance);
         }
         return instance;
     }
