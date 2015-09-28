@@ -114,18 +114,22 @@ public abstract class GL3DCamera {
     private GL3DMat4d saveTransformation;
 
     public void push(Date date, MetaData m) {
-        saveRotation = rotation.copy();
-        saveLocalRotation = localRotation.copy();
-        saveTranslation = translation.copy();
-        saveTransformation = cameraTransformation.copy();
-        updateRotation(date, m);
+        if (!trackingMode) {
+            saveRotation = rotation.copy();
+            saveLocalRotation = localRotation.copy();
+            saveTranslation = translation.copy();
+            saveTransformation = cameraTransformation.copy();
+            updateRotation(date, m);
+        }
     }
 
     public void pop() {
-        rotation = saveRotation;
-        localRotation = saveLocalRotation;
-        translation = saveTranslation;
-        cameraTransformation = saveTransformation;
+        if (!trackingMode) {
+            rotation = saveRotation;
+            localRotation = saveLocalRotation;
+            translation = saveTranslation;
+            cameraTransformation = saveTransformation;
+        }
     }
 
     public double getFOVAngleToDraw() {
