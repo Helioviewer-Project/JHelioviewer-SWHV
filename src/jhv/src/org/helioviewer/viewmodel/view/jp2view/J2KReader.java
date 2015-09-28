@@ -11,6 +11,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
+import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.io.http.HTTPRequest;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPConstants;
@@ -73,6 +74,8 @@ class J2KReader implements Runnable {
     private int JpipRequestLen = JPIPConstants.MIN_REQUEST_LEN;
 
     private final ImageCacheStatus cacheStatusRef;
+
+    private final BooleanSignal readerSignal = new BooleanSignal(false);
 
     /**
      * The constructor. Creates and connects the socket if image is remote.
@@ -216,6 +219,10 @@ class J2KReader implements Runnable {
         });
     }
 
+    protected void signalReader(JP2ImageParameter params) {
+        readerSignal.signal(params);
+    }
+
     @Override
     public void run() {
         JPIPRequest req = null;
@@ -231,7 +238,7 @@ class J2KReader implements Runnable {
             prevParams = currParams;
             // wait for signal
             try {
-                currParams = parentImageRef.readerSignal.waitForSignal();
+                currParams = readerSignal.waitForSignal();
             } catch (InterruptedException e) {
                 continue;
             }
@@ -268,7 +275,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // Send signal to try again
-                        parentImageRef.readerSignal.signal(currParams);
+                        readerSignal.signal(currParams);
                     }/*
                       * catch (JHV_KduException e) { e.printStackTrace(); }
                       */
@@ -473,7 +480,7 @@ class J2KReader implements Runnable {
                                 Thread.yield();
 
                                 // check whether caching has to be interrupted
-                                if (parentImageRef.readerSignal.isSignaled() || Thread.interrupted()) {
+                                if (readerSignal.isSignaled() || Thread.interrupted()) {
                                     stopReading = true;
                                 }
                             }
@@ -482,7 +489,7 @@ class J2KReader implements Runnable {
                             complete = (complete_steps >= stepQuerys.length) && strategy != CacheStrategy.CURRENTFRAMEFIRST;
                             // if current frame first -> signal again, to go on reading
                             if (strategy == CacheStrategy.CURRENTFRAMEFIRST) {
-                                parentImageRef.readerSignal.signal(currParams);
+                                readerSignal.signal(currParams);
                             }
                         }
                     } catch (IOException e) {
@@ -502,7 +509,7 @@ class J2KReader implements Runnable {
                         }
                         // Displayer.display();
                         // send signal to try again
-                        parentImageRef.readerSignal.signal(currParams);
+                        readerSignal.signal(currParams);
                     } catch (JHV_KduException e) {
                         e.printStackTrace();
                     }

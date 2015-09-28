@@ -32,7 +32,6 @@ import org.helioviewer.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
-import org.helioviewer.viewmodel.view.jp2view.concurrency.BooleanSignal;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.io.jpip.JPIPResponse;
@@ -111,7 +110,6 @@ public class JP2Image {
     }
 
     private J2KReader reader;
-    protected BooleanSignal readerSignal = new BooleanSignal(false);
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
     /**
@@ -338,14 +336,20 @@ public class JP2Image {
         }
     }
 
-    protected void startReader(JHVJP2View view, JP2ImageParameter params) {
-        try {
-            reader = new J2KReader(view, this);
-            reader.start();
-            readerSignal.signal(params);
-        } catch (Exception e) {
-            e.printStackTrace();
+    protected void startReader(JHVJP2View view) {
+        if (isRemote()) {
+            try {
+                reader = new J2KReader(view, this);
+                reader.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    protected void signalReader(JP2ImageParameter params) {
+        if (reader != null)
+            reader.signalReader(params);
     }
 
     /**
