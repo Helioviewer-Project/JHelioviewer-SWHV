@@ -69,9 +69,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     private boolean stopRender = false;
 
     public JHVJP2View() {
-
-        Displayer.addRenderListener(this);
-        frameCountStart = System.currentTimeMillis();
+        if (!(this instanceof JHVJP2CallistoView)) {
+            Displayer.addRenderListener(this);
+            frameCountStart = System.currentTimeMillis();
+        }
     }
 
     /**
@@ -139,10 +140,10 @@ public class JHVJP2View extends AbstractView implements RenderListener {
                 try {
                     compositorObj.destroy();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 t.setVar(null);
             }
-
 
             EventQueue.invokeLater(new Runnable() {
                 private JHVJP2View view;
