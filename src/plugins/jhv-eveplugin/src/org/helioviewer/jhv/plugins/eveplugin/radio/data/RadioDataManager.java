@@ -247,8 +247,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                 }
             }
             if (!isDownloading) {
-                drd.setDownloading(false);
-                lineDataSelectorModel.downloadFinished(drd);
+                if (drd.isDownloading()) {
+                    drd.setDownloading(false);
+                    lineDataSelectorModel.downloadFinished(drd);
+                }
             }
         }
     }
@@ -285,8 +287,13 @@ public class RadioDataManager implements RadioDownloaderListener {
     @Override
     public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, double ratioX, double ratioY) {
         DownloadRequestData drd = downloadRequestData.get(downloadID);
+        boolean oldDownloading = drd.isDownloading();
         drd.setDownloading(true);
-        lineDataSelectorModel.downloadStarted(drd);
+        if (!oldDownloading) {
+            lineDataSelectorModel.downloadStarted(drd);
+        } else {
+            Log.debug("was already downloading");
+        }
         for (DownloadedJPXData djd : jpxFiles) {
             handleDownloadedJPXData(djd, drd, downloadID, ratioX, ratioY);
         }

@@ -75,7 +75,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         LineDataSelectorModel.getSingletonInstance().addLineDataSelectorModelListener(this);
         pas = PlotAreaSpace.getSingletonInstance();
         pas.addPlotAreaSpaceListener(this);
-        addDrawControllerListener(LineDataSelectorModel.getSingletonInstance());
     }
 
     public void addDrawControllerListener(DrawControllerListener listener) {
