@@ -52,6 +52,12 @@ public class JHVJP2View extends AbstractView implements RenderListener {
     private final int numOfThread = 1;
     private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
 
+    private void queueSubmitTask(Runnable task) {
+        blockingQueue.poll();
+        blockingQueue.add(task);
+        exec.submit(task);
+    }
+
     protected Region targetRegion;
 
     // Member related to JP2
@@ -167,7 +173,8 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         AbolishThread thread = new AbolishThread();
         stopRender = true;
         thread.init(this);
-        exec.submit(thread);
+
+        queueSubmitTask(thread);
     }
 
     public void abolishExternal() {
@@ -357,12 +364,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
         // ping reader
         _jp2Image.signalReader(imageViewParams);
 
-        J2KRender task = new J2KRender(this, imageViewParams);
-        {
-            blockingQueue.poll();
-            blockingQueue.add(task);
-        }
-        exec.submit(task, Boolean.TRUE);
+        queueSubmitTask(new J2KRender(this, imageViewParams));
     }
 
     @Override
