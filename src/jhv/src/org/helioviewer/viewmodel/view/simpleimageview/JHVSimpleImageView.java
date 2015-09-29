@@ -14,19 +14,6 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-/**
- * Implementation of ImageInfoView for simple image formats.
- *
- * <p>
- * Currently, the view supports JPG and PNG images.
- *
- * <p>
- * For further informations about the behavior of this view,
- * {@link ImageInfoView} is a good start to get into the concept.
- *
- * @author Andreas Hoelzl
- *
- */
 public class JHVSimpleImageView extends AbstractView {
 
     protected URI uri;
