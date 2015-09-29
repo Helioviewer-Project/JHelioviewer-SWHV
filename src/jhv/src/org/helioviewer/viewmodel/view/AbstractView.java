@@ -1,6 +1,8 @@
 package org.helioviewer.viewmodel.view;
 
 import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -8,7 +10,7 @@ import org.helioviewer.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
-public abstract class AbstractView implements View {
+public abstract class AbstractView implements View, RenderListener {
 
     private RenderableImageLayer imageLayer;
     private LocalImageCacheStatus cacheStatus;
@@ -16,8 +18,18 @@ public abstract class AbstractView implements View {
     protected MetaData[] metaDataArray = new MetaData[1];
     protected ImageData imageData = null;
 
+    public AbstractView() {
+        Displayer.addRenderListener(this);
+    }
+
     @Override
     public void abolish() {
+        Displayer.removeRenderListener(this);
+    }
+
+    @Override
+    public void render() {
+        Displayer.display();
     }
 
     @Override

@@ -13,7 +13,6 @@ import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -38,7 +37,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
  * for decoding the images.
  *
  */
-public class JHVJP2View extends AbstractView implements RenderListener {
+public class JHVJP2View extends AbstractView {
 
     static private class RejectExecution implements RejectedExecutionHandler {
         @Override
@@ -74,13 +73,6 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
     private boolean stopRender = false;
 
-    public JHVJP2View() {
-        if (!(this instanceof JHVJP2CallistoView)) {
-            Displayer.addRenderListener(this);
-            frameCountStart = System.currentTimeMillis();
-        }
-    }
-
     /**
      * Sets the JPG2000 image used by this class.
      *
@@ -108,6 +100,7 @@ public class JHVJP2View extends AbstractView implements RenderListener {
 
         _jp2Image.startReader(this);
         signalRender(_jp2Image);
+        frameCountStart = System.currentTimeMillis();
     }
 
     @Override
