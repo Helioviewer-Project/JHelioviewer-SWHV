@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Color;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 
 /**
@@ -112,6 +113,7 @@ public class YAxisElement extends AbstractValueSpace {
      *            The selected range
      */
     public void setSelectedRange(Range selectedRange) {
+        Log.debug("Set selected range old selected range: [" + Math.log10(this.selectedRange.min) + ", " + Math.log10(this.selectedRange.max) + "]; new selected range: [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
         this.selectedRange = selectedRange;
         adaptScaledSelectedRange();
     }
