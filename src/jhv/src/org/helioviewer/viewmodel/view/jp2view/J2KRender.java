@@ -63,17 +63,16 @@ class J2KRender implements Runnable {
         int numLayer = currParams.compositionLayer;
 
         // compositor.Refresh();
-        // compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
 
         Kdu_dims dimsRef1 = new Kdu_dims(), dimsRef2 = new Kdu_dims();
         int numComponents = parentImageRef.getNumComponents();
-        Kdu_ilayer_ref iLayer;
         // parentImageRef.deactivateColorLookupTable(numLayer);
         if (numComponents < 3) {
             // alpha tbd
-            iLayer = compositor.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
+            compositor.Add_primitive_ilayer(numLayer, firstComponent, KakaduConstants.KDU_WANT_CODESTREAM_COMPONENTS, dimsRef1, dimsRef2);
         } else {
-            iLayer = compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
+            compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
         parentImageRef.updateResolutionSet(compositor, numLayer);
@@ -135,8 +134,6 @@ class J2KRender implements Runnable {
         if (compositorBuf != null) {
             compositorBuf.Native_destroy();
         }
-
-        compositor.Remove_ilayer(iLayer, true);
 
         ImageData imdata = null;
         if (numComponents < 3) {
