@@ -59,8 +59,8 @@ public class ViewROI {
 
         activeCamera.pop();
 
-        double widthxAdd = Math.abs((maxPhysicalX - minPhysicalX) * 0.05);
-        double widthyAdd = Math.abs((maxPhysicalY - minPhysicalY) * 0.05);
+        double widthxAdd = Math.abs(0.025 * (maxPhysicalX - minPhysicalX));
+        double widthyAdd = Math.abs(0.025 * (maxPhysicalY - minPhysicalY));
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
