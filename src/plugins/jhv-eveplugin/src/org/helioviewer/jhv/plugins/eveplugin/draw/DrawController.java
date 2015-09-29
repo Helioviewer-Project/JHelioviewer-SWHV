@@ -393,6 +393,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
             double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
             double scaledSelectedEnd = pas.getScaledMinTime() + (1.0 * (selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
+            pas.setMinSelectedTimeDiff(60000.0 / diffAvailable);
             pas.setScaledSelectedTime(scaledSelectedStart, scaledSelectedEnd, true);
         }
     }
