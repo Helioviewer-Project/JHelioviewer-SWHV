@@ -117,7 +117,6 @@ class J2KReader implements Runnable {
         if (myThread != null && myThread.isAlive()) {
             try {
                 stop = true;
-
                 do {
                     myThread.interrupt();
                     myThread.join(100);
@@ -201,11 +200,14 @@ class J2KReader implements Runnable {
         return query;
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         return (socket != null && socket.isConnected());
     }
 
     private void signalRender() {
+        if (stop)
+            return;
+
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
