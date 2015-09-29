@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -51,7 +52,14 @@ public class JHVJP2CallistoView extends JHVJP2View {
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
         ResolutionLevel res = set.getClosestResolutionLevel((int) Math.ceil(viewport.getWidth() / r.getWidth() * maxWidth), 2 * (int) Math.ceil(viewport.getHeight() / r.getHeight() * maxHeight));
 
-        SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width), (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height), (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width), (int) (r.getHeight() / maxHeight * res.getResolutionBounds().height));
+        SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * res.getResolutionBounds().width), (int) (r.getLowerLeftCorner().y / maxHeight * res.getResolutionBounds().height), (int) (r.getWidth() / maxWidth * res.getResolutionBounds().width), (int) Math.ceil(r.getHeight() / maxHeight * res.getResolutionBounds().height));
+        Log.debug("$$$$$$$$$$$$$$$$$$$");
+        Log.debug("region " + r);
+        Log.debug("viewport " + viewport);
+        Log.debug("clostes res: " + res);
+        Log.debug("(int) (r.getHeight() / maxHeight * res.getResolutionBounds().height) = " + "(" + r.getHeight() + " / " + maxHeight + " * " + res.getResolutionBounds().height + ") = " + ((int) (r.getHeight() / maxHeight * res.getResolutionBounds().height)));
+        Log.debug("subImage: " + subImage);
+        Log.debug("$$$$$$$$$$$$$$$$$$$");
         return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
     }
 
