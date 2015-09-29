@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -11,6 +12,10 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 public class JHVJP2CallistoView extends JHVJP2View {
 
     private Viewport viewport = new Viewport(86400, 380);
+
+    public JHVJP2CallistoView() {
+        Displayer.removeRenderListener(this);
+    }
 
     public JP2Image getJP2Image() {
         return _jp2Image;
@@ -28,6 +33,8 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     public void render() {
+        System.out.println(">>> Should not be called");
+        Thread.dumpStack();
     }
 
     @Override
