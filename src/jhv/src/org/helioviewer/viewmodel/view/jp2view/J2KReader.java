@@ -113,18 +113,15 @@ class J2KReader implements Runnable {
     }
 
     /** Stops the J2KReader thread. */
-    synchronized void stop() {
+    private void stop() {
         if (myThread != null && myThread.isAlive()) {
             try {
-                stop = true;
                 do {
                     myThread.interrupt();
                     myThread.join(100);
                 } while (myThread.isAlive());
-
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
-            } catch (NullPointerException e) {
             } finally {
                 myThread = null;
             }
@@ -133,6 +130,7 @@ class J2KReader implements Runnable {
 
     /** Releases the resources associated with this object. */
     void abolish() {
+        stop = true;
         try {
             if (socket != null) {
                 socket.close();
