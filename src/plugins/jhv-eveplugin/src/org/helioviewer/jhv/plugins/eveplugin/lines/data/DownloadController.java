@@ -289,14 +289,32 @@ public class DownloadController {
                 }
                 in.close();
                 try {
-                    final JSONObject jo = new JSONObject(sb.toString());
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            addDataToCache(jo, band);
+                    final JSONObject json = new JSONObject(sb.toString());
 
-                        }
-                    });
+                    double multiplier = 1.0;
+                    if (json.has("multiplier")) {
+                        multiplier = json.getDouble("multiplier");
+                    }
+                    final JSONArray data = json.getJSONArray("data");
+
+                    int length = data.length();
+                    if (length == 0) {
+                        return;
+                    }
+
+                    // Log.warn(data.toString());
+                    final float[] values = new float[length];
+                    final long[] dates = new long[length];
+
+                    for (int i = 0; i < length; i++) {
+                        final JSONArray entry = data.getJSONArray(i);
+                        final long millis = ((long) entry.getDouble(0)) * 1000;
+                        values[i] = (float) (entry.getDouble(1) * multiplier);
+                        dates[i] = millis;
+                    }
+
+                    addDataToCache(band, values, dates);
+
                 } catch (JSONException e) {
                     Log.error("Error Parsing the EVE Response.", e);
                 }
@@ -312,34 +330,13 @@ public class DownloadController {
             return new URL(type.getBaseUrl() + EVEAPI.API_URL_PARAMETER_STARTDATE + eveAPIDateFormat.format(interval.getStart()) + "&" + EVEAPI.API_URL_PARAMETER_ENDDATE + eveAPIDateFormat.format(interval.getEnd()) + "&" + EVEAPI.API_URL_PARAMETER_TYPE + type.getName() + "&" + EVEAPI.API_URL_PARAMETER_FORMAT + EVEAPI.API_URL_PARAMETER_FORMAT_VALUES.JSON);
         }
 
-        private void addDataToCache(final JSONObject json, final Band band) {
-            try {
-                double multiplier = 1.0;
-                if (json.has("multiplier")) {
-                    multiplier = json.getDouble("multiplier");
+        private void addDataToCache(final Band band, final float[] values, final long[] dates) {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    EVECacheController.getSingletonInstance().addToCache(band, values, dates);
                 }
-                final JSONArray data = json.getJSONArray("data");
-
-                int length = data.length();
-                if (length == 0) {
-                    return;
-                }
-
-                // Log.warn(data.toString());
-                final float[] values = new float[length];
-                final long[] dates = new long[length];
-
-                for (int i = 0; i < length; i++) {
-                    final JSONArray entry = data.getJSONArray(i);
-                    final long millis = ((long) entry.getDouble(0)) * 1000;
-                    values[i] = (float) (entry.getDouble(1) * multiplier);
-                    dates[i] = millis;
-                }
-
-                EVECacheController.getSingletonInstance().addToCache(band, values, dates);
-            } catch (JSONException e) {
-                Log.error(e);
-            }
+            });
         }
     }
 
