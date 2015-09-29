@@ -14,15 +14,6 @@ import org.helioviewer.viewmodel.view.AbstractView;
 
 import com.jogamp.opengl.GL2;
 
-/**
- * Implementation of View for FITS images.
- *
- * <p>
- * For further informations about the behavior of this view,
- * {@link View} is a good start to get into the concept.
- *
- * @author Andreas Hoelzl
- * */
 public class JHVFITSView extends AbstractView {
 
     protected FITSImage fits;

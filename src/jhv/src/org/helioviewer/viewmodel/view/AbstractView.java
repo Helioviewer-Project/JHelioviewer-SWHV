@@ -91,7 +91,8 @@ public abstract class AbstractView implements View {
     @Override
     public void setDataHandler(ViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
-        dataHandler.handleData(this, imageData);
+        if (imageData != null)
+            dataHandler.handleData(this, imageData);
     }
 
     @Override
