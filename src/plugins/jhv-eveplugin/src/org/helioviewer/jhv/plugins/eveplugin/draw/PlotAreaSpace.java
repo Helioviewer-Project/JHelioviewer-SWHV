@@ -7,12 +7,8 @@ import java.util.Set;
 
 public class PlotAreaSpace {
 
-    // private double scaledMinValue;
-    // private double scaledMaxValue;
     private double scaledMinTime;
     private double scaledMaxTime;
-    // private double scaledSelectedMinValue;
-    // private double scaledSelectedMaxValue;
     private double scaledSelectedMinTime;
     private double scaledSelectedMaxTime;
     private double minSelectedTimeDiff;
@@ -26,12 +22,8 @@ public class PlotAreaSpace {
     private PlotAreaSpace() {
         listeners = new ArrayList<PlotAreaSpaceListener>();
 
-        // scaledMinValue = 0.0;
-        // scaledMaxValue = 1.0;
         scaledMinTime = 0.0;
         scaledMaxTime = 1.0;
-        // scaledSelectedMinValue = 0.0;
-        // scaledSelectedMaxValue = 1.0;
         scaledSelectedMinTime = 0.0;
         scaledSelectedMaxTime = 1.0;
         minSelectedTimeDiff = 0;
@@ -52,26 +44,6 @@ public class PlotAreaSpace {
     public void removePlotAreaSpaceListener(PlotAreaSpaceListener listener) {
         listeners.remove(listener);
     }
-
-    /*
-     * public double getScaledMinValue() { return scaledMinValue; }
-     */
-
-    /*
-     * public void setScaledMinValue(double scaledMinValue) { if (scaledMinTime
-     * != scaledMinValue) { this.scaledMinValue = scaledMinValue;
-     * firePlotAreaSpaceChanged(false); } }
-     */
-
-    /*
-     * public double getScaledMaxValue() { return scaledMaxValue; }
-     */
-
-    /*
-     * public void setScaledMaxValue(double scaledMaxValue) { if
-     * (this.scaledMaxValue != scaledMaxValue) { this.scaledMaxValue =
-     * scaledMaxValue; firePlotAreaSpaceChanged(false); } }
-     */
 
     public double getScaledMinTime() {
         return scaledMinTime;
@@ -94,30 +66,6 @@ public class PlotAreaSpace {
             firePlotAreaSpaceChanged(false);
         }
     }
-
-    /*
-     * public double getScaledSelectedMinValue() { return
-     * scaledSelectedMinValue; }
-     */
-
-    /*
-     * public void setScaledSelectedMinValue(double scaledSelectedMinValue) { if
-     * (this.scaledSelectedMinValue != scaledSelectedMinValue) {
-     * this.scaledSelectedMinValue = scaledSelectedMinValue;
-     * firePlotAreaSpaceChanged(false); } }
-     */
-
-    /*
-     * public double getScaledSelectedMaxValue() { return
-     * scaledSelectedMaxValue; }
-     */
-
-    /*
-     * public void setScaledSelectedMaxValue(double scaledSelectedMaxValue) { if
-     * (this.scaledSelectedMaxValue != scaledSelectedMaxValue) {
-     * this.scaledSelectedMaxValue = scaledSelectedMaxValue;
-     * firePlotAreaSpaceChanged(false); } }
-     */
 
     public double getScaledSelectedMinTime() {
         return scaledSelectedMinTime;
@@ -156,67 +104,6 @@ public class PlotAreaSpace {
         }
     }
 
-    /*
-     * public void setScaledSelectedValue(double scaledSelectedMinValue, double
-     * scaledSelectedMaxValue, boolean forced) { if (forced ||
-     * !(this.scaledSelectedMinValue == scaledSelectedMinValue &&
-     * this.scaledSelectedMaxValue == scaledSelectedMaxValue)) {
-     * this.scaledSelectedMinValue = scaledSelectedMinValue;
-     * this.scaledSelectedMaxValue = scaledSelectedMaxValue;
-     * firePlotAreaSpaceChanged(forced); } }
-     */
-
-    /*
-     * public void setScaledSelectedTimeAndValue(double scaledSelectedMinTime,
-     * double scaledSelectedMaxTime, double scaledSelectedMinValue, double
-     * scaledSelectedMaxValue) { if (!(this.scaledSelectedMinTime ==
-     * scaledSelectedMinTime && this.scaledSelectedMaxTime ==
-     * scaledSelectedMaxTime && this.scaledSelectedMinValue ==
-     * scaledSelectedMinValue && this.scaledSelectedMaxValue ==
-     * scaledSelectedMaxValue)) { this.scaledSelectedMinTime =
-     * scaledSelectedMinTime; this.scaledSelectedMaxTime =
-     * scaledSelectedMaxTime; this.scaledSelectedMinValue =
-     * scaledSelectedMinValue; this.scaledSelectedMaxValue =
-     * scaledSelectedMaxValue; if (this.scaledSelectedMinTime < scaledMinTime ||
-     * this.scaledSelectedMaxTime > scaledMaxTime || this.scaledSelectedMinValue
-     * < scaledMinValue || this.scaledSelectedMaxValue > scaledMaxValue) { //
-     * Log.debug(
-     * "setScaledSelectedTimeAndValue part 1 executed : this.scaledSelectedMinTime < scaledMinTime "
-     * // + (this.scaledSelectedMinTime < scaledMinTime) + //
-     * " this.scaledSelectedMaxTime > scaledMaxTime " + //
-     * (this.scaledSelectedMaxTime > scaledMaxTime) + //
-     * " this.scaledSelectedMinValue < scaledMinValue " + //
-     * (this.scaledSelectedMinValue < scaledMinValue) + //
-     * " this.scaledSelectedMaxValue > scaledMaxValue " + //
-     * (this.scaledSelectedMaxValue > scaledMaxValue)); double oldScaledMinTime
-     * = scaledMinTime; double oldScaledMaxTime = scaledMaxTime; double
-     * oldScaledMinValue = scaledMinValue; double oldScaledMaxValue =
-     * scaledMaxValue; scaledMinTime = Math.min(this.scaledSelectedMinTime,
-     * scaledMinTime); scaledMaxTime = Math.max(this.scaledSelectedMaxTime,
-     * scaledMaxTime); scaledMinValue = Math.min(this.scaledSelectedMinValue,
-     * scaledMinValue); scaledMaxValue = Math.max(this.scaledSelectedMaxValue,
-     * scaledMaxValue); fireAvailableAreaSpaceChanged(oldScaledMinValue,
-     * oldScaledMaxValue, oldScaledMinTime, oldScaledMaxTime, scaledMinValue,
-     * scaledMaxValue, scaledMinTime, scaledMaxTime); } else { // Log.debug(
-     * "setScaledSelectedTimeAndValue part 1 not executed : this.scaledSelectedMinTime < scaledMinTime "
-     * // + (this.scaledSelectedMinTime < scaledMinTime) + //
-     * " this.scaledSelectedMaxTime > scaledMaxTime " + //
-     * (this.scaledSelectedMaxTime > scaledMaxTime) + //
-     * " this.scaledSelectedMinValue < scaledMinValue " + //
-     * (this.scaledSelectedMinValue < scaledMinValue) + //
-     * " this.scaledSelectedMaxValue > scaledMaxValue " + //
-     * (this.scaledSelectedMaxValue > scaledMaxValue)); }
-     * firePlotAreaSpaceChanged(false); } else { // Log.debug(
-     * "setScaledSelectedTimeAndValue not executed: this.scaledSelectedMinTime == scaledSelectedMinTime "
-     * // + (this.scaledSelectedMinTime == scaledSelectedMinTime) + //
-     * " this.scaledSelectedMaxTime == scaledSelectedMaxTime " + //
-     * (this.scaledSelectedMaxTime == scaledSelectedMaxTime) + //
-     * " this.scaledSelectedMinValue == scaledSelectedMinValue " + //
-     * (this.scaledSelectedMinValue == scaledSelectedMinValue) + //
-     * " this.scaledSelectedMaxValue == scaledSelectedMaxValue" + //
-     * (this.scaledSelectedMaxValue == scaledSelectedMaxValue)); } }
-     */
-
     private void fireAvailableAreaSpaceChanged(double oldScaledMinTime, double oldScaledMaxTime, double newMinTime, double newMaxTime) {
         for (PlotAreaSpaceListener l : listeners) {
             l.availablePlotAreaSpaceChanged(oldScaledMinTime, oldScaledMaxTime, newMinTime, newMaxTime);
@@ -231,11 +118,6 @@ public class PlotAreaSpace {
     public boolean minMaxTimeIntervalContainsTime(double value) {
         return value >= scaledMinTime && value <= scaledMaxTime;
     }
-
-    /*
-     * public boolean minMaxValueIntervalContainsValue(double value) { return
-     * value >= scaledMinValue && value <= scaledMaxValue; }
-     */
 
     public void resetSelectedValueAndTimeInterval() {
         scaledSelectedMinTime = scaledMinTime;
@@ -252,9 +134,7 @@ public class PlotAreaSpace {
     }
 
     private void firePlotAreaSpaceChanged(boolean forced) {
-        // Log.info("Listeners size : " + listeners.size());
         for (PlotAreaSpaceListener l : listeners) {
-            // Log.info("listener : " + l);
             l.plotAreaSpaceChanged(scaledMinTime, scaledMaxTime, scaledSelectedMinTime, scaledSelectedMaxTime, forced);
         }
     }
