@@ -729,7 +729,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double ratioXRight = 1. - ratioXLeft;
                 double startTime = plotAreaSpace.getScaledSelectedMinTime();
                 double endTime = plotAreaSpace.getScaledSelectedMaxTime();
-                if ((!e.isAltDown() && !e.isShiftDown()) | inXAxisOrAboveGraph) {
+                if ((!e.isAltDown() && !e.isShiftDown()) || inXAxisOrAboveGraph) {
                     double ratioTime = (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime()) / graphArea.width;
                     startTime = plotAreaSpace.getScaledSelectedMinTime() - scrollValue * zoomTimeFactor * scrollDistance * ratioXLeft * ratioTime;
                     endTime = plotAreaSpace.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioXRight * ratioTime;
@@ -763,7 +763,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
 
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
-                            ) {
+                    ) {
                         vs.setScaledSelectedRange(new Range(startValue, endValue));
                     }
                 }
