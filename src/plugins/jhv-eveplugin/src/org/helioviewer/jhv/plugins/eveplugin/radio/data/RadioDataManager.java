@@ -544,10 +544,6 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jp2View.setViewport(new Viewport(viewport.width, viewport.height));
 
                         Rectangle roi = ri.getROI();
-                        Log.debug("%%%%%%%%%%%%%");
-                        Log.debug("viewport: " + viewport);
-                        Log.debug("roi: " + roi);
-                        Log.debug("%%%%%%%%%%%%%");
                         if (!jp2View.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()))) {
                             if (ri.getLastDataSize() != null) {
                                 fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
@@ -670,10 +666,6 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        Log.debug("##########");
-                        Log.debug("viewport: " + lastUsedResolutionSetting);
-                        Log.debug("roi: " + roi);
-                        Log.debug("##########");
                         jp2CallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
                         drd.addRadioImage(tempRs);
                     } else {
