@@ -89,9 +89,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID) {
         ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
-        int sourceY0 = defineYInSourceArea((int) yValueModel.getSelectedYMax(), startFrequency, endFrequency, area, zdc);
+        int sourceY0 = defineYInSourceArea((int) yValueModel.getSelectedYMax(), startFrequency, endFrequency, area, zdc, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-        int sourceY1 = defineYInSourceArea((int) yValueModel.getSelectedYMin(), startFrequency, endFrequency, area, zdc);
+        int sourceY1 = defineYInSourceArea((int) yValueModel.getSelectedYMin(), startFrequency, endFrequency, area, zdc, true);
         int destX0 = defineXInDestinationArea(startDate, zdc);
         int destY0 = defineYInDestinationArea(startFrequency, yValueModel, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
@@ -172,8 +172,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         return zdc.getDisplaySize().x + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime()) / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));
     }
 
-    private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, ZoomDataConfig zdc) {
-        return (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
+    private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, ZoomDataConfig zdc, boolean ceil) {
+        if (!ceil) {
+            return (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
+        } else {
+            return (int) Math.ceil((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
+        }
     }
 
     private int defineXInSourceArea(Date dateToFind, Date startDateArea, Date endDateArea, Rectangle area) {
