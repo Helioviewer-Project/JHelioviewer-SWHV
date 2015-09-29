@@ -272,10 +272,12 @@ public class Layers {
     public static void removeLayer(View view) {
         int index = layers.indexOf(view);
 
-        layers.remove(view);
         view.removeDataHandler();
-        view.abolish();
+
+        layers.remove(view);
         setActiveView(getLayer(determineNewActiveLayer(index)));
+
+        view.abolish();
     }
 
     public static void removeLayer(int idx) {

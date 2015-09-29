@@ -149,7 +149,8 @@ public class JHVJP2View extends AbstractView {
 
                 @Override
                 public void run() {
-                    view.abolishExternal();
+                    view._jp2Image.abolish();
+                    view._jp2Image = null;
                 }
 
                 public Runnable init(JHVJP2View view) {
@@ -160,20 +161,14 @@ public class JHVJP2View extends AbstractView {
         }
     }
 
-    // Destroy the resources associated with this object
     @Override
     public void abolish() {
-        AbolishThread thread = new AbolishThread();
         stopRender = true;
-        thread.init(this);
-
-        queueSubmitTask(thread);
-    }
-
-    public void abolishExternal() {
         Displayer.removeRenderListener(this);
-        _jp2Image.abolish();
-        _jp2Image = null;
+
+        AbolishThread thread = new AbolishThread();
+        thread.init(this);
+        exec.submit(thread);
     }
 
     /**
