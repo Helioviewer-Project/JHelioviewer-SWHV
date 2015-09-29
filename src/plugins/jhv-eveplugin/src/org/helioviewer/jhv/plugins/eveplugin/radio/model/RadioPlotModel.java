@@ -221,6 +221,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         bufferedImages.put(radioImageID, newImage);
         radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID);
+        Log.debug("drawable area map: " + dam);
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(downloadID).isVisible(), downloadID, radioImageID);
         if (plotConfigList.containsKey(downloadID)) {
             plotConfigList.get(downloadID).put(radioImageID, pc);
@@ -275,6 +276,14 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, long ID) {
+        Log.debug("***");
+        Log.debug("xStart: " + xStart);
+        Log.debug("xEnd: " + xEnd);
+        Log.debug("yStart: " + yStart);
+        Log.debug("yEnd: " + yEnd);
+        Log.debug("xRatio: " + xRatio);
+        Log.debug("yRatio: " + yRatio);
+        Log.debug("***");
         List<Long> idList = new ArrayList<Long>();
         idList.add(ID);
         radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio, idList);

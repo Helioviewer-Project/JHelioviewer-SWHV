@@ -133,6 +133,8 @@ public class DownloadedJPXData implements ViewDataHandler {
             if (imageData.getWidth() < 1 || imageData.getHeight() < 1) {
                 Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
                 return;
+            } else {
+                Log.debug("image data width: " + imageData.getWidth() + "  image data height: " + imageData.getHeight());
             }
             byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
             DownloadedJPXDataWorkerResult result = new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
