@@ -96,6 +96,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         int destY0 = defineYInDestinationArea(startFrequency, yValueModel, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
         int destY1 = defineYInDestinationArea(endFrequency, yValueModel, zdc);
+        if (sourceY0 == sourceY1) {
+            sourceY1 = sourceY0 + 1;
+        }
+        if (sourceX0 == sourceX1) {
+            sourceX1 = sourceX0 + 1;
+        }
         // Log.trace("Selected interval in getDrawableAreaMap : [" +
         // yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax()
         // + "]");
