@@ -7,11 +7,11 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +37,7 @@ public class DownloadController {
 
     private static final DownloadController singletonInstance = new DownloadController();
 
-    private final HashMap<Band, LinkedList<Interval<Date>>> downloadMap = new HashMap<Band, LinkedList<Interval<Date>>>();
+    private final HashMap<Band, ArrayList<Interval<Date>>> downloadMap = new HashMap<Band, ArrayList<Interval<Date>>>();
     private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     private final LineDataSelectorModel selectorModel;
@@ -67,7 +67,7 @@ public class DownloadController {
             Interval<Date> realQueryInterval = extendQueryInterval(queryInterval);
 
             // get all intervals within query interval where data is missing
-            LinkedList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
+            ArrayList<Interval<Date>> intervals = getIntervals(band, realQueryInterval);
 
             if (intervals == null) {
                 // there is no interval where data is missing
@@ -97,7 +97,7 @@ public class DownloadController {
     }
 
     private void addFutureJobs(List<Future<?>> newFutureJobs, Band band) {
-        List<Future<?>> fj = new LinkedList<Future<?>>();
+        List<Future<?>> fj = new ArrayList<Future<?>>();
         if (futureJobs.containsKey(band)) {
             fj = futureJobs.get(band);
         }
@@ -115,7 +115,7 @@ public class DownloadController {
         return new Interval<Date>(cs.getTime(), ce.getTime());
     }
 
-    private LinkedList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
+    private ArrayList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
         // get missing data intervals within given interval
         final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
         if (missingIntervals.size() == 0) {
@@ -123,7 +123,7 @@ public class DownloadController {
         }
 
         // split intervals (if necessary) into smaller intervals
-        final LinkedList<Interval<Date>> intervals = new LinkedList<Interval<Date>>();
+        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
         for (final Interval<Date> i : missingIntervals) {
             intervals.addAll(splitInterval(i));
         }
@@ -132,7 +132,7 @@ public class DownloadController {
     }
 
     public void stopDownloads(final Band band) {
-        final LinkedList<Interval<Date>> list = downloadMap.get(band);
+        final ArrayList<Interval<Date>> list = downloadMap.get(band);
         if (list == null) {
             return;
         }
@@ -148,7 +148,7 @@ public class DownloadController {
     }
 
     public boolean isDownloadActive(final Band band) {
-        final LinkedList<Interval<Date>> list = downloadMap.get(band);
+        final ArrayList<Interval<Date>> list = downloadMap.get(band);
         if (list == null) {
             return false;
         }
@@ -163,8 +163,8 @@ public class DownloadController {
         selectorModel.downloadFinished(band);
     }
 
-    private LinkedList<Interval<Date>> splitInterval(final Interval<Date> interval) {
-        final LinkedList<Interval<Date>> intervals = new LinkedList<Interval<Date>>();
+    private ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval) {
+        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
 
         if (interval.getStart() == null || interval.getEnd() == null) {
             intervals.add(interval);
@@ -195,15 +195,15 @@ public class DownloadController {
     }
 
     private List<Future<?>> addDownloads(final DownloadThread[] jobs) {
-        List<Future<?>> futureJobs = new LinkedList<Future<?>>();
+        List<Future<?>> futureJobs = new ArrayList<Future<?>>();
         for (int i = 0; i < jobs.length; ++i) {
             // add to download map
             final Band band = jobs[i].getBand();
             final Interval<Date> interval = jobs[i].getInterval();
 
-            LinkedList<Interval<Date>> list = downloadMap.get(band);
+            ArrayList<Interval<Date>> list = downloadMap.get(band);
             if (list == null) {
-                list = new LinkedList<Interval<Date>>();
+                list = new ArrayList<Interval<Date>>();
             }
             list.add(interval);
 
@@ -219,7 +219,7 @@ public class DownloadController {
             public void run() {
                 int numberOfDownloads = 0;
 
-                final LinkedList<Interval<Date>> list = downloadMap.get(band);
+                final ArrayList<Interval<Date>> list = downloadMap.get(band);
                 if (list != null) {
                     list.remove(interval);
                     numberOfDownloads = list.size();
