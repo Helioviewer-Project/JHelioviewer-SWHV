@@ -733,6 +733,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     double ratioTime = (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime()) / graphArea.width;
                     startTime = plotAreaSpace.getScaledSelectedMinTime() - scrollValue * zoomTimeFactor * scrollDistance * ratioXLeft * ratioTime;
                     endTime = plotAreaSpace.getScaledSelectedMaxTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioXRight * ratioTime;
+                    endTime = Math.min(endTime, plotAreaSpace.getScaledMaxTime());
                 } else if (e.isShiftDown()) {
                     double ratioTime = (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime()) / graphArea.width;
                     startTime = plotAreaSpace.getScaledSelectedMinTime() + scrollValue * zoomTimeFactor * scrollDistance * ratioTime;
