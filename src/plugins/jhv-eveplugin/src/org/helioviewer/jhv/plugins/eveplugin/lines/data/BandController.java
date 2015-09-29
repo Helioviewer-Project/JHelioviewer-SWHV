@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
@@ -25,7 +25,7 @@ public class BandController {
     private static final BandController singletonInstance = new BandController();
 
     /** List holds references to all listeners */
-    private final LinkedList<BandControllerListener> bandControllerListeners = new LinkedList<BandControllerListener>();
+    private final ArrayList<BandControllerListener> bandControllerListeners = new ArrayList<BandControllerListener>();
 
     private final HashMap<BandGroup, BandManager> bandManagerMap = new HashMap<BandGroup, BandManager>();
 
@@ -182,7 +182,7 @@ public class BandController {
 
     public Band[] getBands() {
 
-        final LinkedList<Band> availableBands = new LinkedList<Band>();
+        final ArrayList<Band> availableBands = new ArrayList<Band>();
         for (BandManager bm : bandManagerMap.values()) {
             availableBands.addAll(bm.getBands());
         }
@@ -198,7 +198,7 @@ public class BandController {
             return new Band[0];
         }
 
-        final LinkedList<Band> availableBands = bandManagerMap.get(group).getBands(group);
+        final ArrayList<Band> availableBands = bandManagerMap.get(group).getBands(group);
 
         if (availableBands == null) {
             return new Band[0];
@@ -244,7 +244,7 @@ public class BandController {
         private BandGroup selectedBandGroup;
 
         private final HashMap<BandType, Band> lookupAvailableBandTypes = new HashMap<BandType, Band>();
-        private final HashMap<BandGroup, LinkedList<Band>> availableBandsInGroupMap = new HashMap<BandGroup, LinkedList<Band>>();
+        private final HashMap<BandGroup, ArrayList<Band>> availableBandsInGroupMap = new HashMap<BandGroup, ArrayList<Band>>();
 
         // //////////////////////////////////////////////////////////////////////////
         // Methods
@@ -253,7 +253,7 @@ public class BandController {
         public BandManager() {
             selectedBandGroup = BandTypeAPI.getSingletonInstance().getGroups()[0];
             for (final BandGroup type : BandTypeAPI.getSingletonInstance().getGroups()) {
-                availableBandsInGroupMap.put(type, new LinkedList<Band>());
+                availableBandsInGroupMap.put(type, new ArrayList<Band>());
             }
         }
 
@@ -266,9 +266,9 @@ public class BandController {
 
             lookupAvailableBandTypes.put(bandType, band);
 
-            LinkedList<Band> availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
+            ArrayList<Band> availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
             if (availableBandTypes == null) {
-                availableBandsInGroupMap.put(bandType.getGroup(), new LinkedList<Band>());
+                availableBandsInGroupMap.put(bandType.getGroup(), new ArrayList<Band>());
                 availableBandTypes = availableBandsInGroupMap.get(bandType.getGroup());
             }
             availableBandTypes.add(band);
@@ -277,7 +277,7 @@ public class BandController {
 
         public boolean removeBand(final Band band) {
             if (lookupAvailableBandTypes.remove(band.getBandType()) != null) {
-                final LinkedList<Band> availableBandTypes = availableBandsInGroupMap.get(band.getBandType().getGroup());
+                final ArrayList<Band> availableBandTypes = availableBandsInGroupMap.get(band.getBandType().getGroup());
                 availableBandTypes.remove(band);
 
                 return true;
@@ -294,15 +294,15 @@ public class BandController {
             return lookupAvailableBandTypes.get(bandType);
         }
 
-        public LinkedList<Band> getBands() {
+        public ArrayList<Band> getBands() {
             return getBands(selectedBandGroup);
         }
 
-        public LinkedList<Band> getBands(final BandGroup group) {
-            final LinkedList<Band> availableBands = availableBandsInGroupMap.get(group);
+        public ArrayList<Band> getBands(final BandGroup group) {
+            final ArrayList<Band> availableBands = availableBandsInGroupMap.get(group);
 
             if (availableBands == null) {
-                return new LinkedList<Band>();
+                return new ArrayList<Band>();
             }
 
             return availableBands;
@@ -311,15 +311,15 @@ public class BandController {
         public void selectBandGroup(final BandGroup group) {
             // set current group visible = false
             /*
-             * final LinkedList<Band> bands = getBands();
-             * 
+             * final ArrayList<Band> bands = getBands();
+             *
              * for (final Band band : bands) { band.setVisible(false); }
              */
 
             // set selected group visible = true
             selectedBandGroup = group;
 
-            final LinkedList<Band> newBands = getBands();
+            final ArrayList<Band> newBands = getBands();
 
             for (final Band band : newBands) {
                 band.setVisible(true);
