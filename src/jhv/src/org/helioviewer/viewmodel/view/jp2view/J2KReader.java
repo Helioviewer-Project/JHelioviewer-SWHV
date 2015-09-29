@@ -133,8 +133,6 @@ class J2KReader implements Runnable {
 
     /** Releases the resources associated with this object. */
     void abolish() {
-        stop();
-
         try {
             if (socket != null) {
                 socket.close();
@@ -143,6 +141,7 @@ class J2KReader implements Runnable {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        stop();
     }
 
     /**
