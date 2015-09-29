@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 
@@ -259,7 +258,6 @@ public class RadioImage {
             int y0 = (int) Math.round((imageFreqInterval.getEnd() - visibleImageFreqInterval.getEnd()) / freqPerPix);
             int width = (int) Math.round((visibleImageTimeInterval.getEnd().getTime() - visibleImageTimeInterval.getStart().getTime()) / timePerPix);
             int height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix);
-            Log.debug("height = (int) Math.round((visibleImageFreqInterval.getEnd() - visibleImageFreqInterval.getStart()) / freqPerPix) =>  (int) Math.round((" + visibleImageFreqInterval.getEnd() + " - " + visibleImageFreqInterval.getStart() + " ) " + " / " + freqPerPix + ") = " + height);
             return new Rectangle(x0, y0, width, height);
         } else {
             return null;
