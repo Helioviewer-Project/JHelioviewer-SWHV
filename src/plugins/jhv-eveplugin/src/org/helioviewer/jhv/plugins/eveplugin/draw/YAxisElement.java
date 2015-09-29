@@ -152,13 +152,17 @@ public class YAxisElement extends AbstractValueSpace {
         Range dummyRange = new Range();
         if (availableRange.min != dummyRange.min && availableRange.max != dummyRange.max) {
             if (availableRange.min != newAvailableRange.min || availableRange.max != newAvailableRange.max) {
-                availableRange = new Range(newAvailableRange);
+                // availableRange = new Range(newAvailableRange);
+                availableRange.setMax(newAvailableRange.max);
+                availableRange.setMin(newAvailableRange.min);
                 checkSelectedRange();
                 adaptScaledAvailableRange();
             }
         } else {
             availableRange = new Range(newAvailableRange);
+            Log.debug("set available range (old): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
             selectedRange = new Range(newAvailableRange);
+            Log.debug("set available range (new): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
             scaledAvailableRange = new Range(0, 1);
             scaledSelectedRange = new Range(0, 1);
         }
@@ -166,7 +170,10 @@ public class YAxisElement extends AbstractValueSpace {
 
     private void checkSelectedRange() {
         if (selectedRange.min < availableRange.min || selectedRange.max > availableRange.max || selectedRange.min > selectedRange.max) {
+            Thread.dumpStack();
+            Log.debug("check selected range (old): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
             selectedRange = new Range(availableRange);
+            Log.debug("check selected range (new): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
         }
     }
 
@@ -320,8 +327,9 @@ public class YAxisElement extends AbstractValueSpace {
 
         double selectedStart = availableRange.min + diffScSelStartScAvaiStart * ratio;
         double selectedEnd = availableRange.min + diffscSelEndScAvailStart * ratio;
-
+        Log.debug("set scaled selected range (old): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] " + this);
         selectedRange = new Range(selectedStart, selectedEnd);
+        Log.debug("set scaled selected range (new): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "] " + this);
         scaledSelectedRange = new Range(newScaledSelectedRange);
 
         fireSelectedRangeChanged();
@@ -335,7 +343,9 @@ public class YAxisElement extends AbstractValueSpace {
 
     public void reset() {
         availableRange = new Range();
+        Log.debug("reset range (old): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
         selectedRange = new Range();
+        Log.debug("reset range (new): [" + Math.log10(selectedRange.min) + ", " + Math.log10(selectedRange.max) + "]");
         scaledAvailableRange = new Range(0, 1);
         scaledSelectedRange = new Range(0, 1);
     }
