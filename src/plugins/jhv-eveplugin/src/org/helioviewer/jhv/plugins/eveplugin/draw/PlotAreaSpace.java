@@ -15,6 +15,7 @@ public class PlotAreaSpace {
     // private double scaledSelectedMaxValue;
     private double scaledSelectedMinTime;
     private double scaledSelectedMaxTime;
+    private double minSelectedTimeDiff;
 
     private final List<PlotAreaSpaceListener> listeners;
 
@@ -33,6 +34,7 @@ public class PlotAreaSpace {
         // scaledSelectedMaxValue = 1.0;
         scaledSelectedMinTime = 0.0;
         scaledSelectedMaxTime = 1.0;
+        minSelectedTimeDiff = 0;
         valueSpaces = new HashSet<ValueSpace>();
     }
 
@@ -140,7 +142,7 @@ public class PlotAreaSpace {
     }
 
     public void setScaledSelectedTime(double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        if (forced || !(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime)) {
+        if ((forced || !(this.scaledSelectedMinTime == scaledSelectedMinTime && this.scaledSelectedMaxTime == scaledSelectedMaxTime)) && (scaledSelectedMaxTime - scaledSelectedMinTime) > minSelectedTimeDiff) {
             this.scaledSelectedMinTime = scaledSelectedMinTime;
             this.scaledSelectedMaxTime = scaledSelectedMaxTime;
             if (this.scaledSelectedMinTime < scaledMinTime || this.scaledSelectedMaxTime > scaledMaxTime) {
@@ -265,4 +267,11 @@ public class PlotAreaSpace {
         valueSpaces.remove(valueSpace);
     }
 
+    public double getMinSelectedTimeDiff() {
+        return minSelectedTimeDiff;
+    }
+
+    public void setMinSelectedTimeDiff(double minSelectedTimeDiff) {
+        this.minSelectedTimeDiff = minSelectedTimeDiff;
+    }
 }
