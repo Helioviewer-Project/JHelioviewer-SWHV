@@ -532,7 +532,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd, DownloadRequestData drd) {
         RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
         if (ri != null) {
-            ri.setVisibleIntervals(xStart, xEnd, (int) Math.round(yStart), (int) Math.round(yEnd));
+            ri.setVisibleIntervals(xStart, xEnd, (int) Math.floor(yStart), (int) Math.ceil(yEnd));
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
                 Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
                 FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
@@ -544,6 +544,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jp2View.setViewport(new Viewport(viewport.width, viewport.height));
 
                         Rectangle roi = ri.getROI();
+                        Log.debug("%%%%%%%%%%%%%");
+                        Log.debug("viewport: " + viewport);
+                        Log.debug("roi: " + roi);
+                        Log.debug("%%%%%%%%%%%%%");
                         if (!jp2View.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()))) {
                             if (ri.getLastDataSize() != null) {
                                 fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
@@ -666,6 +670,10 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
+                        Log.debug("##########");
+                        Log.debug("viewport: " + lastUsedResolutionSetting);
+                        Log.debug("roi: " + roi);
+                        Log.debug("##########");
                         jp2CallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
                         drd.addRadioImage(tempRs);
                     } else {
