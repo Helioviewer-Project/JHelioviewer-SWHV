@@ -205,12 +205,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             yAxisElement.set(unitLabel, isLog);
             eveDrawableElementMap.get(yAxisElement).set(interval, bands, yAxisElement);
             if (bands.length > 0) {
-                drawController.updateDrawableElement(eveDrawableElementMap.get(yAxisElement));
+                drawController.updateDrawableElement(eveDrawableElementMap.get(yAxisElement), false);
             } else {
                 drawController.removeDrawableElement(eveDrawableElementMap.get(yAxisElement));
             }
-
         }
+        drawController.fireRedrawRequest();
     }
 
     private final EVEValues retrieveData(final Band band, final Interval<Date> interval, Rectangle plotArea) {
@@ -289,7 +289,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
     }
 
     public EVEValues getValues(Band band, Interval<Date> interval, Rectangle graphArea) {

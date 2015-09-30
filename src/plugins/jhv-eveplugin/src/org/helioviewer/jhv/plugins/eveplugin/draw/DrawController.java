@@ -93,12 +93,16 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         tListeners.add(listener);
     }
 
-    public void updateDrawableElement(DrawableElement drawableElement) {
+    public void updateDrawableElement(DrawableElement drawableElement, boolean needsFire) {
         this.addDrawableElement(drawableElement, false);
 
-        if (drawableElement.hasElementsToDraw()) {
+        if (needsFire && drawableElement.hasElementsToDraw()) {
             this.fireRedrawRequest();
         }
+    }
+
+    public void updateDrawableElement(DrawableElement drawableElement) {
+        updateDrawableElement(drawableElement, true);
     }
 
     private void addDrawableElement(DrawableElement element, boolean redraw) {
@@ -169,7 +173,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         fireRedrawRequest();
     }
 
-    private void fireRedrawRequest() {
+    public void fireRedrawRequest() {
         for (DrawControllerListener l : listeners) {
             l.drawRequest();
         }
