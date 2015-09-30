@@ -117,11 +117,14 @@ class J2KReader implements Runnable {
         if (myThread != null && myThread.isAlive()) {
             try {
                 do {
+                    if (socket != null) { // try to unblock i/o
+                        socket.close();
+                    }
                     myThread.interrupt();
                     myThread.join(100);
                 } while (myThread.isAlive());
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 myThread = null;
             }
@@ -137,8 +140,8 @@ class J2KReader implements Runnable {
                 socket.close();
                 socket = null;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
