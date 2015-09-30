@@ -189,7 +189,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
 
-        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "More options", "More options to control playback", this);
+        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback", this);
         buttonPanel.add(advancedButton);
 
         // Current frame number
