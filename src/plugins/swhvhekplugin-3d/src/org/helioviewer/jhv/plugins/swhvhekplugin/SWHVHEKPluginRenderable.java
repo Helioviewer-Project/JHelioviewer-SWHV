@@ -98,7 +98,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glLineWidth(LINEWIDTH);
         }
 
-        double r, alpha, theta = thetaStart;
+        double r, alpha, theta;
         double x, y, z;
         double xrot, yrot, zrot;
 
@@ -136,6 +136,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
             r = alpha * distSun + (1 - alpha) * (distSun + 5);
+            theta = principleAngle;
 
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
