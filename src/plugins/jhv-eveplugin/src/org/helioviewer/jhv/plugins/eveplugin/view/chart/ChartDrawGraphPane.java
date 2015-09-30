@@ -546,28 +546,14 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
 
         if (mousePressedPosition != null && !mousePressedOnMovieFrame) {
-            // updateGraph();
-            // repaint();
             setCursor(UIGlobals.closedHandCursor);
             final int mouseX = e.getX();
             final int mouseY = e.getY();
-            double distanceX = -1 * (mouseX - mousePressedPosition.x);
+            double distanceX = (-mouseX + mousePressedPosition.x);
             double distanceY = mouseY - mousePressedPosition.y;
             double ratioTime = graphArea.width / (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             double startTime = plotAreaSpace.getScaledSelectedMinTime() + distanceX / ratioTime;
             double endTime = startTime + graphArea.width / ratioTime;
-
-            /*
-             * if (startTime < myPlotAreaSpace.getScaledMinTime()) { startTime =
-             * myPlotAreaSpace.getScaledMinTime(); endTime = startTime +
-             * graphArea.width / ratioTime; }
-             */
-
-            /*
-             * if (endTime > myPlotAreaSpace.getScaledMaxTime()) { endTime =
-             * myPlotAreaSpace.getScaledMaxTime(); startTime = endTime -
-             * graphArea.width / ratioTime; }
-             */
 
             plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
 
@@ -762,7 +748,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
 
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
-                            ) {
+                    ) {
                         vs.setScaledSelectedRange(new Range(startValue, endValue));
                     }
                 }
