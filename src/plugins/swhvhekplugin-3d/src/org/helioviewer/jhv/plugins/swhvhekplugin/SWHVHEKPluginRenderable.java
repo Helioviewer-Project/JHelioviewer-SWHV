@@ -75,7 +75,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
 
         double arcResolution = 100;
-        double lineResolution = 10;
+        int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Position.Latitudinal p = Sun.getEarth(date);
@@ -98,15 +98,15 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glLineWidth(LINEWIDTH);
         }
 
-        double r, alpha, theta;
+        double r, alpha, theta = thetaStart;
         double x, y, z;
         double xrot, yrot, zrot;
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution; i++) {
-            alpha = 1. - 1. * i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 2);
+            alpha = 1. - i / arcResolution;
+            r = alpha * distSun + (1 - alpha) * (distSun + 5);
             theta = thetaStart;
 
             x = r * Math.cos(theta) * Math.sin(phi);
@@ -118,8 +118,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
-        for (int i = 0; i <= arcResolution; i++) {
-            alpha = 1. - 1. * i / arcResolution;
+
+        for (int i = 0; i < (int) (arcResolution / 2); i++) {
+            alpha = 1. - i / arcResolution;
             theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
 
             x = distSun * Math.cos(theta) * Math.sin(phi);
@@ -131,9 +132,38 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
+
+        for (int i = 0; i <= lineResolution / 2; i++) {
+            alpha = 1. - i / arcResolution;
+            r = alpha * distSun + (1 - alpha) * (distSun + 5);
+
+            x = r * Math.cos(theta) * Math.sin(phi);
+            z = r * Math.cos(theta) * Math.cos(phi);
+            y = r * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
+
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+        }
+
+        for (int i = (int) (arcResolution / 2); i <= arcResolution; i++) {
+            alpha = 1. - i / arcResolution;
+            theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
+
+            x = distSun * Math.cos(theta) * Math.sin(phi);
+            z = distSun * Math.cos(theta) * Math.cos(phi);
+            y = distSun * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
+
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+        }
+
         for (int i = 0; i <= lineResolution; i++) {
-            alpha = 1. - 1. * i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 2);
+            alpha = 1. - i / arcResolution;
+            r = alpha * distSun + (1 - alpha) * (distSun + 5);
             theta = thetaEnd;
 
             x = r * Math.cos(theta) * Math.sin(phi);
@@ -187,7 +217,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
-                    double alpha = 1. - 1. * j / divpoints;
+                    double alpha = 1. - j / (double) divpoints;
                     double xnew = alpha * oldBoundaryPoint3d.getCoordinate1() + (1 - alpha) * point.getCoordinate1();
                     double ynew = alpha * oldBoundaryPoint3d.getCoordinate2() + (1 - alpha) * point.getCoordinate2();
                     double znew = alpha * oldBoundaryPoint3d.getCoordinate3() + (1 - alpha) * point.getCoordinate3();
@@ -225,9 +255,9 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
-        gl.glColor3f(1.0f, 1.0f, 1.0f);
-        double width2 = width / 2.0;
-        double height2 = height / 2.0;
+        gl.glColor3f(1f, 1f, 1f);
+        double width2 = width / 2.;
+        double height2 = height / 2.;
 
         GL3DVec3d sourceDir = new GL3DVec3d(0, 0, 1);
         GL3DVec3d targetDir = new GL3DVec3d(x, y, z);
@@ -254,13 +284,13 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glBegin(GL2.GL_QUADS);
         {
-            gl.glTexCoord2f(1.0f, 1.0f);
+            gl.glTexCoord2f(1f, 1f);
             gl.glVertex3d(p3.x, p3.y, p3.z);
-            gl.glTexCoord2f(1.0f, 0.0f);
+            gl.glTexCoord2f(1f, 0f);
             gl.glVertex3d(p2.x, p2.y, p2.z);
-            gl.glTexCoord2f(0.0f, 0.0f);
+            gl.glTexCoord2f(0f, 0f);
             gl.glVertex3d(p1.x, p1.y, p1.z);
-            gl.glTexCoord2f(0.0f, 1.0f);
+            gl.glTexCoord2f(0f, 1f);
             gl.glVertex3d(p0.x, p0.y, p0.z);
         }
         gl.glEnd();
