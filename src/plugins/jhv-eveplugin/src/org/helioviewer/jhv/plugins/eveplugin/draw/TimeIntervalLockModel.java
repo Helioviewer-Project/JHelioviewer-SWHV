@@ -4,8 +4,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.helioviewer.base.interval.Interval;
 
@@ -27,11 +25,9 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     private static TimeIntervalLockModel instance;
 
     /** Holds the previous movie time */
-    private Date previousMovieTime;
+    private Date latestMovieTime;
 
     private final PlotAreaSpace plotAreaSpace;
-
-    private Date latestMovieTime;
 
     /**
      * Private constructor
@@ -42,7 +38,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         // currentAvailableInterval = new Interval<Date>(null, null);
         drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
-        previousMovieTime = new Date();
+        latestMovieTime = new Date();
         plotAreaSpace = drawController.getPlotAreaSpace();
     }
 
@@ -107,41 +103,18 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     public void drawMovieLineRequest(Date time) {
         double selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
 
-        latestMovieTime = time;
         Interval<Date> currentAvailableInterval = drawController.getAvailableInterval();
-        if (time != null && currentAvailableInterval != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
-            // Log.debug("Execute drawMovieline : " + time);
-            // Log.trace("previousTimeInterval : " + previousMovieTime +
-            // " currentMovieTime : " + time);
-            previousMovieTime = time;
-            Map<PlotAreaSpace, Double> selectedStartTimes = new HashMap<PlotAreaSpace, Double>();
-            Map<PlotAreaSpace, Double> selectedEndTimes = new HashMap<PlotAreaSpace, Double>();
-            // Log.debug("Selected interval width: " +
-            // selectedIntervalWidth);
+        if (time != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !latestMovieTime.equals(time)) {
+            latestMovieTime = time;
 
             long movieTimeDiff = time.getTime() - currentAvailableInterval.getStart().getTime();
             double availableIntervalWidthScaled = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
             long availableIntervalWidthAbs = currentAvailableInterval.getEnd().getTime() - currentAvailableInterval.getStart().getTime();
-            // Log.debug("Available interval abs: " +
-            // availableIntervalWidthAbs);
-            // Log.debug("Available interval scaled: " +
-            // availableIntervalWidthScaled);
             double scaledPerTime = availableIntervalWidthScaled / availableIntervalWidthAbs;
             double scaledMoviePosition = plotAreaSpace.getScaledMinTime() + movieTimeDiff * scaledPerTime;
-            // double newSelectedScaledStart =
-            // Math.max(space.getScaledMinTime(), scaledMoviePosition -
-            // (selectedIntervalWidth / 2));
             double newSelectedScaledStart = scaledMoviePosition - (selectedSpaceWidth / 2);
-            // double newSelectedScaledEnd =
-            // Math.min(space.getScaledMaxTime(), scaledMoviePosition +
-            // (selectedIntervalWidth / 2));
             double newSelectedScaledEnd = scaledMoviePosition + (selectedSpaceWidth / 2);
-            // Log.debug("Old selected width, new selected width: " +
-            // selectedIntervalWidth + ", " + (newSelectedScaledEnd -
-            // newSelectedScaledStart));
-            selectedStartTimes.put(plotAreaSpace, newSelectedScaledStart);
-            selectedEndTimes.put(plotAreaSpace, newSelectedScaledEnd);
-            plotAreaSpace.setScaledSelectedTime(selectedStartTimes.get(plotAreaSpace), selectedEndTimes.get(plotAreaSpace), false);
+            plotAreaSpace.setScaledSelectedTime(newSelectedScaledStart, newSelectedScaledEnd, false);
 
         }
     }
@@ -157,10 +130,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     @Override
     public void availableIntervalChanged() {
-        // Log.debug("Current interval changed : " + newInterval);
-        if (latestMovieTime != null) {
-            drawMovieLineRequest(latestMovieTime);
-        }
+        drawMovieLineRequest(latestMovieTime);
     }
 
     /*
