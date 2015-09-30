@@ -335,7 +335,7 @@ public class JP2Image {
         }
     }
 
-    protected void startReader(JHVJP2View view) {
+    protected void startReader(JP2View view) {
         if (cache != null) { // remote
             try {
                 reader = new J2KReader(view, this);

@@ -46,7 +46,7 @@ public class LUT {
 
     /**
      * Creates a lookup table with the given table, use e.g. for int[]
-     * org.helioviewer.viewmodel.view.jp2view.JHVJP2View.getBuiltInLUT()
+     * org.helioviewer.viewmodel.view.jp2view.JP2View.getBuiltInLUT()
      * 
      * @param name
      *            Name of the lookup

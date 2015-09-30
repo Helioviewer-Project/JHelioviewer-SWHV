@@ -20,7 +20,7 @@ import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JP2View;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -223,7 +223,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         this.exportMovieDialog = exportMovieDialog;
 
         View mv = Layers.getActiveView();
-        if (mv instanceof JHVJP2View) {
+        if (mv instanceof JP2View) {
             ImageViewerGui.getLeftContentPane().setEnabled(false);
 
             moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + mv.getName().replace(" ", "_") + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";

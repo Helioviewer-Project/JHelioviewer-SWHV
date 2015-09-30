@@ -55,7 +55,7 @@ class J2KReader implements Runnable {
     private final JP2Image parentImageRef;
 
     /** A reference to the JP2ImageView this object is owned by. */
-    private final JHVJP2View parentViewRef;
+    private final JP2View parentViewRef;
 
     /** The JPIPSocket used to connect to the server. */
     private JPIPSocket socket;
@@ -84,7 +84,7 @@ class J2KReader implements Runnable {
      * @throws IOException
      * @throws JHV_KduException
      */
-    J2KReader(JHVJP2View _imageViewRef, JP2Image _jp2ImageRef) throws IOException, JHV_KduException {
+    J2KReader(JP2View _imageViewRef, JP2Image _jp2ImageRef) throws IOException, JHV_KduException {
         parentViewRef = _imageViewRef;
         parentImageRef = _jp2ImageRef;
 
