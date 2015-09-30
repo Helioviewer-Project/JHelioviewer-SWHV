@@ -34,7 +34,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
  * This class represents the gateway to the heart of the helioviewer project. It
  * is responsible for reading and decoding JPG2000 images.
  */
-public class JHVJP2View extends AbstractView {
+public class JP2View extends AbstractView {
 
     static private class RejectExecution implements RejectedExecutionHandler {
         @Override
@@ -112,9 +112,9 @@ public class JHVJP2View extends AbstractView {
     }
 
     private class AbolishThread extends Thread {
-        private JHVJP2View view;
+        private JP2View view;
 
-        public Runnable init(JHVJP2View view) {
+        public Runnable init(JP2View view) {
             this.view = view;
             return this;
         }
@@ -134,7 +134,7 @@ public class JHVJP2View extends AbstractView {
             }
 
             EventQueue.invokeLater(new Runnable() {
-                private JHVJP2View view;
+                private JP2View view;
 
                 @Override
                 public void run() {
@@ -142,7 +142,7 @@ public class JHVJP2View extends AbstractView {
                     view._jp2Image = null;
                 }
 
-                public Runnable init(JHVJP2View view) {
+                public Runnable init(JP2View view) {
                     this.view = view;
                     return this;
                 }

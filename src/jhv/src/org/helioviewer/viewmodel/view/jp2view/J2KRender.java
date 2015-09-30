@@ -36,8 +36,8 @@ class J2KRender implements Runnable {
     /** A reference to the JP2Image this object is owned by. */
     private final JP2Image parentImageRef;
 
-    /** A reference to the JP2ImageView this object is owned by. */
-    private final JHVJP2View parentViewRef;
+    /** A reference to the JP2View this object is owned by. */
+    private final JP2View parentViewRef;
 
     /** An integer buffer used in the run method. */
     private int[] intBuffer;
@@ -52,7 +52,7 @@ class J2KRender implements Runnable {
 
     private final JP2ImageParameter currParams;
 
-    J2KRender(JHVJP2View _parentViewRef, JP2ImageParameter _currParams) {
+    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams) {
         parentViewRef = _parentViewRef;
 
         currParams = _currParams;

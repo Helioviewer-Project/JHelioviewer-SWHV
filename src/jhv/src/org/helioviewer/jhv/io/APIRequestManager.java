@@ -24,8 +24,8 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.viewmodel.view.simpleimageview.SimpleImageView;
 
 /**
@@ -324,7 +324,7 @@ public class APIRequestManager {
                  return new SimpleImageView(uri);
             } else {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                return EventDispatchQueue.invokeAndWait(new NewJHVJP2View(jp2Image));
+                return EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
             }
         } catch (InterruptedException e) {
             // nothing
@@ -335,21 +335,21 @@ public class APIRequestManager {
         return null;
     }
 
-    private static class NewJHVJP2View implements Callable<JHVJP2View> {
+    private static class AllocateJP2View implements Callable<JP2View> {
         private final AtomicReference<JP2Image> refJP2Image = new AtomicReference<JP2Image>();
 
-        public NewJHVJP2View(JP2Image jp2Image) {
+        public AllocateJP2View(JP2Image jp2Image) {
             refJP2Image.set(jp2Image);
         }
 
         @Override
-        public JHVJP2View call() {
-            JHVJP2View view;
+        public JP2View call() {
+            JP2View view;
             JP2Image jp2Image = refJP2Image.get();
             if (jp2Image.getDownloadURI().toString().toLowerCase().contains("callisto")) {
                 view = new JP2CallistoView();
             } else {
-                view = new JHVJP2View();
+                view = new JP2View();
             }
             view.setJP2Image(jp2Image);
 

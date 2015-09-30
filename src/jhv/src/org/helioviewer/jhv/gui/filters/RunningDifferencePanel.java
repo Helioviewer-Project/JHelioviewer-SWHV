@@ -39,7 +39,7 @@ import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JP2View;
 
 /**
  * Panel to control running differences
@@ -236,8 +236,8 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                if (view instanceof JHVJP2View)
-                    downloadLayer((JHVJP2View) view);
+                if (view instanceof JP2View)
+                    downloadLayer((JP2View) view);
             }
         };
         downloadLayerButton.setAction(downloadLayerAction);
@@ -254,7 +254,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         };
         showMetaButton.setAction(showMetaAction);
         showMetaButton.revalidate();
-        if (view instanceof JHVJP2View) {
+        if (view instanceof JP2View) {
             downloadLayerButton.setEnabled(true);
         } else {
             downloadLayerButton.setEnabled(false);
@@ -273,16 +273,16 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      * @param view
      *            - View that can be associated with the layer in question
      */
-    private static void downloadLayer(JHVJP2View view) {
+    private static void downloadLayer(JP2View view) {
         Thread downloadThread = new Thread(new Runnable() {
-            private JHVJP2View theView;
+            private JP2View theView;
 
             @Override
             public void run() {
                 downloadFromJPIP(theView);
             }
 
-            public Runnable init(JHVJP2View theView) {
+            public Runnable init(JP2View theView) {
                 this.theView = theView;
                 return this;
             }
@@ -296,7 +296,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
      * Changes the source of the View afterwards, since a local file is always
      * faster.
      */
-    private static void downloadFromJPIP(JHVJP2View v) {
+    private static void downloadFromJPIP(JP2View v) {
         FileDownloader fileDownloader = new FileDownloader();
         URI downloadUri = v.getDownloadURI();
         URI uri = v.getUri();

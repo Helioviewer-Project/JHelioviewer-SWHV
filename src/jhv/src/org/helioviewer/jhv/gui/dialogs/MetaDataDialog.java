@@ -40,7 +40,7 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.FITSView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
+import org.helioviewer.viewmodel.view.jp2view.JP2View;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -197,8 +197,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("Time        : " + m.getDateObs().getFormattedTime());
 
             String xmlText = null;
-            if (v instanceof JHVJP2View) {
-                xmlText = ((JHVJP2View) v).getXMLMetaData();
+            if (v instanceof JP2View) {
+                xmlText = ((JP2View) v).getXMLMetaData();
             } else if (v instanceof FITSView) {
                 xmlText = ((FITSView) v).getHeaderAsXML();
             }
