@@ -94,7 +94,6 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public void updateDrawableElement(DrawableElement drawableElement) {
-        removeDrawableElement(drawableElement, false, true);
         this.addDrawableElement(drawableElement, false);
 
         if (drawableElement.hasElementsToDraw()) {
