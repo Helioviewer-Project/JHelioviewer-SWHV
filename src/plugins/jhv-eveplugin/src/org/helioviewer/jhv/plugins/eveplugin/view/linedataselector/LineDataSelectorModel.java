@@ -59,7 +59,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
 
     public void addLineData(LineDataSelectorElement element) {
         elements.add(element);
-        element.setDataColor(BandColors.getNextColor());
         fireLineDataSelectorElementAdded(element);
         fireListeners();
     }
