@@ -59,7 +59,7 @@ public class GLImage {
         applyGLLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D);
-        tex.copyImageData2D(gl, imageData, 0, 0, w, h);
+        tex.copyImageData2D(gl, imageData);
     }
 
     private void copyScreenToTexture(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
@@ -129,7 +129,7 @@ public class GLImage {
                 GLSLShader.setTruncationValue(truncation);
                 gl.glActiveTexture(GL2.GL_TEXTURE2);
                 diffTex.bind(gl, GL2.GL_TEXTURE_2D);
-                diffTex.copyImageData2D(gl, prevFrame, 0, 0, prevFrame.getWidth(), prevFrame.getHeight());
+                diffTex.copyImageData2D(gl, prevFrame);
                 gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {

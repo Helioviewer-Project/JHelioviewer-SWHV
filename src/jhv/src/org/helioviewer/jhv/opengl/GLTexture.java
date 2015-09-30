@@ -66,9 +66,11 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageData2D(GL2 gl, ImageData source, int x, int y, int w, int h) {
-        if (x < 0 || y < 0 || w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error(">> x=" + x + " y=" + y + " w= " + w + " h=" + h);
+    public void copyImageData2D(GL2 gl, ImageData source) {
+        int w = source.getWidth();
+        int h = source.getHeight();
+        if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+            Log.error(">> w= " + w + " h=" + h);
             Thread.dumpStack();
             return;
         }
@@ -90,8 +92,8 @@ public class GLTexture {
             buffer = null;
         }
 
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, x);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, y);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
+        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, source.getWidth());
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
@@ -112,9 +114,13 @@ public class GLTexture {
     }
 
     public void copyBufferedImage2D(GL2 gl, BufferedImage source) {
-        int width, height;
-        if ((width = source.getWidth()) > GLInfo.maxTextureSize || (height = source.getHeight()) > GLInfo.maxTextureSize)
+        int w = source.getWidth();
+        int h = source.getHeight();
+        if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+            Log.error(">> w= " + w + " h=" + h);
+            Thread.dumpStack();
             return;
+        }
 
         DataBuffer rawBuffer = source.getRaster().getDataBuffer();
         Buffer buffer;
@@ -141,7 +147,7 @@ public class GLTexture {
         gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
 
-        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), width, height, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
     public void copyBuffer1D(GL2 gl, IntBuffer source) {
