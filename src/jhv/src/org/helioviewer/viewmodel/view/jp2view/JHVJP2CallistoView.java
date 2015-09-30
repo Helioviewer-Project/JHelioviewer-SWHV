@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -33,7 +34,7 @@ public class JHVJP2CallistoView extends JHVJP2View {
 
     @Override
     public void render() {
-        System.out.println(">>> Should not be called");
+        Log.error(">> Should not be called");
         Thread.dumpStack();
     }
 

@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -65,9 +66,12 @@ public class GLTexture {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageData2D(GL2 gl, ImageData source, int x, int y, int width, int height) {
-        if (width > GLInfo.maxTextureSize || height > GLInfo.maxTextureSize)
+    public void copyImageData2D(GL2 gl, ImageData source, int x, int y, int w, int h) {
+        if (x < 0 || y < 0 || w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+            Log.error(">> x=" + x + " y=" + y + " w= " + w + " h=" + h);
+            Thread.dumpStack();
             return;
+        }
 
         int bitsPerPixel = source.getImageTransport().getNumBitsPerPixel();
         Buffer buffer;
@@ -95,16 +99,16 @@ public class GLTexture {
         int inputGLFormat = mapImageFormatToInputGLFormat(imageFormat);
         int bppGLType = mapBitsPerPixelToGLType(bitsPerPixel);
 
-        if (width != prev_width || height != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
+        if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(imageFormat);
-            genTexture2D(gl, internalGLFormat, width, height, inputGLFormat, bppGLType, null);
+            genTexture2D(gl, internalGLFormat, w, h, inputGLFormat, bppGLType, null);
 
-            prev_width = width;
-            prev_height = height;
+            prev_width = w;
+            prev_height = h;
             prev_inputGLFormat = inputGLFormat;
             prev_bppGLType = bppGLType;
         }
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, width, height, inputGLFormat, bppGLType, buffer);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, buffer);
     }
 
     public void copyBufferedImage2D(GL2 gl, BufferedImage source) {
