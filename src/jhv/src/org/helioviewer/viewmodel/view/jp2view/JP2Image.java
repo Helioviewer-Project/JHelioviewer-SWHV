@@ -92,7 +92,6 @@ public class JP2Image {
 
     protected MetaData[] metaDataList;
 
-    private int referenceCounter = 0;
     private JPIPSocket socket;
 
     /**
@@ -460,29 +459,11 @@ public class JP2Image {
     }
 
     /**
-     * Increases the reference counter.
-     *
-     * This counter is used to count all views, which are using this JP2Image as
-     * their data source. The counter is decreased when calling
-     * {@link #abolish()}.
-     */
-    protected synchronized void addReference() {
-        referenceCounter++;
-    }
-
-    /**
      * Closes the image out. Destroys all objects and performs cleanup
      * operations. I use the 'abolish' name to distinguish it from what the
      * Kakadu library uses.
      */
-    protected synchronized void abolish() {
-        referenceCounter--;
-        if (referenceCounter > 0)
-            return;
-        if (referenceCounter < 0) {
-            throw new IllegalStateException("JP2Image abolished more than once: " + uri);
-        }
-
+    protected void abolish() {
         if (reader != null) {
             reader.abolish();
             reader = null;

@@ -90,7 +90,6 @@ public class JHVJP2View extends AbstractView {
         }
 
         _jp2Image = newJP2Image;
-        _jp2Image.addReference();
 
         MetaData metaData = _jp2Image.metaDataList[0];
         targetRegion = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
@@ -161,14 +160,28 @@ public class JHVJP2View extends AbstractView {
         }
     }
 
+    private volatile boolean isAbolished = false;
+
     @Override
     public void abolish() {
+        isAbolished = true;
         stopRender = true;
         Displayer.removeRenderListener(this);
 
         AbolishThread thread = new AbolishThread();
         thread.init(this);
         exec.submit(thread);
+    }
+
+    // if instance was built before cancelling
+    public void finalize() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (!isAbolished)
+                    abolish();
+            }
+        });
     }
 
     /**
