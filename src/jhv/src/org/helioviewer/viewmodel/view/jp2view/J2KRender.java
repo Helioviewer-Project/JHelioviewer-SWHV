@@ -1,7 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -82,11 +81,13 @@ class J2KRender implements Runnable {
 
         Kdu_dims newRegion = new Kdu_dims();
 
-        Buffer buffer;
+        int[] intBuffer = null;
+        byte[] byteBuffer = null;
+
         if (numComponents < 3) {
-            buffer = ByteBuffer.wrap(new byte[roi.getNumPixels()]);
+            byteBuffer = new byte[roi.getNumPixels()];
         } else {
-            buffer = IntBuffer.wrap(new int[roi.getNumPixels()]);
+            intBuffer = new int[roi.getNumPixels()];
         }
 
         int[] localIntBuffer = bufferLocal.get();
@@ -111,16 +112,14 @@ class J2KRender implements Runnable {
             int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
             if (numComponents < 3) {
-                byte[] buf = (byte[]) buffer.array();
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        buf[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
-                int[] buf = (int[]) buffer.array();
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                    System.arraycopy(localIntBuffer, srcIdx, buf, destIdx, newWidth);
+                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                 }
             }
         }
@@ -131,9 +130,9 @@ class J2KRender implements Runnable {
 
         ImageData imdata = null;
         if (numComponents < 3) {
-            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, (byte[]) buffer.array());
+            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, ByteBuffer.wrap(byteBuffer));
         } else {
-            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, (int[]) buffer.array());
+            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, IntBuffer.wrap(intBuffer));
         }
         setImageData(imdata, currParams);
     }

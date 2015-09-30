@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -16,6 +17,9 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 public abstract class AbstractImageData implements ImageData {
 
     protected int width, height;
+    protected int bpp;
+    protected Buffer buffer;
+
     protected BufferedImage image = null;
 
     private int frameNumber;
@@ -61,6 +65,16 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public int getWidth() {
         return width;
+    }
+
+    @Override
+    public int getBitsPerPixel() {
+        return bpp;
+    }
+
+    @Override
+    public Buffer getBuffer() {
+        return buffer;
     }
 
     /**

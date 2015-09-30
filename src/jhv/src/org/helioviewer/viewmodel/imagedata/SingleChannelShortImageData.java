@@ -4,11 +4,11 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.Raster;
+import java.nio.Buffer;
+import java.nio.ShortBuffer;
 
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
-import org.helioviewer.viewmodel.imagetransport.ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 /**
  * Representation of image data in single channel format, using 9 to 16 bits per
@@ -25,7 +25,6 @@ import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 public class SingleChannelShortImageData extends AbstractImageData {
 
     private SingleChannelImageFormat format;
-    private Short16ImageTransport imageTransport;
 
     /**
      * Constructor, given an array as data source.
@@ -46,31 +45,11 @@ public class SingleChannelShortImageData extends AbstractImageData {
      * @param newPixelData
      *            pixel data
      */
-    public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, short[] newPixelData) {
+    public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, Buffer _buffer) {
         super(newWidth, newHeight);
-        imageTransport = new Short16ImageTransport(newPixelData);
         format = new SingleChannelImageFormat(newBitDepth);
-    }
-
-    /**
-     * Constructor, given an array as data source.
-     * 
-     * <p>
-     * This constructor receives the raw data as a data source. If the caller
-     * handles raw data as well, the use of this constructor is recommended.
-     * <p>
-     * The pixel data has to be given as a one-dimensional array containing the
-     * pixel data line by line. Each array element represents one pixel.
-     * 
-     * @param base
-     *            original ImageData-object
-     * @param newPixelData
-     *            pixel data
-     */
-    public SingleChannelShortImageData(ImageData base, short[] newPixelData) {
-        super(base);
-        imageTransport = new Short16ImageTransport(newPixelData);
-        format = (SingleChannelImageFormat) base.getImageFormat();
+        bpp = 16;
+        buffer = _buffer;
     }
 
     /**
@@ -89,28 +68,9 @@ public class SingleChannelShortImageData extends AbstractImageData {
     public SingleChannelShortImageData(int newBitDepth, BufferedImage newImage) {
         super(newImage.getWidth(), newImage.getHeight());
         image = newImage;
-        imageTransport = new Short16ImageTransport(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
         format = new SingleChannelImageFormat(newBitDepth);
-    }
-
-    /**
-     * Constructor, given an BufferedImage as data source.
-     * 
-     * <p>
-     * This constructor receives a BufferedImage as data source. If the caller
-     * operates on BufferedImages as well, the use of this constructor is
-     * recommended.
-     * 
-     * @param base
-     *            original ImageData-object
-     * @param newImage
-     *            pixel data
-     */
-    public SingleChannelShortImageData(ImageData base, BufferedImage newImage) {
-        super(base);
-        image = newImage;
-        imageTransport = new Short16ImageTransport(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
-        format = (SingleChannelImageFormat) base.getImageFormat();
+        bpp = 16;
+        buffer = ShortBuffer.wrap(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
     }
 
     /**
@@ -125,17 +85,9 @@ public class SingleChannelShortImageData extends AbstractImageData {
      * {@inheritDoc}
      */
     @Override
-    public ImageTransport getImageTransport() {
-        return imageTransport;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
-        DataBufferUShort dataBuffer = new DataBufferUShort(imageTransport.getShort16PixelData(), width * height);
+        DataBufferUShort dataBuffer = new DataBufferUShort((short[]) buffer.array(), width * height);
 
         // create the appropriate bit mask
         int mask = 0xffffffff;
