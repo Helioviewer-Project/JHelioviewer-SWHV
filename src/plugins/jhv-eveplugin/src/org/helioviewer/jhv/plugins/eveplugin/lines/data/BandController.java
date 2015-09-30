@@ -69,6 +69,7 @@ public class BandController {
             for (final BandControllerListener listener : bandControllerListeners) {
                 listener.bandAdded(band);
             }
+            band.setDataColor(BandColors.getNextColor());
             selectorModel.addLineData(band);
             DownloadController.getSingletonInstance().updateBand(band, DrawController.getSingletonInstance().getAvailableInterval(), DrawController.getSingletonInstance().getSelectedInterval());
         }
@@ -312,7 +313,7 @@ public class BandController {
             // set current group visible = false
             /*
              * final ArrayList<Band> bands = getBands();
-             *
+             * 
              * for (final Band band : bands) { band.setVisible(false); }
              */
 
