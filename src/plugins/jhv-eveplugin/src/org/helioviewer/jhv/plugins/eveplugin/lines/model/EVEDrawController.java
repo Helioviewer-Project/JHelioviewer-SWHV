@@ -6,8 +6,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,10 +46,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
     private final PlotAreaSpace plotAreaSpace;
     private static EVEDrawController instance;
-    private final Timer addDataTimer;
     private final Timer selectedIntervalChangedTimer;
-    private boolean dataAdded;
-    private final Set<Band> addedDataForBand;
     private boolean selectedIntervalChanged;
     private boolean keepFullValueRange;
 
@@ -71,11 +66,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         plotAreaSpace.addPlotAreaSpaceListener(this);
-        dataAdded = false;
         selectedIntervalChanged = false;
-        addedDataForBand = new HashSet<Band>();
-        addDataTimer = new Timer(200, new DataAddedTimerTask());
-        addDataTimer.start();
         selectedIntervalChangedTimer = new Timer(300, new SelectedIntervalTimerTask());
         selectedIntervalChangedTimer.start();
     }
@@ -189,7 +180,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         Interval<Date> interval = drawController.getSelectedInterval();
         for (YAxisElement yAxisElement : dataMapPerUnitLabel.keySet()) {
             final Band[] bands = dataMapPerUnitLabel.get(yAxisElement).keySet().toArray(new Band[0]);
-            final LinkedList<EVEValues> values = new LinkedList<EVEValues>();
 
             String unitLabel = "";
             boolean isLog = false;
@@ -208,7 +198,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 if (v != null) {
                     newAvailableRange.setMin(v.getMinimumValue());
                     newAvailableRange.setMax(v.getMaximumValue());
-                    values.add(v);
                 }
             }
             yAxisElement.setAvailableRange(new Range(newAvailableRange));
@@ -292,8 +281,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void dataAdded(final Band band) {
-        addedDataForBand.add(band);
-        dataAdded = true;
+        selectedIntervalChanged = true;
     }
 
     @Override
@@ -384,30 +372,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         fireRedrawRequest(false);
     }
 
-    private class DataAddedTimerTask implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-            if (dataAdded) {
-                dataAdded = false;
-                boolean update = false;
-                for (Band b : addedDataForBand) {
-                    if (yAxisElementMap.containsKey(b)) {
-                        if (dataMapPerUnitLabel.get(yAxisElementMap.get(b)).containsKey(b)) {
-                            updateBand(b, keepFullValueRange);
-                            update = true;
-                        }
-                    }
-                }
-                if (update) {
-                    fireRedrawRequest(keepFullValueRange);
-                }
-                addedDataForBand.clear();
-            }
-        }
-    }
-
     private class SelectedIntervalTimerTask implements ActionListener {
 
         @Override
@@ -418,7 +382,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
                 updateBands(keepFullValueRange);
                 fireRedrawRequest(keepFullValueRange);
-
             }
         }
     }
