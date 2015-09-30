@@ -117,13 +117,23 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private void adaptScaledSelectedRange() {
-        double diffAvailable = availableRange.max - availableRange.min;
+        double availableMax = availableRange.max;
+        double availableMin = availableRange.min;
+        double selectedMax = selectedRange.max;
+        double selectedMin = selectedRange.min;
+        if (isLogScale) {
+            availableMax = Math.log10(availableMax);
+            availableMin = Math.log10(availableMin);
+            selectedMax = Math.log10(selectedMax);
+            selectedMin = Math.log10(selectedMin);
+        }
+        double diffAvailable = availableMax - availableMin;
         double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
 
         double ratio = diffScaledAvailable / diffAvailable;
 
-        double diffSelStartAvaiStart = selectedRange.min - availableRange.min;
-        double diffSelEndAvailStart = selectedRange.max - availableRange.min;
+        double diffSelStartAvaiStart = selectedMin - availableMin;
+        double diffSelEndAvailStart = selectedMax - availableMin;
 
         double scaledSelectedStart = scaledAvailableRange.min + ratio * diffSelStartAvaiStart;
         double scaledSelectedEnd = scaledAvailableRange.min + ratio * diffSelEndAvailStart;
@@ -171,13 +181,25 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private void adaptScaledAvailableRange() {
-        double diffSelectedRange = selectedRange.max - selectedRange.min;
+
+        double selectedMax = selectedRange.max;
+        double selectedMin = selectedRange.min;
+        double availableMax = availableRange.max;
+        double availableMin = availableRange.min;
+        if (isLogScale) {
+            selectedMax = Math.log10(selectedMax);
+            selectedMin = Math.log10(selectedMin);
+            availableMin = Math.log10(availableMin);
+            availableMax = Math.log10(availableMax);
+        }
+
+        double diffSelectedRange = selectedMax - selectedMin;
         double diffScaledSelectedRange = scaledSelectedRange.max - scaledSelectedRange.min;
 
         double ratio = diffScaledSelectedRange / diffSelectedRange;
 
-        double diffSelStartAvailStart = selectedRange.min - availableRange.min;
-        double diffSelEndAvailEnd = availableRange.max - selectedRange.max;
+        double diffSelStartAvailStart = selectedMin - availableMin;
+        double diffSelEndAvailEnd = availableMax - selectedMax;
 
         double scaledAvailableStart = scaledSelectedRange.min - diffSelStartAvailStart * ratio;
         double scaledAvailableEnd = scaledSelectedRange.max + diffSelEndAvailEnd * ratio;
@@ -310,19 +332,28 @@ public class YAxisElement extends AbstractValueSpace {
 
     @Override
     public void setScaledSelectedRange(Range newScaledSelectedRange) {
+        double minAvailable = availableRange.min;
+        double maxAvailable = availableRange.max;
+        if (isLogScale) {
+            minAvailable = Math.log10(minAvailable);
+            maxAvailable = Math.log10(maxAvailable);
+        }
         double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
-        double diffAvail = availableRange.max - availableRange.min;
+        double diffAvail = maxAvailable - minAvailable;
 
         double ratio = diffAvail / diffScaledAvailable;
 
         double diffScSelStartScAvaiStart = newScaledSelectedRange.min - scaledAvailableRange.min;
         double diffscSelEndScAvailStart = newScaledSelectedRange.max - scaledAvailableRange.min;
 
-        double selectedStart = availableRange.min + diffScSelStartScAvaiStart * ratio;
-        double selectedEnd = availableRange.min + diffscSelEndScAvailStart * ratio;
-        selectedRange = new Range(selectedStart, selectedEnd);
+        double selectedStart = minAvailable + diffScSelStartScAvaiStart * ratio;
+        double selectedEnd = minAvailable + diffscSelEndScAvailStart * ratio;
+        if (isLogScale) {
+            selectedRange = new Range(Math.pow(10, selectedStart), Math.pow(10, selectedEnd));
+        } else {
+            selectedRange = new Range(selectedStart, selectedEnd);
+        }
         scaledSelectedRange = new Range(newScaledSelectedRange);
-
         fireSelectedRangeChanged();
     }
 
