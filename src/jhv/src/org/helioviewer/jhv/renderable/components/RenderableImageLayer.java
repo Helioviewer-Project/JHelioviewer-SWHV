@@ -26,12 +26,6 @@ import com.jogamp.opengl.GL2;
 public class RenderableImageLayer implements Renderable {
 
     private static boolean showCorona = true;
-    private static int nextLayerId = 0;
-    private final int layerId;
-
-    public int getLayerId() {
-        return layerId;
-    }
 
     private int positionBufferID;
     private int indexBufferID;
@@ -44,18 +38,15 @@ public class RenderableImageLayer implements Renderable {
     private final GLImage glImage;
 
     public RenderableImageLayer(View _view) {
-        layerId = nextLayerId++;
         view = _view;
-
-        glImage = new GLImage(view.getDefaultLUT());
-
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(this);
 
         float opacity;
         if (view.getName().contains("LASCO") || view.getName().contains("COR"))
             opacity = 1.f;
         else
             opacity = (float) (1. / (1. + Layers.getNumLayers()));
+
+        glImage = new GLImage(view.getDefaultLUT());
         glImage.setOpacity(opacity);
     }
 

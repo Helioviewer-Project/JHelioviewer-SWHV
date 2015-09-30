@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
@@ -222,9 +223,11 @@ public class Layers {
         if (view == null)
             return;
 
-        view.setImageLayer(new RenderableImageLayer(view));
-        layers.add(view);
+        RenderableImageLayer renderable = new RenderableImageLayer(view);
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
+        view.setImageLayer(renderable);
 
+        layers.add(view);
         fireLayerAdded(view);
         setActiveView(view);
 
