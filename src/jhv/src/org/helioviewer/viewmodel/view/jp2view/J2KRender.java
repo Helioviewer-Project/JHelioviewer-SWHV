@@ -23,10 +23,9 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 class J2KRender implements Runnable {
 
-    private static final ThreadLocal<int[]> localBuffer = new ThreadLocal<int[]>(){
+    private static final ThreadLocal<int[]> bufferLocal = new ThreadLocal<int[]>(){
         @Override
-        protected int[] initialValue()
-        {
+        protected int[] initialValue() {
             return new int[KakaduConstants.MAX_RENDER_SAMPLES];
         }
     };
@@ -95,7 +94,7 @@ class J2KRender implements Runnable {
             intBuffer = new int[roi.getNumPixels()];
         }
 
-        int[] localIntBuffer = localBuffer.get();
+        int[] localIntBuffer = bufferLocal.get();
         while (!compositor.Is_processing_complete()) {
             compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion);
             Kdu_coords newOffset = newRegion.Access_pos();
@@ -164,18 +163,9 @@ class J2KRender implements Runnable {
         private Kdu_region_compositor compositor;
         private Kdu_thread_env threadEnv;
 
-        JHV_Kdu_compositor(Jpx_source jpx) throws KduException {
-            compositor = new Kdu_region_compositor();
-            compositor.Create(jpx, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-
-            int numThreads = Kdu_global.Kdu_get_num_processors();
-            threadEnv = new Kdu_thread_env();
-            threadEnv.Create();
-            for (int i = 1; i < numThreads; i++)
-                threadEnv.Add_thread();
-
-            compositor.Set_thread_env(threadEnv, null);
-            compositor.Set_surface_initialization_mode(false);
+        JHV_Kdu_compositor(Jpx_source jpxSrc) throws KduException {
+            threadEnv = createThreadEnv();
+            compositor = createCompositor(jpxSrc, threadEnv);
         }
 
         public Kdu_region_compositor getCompositor() {
@@ -183,15 +173,11 @@ class J2KRender implements Runnable {
         }
 
         public void destroy() throws KduException {
-            compositor.Halt_processing();
-            compositor.Set_thread_env(null, null);
-            compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-            compositor.Native_destroy();
-            threadEnv.Native_destroy();
+            destroyCompositor(compositor);
+            destroyThreadEnv(threadEnv);
             compositor = null;
             threadEnv = null;
         }
-
     }
 
     @Override
@@ -214,6 +200,37 @@ class J2KRender implements Runnable {
             }
             e.printStackTrace();
         }
+    }
+
+    private static Kdu_region_compositor createCompositor(Jpx_source jpxSrc, Kdu_thread_env threadEnv) throws KduException {
+        Kdu_region_compositor compositor = new Kdu_region_compositor();
+        compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+        compositor.Set_surface_initialization_mode(false);
+        compositor.Set_thread_env(threadEnv, null);
+        return compositor;
+    }
+
+    private static void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
+        if (compositor != null) {
+            compositor.Halt_processing();
+            compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+            compositor.Set_thread_env(null, null);
+            compositor.Native_destroy();
+        }
+    }
+
+    private static Kdu_thread_env createThreadEnv() throws KduException {
+        Kdu_thread_env threadEnv = new Kdu_thread_env();
+        threadEnv.Create();
+        int numThreads = Kdu_global.Kdu_get_num_processors();
+        for (int i = 1; i < numThreads; i++)
+            threadEnv.Add_thread();
+        return threadEnv;
+    }
+
+    private static void destroyThreadEnv(Kdu_thread_env threadEnv) {
+        if (threadEnv != null)
+            threadEnv.Native_destroy();
     }
 
 }
