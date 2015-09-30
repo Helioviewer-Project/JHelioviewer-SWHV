@@ -181,6 +181,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         playButton = ButtonCreator.createButton(playIcon, "Play movie", this);
         buttonPanel.add(playButton);
+        ImageViewerGui.getMainFrame().getRootPane().setDefaultButton(playButton);
 
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
