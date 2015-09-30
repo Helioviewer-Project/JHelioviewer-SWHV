@@ -15,16 +15,13 @@ import org.helioviewer.base.interval.Interval;
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class TimeIntervalLockModel implements TimingListener, DrawControllerListener, PlotAreaSpaceListener {
+public class TimeIntervalLockModel implements TimingListener, DrawControllerListener {
 
     /** Instance of the draw controller */
     private final DrawController drawController;
 
     /** Is the time interval locked */
     private boolean isLocked;
-
-    /** The current selected widths of the plot area space */
-    private double selectedSpaceWidth;
 
     /** Singleton instance of the time interval lock model */
     private static TimeIntervalLockModel instance;
@@ -45,10 +42,8 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
         // currentAvailableInterval = new Interval<Date>(null, null);
         drawController.addTimingListener(this);
         drawController.addDrawControllerListener(this);
-        selectedSpaceWidth = 0;
         previousMovieTime = new Date();
         plotAreaSpace = drawController.getPlotAreaSpace();
-        plotAreaSpace.addPlotAreaSpaceListener(this);
     }
 
     /**
@@ -83,7 +78,6 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
     public void setLocked(boolean isLocked) {
         this.isLocked = isLocked;
         if (isLocked) {
-            selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
             if (latestMovieTime != null) {
                 drawMovieLineRequest(latestMovieTime);
             }
@@ -95,7 +89,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawRequest()
      */
@@ -105,12 +99,14 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.DrawControllerListener#
      * drawMovieLineRequest(java.util.Date)
      */
     @Override
     public void drawMovieLineRequest(Date time) {
+        double selectedSpaceWidth = plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
+
         latestMovieTime = time;
         Interval<Date> currentAvailableInterval = drawController.getAvailableInterval();
         if (time != null && currentAvailableInterval != null && isLocked && currentAvailableInterval.containsPointInclusive(time) && !previousMovieTime.equals(time)) {
@@ -155,7 +151,7 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
      */
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * availableIntervalChanged(org.helioviewer.base.math.Interval)
      */
@@ -169,23 +165,12 @@ public class TimeIntervalLockModel implements TimingListener, DrawControllerList
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.helioviewer.plugins.eveplugin.controller.ZoomControllerListener#
      * selectedIntervalChanged(org.helioviewer.base.math.Interval)
      */
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
-    }
-
-    @Override
-    public void plotAreaSpaceChanged(double scaledMinTime, double scaledMaxTime, double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
-        selectedSpaceWidth = scaledSelectedMaxTime - scaledSelectedMinTime;
-    }
-
-    @Override
-    public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
-
     }
 
 }
