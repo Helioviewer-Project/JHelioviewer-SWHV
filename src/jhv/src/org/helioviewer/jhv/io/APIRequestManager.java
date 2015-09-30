@@ -12,8 +12,11 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.helioviewer.base.DownloadStream;
+import org.helioviewer.base.EventDispatchQueue;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
@@ -320,16 +323,8 @@ public class APIRequestManager {
             } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
                  return new JHVSimpleImageView(uri);
             } else {
-                JHVJP2View view;
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-
-                if (downloadURI.toString().toLowerCase().contains("callisto"))
-                    view = new JHVJP2CallistoView();
-                else
-                    view = new JHVJP2View();
-                view.setJP2Image(jp2Image);
-
-                return view;
+                return EventDispatchQueue.invokeAndWait(new NewJHVJP2View(jp2Image));
             }
         } catch (InterruptedException e) {
             // nothing
@@ -338,6 +333,28 @@ public class APIRequestManager {
             throw new IOException(e.getMessage());
         }
         return null;
+    }
+
+    private static class NewJHVJP2View implements Callable<JHVJP2View> {
+        private final AtomicReference<JP2Image> refJP2Image = new AtomicReference<JP2Image>();
+
+        public NewJHVJP2View(JP2Image jp2Image) {
+            refJP2Image.set(jp2Image);
+        }
+
+        @Override
+        public JHVJP2View call() {
+            JHVJP2View view;
+            JP2Image jp2Image = refJP2Image.get();
+            if (jp2Image.getDownloadURI().toString().toLowerCase().contains("callisto")) {
+                view = new JHVJP2CallistoView();
+            } else {
+                view = new JHVJP2View();
+            }
+            view.setJP2Image(jp2Image);
+
+            return view;
+        }
     }
 
 }

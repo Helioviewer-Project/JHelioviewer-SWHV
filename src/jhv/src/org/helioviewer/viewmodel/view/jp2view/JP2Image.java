@@ -410,7 +410,7 @@ public class JP2Image {
      *
      * @return download uri
      */
-    protected URI getDownloadURI() {
+    public URI getDownloadURI() {
         return downloadURI;
     }
 
