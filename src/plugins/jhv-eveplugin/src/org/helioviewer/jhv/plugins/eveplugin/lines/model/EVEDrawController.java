@@ -195,10 +195,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
             Range newAvailableRange = new Range();
 
             for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
-                if (v != null) {
-                    newAvailableRange.setMin(v.getMinimumValue());
-                    newAvailableRange.setMax(v.getMaximumValue());
-                }
+                newAvailableRange.setMin(v.getMinimumValue());
+                newAvailableRange.setMax(v.getMaximumValue());
             }
             yAxisElement.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
