@@ -32,10 +32,7 @@ import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
  * Implementation of View for JPG2000 images.
  * <p>
  * This class represents the gateway to the heart of the helioviewer project. It
- * is responsible for reading and decoding JPG2000 images. Therefore, it manages
- * two threads: one thread for communicating with the JPIP server, the other one
- * for decoding the images.
- *
+ * is responsible for reading and decoding JPG2000 images.
  */
 public class JHVJP2View extends AbstractView {
 
@@ -77,7 +74,7 @@ public class JHVJP2View extends AbstractView {
      * Sets the JPG2000 image used by this class.
      *
      * This functions sets up the whole infrastructure needed for using the
-     * image, including the two threads.
+     * image.
      *
      * @param newJP2Image
      */
@@ -167,24 +164,18 @@ public class JHVJP2View extends AbstractView {
 
     // if instance was built before cancelling
     public void finalize() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!isAbolished)
+        if (!isAbolished) {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
                     abolish();
-            }
-        });
+                }
+            });
+        }
     }
 
     /**
-     * Recalculates the image parameters.
-     *
-     * This function maps between the set of parameters used within the view
-     * chain and the set of parameters used within the jp2-package.
-     *
-     * <p>
-     * To achieve this, calculates the set of parameters used within the
-     * jp2-package according to the given requirements from the view chain.
+     * Recalculates the image parameters used within the jp2-package
      *
      * @param v
      *            Viewport the image will be displayed in
@@ -300,13 +291,6 @@ public class JHVJP2View extends AbstractView {
         return targetFrame;
     }
 
-    /**
-     * Before actually setting the new frame number, checks whether that is
-     * necessary. If the frame number has changed, also triggers an update of
-     * the image.
-     *
-     * @param frame
-     */
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame) {
