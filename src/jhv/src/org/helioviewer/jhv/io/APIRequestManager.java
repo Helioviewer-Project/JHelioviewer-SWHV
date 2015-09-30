@@ -319,18 +319,17 @@ public class APIRequestManager {
                 return new JHVFITSView(uri);
             } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
                  return new JHVSimpleImageView(uri);
-            } else if (downloadURI.toString().toLowerCase().contains("callisto")) {
-                JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                JHVJP2CallistoView jp2CallistoView = new JHVJP2CallistoView();
-                jp2CallistoView.setJP2Image(jp2Image);
-
-                return jp2CallistoView;
             } else {
+                JHVJP2View view;
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                JHVJP2View jp2View = new JHVJP2View();
-                jp2View.setJP2Image(jp2Image);
 
-                return jp2View;
+                if (downloadURI.toString().toLowerCase().contains("callisto"))
+                    view = new JHVJP2CallistoView();
+                else
+                    view = new JHVJP2View();
+                view.setJP2Image(jp2Image);
+
+                return view;
             }
         } catch (InterruptedException e) {
             // nothing
