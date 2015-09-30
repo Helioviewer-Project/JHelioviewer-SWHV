@@ -518,7 +518,7 @@ public class JP2Image {
 
         Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
         if (!stream.Exists()) {
-            throw new KduException(">>> stream doesn't exist " + compositionLayerCurrentlyInUse);
+            throw new KduException(">> stream doesn't exist " + compositionLayerCurrentlyInUse);
         }
 
         resolutionSetCompositionLayer = compositionLayerCurrentlyInUse;
