@@ -219,21 +219,6 @@ public class Layers {
         return latest == null ? null : latest.getDate();
     }
 
-    public static void addLayer(View view) {
-        if (view == null)
-            return;
-
-        RenderableImageLayer renderable = new RenderableImageLayer(view);
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
-        view.setImageLayer(renderable);
-
-        layers.add(view);
-        fireLayerAdded(view);
-        setActiveView(view);
-
-        view.setDataHandler(Displayer.displayDataHandler);
-    }
-
     /**
      * Check if the given index is valid, given the current state of the
      * ViewChain
@@ -275,6 +260,7 @@ public class Layers {
     public static void removeLayer(View view) {
         int index = layers.indexOf(view);
 
+        Displayer.removeRenderListener(view);
         view.removeDataHandler();
 
         layers.remove(view);
@@ -283,8 +269,20 @@ public class Layers {
         view.abolish();
     }
 
-    public static void removeLayer(int idx) {
-        removeLayer(getLayer(idx));
+    public static void addLayer(View view) {
+        if (view == null)
+            return;
+
+        RenderableImageLayer renderable = new RenderableImageLayer(view);
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
+        view.setImageLayer(renderable);
+
+        layers.add(view);
+        fireLayerAdded(view);
+        setActiveView(view);
+
+        view.setDataHandler(Displayer.displayDataHandler);
+        Displayer.addRenderListener(view);
     }
 
     private static void fireLayerAdded(View view) {

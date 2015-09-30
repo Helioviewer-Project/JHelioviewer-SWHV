@@ -79,16 +79,9 @@ public class JHVJP2View extends AbstractView {
      * This functions sets up the whole infrastructure needed for using the
      * image, including the two threads.
      *
-     * <p>
-     * Thus, this functions also works as a constructor.
-     *
      * @param newJP2Image
      */
-    public void setJP2Image(JP2Image newJP2Image) throws Exception {
-        if (_jp2Image != null) {
-            throw new Exception("JP2 image already set");
-        }
-
+    public void setJP2Image(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
         MetaData metaData = _jp2Image.metaDataList[0];
@@ -166,7 +159,6 @@ public class JHVJP2View extends AbstractView {
     public void abolish() {
         isAbolished = true;
         stopRender = true;
-        Displayer.removeRenderListener(this);
 
         AbolishThread thread = new AbolishThread();
         thread.init(this);
