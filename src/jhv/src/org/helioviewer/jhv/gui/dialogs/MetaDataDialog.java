@@ -39,7 +39,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
+import org.helioviewer.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -199,8 +199,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             String xmlText = null;
             if (v instanceof JHVJP2View) {
                 xmlText = ((JHVJP2View) v).getXMLMetaData();
-            } else if (v instanceof JHVFITSView) {
-                xmlText = ((JHVFITSView) v).getHeaderAsXML();
+            } else if (v instanceof FITSView) {
+                xmlText = ((FITSView) v).getHeaderAsXML();
             }
 
             if (xmlText != null) {

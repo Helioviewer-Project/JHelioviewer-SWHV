@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.view.AbstractView;
 
 import com.jogamp.opengl.GL2;
 
-public class JHVFITSView extends AbstractView {
+public class FITSView extends AbstractView {
 
     protected FITSImage fits;
     private final URI uri;
@@ -27,7 +27,7 @@ public class JHVFITSView extends AbstractView {
      * @throws IOException
      *             when an error occurred during reading the fits file.
      * */
-    public JHVFITSView(URI _uri) throws IOException {
+    public FITSView(URI _uri) throws IOException {
         uri = _uri;
         if (!uri.getScheme().equalsIgnoreCase("file"))
             throw new IOException("FITS does not support the " + uri.getScheme() + " protocol");
@@ -38,27 +38,6 @@ public class JHVFITSView extends AbstractView {
             throw new IOException("FITS image data cannot be accessed.");
         }
 
-        initFITSImageView();
-    }
-
-    /**
-     * Constructor which uses a given fits image.
-     *
-     * @param fits
-     *            FITSImage object which contains the image data
-     * @param uri
-     *            Specifies the location of the FITS file.
-     * */
-    public JHVFITSView(FITSImage _fits, URI _uri) {
-        uri = _uri;
-        fits = _fits;
-        initFITSImageView();
-    }
-
-    /**
-     * Initializes global variables.
-     */
-    private void initFITSImageView() {
         HelioviewerMetaData m = new HelioviewerMetaData(fits);
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
