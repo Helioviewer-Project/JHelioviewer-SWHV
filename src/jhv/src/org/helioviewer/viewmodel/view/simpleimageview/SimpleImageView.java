@@ -14,7 +14,7 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-public class JHVSimpleImageView extends AbstractView {
+public class SimpleImageView extends AbstractView {
 
     protected URI uri;
     protected BufferedImage image;
@@ -29,27 +29,10 @@ public class JHVSimpleImageView extends AbstractView {
      * @throws IOException
      *             thrown, if the image is not readable
      */
-    public JHVSimpleImageView(URI _uri) throws MalformedURLException, IOException {
+    public SimpleImageView(URI _uri) throws MalformedURLException, IOException {
         uri = _uri;
         image = ImageIO.read(uri.toURL());
-        initSimpleImageView();
-    }
 
-    /**
-     * Constructor which uses a given buffered image.
-     *
-     * @param image
-     *            Buffered image object which contains the image data.
-     * @param uri
-     *            Specifies the location of the simple image file.
-     */
-    public JHVSimpleImageView(BufferedImage _image, URI _uri) {
-        uri = _uri;
-        image = _image;
-        initSimpleImageView();
-    }
-
-    private void initSimpleImageView() {
         if (image.getColorModel().getPixelSize() <= 8) {
             imageData = new SingleChannelByte8ImageData(image);
         } else if (image.getColorModel().getPixelSize() <= 16) {

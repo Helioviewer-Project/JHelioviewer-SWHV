@@ -22,11 +22,11 @@ import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
+import org.helioviewer.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
+import org.helioviewer.viewmodel.view.simpleimageview.SimpleImageView;
 
 /**
  * This class provides methods to download files from a server.
@@ -319,9 +319,9 @@ public class APIRequestManager {
 
         try {
             if (downloadURI.toString().toLowerCase().endsWith(".fits") || downloadURI.toString().toLowerCase().endsWith(".fts")) {
-                return new JHVFITSView(uri);
+                return new FITSView(uri);
             } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
-                 return new JHVSimpleImageView(uri);
+                 return new SimpleImageView(uri);
             } else {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
                 return EventDispatchQueue.invokeAndWait(new NewJHVJP2View(jp2Image));
