@@ -23,7 +23,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.fitsview.JHVFITSView;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
+import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JHVJP2View;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.simpleimageview.JHVSimpleImageView;
@@ -347,7 +347,7 @@ public class APIRequestManager {
             JHVJP2View view;
             JP2Image jp2Image = refJP2Image.get();
             if (jp2Image.getDownloadURI().toString().toLowerCase().contains("callisto")) {
-                view = new JHVJP2CallistoView();
+                view = new JP2CallistoView();
             } else {
                 view = new JHVJP2View();
             }

@@ -9,7 +9,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
-public class JHVJP2CallistoView extends JHVJP2View {
+public class JP2CallistoView extends JHVJP2View {
 
     private Viewport viewport = new Viewport(86400, 380);
 

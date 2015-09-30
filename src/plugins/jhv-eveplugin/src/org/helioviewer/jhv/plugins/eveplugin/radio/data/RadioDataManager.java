@@ -20,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
+import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -539,7 +539,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
 
-                    JHVJP2CallistoView jp2View = jpxData.getView();
+                    JP2CallistoView jp2View = jpxData.getView();
                     if (jp2View != null) {
                         jp2View.setViewport(new Viewport(viewport.width, viewport.height));
 
@@ -620,7 +620,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download identifier for which the data was downloaded
      */
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, Long downloadID, double ratioX, double ratioY) {
-        JHVJP2CallistoView jp2CallistoView = djd.getView();
+        JP2CallistoView jp2CallistoView = djd.getView();
         if (jp2CallistoView != null) {
             JP2Image image = jp2CallistoView.getJP2Image();
             image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);

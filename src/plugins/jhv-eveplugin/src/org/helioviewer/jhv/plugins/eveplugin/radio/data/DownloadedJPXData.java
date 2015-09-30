@@ -11,11 +11,11 @@ import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
-import org.helioviewer.viewmodel.view.jp2view.JHVJP2CallistoView;
+import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
 
 public class DownloadedJPXData implements ViewDataHandler {
 
-    private JHVJP2CallistoView view;
+    private JP2CallistoView view;
     private Long imageID;
     private Date startDate;
     private Date endDate;
@@ -23,7 +23,7 @@ public class DownloadedJPXData implements ViewDataHandler {
     private final Long downloadID;
     private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
 
-    public DownloadedJPXData(JHVJP2CallistoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
+    public DownloadedJPXData(JP2CallistoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
@@ -35,11 +35,11 @@ public class DownloadedJPXData implements ViewDataHandler {
         this.downloadID = downloadID;
     }
 
-    public JHVJP2CallistoView getView() {
+    public JP2CallistoView getView() {
         return view;
     }
 
-    public void setView(JHVJP2CallistoView view) {
+    public void setView(JP2CallistoView view) {
         this.view = view;
     }
 
@@ -129,7 +129,7 @@ public class DownloadedJPXData implements ViewDataHandler {
 
     @Override
     public void handleData(View callistoView, ImageData imageData) {
-        if (callistoView instanceof JHVJP2CallistoView && imageData instanceof SingleChannelByte8ImageData) {
+        if (callistoView instanceof JP2CallistoView && imageData instanceof SingleChannelByte8ImageData) {
             if (imageData.getWidth() < 1 || imageData.getHeight() < 1) {
                 Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
                 return;
