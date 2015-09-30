@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 
 public class LoadURITask extends SwingWorker<View, Void> {
@@ -45,8 +46,16 @@ public class LoadURITask extends SwingWorker<View, Void> {
     protected void done() {
         if (!isCancelled()) {
             ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
+
             try {
-                Layers.addLayer(get());
+                View view = get();
+                if (view != null) {
+                    RenderableImageLayer renderable = new RenderableImageLayer(view);
+                    ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
+                    view.setImageLayer(renderable);
+
+                    Layers.addLayer(view);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
