@@ -279,7 +279,8 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     @Override
     public void dataAdded(final Band band) {
-        selectedIntervalChanged = true;
+        updateBands(keepFullValueRange);
+        fireRedrawRequest(keepFullValueRange);
     }
 
     @Override
@@ -376,7 +377,6 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
             if (selectedIntervalChanged) {
                 selectedIntervalChanged = false;
-
                 updateBands(keepFullValueRange);
                 fireRedrawRequest(keepFullValueRange);
             }
