@@ -17,9 +17,6 @@ import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.viewmodel.imageformat.RGB24ImageFormat;
 import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Short16ImageTransport;
 
 import com.jogamp.opengl.GL2;
 
@@ -75,26 +72,7 @@ public class GLTexture {
             return;
         }
 
-        int bitsPerPixel = source.getImageTransport().getNumBitsPerPixel();
-        Buffer buffer;
-
-        switch (bitsPerPixel) {
-        case 8:
-            buffer = ByteBuffer.wrap(((Byte8ImageTransport) source.getImageTransport()).getByte8PixelData());
-            break;
-        case 16:
-            buffer = ShortBuffer.wrap(((Short16ImageTransport) source.getImageTransport()).getShort16PixelData());
-            break;
-        case 32:
-            buffer = IntBuffer.wrap(((Int32ImageTransport) source.getImageTransport()).getInt32PixelData());
-            break;
-        default:
-            buffer = null;
-        }
-
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, source.getWidth());
+        int bitsPerPixel = source.getBitsPerPixel();
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, bitsPerPixel >> 3);
 
         ImageFormat imageFormat = source.getImageFormat();
@@ -110,7 +88,7 @@ public class GLTexture {
             prev_inputGLFormat = inputGLFormat;
             prev_bppGLType = bppGLType;
         }
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, buffer);
+        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
     }
 
     public void copyBufferedImage2D(GL2 gl, BufferedImage source) {
@@ -142,20 +120,12 @@ public class GLTexture {
             buffer = null;
         }
 
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
-
         genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
     public void copyBuffer1D(GL2 gl, IntBuffer source) {
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, 0);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, 0);
         gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-
         gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, source.limit(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, source);
         gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
         gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);

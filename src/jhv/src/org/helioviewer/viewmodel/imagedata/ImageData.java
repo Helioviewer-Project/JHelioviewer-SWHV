@@ -1,10 +1,10 @@
 package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.viewmodel.imagetransport.ImageTransport;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 public interface ImageData {
@@ -20,12 +20,11 @@ public interface ImageData {
      * @return height of the image
      */
     public int getHeight();
-    /**
-     * Returns an object to read the pixel data
-     *
-     * @return object to read pixels
-     */
-    public ImageTransport getImageTransport();
+
+    public int getBitsPerPixel();
+
+    public Buffer getBuffer();
+
     /**
      * Returns an object to get informations about the image format
      *

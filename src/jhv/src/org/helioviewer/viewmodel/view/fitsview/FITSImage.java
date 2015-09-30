@@ -1,6 +1,9 @@
 package org.helioviewer.viewmodel.view.fitsview;
 
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -63,7 +66,7 @@ public class FITSImage implements MetaDataContainer {
                     counter++;
                 }
             }
-            imageData = new SingleChannelByte8ImageData(width, height, data);
+            imageData = new SingleChannelByte8ImageData(width, height, ByteBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_SHORT) {
             // get image raw data
             short[][] data2D = (short[][]) ((hdu).getKernel());
@@ -102,7 +105,7 @@ public class FITSImage implements MetaDataContainer {
                     data[i] = (short) (data[i] << shiftBits);
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, data);
+            imageData = new SingleChannelShortImageData(width, height, bitsPerPixel, ShortBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_INT) {
             // get image raw data
             int[][] data2D = (int[][]) ((hdu).getKernel());
@@ -119,7 +122,7 @@ public class FITSImage implements MetaDataContainer {
                     counter++;
                 }
             }
-            imageData = new ARGBInt32ImageData(false, width, height, data);
+            imageData = new ARGBInt32ImageData(false, width, height, IntBuffer.wrap(data));
         } else if (bitsPerPixel == BasicHDU.BITPIX_FLOAT) {
             // get image raw data
             float[][] data2D = (float[][]) ((hdu).getKernel());
@@ -172,7 +175,7 @@ public class FITSImage implements MetaDataContainer {
                     }
                 }
             }
-            imageData = new SingleChannelShortImageData(width, height, 16, data);
+            imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
         }
         image = imageData.getBufferedImage();
     }

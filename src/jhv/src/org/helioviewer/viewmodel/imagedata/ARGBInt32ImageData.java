@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.nio.Buffer;
+import java.nio.IntBuffer;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.viewmodel.imagetransport.ImageTransport;
-import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 
 /**
  * Representation of image data in ARGB32 format.
@@ -25,7 +25,6 @@ import org.helioviewer.viewmodel.imagetransport.Int32ImageTransport;
 public class ARGBInt32ImageData extends AbstractImageData {
 
     private final ARGB32ImageFormat format = new ARGB32ImageFormat();
-    private Int32ImageTransport imageTransport;
 
     /**
      * Constructor, given an array as data source.
@@ -46,30 +45,11 @@ public class ARGBInt32ImageData extends AbstractImageData {
      * @param newPixelData
      *            pixel data
      */
-    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, int[] newPixelData) {
+    public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, Buffer _buffer) {
         super(newWidth, newHeight);
         format.setSingleChannel(true);
-        imageTransport = new Int32ImageTransport(newPixelData);
-    }
-
-    /**
-     * Constructor, given an array as data source.
-     * 
-     * <p>
-     * This constructor receives the raw data as a data source. If the caller
-     * handles raw data as well, the use of this constructor is recommended.
-     * <p>
-     * The pixel data has to be given as a one-dimensional array containing the
-     * pixel data line by line. Each array element represents one pixel.
-     * 
-     * @param base
-     *            original ImageData-object
-     * @param newPixelData
-     *            pixel data
-     */
-    public ARGBInt32ImageData(ImageData base, int[] newPixelData) {
-        super(base);
-        imageTransport = new Int32ImageTransport(newPixelData);
+        bpp = 32;
+        buffer = _buffer;
     }
 
     /**
@@ -85,24 +65,8 @@ public class ARGBInt32ImageData extends AbstractImageData {
      */
     public ARGBInt32ImageData(BufferedImage newImage) {
         super(newImage.getWidth(), newImage.getHeight());
-        readImageTransportFromBufferedImage(newImage);
-    }
-
-    /**
-     * Constructor, given an BufferedImage as data source.
-     * 
-     * <p>
-     * This constructor receives a BufferedImage as data source. If the caller
-     * operates on BufferedImages as well, the use of this constructor is
-     * recommended.
-     * 
-     * @param base
-     *            original ImageData-object
-     * @param newImage
-     *            pixel data
-     */
-    public ARGBInt32ImageData(ImageData base, BufferedImage newImage) {
-        super(base);
+        image = newImage;
+        bpp = 32;
         readImageTransportFromBufferedImage(newImage);
     }
 
@@ -114,37 +78,29 @@ public class ARGBInt32ImageData extends AbstractImageData {
      *            source image
      */
     private void readImageTransportFromBufferedImage(BufferedImage newImage) {
-        image = newImage;
+        int[] outputData = null;
 
         DataBuffer dataBuffer = newImage.getRaster().getDataBuffer();
-
         if (dataBuffer instanceof DataBufferInt) {
-            imageTransport = new Int32ImageTransport(((DataBufferInt) newImage.getRaster().getDataBuffer()).getData());
-
+            outputData = ((DataBufferInt) dataBuffer).getData();
         } else if (dataBuffer instanceof DataBufferByte) {
+            outputData = new int[width * height];
             byte[] inputData = ((DataBufferByte) dataBuffer).getData();
-            int[] outputData = new int[width * height];
-
             int bytesPerPixel = inputData.length / (width * height);
 
             for (int i = 0; i < width * height; i++) {
-
                 outputData[i] = (inputData[i * bytesPerPixel] & 0xFF);
-
                 for (int j = 1; j < bytesPerPixel; j++) {
                     outputData[i] |= (inputData[i * bytesPerPixel + j] & 0xFF) << (j * 8);
                 }
-
                 if (bytesPerPixel < 4) {
                     outputData[i] |= 0xFF000000;
                 }
             }
-
-            imageTransport = new Int32ImageTransport(outputData);
-
         } else {
             Log.error("Unknown DataBuffer: " + dataBuffer);
         }
+        buffer = IntBuffer.wrap(outputData);
     }
 
     /**
@@ -159,17 +115,9 @@ public class ARGBInt32ImageData extends AbstractImageData {
      * {@inheritDoc}
      */
     @Override
-    public ImageTransport getImageTransport() {
-        return imageTransport;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected BufferedImage createBufferedImageFromImageTransport() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        newImage.setRGB(0, 0, width, height, imageTransport.getInt32PixelData(), 0, width);
+        newImage.setRGB(0, 0, width, height, (int[]) buffer.array(), 0, width);
         return newImage;
     }
 

@@ -8,7 +8,6 @@ import javax.swing.SwingWorker;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.imagetransport.Byte8ImageTransport;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;
 import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
@@ -134,7 +133,7 @@ public class DownloadedJPXData implements ViewDataHandler {
                 Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
                 return;
             }
-            byte[] data = ((Byte8ImageTransport) imageData.getImageTransport()).getByte8PixelData();
+            byte[] data = (byte[]) imageData.getBuffer().array();
             DownloadedJPXDataWorkerResult result = new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
 
             radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
