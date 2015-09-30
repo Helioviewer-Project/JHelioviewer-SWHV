@@ -1,6 +1,9 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -35,15 +38,6 @@ class J2KRender implements Runnable {
 
     /** A reference to the JP2View this object is owned by. */
     private final JP2View parentViewRef;
-
-    /** An integer buffer used in the run method. */
-    private int[] intBuffer;
-
-    /** A byte buffer used in the run method. */
-    private byte[] byteBuffer;
-
-    /** Maximum of samples to process per rendering iteration */
-    private final int MAX_RENDER_SAMPLES = 1024 * 1024;
 
     private final int[] firstComponent = new int[] { 0 };
 
@@ -88,10 +82,11 @@ class J2KRender implements Runnable {
 
         Kdu_dims newRegion = new Kdu_dims();
 
+        Buffer buffer;
         if (numComponents < 3) {
-            byteBuffer = new byte[roi.getNumPixels()];
+            buffer = ByteBuffer.wrap(new byte[roi.getNumPixels()]);
         } else {
-            intBuffer = new int[roi.getNumPixels()];
+            buffer = IntBuffer.wrap(new int[roi.getNumPixels()]);
         }
 
         int[] localIntBuffer = bufferLocal.get();
@@ -116,14 +111,16 @@ class J2KRender implements Runnable {
             int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
 
             if (numComponents < 3) {
+                byte[] buf = (byte[]) buffer.array();
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
-                        byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
+                        buf[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
+                int[] buf = (int[]) buffer.array();
                 for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
-                    System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
+                    System.arraycopy(localIntBuffer, srcIdx, buf, destIdx, newWidth);
                 }
             }
         }
@@ -134,9 +131,9 @@ class J2KRender implements Runnable {
 
         ImageData imdata = null;
         if (numComponents < 3) {
-            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, byteBuffer);
+            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, (byte[]) buffer.array());
         } else {
-            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, intBuffer);
+            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, (int[]) buffer.array());
         }
         setImageData(imdata, currParams);
     }
