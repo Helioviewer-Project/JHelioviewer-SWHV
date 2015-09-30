@@ -513,16 +513,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         for (ValueSpace vs : valueSpaces) {
             Range selectedRange = vs.getScaledSelectedRange();
             Range availableRange = vs.getScaledAvailableRange();
-            double ratioValue = graphArea.height / (selectedRange.max - selectedRange.min);
-            double startValue = selectedRange.min + distanceY / ratioValue;
-            double endValue = startValue + graphArea.height / ratioValue;
+            double ratioValue = (selectedRange.max - selectedRange.min) / graphArea.height;
+            double startValue = selectedRange.min + distanceY * ratioValue;
+            double endValue = startValue + graphArea.height * ratioValue;
             if (startValue < availableRange.min) {
                 startValue = availableRange.min;
-                endValue = startValue + graphArea.height / ratioValue;
+                endValue = startValue + graphArea.height * ratioValue;
             }
             if (endValue > availableRange.max) {
                 endValue = availableRange.max;
-                startValue = endValue - graphArea.height / ratioValue;
+                startValue = endValue - graphArea.height * ratioValue;
             }
 
             vs.setScaledSelectedRange(new Range(startValue, endValue));
