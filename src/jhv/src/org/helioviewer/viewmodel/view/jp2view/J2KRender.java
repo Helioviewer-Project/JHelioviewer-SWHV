@@ -21,17 +21,15 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
-/**
- * The J2KRender class handles all of the decompression, buffering, and
- * filtering of the image data. It essentially just waits for the shared object
- * in the JP2ImageView to signal it.
- *
- * @author caplins
- * @author Benjamin Wamsler
- * @author Desmond Amadigwe
- * @author Markus Langenberg
- */
 class J2KRender implements Runnable {
+
+    private static final ThreadLocal<int[]> localBuffer = new ThreadLocal<int[]>(){
+        @Override
+        protected int[] initialValue()
+        {
+            return new int[KakaduConstants.MAX_RENDER_SAMPLES];
+        }
+    };
 
     /** A reference to the JP2Image this object is owned by. */
     private final JP2Image parentImageRef;
@@ -97,7 +95,7 @@ class J2KRender implements Runnable {
             intBuffer = new int[roi.getNumPixels()];
         }
 
-        int[] localIntBuffer = parentViewRef.localIntBuffer;
+        int[] localIntBuffer = localBuffer.get();
         while (!compositor.Is_processing_complete()) {
             compositor.Process(KakaduConstants.MAX_RENDER_SAMPLES, newRegion);
             Kdu_coords newOffset = newRegion.Access_pos();
