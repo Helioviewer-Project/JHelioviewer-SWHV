@@ -17,7 +17,7 @@
     <path id="lib.path.ref">
         <fileset dir="${env.RT_PATH}" includes="classes.jar"/>
     </path>
-    
+
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
             <pathelement location="${build.resources}/shared/ant-contrib-1.0b3.jar"/>
@@ -63,6 +63,9 @@
         <!-- <exec executable="${bzrpath}" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
             <arg value="revno"/>
         </exec> -->
+        <exec executable="svnversion" outputproperty="jhv.revision.tmp" resolveexecutable="true" searchpath="true" resultproperty="jhv.revision.retcode" failifexecutionfails="false">
+            <arg value="."/>
+        </exec>
         <loadfile property="jhv.version" srcFile="VERSION"/>
         <property name="jhv.version" value="2.0.0"/>
         <if>
