@@ -49,44 +49,16 @@ public class PlotAreaSpace {
         return scaledMinTime;
     }
 
-    public void setScaledMinTime(double scaledMinTime) {
-        if (this.scaledMinTime != scaledMinTime) {
-            this.scaledMinTime = scaledMinTime;
-            firePlotAreaSpaceChanged(false);
-        }
-    }
-
     public double getScaledMaxTime() {
         return scaledMaxTime;
-    }
-
-    public void setScaledMaxTime(double scaledMaxTime) {
-        if (this.scaledMaxTime != scaledMaxTime) {
-            this.scaledMaxTime = scaledMaxTime;
-            firePlotAreaSpaceChanged(false);
-        }
     }
 
     public double getScaledSelectedMinTime() {
         return scaledSelectedMinTime;
     }
 
-    public void setScaledSelectedMinTime(double scaledSelectedMinTime) {
-        if (this.scaledSelectedMinTime != scaledSelectedMinTime) {
-            this.scaledSelectedMinTime = scaledSelectedMinTime;
-            firePlotAreaSpaceChanged(false);
-        }
-    }
-
     public double getScaledSelectedMaxTime() {
         return scaledSelectedMaxTime;
-    }
-
-    public void setScaledSelectedMaxTime(double scaledSelectedMaxTime) {
-        if (this.scaledSelectedMaxTime != scaledSelectedMaxTime) {
-            this.scaledSelectedMaxTime = scaledSelectedMaxTime;
-            firePlotAreaSpaceChanged(false);
-        }
     }
 
     public void setScaledSelectedTime(double scaledSelectedMinTime, double scaledSelectedMaxTime, boolean forced) {
@@ -145,10 +117,6 @@ public class PlotAreaSpace {
 
     public void removeValueSpace(ValueSpace valueSpace) {
         valueSpaces.remove(valueSpace);
-    }
-
-    public double getMinSelectedTimeDiff() {
-        return minSelectedTimeDiff;
     }
 
     public void setMinSelectedTimeDiff(double minSelectedTimeDiff) {
