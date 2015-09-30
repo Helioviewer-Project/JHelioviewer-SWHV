@@ -155,42 +155,21 @@ class J2KRender implements Runnable {
         }.init(newImdata, newParams));
     }
 
-    public static class JHV_Kdu_compositor {
-        private Kdu_region_compositor compositor;
-        private Kdu_thread_env threadEnv;
-
-        JHV_Kdu_compositor(Jpx_source jpxSrc) throws KduException {
-            threadEnv = createThreadEnv();
-            compositor = createCompositor(jpxSrc, threadEnv);
-        }
-
-        public Kdu_region_compositor getCompositor() {
-            return compositor;
-        }
-
-        public void destroy() throws KduException {
-            destroyCompositor(compositor);
-            destroyThreadEnv(threadEnv);
-            compositor = null;
-            threadEnv = null;
-        }
-    }
-
     @Override
     public void run() {
         JHVThread.BagThread t = (JHVThread.BagThread) Thread.currentThread();
-        JHV_Kdu_compositor compositorObj = (JHV_Kdu_compositor) t.getVar();
+        Kdu_region_compositor compositor = (Kdu_region_compositor) t.getVar();
 
         try {
-            if (compositorObj == null) {
-                compositorObj = new JHV_Kdu_compositor(parentImageRef.jpxSrc);
-                t.setVar(compositorObj);
+            if (compositor == null) {
+                compositor = createCompositor(parentImageRef.jpxSrc, threadEnvLocal.get());
+                t.setVar(compositor);
             }
-            renderLayer(compositorObj.getCompositor());
+            renderLayer(compositor);
         } catch (KduException e) {
             // reboot the compositor
             try {
-                compositorObj.destroy();
+                destroyCompositor(compositor);
                 t.setVar(null);
             } catch (Exception ex) {
             }
@@ -198,16 +177,45 @@ class J2KRender implements Runnable {
         }
     }
 
+    static final ThreadEnvLocal threadEnvLocal = new ThreadEnvLocal();
+
+    static class ThreadEnvLocal {
+
+        private static final ThreadLocal<Kdu_thread_env> threadEnvLocal = new ThreadLocal<Kdu_thread_env>() {
+                 @Override
+                 protected Kdu_thread_env initialValue() {
+                    try {
+                        return createThreadEnv();
+                    } catch (KduException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+        };
+
+        protected static Kdu_thread_env get() {
+            return threadEnvLocal.get();
+        }
+
+        public static void destroy() {
+            destroyThreadEnv(threadEnvLocal.get());
+            threadEnvLocal.set(null);
+        }
+
+    }
+
     private static Kdu_region_compositor createCompositor(Jpx_source jpxSrc, Kdu_thread_env threadEnv) throws KduException {
         Kdu_region_compositor compositor = new Kdu_region_compositor();
+        // System.out.println(">>>> compositor create " + compositor);
         compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
         compositor.Set_surface_initialization_mode(false);
         compositor.Set_thread_env(threadEnv, null);
         return compositor;
     }
 
-    private static void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
+    static void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
         if (compositor != null) {
+            // System.out.println(">>>> compositor destroy " + compositor);
             compositor.Halt_processing();
             compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
             compositor.Set_thread_env(null, null);
@@ -217,6 +225,7 @@ class J2KRender implements Runnable {
 
     private static Kdu_thread_env createThreadEnv() throws KduException {
         Kdu_thread_env threadEnv = new Kdu_thread_env();
+        // System.out.println(">>>> threadEnv create " + threadEnv);
         threadEnv.Create();
         int numThreads = Kdu_global.Kdu_get_num_processors();
         for (int i = 1; i < numThreads; i++)
@@ -225,8 +234,10 @@ class J2KRender implements Runnable {
     }
 
     private static void destroyThreadEnv(Kdu_thread_env threadEnv) {
-        if (threadEnv != null)
+        if (threadEnv != null) {
+            // System.out.println(">>>> threadEnv destroy " + threadEnv);
             threadEnv.Native_destroy();
+        }
     }
 
 }

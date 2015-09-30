@@ -9,6 +9,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import kdu_jni.Kdu_region_compositor;
+
 import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
@@ -119,16 +121,17 @@ public class JP2View extends AbstractView {
         @Override
         public void run() {
             JHVThread.BagThread t = (JHVThread.BagThread) Thread.currentThread();
-            J2KRender.JHV_Kdu_compositor compositorObj = (J2KRender.JHV_Kdu_compositor) t.getVar();
-
-            if (compositorObj != null) {
+            Kdu_region_compositor compositor = (Kdu_region_compositor) t.getVar();
+            if (compositor != null) {
                 try {
-                    compositorObj.destroy();
+                    J2KRender.destroyCompositor(compositor);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 t.setVar(null);
             }
+
+            J2KRender.threadEnvLocal.destroy();
 
             EventQueue.invokeLater(new Runnable() {
                 private JP2View view;
