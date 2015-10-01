@@ -41,8 +41,7 @@ public class RGBInt24ImageData extends AbstractImageData {
      *            pixel data
      */
     public RGBInt24ImageData(int newWidth, int newHeight, Buffer _buffer) {
-        super(newWidth, newHeight);
-        bpp = 32;
+        super(newWidth, newHeight, 32);
         buffer = _buffer;
     }
 
@@ -58,9 +57,8 @@ public class RGBInt24ImageData extends AbstractImageData {
      *            pixel data
      */
     public RGBInt24ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight());
+        super(newImage.getWidth(), newImage.getHeight(), 32);
         image = newImage;
-        bpp = 32;
         buffer = IntBuffer.wrap(((DataBufferInt) newImage.getRaster().getDataBuffer()).getData());
     }
 

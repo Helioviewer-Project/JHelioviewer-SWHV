@@ -40,8 +40,7 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
      *            pixel data
      */
     public SingleChannelByte8ImageData(int newWidth, int newHeight, Buffer _buffer) {
-        super(newWidth, newHeight);
-        bpp = 8;
+        super(newWidth, newHeight, 8);
         buffer = _buffer;
     }
 
@@ -57,9 +56,8 @@ public class SingleChannelByte8ImageData extends AbstractImageData {
      *            pixel data
      */
     public SingleChannelByte8ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight());
+        super(newImage.getWidth(), newImage.getHeight(), 8);
         image = newImage;
-        bpp = 8;
         buffer = ByteBuffer.wrap(((DataBufferByte) newImage.getRaster().getDataBuffer()).getData());
     }
 
