@@ -47,6 +47,10 @@ class J2KRender implements Runnable {
 
         currParams = _currParams;
         parentImageRef = currParams.jp2Image;
+
+//        if (compositor == null) {
+//            compositor = new CompositorLocal(parentImageRef.jpxSrc, threadEnv.get());
+//        }
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
@@ -162,47 +166,83 @@ class J2KRender implements Runnable {
 
         try {
             if (compositor == null) {
-                compositor = createCompositor(parentImageRef.jpxSrc, threadEnvLocal.get());
+                compositor = createCompositor(parentImageRef.jpxSrc, threadEnv.get());
                 t.setVar(compositor);
             }
             renderLayer(compositor);
+//          renderLayer(compositor.get());
         } catch (KduException e) {
             // reboot the compositor
             try {
                 destroyCompositor(compositor);
                 t.setVar(null);
+//              compositor.reboot();
             } catch (Exception ex) {
             }
             e.printStackTrace();
         }
     }
 
-    static final ThreadEnvLocal threadEnvLocal = new ThreadEnvLocal();
+    static final ThreadEnvLocal threadEnv = new ThreadEnvLocal();
 
-    static class ThreadEnvLocal {
-
-        private static final ThreadLocal<Kdu_thread_env> threadEnvLocal = new ThreadLocal<Kdu_thread_env>() {
-                 @Override
-                 protected Kdu_thread_env initialValue() {
-                    try {
-                        return createThreadEnv();
-                    } catch (KduException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-        };
-
-        protected static Kdu_thread_env get() {
-            return threadEnvLocal.get();
+    static class ThreadEnvLocal extends ThreadLocal<Kdu_thread_env> {
+        @Override
+        protected Kdu_thread_env initialValue() {
+            try {
+                return createThreadEnv();
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
-        public static void destroy() {
-            destroyThreadEnv(threadEnvLocal.get());
-            threadEnvLocal.set(null);
+        public void destroy() {
+            destroyThreadEnv(get());
+            set(null);
         }
-
     }
+
+/*
+    static CompositorLocal compositor;
+
+    static class CompositorLocal extends ThreadLocal<Kdu_region_compositor> {
+        private final Jpx_source jpxSrc;
+        private final Kdu_thread_env threadEnv;
+
+        protected CompositorLocal(Jpx_source jpxSrc, Kdu_thread_env threadEnv) {
+            this.jpxSrc = jpxSrc;
+            this.threadEnv = threadEnv;
+        }
+
+        @Override
+        protected Kdu_region_compositor initialValue() {
+            try {
+                return createCompositor(this.jpxSrc, this.threadEnv);
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void reboot() {
+            destroy();
+            try {
+                set(createCompositor(this.jpxSrc, this.threadEnv));
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void destroy() {
+            try {
+                destroyCompositor(get());
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
+            set(null);
+        }
+    }
+*/
 
     private static Kdu_region_compositor createCompositor(Jpx_source jpxSrc, Kdu_thread_env threadEnv) throws KduException {
         Kdu_region_compositor compositor = new Kdu_region_compositor();
