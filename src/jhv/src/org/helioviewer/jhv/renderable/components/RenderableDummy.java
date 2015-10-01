@@ -83,7 +83,7 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return false;
     }
 
     @Override
