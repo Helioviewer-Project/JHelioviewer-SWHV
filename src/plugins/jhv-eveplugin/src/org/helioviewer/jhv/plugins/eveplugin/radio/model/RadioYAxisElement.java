@@ -3,8 +3,6 @@
  */
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
-import java.awt.Color;
-
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
@@ -39,17 +37,9 @@ public class RadioYAxisElement extends YAxisElement {
      *            The available range of the radio y-axis element
      * @param label
      *            The label corresponding with the radio y-axis element
-     * @param minValue
-     *            The minimum value of the y-axis element
-     * @param maxValue
-     *            The maximum value of the y-axis element
-     * @param color
-     *            The color of the y-axis element
-     * @param plotIdentifier
-     *            The plot identifier for this radio y-axis element
      */
-    public RadioYAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color, long activationTime) {
-        super(selectedRange, availableRange, label, minValue, maxValue, color, false, activationTime);
+    public RadioYAxisElement(Range selectedRange, Range availableRange, String label, long activationTime) {
+        super(selectedRange, availableRange, label, false, activationTime);
     }
 
     @Override
