@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.base.logging.Log;
@@ -36,11 +35,11 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
-import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.LoadRemoteTask;
+import org.helioviewer.jhv.io.SetupTimeTask;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -49,7 +48,7 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
  *
  * @author Stephan Pagel
  * */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class ImageDataPanel extends ObservationDialogPanel implements DataSourcesListener {
 
     private boolean isSelected = false;
@@ -96,7 +95,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             // first time ignore donotloadStartup - comes via comboServer.setSelectedItem() below
             if (isFirst || !donotloadStartup) {
                 isFirst = false;
-                timeSelectionPanel.setupTime(Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")));
+                SetupTimeTask setupTimeTask = new SetupTimeTask(
+                                                        Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")),
+                                                        cadencePanel.getCadence(),
+                                                        instrumentsPanel.getObservatory(),
+                                                        instrumentsPanel.getInstrument(),
+                                                        instrumentsPanel.getDetector(),
+                                                        instrumentsPanel.getMeasurement());
+                setupTimeTask.execute();
             }
         } else {
             Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
@@ -190,7 +196,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      * Loads an image series from the Helioviewer server and adds a new layer to
      * the GUI which represents the image series.
      * */
-    private void loadRemote(boolean isImage) {
+    public void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
         LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
@@ -318,61 +324,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             add(startTimePane);
             add(endDatePane);
             add(endTimePane);
-        }
-
-        /**
-         * Sets the latest available image (or now if fails) to the end time and
-         * the start 24h earlier.
-         */
-        public void setupTime(final boolean load) {
-
-            class SetupTimeTask extends SwingWorker<Date, Void> {
-
-                private final String observatory;
-                private final String instrument;
-                private final String detector;
-                private final String measurement;
-
-                SetupTimeTask(String _observatory, String _instrument, String _detector, String _measurement) {
-                    observatory = _observatory;
-                    instrument = _instrument;
-                    detector = _detector;
-                    measurement = _measurement;
-                }
-
-                @Override
-                protected Date doInBackground() {
-                    Thread.currentThread().setName("SetupTime");
-                    return APIRequestManager.getLatestImageDate(observatory, instrument, detector, measurement, true);
-                }
-
-                @Override
-                public void done() {
-                    try {
-                        Date endDate = get();
-                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
-                        gregorianCalendar.setTime(endDate);
-
-                        gregorianCalendar.add(GregorianCalendar.SECOND, cadencePanel.getCadence());
-                        setEndDate(gregorianCalendar.getTime(), false);
-
-                        gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                        setStartDate(gregorianCalendar.getTime(), false);
-
-                        if (load)
-                            loadRemote(false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            SetupTimeTask setupTimeTask = new SetupTimeTask(
-                                                instrumentsPanel.getObservatory(),
-                                                instrumentsPanel.getInstrument(),
-                                                instrumentsPanel.getDetector(),
-                                                instrumentsPanel.getMeasurement());
-            setupTimeTask.execute();
         }
 
         /**
