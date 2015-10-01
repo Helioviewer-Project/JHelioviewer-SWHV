@@ -89,7 +89,7 @@ public class JP2View extends AbstractView {
 
         int numOfThread = 1;
         executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/*rejectedExecutionHandler*/);
-        signalRender(_jp2Image);
+        render(); // for proper ROI computation (ViewROI)
 
         frameCountStart = System.currentTimeMillis();
     }
