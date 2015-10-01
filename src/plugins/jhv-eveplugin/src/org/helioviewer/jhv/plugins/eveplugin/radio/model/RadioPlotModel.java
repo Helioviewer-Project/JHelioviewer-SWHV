@@ -51,8 +51,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         zoomManager = ZoomManager.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
         bufferedImages = new HashMap<Long, BufferedImage>();
-        // radioPlotModelData = new RadioPlotModelData();
-        // yValueModel = YValueModel.getSingletonInstance();
         yAxisElement = new RadioYAxisElement();
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
@@ -68,13 +66,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     public static RadioPlotModel getSingletonInstance() {
         if (instance == null) {
             instance = new RadioPlotModel();
-            instance.init();
         }
         return instance;
-    }
-
-    private void init() {
-        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }
 
     public void addRadioPlotModelListener(RadioPlotModelListener listener, String plotIdentifier) {
@@ -118,6 +111,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void downloadRequestAnswered(Interval<Date> timeInterval, long ID) {
         zoomManager.addZoomDataConfig(timeInterval, this, ID);
+        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }
 
     @Override
@@ -170,6 +164,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void downloadRequestDataRemoved(DownloadRequestData drd, long ID) {
+        PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
         noDataConfigList.remove(ID);
         plotConfigList.remove(ID);
         downloadRequestData.remove(ID);
