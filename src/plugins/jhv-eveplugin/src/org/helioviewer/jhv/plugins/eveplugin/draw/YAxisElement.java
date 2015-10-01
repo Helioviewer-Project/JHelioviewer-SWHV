@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import java.awt.Color;
-
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 
 /**
@@ -26,14 +24,6 @@ public class YAxisElement extends AbstractValueSpace {
     /** The scaled available range */
     protected Range scaledAvailableRange;
 
-    /** The minimum value of the y-axis */
-    protected double minValue;
-    /** The maximum value o the y-axis */
-    protected double maxValue;
-    /**  */
-
-    private Color color;
-
     private boolean isLogScale;
 
     private YAxisLocation location;
@@ -55,17 +45,13 @@ public class YAxisElement extends AbstractValueSpace {
      * @param color
      *            The color of this this y-axis element
      */
-    public YAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color, boolean isLogScale, long activationTime) {
+    public YAxisElement(Range selectedRange, Range availableRange, String label, boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
         scaledSelectedRange = new Range(0, 1);
         scaledAvailableRange = new Range(0, 1);
         this.label = label;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.color = color;
         this.isLogScale = isLogScale;
-        checkMinMax();
     }
 
     /**
@@ -78,22 +64,9 @@ public class YAxisElement extends AbstractValueSpace {
         selectedRange = new Range();
         availableRange = new Range();
         label = "";
-        minValue = 0.0;
-        maxValue = 0.0;
-        color = Color.BLACK;
         isLogScale = true;
         scaledSelectedRange = new Range(0, 1);
         scaledAvailableRange = new Range(0, 1);
-    }
-
-    private void checkMinMax() {
-        if (minValue == 0.0 && maxValue == 0.0) {
-            minValue = -1.0;
-            maxValue = 1.0;
-        } else if (minValue == maxValue) {
-            minValue = minValue - minValue / 10;
-            maxValue = maxValue + maxValue / 10;
-        }
     }
 
     /**
@@ -242,51 +215,12 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     /**
-     * Sets the minimum value.
-     *
-     * @param minValue
-     *            The minimum value
-     */
-    public void setMinValue(double minValue) {
-        this.minValue = minValue;
-    }
-
-    /**
      * Gets the maximum value.
      *
      * @return The maximum value
      */
     public double getMaxValue() {
         return selectedRange.max;
-    }
-
-    /**
-     * Sets the maximum value.
-     *
-     * @param maxValue
-     *            The maximum value
-     */
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    /**
-     * Gets the color.
-     *
-     * @return The color.
-     */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * Sets the color.
-     *
-     * @param color
-     *            The color.
-     */
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     /**
@@ -299,7 +233,6 @@ public class YAxisElement extends AbstractValueSpace {
     public void set(String label, boolean isLogScale) {
         this.label = label;
         this.isLogScale = isLogScale;
-        checkMinMax();
     }
 
     public boolean isLogScale() {

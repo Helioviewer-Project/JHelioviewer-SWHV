@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -55,7 +54,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         // radioPlotModelData = new RadioPlotModelData();
         // yValueModel = YValueModel.getSingletonInstance();
         yAxisElement = new RadioYAxisElement();
-        yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("MHz");
         yAxisElement.setIsLogScale(false);
         radioImagePane = new RadioImagePane();
