@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.awt.Color;
 
+import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 
 /**
@@ -137,8 +138,9 @@ public class YAxisElement extends AbstractValueSpace {
 
         double scaledSelectedStart = scaledAvailableRange.min + ratio * diffSelStartAvaiStart;
         double scaledSelectedEnd = scaledAvailableRange.min + ratio * diffSelEndAvailStart;
-
+        Log.debug("adaptScaledSelectedRange adaptScaledSelectedRange old: " + scaledSelectedRange);
         scaledSelectedRange = new Range(scaledSelectedStart, scaledSelectedEnd);
+        Log.debug("adaptScaledSelectedRange adaptScaledSelectedRange new: " + scaledSelectedRange);
     }
 
     /**
@@ -170,7 +172,9 @@ public class YAxisElement extends AbstractValueSpace {
             availableRange.setMin(newAvailableRange.min);
             selectedRange = new Range(newAvailableRange);
             scaledAvailableRange = new Range(0, 1);
+            Log.debug("setAvailable old: " + scaledSelectedRange);
             scaledSelectedRange = new Range(0, 1);
+            Log.debug("setAvailable new: " + scaledSelectedRange);
         }
     }
 
@@ -353,7 +357,9 @@ public class YAxisElement extends AbstractValueSpace {
         } else {
             selectedRange = new Range(selectedStart, selectedEnd);
         }
+        Log.debug("setScaledSelectedRange old: " + scaledSelectedRange);
         scaledSelectedRange = new Range(newScaledSelectedRange);
+        Log.debug("setScaledSelectedRange new: " + scaledSelectedRange);
         fireSelectedRangeChanged();
     }
 
@@ -367,6 +373,8 @@ public class YAxisElement extends AbstractValueSpace {
         availableRange = new Range();
         selectedRange = new Range();
         scaledAvailableRange = new Range(0, 1);
+        Log.debug("reset old: " + scaledSelectedRange);
         scaledSelectedRange = new Range(0, 1);
+        Log.debug("reset new: " + scaledSelectedRange);
     }
 }

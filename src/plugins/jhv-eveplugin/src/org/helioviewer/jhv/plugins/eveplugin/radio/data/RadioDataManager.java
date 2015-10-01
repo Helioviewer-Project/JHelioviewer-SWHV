@@ -13,9 +13,11 @@ import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
+import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModel;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioYAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.YValueModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -355,9 +357,8 @@ public class RadioDataManager implements RadioDownloaderListener {
                 maxFrequencyInterval = new FrequencyInterval(0, 0);
             }
         }
-        YValueModel yValueModel = YValueModel.getSingletonInstance();
-        yValueModel.setAvailableYMin(maxFrequencyInterval.getStart());
-        yValueModel.setAvailableYMax(maxFrequencyInterval.getEnd());
+        RadioYAxisElement yAxisElement = RadioPlotModel.getSingletonInstance().getYAxisElement();
+        yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
     /**

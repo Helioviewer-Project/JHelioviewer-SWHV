@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
@@ -12,29 +12,29 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
  * Radio specific implementation of y-axis element. This implementation
  * overrides the getSelectedRange() and getAvailableRange() in order to use the
  * YValueModel to get the correct values.
- * 
+ *
  * @author Bram.Bourgoignie@oma.be
- * 
+ *
  */
 public class RadioYAxisElement extends YAxisElement {
 
     /** Instance of the y-value model manager. */
-    private final YValueModel yValueModel;
+    // private final YValueModel yValueModel;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public RadioYAxisElement() {
         super();
-        yValueModel = YValueModel.getSingletonInstance();
+        // yValueModel = YValueModel.getSingletonInstance();
     }
 
     /**
      * Creates a radio y-axis element based on the given selected range,
      * available range, label, minimum value, maximum value, a color and a plot
      * identifier.
-     * 
+     *
      * @param selectedRange
      *            The selected range of the radio y-axis element
      * @param availableRange
@@ -52,26 +52,23 @@ public class RadioYAxisElement extends YAxisElement {
      */
     public RadioYAxisElement(Range selectedRange, Range availableRange, String label, double minValue, double maxValue, Color color, long activationTime) {
         super(selectedRange, availableRange, label, minValue, maxValue, color, false, activationTime);
-        yValueModel = YValueModel.getSingletonInstance();
+        // yValueModel = YValueModel.getSingletonInstance();
     }
 
-    @Override
-    public Range getSelectedRange() {
-        return new Range(yValueModel.getSelectedYMax(), yValueModel.getSelectedYMin());
-    }
-
-    @Override
-    public Range getAvailableRange() {
-        return new Range(yValueModel.getAvailableYMax(), yValueModel.getAvailableYMin());
-    }
+    /*
+     * @Override public Range getSelectedRange() { return getSelectedRange(); }
+     * 
+     * @Override public Range getAvailableRange() { return getAvailableRange();
+     * }
+     */
 
     @Override
     public double getMinValue() {
-        return yValueModel.getSelectedYMax();
+        return getSelectedRange().max;
     }
 
     @Override
     public double getMaxValue() {
-        return yValueModel.getSelectedYMin();
+        return getSelectedRange().min;
     }
 }
