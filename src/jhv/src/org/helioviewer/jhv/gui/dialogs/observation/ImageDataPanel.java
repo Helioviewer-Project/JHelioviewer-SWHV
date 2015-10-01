@@ -96,7 +96,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (isFirst || !donotloadStartup) {
                 isFirst = false;
                 SetupTimeTask setupTimeTask = new SetupTimeTask(
-                                                        Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")),
                                                         cadencePanel.getCadence(),
                                                         instrumentsPanel.getObservatory(),
                                                         instrumentsPanel.getInstrument(),
