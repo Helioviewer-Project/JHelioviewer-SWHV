@@ -29,8 +29,7 @@ public class JP2CallistoView extends JP2View {
 
     @Override
     public void render() {
-        Log.error(">> Should not be called");
-        Thread.dumpStack();
+        // should be called only during setJP2Image
     }
 
     @Override
