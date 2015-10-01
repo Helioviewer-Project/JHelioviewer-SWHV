@@ -75,7 +75,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
 
         double arcResolution = 100;
-        int lineResolution = 2;
+        double lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Position.Latitudinal p = Sun.getEarth(date);

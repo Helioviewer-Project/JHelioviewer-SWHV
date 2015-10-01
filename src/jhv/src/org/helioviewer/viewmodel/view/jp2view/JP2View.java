@@ -40,19 +40,18 @@ public class JP2View extends AbstractView {
     static private class RejectExecution implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            // System.out.println(Thread.currentThread().getName());
+            System.out.println(Thread.currentThread().getName());
         }
     }
 
     private final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
     private final RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
-    private final int numOfThread = 1;
-    private final ExecutorService exec = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), rejectedExecutionHandler);
+    private ExecutorService executor;
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
         blockingQueue.add(task);
-        exec.submit(task);
+        executor.submit(task);
     }
 
     protected Region targetRegion;
@@ -87,7 +86,11 @@ public class JP2View extends AbstractView {
         metaDataArray = _jp2Image.metaDataList;
 
         _jp2Image.startReader(this);
+
+        int numOfThread = 1;
+        executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/*rejectedExecutionHandler*/);
         signalRender(_jp2Image);
+
         frameCountStart = System.currentTimeMillis();
     }
 
@@ -141,6 +144,7 @@ public class JP2View extends AbstractView {
 
                 @Override
                 public void run() {
+                    executor.shutdown();
                     view._jp2Image.abolish();
                     view._jp2Image = null;
                 }
@@ -162,7 +166,7 @@ public class JP2View extends AbstractView {
 
         AbolishThread thread = new AbolishThread();
         thread.init(this);
-        exec.submit(thread);
+        executor.submit(thread);
     }
 
     // if instance was built before cancelling
