@@ -5,12 +5,12 @@ import java.util.GregorianCalendar;
 
 import javax.swing.SwingWorker;
 
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
 
 public class SetupTimeTask extends SwingWorker<Date, Void> {
 
-    private final boolean load;
     private final int cadence;
     private final String observatory;
     private final String instrument;
@@ -18,8 +18,7 @@ public class SetupTimeTask extends SwingWorker<Date, Void> {
     private final String measurement;
 
     // Sets the latest available image (or now if fails) to the end time and the start 24h earlier.
-    public SetupTimeTask(boolean _load, int _cadence, String _observatory, String _instrument, String _detector, String _measurement) {
-        load = _load;
+    public SetupTimeTask(int _cadence, String _observatory, String _instrument, String _detector, String _measurement) {
         cadence = _cadence;
         observatory = _observatory;
         instrument = _instrument;
@@ -48,7 +47,7 @@ public class SetupTimeTask extends SwingWorker<Date, Void> {
             gregorianCalendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
             idp.setStartDate(gregorianCalendar.getTime(), false);
 
-            if (load)
+            if (Boolean.parseBoolean(Settings.getSingletonInstance().getProperty("startup.loadmovie")))
                 idp.loadRemote(false);
         } catch (Exception e) {
             e.printStackTrace();
