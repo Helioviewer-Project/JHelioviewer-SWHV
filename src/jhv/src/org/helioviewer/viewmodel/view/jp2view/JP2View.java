@@ -131,7 +131,10 @@ public class JP2View extends AbstractView {
                 t.setVar(null);
             }
 
-            J2KRender.threadEnvLocal.destroy();
+//            if (J2KRender.compositor != null) {
+//                J2KRender.compositor.destroy();
+//            }
+            J2KRender.threadEnv.destroy();
 
             EventQueue.invokeLater(new Runnable() {
                 private JP2View view;
