@@ -104,7 +104,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINE_STRIP);
-        for (int i = 0; i <= lineResolution; i++) {
+        for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
             r = alpha * distSun + (1 - alpha) * (distSun + 5);
             theta = thetaStart;
@@ -133,7 +133,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
 
-        for (int i = 0; i <= lineResolution / 2; i++) {
+        for (int i = 0; i <= lineResolution; i++) {
             alpha = 1. - i / arcResolution;
             r = alpha * distSun + (1 - alpha) * (distSun + 5);
             theta = principleAngle;
@@ -162,7 +162,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
 
-        for (int i = 0; i <= lineResolution; i++) {
+        for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
             r = alpha * distSun + (1 - alpha) * (distSun + 5);
             theta = thetaEnd;

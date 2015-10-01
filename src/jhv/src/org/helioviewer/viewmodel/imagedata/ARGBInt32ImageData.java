@@ -46,9 +46,8 @@ public class ARGBInt32ImageData extends AbstractImageData {
      *            pixel data
      */
     public ARGBInt32ImageData(boolean singleChannel, int newWidth, int newHeight, Buffer _buffer) {
-        super(newWidth, newHeight);
+        super(newWidth, newHeight, 32);
         format.setSingleChannel(true);
-        bpp = 32;
         buffer = _buffer;
     }
 
@@ -64,9 +63,8 @@ public class ARGBInt32ImageData extends AbstractImageData {
      *            pixel data
      */
     public ARGBInt32ImageData(BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight());
+        super(newImage.getWidth(), newImage.getHeight(), 32);
         image = newImage;
-        bpp = 32;
         readImageTransportFromBufferedImage(newImage);
     }
 

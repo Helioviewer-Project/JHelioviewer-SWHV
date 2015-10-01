@@ -46,9 +46,8 @@ public class SingleChannelShortImageData extends AbstractImageData {
      *            pixel data
      */
     public SingleChannelShortImageData(int newWidth, int newHeight, int newBitDepth, Buffer _buffer) {
-        super(newWidth, newHeight);
+        super(newWidth, newHeight, 16);
         format = new SingleChannelImageFormat(newBitDepth);
-        bpp = 16;
         buffer = _buffer;
     }
 
@@ -66,10 +65,9 @@ public class SingleChannelShortImageData extends AbstractImageData {
      *            pixel data
      */
     public SingleChannelShortImageData(int newBitDepth, BufferedImage newImage) {
-        super(newImage.getWidth(), newImage.getHeight());
+        super(newImage.getWidth(), newImage.getHeight(), 16);
         image = newImage;
         format = new SingleChannelImageFormat(newBitDepth);
-        bpp = 16;
         buffer = ShortBuffer.wrap(((DataBufferUShort) newImage.getRaster().getDataBuffer()).getData());
     }
 

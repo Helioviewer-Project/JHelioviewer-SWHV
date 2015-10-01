@@ -16,8 +16,8 @@ import org.helioviewer.viewmodel.metadata.MetaData;
  */
 public abstract class AbstractImageData implements ImageData {
 
-    protected int width, height;
-    protected int bpp;
+    protected final int width, height;
+    protected final int bpp;
     protected Buffer buffer;
 
     protected BufferedImage image = null;
@@ -34,21 +34,10 @@ public abstract class AbstractImageData implements ImageData {
      * @param newHeight
      *            height of the image
      */
-    protected AbstractImageData(int newWidth, int newHeight) {
+    protected AbstractImageData(int newWidth, int newHeight, int newBpp) {
         width = newWidth;
         height = newHeight;
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param copyFrom
-     *            object to copy
-     */
-    protected AbstractImageData(ImageData copyFrom) {
-        AbstractImageData base = (AbstractImageData) copyFrom;
-        width = base.width;
-        height = base.height;
+        bpp = newBpp;
     }
 
     /**
