@@ -32,13 +32,13 @@ class J2KRender implements Runnable {
         }
     };
 
+    private static final int[] firstComponent = new int[] { 0 };
+
     /** A reference to the JP2Image this object is owned by. */
     private final JP2Image parentImageRef;
 
     /** A reference to the JP2View this object is owned by. */
     private final JP2View parentViewRef;
-
-    private final int[] firstComponent = new int[] { 0 };
 
     private final JP2ImageParameter currParams;
 
@@ -151,9 +151,9 @@ class J2KRender implements Runnable {
                 parentViewRef.setSubimageData(theImdata, theParams);
             }
 
-            public Runnable init(ImageData theImdata, JP2ImageParameter theParams) {
-                this.theImdata = theImdata;
-                this.theParams = theParams;
+            public Runnable init(ImageData imdata, JP2ImageParameter params) {
+                theImdata = imdata;
+                theParams = params;
                 return this;
             }
         }.init(newImdata, newParams));
