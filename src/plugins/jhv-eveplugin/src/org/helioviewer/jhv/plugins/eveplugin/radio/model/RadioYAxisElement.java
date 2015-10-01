@@ -5,7 +5,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import java.awt.Color;
 
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
@@ -78,9 +77,7 @@ public class RadioYAxisElement extends YAxisElement {
 
         selectedRange = new Range(selectedStart, selectedEnd);
 
-        Log.debug("setScaledSelectedRange old: " + scaledSelectedRange);
         scaledSelectedRange = new Range(newScaledSelectedRange);
-        Log.debug("setScaledSelectedRange new: " + scaledSelectedRange);
         fireSelectedRangeChanged();
     }
 }
