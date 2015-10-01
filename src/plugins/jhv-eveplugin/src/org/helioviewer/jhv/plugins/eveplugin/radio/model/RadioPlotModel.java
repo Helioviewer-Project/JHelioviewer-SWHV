@@ -19,9 +19,9 @@ import java.util.Set;
 
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
-import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.DownloadRequestData;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.FrequencyInterval;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
@@ -34,8 +34,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private final ZoomManager zoomManager;
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    private final YValueModel yValueModel;
-    private final YAxisElement yAxisElement;
+    // private final YValueModel yValueModel;
+    private final RadioYAxisElement yAxisElement;
     private final RadioImagePane radioImagePane;
     private final Set<RadioPlotModelListener> listeners;
     private final Map<Long, DownloadRequestData> downloadRequestData;
@@ -53,7 +53,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         drawController = DrawController.getSingletonInstance();
         bufferedImages = new HashMap<Long, BufferedImage>();
         // radioPlotModelData = new RadioPlotModelData();
-        yValueModel = YValueModel.getSingletonInstance();
+        // yValueModel = YValueModel.getSingletonInstance();
         yAxisElement = new RadioYAxisElement();
         yAxisElement.setColor(Color.BLACK);
         yAxisElement.setLabel("MHz");
@@ -265,8 +265,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval) {
-        yValueModel.setAvailableYMin(maxFrequencyInterval.getStart());
-        yValueModel.setAvailableYMax(maxFrequencyInterval.getEnd());
+        yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
     /*
@@ -370,7 +369,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         }
     }
 
-    public YAxisElement getYAxisElement() {
+    public RadioYAxisElement getYAxisElement() {
         return yAxisElement;
     }
 }

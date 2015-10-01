@@ -14,7 +14,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     private Date maxX;
     private Rectangle displaySize;
     private long ID;
-    private final YValueModel yValueModel;
+    private final RadioYAxisElement yAxisElement;
 
     private final List<ZoomDataConfigListener> listeners;
 
@@ -23,7 +23,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
         this.maxX = maxX;
         this.minX = minX;
-        yValueModel = YValueModel.getSingletonInstance();
+        yAxisElement = RadioPlotModel.getSingletonInstance().getYAxisElement();
         this.displaySize = displaySize;
         RadioPlotModel.getSingletonInstance().getYAxisElement().addValueSpaceListener(this);
         if (displaySize != null) {
@@ -35,8 +35,8 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     public void addListener(ZoomDataConfigListener l) {
         listeners.add(l);
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
-        double yRatio = 1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / displaySize.getHeight();
-        l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID);
+        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
+        l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio, ID);
     }
 
     public long getID() {
@@ -88,9 +88,9 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
     private void requestData() {
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
-        double yRatio = 1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / displaySize.getHeight();
+        double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         for (ZoomDataConfigListener l : listeners) {
-            l.requestData(minX, maxX, yValueModel.getSelectedYMin(), yValueModel.getSelectedYMax(), xRatio, yRatio, ID);
+            l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio, ID);
         }
     }
 

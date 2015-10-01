@@ -12,12 +12,13 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
 public class ZoomManager implements TimingListener, GraphDimensionListener {
     private static ZoomManager instance;
     private DrawController drawController;
     private PlotAreaSpace plotAreaSpace;
-    private YValueModel yValueModel;
+    private YAxisElement yAxisElement;
 
     private final Map<Long, ZoomDataConfig> zoomDataConfigMap;
     private boolean isAreaInitialized;
@@ -46,7 +47,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        yValueModel = YValueModel.getSingletonInstance();
+        yAxisElement = RadioPlotModel.getSingletonInstance().getYAxisElement();
     }
 
     public void calculateZoomXDirection() {
@@ -89,13 +90,13 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID) {
         ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
-        int sourceY0 = defineYInSourceArea((int) yValueModel.getSelectedYMax(), startFrequency, endFrequency, area, zdc, false);
+        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, startFrequency, endFrequency, area, zdc, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-        int sourceY1 = defineYInSourceArea((int) yValueModel.getSelectedYMin(), startFrequency, endFrequency, area, zdc, true);
+        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, startFrequency, endFrequency, area, zdc, true);
         int destX0 = defineXInDestinationArea(startDate, zdc);
-        int destY0 = defineYInDestinationArea(startFrequency, yValueModel, zdc);
+        int destY0 = defineYInDestinationArea(startFrequency, yAxisElement, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
-        int destY1 = defineYInDestinationArea(endFrequency, yValueModel, zdc);
+        int destY1 = defineYInDestinationArea(endFrequency, yAxisElement, zdc);
         if (sourceY0 == sourceY1) {
             sourceY1 = sourceY0 + 1;
         }
@@ -158,9 +159,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
      *             outside the minimum and maximum frequency.
      */
     public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId) {
-        YValueModel yValueModel = YValueModel.getSingletonInstance();
         Interval<Date> currentInterval = drawController.getSelectedInterval();
-        if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yValueModel.getAvailableYMin() && startFreq <= yValueModel.getAvailableYMax()) && (endFreq >= yValueModel.getAvailableYMin() && endFreq <= yValueModel.getAvailableYMax())) {
+        if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
             int height = displaySize.height;
             double ratio = 1.0 * displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
             int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
@@ -170,8 +170,8 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         }
     }
 
-    private int defineYInDestinationArea(int frequencyToFind, YValueModel yValueModel, ZoomDataConfig zdc) {
-        return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - yValueModel.getSelectedYMin()) / (1.0 * (yValueModel.getSelectedYMax() - yValueModel.getSelectedYMin()) / zdc.getDisplaySize().height));
+    private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement, ZoomDataConfig zdc) {
+        return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / zdc.getDisplaySize().height));
     }
 
     private int defineXInDestinationArea(Date dateToFind, ZoomDataConfig zdc) {
