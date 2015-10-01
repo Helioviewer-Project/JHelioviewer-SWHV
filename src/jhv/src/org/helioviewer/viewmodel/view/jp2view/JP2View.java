@@ -218,6 +218,17 @@ public class JP2View extends AbstractView {
 
         int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
+
+        int pWidth = m.getPixelWidth();
+        int pHeight = m.getPixelHeight();
+        imageWidth = Math.max(0, Math.min(pWidth, imageWidth));
+        imageHeight = Math.max(0, Math.min(pHeight, imageHeight));
+        imagePositionX = Math.max(0, Math.min(pWidth, imagePositionX));
+        imagePositionY = Math.max(0, Math.min(pHeight, imagePositionY));
+
+        imageWidth = Math.max(0, Math.min(pWidth - imagePositionX, imageWidth));
+        imageHeight = Math.max(0, Math.min(pHeight - imagePositionY, imageHeight));
+
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight);
 
         return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
