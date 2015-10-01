@@ -280,6 +280,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             }
             setAvailableInterval(new Interval<Date>(start, end));
         }
+        TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
+        if (lockModel.isLocked()) {
+            setSelectedInterval(interval, true);
+            lockModel.setLocked(true);
+        }
     }
 
     @Override
