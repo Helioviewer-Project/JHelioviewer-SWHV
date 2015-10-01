@@ -17,20 +17,20 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     /** The current selected range */
-    private Range selectedRange;
+    protected Range selectedRange;
     /** The current available range */
-    private Range availableRange;
+    protected Range availableRange;
     /** The label of the y-axis */
     private String label;
     /** The scaled selected range */
-    private Range scaledSelectedRange;
+    protected Range scaledSelectedRange;
     /** The scaled available range */
-    private Range scaledAvailableRange;
+    protected Range scaledAvailableRange;
 
     /** The minimum value of the y-axis */
-    private double minValue;
+    protected double minValue;
     /** The maximum value o the y-axis */
-    private double maxValue;
+    protected double maxValue;
     /**  */
 
     private Color color;
@@ -363,7 +363,7 @@ public class YAxisElement extends AbstractValueSpace {
         fireSelectedRangeChanged();
     }
 
-    private void fireSelectedRangeChanged() {
+    protected void fireSelectedRangeChanged() {
         for (ValueSpaceListener vsl : listeners) {
             vsl.valueSpaceChanged(availableRange, selectedRange);
         }
