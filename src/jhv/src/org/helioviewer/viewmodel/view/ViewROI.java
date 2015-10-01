@@ -10,8 +10,8 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
-    private final int resolution = 3;
-    private final GL3DVec2d[] pointlist = new GL3DVec2d[(resolution + 1) * 2 * 2];
+    private final double resolution = 5.;
+    private final GL3DVec2d[] pointlist = new GL3DVec2d[((int) resolution + 1) * 2 * 2];
 
     private static final ViewROI instance = new ViewROI();
 
@@ -23,13 +23,13 @@ public class ViewROI {
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (1. * i / resolution - 0.5), -2. * (j - 0.5));
+                pointlist[count] = new GL3DVec2d(2. * (i / resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= resolution; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (i / 1. - 0.5), -2. * (1. * j / resolution - 0.5));
+                pointlist[count] = new GL3DVec2d(2. * (i - 0.5), -2. * (j / resolution - 0.5));
                 count++;
             }
         }
@@ -59,8 +59,8 @@ public class ViewROI {
 
         activeCamera.pop();
 
-        double widthxAdd = Math.abs(0.025 * (maxPhysicalX - minPhysicalX));
-        double widthyAdd = Math.abs(0.025 * (maxPhysicalY - minPhysicalY));
+        double widthxAdd = Math.abs(0.02 * (maxPhysicalX - minPhysicalX));
+        double widthyAdd = Math.abs(0.02 * (maxPhysicalY - minPhysicalY));
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;

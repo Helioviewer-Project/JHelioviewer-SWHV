@@ -219,6 +219,7 @@ public class JP2View extends AbstractView {
         int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
 
+        // clamp for esajpip
         imageWidth = Math.max(0, Math.min(viewportImageWidth, imageWidth));
         imageHeight = Math.max(0, Math.min(viewportImageHeight, imageHeight));
         imagePositionX = Math.max(0, Math.min(viewportImageWidth - 1, imagePositionX));
