@@ -15,8 +15,10 @@ import kdu_jni.Kdu_region_compositor;
 import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -203,7 +205,11 @@ public class JP2View extends AbstractView {
         double ratio = (Displayer.getViewport().getCamera().getCameraWidth() * 2) / (Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
         int totalHeight = (int) (mHeight / ratio);
 
-        ResolutionLevel res = jp2Image.getResolutionSet().getClosestResolutionLevel(totalHeight, totalHeight);
+        ResolutionLevel res;
+        if (JHVGlobals.GoForTheBroke && Layers.isMoviePlaying())
+            res = jp2Image.getResolutionSet().getClosestResolutionLevel(totalHeight, totalHeight);
+        else
+            res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
 
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;

@@ -1,6 +1,5 @@
 package org.helioviewer.viewmodel.view.jp2view.image;
 
-import java.awt.Dimension;
 import java.awt.Rectangle;
 
 import org.helioviewer.base.interval.Interval;
@@ -98,9 +97,9 @@ public class ResolutionSet {
         return resolutions[idx];
     }
 
-    public ResolutionLevel getNextResolutionLevel(Dimension bounds) {
+    public ResolutionLevel getNextResolutionLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
-            if (resolutions[i].dims.width < bounds.width || resolutions[i].dims.height < bounds.height)
+            if (resolutions[i].dims.width < w || resolutions[i].dims.height < h)
                 return resolutions[i - 1];
         }
         return resolutions[resolutions.length - 1];
