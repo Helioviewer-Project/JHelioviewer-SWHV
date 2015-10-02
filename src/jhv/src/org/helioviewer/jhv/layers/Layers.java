@@ -134,9 +134,16 @@ public class Layers {
 
     private static void syncTime(ImmutableDateTime dateTime) {
         for (View view : layers) {
-            view.setFrame(view.getFrame(dateTime));
+            if (view.getImageLayer().isVisible()) {
+                view.setFrame(view.getFrame(dateTime));
+            }
         }
-        MoviePanel.getSingletonInstance().setFrameSlider(activeView.getCurrentFrameNumber());
+
+        if (activeView.getImageLayer().isVisible()) {
+            MoviePanel.getSingletonInstance().setFrameSlider(activeView.getCurrentFrameNumber());
+        } /* else {
+            MoviePanel.getSingletonInstance().setEnabledState(false);
+        } */
     }
 
     private static ImmutableDateTime getStartDateImmutable(View view) {

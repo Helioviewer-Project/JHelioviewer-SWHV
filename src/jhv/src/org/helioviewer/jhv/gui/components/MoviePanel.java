@@ -123,8 +123,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
 
-    private final JPanel modePanel;
-    private final JPanel speedPanel;
+    private static JPanel modePanel;
+    private static JPanel speedPanel;
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -146,13 +146,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static void unsetMovie() {
         timeSlider.setMaximum(0);
         timeSlider.setValue(0);
-        setState(false);
+        setEnabledState(false);
     }
 
     public static void setMovie(View view) {
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
-        setState(true);
+        setEnabledState(true);
     }
 
     private MoviePanel() {
@@ -212,7 +212,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND, SpeedUnit.FRAMESPERSECOND };
+        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /* SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */ };
         speedUnitComboBox = new JComboBox(units);
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
@@ -232,12 +232,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        setState(false);
+        setEnabledState(false);
         setAdvanced(isAdvanced);
         sliderTimer.start();
     }
 
-    private static void setState(boolean enabled) {
+    public static void setEnabledState(boolean enabled) {
         animationModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
         playButton.setEnabled(enabled);
@@ -248,7 +248,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         advancedButton.setEnabled(enabled);
     }
 
-    private void setAdvanced(boolean advanced) {
+    private static void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
 
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
