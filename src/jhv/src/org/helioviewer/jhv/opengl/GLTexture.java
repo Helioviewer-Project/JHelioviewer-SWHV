@@ -12,6 +12,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -88,6 +90,14 @@ public class GLTexture {
             prev_inputGLFormat = inputGLFormat;
             prev_bppGLType = bppGLType;
         }
+
+        if (JHVGlobals.GoForTheBroke) {
+            if (Layers.isMoviePlaying())
+                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+            else
+                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        }
+
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
     }
 

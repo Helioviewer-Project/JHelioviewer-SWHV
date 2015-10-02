@@ -32,8 +32,9 @@ public class JHVGlobals {
     private static String version = "";
     private static String revision = "";
 
-    private JHVGlobals() {
-    }
+    private JHVGlobals() {}
+
+    public static final boolean GoForTheBroke = true;
 
     /**
      * @return standard read timeout
