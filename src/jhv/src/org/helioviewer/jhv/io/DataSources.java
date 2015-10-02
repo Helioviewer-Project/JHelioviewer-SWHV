@@ -46,7 +46,7 @@ import org.json.JSONTokener;
  */
 public class DataSources {
 
-    public static final HashSet<String> SUPPORTED_OBSERVATORIES = new HashSet<String>();
+    public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
     /**
      * Item to select. Has a nice toString() so that a list can be put into a
@@ -161,12 +161,25 @@ public class DataSources {
         }
     }
 
-    private static final DataSources singleton = new DataSources();
+    private static DataSources instance;
 
     private DataSources() {}
 
     public static DataSources getSingletonInstance() {
-        return singleton;
+        if (instance == null) {
+            instance = new DataSources();
+            String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
+
+            if (prop != null && SupportedObservatories.isEmpty()) {
+                String supportedObservatories[] = prop.split(" ");
+                for (String s : supportedObservatories) {
+                    if (!s.isEmpty()) {
+                        SupportedObservatories.add(s);
+                    }
+                }
+            }
+        }
+        return instance;
     }
 
     /**
@@ -180,18 +193,6 @@ public class DataSources {
     private final Comparator<String> keyComparator = new AlphanumComparator();
 
     private void reload() {
-        Settings settingsInstance = Settings.getSingletonInstance();
-        String prop = settingsInstance.getProperty("supported.data.sources");
-
-        if (prop != null && SUPPORTED_OBSERVATORIES.isEmpty()) {
-            String supportedObservatories[] = prop.split(" ");
-            for (String s : supportedObservatories) {
-                if (!s.isEmpty()) {
-                    SUPPORTED_OBSERVATORIES.add(s);
-                }
-            }
-        }
-
         jsonResult = null;
 
         while (true) {
@@ -345,7 +346,7 @@ public class DataSources {
     public Item[] getObservatories() {
         ArrayList<Item> result = new ArrayList<Item>();
         for (Item item : getChildrenList(jsonResult)) {
-            if (SUPPORTED_OBSERVATORIES.contains(item.getName())) {
+            if (SupportedObservatories.contains(item.getName())) {
                 result.add(item);
             }
         }
