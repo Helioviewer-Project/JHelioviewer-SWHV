@@ -64,7 +64,10 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void render() {
-        torender = true;
+        if (Layers.getActiveView() == null)
+            todisplay = true;
+        else
+            torender = true;
     }
 
     public static void display() {
