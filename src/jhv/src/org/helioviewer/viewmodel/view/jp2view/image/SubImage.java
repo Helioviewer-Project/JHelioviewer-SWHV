@@ -1,12 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view.image;
 
-/**
- * A very simple region of interest class. Basically just an immutable (for
- * thread safety) rectangle class with less functionality. At the moment the
- * information contained in this class is just x,y,width, and height.
- * @author caplins
- *
- */
+import java.awt.Rectangle;
+
 public class SubImage {
 
     public final int x;
@@ -14,26 +9,20 @@ public class SubImage {
     public final int width;
     public final int height;
 
-    public SubImage(int _x, int _y, int _width, int _height) {
-        if (_x < 0)
-            x = 0;
-        else
-            x = _x;
+    // minimum 1 pixel, fit into rectangle
+    public SubImage(int x, int y, int w, int h, Rectangle r) {
+        w = Math.min(Math.max(w, 1), r.width);
+        h = Math.min(Math.max(h, 1), r.height);
+        x = Math.min(Math.max(x, 0), r.width - 1);
+        y = Math.min(Math.max(y, 0), r.height - 1);
 
-        if (_y < 0)
-            y = 0;
-        else
-            y = _y;
+        w = Math.min(w, r.width - x);
+        h = Math.min(h, r.height - y);
 
-        if (_width < 0)
-            width = -_width;
-        else
-            width = _width;
-
-        if (_height < 0)
-            height = -_height;
-        else
-            height = _height;
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
     }
 
     /** Overridden equals method. */
