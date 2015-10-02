@@ -123,7 +123,6 @@ public class Displayer implements JHVEventHighlightListener {
                     for (final TimeListener listener : timeListeners) {
                         listener.timeChanged(lastTimestamp);
                     }
-                    ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getActualFramerate());
                 }
             }
             view.getImageLayer().setImageData(imageData);
