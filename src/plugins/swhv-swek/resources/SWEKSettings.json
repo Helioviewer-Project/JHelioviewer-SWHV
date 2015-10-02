@@ -385,7 +385,7 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : “km/s"
+                            "units"         : "km/s"
                         },
                     "default_visible"   : true
                 },
@@ -406,7 +406,7 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : “km/s"
+                            "units"         : "km/s"
                         },
                     "default_visible"           : true
                 },
@@ -420,7 +420,7 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : “km/s"
+                            "units"         : "km/s"
                         },
                     "default_visible"           : true
                 },

@@ -95,12 +95,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             // first time ignore donotloadStartup - comes via comboServer.setSelectedItem() below
             if (isFirst || !donotloadStartup) {
                 isFirst = false;
-                SetupTimeTask setupTimeTask = new SetupTimeTask(
-                                                        cadencePanel.getCadence(),
-                                                        instrumentsPanel.getObservatory(),
-                                                        instrumentsPanel.getInstrument(),
-                                                        instrumentsPanel.getDetector(),
-                                                        instrumentsPanel.getMeasurement());
+                SetupTimeTask setupTimeTask = new SetupTimeTask(getCadence(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
                 setupTimeTask.execute();
             }
         } else {
@@ -151,8 +146,8 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected cadence.
      */
-    public String getCadence() {
-        return Integer.toString(cadencePanel.getCadence());
+    private int getCadence() {
+        return cadencePanel.getCadence();
     }
 
     /**
@@ -160,7 +155,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected observatory.
      */
-    public String getObservation() {
+    private String getObservatory() {
         return instrumentsPanel.getObservatory();
     }
 
@@ -169,7 +164,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected instrument.
      * */
-    public String getInstrument() {
+    private String getInstrument() {
         return instrumentsPanel.getInstrument();
     }
 
@@ -178,7 +173,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected detector.
      * */
-    public String getDetector() {
+    private String getDetector() {
         return instrumentsPanel.getDetector();
     }
 
@@ -187,7 +182,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected measurement.
      * */
-    public String getMeasurement() {
+    private String getMeasurement() {
         return instrumentsPanel.getMeasurement();
     }
 
@@ -198,7 +193,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
     public void loadRemote(boolean isImage) {
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
-        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservation(), getInstrument(), getDetector(), getMeasurement());
+        LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
         remoteTask.execute();
     }
 

@@ -163,8 +163,7 @@ public class DataSources {
 
     private static final DataSources singleton = new DataSources();
 
-    private DataSources() {
-    }
+    private DataSources() {}
 
     public static DataSources getSingletonInstance() {
         return singleton;
@@ -184,7 +183,7 @@ public class DataSources {
         Settings settingsInstance = Settings.getSingletonInstance();
         String prop = settingsInstance.getProperty("supported.data.sources");
 
-        if (prop != null&& SUPPORTED_OBSERVATORIES.isEmpty()) {
+        if (prop != null && SUPPORTED_OBSERVATORIES.isEmpty()) {
             String supportedObservatories[] = prop.split(" ");
             for (String s : supportedObservatories) {
                 if (!s.isEmpty()) {
@@ -356,7 +355,6 @@ public class DataSources {
     private JSONObject getObservatory(String observatory) throws JSONException {
         return jsonResult.getJSONObject(observatory);
     }
-
 
     private String selectedServer = "";
     private final String[] serverList = new String[] { "ROB", "GSFC", "IAS" };
