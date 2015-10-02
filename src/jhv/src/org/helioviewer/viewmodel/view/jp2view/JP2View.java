@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -219,14 +220,15 @@ public class JP2View extends AbstractView {
         int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
 
-        // clamp for esajpip
-        imageWidth = Math.max(0, Math.min(viewportImageWidth, imageWidth));
-        imageHeight = Math.max(0, Math.min(viewportImageHeight, imageHeight));
-        imagePositionX = Math.max(0, Math.min(viewportImageWidth - 1, imagePositionX));
-        imagePositionY = Math.max(0, Math.min(viewportImageHeight - 1, imagePositionY));
+        // clamp into frame for esajpip
+        Rectangle frame = jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds();
+        imageWidth = Math.min(frame.width, imageWidth);
+        imageHeight = Math.min(frame.height, imageHeight);
+        imagePositionX = Math.min(frame.width - 1, imagePositionX);
+        imagePositionY = Math.min(frame.height - 1, imagePositionY);
 
-        imageWidth = Math.min(viewportImageHeight - imagePositionX, imageWidth);
-        imageHeight = Math.min(viewportImageHeight - imagePositionY, imageHeight);
+        imageWidth = Math.min(frame.width - imagePositionX, imageWidth);
+        imageHeight = Math.min(frame.height - imagePositionY, imageHeight);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight);
 
