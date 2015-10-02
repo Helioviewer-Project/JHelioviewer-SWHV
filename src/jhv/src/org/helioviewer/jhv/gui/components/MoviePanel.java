@@ -395,7 +395,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static void setPlayState(boolean play) {
         if (!someoneIsDragging) {
             if (!play) {
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(0); // somewhat hackish
                 playButton.setIcon(playIcon);
                 playButton.setToolTipText("Play movie");
             } else {
@@ -405,7 +404,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
     }
 
-    private static final Timer sliderTimer = new Timer(1000 / 10, new CacheChangedListener());
+    private static final Timer sliderTimer = new Timer(1000 / 10, new SliderListener());
 
     private static boolean cacheChanged = false;
 
@@ -414,13 +413,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         cacheChanged = true;
     }
 
-    private static class CacheChangedListener implements ActionListener {
+    private static class SliderListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (cacheChanged == true) {
                 cacheChanged = false;
                 timeSlider.repaint();
             }
+
+            View view = Layers.getActiveView();
+            if (view == null)
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(0);
+            else
+                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getCurrentFramerate());
         }
     }
 

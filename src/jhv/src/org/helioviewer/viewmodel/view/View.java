@@ -80,7 +80,7 @@ public interface View extends RenderListener {
      *
      * @return average actual frame rate
      */
-    public float getActualFramerate();
+    public float getCurrentFramerate();
 
     public boolean isMultiFrame();
 

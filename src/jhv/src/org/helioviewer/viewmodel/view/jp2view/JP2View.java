@@ -279,7 +279,7 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public float getActualFramerate() {
+    public float getCurrentFramerate() {
         long currentTime = System.currentTimeMillis();
         long delta = currentTime - frameCountStart;
 
