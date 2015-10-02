@@ -46,15 +46,6 @@ public class JP2CallistoView extends JP2View {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        if (rWidth < 1 || rHeight < 1) {
-            Log.debug(">> Empty region: " + r);
-            Thread.dumpStack();
-            if (rWidth < 1)
-                rWidth = 1;
-            if (rHeight < 1)
-                rHeight = 1;
-        }
-
         ResolutionSet set = jp2Image.getResolutionSet();
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
@@ -65,7 +56,7 @@ public class JP2CallistoView extends JP2View {
 
         SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * rect.width),
                                          (int) (r.getLowerLeftCorner().y / maxHeight * rect.height),
-                                         (int) (rWidth / maxWidth * rect.width),
+                                         (int) Math.ceil(rWidth / maxWidth * rect.width),
                                          (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 
         return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
