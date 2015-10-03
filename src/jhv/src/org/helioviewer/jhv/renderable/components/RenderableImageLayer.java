@@ -328,17 +328,16 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
-    public boolean isActiveImageLayer() {
-        return Layers.getActiveView() == view;
-    }
-
-    @Override
     public void dispose(GL2 gl) {
         disablePositionVBO(gl);
         disableIndexVBO(gl);
         deletePositionVBO(gl);
         deleteIndexVBO(gl);
         glImage.dispose(gl);
+    }
+
+    public boolean isActiveImageLayer() {
+        return Layers.getActiveView() == view;
     }
 
     private ImageData imageData;

@@ -24,8 +24,6 @@ public interface Renderable {
 
     public boolean isDeletable();
 
-    public boolean isActiveImageLayer();
-
     public void init(GL2 gl);
 
     public void dispose(GL2 gl);

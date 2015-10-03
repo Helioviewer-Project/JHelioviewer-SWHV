@@ -354,11 +354,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public boolean isActiveImageLayer() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
     }
 
@@ -373,4 +368,5 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
     }
+
 }

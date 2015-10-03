@@ -6,7 +6,9 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-@SuppressWarnings({ "serial" })
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+
+@SuppressWarnings("serial")
 public class RenderableCellRenderer extends DefaultTableCellRenderer {
 
     @Override
@@ -18,16 +20,17 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
 
         Renderable renderable = (Renderable) value;
         String layerName = renderable.getName();
-        String tooltip = "Layer name: " + layerName;
+        String tooltip = layerName;
 
-        if (renderable.isActiveImageLayer()) {
+        if (renderable instanceof RenderableImageLayer && ((RenderableImageLayer) renderable).isActiveImageLayer()) {
             layerName = "\u2299" + layerName;
             tooltip += " (active)";
         }
+
         label.setText(layerName);
         label.setBorder(RenderableContainerPanel.commonBorder);
-
         label.setToolTipText(tooltip);
+
         return label;
     }
 

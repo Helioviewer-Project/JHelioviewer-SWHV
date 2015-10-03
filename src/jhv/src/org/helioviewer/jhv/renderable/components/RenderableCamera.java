@@ -163,11 +163,6 @@ public class RenderableCamera implements Renderable {
     }
 
     @Override
-    public boolean isActiveImageLayer() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
     }
 

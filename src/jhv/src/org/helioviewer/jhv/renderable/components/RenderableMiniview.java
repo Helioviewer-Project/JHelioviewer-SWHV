@@ -88,11 +88,6 @@ public class RenderableMiniview implements Renderable, LayersListener {
     }
 
     @Override
-    public boolean isActiveImageLayer() {
-        return false;
-    }
-
-    @Override
     public void init(GL2 gl) {
     }
 
