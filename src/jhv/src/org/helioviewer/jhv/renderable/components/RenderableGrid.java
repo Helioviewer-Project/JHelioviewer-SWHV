@@ -406,11 +406,6 @@ public class RenderableGrid implements Renderable {
     }
 
     @Override
-    public boolean isActiveImageLayer() {
-        return false;
-    }
-
-    @Override
     public void dispose(GL2 gl) {
         if (textRenderer != null) {
             textRenderer.dispose();
