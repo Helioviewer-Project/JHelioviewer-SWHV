@@ -13,6 +13,7 @@ import org.helioviewer.viewmodel.view.jp2view.image.SubImage;
 
 public class JP2CallistoView extends JP2View {
 
+    private Region region;
     private Viewport viewport = new Viewport(86400, 380);
 
     public JP2Image getJP2Image() {
@@ -24,7 +25,7 @@ public class JP2CallistoView extends JP2View {
     }
 
     public boolean setRegion(Region r) {
-        targetRegion = r;
+        region = r;
         signalRender(_jp2Image);
         return true;
     }
@@ -42,9 +43,9 @@ public class JP2CallistoView extends JP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Region r, int frameNumber) {
-        double rWidth = r.getWidth();
-        double rHeight = r.getHeight();
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, int frameNumber) {
+        double rWidth = region.getWidth();
+        double rHeight = region.getHeight();
 
         ResolutionSet set = jp2Image.getResolutionSet();
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
@@ -54,8 +55,8 @@ public class JP2CallistoView extends JP2View {
                                                         2 * (int) Math.ceil(viewport.getHeight() / rHeight * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
-        SubImage subImage = new SubImage((int) (r.getLowerLeftCorner().x / maxWidth * rect.width),
-                                         (int) (r.getLowerLeftCorner().y / maxHeight * rect.height),
+        SubImage subImage = new SubImage((int) (region.getLowerLeftCorner().x / maxWidth * rect.width),
+                                         (int) (region.getLowerLeftCorner().y / maxHeight * rect.height),
                                          (int) Math.ceil(rWidth / maxWidth * rect.width),
                                          (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 

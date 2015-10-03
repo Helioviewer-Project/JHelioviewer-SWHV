@@ -56,8 +56,6 @@ public class JP2View extends AbstractView {
         executor.submit(task);
     }
 
-    protected Region targetRegion;
-
     // Member related to JP2
     protected JP2Image _jp2Image;
 
@@ -81,19 +79,15 @@ public class JP2View extends AbstractView {
     public void setJP2Image(JP2Image newJP2Image) {
         _jp2Image = newJP2Image;
 
-        MetaData metaData = _jp2Image.metaDataList[0];
-        targetRegion = new Region(metaData.getPhysicalLowerLeft(), metaData.getPhysicalSize());
-        targetFrame = 0;
-
         metaDataArray = _jp2Image.metaDataList;
 
         _jp2Image.startReader(this);
 
         int numOfThread = 1;
         executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/*rejectedExecutionHandler*/);
-        render(); // for proper ROI computation (ViewROI)
-
         frameCountStart = System.currentTimeMillis();
+
+        render();
     }
 
     @Override
@@ -185,17 +179,11 @@ public class JP2View extends AbstractView {
 
     /**
      * Recalculates the image parameters used within the jp2-package
-     *
-     * @param v
-     *            Viewport the image will be displayed in
-     * @param r
-     *            Physical region
-     * @param frameNumber
-     *            Frame number to show (has to be 0 for single images)
-     * @return Set of parameters used within the jp2-package
      */
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Region r, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
+        Region r = ViewROI.updateROI(m);
+
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
         double rWidth = r.getWidth();
@@ -340,7 +328,6 @@ public class JP2View extends AbstractView {
 
     @Override
     public void render() {
-        targetRegion = ViewROI.getSingletonInstance().updateROI(metaDataArray[targetFrame]);
         signalRender(_jp2Image);
     }
 
@@ -349,7 +336,7 @@ public class JP2View extends AbstractView {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetRegion, targetFrame);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetFrame);
 
         // ping reader
         _jp2Image.signalReader(imageViewParams);
