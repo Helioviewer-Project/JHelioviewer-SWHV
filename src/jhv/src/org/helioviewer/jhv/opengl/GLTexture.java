@@ -12,8 +12,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -60,7 +58,7 @@ public class GLTexture {
     private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
     }
@@ -69,8 +67,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error(">> w= " + w + " h=" + h);
-            Thread.dumpStack();
+            Log.error(">> copyImageData2D: w= " + w + " h=" + h);
             return;
         }
 
@@ -91,13 +88,6 @@ public class GLTexture {
             prev_bppGLType = bppGLType;
         }
 
-        if (JHVGlobals.GoForTheBroke) {
-            if (Layers.isMoviePlaying())
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-            else
-                gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-        }
-
         gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, source.getBuffer());
     }
 
@@ -105,8 +95,7 @@ public class GLTexture {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w <= 0 || h <= 0 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
-            Log.error(">> w= " + w + " h=" + h);
-            Thread.dumpStack();
+            Log.error(">> copyBufferedImage2D: w= " + w + " h=" + h);
             return;
         }
 
