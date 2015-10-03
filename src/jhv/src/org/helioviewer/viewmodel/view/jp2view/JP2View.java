@@ -61,7 +61,7 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
-    private int targetFrame;
+    private int targetFrame = 0;
     private int trueFrame;
 
     private int frameCount = 0;
@@ -206,7 +206,7 @@ public class JP2View extends AbstractView {
 
         ResolutionLevel res;
         if (JHVGlobals.GoForTheBroke && Layers.isMoviePlaying())
-            res = jp2Image.getResolutionSet().getClosestResolutionLevel(totalHeight, totalHeight);
+            res = jp2Image.getResolutionSet().getPreviousResolutionLevel(totalHeight, totalHeight);
         else
             res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
 

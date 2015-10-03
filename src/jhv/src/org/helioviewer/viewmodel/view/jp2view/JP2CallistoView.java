@@ -50,7 +50,7 @@ public class JP2CallistoView extends JP2View {
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
 
-        ResolutionLevel res = set.getClosestResolutionLevel((int) Math.ceil(viewport.getWidth() / rWidth * maxWidth),
+        ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.getWidth() / rWidth * maxWidth),
                                                         2 * (int) Math.ceil(viewport.getHeight() / rHeight * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
