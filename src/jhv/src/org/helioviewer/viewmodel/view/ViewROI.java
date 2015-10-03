@@ -10,14 +10,10 @@ import org.helioviewer.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
-    private final double resolution = 5.;
-    private final GL3DVec2d[] pointlist = new GL3DVec2d[((int) resolution + 1) * 2 * 2];
+    private static final double resolution = 5.;
+    private static final GL3DVec2d[] pointlist = new GL3DVec2d[((int) resolution + 1) * 2 * 2];
 
     private static final ViewROI instance = new ViewROI();
-
-    public static ViewROI getSingletonInstance() {
-        return instance;
-    }
 
     private ViewROI() {
         int count = 0;
@@ -35,7 +31,7 @@ public class ViewROI {
         }
     }
 
-    public Region updateROI(MetaData m) {
+    public static Region updateROI(MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
