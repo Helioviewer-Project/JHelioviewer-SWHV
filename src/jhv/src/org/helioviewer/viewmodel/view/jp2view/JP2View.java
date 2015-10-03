@@ -315,7 +315,7 @@ public class JP2View extends AbstractView {
             targetFrame = frame;
 
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
-                signalRender(_jp2Image);
+                render();
             }
         }
     }
