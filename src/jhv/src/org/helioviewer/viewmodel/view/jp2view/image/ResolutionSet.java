@@ -69,15 +69,7 @@ public class ResolutionSet {
         return resolutions[_index];
     }
 
-    /**
-     * Returns the smallest Resolution level that fits within the _bounds (or
-     * just the smallest if none fit in the _bounds). Useful for zoomfit
-     * operations.
-     *
-     * @param _bounds
-     * @return Closest resolution level
-     */
-    public ResolutionLevel getClosestResolutionLevel(int w, int h) {
+    public ResolutionLevel getPreviousResolutionLevel(int w, int h) {
         int idx = 0;
         for (int i = 0; i < resolutions.length; i++) {
             idx = i;
@@ -87,6 +79,7 @@ public class ResolutionSet {
         return resolutions[idx];
     }
 
+/*
     public ResolutionLevel getClosestResolutionLevel(double _source, double _target) {
         int idx = 0;
         for (int i = resolutions.length - 1; i >= 0; i--) {
@@ -96,6 +89,7 @@ public class ResolutionSet {
         }
         return resolutions[idx];
     }
+*/
 
     public ResolutionLevel getNextResolutionLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
