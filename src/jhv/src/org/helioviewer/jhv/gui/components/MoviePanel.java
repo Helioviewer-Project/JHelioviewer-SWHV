@@ -237,7 +237,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         sliderTimer.start();
     }
 
-    public static void setEnabledState(boolean enabled) {
+    private static void setEnabledState(boolean enabled) {
         animationModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
         playButton.setEnabled(enabled);
