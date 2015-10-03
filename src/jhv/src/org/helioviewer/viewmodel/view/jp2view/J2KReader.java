@@ -7,6 +7,7 @@ import java.net.SocketException;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -211,7 +212,8 @@ class J2KReader implements Runnable {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parentViewRef.signalRender(parentImageRef);
+                if (!Layers.isMoviePlaying())
+                    parentViewRef.signalRender(parentImageRef);
             }
         });
     }
@@ -270,12 +272,9 @@ class J2KReader implements Runnable {
                         } catch (IOException ioe) {
                             Log.error(">> J2KReader.run() > Error closing socket.", ioe);
                         }
-                        // Displayer.display();
                         // Send signal to try again
                         readerSignal.signal(currParams);
-                    }/*
-                      * catch (JHV_KduException e) { e.printStackTrace(); }
-                      */
+                    }
                 }
 
                 // if socket is open, get image data
@@ -504,7 +503,6 @@ class J2KReader implements Runnable {
                                 }
                             }
                         }
-                        // Displayer.display();
                         // send signal to try again
                         readerSignal.signal(currParams);
                     } catch (JHV_KduException e) {
