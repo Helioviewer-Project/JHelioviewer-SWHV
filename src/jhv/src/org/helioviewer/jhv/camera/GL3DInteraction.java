@@ -35,7 +35,7 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
     public void drawInteractionFeedback(GL2 gl) {
     }
 
-    public abstract void reset(GL3DCamera camera);
+    public abstract void reset();
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {

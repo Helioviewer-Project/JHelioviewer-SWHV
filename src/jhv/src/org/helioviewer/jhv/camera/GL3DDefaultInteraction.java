@@ -19,10 +19,6 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
     }
 
     @Override
-    public void reset(GL3DCamera camera) {
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             camera.reset();
@@ -30,6 +26,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
         }
     }
 
+    @Override
     public void reset() {
     }
 
