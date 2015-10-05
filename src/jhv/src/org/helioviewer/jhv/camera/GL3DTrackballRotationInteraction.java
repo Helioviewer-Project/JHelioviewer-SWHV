@@ -26,33 +26,33 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-        this.currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+    public void mouseDragged(MouseEvent e) {
+        currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
         if (currentRotationStartPoint != null && currentRotationEndPoint != null) {
             currentDragRotation = GL3DQuatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         }
         camera.rotateCurrentDragRotation(currentDragRotation);
-        this.camera.updateCameraTransformation();
+        camera.updateCameraTransformation();
         Displayer.render();
     }
 
     @Override
-    public void mouseReleased(MouseEvent e, GL3DCamera camera) {
-        this.currentRotationStartPoint = null;
-        this.currentRotationEndPoint = null;
+    public void mouseReleased(MouseEvent e) {
+        currentRotationStartPoint = null;
+        currentRotationEndPoint = null;
     }
 
     @Override
     public void reset() {
-        if (this.currentDragRotation != null) {
-            this.currentDragRotation.clear();
+        if (currentDragRotation != null) {
+            currentDragRotation.clear();
         }
         super.reset();
     }
 
     @Override
-    public void mousePressed(MouseEvent e, GL3DCamera camera) {
-        this.currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+    public void mousePressed(MouseEvent e) {
+        currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
     }
 
 }

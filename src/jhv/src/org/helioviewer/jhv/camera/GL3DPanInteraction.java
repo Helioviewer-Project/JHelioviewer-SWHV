@@ -22,12 +22,12 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, GL3DCamera camera) {
+    public void mousePressed(MouseEvent e) {
         lastMousePoint = e.getPoint();
     }
 
     @Override
-    public void mouseDragged(MouseEvent e, GL3DCamera camera) {
+    public void mouseDragged(MouseEvent e) {
         Point p = e.getPoint();
         int x = p.x - lastMousePoint.x;
         int y = p.y - lastMousePoint.y;
@@ -44,7 +44,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e, GL3DCamera camera) {
+    public void mouseReleased(MouseEvent e) {
         Displayer.render();
     }
 

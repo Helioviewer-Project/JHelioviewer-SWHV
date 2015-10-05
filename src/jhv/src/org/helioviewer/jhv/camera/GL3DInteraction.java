@@ -32,97 +32,53 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
         this.camera = camera;
     }
 
-    public void drawInteractionFeedback(GL2 gl, GL3DCamera camera) {
+    public void drawInteractionFeedback(GL2 gl) {
     }
 
     public abstract void reset(GL3DCamera camera);
 
-    public void mouseWheelMoved(MouseWheelEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseDragged(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseReleased(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseMoved(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseClicked(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseEntered(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mouseExited(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void mousePressed(MouseEvent e, GL3DCamera camera) {
-    }
-
-    public void keyTyped(KeyEvent e, GL3DCamera camera) {
-    }
-
-    public void keyPressed(KeyEvent e, GL3DCamera camera) {
-    }
-
-    public void keyReleased(KeyEvent e, GL3DCamera camera) {
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
     }
 
     @Override
-    public final void mouseWheelMoved(MouseWheelEvent e) {
-        this.mouseWheelMoved(e, camera);
+    public void mouseDragged(MouseEvent e) {
     }
 
     @Override
-    public final void mouseDragged(MouseEvent e) {
-        this.mouseDragged(e, camera);
+    public void mouseReleased(MouseEvent e) {
     }
 
     @Override
-    public final void mouseReleased(MouseEvent e) {
-        this.mouseReleased(e, camera);
+    public void mouseMoved(MouseEvent e) {
     }
 
     @Override
-    public final void mouseMoved(MouseEvent e) {
-        this.mouseMoved(e, camera);
+    public void mouseClicked(MouseEvent e) {
     }
 
     @Override
-    public final void mouseClicked(MouseEvent e) {
-        this.mouseClicked(e, camera);
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-    public final void mouseEntered(MouseEvent e) {
-        this.mouseEntered(e, camera);
+    public void mouseExited(MouseEvent e) {
     }
 
     @Override
-    public final void mouseExited(MouseEvent e) {
-        this.mouseExited(e, camera);
-    }
-
-    @Override
-    public final void mousePressed(MouseEvent e) {
-        this.mousePressed(e, camera);
+    public void mousePressed(MouseEvent e) {
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        this.keyTyped(e, camera);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        this.keyPressed(e, camera);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        this.keyReleased(e, camera);
     }
 
 }

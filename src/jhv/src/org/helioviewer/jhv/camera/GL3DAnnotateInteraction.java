@@ -13,18 +13,19 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
+
     private static final double epsilon = 0.01;
     private final ArrayList<GL3DVec3d> points = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
 
-    public GL3DAnnotateInteraction(GL3DCamera camera) {
+    protected GL3DAnnotateInteraction(GL3DCamera camera) {
         super(camera);
     }
 
     private boolean isValidZoomBox() {
-        return this.zoomBoxEndPoint != null && this.zoomBoxStartPoint != null;
+        return zoomBoxEndPoint != null && zoomBoxStartPoint != null;
     }
 
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
@@ -42,7 +43,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void drawInteractionFeedback(GL2 gl, GL3DCamera camera) {
+    public void drawInteractionFeedback(GL2 gl) {
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glLineWidth(2.0f);
@@ -105,39 +106,38 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, GL3DCamera camera) {
-        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
-
-        if (pt != null) {
-            this.zoomBoxStartPoint = (pt);
-        }
-        Displayer.display();
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e, GL3DCamera camera) {
+    public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
-            this.zoomBoxEndPoint = (pt);
+            zoomBoxStartPoint = pt;
             Displayer.display();
         }
     }
 
     @Override
-    public void mouseReleased(MouseEvent e, GL3DCamera camera) {
+    public void mouseDragged(MouseEvent e) {
+        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
+        if (pt != null) {
+            zoomBoxEndPoint = pt;
+            Displayer.display();
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
         if (zoomBoxStartPoint != null && zoomBoxEndPoint != null) {
             rectangleStartPoints.add(zoomBoxStartPoint);
             rectangleEndPoints.add(zoomBoxEndPoint);
             activeIndex = rectangleEndPoints.size() - 1;
         }
 
-        this.zoomBoxEndPoint = null;
-        this.zoomBoxStartPoint = null;
+        zoomBoxEndPoint = null;
+        zoomBoxStartPoint = null;
         Displayer.display();
     }
 
     @Override
-    public void keyPressed(KeyEvent e, GL3DCamera camera) {
+    public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_R) {
             if (activeIndex >= 0) {
                 rectangleEndPoints.remove(activeIndex);
