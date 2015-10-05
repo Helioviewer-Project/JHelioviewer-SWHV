@@ -31,7 +31,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        if (Math.signum(bp.z) != Math.signum(ep.z)) {
+        if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
             else if (ep.z > bp.z && bp.z < -Math.PI / 2)
@@ -149,16 +149,16 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_R) {
+        int code = e.getKeyCode();
+
+        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             if (activeIndex >= 0) {
                 rectangleEndPoints.remove(activeIndex);
                 rectangleStartPoints.remove(activeIndex);
             }
             activeIndex = rectangleEndPoints.size() - 1;
             Displayer.display();
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_N) {
+        } else if (code == KeyEvent.VK_N) {
             activeIndex++;
             if (activeIndex >= rectangleEndPoints.size()) {
                 activeIndex = 0;
