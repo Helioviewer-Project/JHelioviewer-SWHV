@@ -12,6 +12,7 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
@@ -164,6 +165,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
             }
         }
+
+        GL3DCamera camera = Displayer.getViewport().getCamera();
+        camera.getCurrentInteraction().drawInteractionFeedback(gl, camera);
 
         GL3DViewport vp = Displayer.getMiniview();
         if (vp.isVisible()) {
