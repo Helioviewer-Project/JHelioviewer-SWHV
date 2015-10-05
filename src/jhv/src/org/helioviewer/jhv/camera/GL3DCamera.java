@@ -71,7 +71,7 @@ public abstract class GL3DCamera {
     public void reset() {
         this.translation = new GL3DVec3d(0, 0, this.translation.z);
         this.currentDragRotation.clear();
-        this.currentInteraction.reset(this);
+        this.currentInteraction.reset();
         View vw = Layers.getActiveView();
         if (vw != null)
             zoomToFit(vw);
