@@ -9,7 +9,6 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -98,36 +97,14 @@ public class Displayer implements JHVEventHighlightListener {
         viewport.setCamera(camera);
     }
 
-    private static Date lastTimestamp = TimeUtils.epoch.getDate();
-
-    public static Date getLastUpdatedTimestamp() {
-        return lastTimestamp;
-    }
-
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
     private static class DisplayDataHandler implements ViewDataHandler {
 
         @Override
         public void handleData(View view, ImageData imageData) {
-            if (view == Layers.getActiveView()) {
-                boolean timeChanged = false;
-                Date timestamp = imageData.getMetaData().getDateObs().getDate();
-                if (timestamp.getTime() != lastTimestamp.getTime()) {
-                    timeChanged = true;
-                    lastTimestamp = timestamp;
-                }
-
-                if (timeChanged) {
-                    viewport.getCamera().timeChanged(lastTimestamp);
-                    for (final TimeListener listener : timeListeners) {
-                        listener.timeChanged(lastTimestamp);
-                    }
-                }
-            }
             view.getImageLayer().setImageData(imageData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-
             display();
         }
 
@@ -143,7 +120,6 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
-    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
     public static void addRenderListener(final RenderListener renderListener) {
         renderListeners.add(renderListener);
@@ -151,14 +127,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void removeRenderListener(final RenderListener renderListener) {
         renderListeners.remove(renderListener);
-    }
-
-    public static void addTimeListener(final TimeListener timeListener) {
-        timeListeners.add(timeListener);
-    }
-
-    public static void removeTimeListener(final TimeListener timeListener) {
-        timeListeners.remove(timeListener);
     }
 
     private static final Displayer instance = new Displayer();

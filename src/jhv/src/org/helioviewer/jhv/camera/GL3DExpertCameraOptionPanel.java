@@ -269,7 +269,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     private void syncWithLayerCurrentTime() {
-        Date currentDate = Displayer.getLastUpdatedTimestamp();
+        Date currentDate = Layers.getLastUpdatedTimestamp();
         Date syncDate = new Date(currentDate.getTime() - currentDate.getTime() % (60 * 60 * 24 * 1000));
 
         endDatePicker.setDate(syncDate);

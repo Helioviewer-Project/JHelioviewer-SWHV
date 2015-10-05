@@ -21,7 +21,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
@@ -301,7 +301,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible) {
-            Date currentTime = Displayer.getLastUpdatedTimestamp();
+            Date currentTime = Layers.getLastUpdatedTimestamp();
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
             for (JHVEvent evt : toDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {

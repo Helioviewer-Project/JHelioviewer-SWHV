@@ -170,7 +170,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         GL3DViewport vp = Displayer.getMiniview();
         if (vp.isVisible()) {
-            vp.getCamera().updateRotation(Displayer.getLastUpdatedTimestamp(), null);
+            vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
             vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
             gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
             vp.getCamera().applyPerspective(gl);

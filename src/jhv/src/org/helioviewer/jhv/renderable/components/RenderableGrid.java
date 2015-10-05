@@ -10,8 +10,8 @@ import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.Renderable;
@@ -219,7 +219,7 @@ public class RenderableGrid implements Renderable {
             gl.glRotatef(-90, 0, 1, 0);
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
-                Position.Latitudinal p = Sun.getEarth(Displayer.getLastUpdatedTimestamp());
+                Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
                 gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
                 gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
