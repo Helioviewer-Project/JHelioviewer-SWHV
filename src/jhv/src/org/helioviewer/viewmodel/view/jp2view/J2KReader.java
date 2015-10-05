@@ -7,7 +7,6 @@ import java.net.SocketException;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -205,15 +204,14 @@ class J2KReader implements Runnable {
         return (socket != null && socket.isConnected());
     }
 
-    private void signalRender() {
+    private void signalRender(final int frame) {
         if (stop)
             return;
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (!Layers.isMoviePlaying())
-                    parentViewRef.signalRender(parentImageRef);
+                parentViewRef.signalRenderFromReader(parentImageRef, frame);
             }
         });
     }
@@ -247,7 +245,7 @@ class J2KReader implements Runnable {
                 // nothing
             } else if (readerMode == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentImageRef.setReaderMode(ReaderMode.NEVERFIRE);
-                signalRender();
+                signalRender(currParams.compositionLayer);
             } else {
                 // check whether view parameters have changed
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
@@ -450,11 +448,11 @@ class J2KReader implements Runnable {
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            signalRender();
+                                            signalRender(curLayer);
                                             break;
                                         default:
                                             if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                                signalRender();
+                                                signalRender(curLayer);
                                             }
                                         }
                                     }
