@@ -336,6 +336,12 @@ public class JP2View extends AbstractView {
         signalRender(_jp2Image);
     }
 
+    void signalRenderFromReader(JP2Image jp2Image, int frame) {
+        if (!Layers.isMoviePlaying() && frame == targetFrame)
+            signalRender(jp2Image);
+    }
+
+
     void signalRender(JP2Image jp2Image) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
