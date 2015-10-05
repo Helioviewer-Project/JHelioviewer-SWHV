@@ -87,11 +87,11 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         return pt;
     }
 
-    private GL3DVec3d toCart(GL3DVec3d p) {
+    private GL3DVec3d toCart(double x, double y, double z) {
         GL3DVec3d pt = new GL3DVec3d();
-        pt.z = p.x * Math.sin(p.y) * Math.cos(p.z);
-        pt.x = p.x * Math.sin(p.y) * Math.sin(p.z);
-        pt.y = p.x * Math.cos(p.y);
+        pt.z = x * Math.sin(y) * Math.cos(z);
+        pt.x = x * Math.sin(y) * Math.sin(z);
+        pt.y = x * Math.cos(y);
 
         return camera.getLocalRotation().rotateInverseVector(pt);
     }
@@ -103,7 +103,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = toCart(new GL3DVec3d(1., y, z));
+            GL3DVec3d pc = toCart(1., y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
