@@ -27,7 +27,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         return this.zoomBoxEndPoint != null && this.zoomBoxStartPoint != null;
     }
 
-    public void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
+    private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         gl.glBegin(GL2.GL_LINE_LOOP);
         GL3DVec3d p1 = bp;
         GL3DVec3d p2 = new GL3DVec3d(1, ep.y, bp.z);
@@ -72,28 +72,27 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
-    public GL3DVec3d toSpherical(GL3DVec3d _p) {
-        GL3DCamera activeCamera = Displayer.getViewport().getCamera();
-        GL3DVec3d p = activeCamera.getLocalRotation().rotateVector(_p);
+    private GL3DVec3d toSpherical(GL3DVec3d _p) {
+        GL3DVec3d p = camera.getLocalRotation().rotateVector(_p);
 
         GL3DVec3d pt = new GL3DVec3d();
         pt.x = p.length();
         pt.y = Math.acos(p.y / pt.x);
         pt.z = Math.atan2(p.x, p.z);
+
         return pt;
     }
 
-    public GL3DVec3d toCart(GL3DVec3d p) {
+    private GL3DVec3d toCart(GL3DVec3d p) {
         GL3DVec3d pt = new GL3DVec3d();
         pt.z = p.x * Math.sin(p.y) * Math.cos(p.z);
         pt.x = p.x * Math.sin(p.y) * Math.sin(p.z);
         pt.y = p.x * Math.cos(p.y);
-        GL3DCamera activeCamera = Displayer.getViewport().getCamera();
-        GL3DVec3d _pt = activeCamera.getLocalRotation().rotateInverseVector(pt);
-        return _pt;
+
+        return camera.getLocalRotation().rotateInverseVector(pt);
     }
 
-    public void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
+    private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
         int subdivisions = 5;
 
         for (double i = 0; i <= subdivisions; i++) {
@@ -138,7 +137,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e, GL3DCamera camera) {
         if (e.getKeyCode() == KeyEvent.VK_R) {
             if (activeIndex >= 0) {
                 rectangleEndPoints.remove(activeIndex);
