@@ -14,7 +14,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
-    private static final double epsilon = 0.01;
+    private static final double radius = 1.01;
     private final ArrayList<GL3DVec3d> points = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
@@ -29,11 +29,15 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     }
 
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
-        gl.glBegin(GL2.GL_LINE_LOOP);
+        gl.glBegin(GL2.GL_LINE_STRIP);
+
+        if (ep.z < bp.z)
+            ep.z += 2 * Math.PI;
+
         GL3DVec3d p1 = bp;
-        GL3DVec3d p2 = new GL3DVec3d(1, ep.y, bp.z);
+        GL3DVec3d p2 = new GL3DVec3d(radius, ep.y, bp.z);
         GL3DVec3d p3 = ep;
-        GL3DVec3d p4 = new GL3DVec3d(1, bp.y, ep.z);
+        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, ep.z);
 
         interpolatedDraw(gl, p1, p2);
         interpolatedDraw(gl, p2, p3);
@@ -103,7 +107,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = toCart(1., y, z);
+            GL3DVec3d pc = toCart(radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
