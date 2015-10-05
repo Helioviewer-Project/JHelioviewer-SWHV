@@ -11,8 +11,8 @@ import com.jogamp.opengl.GL2;
 
 public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
-    private GL3DVec3d zoomBoxStartPoint;
-    private GL3DVec3d zoomBoxEndPoint;
+    private GL3DVec3d startPoint;
+    private GL3DVec3d endPoint;
 
     private static final double epsilon = 0.01;
     private final ArrayList<GL3DVec3d> points = new ArrayList<GL3DVec3d>();
@@ -24,8 +24,8 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         super(camera);
     }
 
-    private boolean isValidZoomBox() {
-        return zoomBoxEndPoint != null && zoomBoxStartPoint != null;
+    private boolean beingDragged() {
+        return endPoint != null && startPoint != null;
     }
 
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
@@ -44,13 +44,16 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void drawInteractionFeedback(GL2 gl) {
+        if (rectangleStartPoints.size() == 0 && !beingDragged())
+            return;
+
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glLineWidth(2.0f);
 
         gl.glColor3f(1f, 1f, 0f);
-        if (this.isValidZoomBox()) {
-            drawRectangle(gl, toSpherical(zoomBoxStartPoint), toSpherical(zoomBoxEndPoint));
+        if (beingDragged()) {
+            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
         }
 
         gl.glColor3f(0f, 0f, 1f);
@@ -109,7 +112,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
-            zoomBoxStartPoint = pt;
+            startPoint = pt;
             Displayer.display();
         }
     }
@@ -118,21 +121,21 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     public void mouseDragged(MouseEvent e) {
         GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
-            zoomBoxEndPoint = pt;
+            endPoint = pt;
             Displayer.display();
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (zoomBoxStartPoint != null && zoomBoxEndPoint != null) {
-            rectangleStartPoints.add(zoomBoxStartPoint);
-            rectangleEndPoints.add(zoomBoxEndPoint);
+        if (beingDragged()) {
+            rectangleStartPoints.add(startPoint);
+            rectangleEndPoints.add(endPoint);
             activeIndex = rectangleEndPoints.size() - 1;
         }
 
-        zoomBoxEndPoint = null;
-        zoomBoxStartPoint = null;
+        endPoint = null;
+        startPoint = null;
         Displayer.display();
     }
 
@@ -144,14 +147,16 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
                 rectangleStartPoints.remove(activeIndex);
             }
             activeIndex = rectangleEndPoints.size() - 1;
+            Displayer.display();
         }
+
         if (e.getKeyCode() == KeyEvent.VK_N) {
             activeIndex++;
             if (activeIndex >= rectangleEndPoints.size()) {
                 activeIndex = 0;
             }
+            Displayer.display();
         }
-        Displayer.display();
     }
 
 }
