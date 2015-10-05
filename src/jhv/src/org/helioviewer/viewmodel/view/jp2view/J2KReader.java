@@ -270,7 +270,7 @@ class J2KReader implements Runnable {
                         try {
                             socket.close();
                         } catch (IOException ioe) {
-                            Log.error(">> J2KReader.run() > Error closing socket.", ioe);
+                            Log.error(">> J2KReader.run() > Error closing socket", ioe);
                         }
                         // Send signal to try again
                         readerSignal.signal(currParams);

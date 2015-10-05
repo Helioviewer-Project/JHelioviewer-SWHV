@@ -141,7 +141,7 @@ public class HTTPSocket extends Socket {
 
         parts = line.split(" ", 3);
         if (parts.length != 3) {
-            throw new ProtocolException("Invalid HTTP message");
+            throw new ProtocolException("Invalid HTTP message: " + line);
         }
 
         if (parts[0].startsWith("HTTP/")) {
