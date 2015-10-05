@@ -2,6 +2,8 @@ package org.helioviewer.jhv.gui.controller;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -14,7 +16,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
-public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
     private static Component component;
 
@@ -26,6 +28,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         component.addMouseListener(this);
         component.addMouseMotionListener(this);
         component.addMouseWheelListener(this);
+        component.addKeyListener(this);
     }
 
     @Override
@@ -86,6 +89,21 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         Displayer.getViewport().getCamera().getCurrentInteraction().mouseMoved(e);
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+        Displayer.getViewport().getCamera().getCurrentInteraction().keyTyped(e);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        Displayer.getViewport().getCamera().getCurrentInteraction().keyPressed(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        Displayer.getViewport().getCamera().getCurrentInteraction().keyReleased(e);
+    }
+
     private final LinkedList<InputControllerPlugin> plugins = new LinkedList<InputControllerPlugin>();
 
     public void addPlugin(InputControllerPlugin newPlugin) {
@@ -102,6 +120,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             component.addMouseMotionListener((MouseMotionListener) newPlugin);
         if (newPlugin instanceof MouseWheelListener)
             component.addMouseWheelListener((MouseWheelListener) newPlugin);
+        if (newPlugin instanceof KeyListener)
+            component.addKeyListener((KeyListener) newPlugin);
     }
 
     public void removePlugin(InputControllerPlugin oldPlugin) {
@@ -117,6 +137,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             component.removeMouseMotionListener((MouseMotionListener) oldPlugin);
         if (oldPlugin instanceof MouseWheelListener)
             component.removeMouseWheelListener((MouseWheelListener) oldPlugin);
+        if (oldPlugin instanceof KeyListener)
+            component.removeKeyListener((KeyListener) oldPlugin);
     }
 
 }
