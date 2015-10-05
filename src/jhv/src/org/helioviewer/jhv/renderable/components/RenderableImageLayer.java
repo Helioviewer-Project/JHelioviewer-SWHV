@@ -18,6 +18,7 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
+import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.common.nio.Buffers;
@@ -97,16 +98,20 @@ public class RenderableImageLayer implements Renderable {
             }
             GLSLShader.filter(gl);
 
+            MetaData m = imageData.getMetaData();
             GL3DCamera camera = vp.getCamera();
+
+            camera.push(m.getDateObs().getDate(), m);
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(m.getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
                 GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
                 GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
             }
+            camera.pop();
 
             enablePositionVBO(gl);
             enableIndexVBO(gl);
