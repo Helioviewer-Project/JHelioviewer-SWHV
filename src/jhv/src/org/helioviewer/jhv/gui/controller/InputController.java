@@ -34,7 +34,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseEntered(MouseEvent e) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
-        if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
+        if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
             component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
         }
     }
@@ -48,7 +48,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     public void mousePressed(MouseEvent e) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (camera.getCurrentInteraction() != camera.getZoomInteraction()) {
+            if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
                 component.setCursor(UIGlobals.closedHandCursor);
             }
             buttonDown = true;

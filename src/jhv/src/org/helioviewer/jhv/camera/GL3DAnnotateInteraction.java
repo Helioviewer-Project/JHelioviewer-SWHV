@@ -9,18 +9,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-/**
- * The zoom box interaction allows the user to select a region of interest in
- * the scene by dragging. The camera then moves accordingly so that only the
- * selected region is contained within the view frustum. If the zoom box is
- * restricted to the solar disk, the camera panning will be reset and a rotation
- * is applied. When the zoom box intersects with the corona the rotation is
- * reset and only a panning is applied.
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
-public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
+public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     private GL3DVec3d zoomBoxStartPoint;
     private GL3DVec3d zoomBoxEndPoint;
@@ -30,7 +19,7 @@ public class GL3DZoomBoxInteraction extends GL3DDefaultInteraction {
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
 
-    public GL3DZoomBoxInteraction(GL3DCamera camera) {
+    public GL3DAnnotateInteraction(GL3DCamera camera) {
         super(camera);
     }
 
