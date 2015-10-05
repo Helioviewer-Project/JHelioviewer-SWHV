@@ -39,7 +39,7 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
  * @author Markus Langenberg
  * @author Andre Dau
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings({ "serial" })
 public class TopToolBar extends JToolBar implements MouseListener {
 
     private enum InteractionMode {
@@ -170,8 +170,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         zoomBoxButton.setToolTipText("Zoom box");
-        //group.add(zoomBoxButton);
-        //addButton(zoomBoxButton);
+        group.add(zoomBoxButton);
+        addButton(zoomBoxButton);
 
         rotateButton = new JToggleButton(new SetRotationInteractionAction());
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
