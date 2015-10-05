@@ -20,9 +20,9 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
+import org.helioviewer.jhv.gui.actions.SetAnnotateInteractionAction;
 import org.helioviewer.jhv.gui.actions.SetPanInteractionAction;
 import org.helioviewer.jhv.gui.actions.SetRotationInteractionAction;
-import org.helioviewer.jhv.gui.actions.SetZoomBoxInteractionAction;
 import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
 import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -39,11 +39,11 @@ import org.helioviewer.jhv.gui.actions.ZoomOutAction;
  * @author Markus Langenberg
  * @author Andre Dau
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class TopToolBar extends JToolBar implements MouseListener {
 
     private enum InteractionMode {
-        PAN, ZOOMBOX, ROTATE
+        PAN, ROTATE, ANNOTATE
     };
 
     private static final InteractionMode defaultInteractionMode = InteractionMode.ROTATE;
@@ -55,8 +55,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private DisplayMode displayMode;
 
     private JToggleButton panButton;
-    private JToggleButton zoomBoxButton;
     private JToggleButton rotateButton;
+    private JToggleButton annotateButton;
 
     private JToggleButton trackSolarRotationButton;
     private JToggleButton coronaVisibilityButton;
@@ -77,22 +77,16 @@ public class TopToolBar extends JToolBar implements MouseListener {
         addMouseListener(this);
     }
 
-    /**
-     * Sets the active interaction mode.
-     *
-     * @param mode
-     *            Interaction mode can be either PAN, ZOOMBOX or ROTATE.
-     */
     private void setActiveInteractionMode(InteractionMode mode) {
         switch (mode) {
         case PAN:
             panButton.doClick();
             break;
-        case ZOOMBOX:
-            zoomBoxButton.doClick();
-            break;
         case ROTATE:
             rotateButton.doClick();
+            break;
+        case ANNOTATE:
+            annotateButton.doClick();
             break;
         }
     }
@@ -166,19 +160,19 @@ public class TopToolBar extends JToolBar implements MouseListener {
         group.add(panButton);
         addButton(panButton);
 
-        zoomBoxButton = new JToggleButton(new SetZoomBoxInteractionAction());
-        zoomBoxButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
-        zoomBoxButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
-        zoomBoxButton.setToolTipText("Zoom box");
-        group.add(zoomBoxButton);
-        addButton(zoomBoxButton);
-
         rotateButton = new JToggleButton(new SetRotationInteractionAction());
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
         rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
         rotateButton.setToolTipText("Rotate");
         group.add(rotateButton);
         addButton(rotateButton);
+
+        annotateButton = new JToggleButton(new SetAnnotateInteractionAction());
+        annotateButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
+        annotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
+        annotateButton.setToolTipText("Annotate");
+        group.add(annotateButton);
+        addButton(annotateButton);
 
         setActiveInteractionMode(interactionMode);
 
@@ -259,10 +253,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
         InteractionMode interactionMode = defaultInteractionMode;
         if (panButton.isSelected())
             interactionMode = InteractionMode.PAN;
-        else if (zoomBoxButton.isSelected())
-            interactionMode = InteractionMode.ZOOMBOX;
         else if (rotateButton.isSelected())
             interactionMode = InteractionMode.ROTATE;
+        else if (annotateButton.isSelected())
+            interactionMode = InteractionMode.ANNOTATE;
 
         createNewToolBar(interactionMode);
         firePropertyChange("displayMode", oldDisplayMode, displayMode);

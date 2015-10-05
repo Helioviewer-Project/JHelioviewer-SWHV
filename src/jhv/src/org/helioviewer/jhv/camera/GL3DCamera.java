@@ -51,7 +51,7 @@ public abstract class GL3DCamera {
 
     private final GL3DTrackballRotationInteraction rotationInteraction;
     private final GL3DPanInteraction panInteraction;
-    private final GL3DZoomBoxInteraction zoomBoxInteraction;
+    private final GL3DAnnotateInteraction annotateInteraction;
 
     private GL3DInteraction currentInteraction;
 
@@ -64,7 +64,7 @@ public abstract class GL3DCamera {
         this.fov = INITFOV;
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
-        this.zoomBoxInteraction = new GL3DZoomBoxInteraction(this);
+        this.annotateInteraction = new GL3DAnnotateInteraction(this);
         this.currentInteraction = this.rotationInteraction;
     }
 
@@ -99,8 +99,8 @@ public abstract class GL3DCamera {
                 this.setCurrentInteraction(this.getRotateInteraction());
             } else if (precedingInteraction.equals(precedingCamera.getPanInteraction())) {
                 this.setCurrentInteraction(this.getPanInteraction());
-            } else if (precedingInteraction.equals(precedingCamera.getZoomInteraction())) {
-                this.setCurrentInteraction(this.getZoomInteraction());
+            } else if (precedingInteraction.equals(precedingCamera.getAnnotateInteraction())) {
+                this.setCurrentInteraction(this.getAnnotateInteraction());
             }
         } else {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
@@ -371,8 +371,8 @@ public abstract class GL3DCamera {
         return this.rotationInteraction;
     }
 
-    public GL3DInteraction getZoomInteraction() {
-        return this.zoomBoxInteraction;
+    public GL3DInteraction getAnnotateInteraction() {
+        return this.annotateInteraction;
     }
 
     public abstract String getName();

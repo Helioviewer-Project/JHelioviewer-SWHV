@@ -8,19 +8,19 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 
 /**
- * Sets the interaction of the current camera to Zoom Box Interaction
+ * Sets the interaction of the current camera to annotate
  */
 @SuppressWarnings("serial")
-public class SetZoomBoxInteractionAction extends AbstractAction {
+public class SetAnnotateInteractionAction extends AbstractAction {
 
-    public SetZoomBoxInteractionAction() {
-        super("Zoom Box");
+    public SetAnnotateInteractionAction() {
+        super("Annotate");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         GL3DCamera cam = Displayer.getViewport().getCamera();
-        cam.setCurrentInteraction(cam.getZoomInteraction());
+        cam.setCurrentInteraction(cam.getAnnotateInteraction());
     }
 
 }
