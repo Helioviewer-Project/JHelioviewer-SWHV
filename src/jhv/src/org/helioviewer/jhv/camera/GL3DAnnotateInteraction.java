@@ -159,4 +159,11 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         }
     }
 
+    @Override
+    public void reset() {
+        rectangleStartPoints.clear();
+        rectangleEndPoints.clear();
+        super.reset();
+    }
+
 }
