@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
+import java.util.Date;
+
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -55,7 +57,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void setFrame(int frame) {
+    public void setFrame(int frame, Date masterTime) {
     }
 
     @Override

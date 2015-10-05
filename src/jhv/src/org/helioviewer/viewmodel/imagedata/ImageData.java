@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.util.Date;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.imageformat.ImageFormat;
@@ -45,5 +46,9 @@ public interface ImageData {
     public void setMetaData(MetaData m);
 
     public MetaData getMetaData();
+
+    public void setMasterTime(Date masterTime);
+
+    public Date getMasterTime();
 
 }

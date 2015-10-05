@@ -149,7 +149,7 @@ public class Layers {
 
         for (View view : layers) {
             if (view == activeView || view.getImageLayer().isVisible()) {
-                view.setFrame(view.getFrame(dateTime));
+                view.setFrame(view.getFrame(dateTime), lastTimestamp);
             }
         }
         MoviePanel.getSingletonInstance().setFrameSlider(activeView.getCurrentFrameNumber());
