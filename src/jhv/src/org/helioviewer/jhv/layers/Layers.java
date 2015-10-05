@@ -10,6 +10,7 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.view.View;
@@ -132,7 +133,20 @@ public class Layers {
         }
     }
 
+    private static Date lastTimestamp = TimeUtils.epoch.getDate();
+
+    public static Date getLastUpdatedTimestamp() {
+        return lastTimestamp;
+    }
+
     private static void syncTime(ImmutableDateTime dateTime) {
+        lastTimestamp = dateTime.getDate();
+
+        Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
+        for (final TimeListener listener : timeListeners) {
+            listener.timeChanged(lastTimestamp);
+        }
+
         for (View view : layers) {
             if (view == activeView || view.getImageLayer().isVisible()) {
                 view.setFrame(view.getFrame(dateTime));
@@ -291,6 +305,7 @@ public class Layers {
     }
 
     private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
+    private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
 
     public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);
@@ -298,6 +313,14 @@ public class Layers {
 
     public static void removeLayersListener(LayersListener layerListener) {
         layerListeners.remove(layerListener);
+    }
+
+    public static void addTimeListener(final TimeListener timeListener) {
+        timeListeners.add(timeListener);
+    }
+
+    public static void removeTimeListener(final TimeListener timeListener) {
+        timeListeners.remove(timeListener);
     }
 
     public static void setDesiredRelativeSpeed(int fps) {

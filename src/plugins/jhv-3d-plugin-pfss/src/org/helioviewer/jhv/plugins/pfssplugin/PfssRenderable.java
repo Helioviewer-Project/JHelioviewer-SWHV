@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -37,7 +36,7 @@ public class PfssRenderable implements Renderable, LayersListener {
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible) {
             PfssData pfssData;
-            long millis = Displayer.getLastUpdatedTimestamp().getTime();
+            long millis = Layers.getLastUpdatedTimestamp().getTime();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);
@@ -93,7 +92,6 @@ public class PfssRenderable implements Renderable, LayersListener {
         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssNewDataLoader(Layers.getFirstDate(), Layers.getLastDate()), null);
         PfssPlugin.pfssNewLoadPool.submit(dataLoaderTask);
         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), 60 * 5, TimeUnit.SECONDS);
-
     }
 
     @Override
