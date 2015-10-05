@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,11 +20,11 @@ import com.jogamp.opengl.GL2;
  * {@link GL3DCamera}. Furthermore every interaction can draw Interaction
  * Feedback by overriding the corresponding method, which is called at the end
  * of each renderloop.
- * 
+ *
  * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- * 
+ *
  */
-public abstract class GL3DInteraction implements MouseWheelListener, MouseMotionListener, MouseListener {
+public abstract class GL3DInteraction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
     protected GL3DCamera camera;
 
@@ -59,36 +61,68 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
     public void mousePressed(MouseEvent e, GL3DCamera camera) {
     }
 
+    public void keyTyped(KeyEvent e, GL3DCamera camera) {
+    }
+
+    public void keyPressed(KeyEvent e, GL3DCamera camera) {
+    }
+
+    public void keyReleased(KeyEvent e, GL3DCamera camera) {
+    }
+
+    @Override
     public final void mouseWheelMoved(MouseWheelEvent e) {
         this.mouseWheelMoved(e, camera);
     }
 
+    @Override
     public final void mouseDragged(MouseEvent e) {
         this.mouseDragged(e, camera);
     }
 
+    @Override
     public final void mouseReleased(MouseEvent e) {
         this.mouseReleased(e, camera);
     }
 
+    @Override
     public final void mouseMoved(MouseEvent e) {
         this.mouseMoved(e, camera);
     }
 
+    @Override
     public final void mouseClicked(MouseEvent e) {
         this.mouseClicked(e, camera);
     }
 
+    @Override
     public final void mouseEntered(MouseEvent e) {
         this.mouseEntered(e, camera);
     }
 
+    @Override
     public final void mouseExited(MouseEvent e) {
         this.mouseExited(e, camera);
     }
 
+    @Override
     public final void mousePressed(MouseEvent e) {
         this.mousePressed(e, camera);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        this.keyTyped(e, camera);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        this.keyPressed(e, camera);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        this.keyReleased(e, camera);
     }
 
 }
