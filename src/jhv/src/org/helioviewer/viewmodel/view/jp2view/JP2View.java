@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -180,7 +181,7 @@ public class JP2View extends AbstractView {
     /**
      * Recalculates the image parameters used within the jp2-package
      */
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.updateROI(m);
 
@@ -215,7 +216,7 @@ public class JP2View extends AbstractView {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        return new JP2ImageParameter(jp2Image, subImage, res, frameNumber);
+        return new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
     }
 
     /*
@@ -242,6 +243,7 @@ public class JP2View extends AbstractView {
 
         newImageData.setFrameNumber(frame);
         newImageData.setMetaData(metaData);
+        newImageData.setMasterTime(params.masterTime);
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
@@ -292,15 +294,18 @@ public class JP2View extends AbstractView {
         return targetFrame;
     }
 
+    private Date targetMasterTime;
+
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame) {
+    public void setFrame(int frame, Date masterTime) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
                 return;
 
             targetFrame = frame;
+            targetMasterTime = masterTime;
 
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
                 render();
@@ -336,7 +341,7 @@ public class JP2View extends AbstractView {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetFrame);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame);
         // ping reader
         jp2Image.signalReader(imageViewParams);
 

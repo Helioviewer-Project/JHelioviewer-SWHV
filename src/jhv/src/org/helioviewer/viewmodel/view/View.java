@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
 import java.net.URI;
+import java.util.Date;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
@@ -109,7 +110,7 @@ public interface View extends RenderListener {
     public ImmutableDateTime getFrameDateTime(int frame);
 
     // <!- only for Layers
-    public void setFrame(int frame);
+    public void setFrame(int frame, Date masterTime);
     public int getFrame(ImmutableDateTime time);
     public MetaData getMetaData(ImmutableDateTime time);
     // -->

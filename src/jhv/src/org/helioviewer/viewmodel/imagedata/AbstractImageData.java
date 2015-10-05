@@ -2,6 +2,7 @@ package org.helioviewer.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.util.Date;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -25,6 +26,7 @@ public abstract class AbstractImageData implements ImageData {
     private int frameNumber;
     private Region region;
     private MetaData metaData;
+    private Date masterTime;
 
     /**
      * Default constructor.
@@ -116,6 +118,16 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public MetaData getMetaData() {
         return metaData;
+    }
+
+    @Override
+    public void setMasterTime(Date _masterTime) {
+        masterTime = _masterTime;
+    }
+
+    @Override
+    public Date getMasterTime() {
+        return masterTime;
     }
 
 }
