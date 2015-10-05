@@ -31,8 +31,12 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        if (ep.z < bp.z)
-            ep.z += 2 * Math.PI;
+        if (Math.signum(bp.z) != Math.signum(ep.z)) {
+            if (ep.z < bp.z && bp.z > Math.PI / 2)
+                ep.z += 2 * Math.PI;
+            else if (ep.z > bp.z && bp.z < -Math.PI / 2)
+                bp.z += 2 * Math.PI;
+        }
 
         GL3DVec3d p1 = bp;
         GL3DVec3d p2 = new GL3DVec3d(radius, ep.y, bp.z);
