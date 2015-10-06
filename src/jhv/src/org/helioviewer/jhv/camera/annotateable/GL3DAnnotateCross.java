@@ -13,7 +13,6 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
 
     private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
-    private static final double radius = 1.01;
 
     private void drawCross(GL2 gl, GL3DVec3d bp) {
         double delta = Math.PI * 2.5 / 180;
@@ -21,6 +20,7 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
         GL3DVec3d p2 = new GL3DVec3d(radius, bp.y + delta, bp.z);
         GL3DVec3d p3 = new GL3DVec3d(radius, bp.y, bp.z - delta);
         GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, bp.z + delta);
+
         gl.glBegin(GL2.GL_LINE_STRIP);
         interpolatedDraw(gl, p1, p2);
         gl.glEnd();
@@ -31,7 +31,7 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
     }
 
     private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
-        int subdivisions = 5;
+        int subdivisions = 1;
 
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
@@ -123,6 +123,7 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
         if (pt != null) {
             crossPoints.add(pt);
             activeIndex = crossPoints.size() - 1;
+            Displayer.display();
         }
     }
 

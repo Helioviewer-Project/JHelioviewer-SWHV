@@ -14,7 +14,7 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
     private final ArrayList<GL3DVec3d> circleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> circleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
-    private static final double radius = 1.01;
+
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
@@ -24,9 +24,12 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
         //P = center + r cos(A) (bp x ep) + r sin(A) ep
 
         GL3DVec3d center = GL3DVec3d.multiply(bp, cosf);
+        center.multiply(radius);
+
         GL3DVec3d u = GL3DVec3d.cross(bp, ep);
         u.normalize();
         GL3DVec3d v = GL3DVec3d.cross(bp, u);
+
         gl.glBegin(GL2.GL_LINE_STRIP);
         int subdivs = 100;
 
