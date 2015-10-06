@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.camera.annotateable;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -9,24 +9,39 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCross implements GL3DAnnotatable {
-    private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
+public class GL3DAnnotateRectangle implements GL3DAnnotatable {
+
+    private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
+    private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
     private static final double radius = 1.01;
+    private GL3DVec3d startPoint;
+    private GL3DVec3d endPoint;
 
-    private void drawCross(GL2 gl, GL3DVec3d bp) {
-        double delta = Math.PI * 2.5 / 180;
-        GL3DVec3d p1 = new GL3DVec3d(radius, bp.y - delta, bp.z);
-        GL3DVec3d p2 = new GL3DVec3d(radius, bp.y + delta, bp.z);
-        GL3DVec3d p3 = new GL3DVec3d(radius, bp.y, bp.z - delta);
-        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, bp.z + delta);
+    private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         gl.glBegin(GL2.GL_LINE_STRIP);
+
+        if (bp.z * ep.z < 0) {
+            if (ep.z < bp.z && bp.z > Math.PI / 2)
+                ep.z += 2 * Math.PI;
+            else if (ep.z > bp.z && bp.z < -Math.PI / 2)
+                bp.z += 2 * Math.PI;
+        }
+
+        GL3DVec3d p1 = bp;
+        GL3DVec3d p2 = new GL3DVec3d(radius, ep.y, bp.z);
+        GL3DVec3d p3 = ep;
+        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, ep.z);
+
         interpolatedDraw(gl, p1, p2);
-        gl.glEnd();
-
-        gl.glBegin(GL2.GL_LINE_STRIP);
+        interpolatedDraw(gl, p2, p3);
         interpolatedDraw(gl, p3, p4);
+        interpolatedDraw(gl, p4, p1);
         gl.glEnd();
+    }
+
+    private boolean beingDragged() {
+        return endPoint != null && startPoint != null;
     }
 
     private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
@@ -43,23 +58,28 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
 
     @Override
     public void render(GL2 gl) {
-        if (crossPoints.size() == 0)
+        if (rectangleStartPoints.size() == 0 && !beingDragged())
             return;
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glLineWidth(2.0f);
 
+        gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
+        if (beingDragged()) {
+            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
+        }
+
         gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
-        int sz = crossPoints.size();
+        int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawCross(gl, toSpherical(crossPoints.get(i)));
+                drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
         }
 
         gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
-            drawCross(gl, toSpherical(crossPoints.get(activeIndex)));
+            drawRectangle(gl, toSpherical(rectangleStartPoints.get(activeIndex)), toSpherical(rectangleEndPoints.get(activeIndex)));
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
@@ -86,10 +106,24 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        if (pt != null) {
+            endPoint = pt;
+            Displayer.display();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if (beingDragged()) {
+            rectangleStartPoints.add(startPoint);
+            rectangleEndPoints.add(endPoint);
+            activeIndex = rectangleEndPoints.size() - 1;
+        }
+
+        endPoint = null;
+        startPoint = null;
+        Displayer.display();
     }
 
     @Override
@@ -98,13 +132,14 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
 
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             if (activeIndex >= 0) {
-                crossPoints.remove(activeIndex);
+                rectangleEndPoints.remove(activeIndex);
+                rectangleStartPoints.remove(activeIndex);
             }
-            activeIndex = crossPoints.size() - 1;
+            activeIndex = rectangleEndPoints.size() - 1;
             Displayer.display();
         } else if (code == KeyEvent.VK_N) {
             activeIndex++;
-            if (activeIndex >= crossPoints.size()) {
+            if (activeIndex >= rectangleEndPoints.size()) {
                 activeIndex = 0;
             }
             Displayer.display();
@@ -113,15 +148,16 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
 
     @Override
     public void reset() {
-        crossPoints.clear();
+        rectangleStartPoints.clear();
+        rectangleEndPoints.clear();
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (pt != null) {
-            crossPoints.add(pt);
-            activeIndex = crossPoints.size() - 1;
+            startPoint = pt;
         }
     }
+
 }

@@ -3,9 +3,12 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import org.helioviewer.jhv.camera.annotateable.*;
+
 import com.jogamp.opengl.GL2;
 
 public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
+
     private enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
         private static AnnotationMode[] vals = values();
