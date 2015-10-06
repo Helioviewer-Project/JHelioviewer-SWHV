@@ -60,7 +60,9 @@ public class JP2View extends AbstractView {
 
     // Member related to JP2
     protected JP2Image _jp2Image;
+
     private boolean hiResImage = false;
+    private static final int hiDpiCutoff = 1024;
 
     private Date targetMasterTime;
 
@@ -90,7 +92,7 @@ public class JP2View extends AbstractView {
         _jp2Image.startReader(this);
 
         Rectangle fullFrame = _jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds();
-        if (fullFrame.width * fullFrame.height > 1024 * 1024)
+        if (JHVGlobals.GoForTheBroke && fullFrame.width * fullFrame.height > hiDpiCutoff * hiDpiCutoff)
             hiResImage = true;
 
         int numOfThread = 1;
@@ -203,7 +205,7 @@ public class JP2View extends AbstractView {
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;
-        if (JHVGlobals.GoForTheBroke && hiResImage && Layers.isMoviePlaying())
+        if (hiResImage && totalHeight > hiDpiCutoff && Layers.isMoviePlaying())
             res = jp2Image.getResolutionSet().getPreviousResolutionLevel(totalHeight, totalHeight);
         else
             res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
