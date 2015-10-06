@@ -101,7 +101,7 @@ public class RenderableImageLayer implements Renderable {
             MetaData m = imageData.getMetaData();
             GL3DCamera camera = vp.getCamera();
 
-            camera.push(imageData.getMasterTime(), m);
+            camera.push(imageData.getMasterTime(), null);
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());

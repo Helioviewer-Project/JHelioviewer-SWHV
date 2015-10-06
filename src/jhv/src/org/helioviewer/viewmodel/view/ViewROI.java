@@ -1,5 +1,7 @@
 package org.helioviewer.viewmodel.view;
 
+import java.util.Date;
+
 import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
@@ -31,7 +33,7 @@ public class ViewROI {
         }
     }
 
-    public static Region updateROI(MetaData m) {
+    public static Region updateROI(Date masterTime, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
@@ -39,7 +41,7 @@ public class ViewROI {
 
         GL3DCamera activeCamera = Displayer.getViewport().getCamera();
 
-        activeCamera.push(m.getDateObs().getDate(), m);
+        activeCamera.push(masterTime, m);
 
         GL3DQuatd camDiff = activeCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {

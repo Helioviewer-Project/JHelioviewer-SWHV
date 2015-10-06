@@ -60,6 +60,8 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
+    private Date targetMasterTime;
+
     private int targetFrame = 0;
     private int trueFrame;
 
@@ -81,6 +83,7 @@ public class JP2View extends AbstractView {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
+        targetMasterTime = metaDataArray[0].getDateObs().getDate();
 
         _jp2Image.startReader(this);
 
@@ -183,7 +186,7 @@ public class JP2View extends AbstractView {
      */
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
-        Region r = ViewROI.updateROI(m);
+        Region r = ViewROI.updateROI(masterTime, m);
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
@@ -294,8 +297,6 @@ public class JP2View extends AbstractView {
         return targetFrame;
     }
 
-    private Date targetMasterTime;
-
     // to be accessed only from Layers
     @Override
     public void setFrame(int frame, Date masterTime) {
@@ -337,8 +338,9 @@ public class JP2View extends AbstractView {
     }
 
     void signalRenderFromReader(JP2Image jp2Image, int frame) {
-        if (!Layers.isMoviePlaying() && frame == targetFrame)
+        if (!Layers.isMoviePlaying() && frame == targetFrame) {
             signalRender(jp2Image);
+        }
     }
 
 
