@@ -56,7 +56,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static boolean torender = false;
     private static boolean todisplay = false;
 
-    private static final Timer displayTimer = new Timer(1000 / 20, new DisplayTimerListener());
+    private static final Timer displayTimer = new Timer(1000 / 30, new DisplayTimerListener());
 
     private Displayer() {
         displayTimer.start();

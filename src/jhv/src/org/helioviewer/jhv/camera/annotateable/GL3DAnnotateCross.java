@@ -38,7 +38,7 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
     }
 
     private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
-        int subdivisions = 1;
+        int subdivisions = 2;
 
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
