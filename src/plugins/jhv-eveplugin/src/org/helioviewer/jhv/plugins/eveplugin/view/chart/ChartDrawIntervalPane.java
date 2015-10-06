@@ -357,49 +357,51 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
-        final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-        final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
-        final double movedUnits = diffPixel / availableIntervalSpace;
+        if (mousePressed != null) {
+            final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
+            final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
+            final double movedUnits = diffPixel / availableIntervalSpace;
 
-        if (mousePressed.x > newMousePosition.x) {
-            List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
-            Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
-            Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
-            double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            double start = plotAreaSpace.getScaledSelectedMinTime() - movedUnits * diffUnits;
-            double end = plotAreaSpace.getScaledSelectedMaxTime() - movedUnits * diffUnits;
-            pasList.add(plotAreaSpace);
-            if (start < plotAreaSpace.getScaledMinTime()) {
-                end += (plotAreaSpace.getScaledMinTime() - start);
-                start = plotAreaSpace.getScaledMinTime();
-            }
-            minList.put(plotAreaSpace, start);
-            maxList.put(plotAreaSpace, end);
-            for (PlotAreaSpace pas : pasList) {
-                if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
-                    pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), forced);
+            if (mousePressed.x > newMousePosition.x) {
+                List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
+                Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
+                Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
+                double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
+                double start = plotAreaSpace.getScaledSelectedMinTime() - movedUnits * diffUnits;
+                double end = plotAreaSpace.getScaledSelectedMaxTime() - movedUnits * diffUnits;
+                pasList.add(plotAreaSpace);
+                if (start < plotAreaSpace.getScaledMinTime()) {
+                    end += (plotAreaSpace.getScaledMinTime() - start);
+                    start = plotAreaSpace.getScaledMinTime();
                 }
-            }
-            mousePressed = newMousePosition;
-        } else {
-            List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
-            Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
-            Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
-            double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            double start = plotAreaSpace.getScaledSelectedMinTime() + movedUnits * diffUnits;
-            double end = plotAreaSpace.getScaledSelectedMaxTime() + movedUnits * diffUnits;
-            if (end > plotAreaSpace.getScaledMaxTime()) {
-                start -= (end - plotAreaSpace.getScaledMaxTime());
-                end = plotAreaSpace.getScaledMaxTime();
-            }
-            pasList.add(plotAreaSpace);
-            minList.put(plotAreaSpace, start);
-            maxList.put(plotAreaSpace, end);
-            if (plotAreaSpace.minMaxTimeIntervalContainsTime(maxList.get(plotAreaSpace))) {
-                plotAreaSpace.setScaledSelectedTime(minList.get(plotAreaSpace), maxList.get(plotAreaSpace), forced);
-            }
+                minList.put(plotAreaSpace, start);
+                maxList.put(plotAreaSpace, end);
+                for (PlotAreaSpace pas : pasList) {
+                    if (pas.minMaxTimeIntervalContainsTime(minList.get(pas))) {
+                        pas.setScaledSelectedTime(minList.get(pas), maxList.get(pas), forced);
+                    }
+                }
+                mousePressed = newMousePosition;
+            } else {
+                List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
+                Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
+                Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
+                double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
+                double start = plotAreaSpace.getScaledSelectedMinTime() + movedUnits * diffUnits;
+                double end = plotAreaSpace.getScaledSelectedMaxTime() + movedUnits * diffUnits;
+                if (end > plotAreaSpace.getScaledMaxTime()) {
+                    start -= (end - plotAreaSpace.getScaledMaxTime());
+                    end = plotAreaSpace.getScaledMaxTime();
+                }
+                pasList.add(plotAreaSpace);
+                minList.put(plotAreaSpace, start);
+                maxList.put(plotAreaSpace, end);
+                if (plotAreaSpace.minMaxTimeIntervalContainsTime(maxList.get(plotAreaSpace))) {
+                    plotAreaSpace.setScaledSelectedTime(minList.get(plotAreaSpace), maxList.get(plotAreaSpace), forced);
+                }
 
-            mousePressed = newMousePosition;
+                mousePressed = newMousePosition;
+            }
         }
     }
 
