@@ -9,11 +9,19 @@ import com.jogamp.opengl.GL2;
 
 public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private enum AnnotationMode {
-        RECTANGLE, CROSS
+        RECTANGLE, CIRCLE, CROSS;
+        private static AnnotationMode[] vals = values();
+
+        public AnnotationMode next() {
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
     }
 
-    private final AnnotationMode mode = AnnotationMode.RECTANGLE;
+    private AnnotationMode mode = AnnotationMode.CROSS;
+
     private final GL3DAnnotateRectangle aRect = new GL3DAnnotateRectangle();
+    private final GL3DAnnotateCircle aCircle = new GL3DAnnotateCircle();
+    private final GL3DAnnotateCross aCross = new GL3DAnnotateCross();
 
     protected GL3DAnnotateInteraction(GL3DCamera camera) {
         super(camera);
@@ -22,6 +30,9 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     @Override
     public void drawInteractionFeedback(GL2 gl) {
         aRect.render(gl);
+        aCircle.render(gl);
+        aCross.render(gl);
+
     }
 
     @Override
@@ -29,6 +40,13 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         switch (mode) {
         case RECTANGLE:
             aRect.mousePressed(e);
+            break;
+        case CIRCLE:
+            aCircle.mousePressed(e);
+        case CROSS:
+            aCross.mousePressed(e);
+            break;
+        default:
             break;
         }
     }
@@ -39,6 +57,13 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         case RECTANGLE:
             aRect.mouseDragged(e);
             break;
+        case CIRCLE:
+            aCircle.mouseDragged(e);
+        case CROSS:
+            aCross.mouseDragged(e);
+            break;
+        default:
+            break;
         }
     }
 
@@ -48,15 +73,33 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         case RECTANGLE:
             aRect.mouseReleased(e);
             break;
+        case CIRCLE:
+            aCircle.mouseReleased(e);
+        case CROSS:
+            aCross.mouseReleased(e);
+            break;
+        default:
+            break;
         }
         Displayer.display();
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_M) {
+            this.mode = this.mode.next();
+        }
         switch (mode) {
         case RECTANGLE:
             aRect.keyPressed(e);
+            break;
+        case CIRCLE:
+            aCircle.keyPressed(e);
+        case CROSS:
+            aCross.keyPressed(e);
+            break;
+        default:
             break;
         }
     }
@@ -66,6 +109,13 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         switch (mode) {
         case RECTANGLE:
             aRect.reset();
+            break;
+        case CIRCLE:
+            aCircle.reset();
+        case CROSS:
+            aCross.reset();
+            break;
+        default:
             break;
         }
         super.reset();

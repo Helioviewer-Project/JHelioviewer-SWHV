@@ -9,38 +9,24 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateRectangle implements GL3DAnnotatable {
-    private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
-    private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
+public class GL3DAnnotateCross {
+    private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
     private static final double radius = 1.01;
-    private GL3DVec3d startPoint;
-    private GL3DVec3d endPoint;
 
-    private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
+    private void drawCross(GL2 gl, GL3DVec3d bp) {
+        double delta = Math.PI * 2.5 / 180;
+        GL3DVec3d p1 = new GL3DVec3d(radius, bp.y - delta, bp.z);
+        GL3DVec3d p2 = new GL3DVec3d(radius, bp.y + delta, bp.z);
+        GL3DVec3d p3 = new GL3DVec3d(radius, bp.y, bp.z - delta);
+        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, bp.z + delta);
         gl.glBegin(GL2.GL_LINE_STRIP);
-
-        if (bp.z * ep.z < 0) {
-            if (ep.z < bp.z && bp.z > Math.PI / 2)
-                ep.z += 2 * Math.PI;
-            else if (ep.z > bp.z && bp.z < -Math.PI / 2)
-                bp.z += 2 * Math.PI;
-        }
-
-        GL3DVec3d p1 = bp;
-        GL3DVec3d p2 = new GL3DVec3d(radius, ep.y, bp.z);
-        GL3DVec3d p3 = ep;
-        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, ep.z);
-
         interpolatedDraw(gl, p1, p2);
-        interpolatedDraw(gl, p2, p3);
-        interpolatedDraw(gl, p3, p4);
-        interpolatedDraw(gl, p4, p1);
         gl.glEnd();
-    }
 
-    private boolean beingDragged() {
-        return endPoint != null && startPoint != null;
+        gl.glBegin(GL2.GL_LINE_STRIP);
+        interpolatedDraw(gl, p3, p4);
+        gl.glEnd();
     }
 
     private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
@@ -55,9 +41,8 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
         }
     }
 
-    @Override
     public void render(GL2 gl) {
-        if (rectangleStartPoints.size() == 0 && !beingDragged())
+        if (crossPoints.size() == 0)
             return;
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -65,20 +50,17 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
         gl.glLineWidth(2.0f);
 
         gl.glColor3f(1f, 1f, 0f);
-        if (beingDragged()) {
-            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
-        }
 
         gl.glColor3f(0f, 0f, 1f);
-        int sz = rectangleStartPoints.size();
+        int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
+                drawCross(gl, toSpherical(crossPoints.get(i)));
         }
 
         gl.glColor3f(1f, 0f, 0f);
         if (sz - 1 >= 0)
-            drawRectangle(gl, toSpherical(rectangleStartPoints.get(activeIndex)), toSpherical(rectangleEndPoints.get(activeIndex)));
+            drawCross(gl, toSpherical(crossPoints.get(activeIndex)));
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
@@ -103,59 +85,39 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
         return Displayer.getViewport().getCamera().getLocalRotation().rotateInverseVector(pt);
     }
 
-    @Override
     public void mouseDragged(MouseEvent e) {
-        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
-        if (pt != null) {
-            endPoint = pt;
-            Displayer.display();
-        }
     }
 
-    @Override
     public void mouseReleased(MouseEvent e) {
-        if (beingDragged()) {
-            rectangleStartPoints.add(startPoint);
-            rectangleEndPoints.add(endPoint);
-            activeIndex = rectangleEndPoints.size() - 1;
-        }
-
-        endPoint = null;
-        startPoint = null;
-        Displayer.display();
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             if (activeIndex >= 0) {
-                rectangleEndPoints.remove(activeIndex);
-                rectangleStartPoints.remove(activeIndex);
+                crossPoints.remove(activeIndex);
             }
-            activeIndex = rectangleEndPoints.size() - 1;
+            activeIndex = crossPoints.size() - 1;
             Displayer.display();
         } else if (code == KeyEvent.VK_N) {
             activeIndex++;
-            if (activeIndex >= rectangleEndPoints.size()) {
+            if (activeIndex >= crossPoints.size()) {
                 activeIndex = 0;
             }
             Displayer.display();
         }
     }
 
-    @Override
     public void reset() {
-        rectangleStartPoints.clear();
-        rectangleEndPoints.clear();
+        crossPoints.clear();
     }
 
-    @Override
     public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (pt != null) {
-            startPoint = pt;
+            crossPoints.add(pt);
+            activeIndex = crossPoints.size() - 1;
         }
     }
 }
