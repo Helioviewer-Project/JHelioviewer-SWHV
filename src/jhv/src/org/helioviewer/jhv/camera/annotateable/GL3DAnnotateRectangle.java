@@ -14,7 +14,7 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
-    private static final double radius = 1.01;
+
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
@@ -45,7 +45,8 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
     }
 
     private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
-        int subdivisions = 5;
+        double delta = Math.PI * 2.5 / 180;
+        int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
 
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
