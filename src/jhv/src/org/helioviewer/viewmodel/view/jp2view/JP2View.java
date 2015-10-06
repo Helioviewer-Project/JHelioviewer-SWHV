@@ -1,6 +1,7 @@
 package org.helioviewer.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -59,6 +60,7 @@ public class JP2View extends AbstractView {
 
     // Member related to JP2
     protected JP2Image _jp2Image;
+    private boolean hiResImage = false;
 
     private Date targetMasterTime;
 
@@ -86,6 +88,10 @@ public class JP2View extends AbstractView {
         targetMasterTime = metaDataArray[0].getDateObs().getDate();
 
         _jp2Image.startReader(this);
+
+        Rectangle fullFrame = _jp2Image.getResolutionSet().getResolutionLevel(0).getResolutionBounds();
+        if (fullFrame.width * fullFrame.height > 1024 * 1024)
+            hiResImage = true;
 
         int numOfThread = 1;
         executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/*rejectedExecutionHandler*/);
@@ -197,7 +203,7 @@ public class JP2View extends AbstractView {
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;
-        if (JHVGlobals.GoForTheBroke && Layers.isMoviePlaying())
+        if (JHVGlobals.GoForTheBroke && hiResImage && Layers.isMoviePlaying())
             res = jp2Image.getResolutionSet().getPreviousResolutionLevel(totalHeight, totalHeight);
         else
             res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
