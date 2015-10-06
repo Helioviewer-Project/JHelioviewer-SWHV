@@ -8,6 +8,7 @@ import java.net.SocketException;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
@@ -204,14 +205,14 @@ class J2KReader implements Runnable {
         return (socket != null && socket.isConnected());
     }
 
-    private void signalRender(final int frame) {
+    private void signalRender() {
         if (stop)
             return;
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parentViewRef.signalRenderFromReader(parentImageRef, frame);
+                parentViewRef.signalRenderFromReader(parentImageRef);
             }
         });
     }
@@ -245,7 +246,7 @@ class J2KReader implements Runnable {
                 // nothing
             } else if (readerMode == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentImageRef.setReaderMode(ReaderMode.NEVERFIRE);
-                signalRender(currParams.compositionLayer);
+                signalRender();
             } else {
                 // check whether view parameters have changed
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
@@ -319,7 +320,7 @@ class J2KReader implements Runnable {
 
                             if (!parentImageRef.isMultiFrame()) {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
-                            } else if (cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
+                            } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
                             } else if (parentImageRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
@@ -448,12 +449,13 @@ class J2KReader implements Runnable {
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            signalRender(curLayer);
+                                            signalRender();
                                             break;
                                         default:
-                                            if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) { //!
-                                                signalRender(curLayer);
-                                            }
+                                            /*! not good for on the fly resolution update
+                                                if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
+                                                signalRender();
+                                            } */
                                         }
                                     }
                                 }

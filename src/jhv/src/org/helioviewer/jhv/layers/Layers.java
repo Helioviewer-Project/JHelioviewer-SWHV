@@ -97,6 +97,7 @@ public class Layers {
     public static void pauseMovie() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
+        Displayer.render(); /*! force update for on the fly resolution change */
     }
 
     public static void toggleMovie() {
@@ -290,6 +291,7 @@ public class Layers {
 
         view.setDataHandler(Displayer.displayDataHandler);
         Displayer.addRenderListener(view);
+        Layers.setFrame(0); // sync layers
     }
 
     private static void fireLayerAdded(View view) {
