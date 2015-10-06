@@ -337,8 +337,8 @@ public class JP2View extends AbstractView {
         signalRender(_jp2Image);
     }
 
-    void signalRenderFromReader(JP2Image jp2Image, int frame) {
-        if (!Layers.isMoviePlaying() && frame == targetFrame) {
+    void signalRenderFromReader(JP2Image jp2Image) {
+        /*! if (!Layers.isMoviePlaying())*/ {
             signalRender(jp2Image);
         }
     }
