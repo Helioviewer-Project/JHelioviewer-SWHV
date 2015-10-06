@@ -324,7 +324,13 @@ public class APIRequestManager {
                  return new SimpleImageView(uri);
             } else {
                 JP2Image jp2Image = new JP2Image(uri, downloadURI);
-                return EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
+                JP2View view = EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
+
+                // wait until there is something to show before adding to the UI
+                while (view.hasImageData() == false) {
+                    Thread.sleep(100);
+                }
+                return view;
             }
         } catch (InterruptedException e) {
             // nothing
