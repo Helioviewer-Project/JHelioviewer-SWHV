@@ -9,7 +9,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCross {
+public class GL3DAnnotateCross implements GL3DAnnotatable {
     private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
     private static final double radius = 1.01;
@@ -41,6 +41,7 @@ public class GL3DAnnotateCross {
         }
     }
 
+    @Override
     public void render(GL2 gl) {
         if (crossPoints.size() == 0)
             return;
@@ -49,16 +50,14 @@ public class GL3DAnnotateCross {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(1f, 1f, 0f);
-
-        gl.glColor3f(0f, 0f, 1f);
+        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
         int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawCross(gl, toSpherical(crossPoints.get(i)));
         }
 
-        gl.glColor3f(1f, 0f, 0f);
+        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
             drawCross(gl, toSpherical(crossPoints.get(activeIndex)));
 
@@ -85,12 +84,15 @@ public class GL3DAnnotateCross {
         return Displayer.getViewport().getCamera().getLocalRotation().rotateInverseVector(pt);
     }
 
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
@@ -109,10 +111,12 @@ public class GL3DAnnotateCross {
         }
     }
 
+    @Override
     public void reset() {
         crossPoints.clear();
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (pt != null) {

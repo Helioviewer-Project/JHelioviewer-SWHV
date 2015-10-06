@@ -64,19 +64,19 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(1f, 1f, 0f);
+        gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
         if (beingDragged()) {
             drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
         }
 
-        gl.glColor3f(0f, 0f, 1f);
+        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
         }
 
-        gl.glColor3f(1f, 0f, 0f);
+        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
             drawRectangle(gl, toSpherical(rectangleStartPoints.get(activeIndex)), toSpherical(rectangleEndPoints.get(activeIndex)));
 

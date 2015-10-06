@@ -3,8 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.display.Displayer;
-
 import com.jogamp.opengl.GL2;
 
 public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
@@ -22,6 +20,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private final GL3DAnnotateRectangle aRect = new GL3DAnnotateRectangle();
     private final GL3DAnnotateCircle aCircle = new GL3DAnnotateCircle();
     private final GL3DAnnotateCross aCross = new GL3DAnnotateCross();
+    GL3DAnnotatable activeAnnotatable = aRect;
 
     protected GL3DAnnotateInteraction(GL3DCamera camera) {
         super(camera);
@@ -37,51 +36,17 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        switch (mode) {
-        case RECTANGLE:
-            aRect.mousePressed(e);
-            break;
-        case CIRCLE:
-            aCircle.mousePressed(e);
-        case CROSS:
-            aCross.mousePressed(e);
-            break;
-        default:
-            break;
-        }
+        activeAnnotatable.mousePressed(e);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        switch (mode) {
-        case RECTANGLE:
-            aRect.mouseDragged(e);
-            break;
-        case CIRCLE:
-            aCircle.mouseDragged(e);
-        case CROSS:
-            aCross.mouseDragged(e);
-            break;
-        default:
-            break;
-        }
+        activeAnnotatable.mouseDragged(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        switch (mode) {
-        case RECTANGLE:
-            aRect.mouseReleased(e);
-            break;
-        case CIRCLE:
-            aCircle.mouseReleased(e);
-        case CROSS:
-            aCross.mouseReleased(e);
-            break;
-        default:
-            break;
-        }
-        Displayer.display();
+        activeAnnotatable.mouseReleased(e);
     }
 
     @Override
@@ -89,35 +54,27 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         int code = e.getKeyCode();
         if (code == KeyEvent.VK_M) {
             this.mode = this.mode.next();
-        }
-        switch (mode) {
-        case RECTANGLE:
-            aRect.keyPressed(e);
-            break;
-        case CIRCLE:
-            aCircle.keyPressed(e);
-        case CROSS:
-            aCross.keyPressed(e);
-            break;
-        default:
-            break;
+            switch (mode) {
+            case RECTANGLE:
+                activeAnnotatable = aRect;
+                break;
+            case CIRCLE:
+                activeAnnotatable = aCircle;
+                break;
+            case CROSS:
+                activeAnnotatable = aCross;
+                break;
+            default:
+                break;
+            }
+        } else {
+            activeAnnotatable.keyPressed(e);
         }
     }
 
     @Override
     public void reset() {
-        switch (mode) {
-        case RECTANGLE:
-            aRect.reset();
-            break;
-        case CIRCLE:
-            aCircle.reset();
-        case CROSS:
-            aCross.reset();
-            break;
-        default:
-            break;
-        }
+        activeAnnotatable.reset();
         super.reset();
     }
 
