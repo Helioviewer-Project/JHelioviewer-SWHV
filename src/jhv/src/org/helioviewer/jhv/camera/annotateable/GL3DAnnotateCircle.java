@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
@@ -17,6 +18,12 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
 
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
+
+    private final GL3DCamera camera;
+
+    public GL3DAnnotateCircle(GL3DCamera _camera) {
+        camera = _camera;
+    }
 
     private void drawCircle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         double cosf = bp.dot(ep);
@@ -79,7 +86,7 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -126,7 +133,7 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }

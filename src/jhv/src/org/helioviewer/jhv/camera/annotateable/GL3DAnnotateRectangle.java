@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
@@ -17,6 +18,12 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
 
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
+
+    private final GL3DCamera camera;
+
+    public GL3DAnnotateRectangle(GL3DCamera _camera) {
+        camera = _camera;
+    }
 
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
         gl.glBegin(GL2.GL_LINE_STRIP);
@@ -86,7 +93,7 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
     }
 
     private GL3DVec3d toSpherical(GL3DVec3d _p) {
-        GL3DVec3d p = Displayer.getViewport().getCamera().getLocalRotation().rotateVector(_p);
+        GL3DVec3d p = camera.getLocalRotation().rotateVector(_p);
 
         GL3DVec3d pt = new GL3DVec3d();
         pt.x = p.length();
@@ -102,12 +109,12 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
         pt.x = x * Math.sin(y) * Math.sin(z);
         pt.y = x * Math.cos(y);
 
-        return Displayer.getViewport().getCamera().getLocalRotation().rotateInverseVector(pt);
+        return camera.getLocalRotation().rotateInverseVector(pt);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -155,7 +162,7 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }

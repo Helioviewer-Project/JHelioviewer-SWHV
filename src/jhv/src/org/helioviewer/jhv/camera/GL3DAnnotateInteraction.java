@@ -20,9 +20,9 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     private AnnotationMode mode = AnnotationMode.RECTANGLE;
 
-    private final GL3DAnnotateRectangle aRect = new GL3DAnnotateRectangle();
-    private final GL3DAnnotateCircle aCircle = new GL3DAnnotateCircle();
-    private final GL3DAnnotateCross aCross = new GL3DAnnotateCross();
+    private final GL3DAnnotateRectangle aRect = new GL3DAnnotateRectangle(camera);
+    private final GL3DAnnotateCircle aCircle = new GL3DAnnotateCircle(camera);
+    private final GL3DAnnotateCross aCross = new GL3DAnnotateCross(camera);
     private GL3DAnnotatable activeAnnotatable = aRect;
 
     protected GL3DAnnotateInteraction(GL3DCamera camera) {
