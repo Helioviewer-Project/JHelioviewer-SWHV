@@ -9,7 +9,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateRectangle {
+public class GL3DAnnotateRectangle implements GL3DAnnotatable {
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
@@ -55,6 +55,7 @@ public class GL3DAnnotateRectangle {
         }
     }
 
+    @Override
     public void render(GL2 gl) {
         if (rectangleStartPoints.size() == 0 && !beingDragged())
             return;
@@ -102,6 +103,7 @@ public class GL3DAnnotateRectangle {
         return Displayer.getViewport().getCamera().getLocalRotation().rotateInverseVector(pt);
     }
 
+    @Override
     public void mouseDragged(MouseEvent e) {
         GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (pt != null) {
@@ -110,6 +112,7 @@ public class GL3DAnnotateRectangle {
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (beingDragged()) {
             rectangleStartPoints.add(startPoint);
@@ -122,6 +125,7 @@ public class GL3DAnnotateRectangle {
         Displayer.display();
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
@@ -141,11 +145,13 @@ public class GL3DAnnotateRectangle {
         }
     }
 
+    @Override
     public void reset() {
         rectangleStartPoints.clear();
         rectangleEndPoints.clear();
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         GL3DVec3d pt = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (pt != null) {
