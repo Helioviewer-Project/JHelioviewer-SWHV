@@ -451,7 +451,7 @@ class J2KReader implements Runnable {
                                             signalRender(curLayer);
                                             break;
                                         default:
-                                            if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
+                                            if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) { //!
                                                 signalRender(curLayer);
                                             }
                                         }
