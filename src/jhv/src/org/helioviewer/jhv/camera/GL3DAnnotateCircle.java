@@ -54,19 +54,19 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(1f, 1f, 0f);
+        gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
         if (beingDragged()) {
             drawCircle(gl, startPoint, endPoint);
         }
 
-        gl.glColor3f(0f, 0f, 1f);
+        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
         int sz = circleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawCircle(gl, circleStartPoints.get(i), circleEndPoints.get(i));
         }
 
-        gl.glColor3f(1f, 0f, 0f);
+        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
             drawCircle(gl, (circleStartPoints.get(activeIndex)), (circleEndPoints.get(activeIndex)));
 
