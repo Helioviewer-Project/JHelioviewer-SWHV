@@ -24,15 +24,17 @@ import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
 
 public class MovieExporter {
+
     private final int w;
     private final int h;
-    private final String moviePath;
-    private final FBObject fbo = new FBObject();;
+    private final FBObject fbo = new FBObject();
     private int numSamples = 0;
     private TextureAttachment fboTex;
-    private IMediaWriter movieWriter;
+
+    private final String moviePath;
     private boolean inited;
     private boolean stopped = false;
+    private IMediaWriter movieWriter;
 
     private GL3DViewport vp;
     private int framenumber = 0;
@@ -54,11 +56,9 @@ public class MovieExporter {
     }
 
     private void initFBO(final GL2 gl, int fbow, int fboh) {
-
         fbo.init(gl, fbow, fboh, numSamples);
 
         numSamples = fbo.getNumSamples();
-
         if (numSamples > 0) {
             fbo.attachColorbuffer(gl, 0, true);
             fbo.resetSamplingSink(gl);
