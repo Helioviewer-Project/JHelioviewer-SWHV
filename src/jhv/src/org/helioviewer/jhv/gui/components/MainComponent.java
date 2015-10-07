@@ -200,8 +200,12 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
             screenshot = ImageUtil.createThumbnail(rbu.readPixelsToBufferedImage(gl, true), width);
             if (currentScreenshot != previousScreenshot) {
-                BufferedImage xugScreenshot = ConverterFactory.convertToType(screenshot, BufferedImage.TYPE_3BYTE_BGR);
-                movieWriter.encodeVideo(0, xugScreenshot, (int) (1000 / framerate * currentScreenshot), TimeUnit.MILLISECONDS);
+                try {
+                    BufferedImage xugScreenshot = ConverterFactory.convertToType(screenshot, BufferedImage.TYPE_3BYTE_BGR);
+                    movieWriter.encodeVideo(0, xugScreenshot, (int) (1000 / framerate * currentScreenshot), TimeUnit.MILLISECONDS);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             exportMovieDialog.setLabelText("Exporting frame " + (currentScreenshot + 1) + " / " + (maxframeno + 1));
             previousScreenshot = currentScreenshot;

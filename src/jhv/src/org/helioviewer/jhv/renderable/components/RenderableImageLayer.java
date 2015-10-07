@@ -118,8 +118,8 @@ public class RenderableImageLayer implements Renderable {
             {
                 gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
 
-                gl.glDepthRange(depthrange[2], depthrange[3]);
                 GLSLShader.bindIsDisc(gl, 1);
+                gl.glDepthRange(depthrange[2], depthrange[3]);
                 gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
 
                 GLSLShader.bindIsDisc(gl, 0);
@@ -127,7 +127,6 @@ public class RenderableImageLayer implements Renderable {
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
 
                 gl.glDepthRange(0.f, 1.f);
-
             }
             disableIndexVBO(gl);
             disablePositionVBO(gl);
