@@ -189,6 +189,7 @@ public class JP2View extends AbstractView {
         }
     }
 
+    private JP2ImageParameter oldImageViewParams;
     /**
      * Recalculates the image parameters used within the jp2-package
      */
@@ -226,8 +227,15 @@ public class JP2View extends AbstractView {
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
+        JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
 
-        return new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        if (jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
+            Displayer.display();
+            return null;
+        }
+        oldImageViewParams = newImageViewParams;
+
+        return newImageViewParams;
     }
 
     /*
@@ -346,9 +354,7 @@ public class JP2View extends AbstractView {
     }
 
     void signalRenderFromReader(JP2Image jp2Image) {
-        /*! if (!Layers.isMoviePlaying())*/ {
-            signalRender(jp2Image);
-        }
+        signalRender(jp2Image);
     }
 
     void signalRender(JP2Image jp2Image) {
@@ -357,6 +363,9 @@ public class JP2View extends AbstractView {
             return;
 
         JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame);
+        if (imageViewParams == null)
+            return;
+
         // ping reader
         jp2Image.signalReader(imageViewParams);
 
