@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateRectangle implements GL3DAnnotatable {
+public class GL3DAnnotateRectangle extends GL3DAbstractAnnotatable {
 
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
@@ -59,7 +59,7 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = GL3DAnnotatable.toCart(camera, radius, y, z);
+            GL3DVec3d pc = toCart(camera, radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
@@ -75,19 +75,19 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
 
         gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
         if (beingDragged()) {
-            drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, startPoint), GL3DAnnotatable.toSpherical(camera, endPoint));
+            drawRectangle(gl, toSpherical(camera, startPoint), toSpherical(camera, endPoint));
         }
 
         gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, rectangleStartPoints.get(i)), GL3DAnnotatable.toSpherical(camera, rectangleEndPoints.get(i)));
+                drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(i)), toSpherical(camera, rectangleEndPoints.get(i)));
         }
 
         gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
-            drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, rectangleStartPoints.get(activeIndex)), GL3DAnnotatable.toSpherical(camera, rectangleEndPoints.get(activeIndex)));
+            drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(activeIndex)), toSpherical(camera, rectangleEndPoints.get(activeIndex)));
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
