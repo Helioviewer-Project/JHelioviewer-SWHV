@@ -139,14 +139,21 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrieveDateTime(MetaDataContainer m) {
-        String observedDate = m.get("DATE-OBS");
-        if (observedDate == null) {
+        String observedDate;
+
+        if (instrument.equals("MDI")) {
             observedDate = m.get("DATE_OBS");
-            if (observedDate != null && instrument.equals("LASCO")) {
-                observedDate += "T" + m.get("TIME_OBS");
+        } else {
+            observedDate = m.get("DATE-OBS");
+            if (observedDate == null) {
+                observedDate = m.get("DATE_OBS");
+                if (observedDate != null && instrument.equals("LASCO")) {
+                    observedDate += "T" + m.get("TIME_OBS");
+                }
             }
         }
         // otherwise default epoch
+
         if (observedDate != null)
             dateObs = ImmutableDateTime.parseDateTime(observedDate);
     }
