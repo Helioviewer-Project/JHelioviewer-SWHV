@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotateable;
+package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -10,11 +10,11 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCross extends GL3DAbstractAnnotatable {
+public class AnnotateCross extends AbstractAnnotateable {
 
     private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
 
-    public GL3DAnnotateCross(GL3DCamera _camera) {
+    public AnnotateCross(GL3DCamera _camera) {
         super(_camera);
     }
 

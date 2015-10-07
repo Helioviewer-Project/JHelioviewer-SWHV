@@ -1,11 +1,11 @@
-package org.helioviewer.jhv.camera.annotateable;
+package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
 
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 
-public abstract class GL3DAbstractAnnotatable implements GL3DAnnotatable {
+public abstract class AbstractAnnotateable implements Annotateable {
 
     protected static final float[] activeColor = new float[] { Color.red.getRed() / 255f, Color.red.getGreen() / 255f, Color.red.getBlue() / 255f };
     protected static final float[] dragColor = new float[] { Color.yellow.getRed() / 255f, Color.yellow.getGreen() / 255f, Color.yellow.getBlue() / 255f };
@@ -17,7 +17,7 @@ public abstract class GL3DAbstractAnnotatable implements GL3DAnnotatable {
 
     protected int activeIndex = -1;
 
-    public GL3DAbstractAnnotatable(GL3DCamera _camera) {
+    public AbstractAnnotateable(GL3DCamera _camera) {
         camera = _camera;
     }
 
