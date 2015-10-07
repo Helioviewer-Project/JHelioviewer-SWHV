@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -41,7 +42,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -74,8 +75,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 try {
                     Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
                     Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
-                    // only updates if its really necessary with a
-                    // tolerance of an hour
+                    // only updates if it's really necessary with a tolerance of an hour
                     final int tolerance = 60 * 60 * 1000;
                     if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
                         if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
@@ -180,6 +180,11 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
+                    Component optionsPanel = renderable.getOptionsPanel();
+                    if (optionsPanel != null) {
+                        enableComponents(optionsPanel, renderable.isVisible());
+                    }
+
                     renderableContainer.fireListeners();
                     Displayer.display();
                 }
@@ -232,16 +237,32 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     }
 
     private void setOptionsPanel(Renderable renderable) {
-        setOptionsPanel(renderable.getOptionsPanel());
+        Component optionsPanel = renderable.getOptionsPanel();
+        if (optionsPanel != null) {
+            enableComponents(optionsPanel, renderable.isVisible());
+        }
+        setOptionsComponent(optionsPanel);
     }
 
-    private void setOptionsPanel(Component cmp) {
+    private void setOptionsComponent(Component cmp) {
         optionsPanelWrapper.removeAll();
         if (cmp != null) {
             optionsPanelWrapper.add(cmp, BorderLayout.CENTER);
         }
         super.revalidate();
         // super.repaint();
+    }
+
+    private void enableComponents(Component container, boolean enable) {
+        if (container instanceof Container) {
+            Component[] components = ((Container) container).getComponents();
+            for (Component component : components) {
+                component.setEnabled(enable);
+                if (component instanceof Container) {
+                    enableComponents(component, enable);
+                }
+            }
+        }
     }
 
     @Override
@@ -256,9 +277,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             int index = ImageViewerGui.getRenderableContainer().getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
         } else {
-            JPanel jpl = new JPanel();
-            jpl.add(new JLabel("No layer selected"));
-            setOptionsPanel(jpl);
+            setOptionsComponent(new JPanel());
         }
     }
 
