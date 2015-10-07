@@ -190,9 +190,8 @@ public class JP2View extends AbstractView {
     }
 
     private JP2ImageParameter oldImageViewParams;
-    /**
-     * Recalculates the image parameters used within the jp2-package
-     */
+
+    // Recalculates the image parameters used within the jp2-package
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.updateROI(masterTime, m);
