@@ -59,7 +59,7 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = toCart(radius, y, z);
+            GL3DVec3d pc = GL3DAnnotatable.toCart(camera, radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
@@ -75,41 +75,21 @@ public class GL3DAnnotateRectangle implements GL3DAnnotatable {
 
         gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
         if (beingDragged()) {
-            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
+            drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, startPoint), GL3DAnnotatable.toSpherical(camera, endPoint));
         }
 
         gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
+                drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, rectangleStartPoints.get(i)), GL3DAnnotatable.toSpherical(camera, rectangleEndPoints.get(i)));
         }
 
         gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
-            drawRectangle(gl, toSpherical(rectangleStartPoints.get(activeIndex)), toSpherical(rectangleEndPoints.get(activeIndex)));
+            drawRectangle(gl, GL3DAnnotatable.toSpherical(camera, rectangleStartPoints.get(activeIndex)), GL3DAnnotatable.toSpherical(camera, rectangleEndPoints.get(activeIndex)));
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
-    }
-
-    private GL3DVec3d toSpherical(GL3DVec3d _p) {
-        GL3DVec3d p = camera.getLocalRotation().rotateVector(_p);
-
-        GL3DVec3d pt = new GL3DVec3d();
-        pt.x = p.length();
-        pt.y = Math.acos(p.y / pt.x);
-        pt.z = Math.atan2(p.x, p.z);
-
-        return pt;
-    }
-
-    private GL3DVec3d toCart(double x, double y, double z) {
-        GL3DVec3d pt = new GL3DVec3d();
-        pt.z = x * Math.sin(y) * Math.cos(z);
-        pt.x = x * Math.sin(y) * Math.sin(z);
-        pt.y = x * Math.cos(y);
-
-        return camera.getLocalRotation().rotateInverseVector(pt);
     }
 
     @Override
