@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotateable;
+package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCircle extends GL3DAbstractAnnotatable {
+public class AnnotateCircle extends AbstractAnnotateable {
 
     private final ArrayList<GL3DVec3d> circleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> circleEndPoints = new ArrayList<GL3DVec3d>();
@@ -18,7 +18,7 @@ public class GL3DAnnotateCircle extends GL3DAbstractAnnotatable {
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
-    public GL3DAnnotateCircle(GL3DCamera _camera) {
+    public AnnotateCircle(GL3DCamera _camera) {
         super(_camera);
     }
 

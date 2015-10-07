@@ -3,10 +3,10 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.camera.annotateable.GL3DAnnotatable;
-import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateCircle;
-import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateCross;
-import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateRectangle;
+import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
+import org.helioviewer.jhv.camera.annotate.AnnotateCross;
+import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
+import org.helioviewer.jhv.camera.annotate.Annotateable;
 
 import com.jogamp.opengl.GL2;
 
@@ -23,10 +23,10 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     private AnnotationMode mode = AnnotationMode.RECTANGLE;
 
-    private final GL3DAnnotateRectangle aRect = new GL3DAnnotateRectangle(camera);
-    private final GL3DAnnotateCircle aCircle = new GL3DAnnotateCircle(camera);
-    private final GL3DAnnotateCross aCross = new GL3DAnnotateCross(camera);
-    private GL3DAnnotatable activeAnnotatable = aRect;
+    private final AnnotateRectangle aRect = new AnnotateRectangle(camera);
+    private final AnnotateCircle aCircle = new AnnotateCircle(camera);
+    private final AnnotateCross aCross = new AnnotateCross(camera);
+    private Annotateable activeAnnotatable = aRect;
 
     protected GL3DAnnotateInteraction(GL3DCamera camera) {
         super(camera);

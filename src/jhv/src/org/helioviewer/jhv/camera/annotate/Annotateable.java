@@ -1,11 +1,11 @@
-package org.helioviewer.jhv.camera.annotateable;
+package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import com.jogamp.opengl.GL2;
 
-public interface GL3DAnnotatable {
+public interface Annotateable {
 
     public void render(GL2 gl);
 
