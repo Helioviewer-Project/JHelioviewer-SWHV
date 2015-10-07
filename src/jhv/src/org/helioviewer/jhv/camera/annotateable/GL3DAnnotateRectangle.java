@@ -14,15 +14,12 @@ public class GL3DAnnotateRectangle extends GL3DAbstractAnnotatable {
 
     private final ArrayList<GL3DVec3d> rectangleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> rectangleEndPoints = new ArrayList<GL3DVec3d>();
-    private int activeIndex = -1;
 
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
-    private final GL3DCamera camera;
-
     public GL3DAnnotateRectangle(GL3DCamera _camera) {
-        camera = _camera;
+        super(_camera);
     }
 
     private void drawRectangle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
@@ -73,19 +70,19 @@ public class GL3DAnnotateRectangle extends GL3DAbstractAnnotatable {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
+        gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
         if (beingDragged()) {
             drawRectangle(gl, toSpherical(camera, startPoint), toSpherical(camera, endPoint));
         }
 
-        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
+        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(i)), toSpherical(camera, rectangleEndPoints.get(i)));
         }
 
-        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
+        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
             drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(activeIndex)), toSpherical(camera, rectangleEndPoints.get(activeIndex)));
 
