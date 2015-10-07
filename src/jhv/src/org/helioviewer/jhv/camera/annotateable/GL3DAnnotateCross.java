@@ -13,12 +13,9 @@ import com.jogamp.opengl.GL2;
 public class GL3DAnnotateCross extends GL3DAbstractAnnotatable {
 
     private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
-    private int activeIndex = -1;
-
-    private final GL3DCamera camera;
 
     public GL3DAnnotateCross(GL3DCamera _camera) {
-        camera = _camera;
+        super(_camera);
     }
 
     private void drawCross(GL2 gl, GL3DVec3d bp) {
@@ -58,14 +55,14 @@ public class GL3DAnnotateCross extends GL3DAbstractAnnotatable {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
+        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawCross(gl, toSpherical(camera, crossPoints.get(i)));
         }
 
-        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
+        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
             drawCross(gl, toSpherical(camera, crossPoints.get(activeIndex)));
 

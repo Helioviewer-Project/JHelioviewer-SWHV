@@ -1,13 +1,27 @@
 package org.helioviewer.jhv.camera.annotateable;
 
+import java.awt.Color;
+
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 
-import com.jogamp.opengl.GL3;
-
 public abstract class GL3DAbstractAnnotatable implements GL3DAnnotatable {
 
-    public static GL3DVec3d toSpherical(GL3DCamera camera, GL3DVec3d _p) {
+    protected static final float[] activeColor = new float[] { Color.red.getRed() / 255f, Color.red.getGreen() / 255f, Color.red.getBlue() / 255f };
+    protected static final float[] dragColor = new float[] { Color.yellow.getRed() / 255f, Color.yellow.getGreen() / 255f, Color.yellow.getBlue() / 255f };
+    protected static final float[] baseColor = new float[] { Color.blue.getRed() / 255f, Color.blue.getGreen() / 255f, Color.blue.getBlue() / 255f };
+
+    protected static final double radius = 1.01;
+
+    protected final GL3DCamera camera;
+
+    protected int activeIndex = -1;
+
+    public GL3DAbstractAnnotatable(GL3DCamera _camera) {
+        camera = _camera;
+    }
+
+    protected static GL3DVec3d toSpherical(GL3DCamera camera, GL3DVec3d _p) {
         GL3DVec3d p = camera.getLocalRotation().rotateVector(_p);
 
         GL3DVec3d pt = new GL3DVec3d();
@@ -18,7 +32,7 @@ public abstract class GL3DAbstractAnnotatable implements GL3DAnnotatable {
         return pt;
     }
 
-    public static GL3DVec3d toCart(GL3DCamera camera, double x, double y, double z) {
+    protected static GL3DVec3d toCart(GL3DCamera camera, double x, double y, double z) {
         GL3DVec3d pt = new GL3DVec3d();
         pt.z = x * Math.sin(y) * Math.cos(z);
         pt.x = x * Math.sin(y) * Math.sin(z);
@@ -26,4 +40,5 @@ public abstract class GL3DAbstractAnnotatable implements GL3DAnnotatable {
 
         return camera.getLocalRotation().rotateInverseVector(pt);
     }
+
 }

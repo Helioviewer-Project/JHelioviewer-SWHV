@@ -10,19 +10,16 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCircle implements GL3DAnnotatable {
+public class GL3DAnnotateCircle extends GL3DAbstractAnnotatable {
 
     private final ArrayList<GL3DVec3d> circleStartPoints = new ArrayList<GL3DVec3d>();
     private final ArrayList<GL3DVec3d> circleEndPoints = new ArrayList<GL3DVec3d>();
-    private int activeIndex = -1;
 
     private GL3DVec3d startPoint;
     private GL3DVec3d endPoint;
 
-    private final GL3DCamera camera;
-
     public GL3DAnnotateCircle(GL3DCamera _camera) {
-        camera = _camera;
+        super(_camera);
     }
 
     private void drawCircle(GL2 gl, GL3DVec3d bp, GL3DVec3d ep) {
@@ -65,19 +62,19 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
 
         gl.glLineWidth(2.0f);
 
-        gl.glColor3f(GL3DAnnotatable.dragColor.getRed() / 255f, GL3DAnnotatable.dragColor.getGreen() / 255f, GL3DAnnotatable.dragColor.getBlue() / 255f);
+        gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
         if (beingDragged()) {
             drawCircle(gl, startPoint, endPoint);
         }
 
-        gl.glColor3f(GL3DAnnotatable.baseColor.getRed() / 255f, GL3DAnnotatable.baseColor.getGreen() / 255f, GL3DAnnotatable.baseColor.getBlue() / 255f);
+        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = circleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 drawCircle(gl, circleStartPoints.get(i), circleEndPoints.get(i));
         }
 
-        gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
+        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
             drawCircle(gl, (circleStartPoints.get(activeIndex)), (circleEndPoints.get(activeIndex)));
 
