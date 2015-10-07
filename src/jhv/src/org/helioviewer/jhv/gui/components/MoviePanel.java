@@ -126,8 +126,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JComboBox animationModeComboBox;
 
     private static JPanel modePanel;
-    private static JPanel recordPanel;
-
     private static JPanel speedPanel;
 
     // Icons
@@ -189,12 +187,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
-        secondLine.add(buttonPanel, BorderLayout.WEST);
+
+        JButton recordButton = new JButton("REC");
+        recordButton.addActionListener(new RecordActionListener(recordButton));
+        buttonPanel.add(recordButton);
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
 
-        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback", this);
+        advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback and recording", this);
         buttonPanel.add(advancedButton);
+
+        secondLine.add(buttonPanel, BorderLayout.WEST);
 
         // Current frame number
         frameNumberLabel = new JLabel((timeSlider.getValue() + 1) + "/" + (timeSlider.getMaximum() + 1), JLabel.RIGHT);
@@ -241,11 +244,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
         mainPanel.add(modePanel);
-        recordPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton recordButton = new JButton("Rec");
-        recordButton.addActionListener(new RecordActionListener(recordButton));
-        recordPanel.add(recordButton);
-        mainPanel.add(recordPanel);
+
         setEnabledState(false);
         setAdvanced(isAdvanced);
         sliderTimer.start();
@@ -263,7 +262,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         @Override
         public void actionPerformed(ActionEvent e) {
             if (started) {
-                recordButton.setText("Rec");
+                recordButton.setText("REC");
                 el.stop();
             } else {
                 recordButton.setText("BUSY");
@@ -271,7 +270,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             }
             started = !started;
         }
-
     }
 
     private static void setEnabledState(boolean enabled) {
