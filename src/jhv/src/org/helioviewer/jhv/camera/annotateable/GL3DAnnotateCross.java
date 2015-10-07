@@ -102,6 +102,7 @@ public class GL3DAnnotateCross extends GL3DAbstractAnnotatable {
     @Override
     public void reset() {
         crossPoints.clear();
+        activeIndex = -1;
     }
 
     @Override
