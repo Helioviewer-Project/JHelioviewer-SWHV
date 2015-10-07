@@ -51,7 +51,7 @@ public class UIGlobals {
                 UIFont = font;
 
                 map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-                map.put(TextAttribute.SIZE, 11);
+                map.put(TextAttribute.SIZE, 12);
                 UIFontBold = font.deriveFont(map);
 
                 map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
@@ -59,7 +59,7 @@ public class UIGlobals {
                 UIFontSmall = font.deriveFont(map);
 
                 map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-                map.put(TextAttribute.SIZE, 9);
+                map.put(TextAttribute.SIZE, 10);
                 UIFontSmallBold = font.deriveFont(map);
             }
         }
@@ -78,10 +78,10 @@ public class UIGlobals {
     }
 
     public static Font UIFont = new Font("SansSerif", Font.PLAIN, 12);
-    public static Font UIFontBold = new Font("SansSerif", Font.BOLD, 11);
+    public static Font UIFontBold = new Font("SansSerif", Font.BOLD, 12);
 
     public static Font UIFontSmall = new Font("SansSerif", Font.PLAIN, 10);
-    public static Font UIFontSmallBold = new Font("SansSerif", Font.BOLD, 9);
+    public static Font UIFontSmallBold = new Font("SansSerif", Font.BOLD, 10);
 
     public static Font UIFontMono = new Font("Courier", Font.PLAIN, 12);
 

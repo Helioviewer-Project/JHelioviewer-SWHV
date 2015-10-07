@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 @SuppressWarnings("serial")
@@ -22,11 +23,12 @@ public class RenderableCellRenderer extends DefaultTableCellRenderer {
             String tooltip = layerName;
 
             if (renderable instanceof RenderableImageLayer && ((RenderableImageLayer) renderable).isActiveImageLayer()) {
-                layerName = "\u2299" + layerName;
-                tooltip += " (active)";
+                tooltip += " (master)";
                 label.setToolTipText(tooltip);
+                label.setFont(UIGlobals.UIFontBold);
             } else {
                 label.setToolTipText(null);
+                label.setFont(UIGlobals.UIFont);
             }
 
             label.setText(layerName);
