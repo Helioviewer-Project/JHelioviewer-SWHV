@@ -16,6 +16,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
+import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
@@ -144,6 +145,16 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         GLSLShader.dispose(gl);
     }
 
+    private MovieExporter exporter;
+
+    public void attachExport(MovieExporter me) {
+        exporter = me;
+    }
+
+    public void detachExport() {
+        exporter = null;
+    }
+
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         int w = getWidth();
@@ -155,11 +166,15 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
+        if (exporter != null) {
+            exporter.handleMovieExport(gl);
+        }
         GLInfo.updatePixelScale(this);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isVisible()) {
+                vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
                 vp.getCamera().applyPerspective(gl);
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
@@ -182,6 +197,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         if (exportMode || screenshotMode) {
             exportFrame(gl);
         }
+
     }
 
     private void exportFrame(GL2 gl) {

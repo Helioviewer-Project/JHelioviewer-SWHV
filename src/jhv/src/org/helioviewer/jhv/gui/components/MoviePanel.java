@@ -34,11 +34,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -123,6 +126,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JComboBox animationModeComboBox;
 
     private static JPanel modePanel;
+    private static JPanel recordPanel;
+
     private static JPanel speedPanel;
 
     // Icons
@@ -211,7 +216,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /* SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */ };
+        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /*
+                                                          * SpeedUnit.
+                                                          * MINUTESPERSECOND,
+                                                          * SpeedUnit
+                                                          * .HOURSPERSECOND,
+                                                          * SpeedUnit
+                                                          * .DAYSPERSECOND
+                                                          */};
         speedUnitComboBox = new JComboBox(units);
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
@@ -228,12 +240,38 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
-
         mainPanel.add(modePanel);
-
+        recordPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton recordButton = new JButton("Rec");
+        recordButton.addActionListener(new RecordActionListener(recordButton));
+        recordPanel.add(recordButton);
+        mainPanel.add(recordPanel);
         setEnabledState(false);
         setAdvanced(isAdvanced);
         sliderTimer.start();
+    }
+
+    private static class RecordActionListener implements ActionListener {
+        private MovieExporter el = null;
+        private boolean started = false;
+        private final JButton recordButton;
+
+        public RecordActionListener(JButton recordButton) {
+            this.recordButton = recordButton;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (started) {
+                recordButton.setText("Rec");
+                el.stop();
+            } else {
+                recordButton.setText("BUSY");
+                el = MovieExporter.exportMovie(Displayer.getViewport().getWidth() * GLInfo.pixelScale[0], Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
+            }
+            started = !started;
+        }
+
     }
 
     private static void setEnabledState(boolean enabled) {
@@ -270,11 +308,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-        } /* else {
-            Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() *
-                                           ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
-        }
-        */
+        } /*
+         * else { Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel)
+         * speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit)
+         * speedUnitComboBox.getSelectedItem()).getSecondsPerSecond()); }
+         */
     }
 
     /**

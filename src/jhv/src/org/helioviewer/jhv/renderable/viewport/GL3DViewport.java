@@ -12,13 +12,20 @@ public class GL3DViewport {
     private int y;
     private boolean isVisible = true;
     private GL3DCamera camera;
+    private final boolean movieExport;
 
     public GL3DViewport(int _x, int _y, int _w, int _h, GL3DCamera _camera) {
+        this(_x, _y, _w, _h, _camera, false);
+
+    }
+
+    public GL3DViewport(int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _movieExport) {
         w = _w;
         h = _h;
         x = _x;
         y = _y;
         camera = _camera;
+        movieExport = _movieExport;
     }
 
     public GL3DCamera getCamera() {
@@ -38,10 +45,14 @@ public class GL3DViewport {
     }
 
     public int getOffsetX() {
+        if (movieExport)
+            return 0;
         return GLInfo.pixelScale[0] * x;
     }
 
     public int getOffsetY() {
+        if (movieExport)
+            return 0;
         return GLInfo.pixelScale[1] * (Displayer.getViewport().getHeight() - h - y);
     }
 
@@ -63,4 +74,8 @@ public class GL3DViewport {
         isVisible = _isVisible;
     }
 
+    @Override
+    public String toString() {
+        return "Offset: " + this.getOffsetX() + "," + this.getOffsetY() + " Size: " + this.getWidth() + "," + this.getHeight();
+    }
 }
