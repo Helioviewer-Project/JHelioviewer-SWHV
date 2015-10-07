@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateCross implements GL3DAnnotatable {
+public class GL3DAnnotateCross extends GL3DAbstractAnnotatable {
 
     private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
     private int activeIndex = -1;
@@ -44,7 +44,7 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = GL3DAnnotatable.toCart(camera, radius, y, z);
+            GL3DVec3d pc = toCart(camera, radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
@@ -62,12 +62,12 @@ public class GL3DAnnotateCross implements GL3DAnnotatable {
         int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawCross(gl, GL3DAnnotatable.toSpherical(camera, crossPoints.get(i)));
+                drawCross(gl, toSpherical(camera, crossPoints.get(i)));
         }
 
         gl.glColor3f(GL3DAnnotatable.activeColor.getRed() / 255f, GL3DAnnotatable.activeColor.getGreen() / 255f, GL3DAnnotatable.activeColor.getBlue() / 255f);
         if (sz - 1 >= 0)
-            drawCross(gl, GL3DAnnotatable.toSpherical(camera, crossPoints.get(activeIndex)));
+            drawCross(gl, toSpherical(camera, crossPoints.get(activeIndex)));
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
