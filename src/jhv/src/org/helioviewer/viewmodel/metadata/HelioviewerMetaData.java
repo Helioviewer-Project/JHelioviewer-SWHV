@@ -89,6 +89,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (outerRadius == 0) {
             outerRadius = Double.MAX_VALUE;
         }
+
+        // magic
+        if (detector.equalsIgnoreCase("C3"))
+            innerRadius *= 1.05;
+        // outerRadius *= 0.9625;
+        if (instrument.equals("MDI") || instrument.equals("HMI"))
+            outerRadius = 1;
     }
 
     private void identifyObservation(MetaDataContainer m) {
