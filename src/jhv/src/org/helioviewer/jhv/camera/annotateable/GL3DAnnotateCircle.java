@@ -129,6 +129,7 @@ public class GL3DAnnotateCircle implements GL3DAnnotatable {
     public void reset() {
         circleStartPoints.clear();
         circleEndPoints.clear();
+        activeIndex = -1;
     }
 
     @Override

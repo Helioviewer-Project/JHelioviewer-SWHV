@@ -138,6 +138,7 @@ public class GL3DAnnotateRectangle extends GL3DAbstractAnnotatable {
     public void reset() {
         rectangleStartPoints.clear();
         rectangleEndPoints.clear();
+        activeIndex = -1;
     }
 
     @Override

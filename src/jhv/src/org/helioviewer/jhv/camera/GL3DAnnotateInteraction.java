@@ -3,7 +3,10 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.camera.annotateable.*;
+import org.helioviewer.jhv.camera.annotateable.GL3DAnnotatable;
+import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateCircle;
+import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateCross;
+import org.helioviewer.jhv.camera.annotateable.GL3DAnnotateRectangle;
 
 import com.jogamp.opengl.GL2;
 
@@ -76,7 +79,9 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void reset() {
-        activeAnnotatable.reset();
+        aRect.reset();
+        aCircle.reset();
+        aCross.reset();
         super.reset();
     }
 
