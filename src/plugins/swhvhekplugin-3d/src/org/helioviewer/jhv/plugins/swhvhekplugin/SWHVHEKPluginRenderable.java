@@ -256,7 +256,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
-        gl.glColor3f(1f, 1f, 1f);
+        gl.glColor3f(1, 1, 1);
         double width2 = width / 2.;
         double height2 = height / 2.;
 
@@ -285,14 +285,14 @@ public class SWHVHEKPluginRenderable implements Renderable {
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glBegin(GL2.GL_QUADS);
         {
-            gl.glTexCoord2f(1f, 1f);
-            gl.glVertex3d(p3.x, p3.y, p3.z);
-            gl.glTexCoord2f(1f, 0f);
-            gl.glVertex3d(p2.x, p2.y, p2.z);
-            gl.glTexCoord2f(0f, 0f);
-            gl.glVertex3d(p1.x, p1.y, p1.z);
-            gl.glTexCoord2f(0f, 1f);
-            gl.glVertex3d(p0.x, p0.y, p0.z);
+            gl.glTexCoord2f(1, 1);
+            gl.glVertex3f((float) p3.x, (float) p3.y, (float) p3.z);
+            gl.glTexCoord2f(1, 0);
+            gl.glVertex3f((float) p2.x, (float) p2.y, (float) p2.z);
+            gl.glTexCoord2f(0, 0);
+            gl.glVertex3f((float) p1.x, (float) p1.y, (float) p1.z);
+            gl.glTexCoord2f(0, 1);
+            gl.glVertex3f((float) p0.x, (float) p0.y, (float) p0.z);
         }
         gl.glEnd();
         gl.glDisable(GL2.GL_CULL_FACE);
