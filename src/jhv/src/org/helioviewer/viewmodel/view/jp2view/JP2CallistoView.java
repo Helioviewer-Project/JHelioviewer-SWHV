@@ -5,7 +5,6 @@ import java.util.Date;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;

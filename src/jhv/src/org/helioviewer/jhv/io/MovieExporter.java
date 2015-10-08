@@ -11,7 +11,6 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GL3DViewport;
-import org.helioviewer.jhv.opengl.GLInfo;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;

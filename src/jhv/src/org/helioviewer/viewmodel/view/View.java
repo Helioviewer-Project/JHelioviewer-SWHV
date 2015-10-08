@@ -3,14 +3,11 @@ package org.helioviewer.viewmodel.view;
 import java.net.URI;
 import java.util.Date;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 /**
