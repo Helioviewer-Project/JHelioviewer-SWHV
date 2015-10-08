@@ -47,7 +47,7 @@ public class RenderableDummy implements Renderable {
 
         textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
         Rectangle2D rect = textRenderer.getBounds(name);
-        textRenderer.draw(name, (vp.getWidth() - 5) - (int) rect.getWidth(), (vp.getHeight() - 5) - (int) rect.getHeight());
+        textRenderer.draw(name, (int) (vp.getWidth() - rect.getWidth() - 5 * sx), (int) (vp.getHeight() - rect.getHeight() - 5 * sy));
         textRenderer.endRendering();
     }
 
