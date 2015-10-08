@@ -21,7 +21,6 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;
-import org.helioviewer.jhv.threads.JHVThread;
 
 public class PfssNewDataLoader implements Runnable {
 

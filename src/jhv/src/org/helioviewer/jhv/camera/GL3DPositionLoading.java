@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.SwingWorker;
 
@@ -19,7 +18,6 @@ import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.base.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
