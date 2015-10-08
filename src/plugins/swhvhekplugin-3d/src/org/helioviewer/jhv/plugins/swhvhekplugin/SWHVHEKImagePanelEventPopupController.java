@@ -19,6 +19,7 @@ import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 /**
  * Implementation of ImagePanelPlugin for showing event popups.
@@ -94,7 +95,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     public void mouseClicked(MouseEvent e) {
         if (component != null && mouseOverJHVEvent != null) {
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
-            hekPopUp.setLocation(calcWindowPosition(mouseOverPosition, hekPopUp.getWidth(), hekPopUp.getHeight()));
+            hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(mouseOverPosition), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.pack();
             hekPopUp.setVisible(true);
 
@@ -152,7 +153,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
 
-        hitpoint = this.getHitPoint(e);
+        hitpoint = getHitPoint(e);
 
         ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
         for (JHVEvent evt : toDraw) {

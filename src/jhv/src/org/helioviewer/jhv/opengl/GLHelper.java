@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import java.awt.Point;
+
 import com.jogamp.opengl.GL2;
 
 public class GLHelper {
@@ -35,6 +37,10 @@ public class GLHelper {
 
     public static void lineWidth(GL2 gl, double w) {
         gl.glLineWidth((float) (w * GLInfo.pixelScaleFloat[0]));
+    }
+
+    public static Point GL2AWTPoint(Point p) {
+        return new Point((int) (p.x / GLInfo.pixelScaleFloat[0]), (int) (p.y / GLInfo.pixelScaleFloat[1]));
     }
 
 }
