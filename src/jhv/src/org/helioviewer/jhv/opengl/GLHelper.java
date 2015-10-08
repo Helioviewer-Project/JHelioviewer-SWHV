@@ -33,4 +33,8 @@ public class GLHelper {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
+    public static void lineWidth(GL2 gl, double w) {
+        gl.glLineWidth((float) (w * GLInfo.pixelScaleFloat[0]));
+    }
+
 }

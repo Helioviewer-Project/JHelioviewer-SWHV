@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -68,7 +69,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glLineWidth(2.0f);
+        GLHelper.lineWidth(gl, lineWidth);
 
         gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
         if (beingDragged()) {

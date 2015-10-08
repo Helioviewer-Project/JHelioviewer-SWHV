@@ -13,6 +13,7 @@ import nom.tam.fits.Header;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
@@ -249,7 +250,7 @@ public class PfssData {
         gl.glColorPointer(4, GL2.GL_FLOAT, 7 * 4, 3 * 4);
         gl.glVertexPointer(3, GL2.GL_FLOAT, 7 * 4, 0);
 
-        gl.glLineWidth(PfssSettings.LINE_WIDTH);
+        GLHelper.lineWidth(gl, PfssSettings.LINE_WIDTH);
         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
         gl.glDepthMask(true);

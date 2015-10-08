@@ -17,9 +17,9 @@ public class PfssSettings {
      */
     public final static int CACHE_SIZE = 365 * 4;
 
-    public final static float LINE_ALPHA = 1.0f;
+    public final static float LINE_ALPHA = 1;
 
-    public final static float LINE_WIDTH = 0.6f;
+    public final static double LINE_WIDTH = 0.5;
 
     public final static int POINTS_PER_LINE = 40;
 
