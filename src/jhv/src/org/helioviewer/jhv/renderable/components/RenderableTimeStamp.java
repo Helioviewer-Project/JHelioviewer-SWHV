@@ -3,7 +3,6 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.geom.Rectangle2D;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;

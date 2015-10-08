@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.gui.filters;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.JPanel;
 

@@ -12,8 +12,6 @@ import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.viewmodel.view.AbstractView;
 
-import com.jogamp.opengl.GL2;
-
 public class FITSView extends AbstractView {
 
     protected FITSImage fits;
