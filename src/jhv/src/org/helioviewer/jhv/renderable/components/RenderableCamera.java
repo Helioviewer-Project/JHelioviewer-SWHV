@@ -8,8 +8,8 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 
 import com.jogamp.opengl.GL2;
 

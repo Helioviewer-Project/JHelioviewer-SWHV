@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
+import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.ViewDataHandler;

@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.viewmodel.view.View;
 

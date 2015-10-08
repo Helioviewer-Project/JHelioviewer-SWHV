@@ -7,9 +7,9 @@ import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
-import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
