@@ -13,10 +13,10 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GL3DViewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -113,8 +113,8 @@ public class RenderableGrid implements Renderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(matrix, 0);
         {
-            gl.glColor3f(0f, 0f, 0f);
-            RenderableHelper.drawCircle(gl, 0, 0, 0.95, 25);
+            gl.glColor3f(0, 0, 0);
+            GLHelper.drawCircle(gl, 0, 0, 0.95, 25);
         }
         gl.glPopMatrix();
     }

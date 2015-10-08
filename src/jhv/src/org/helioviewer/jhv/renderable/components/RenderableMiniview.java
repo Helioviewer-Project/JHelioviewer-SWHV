@@ -8,8 +8,8 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GL3DViewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.Renderable;
-import org.helioviewer.jhv.renderable.helpers.RenderableHelper;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
@@ -32,23 +32,26 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
         GL3DMat4d cameraMatrix = vp.getCamera().getLocalRotation().toMatrix();
-        gl.glDepthRange(0.f, 0.f);
+        gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-            gl.glColor4d(0, 0, 0, 1);
-            RenderableHelper.drawRectangle(gl, -30, -30, 60, 60);
-            gl.glColor4d(1, 0, 0, 1);
-            RenderableHelper.drawCircle(gl, 0, 0, 1, 100);
-            gl.glColor4d(0, 1, 0, 0.2);
+
+            gl.glColor4f(0, 0, 0, 1);
+            GLHelper.drawRectangle(gl, -30, -30, 60, 60);
+
+            gl.glColor4f(1, 0, 0, 1);
+            GLHelper.drawCircle(gl, 0, 0, 1, 100);
+
+            gl.glColor4f(0, 1, 0, 0.2f);
             View v = Layers.getActiveView();
             if (v != null) {
                 MetaData m = v.getMetaData(new ImmutableDateTime(0));
-                RenderableHelper.drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
+                GLHelper.drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
             }
         }
         gl.glPopMatrix();
-        gl.glDepthRange(0.f, 1.f);
+        gl.glDepthRange(0, 1);
     }
 
     @Override
