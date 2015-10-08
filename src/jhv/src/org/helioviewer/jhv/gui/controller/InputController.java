@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.LinkedList;
+import java.util.HashSet;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
@@ -47,10 +47,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseClicked(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseListener) plugin).mouseClicked(e);
-        }
+        for (MouseListener listener : mouseListeners)
+            listener.mouseClicked(e);
 
         Displayer.getViewport().getCamera().getCurrentInteraction().mouseClicked(e);
     }
@@ -58,10 +56,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseEntered(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseListener) plugin).mouseEntered(e);
-        }
+        for (MouseListener listener : mouseListeners)
+            listener.mouseEntered(e);
 
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
@@ -72,10 +68,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseExited(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseListener) plugin).mouseExited(e);
-        }
+        for (MouseListener listener : mouseListeners)
+            listener.mouseExited(e);
 
         component.setCursor(Cursor.getDefaultCursor());
     }
@@ -83,10 +77,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mousePressed(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseListener) plugin).mousePressed(e);
-        }
+        for (MouseListener listener : mouseListeners)
+            listener.mousePressed(e);
 
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
@@ -101,10 +93,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseReleased(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseListener) plugin).mouseReleased(e);
-        }
+        for (MouseListener listener : mouseListeners)
+            listener.mouseReleased(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             component.setCursor(UIGlobals.openHandCursor);
@@ -116,10 +106,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseDragged(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseMotionListener)
-                ((MouseMotionListener) plugin).mouseDragged(e);
-        }
+        for (MouseMotionListener listener : mouseMotionListeners)
+            listener.mouseDragged(e);
 
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
@@ -131,10 +119,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseMoved(MouseEvent e) {
         e = mouseSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseListener)
-                ((MouseMotionListener) plugin).mouseMoved(e);
-        }
+        for (MouseMotionListener listener : mouseMotionListeners)
+            listener.mouseMoved(e);
 
         Displayer.getViewport().getCamera().getCurrentInteraction().mouseMoved(e);
     }
@@ -143,52 +129,63 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         e = mouseWheelSynthesizer(e);
-        for (InputControllerPlugin plugin : plugins) {
-            if (plugin instanceof MouseWheelListener)
-                ((MouseWheelListener) plugin).mouseWheelMoved(e);
-        }
+        for (MouseWheelListener listener : mouseWheelListeners)
+            listener.mouseWheelMoved(e);
 
         Displayer.getViewport().getCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
+        for (KeyListener listener : keyListeners)
+            listener.keyTyped(e);
+
         Displayer.getViewport().getCamera().getCurrentInteraction().keyTyped(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        for (KeyListener listener : keyListeners)
+            listener.keyPressed(e);
+
         Displayer.getViewport().getCamera().getCurrentInteraction().keyPressed(e);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        for (KeyListener listener : keyListeners)
+            listener.keyReleased(e);
+
         Displayer.getViewport().getCamera().getCurrentInteraction().keyReleased(e);
     }
 
-    private final LinkedList<InputControllerPlugin> plugins = new LinkedList<InputControllerPlugin>();
+    private final HashSet<MouseListener> mouseListeners = new HashSet<MouseListener>();
+    private final HashSet<MouseMotionListener> mouseMotionListeners = new HashSet<MouseMotionListener>();
+    private final HashSet<MouseWheelListener> mouseWheelListeners = new HashSet<MouseWheelListener>();
+    private final HashSet<KeyListener> keyListeners = new HashSet<KeyListener>();
 
-    public void addPlugin(InputControllerPlugin newPlugin) {
-        if (newPlugin == null || plugins.contains(newPlugin)) {
-            return;
-        }
-
-        plugins.add(newPlugin);
-        newPlugin.setComponent(component);
-
-        if (newPlugin instanceof KeyListener)
-            component.addKeyListener((KeyListener) newPlugin);
+    public void addPlugin(InputControllerPlugin plugin) {
+        if (plugin instanceof MouseListener)
+            mouseListeners.add((MouseListener) plugin);
+        if (plugin instanceof MouseMotionListener)
+            mouseMotionListeners.add((MouseMotionListener) plugin);
+        if (plugin instanceof MouseWheelListener)
+            mouseWheelListeners.add((MouseWheelListener) plugin);
+        if (plugin instanceof KeyListener)
+            keyListeners.add((KeyListener) plugin);
+        plugin.setComponent(component);
     }
 
-    public void removePlugin(InputControllerPlugin oldPlugin) {
-        if (oldPlugin == null || !plugins.remove(oldPlugin)) {
-            return;
-        }
-
-        oldPlugin.setComponent(null);
-
-        if (oldPlugin instanceof KeyListener)
-            component.removeKeyListener((KeyListener) oldPlugin);
+    public void removePlugin(InputControllerPlugin plugin) {
+        if (plugin instanceof MouseListener)
+            mouseListeners.remove((MouseListener) plugin);
+        if (plugin instanceof MouseMotionListener)
+            mouseMotionListeners.remove((MouseMotionListener) plugin);
+        if (plugin instanceof MouseWheelListener)
+            mouseWheelListeners.remove((MouseWheelListener) plugin);
+        if (plugin instanceof KeyListener)
+            keyListeners.remove((KeyListener) plugin);
+        plugin.setComponent(null);
     }
 
 }

@@ -50,7 +50,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void setComponent(Component _component) {
-        component = _component; // may be null
+        component = _component;
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
@@ -93,7 +93,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (component != null && mouseOverJHVEvent != null) {
+        if (mouseOverJHVEvent != null) {
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
             hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(mouseOverPosition), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.pack();
@@ -143,9 +143,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (component == null)
-            return;
-
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
         Date currentDate = Layers.getLastUpdatedTimestamp();
 
