@@ -21,6 +21,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -30,6 +31,8 @@ import org.helioviewer.jhv.renderable.gui.Renderable;
 import com.jogamp.opengl.GL2;
 
 public class SWHVHEKPluginRenderable implements Renderable {
+
+    private static final SWHVHEKImagePanelEventPopupController controller = new SWHVHEKImagePanelEventPopupController();
 
     private static final double LINEWIDTH = 0.5;
     private static final double LINEWIDTH_HI = 1;
@@ -314,6 +317,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void remove(GL2 gl) {
         dispose(gl);
+        ImageViewerGui.getInputController().removePlugin(controller);
     }
 
     @Override
@@ -332,8 +336,12 @@ public class SWHVHEKPluginRenderable implements Renderable {
     }
 
     @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void setVisible(boolean _isVisible) {
+        isVisible = _isVisible;
+        if (isVisible)
+            ImageViewerGui.getInputController().addPlugin(controller);
+        else
+            ImageViewerGui.getInputController().removePlugin(controller);
     }
 
     @Override
@@ -348,6 +356,8 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void init(GL2 gl) {
+        if (isVisible)
+            ImageViewerGui.getInputController().addPlugin(controller);
     }
 
     @Override
