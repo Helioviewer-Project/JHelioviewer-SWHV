@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.renderable.helpers;
+package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableHelper {
+public class GLHelper {
 
     public static void drawCircle(GL2 gl, double x, double y, double r, int segments) {
         gl.glDisable(GL2.GL_TEXTURE_2D);
