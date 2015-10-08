@@ -20,7 +20,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.imagedata.ImageData;
@@ -201,7 +200,7 @@ public class JP2View extends AbstractView {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = (Displayer.getViewport().getCamera().getCameraWidth() * 2) / (Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
+        double ratio = (Displayer.getViewport().getCamera().getCameraWidth() * 2) / Displayer.getViewport().getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;

@@ -47,7 +47,7 @@ public class RenderableTimeStamp implements Renderable {
             textRenderer.setColor(Color.WHITE);
         }
 
-        textRenderer.beginRendering(sx * vp.getWidth(), sy * vp.getHeight(), true);
+        textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
         textRenderer.draw(TimeUtils.utcDateFormat.format(Layers.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
         textRenderer.endRendering();
     }

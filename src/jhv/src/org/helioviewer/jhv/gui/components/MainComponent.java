@@ -119,27 +119,25 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        int w = getWidth();
-        int h = getHeight();
-        Displayer.getViewport().getCamera().updateCameraWidthAspect(w / (double) h);
-        Displayer.getViewport().setViewportSize(w, h);
+        Displayer.getViewport().getCamera().updateCameraWidthAspect(width / (double) height);
+        Displayer.getViewport().setViewportSize(width, height);
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(this);
 
         if (exporter != null) {
             exporter.handleMovieExport(gl);
         }
 
-        GLInfo.updatePixelScale(this);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isVisible()) {
                 vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
+                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 vp.getCamera().applyPerspective(gl);
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
             }
@@ -151,7 +149,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         if (vp.isVisible()) {
             vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
             vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth() * GLInfo.pixelScale[0], vp.getHeight() * GLInfo.pixelScale[1]);
+            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
             vp.getCamera().applyPerspective(gl);
             ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
         }

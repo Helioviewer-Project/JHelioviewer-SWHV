@@ -41,7 +41,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -266,7 +265,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 el.stop();
             } else {
                 recordButton.setText("BUSY");
-                el = MovieExporter.exportMovie(Displayer.getViewport().getWidth() * GLInfo.pixelScale[0], Displayer.getViewport().getHeight() * GLInfo.pixelScale[1]);
+                el = MovieExporter.exportMovie(Displayer.getViewport().getWidth(), Displayer.getViewport().getHeight());
             }
             started = !started;
         }

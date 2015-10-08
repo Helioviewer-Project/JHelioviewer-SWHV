@@ -77,7 +77,6 @@ public class MovieExporter {
     }
 
     private void renderFrame(GL2 gl) {
-        GLInfo.updatePixelScale(1, 1);
         fbo.bind(gl);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());

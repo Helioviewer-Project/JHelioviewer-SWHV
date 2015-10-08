@@ -55,11 +55,4 @@ public class GLInfo {
             return true;
     }
 
-    public static void updatePixelScale(int i, int j) {
-        pixelScale[0] = i;
-        pixelScale[1] = j;
-        pixelScaleFloat[0] = i;
-        pixelScaleFloat[1] = j;
-    }
-
 }
