@@ -9,7 +9,6 @@ import org.helioviewer.jhv.plugin.interfaces.Plugin;
 public class SWHVHEKPlugin implements Plugin {
 
     private SWHVHEKPluginRenderable renderable;
-    private SWHVHEKImagePanelEventPopupController controller;
 
     public SWHVHEKPlugin() {
         renderable = new SWHVHEKPluginRenderable();
@@ -17,9 +16,6 @@ public class SWHVHEKPlugin implements Plugin {
 
     @Override
     public void installPlugin() {
-        controller = new SWHVHEKImagePanelEventPopupController();
-        ImageViewerGui.getInputController().addPlugin(controller);
-
         SWHVHEKData.getSingletonInstance().requestEvents();
         Layers.addLayersListener(SWHVHEKData.getSingletonInstance());
         ImageViewerGui.getRenderableContainer().addRenderable(renderable);
@@ -30,9 +26,6 @@ public class SWHVHEKPlugin implements Plugin {
         ImageViewerGui.getRenderableContainer().removeRenderable(renderable);
         Layers.removeLayersListener(SWHVHEKData.getSingletonInstance());
         SWHVHEKData.getSingletonInstance().reset();
-
-        ImageViewerGui.getInputController().removePlugin(controller);
-        controller = null;
     }
 
     @Override
