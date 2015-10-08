@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -432,7 +431,7 @@ public class Layers {
 
     private static class AbsoluteFrameChooser implements FrameChooser {
 
-        private long[] obsMillis;
+        private final long[] obsMillis;
         private long absoluteStartTime;
         private long systemStartTime;
 
