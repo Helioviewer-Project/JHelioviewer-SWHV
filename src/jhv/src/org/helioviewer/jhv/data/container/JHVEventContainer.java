@@ -126,7 +126,7 @@ public class JHVEventContainer {
      * Indicates to the JHVEventContainer that a download was finished. This
      * must be called the event request handlers in order to propagate the
      * downloaded events to the event handlers.
-     * 
+     *
      * @param partially
      */
     public void finishedDownload(boolean partially) {
@@ -139,8 +139,8 @@ public class JHVEventContainer {
      * @param eventType
      *            the event type to remove from the cache.
      */
-    public void removeEvents(final JHVEventType eventType) {
-        eventCache.removeEventType(eventType);
+    public void removeEvents(final JHVEventType eventType, boolean keepActive) {
+        eventCache.removeEventType(eventType, keepActive);
         fireEventCacheChanged();
     }
 

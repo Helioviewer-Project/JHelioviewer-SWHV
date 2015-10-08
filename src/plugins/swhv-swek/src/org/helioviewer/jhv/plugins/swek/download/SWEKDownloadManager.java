@@ -107,7 +107,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      * @param eventType
      *            the event type for which to stop downloads
      */
-    public void stopDownloadingEventType(SWEKEventType eventType) {
+    public void stopDownloadingEventType(SWEKEventType eventType, boolean keepActive) {
         if (dwMap.containsKey(eventType)) {
             Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapOnDate.values()) {
@@ -117,7 +117,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         removeFromBusyAndFinishedJobs(eventType);
         removeFromBusyAndFinishedIntervalJobs(eventType);
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()));
+            eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()), keepActive);
         }
     }
 
@@ -129,7 +129,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      * @param source
      *            the source for which to stop the downloads
      */
-    public void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier) {
+    public void stopDownloadingEventType(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier, boolean keepActive) {
         if (dwMap.containsKey(eventType)) {
             Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapOnDate.values()) {
@@ -140,7 +140,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         }
         removeFromBusyAndFinishedJobs(eventType, supplier);
         removeFromBusyAndFinishedIntervalJobs(eventType, supplier);
-        eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()));
+        eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     @Override
     public void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
         removeEventTypeFromActiveEventTypeMap(eventType, swekSource, supplier);
-        stopDownloadingEventType(eventType, swekSource, supplier);
+        stopDownloadingEventType(eventType, swekSource, supplier, false);
     }
 
     @Override
@@ -193,13 +193,13 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
     @Override
     public void filtersAdded(SWEKEventType swekEventType) {
-        stopDownloadingEventType(swekEventType);
+        stopDownloadingEventType(swekEventType, true);
         downloadSelectedSuppliers(swekEventType);
     }
 
     @Override
     public void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter) {
-        stopDownloadingEventType(swekEventType);
+        stopDownloadingEventType(swekEventType, true);
         downloadSelectedSuppliers(swekEventType);
     }
 
