@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.renderable.viewport;
+package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
@@ -77,4 +77,5 @@ public class GL3DViewport {
     public String toString() {
         return "Offset: " + this.getOffsetX() + "," + this.getOffsetY() + " Size: " + this.getWidth() + "," + this.getHeight();
     }
+
 }
