@@ -23,6 +23,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GL3DViewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
@@ -30,8 +31,8 @@ import com.jogamp.opengl.GL2;
 
 public class SWHVHEKPluginRenderable implements Renderable {
 
-    private static final float LINEWIDTH = 1f;
-    private static final float LINEWIDTH_HI = 2f;
+    private static final double LINEWIDTH = 0.5;
+    private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private boolean isVisible = true;
@@ -92,11 +93,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
-        if (evt.isHighlighted()) {
-            gl.glLineWidth(LINEWIDTH_HI);
-        } else {
-            gl.glLineWidth(LINEWIDTH);
-        }
+        GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         double r, alpha, theta;
         double x, y, z;
@@ -202,11 +199,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         }
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
-        if (evt.isHighlighted()) {
-            gl.glLineWidth(LINEWIDTH_HI);
-        } else {
-            gl.glLineWidth(LINEWIDTH);
-        }
+        GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
         JHVPoint oldBoundaryPoint3d = null;

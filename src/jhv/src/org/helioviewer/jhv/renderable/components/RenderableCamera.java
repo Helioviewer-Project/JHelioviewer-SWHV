@@ -9,6 +9,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GL3DViewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 import com.jogamp.opengl.GL2;
@@ -48,7 +49,7 @@ public class RenderableCamera implements Renderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
         {
-            gl.glLineWidth(2.5f);
+            GLHelper.lineWidth(gl, 1);
 
             gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glBegin(GL2.GL_LINE_LOOP);

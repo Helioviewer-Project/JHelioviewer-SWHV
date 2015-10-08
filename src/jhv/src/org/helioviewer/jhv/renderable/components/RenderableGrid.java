@@ -120,7 +120,7 @@ public class RenderableGrid implements Renderable {
     }
 
     private void drawAxes(GL2 gl) {
-        gl.glLineWidth(2f);
+        GLHelper.lineWidth(gl, 1);
 
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINES);
@@ -137,7 +137,7 @@ public class RenderableGrid implements Renderable {
     }
 
     private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {
-        gl.glLineWidth(0.5f);
+        GLHelper.lineWidth(gl, 0.25);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
