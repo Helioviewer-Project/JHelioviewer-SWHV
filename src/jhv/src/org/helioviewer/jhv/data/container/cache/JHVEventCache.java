@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -150,8 +151,35 @@ public class JHVEventCache {
      * @param eventType
      *            the event type to remove
      */
-    public void removeEventType(JHVEventType eventType) {
-        activeEventTypes.remove(eventType);
+    public void removeEventType(JHVEventType eventType, boolean keepActive) {
+        if (!keepActive) {
+            activeEventTypes.remove(eventType);
+        } else {
+            deleteFromCache(eventType);
+        }
+    }
+
+    private void deleteFromCache(JHVEventType eventType) {
+        downloadedCache.put(eventType, new RequestCache());
+        for (Iterator<Map.Entry<String, JHVEvent>> it = allEvents.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, JHVEvent> entry = it.next();
+            if (entry.getValue().getJHVEventType().equals(eventType)) {
+                eventIDs.remove(entry.getKey());
+                colorPerId.remove(entry.getKey());
+                eventsWithRelationRules.remove(entry.getValue());
+                missingEventsInEventRelations.remove(entry.getKey());
+                it.remove();
+            }
+        }
+        for (Iterator<Map.Entry<Date, Map<Date, List<JHVEvent>>>> itDate1 = events.entrySet().iterator(); itDate1.hasNext();) {
+            for (Iterator<Map.Entry<Date, List<JHVEvent>>> itDate2 = itDate1.next().getValue().entrySet().iterator(); itDate2.hasNext();) {
+                for (Iterator<JHVEvent> itEvent = itDate2.next().getValue().iterator(); itEvent.hasNext();) {
+                    if (itEvent.next().getJHVEventType().equals(eventType)) {
+                        itEvent.remove();
+                    }
+                }
+            }
+        }
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
