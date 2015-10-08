@@ -15,6 +15,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
+import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
@@ -31,8 +32,37 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         component.addKeyListener(this);
     }
 
+    private MouseEvent mouseSynthesizer(MouseEvent e) {
+        return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiers(),
+                              e.getX() * GLInfo.pixelScale[0], e.getY() * GLInfo.pixelScale[1],
+                              e.getClickCount(), e.isPopupTrigger(), e.getButton());
+    }
+
+    private MouseWheelEvent mouseWheelSynthesizer(MouseWheelEvent e) {
+        return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiers(),
+                                   e.getX() * GLInfo.pixelScale[0], e.getY() * GLInfo.pixelScale[1],
+                                   e.getClickCount(),  e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseListener) plugin).mouseClicked(e);
+        }
+
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseClicked(e);
+    }
+
     @Override
     public void mouseEntered(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseListener) plugin).mouseEntered(e);
+        }
+
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
             component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
@@ -41,11 +71,23 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseExited(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseListener) plugin).mouseExited(e);
+        }
+
         component.setCursor(Cursor.getDefaultCursor());
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseListener) plugin).mousePressed(e);
+        }
+
         GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
@@ -58,6 +100,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseListener) plugin).mouseReleased(e);
+        }
+
         if (e.getButton() == MouseEvent.BUTTON1) {
             component.setCursor(UIGlobals.openHandCursor);
             buttonDown = false;
@@ -67,6 +115,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseMotionListener)
+                ((MouseMotionListener) plugin).mouseDragged(e);
+        }
+
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
@@ -75,18 +129,26 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        Displayer.getViewport().getCamera().getCurrentInteraction().mouseClicked(e);
+    public void mouseMoved(MouseEvent e) {
+        e = mouseSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseListener)
+                ((MouseMotionListener) plugin).mouseMoved(e);
+        }
+
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseMoved(e);
     }
+
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        Displayer.getViewport().getCamera().getCurrentInteraction().mouseWheelMoved(e);
-    }
+        e = mouseWheelSynthesizer(e);
+        for (InputControllerPlugin plugin : plugins) {
+            if (plugin instanceof MouseWheelListener)
+                ((MouseWheelListener) plugin).mouseWheelMoved(e);
+        }
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        Displayer.getViewport().getCamera().getCurrentInteraction().mouseMoved(e);
+        Displayer.getViewport().getCamera().getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
@@ -114,12 +176,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         plugins.add(newPlugin);
         newPlugin.setComponent(component);
 
-        if (newPlugin instanceof MouseListener)
-            component.addMouseListener((MouseListener) newPlugin);
-        if (newPlugin instanceof MouseMotionListener)
-            component.addMouseMotionListener((MouseMotionListener) newPlugin);
-        if (newPlugin instanceof MouseWheelListener)
-            component.addMouseWheelListener((MouseWheelListener) newPlugin);
         if (newPlugin instanceof KeyListener)
             component.addKeyListener((KeyListener) newPlugin);
     }
@@ -131,12 +187,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
         oldPlugin.setComponent(null);
 
-        if (oldPlugin instanceof MouseListener)
-            component.removeMouseListener((MouseListener) oldPlugin);
-        if (oldPlugin instanceof MouseMotionListener)
-            component.removeMouseMotionListener((MouseMotionListener) oldPlugin);
-        if (oldPlugin instanceof MouseWheelListener)
-            component.removeMouseWheelListener((MouseWheelListener) oldPlugin);
         if (oldPlugin instanceof KeyListener)
             component.removeKeyListener((KeyListener) oldPlugin);
     }

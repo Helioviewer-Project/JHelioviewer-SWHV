@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.viewport;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.opengl.GLInfo;
 
 public class GL3DViewport {
 
@@ -47,13 +46,13 @@ public class GL3DViewport {
     public int getOffsetX() {
         if (movieExport)
             return 0;
-        return GLInfo.pixelScale[0] * x;
+        return x;
     }
 
     public int getOffsetY() {
         if (movieExport)
             return 0;
-        return GLInfo.pixelScale[1] * (Displayer.getViewport().getHeight() - h - y);
+        return Displayer.getViewport().getHeight() - h - y;
     }
 
     public void setViewportSize(int width, int height) {

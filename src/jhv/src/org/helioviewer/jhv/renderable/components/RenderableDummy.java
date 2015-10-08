@@ -45,9 +45,9 @@ public class RenderableDummy implements Renderable {
             textRenderer.setColor(Color.WHITE);
         }
 
-        textRenderer.beginRendering(sx * vp.getWidth(), sy * vp.getHeight(), true);
+        textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
         Rectangle2D rect = textRenderer.getBounds(name);
-        textRenderer.draw(name, sx * (vp.getWidth() - 5) - (int) rect.getWidth(), sy * (vp.getHeight() - 5) - (int) rect.getHeight());
+        textRenderer.draw(name, (vp.getWidth() - 5) - (int) rect.getWidth(), (vp.getHeight() - 5) - (int) rect.getHeight());
         textRenderer.endRendering();
     }
 

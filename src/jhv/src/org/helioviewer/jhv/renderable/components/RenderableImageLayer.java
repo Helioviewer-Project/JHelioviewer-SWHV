@@ -13,7 +13,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.jhv.renderable.viewport.GL3DViewport;
@@ -92,7 +91,7 @@ public class RenderableImageLayer implements Renderable {
             gl.glCullFace(GL2.GL_BACK);
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
-            GLSLShader.setViewport(GLInfo.pixelScale[0] * vp.getWidth(), GLInfo.pixelScale[1] * vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
+            GLSLShader.setViewport(vp.getWidth(), vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
             if (!RenderableImageLayer.showCorona) {
                 GLSLShader.setOuterCutOffRadius(1.);
             }
