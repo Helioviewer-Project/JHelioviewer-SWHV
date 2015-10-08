@@ -27,7 +27,6 @@ public class MovieExporter {
     private final int w;
     private final int h;
     private final FBObject fbo = new FBObject();
-    private int numSamples = 0;
     private TextureAttachment fboTex;
 
     private final String moviePath;
@@ -55,18 +54,9 @@ public class MovieExporter {
     }
 
     private void initFBO(final GL2 gl, int fbow, int fboh) {
-        fbo.init(gl, fbow, fboh, numSamples);
+        fbo.init(gl, fbow, fboh, 0);
+        fboTex = fbo.attachTexture2D(gl, 0, true);
 
-        numSamples = fbo.getNumSamples();
-        if (numSamples > 0) {
-            fbo.attachColorbuffer(gl, 0, true);
-            fbo.resetSamplingSink(gl);
-
-            fboTex = fbo.getSamplingSink().getTextureAttachment();
-        } else {
-            fboTex = fbo.attachTexture2D(gl, 0, true);
-        }
-        numSamples = fbo.getNumSamples();
         fbo.attachRenderbuffer(gl, Type.DEPTH, FBObject.CHOSEN_BITS);
         fbo.unbind(gl);
     }
@@ -87,14 +77,22 @@ public class MovieExporter {
 
     private void exportFrame(GL2 gl, double framerate, int framenumber) {
         fbo.use(gl, fboTex);
+
         BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
         byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
         ByteBuffer fb = ByteBuffer.wrap(array);
         gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
         gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
         gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
-        ImageUtil.flipImageVertically(screenshot);
-        movieWriter.encodeVideo(0, screenshot, (int) (1000 / framerate * framenumber), TimeUnit.MILLISECONDS);
+
+        fbo.unuse(gl);
+
+        try {
+            ImageUtil.flipImageVertically(screenshot);
+            movieWriter.encodeVideo(0, screenshot, (int) (1000 / framerate * framenumber), TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void exportMovieStart(GL2 gl) {
