@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -11,16 +12,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ListCellRenderer;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -34,7 +36,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.viewmodel.metadata.MetaData;
@@ -53,12 +54,23 @@ import org.w3c.dom.NodeList;
  */
 @SuppressWarnings({ "serial" })
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
+    private static class LocalTableModel extends DefaultTableModel {
+        public LocalTableModel(Object[][] object, Object[] objects) {
+            super(object, objects);
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    }
 
     private final JButton closeButton = new JButton("Close");
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
+    private final DefaultTableModel basicModel = new LocalTableModel(null, new Object[] { "Basic information", "" });
+    private final DefaultTableModel fitsModel = new LocalTableModel(null, new Object[] { "FITS Key", "value" });
+    private final DefaultTableModel jhModel = new LocalTableModel(null, new Object[] { "JHV Key", "value" });
 
-    private final Vector<String> infoList = new Vector<String>();
-    private final JList listBox = new JList();
     private Document xmlDoc = null;
     private boolean metaDataOK;
     private String outFileName;
@@ -72,27 +84,38 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         setLayout(new BorderLayout());
         setResizable(false);
 
-        listBox.setFont(UIGlobals.UIFontMono);
-
-        listBox.setCellRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JTextArea textArea = new JTextArea(value.toString().trim());
-                textArea.setLineWrap(true);
-                textArea.setWrapStyleWord(true);
-                textArea.setFont(list.getFont());
-                return textArea;
-            }
-        });
-
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(exportFitsButton);
-        // bottomPanel.add(exportButton);
         bottomPanel.add(closeButton);
+        JTable basicTable = new JTable(basicModel);
+        prepareTable(basicTable);
+        JTable fTable = new JTable(fitsModel);
+        prepareTable(fTable);
+        JTable jhTable = new JTable(jhModel);
+        prepareTable(jhTable);
 
-        JScrollPane listScroller = new JScrollPane(listBox);
-        add(listScroller, BorderLayout.CENTER);
+        JPanel sp = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.weightx = 1;
+        c.weighty = 1;
+
+        c.gridx = 0;
+        c.gridy = 0;
+
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = 1;
+        sp.add(new JScrollPane(basicTable), c);
+        c.weighty = 3;
+        c.gridy = 1;
+        sp.add(new JScrollPane(fTable), c);
+        c.weighty = 1.25;
+        c.gridy = 2;
+        sp.add(new JScrollPane(jhTable), c);
+
+        //JScrollPane listScroller = new JScrollPane(sp);
+        add(sp, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.PAGE_END);
 
         // add action listeners to the buttons
@@ -103,13 +126,20 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         setMetaData(view);
     }
 
+    public void prepareTable(JTable t) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(t.getModel());
+        t.setRowSorter(sorter);
+        JTextField tf = new JTextField();
+        t.setRowSelectionAllowed(true);
+        t.setColumnSelectionAllowed(true);
+        t.setCellSelectionEnabled(true);
+    }
+
     /**
      * Resets the list.
      */
     public void resetData() {
-        infoList.removeAllElements();
         // update the listBox
-        listBox.setListData(this.infoList);
         // set the status of export button
         if (!metaDataOK) {
             exportFitsButton.setEnabled(false);
@@ -125,10 +155,16 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      *            New item to add
      * @see #setMetaData(MetaDataView)
      */
-    public void addDataItem(String _item) {
-        infoList.add(_item);
-        // update the listBox
-        listBox.setListData(this.infoList);
+    public void addDataItem(String key, String value) {
+        basicModel.addRow(new Object[] { key, value });
+    }
+
+    private void addDataItem(String nodeName, String nodeValue, boolean isFits) {
+        System.out.println("nodeName:" + nodeName + " " + nodeName.length());
+        if (isFits)
+            fitsModel.addRow(new Object[] { nodeName, nodeValue });
+        else
+            jhModel.addRow(new Object[] { nodeName, nodeValue });
     }
 
     /**
@@ -153,7 +189,6 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     public void actionPerformed(ActionEvent _a) {
         if (_a.getSource() == closeButton) {
             xmlDoc = null;
-            infoList.removeAllElements();
             resetData();
             dispose();
 
@@ -181,20 +216,17 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
             resetData();
-            addDataItem("No metadata is available.");
+            addDataItem("error", "No metadata is available.");
         } else {
             HelioviewerMetaData m = (HelioviewerMetaData) metaData;
             metaDataOK = true;
             resetData();
-            addDataItem("-------------------------------");
-            addDataItem("       Basic Information       ");
-            addDataItem("-------------------------------");
-            addDataItem("Observatory : " + m.getObservatory());
-            addDataItem("Instrument  : " + m.getInstrument());
-            addDataItem("Detector    : " + m.getDetector());
-            addDataItem("Measurement : " + m.getMeasurement());
-            addDataItem("Date        : " + m.getDateObs().getFormattedDate());
-            addDataItem("Time        : " + m.getDateObs().getFormattedTime());
+            addDataItem("Observatory", m.getObservatory());
+            addDataItem("Instrument", m.getInstrument());
+            addDataItem("Detector", m.getDetector());
+            addDataItem("Measurement", m.getMeasurement());
+            addDataItem("Date", m.getDateObs().getFormattedDate());
+            addDataItem("Time", m.getDateObs().getFormattedTime());
 
             String xmlText = null;
             if (v instanceof JP2View) {
@@ -237,25 +269,23 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      * @param indent
      *            Number of tabstops to insert
      */
+    private String lastNodeSeen = null;
+
     private void writeXMLData(Node node, int indent) {
         // get element name and value
         String nodeName = node.getNodeName();
         String nodeValue = getElementValue(node);
 
         if (nodeName.equals("fits")) {
-            addDataItem("-------------------------------");
-            addDataItem("          FITS Header");
-            addDataItem("-------------------------------");
+            lastNodeSeen = nodeName;
         } else if (nodeName.equals("helioviewer")) {
-            addDataItem("-------------------------------");
-            addDataItem("      Helioviewer Header");
-            addDataItem("-------------------------------");
+            lastNodeSeen = nodeName;
         } else {
             String tab = "";
             for (int i = 0; i < indent; i++) {
                 tab = tab + "\t";
             }
-            addDataItem(tab + nodeName + ": " + nodeValue);
+            addDataItem(nodeName, nodeValue, lastNodeSeen.equals("fits"));
         }
 
         // write the child nodes recursively
