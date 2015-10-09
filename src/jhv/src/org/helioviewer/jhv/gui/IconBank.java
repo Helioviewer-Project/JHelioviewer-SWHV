@@ -36,7 +36,7 @@ public class IconBank {
         PROPERTIES("properties16.gif"), BLANK("blank_square.gif"), ADD("edit_add.png"), DOWNLOAD("download_dm.png"),
 
         // MOVIE CONTROLS
-        PLAY("play_dm.png"), PAUSE("agt_pause-queue.png"), BACK("agt_back.png"), FORWARD("agt_forward.png"),
+        PLAY("play_dm.png"), PAUSE("agt_pause-queue.png"), BACK("agt_back.png"), FORWARD("agt_forward.png"), RECORD("rec.png"),
 
         // ZOOMING
         ZOOM_IN("zoomIn24.png"), ZOOM_IN_SMALL("zoomIn24small.png"),
