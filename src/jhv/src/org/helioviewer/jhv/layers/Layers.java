@@ -467,4 +467,14 @@ public class Layers {
         }
     }
 
+    public static double getLargestPhysicalSize() {
+        double sz = 0;
+        for (View layer : layers) {
+            double newsz = layer.getMetaData(new ImmutableDateTime(0)).getPhysicalSize().y;
+            if (newsz > sz) {
+                sz = newsz;
+            }
+        }
+        return sz;
+    }
 }
