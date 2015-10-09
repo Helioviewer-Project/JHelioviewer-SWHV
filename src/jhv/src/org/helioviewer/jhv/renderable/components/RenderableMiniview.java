@@ -107,7 +107,7 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public void activeLayerChanged(View view) {
         if (view != null)
-            Displayer.getMiniview().getCamera().zoomToFit(view);
+            Displayer.getMiniview().getCamera().zoomToFitMiniview();
     }
 
 }

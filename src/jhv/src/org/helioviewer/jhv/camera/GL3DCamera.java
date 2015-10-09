@@ -388,6 +388,11 @@ public abstract class GL3DCamera {
         this.setCameraFOV(fov);
     }
 
+    public void zoomToFitMiniview() {
+        double fov = 2. * Math.atan(-Layers.getLargestPhysicalSize() / 2. / this.getZTranslation());
+        this.setCameraFOV(fov);
+    }
+
     public GL3DMat4d getRotation() {
         return this.rotation.toMatrix();
     }
