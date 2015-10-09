@@ -31,7 +31,7 @@ public class MovieExporter {
     private final String moviePath;
     private boolean inited;
     private boolean stopped = false;
-    private IMediaWriter movieWriter;
+    private static IMediaWriter movieWriter;
 
     private GL3DViewport vp;
     private int framenumber = 0;
@@ -47,9 +47,11 @@ public class MovieExporter {
         movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, w, h);
     }
 
-    private void disposeMovieWriter() {
-        movieWriter.close();
-        movieWriter = null;
+    public static void disposeMovieWriter() {
+        if (movieWriter != null) {
+            movieWriter.close();
+            movieWriter = null;
+        }
     }
 
     private void initFBO(final GL2 gl, int fbow, int fboh) {
