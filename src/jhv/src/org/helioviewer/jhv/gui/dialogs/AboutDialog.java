@@ -39,7 +39,7 @@ import org.helioviewer.jhv.plugin.interfaces.Plugin;
  * @author Markus Langenberg
  * @author Andre Dau
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public final class AboutDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
 
     private final JButton closeButton = new JButton("Close");
@@ -190,6 +190,12 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
     @Override
     public void init() {
+    }
+
+    public static void dialogShow() {
+        AboutDialog dialog = new AboutDialog();
+        dialog.init();
+        dialog.showDialog();
     }
 
 }
