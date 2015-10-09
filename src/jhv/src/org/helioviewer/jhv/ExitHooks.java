@@ -1,6 +1,5 @@
-package org.helioviewer.base;
+package org.helioviewer.jhv;
 
-import java.awt.EventQueue;
 import java.io.File;
 
 import java.util.concurrent.ExecutionException;
@@ -13,23 +12,12 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.JOptionPane;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.platform.OSXHandler;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
 
 public class ExitHooks {
-
-    public static boolean quit() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                exitProgram();
-            }
-        });
-        return false;
-    }
 
     static Thread finishMovieThread = new Thread() {
         @Override
@@ -43,7 +31,6 @@ public class ExitHooks {
     };
 
     public static void attach() {
-        OSXHandler.quitHandler();
         // At the moment this runs, the EventQueue is blocked (by enforcing to run System.exit on it which is blocking)
         Runtime.getRuntime().addShutdownHook(finishMovieThread);
     }

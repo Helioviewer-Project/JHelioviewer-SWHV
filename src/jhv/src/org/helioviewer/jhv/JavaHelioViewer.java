@@ -6,7 +6,6 @@ import java.util.TimeZone;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.base.ExitHooks;
 import org.helioviewer.base.FileUtils;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.logging.LogSettings;

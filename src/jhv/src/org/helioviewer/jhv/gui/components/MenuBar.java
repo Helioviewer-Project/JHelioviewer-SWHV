@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.helioviewer.base.platform.OSXHandler;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
@@ -25,6 +24,7 @@ import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 //import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
 import org.helioviewer.jhv.gui.dialogs.plugins.PluginsDialog;
+import org.helioviewer.jhv.platform.OSXHandler;
 
 /**
  * Menu bar of the main window.
@@ -51,8 +51,12 @@ public class MenuBar extends JMenuBar {
         fileMenu.add(new SaveScreenshotAsAction());
         fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class));
 
-        fileMenu.addSeparator();
-        fileMenu.add(new ExitProgramAction());
+        if (System.getProperty("jhv.os").equals("mac")) {
+            OSXHandler.quitHandler();
+        } else {
+            fileMenu.addSeparator();
+            fileMenu.add(new ExitProgramAction());
+        }
         add(fileMenu);
 
         JMenu viewMenu = new JMenu("View");

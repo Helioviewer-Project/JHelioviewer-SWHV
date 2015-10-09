@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.base.ExitHooks;
+import org.helioviewer.jhv.ExitHooks;
 
 @SuppressWarnings("serial")
 public class ExitProgramAction extends AbstractAction {
