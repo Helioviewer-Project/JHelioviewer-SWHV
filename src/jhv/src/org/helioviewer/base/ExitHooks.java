@@ -2,7 +2,6 @@ package org.helioviewer.base;
 
 import java.awt.EventQueue;
 import java.io.File;
-import java.lang.reflect.Method;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.JOptionPane;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.platform.OSXAdapter;
+import org.helioviewer.base.platform.OSXHandler;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.io.MovieExporter;
@@ -44,21 +43,9 @@ public class ExitHooks {
     };
 
     public static void attach() {
-        attachQuit();
+        OSXHandler.quitHandler();
         // At the moment this runs, the EventQueue is blocked (by enforcing to run System.exit on it which is blocking)
         Runtime.getRuntime().addShutdownHook(finishMovieThread);
-    }
-
-    public static void attachQuit() {
-        try {
-            Class[] cArg = new Class[0];
-            Method m = ExitHooks.class.getMethod("quit", cArg);
-            OSXAdapter.setQuitHandler("", m);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void exitProgram() {

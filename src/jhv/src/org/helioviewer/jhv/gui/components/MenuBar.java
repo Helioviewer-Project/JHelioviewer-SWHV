@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import org.helioviewer.base.platform.OSXHandler;
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
@@ -78,14 +79,24 @@ public class MenuBar extends JMenuBar {
         pluginsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
         add(pluginsMenu);
 
-        JMenu optionsMenu = new JMenu("Options");
-        optionsMenu.setMnemonic(KeyEvent.VK_O);
-        optionsMenu.add(new ShowDialogAction("Preferences...", PreferencesDialog.class));
-        add(optionsMenu);
+        if (System.getProperty("jhv.os").equals("mac")) {
+            OSXHandler.preferencesHandler();
+        } else {
+            JMenu optionsMenu = new JMenu("Options");
+            optionsMenu.setMnemonic(KeyEvent.VK_O);
+            optionsMenu.add(new ShowDialogAction("Preferences...", PreferencesDialog.class));
+            add(optionsMenu);
+        }
 
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
-        helpMenu.add(new ShowDialogAction("About JHelioviewer...", AboutDialog.class));
+
+        if (System.getProperty("jhv.os").equals("mac")) {
+            OSXHandler.aboutHandler();
+        } else {
+            helpMenu.add(new ShowDialogAction("About JHelioviewer...", AboutDialog.class));
+        }
+
         helpMenu.add(new OpenURLinBrowserAction("Open Online Handbook", "http://wiki.helioviewer.org/wiki/JHelioviewer_Handbook"));
         helpMenu.add(new ShowDialogAction("Show Shortcuts...", HelpDialog.class));
         helpMenu.addSeparator();
