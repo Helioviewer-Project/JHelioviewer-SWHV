@@ -35,11 +35,11 @@ public class ExitHooks {
         Runtime.getRuntime().addShutdownHook(finishMovieThread);
     }
 
-    public static void exitProgram() {
+    public static boolean exitProgram() {
         if (Layers.getNumLayers() > 0) {
             int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.CANCEL_OPTION) {
-                return;
+                return false;
             }
         }
 
@@ -68,6 +68,7 @@ public class ExitHooks {
         }
 
         System.exit(0);
+        return true;
     }
 
 }
