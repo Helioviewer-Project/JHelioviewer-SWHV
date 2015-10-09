@@ -1,0 +1,25 @@
+diff -ur jogl-v2.3.1/src/jogl/native/macosx/MacOSXWindowSystemInterface.m jogl/src/jogl/native/macosx/MacOSXWindowSystemInterface.m
+--- jogl-v2.3.1/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-03-27 15:58:50.000000000 +0100
++++ jogl/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-10-09 22:03:03.000000000 +0200
+@@ -556,8 +556,8 @@
+             GLint zeroOpacity = 0;
+             [ctx setValues:&zeroOpacity forParameter:NSOpenGLCPSurfaceOpacity];
+         }
+-        [ctx setView:view]; // Bug 1087: Set default framebuffer, hence enforce NSView realization
+         if( viewReadyAndLocked ) {
++            [ctx setView:view]; // Bug 1087: Set default framebuffer, hence enforce NSView realization
+             [view unlockFocus];        
+         }
+     }
+diff -ur jogl-v2.3.1/src/nativewindow/native/macosx/OSXmisc.m jogl/src/nativewindow/native/macosx/OSXmisc.m
+--- jogl-v2.3.1/src/nativewindow/native/macosx/OSXmisc.m	2015-03-27 15:58:50.000000000 +0100
++++ jogl/src/nativewindow/native/macosx/OSXmisc.m	2015-10-09 22:03:38.000000000 +0200
+@@ -342,7 +342,7 @@
+     NSWindow* myWindow = [[NSWindow alloc] initWithContentRect: rect
+                                            styleMask: NSBorderlessWindowMask
+                                            backing: NSBackingStoreBuffered
+-                                           defer: NO]; // Bug 1087: Set default framebuffer, hence enforce NSView realization
++                                           defer: YES]; // Bug 1087: Set default framebuffer, hence enforce NSView realization
+     [myWindow setReleasedWhenClosed: YES]; // default
+     [myWindow setPreservesContentDuringLiveResize: YES];
+     // Remove animations
