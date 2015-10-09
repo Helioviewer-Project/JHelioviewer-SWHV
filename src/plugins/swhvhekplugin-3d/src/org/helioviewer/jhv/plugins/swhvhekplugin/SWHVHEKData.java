@@ -82,6 +82,8 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     @Override
     public void cacheUpdated() {
         if (beginDate != null && endDate != null) {
+            beginDate = null;
+            endDate = null;
             requestEvents();
             displayEvents();
         }
