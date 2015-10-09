@@ -15,7 +15,6 @@ import org.helioviewer.jhv.opengl.GL3DViewport;
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
 import com.jogamp.opengl.FBObject.TextureAttachment;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.ImageUtil;
 import com.xuggle.mediatool.IMediaWriter;
@@ -82,7 +81,7 @@ public class MovieExporter {
         byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
         ByteBuffer fb = ByteBuffer.wrap(array);
         gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1);
+        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
         gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
 
         fbo.unuse(gl);
