@@ -151,7 +151,6 @@ public class JP2Image {
 
         if (cache != null) {
             imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
-            cache.setImageCacheStatus(imageCacheStatus);
         } else {
             imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
         }
@@ -178,7 +177,7 @@ public class JP2Image {
             // Create the cache object and add the first response to it
             cache = new JHV_Kdu_cache();
             // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-            cache.addJPIPResponseData(res);
+            cache.addJPIPResponseData(res, null);
 
             // Download the necessary initial data
             boolean initialDataLoaded = false;

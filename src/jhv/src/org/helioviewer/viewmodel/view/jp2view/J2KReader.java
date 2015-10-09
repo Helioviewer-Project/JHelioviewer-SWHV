@@ -96,7 +96,7 @@ class J2KReader implements Runnable {
         if (socket == null) {
             socket = new JPIPSocket();
             JPIPResponse res = (JPIPResponse) socket.connect(parentImageRef.getURI());
-            cacheRef.addJPIPResponseData(res);
+            cacheRef.addJPIPResponseData(res, cacheStatusRef);
             MoviePanel.cacheStatusChanged();
         }
 
@@ -424,7 +424,7 @@ class J2KReader implements Runnable {
                                     }
 
                                     // add response to cache - react if query complete
-                                    if (cacheRef.addJPIPResponseData(res)) {
+                                    if (cacheRef.addJPIPResponseData(res, cacheStatusRef)) {
                                         // mark query as complete
                                         complete_steps++;
                                         stepQuerys[current_step] = null;

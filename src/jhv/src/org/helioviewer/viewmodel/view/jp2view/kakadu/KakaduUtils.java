@@ -117,7 +117,7 @@ public class KakaduUtils {
                 _socket.send(req);
                 if ((res = _socket.receive()) == null)
                     break;
-            } while (!_cache.addJPIPResponseData(res));
+            } while (!_cache.addJPIPResponseData(res, null));
 
             if (!_cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0)) {
                 req.setQuery(new JPIPQuery("stream", "0"));
@@ -126,7 +126,7 @@ public class KakaduUtils {
                     _socket.send(req);
                     if ((res = _socket.receive()) == null)
                         break;
-                } while (!_cache.addJPIPResponseData(res) && !_cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
+                } while (!_cache.addJPIPResponseData(res, null) && !_cache.isDataBinCompleted(JPIPDatabinClass.MAIN_HEADER_DATABIN, 0, 0));
             }
         } catch (EOFException e) {
             e.printStackTrace();
