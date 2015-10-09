@@ -11,7 +11,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,8 +31,10 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
-
-        String str = Objects.toString(value, "");
+        String str = "";
+        if (value != null) {
+            str = value.toString();
+        }
 
         if (isRolloverCell(table, row, column) && isValueURL(value)) {
             setText("<html><u><font color='blue'>" + str);
