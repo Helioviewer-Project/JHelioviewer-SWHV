@@ -108,8 +108,4 @@ public abstract class AbstractView implements View {
         dataHandler = null;
     }
 
-    public boolean hasImageData() {
-        return imageData != null;
-    }
-
 }

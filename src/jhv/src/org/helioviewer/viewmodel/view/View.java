@@ -112,7 +112,4 @@ public interface View extends RenderListener {
     public MetaData getMetaData(ImmutableDateTime time);
     // -->
 
-    // only for APIRequestManager
-    public boolean hasImageData();
-
 }
