@@ -130,6 +130,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
     private static final Icon pauseIcon = IconBank.getIcon(JHVIcon.PAUSE);
+    private static final Icon recordIcon = IconBank.getIcon(JHVIcon.RECORD);
     private static final Icon openIcon = IconBank.getIcon(JHVIcon.SHOW_MORE);
     private static final Icon closeIcon = IconBank.getIcon(JHVIcon.SHOW_LESS);
 
@@ -187,7 +188,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
 
-        JButton recordButton = new JButton("REC");
+        JButton recordButton = ButtonCreator.createTextButton(recordIcon, "REC", "Record movie", null);
         recordButton.addActionListener(new RecordActionListener(recordButton));
         buttonPanel.add(recordButton);
 
