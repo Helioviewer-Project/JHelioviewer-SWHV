@@ -27,7 +27,7 @@ public class Layers {
      *            Position within the stack of layers
      * @return View at given position
      */
-    private static View getLayer(int index) {
+    public static View getLayer(int index) {
         try {
             return layers.get(index);
         } catch (Exception e) {

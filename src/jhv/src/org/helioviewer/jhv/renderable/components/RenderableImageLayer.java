@@ -40,11 +40,17 @@ public class RenderableImageLayer implements Renderable {
     public RenderableImageLayer(View _view) {
         view = _view;
 
-        float opacity;
-        if (view.getName().contains("LASCO") || view.getName().contains("COR"))
-            opacity = 1.f;
-        else
-            opacity = (float) (1. / (1. + Layers.getNumLayers()));
+        float opacity = 1f;
+
+        if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
+            int count = 0;
+            for (int i = 0; i < Layers.getNumLayers(); i++) {
+                String name = Layers.getLayer(i).getName();
+                if (!name.contains("LASCO") && !name.contains("COR"))
+                    count++;
+            }
+            opacity = (float) (1. / (1 + count));
+        }
 
         glImage = new GLImage(view.getDefaultLUT());
         glImage.setOpacity(opacity);
