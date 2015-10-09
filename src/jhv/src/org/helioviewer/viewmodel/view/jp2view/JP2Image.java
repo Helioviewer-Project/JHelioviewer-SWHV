@@ -149,12 +149,6 @@ public class JP2Image {
 
         createKakaduMachinery();
 
-        if (cache != null) {
-            imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
-        } else {
-            imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
-        }
-
         metaDataList = new MetaData[frameCount];
         KakaduUtils.cacheMetaData(familySrc, metaDataList);
     }
@@ -334,13 +328,15 @@ public class JP2Image {
 
     protected void startReader(JP2View view) {
         if (cache != null) { // remote
+            imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
             try {
                 reader = new J2KReader(view, this);
                 reader.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        } else
+            imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
     }
 
     protected void signalReader(JP2ImageParameter params) {
