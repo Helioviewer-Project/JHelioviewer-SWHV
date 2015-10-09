@@ -1,0 +1,99 @@
+package org.helioviewer.base;
+
+import java.awt.EventQueue;
+import java.io.File;
+import java.lang.reflect.Method;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import javax.swing.JOptionPane;
+
+import org.helioviewer.base.logging.Log;
+import org.helioviewer.base.platform.OSXAdapter;
+import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.io.MovieExporter;
+import org.helioviewer.jhv.layers.Layers;
+
+public class ExitHooks {
+
+    public static boolean quit() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                exitProgram();
+            }
+        });
+        return false;
+    }
+
+    static Thread finishMovieThread = new Thread() {
+        @Override
+        public void run() {
+            try {
+                MovieExporter.disposeMovieWriter();
+            } catch (Exception e) {
+                Log.warn("Movie was not shut down properly");
+            }
+        }
+    };
+
+    public static void attach() {
+        attachQuit();
+        // At the moment this runs, the EventQueue is blocked (by enforcing to run System.exit on it which is blocking)
+        Runtime.getRuntime().addShutdownHook(finishMovieThread);
+    }
+
+    public static void attachQuit() {
+        try {
+            Class[] cArg = new Class[0];
+            Method m = ExitHooks.class.getMethod("quit", cArg);
+            OSXAdapter.setQuitHandler("", m);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void exitProgram() {
+        if (Layers.getNumLayers() > 0) {
+            int option = JOptionPane.showConfirmDialog(ImageViewerGui.getMainFrame(), "Are you sure you want to quit?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
+
+        final ExecutorService executor = Executors.newFixedThreadPool(4);
+        Future<?> futureFileDelete = executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                File[] tempFiles = JHVDirectory.TEMP.getFile().listFiles();
+
+                for (File tempFile : tempFiles) {
+                    tempFile.delete();
+                }
+            }
+        });
+        executor.shutdown();
+
+        try {
+            futureFileDelete.get(1500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Log.warn("FileDelete job was interrupted");
+        } catch (ExecutionException e) {
+            Log.warn("Caught exception on FileDelete: " + e);
+        } catch (TimeoutException e) {
+            futureFileDelete.cancel(true);
+            Log.warn("Timeout upon deleting temporary files");
+        }
+
+        System.exit(0);
+    }
+
+}
