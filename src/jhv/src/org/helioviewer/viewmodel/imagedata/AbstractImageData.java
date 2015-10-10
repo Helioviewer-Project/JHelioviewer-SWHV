@@ -27,6 +27,7 @@ public abstract class AbstractImageData implements ImageData {
     private Region region;
     private MetaData metaData;
     private Date masterTime;
+    private boolean uploaded = false;
 
     /**
      * Default constructor.
@@ -128,6 +129,16 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public Date getMasterTime() {
         return masterTime;
+    }
+
+    @Override
+    public boolean getUploaded() {
+        return uploaded;
+    }
+
+    @Override
+    public void setUploaded(boolean _uploaded) {
+        uploaded = _uploaded;
     }
 
 }

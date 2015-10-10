@@ -51,4 +51,8 @@ public interface ImageData {
 
     public Date getMasterTime();
 
+    public boolean getUploaded();
+
+    public void setUploaded(boolean uploaded);
+
 }
