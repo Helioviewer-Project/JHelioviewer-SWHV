@@ -59,7 +59,11 @@ public class GLImage {
         applyGLLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D);
-        tex.copyImageData2D(gl, imageData);
+
+        if (imageData.getUploaded() == false) {
+            imageData.setUploaded(true);
+            tex.copyImageData2D(gl, imageData);
+        }
     }
 
     private void copyScreenToTexture(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
