@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,7 @@ public class MovieExporter {
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
 
-    private final String moviePath;
+    private static String moviePath;
     private boolean inited;
     private boolean stopped = false;
     private static IMediaWriter movieWriter;
@@ -47,11 +48,16 @@ public class MovieExporter {
         movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, w, h);
     }
 
-    public static void disposeMovieWriter() {
+    public static void disposeMovieWriter(boolean done) {
         if (movieWriter != null) {
             movieWriter.close();
             movieWriter = null;
         }
+        if (!done && moviePath != null) {
+            File f = new File(moviePath);
+            f.delete();
+        }
+        moviePath = null;
     }
 
     private void initFBO(final GL2 gl, int fbow, int fboh) {
@@ -118,7 +124,7 @@ public class MovieExporter {
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
         disposeFBO(gl);
-        disposeMovieWriter();
+        disposeMovieWriter(true);
     }
 
     public void handleMovieExport(GL2 gl) {
