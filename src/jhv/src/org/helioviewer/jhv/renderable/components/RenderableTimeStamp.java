@@ -8,7 +8,6 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GL3DViewport;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 import com.jogamp.opengl.GL2;
@@ -17,8 +16,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableTimeStamp implements Renderable {
 
     private Font font;
-    private final float baseFontSize = 16;
-    private float fontSize;
+    private float oldFontSize = -1;
+    private static final double vpScale = 0.035;
     private TextRenderer textRenderer;
 
     private final String name = "Timestamp";
@@ -32,10 +31,9 @@ public class RenderableTimeStamp implements Renderable {
         if (!isVisible)
             return;
 
-        int sx = GLInfo.pixelScale[0];
-        int sy = GLInfo.pixelScale[1];
-        if (textRenderer == null || fontSize != sy * baseFontSize) {
-            fontSize = sy * baseFontSize;
+        float fontSize = (int) (vp.getHeight() * vpScale);
+        if (textRenderer == null || fontSize != oldFontSize) {
+            oldFontSize = fontSize;
             font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             if (textRenderer != null) {
                 textRenderer.dispose();
@@ -46,8 +44,9 @@ public class RenderableTimeStamp implements Renderable {
             textRenderer.setColor(Color.WHITE);
         }
 
+        int delta = (int) (vp.getHeight() * 0.01);
         textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-        textRenderer.draw(TimeUtils.utcDateFormat.format(Layers.getLastUpdatedTimestamp()), 5 * sx, 5 * sy);
+        textRenderer.draw(TimeUtils.utcDateFormat.format(Layers.getLastUpdatedTimestamp()), delta, delta);
         textRenderer.endRendering();
     }
 
@@ -96,6 +95,7 @@ public class RenderableTimeStamp implements Renderable {
             textRenderer.dispose();
             textRenderer = null;
         }
+        oldFontSize = -1;
     }
 
     @Override
