@@ -17,6 +17,7 @@ import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
@@ -178,15 +179,16 @@ public class JP2View extends AbstractView {
 
     // Recalculates the image parameters used within the jp2-package
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
+        GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
-        Region r = ViewROI.updateROI(masterTime, m);
+        Region r = ViewROI.updateROI(camera, masterTime, m);
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = (Displayer.getViewport().getCamera().getCameraWidth() * 2) / Displayer.getViewport().getHeight();
+        double ratio = 2 * camera.getCameraWidth() / Displayer.getViewport().getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;

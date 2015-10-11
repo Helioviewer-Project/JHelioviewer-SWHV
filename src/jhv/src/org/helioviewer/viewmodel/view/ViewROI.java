@@ -7,7 +7,6 @@ import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.viewmodel.metadata.MetaData;
 
 public class ViewROI {
@@ -33,20 +32,17 @@ public class ViewROI {
         }
     }
 
-    public static Region updateROI(Date masterTime, MetaData m) {
+    public static Region updateROI(GL3DCamera camera, Date masterTime, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera activeCamera = Displayer.getViewport().getCamera();
+        camera.push(masterTime, m);
 
-        activeCamera.push(masterTime, m);
-
-        GL3DQuatd camDiff = activeCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
+        GL3DQuatd camDiff = camera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
-            GL3DVec3d hitPoint;
-            hitPoint = activeCamera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
+            GL3DVec3d hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
             if (hitPoint != null) {
                 minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
                 minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
@@ -55,7 +51,7 @@ public class ViewROI {
             }
         }
 
-        activeCamera.pop();
+        camera.pop();
 
         double widthxAdd = Math.abs(0.02 * (maxPhysicalX - minPhysicalX));
         double widthyAdd = Math.abs(0.02 * (maxPhysicalY - minPhysicalY));
