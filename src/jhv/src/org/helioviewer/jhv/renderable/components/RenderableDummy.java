@@ -9,7 +9,6 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GL3DViewport;
-import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 import com.jogamp.opengl.GL2;
@@ -18,8 +17,8 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableDummy implements Renderable {
 
     private Font font;
-    private final float baseFontSize = 16;
-    private float fontSize;
+    private float oldFontSize = -1;
+    private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
     private SwingWorker<?,?> worker;
 
@@ -31,10 +30,9 @@ public class RenderableDummy implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        int sx = GLInfo.pixelScale[0];
-        int sy = GLInfo.pixelScale[1];
-        if (textRenderer == null || fontSize != sy * baseFontSize) {
-            fontSize = sy * baseFontSize;
+        float fontSize = (int) (vp.getHeight() * vpScale);
+        if (textRenderer == null || fontSize != oldFontSize) {
+            oldFontSize = fontSize;
             font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             if (textRenderer != null) {
                 textRenderer.dispose();
@@ -45,9 +43,10 @@ public class RenderableDummy implements Renderable {
             textRenderer.setColor(Color.WHITE);
         }
 
+        int delta = (int) (vp.getHeight() * 0.01);
         textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
         Rectangle2D rect = textRenderer.getBounds(name);
-        textRenderer.draw(name, (int) (vp.getWidth() - rect.getWidth() - 5 * sx), (int) (vp.getHeight() - rect.getHeight() - 5 * sy));
+        textRenderer.draw(name, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
         textRenderer.endRendering();
     }
 
@@ -96,6 +95,7 @@ public class RenderableDummy implements Renderable {
             textRenderer.dispose();
             textRenderer = null;
         }
+        oldFontSize = -1;
     }
 
     @Override
