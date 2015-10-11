@@ -67,6 +67,7 @@ public class MenuBar extends JMenuBar {
         viewMenu.add(new ZoomOutAction(true, false));
         viewMenu.add(new ZoomFitAction(true, false));
         viewMenu.add(new ZoomOneToOneAction(true, false));
+        viewMenu.addSeparator();
         viewMenu.add(new ResetCameraAction(true, false));
         viewMenu.add(new ClearAnnotationsAction(true, false));
         add(viewMenu);

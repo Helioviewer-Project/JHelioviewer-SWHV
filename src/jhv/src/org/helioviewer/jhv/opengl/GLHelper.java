@@ -35,8 +35,10 @@ public class GLHelper {
         gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
+    public static boolean unitScale = false;
+
     public static void lineWidth(GL2 gl, double w) {
-        gl.glLineWidth((float) (w * GLInfo.pixelScaleFloat[0]));
+        gl.glLineWidth((float) (w * (unitScale ? 1 : GLInfo.pixelScaleFloat[0])));
     }
 
     public static Point GL2AWTPoint(Point p) {

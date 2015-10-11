@@ -266,7 +266,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 el.stop();
             } else {
                 recordButton.setText("BUSY");
-                el = MovieExporter.exportMovie(Displayer.getViewport().getWidth(), Displayer.getViewport().getHeight());
+                el = MovieExporter.exportMovie(1280, 720);
             }
             started = !started;
         }

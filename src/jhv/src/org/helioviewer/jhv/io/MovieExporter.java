@@ -12,6 +12,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GL3DViewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
@@ -37,10 +38,10 @@ public class MovieExporter {
     private GL3DViewport vp;
     private int framenumber = 0;
 
-    private MovieExporter(String moviePath, int w, int h) {
-        this.w = w;
-        this.h = h;
-        this.moviePath = moviePath;
+    private MovieExporter(String _moviePath, int _w, int _h) {
+        w = _w;
+        h = _h;
+        moviePath = _moviePath;
     }
 
     private void initMovieWriter(String moviePath, int w, int h) {
@@ -73,13 +74,17 @@ public class MovieExporter {
     }
 
     private void renderFrame(GL2 gl) {
+        GLHelper.unitScale = true;
         fbo.bind(gl);
+
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
         gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
         vp.getCamera().applyPerspective(gl);
         ImageViewerGui.getRenderableContainer().render(gl, vp);
+
         fbo.unbind(gl);
+        GLHelper.unitScale = false;
     }
 
     private void exportFrame(GL2 gl, double framerate, int framenumber) {
@@ -111,7 +116,7 @@ public class MovieExporter {
 
     private void exportMovieFrame(GL2 gl) {
         renderFrame(gl);
-        exportFrame(gl, 20, framenumber++);
+        exportFrame(gl, 30, framenumber++);
         if (stopped) {
             exportMovieFinish(gl);
         }
