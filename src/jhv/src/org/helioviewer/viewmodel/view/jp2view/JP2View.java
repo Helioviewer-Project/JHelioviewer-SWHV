@@ -130,20 +130,6 @@ public class JP2View extends AbstractView {
 
         @Override
         public void run() {
-            JHVThread.BagThread t = (JHVThread.BagThread) Thread.currentThread();
-            Kdu_region_compositor compositor = (Kdu_region_compositor) t.getVar();
-            if (compositor != null) {
-                try {
-                    J2KRender.destroyCompositor(compositor);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                t.setVar(null);
-            }
-
-//            if (J2KRender.compositor != null) {
-//                J2KRender.compositor.destroy();
-//            }
             J2KRender.threadEnv.destroy();
 
             EventQueue.invokeLater(new Runnable() {
@@ -271,7 +257,6 @@ public class JP2View extends AbstractView {
             ++frameCount;
         }
 
-        imageData = newImageData; // tbd
         if (dataHandler != null) {
             dataHandler.handleData(this, newImageData);
         }
