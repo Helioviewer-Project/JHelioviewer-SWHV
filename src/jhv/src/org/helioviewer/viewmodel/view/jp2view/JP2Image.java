@@ -18,6 +18,7 @@ import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
+import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.math.MathUtils;
@@ -326,6 +327,38 @@ public class JP2Image {
         }
     }
 
+    private Kdu_region_compositor compositorRender;
+
+    Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException {
+        if (compositorRender == null)
+            compositorRender = createCompositor(jpxSrc, threadEnv);
+        return compositorRender;
+    }
+
+    private Kdu_region_compositor createCompositor(Jpx_source jpxSrc, Kdu_thread_env threadEnv) throws KduException {
+        Kdu_region_compositor compositor = new Kdu_region_compositor();
+        // System.out.println(">>>> compositor create " + compositor);
+        compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
+        compositor.Set_surface_initialization_mode(false);
+        compositor.Set_thread_env(threadEnv, null);
+        return compositor;
+    }
+
+    void destroyCompositor() throws KduException {
+        if (compositorRender != null) {
+            destroyCompositor(compositorRender);
+            compositorRender = null;
+        }
+    }
+
+    private void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
+        // System.out.println(">>>> compositor destroy " + compositor);
+        compositor.Halt_processing();
+        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+        compositor.Set_thread_env(null, null);
+        compositor.Native_destroy();
+    }
+
     protected void startReader(JP2View view) {
         if (cache != null) { // remote
             imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
@@ -465,6 +498,8 @@ public class JP2Image {
         APIResponseDump.getSingletonInstance().removeResponse(uri);
 
         try {
+            destroyCompositor();
+
             if (jpxSrc != null) {
                 jpxSrc.Close();
                 jpxSrc.Native_destroy();
