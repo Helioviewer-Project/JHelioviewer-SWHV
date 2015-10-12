@@ -289,7 +289,7 @@ public class RadioDataManager implements RadioDownloaderListener {
     @Override
     public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, Long downloadID, double ratioX, double ratioY) {
         DownloadRequestData drd = downloadRequestData.get(downloadID);
-        if (dtd != null) {
+        if (drd != null) {
             boolean oldDownloading = drd.isDownloading();
             drd.setDownloading(true);
             if (!oldDownloading) {
