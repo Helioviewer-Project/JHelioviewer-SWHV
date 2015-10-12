@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
+
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -31,9 +33,12 @@ public class MovieExporter {
     private TextureAttachment fboTex;
 
     private static String moviePath;
+    private static String imagePath;
     private static boolean inited = false;
     private static boolean stopped = false;
     private static IMediaWriter movieWriter;
+
+    private static BufferedImage lastScreenshot;
 
     private static GL3DViewport vp;
     private static int frameNumber = 0;
@@ -45,12 +50,12 @@ public class MovieExporter {
         movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, w, h);
     }
 
-    public static void disposeMovieWriter(boolean done) {
+    public static void disposeMovieWriter(boolean keep) {
         if (movieWriter != null) {
             movieWriter.close();
             movieWriter = null;
         }
-        if (!done && moviePath != null) {
+        if (!keep && moviePath != null) {
             File f = new File(moviePath);
             f.delete();
         }
@@ -69,7 +74,7 @@ public class MovieExporter {
         fbo.destroy(gl);
     }
 
-    private void renderFrame(GL2 gl) {
+    private BufferedImage renderFrame(GL2 gl) {
         GLHelper.unitScale = true;
         fbo.bind(gl);
 
@@ -81,9 +86,7 @@ public class MovieExporter {
 
         fbo.unbind(gl);
         GLHelper.unitScale = false;
-    }
 
-    private BufferedImage grabFrame(GL2 gl) {
         fbo.use(gl, fboTex);
 
         BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
@@ -115,18 +118,21 @@ public class MovieExporter {
         inited = true;
     }
 
-    private void exportMovieFrame(GL2 gl) {
-        renderFrame(gl);
-        exportFrame(grabFrame(gl));
-        if (stopped) {
-            exportMovieFinish(gl);
-        }
-    }
-
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
         disposeFBO(gl);
-        disposeMovieWriter(frameNumber == 0 ? false : true);
+
+        try {
+            if (frameNumber < 2) {
+                disposeMovieWriter(false);
+                ImageIO.write(lastScreenshot, "png", new File(imagePath));
+            } else
+                disposeMovieWriter(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        lastScreenshot = null;
         frameNumber = 0;
         inited = false;
     }
@@ -134,16 +140,20 @@ public class MovieExporter {
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
             exportMovieStart(gl);
-            exportMovieFrame(gl);
-        } else {
-            exportMovieFrame(gl);
+        }
+        lastScreenshot = renderFrame(gl);
+        exportFrame(lastScreenshot);
+        if (stopped) {
+            exportMovieFinish(gl);
         }
     }
 
     public static void start(int _w, int _h) {
+        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date());
+        moviePath = prefix + ".mp4";
+        imagePath = prefix + ".png";
         w = _w;
         h = _h;
-        moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
         ImageViewerGui.getMainComponent().attachExport(instance);
     }
 
