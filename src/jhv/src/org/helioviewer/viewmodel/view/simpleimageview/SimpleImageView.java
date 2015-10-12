@@ -42,9 +42,11 @@ public class SimpleImageView extends AbstractView {
         }
 
         metaDataArray[0] = new PixelBasedMetaData(image.getWidth(), image.getHeight());
+
         imageData.setRegion(new Region(-1.5, -1.5, 3., 3.));
         imageData.setMetaData(metaDataArray[0]);
         imageData.setFrameNumber(0);
+        imageData.setMasterTime(metaDataArray[0].getDateObs().getDate());
     }
 
     /**

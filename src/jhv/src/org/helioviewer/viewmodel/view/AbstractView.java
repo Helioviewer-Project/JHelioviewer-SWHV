@@ -58,6 +58,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public void setFrame(int frame, Date masterTime) {
+        imageData.setMasterTime(masterTime);
     }
 
     @Override
