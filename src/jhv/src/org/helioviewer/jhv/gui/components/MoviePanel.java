@@ -118,7 +118,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         protected abstract int getSecondsPerSecond();
     }
 
-    private enum RecordMode {
+    public enum RecordMode {
         LOOP, SHOT, FREE
     };
 
@@ -159,6 +159,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JButton previousFrameButton;
     private static JButton nextFrameButton;
     private static JButton playButton;
+
+    private static RecordButton recordButton;
+
     private static JButton advancedButton;
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
@@ -179,7 +182,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
     private static MoviePanel instance;
 
-    public static MoviePanel getSingletonInstance() {
+    public static MoviePanel getInstance() {
         if (instance == null) {
             instance = new MoviePanel();
         }
@@ -229,7 +232,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
 
-        final RecordButton recordButton = new RecordButton();
+        recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
@@ -357,6 +360,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         sliderTimer.start();
     }
 
+    public static void clickRecordButton() {
+        recordButton.doClick();
+    }
+
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
 
         private RecordMode mode = RecordMode.LOOP;
@@ -387,7 +394,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 setText("BUSY");
-                MovieExporter.start(size.getSize().width, size.getSize().height);
+                MovieExporter.start(size.getSize().width, size.getSize().height, mode);
             } else {
                 setText("REC");
                 MovieExporter.stop();

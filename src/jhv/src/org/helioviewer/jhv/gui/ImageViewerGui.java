@@ -107,8 +107,7 @@ public class ImageViewerGui {
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
 
         // STATUS PANEL
-        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised
-                                            // before topToolBar
+        zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
         framerateStatus = new FramerateStatusPanel();
 
         TopToolBar topToolBar = new TopToolBar();
@@ -116,7 +115,7 @@ public class ImageViewerGui {
 
         leftPane = new SideContentPane();
         // Movie control
-        leftPane.add("Movie Controls", MoviePanel.getSingletonInstance(), true);
+        leftPane.add("Movie Controls", MoviePanel.getInstance(), true);
 
         // Layer control
         imageObservationPanel = new ImageDataPanel();

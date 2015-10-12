@@ -158,7 +158,7 @@ public class Layers {
             listener.frameChanged(activeFrame);
         }
 
-        MoviePanel.getSingletonInstance().setFrameSlider(activeFrame);
+        MoviePanel.getInstance().setFrameSlider(activeFrame);
     }
 
     private static ImmutableDateTime getStartDateImmutable(View view) {
