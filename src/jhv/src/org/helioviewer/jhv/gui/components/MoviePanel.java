@@ -43,6 +43,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -190,9 +191,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
 
-        JToggleButton recordButton = new JToggleButton("REC", recordIcon);
-        recordButton.setToolTipText("Record movie");
-        recordButton.addActionListener(new RecordActionListener(recordButton));
+        RecordButton recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
@@ -259,25 +258,39 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         sliderTimer.start();
     }
 
-    private static class RecordActionListener implements ActionListener {
-        private boolean started = false;
-        private final JToggleButton recordButton;
+    private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
 
-        public RecordActionListener(JToggleButton recordButton) {
-            this.recordButton = recordButton;
+        public RecordButton() {
+            super("REC", recordIcon);
+            setToolTipText("Record movie");
+            addActionListener(this);
+            Layers.addLayersListener(this);
+        }
+
+        @Override
+        public void layerAdded(View view) {}
+
+        @Override
+        public void activeLayerChanged(View view) {
+            if (view == null) {
+                if (isSelected())
+                    doClick();
+                setEnabled(false);
+            } else
+                setEnabled(true);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (started) {
-                recordButton.setText("REC");
-                MovieExporter.stop();
-            } else {
-                recordButton.setText("BUSY");
+            if (isSelected()) {
+                setText("BUSY");
                 MovieExporter.start(1280, 720);
+            } else {
+                setText("REC");
+                MovieExporter.stop();
             }
-            started = !started;
         }
+
     }
 
     private static void setEnabledState(boolean enabled) {
