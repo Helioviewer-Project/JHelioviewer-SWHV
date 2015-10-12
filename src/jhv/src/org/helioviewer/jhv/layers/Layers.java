@@ -290,6 +290,9 @@ public class Layers {
 
         view.setDataHandler(Displayer.displayDataHandler);
         Displayer.addRenderListener(view);
+
+        view.render();
+        setFrame(0); // force sync
     }
 
     private static void fireLayerAdded(View view) {

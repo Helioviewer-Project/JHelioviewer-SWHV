@@ -95,8 +95,6 @@ public class JP2View extends AbstractView {
         int numOfThread = 1;
         executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
         frameCountStart = System.currentTimeMillis();
-
-        render();
     }
 
     @Override
@@ -257,9 +255,7 @@ public class JP2View extends AbstractView {
             ++frameCount;
         }
 
-        if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData);
-        }
+        dataHandler.handleData(this, newImageData);
     }
 
     @Override
