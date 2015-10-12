@@ -25,8 +25,8 @@ import com.xuggle.xuggler.ICodec;
 
 public class MovieExporter {
 
-    private final int w;
-    private final int h;
+    private static int w;
+    private static int h;
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
 
@@ -37,12 +37,6 @@ public class MovieExporter {
 
     private GL3DViewport vp;
     private int framenumber = 0;
-
-    private MovieExporter(String _moviePath, int _w, int _h) {
-        w = _w;
-        h = _h;
-        moviePath = _moviePath;
-    }
 
     private void initMovieWriter(String moviePath, int w, int h) {
         movieWriter = ToolFactory.makeWriter(moviePath);
@@ -70,7 +64,7 @@ public class MovieExporter {
     }
 
     private void disposeFBO(final GL2 gl) {
-        this.fbo.destroy(gl);
+        fbo.destroy(gl);
     }
 
     private void renderFrame(GL2 gl) {
@@ -87,7 +81,7 @@ public class MovieExporter {
         GLHelper.unitScale = false;
     }
 
-    private void exportFrame(GL2 gl, double framerate, int framenumber) {
+    private BufferedImage grabFrame(GL2 gl) {
         fbo.use(gl, fboTex);
 
         BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
@@ -99,6 +93,10 @@ public class MovieExporter {
 
         fbo.unuse(gl);
 
+        return screenshot;
+    }
+
+    private void exportFrame(BufferedImage screenshot, double framerate, int framenumber) {
         try {
             ImageUtil.flipImageVertically(screenshot);
             movieWriter.encodeVideo(0, screenshot, (int) (1000 / framerate * framenumber), TimeUnit.MILLISECONDS);
@@ -108,7 +106,7 @@ public class MovieExporter {
     }
 
     private void exportMovieStart(GL2 gl) {
-        vp = new GL3DViewport(0, 0, w, h, Displayer.getViewport().getCamera(), true);
+        vp = new GL3DViewport(0, 0, w, h, Displayer.getViewport().getCamera(), false);
         initFBO(gl, w, h);
         initMovieWriter(moviePath, w, h);
         inited = true;
@@ -116,7 +114,7 @@ public class MovieExporter {
 
     private void exportMovieFrame(GL2 gl) {
         renderFrame(gl);
-        exportFrame(gl, 30, framenumber++);
+        exportFrame(grabFrame(gl), 30, framenumber++);
         if (stopped) {
             exportMovieFinish(gl);
         }
@@ -141,11 +139,17 @@ public class MovieExporter {
         }
     }
 
-    public static MovieExporter exportMovie(int w, int h) {
-        String moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
-        MovieExporter me = new MovieExporter(moviePath, w, h);
-        ImageViewerGui.getMainComponent().attachExport(me);
-        return me;
+    public static MovieExporter exportMovie(int _w, int _h) {
+        w = _w;
+        h = _h;
+        moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
+
+        ImageViewerGui.getMainComponent().attachExport(instance);
+        return instance;
     }
+
+    private static final MovieExporter instance = new MovieExporter();
+
+    private MovieExporter() {}
 
 }
