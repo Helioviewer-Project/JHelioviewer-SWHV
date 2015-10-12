@@ -10,8 +10,6 @@ import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.SaveScreenshotAction;
-import org.helioviewer.jhv.gui.actions.SaveScreenshotAsAction;
 import org.helioviewer.jhv.gui.actions.ShowDialogAction;
 import org.helioviewer.jhv.gui.actions.ToggleFullscreenAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -19,7 +17,6 @@ import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
-import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.gui.dialogs.HelpDialog;
 //import org.helioviewer.jhv.gui.dialogs.OpenRemoteFileDialog;
 import org.helioviewer.jhv.gui.dialogs.PreferencesDialog;
@@ -45,11 +42,6 @@ public class MenuBar extends JMenuBar {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new OpenLocalFileAction());
         // fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
-        fileMenu.addSeparator();
-
-        fileMenu.add(new SaveScreenshotAction());
-        fileMenu.add(new SaveScreenshotAsAction());
-        fileMenu.add(new ShowDialogAction("Export Movie...", ExportMovieDialog.class));
 
         if (System.getProperty("jhv.os").equals("mac")) {
             OSXHandler.quitHandler();
