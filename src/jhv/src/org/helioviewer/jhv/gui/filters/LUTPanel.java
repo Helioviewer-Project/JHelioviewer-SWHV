@@ -18,13 +18,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.opengl.GLImage;
 
-/**
- * Panel containing a combobox for choosing the color table and button to add
- * further tables adapted
- *
- * @author Helge Dietert (extended)
- */
-public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
+public class LUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
 
@@ -37,7 +31,7 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
     private final JToggleButton invertButton;
     private final JLabel title;
 
-    public SOHOLUTPanel() {
+    public LUTPanel() {
         lutMap = LUT.getStandardList();
 
         title = new JLabel("Color", JLabel.RIGHT);
@@ -95,17 +89,6 @@ public class SOHOLUTPanel extends AbstractFilterPanel implements ActionListener,
         image.setLUT(lut, invertButton.isSelected());
     }
 
-    /**
-     * Sets the sharpen value.
-     *
-     * This may be useful, if the opacity is changed from another source than
-     * the slider itself.
-     *
-     * @param lut
-     *            New look up table
-     * @param invertLUT
-     *            true if the look up table shall be inverted, false otherwise.
-     */
     void setValue(LUT lut, boolean invertLUT) {
         invertButton.setSelected(invertLUT);
         combobox.setSelectedItem(lut.getName());
