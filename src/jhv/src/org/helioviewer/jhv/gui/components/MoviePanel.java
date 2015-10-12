@@ -118,7 +118,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         protected abstract int getSecondsPerSecond();
     }
 
-    public enum RecordMode {
+    private enum RecordMode {
         LOOP, SHOT, FREE
     };
 
@@ -385,38 +385,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int w = size.getSize().width;
-            int h = size.getSize().height;
-
-            if (mode == mode.LOOP) {
-                if (isSelected()) {
-                    setText("BUSY");
-                    MovieExporter.getInstance().start(w, h, mode);
-                    Layers.setFrame(0);
-                    Layers.playMovie();
-                } else {
-                    setText("REC");
-                    MovieExporter.getInstance().stop();
-                }
-            } else if (mode == mode.FREE) {
-                if (isSelected()) {
-                    setText("BUSY");
-                    MovieExporter.getInstance().start(w, h, mode);
-                } else {
-                    setText("REC");
-                    MovieExporter.getInstance().stop();
-                }
-            } else if (mode == mode.SHOT) {
-                setText("SCREENSHOT");
-                MovieExporter.getInstance().start(w, h, mode);
+            if (isSelected()) {
+                setText("BUSY");
+                MovieExporter.start(size.getSize().width, size.getSize().height);
+            } else {
+                setText("REC");
+                MovieExporter.stop();
             }
         }
 
         public void setRecordMode(RecordMode _mode) {
             mode = _mode;
-            if (isSelected()) {
-                actionPerformed(new ActionEvent(null, 0, ""));
-            }
         }
 
         public void setRecordSize(RecordSize _size) {
