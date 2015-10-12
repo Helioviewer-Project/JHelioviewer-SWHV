@@ -25,7 +25,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public void render() {
-        Displayer.display();
+        dataHandler.handleData(this, imageData);
     }
 
     @Override
@@ -100,8 +100,6 @@ public abstract class AbstractView implements View {
     @Override
     public void setDataHandler(ViewDataHandler _dataHandler) {
         dataHandler = _dataHandler;
-        if (imageData != null)
-            dataHandler.handleData(this, imageData);
     }
 
     @Override
