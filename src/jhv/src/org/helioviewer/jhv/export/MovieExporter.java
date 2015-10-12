@@ -31,12 +31,14 @@ public class MovieExporter {
     private TextureAttachment fboTex;
 
     private static String moviePath;
-    private boolean inited;
-    private boolean stopped = false;
+    private static boolean inited = false;
+    private static boolean stopped = false;
     private static IMediaWriter movieWriter;
 
-    private GL3DViewport vp;
-    private int framenumber = 0;
+    private static GL3DViewport vp;
+    private static int frameNumber = 0;
+
+    private static final int frameRate = 30;
 
     private void initMovieWriter(String moviePath, int w, int h) {
         movieWriter = ToolFactory.makeWriter(moviePath);
@@ -55,7 +57,7 @@ public class MovieExporter {
         moviePath = null;
     }
 
-    private void initFBO(final GL2 gl, int fbow, int fboh) {
+    private void initFBO(GL2 gl, int fbow, int fboh) {
         fbo.init(gl, fbow, fboh, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true);
 
@@ -63,7 +65,7 @@ public class MovieExporter {
         fbo.unbind(gl);
     }
 
-    private void disposeFBO(final GL2 gl) {
+    private void disposeFBO(GL2 gl) {
         fbo.destroy(gl);
     }
 
@@ -96,10 +98,11 @@ public class MovieExporter {
         return screenshot;
     }
 
-    private void exportFrame(BufferedImage screenshot, double framerate, int framenumber) {
+    private void exportFrame(BufferedImage screenshot) {
         try {
             ImageUtil.flipImageVertically(screenshot);
-            movieWriter.encodeVideo(0, screenshot, (int) (1000 / framerate * framenumber), TimeUnit.MILLISECONDS);
+            movieWriter.encodeVideo(0, screenshot, (int) (1000 / frameRate * frameNumber), TimeUnit.MILLISECONDS);
+            frameNumber++;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,20 +117,18 @@ public class MovieExporter {
 
     private void exportMovieFrame(GL2 gl) {
         renderFrame(gl);
-        exportFrame(grabFrame(gl), 30, framenumber++);
+        exportFrame(grabFrame(gl));
         if (stopped) {
             exportMovieFinish(gl);
         }
     }
 
-    public void stop() {
-        stopped = true;
-    }
-
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
         disposeFBO(gl);
-        disposeMovieWriter(true);
+        disposeMovieWriter(frameNumber == 0 ? false : true);
+        frameNumber = 0;
+        inited = false;
     }
 
     public void handleMovieExport(GL2 gl) {
@@ -139,13 +140,15 @@ public class MovieExporter {
         }
     }
 
-    public static MovieExporter exportMovie(int _w, int _h) {
+    public static void start(int _w, int _h) {
         w = _w;
         h = _h;
         moviePath = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date()) + ".mp4";
-
         ImageViewerGui.getMainComponent().attachExport(instance);
-        return instance;
+    }
+
+    public static void stop() {
+        stopped = true;
     }
 
     private static final MovieExporter instance = new MovieExporter();
