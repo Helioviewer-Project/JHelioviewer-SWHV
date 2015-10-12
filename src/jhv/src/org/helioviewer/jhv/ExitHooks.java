@@ -13,8 +13,8 @@ import javax.swing.JOptionPane;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.export.MovieExporter;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
 
 public class ExitHooks {
