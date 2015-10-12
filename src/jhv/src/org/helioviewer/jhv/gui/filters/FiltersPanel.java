@@ -13,7 +13,7 @@ public class FiltersPanel extends JPanel {
     private final RunningDifferencePanel runningDifferencePanel;
     private final OpacityPanel opacityPanel;
     private final ChannelMixerPanel channelMixerPanel;
-    private final SOHOLUTPanel lutPanel;
+    private final LUTPanel lutPanel;
     private final GammaCorrectionPanel gammaCorrectionPanel;
     private final ContrastPanel contrastPanel;
     private final SharpenPanel sharpenPanel;
@@ -22,7 +22,7 @@ public class FiltersPanel extends JPanel {
         runningDifferencePanel = new RunningDifferencePanel();
         opacityPanel = new OpacityPanel();
         channelMixerPanel = new ChannelMixerPanel();
-        lutPanel = new SOHOLUTPanel();
+        lutPanel = new LUTPanel();
         gammaCorrectionPanel = new GammaCorrectionPanel();
         contrastPanel = new ContrastPanel();
         sharpenPanel = new SharpenPanel();
