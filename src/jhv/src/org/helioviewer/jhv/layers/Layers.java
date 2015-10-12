@@ -63,9 +63,9 @@ public class Layers {
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
     private static FrameChooser frameChooser = new RelativeFrameChooser();
 
-    private static final Timer frameTimer = new Timer(1000 / 20, new FrameListener());
+    private static final Timer frameTimer = new Timer(1000 / 20, new FrameTimerListener());
 
-    private static class FrameListener implements ActionListener {
+    private static class FrameTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             setFrame(frameChooser.moveToNextFrame(activeView.getCurrentFrameNumber()));
@@ -143,7 +143,7 @@ public class Layers {
         lastTimestamp = dateTime.getDate();
 
         Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
-        for (final TimeListener listener : timeListeners) {
+        for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp);
         }
 
@@ -152,7 +152,13 @@ public class Layers {
                 view.setFrame(view.getFrame(dateTime), lastTimestamp);
             }
         }
-        MoviePanel.getSingletonInstance().setFrameSlider(activeView.getCurrentFrameNumber());
+
+        int activeFrame = activeView.getCurrentFrameNumber();
+        for (FrameListener listener : frameListeners) {
+            listener.frameChanged(activeFrame);
+        }
+
+        MoviePanel.getSingletonInstance().setFrameSlider(activeFrame);
     }
 
     private static ImmutableDateTime getStartDateImmutable(View view) {
@@ -307,8 +313,17 @@ public class Layers {
         }
     }
 
+    private static final HashSet<FrameListener> frameListeners = new HashSet<FrameListener>();
     private static final HashSet<LayersListener> layerListeners = new HashSet<LayersListener>();
     private static final HashSet<TimeListener> timeListeners = new HashSet<TimeListener>();
+
+    public static void addFrameListener(FrameListener frameListener) {
+        frameListeners.add(frameListener);
+    }
+
+    public static void removeFrameListener(FrameListener frameListener) {
+        frameListeners.remove(frameListener);
+    }
 
     public static void addLayersListener(LayersListener layerListener) {
         layerListeners.add(layerListener);
@@ -318,11 +333,12 @@ public class Layers {
         layerListeners.remove(layerListener);
     }
 
-    public static void addTimeListener(final TimeListener timeListener) {
+
+    public static void addTimeListener(TimeListener timeListener) {
         timeListeners.add(timeListener);
     }
 
-    public static void removeTimeListener(final TimeListener timeListener) {
+    public static void removeTimeListener(TimeListener timeListener) {
         timeListeners.remove(timeListener);
     }
 
