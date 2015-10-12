@@ -54,17 +54,10 @@ public interface ImageCacheStatus {
     public CacheStatus getImageStatus(int compositionLayer);
 
     /**
-     * Returns the highest frame, until which the status is at least PARTIAL.
+     * Returns the highest frame until which the status is at least PARTIAL.
      * 
-     * @return highest frame, until which the status is at least PARTIAL.
+     * @return highest frame until which the status is at least PARTIAL.
      */
     public int getImageCachedPartiallyUntil();
-
-    /**
-     * Returns the highest frame, until which the status is COMPLETE.
-     * 
-     * @return highest frame, until which the status is COMPLETE.
-     */
-    public int getImageCachedCompletelyUntil();
 
 }

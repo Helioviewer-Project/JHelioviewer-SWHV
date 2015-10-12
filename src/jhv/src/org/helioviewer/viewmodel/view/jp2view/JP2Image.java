@@ -588,10 +588,6 @@ public class JP2Image {
         return imageCacheStatus;
     }
 
-    protected int getMaximumAccessibleFrameNumber() {
-        return imageCacheStatus.getImageCachedPartiallyUntil();
-    }
-
     // Returns the built-in color lookup table.
     protected int[] getBuiltinLUT() {
         return builtinLUT;
