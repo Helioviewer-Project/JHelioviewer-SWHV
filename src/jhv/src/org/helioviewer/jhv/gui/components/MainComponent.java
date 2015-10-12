@@ -12,12 +12,12 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.ExportMovieDialog;
 import org.helioviewer.jhv.io.MovieExporter;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.viewmodel.view.View;

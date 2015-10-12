@@ -4,10 +4,10 @@ import java.awt.Component;
 
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
-import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 import org.helioviewer.viewmodel.metadata.MetaData;

@@ -7,8 +7,8 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.SwingWorker;
 
+import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.renderable.gui.Renderable;
 
 import com.jogamp.opengl.GL2;
