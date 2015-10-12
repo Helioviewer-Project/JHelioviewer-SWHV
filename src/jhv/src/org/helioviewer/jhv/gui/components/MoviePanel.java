@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,13 +19,16 @@ import java.awt.event.MouseWheelListener;
 import java.text.ParseException;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
@@ -36,7 +41,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.MovieExporter;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
@@ -126,6 +130,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
+    private static JPanel radioButtonPanel;
 
     private static JPanel modePanel;
     private static JPanel speedPanel;
@@ -251,8 +256,56 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         animationModeComboBox.setPreferredSize(speedUnitComboBox.getPreferredSize());
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
-        mainPanel.add(modePanel);
 
+        radioButtonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JRadioButton freeRecordButton = new JRadioButton("Record freely");
+        JRadioButton loopButton = new JRadioButton("Record by looping once");
+        JRadioButton screenshotButton = new JRadioButton("Record screenshot");
+        radioButtonPanel.add(freeRecordButton, c);
+        c.gridy = 1;
+        radioButtonPanel.add(loopButton, c);
+        c.gridy = 2;
+        radioButtonPanel.add(screenshotButton, c);
+        //Group the radio buttons.
+        ButtonGroup group = new ButtonGroup();
+        group.add(freeRecordButton);
+        group.add(loopButton);
+        group.add(screenshotButton);
+
+        //Register a listener for the radio buttons.
+        ActionListener freeRecordButtonActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
+            }
+        };
+        ActionListener loopButtonActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
+            }
+        };
+        ActionListener screenshotButtonActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
+            }
+        };
+        freeRecordButton.addActionListener(freeRecordButtonActionListener);
+        loopButton.addActionListener(loopButtonActionListener);
+        screenshotButton.addActionListener(screenshotButtonActionListener);
+        freeRecordButton.setSelected(true);
+
+        mainPanel.add(modePanel);
+        mainPanel.add(radioButtonPanel);
         setEnabledState(false);
         setAdvanced(isAdvanced);
         sliderTimer.start();
@@ -268,7 +321,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         }
 
         @Override
-        public void layerAdded(View view) {}
+        public void layerAdded(View view) {
+        }
 
         @Override
         public void activeLayerChanged(View view) {
@@ -310,6 +364,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
+        radioButtonPanel.setVisible(advanced);
     }
 
     public void setFrameSlider(int frame) {
