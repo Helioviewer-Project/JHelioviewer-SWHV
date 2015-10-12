@@ -338,10 +338,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         shotButton.addActionListener(recordModeListener);
         freeButton.addActionListener(recordModeListener);
 
+        c.gridy = 1;
+        c.gridx = 1;
+        recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
+
         RecordSize[] sizes = { RecordSize.H720, RecordSize.ORIGINAL };
         final JComboBox recordSizeCombo = new JComboBox(sizes);
         recordSizeCombo.setSelectedItem(RecordSize.H720);
-        c.gridy = 1;
         c.gridx = 2;
         recordPanel.add(recordSizeCombo, c);
 

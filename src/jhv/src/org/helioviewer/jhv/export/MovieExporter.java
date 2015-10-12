@@ -115,9 +115,10 @@ public class MovieExporter implements FrameListener {
     }
 
     private void exportMovieFinish(GL2 gl) {
-        dispose(gl);
+        ImageViewerGui.getMainComponent().detachExport();
 
         try {
+            dispose(gl);
             disposeMovieWriter(frameNumber > 0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,6 +128,11 @@ public class MovieExporter implements FrameListener {
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
             init(gl, w, h);
+        }
+
+        if (stopped) {
+            exportMovieFinish(gl);
+            return;
         }
 
         BufferedImage screenshot = renderFrame(gl);
@@ -140,10 +146,6 @@ public class MovieExporter implements FrameListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        if (stopped) {
-            exportMovieFinish(gl);
         }
     }
 
@@ -177,11 +179,10 @@ public class MovieExporter implements FrameListener {
         if (!stopped) {
             stopped = true;
 
-            ImageViewerGui.getMainComponent().detachExport();
-            if (mode == RecordMode.LOOP) {
+            if (mode == RecordMode.LOOP)
                 Layers.removeFrameListener(instance);
-            }
-            MoviePanel.clickRecordButton();
+            if (mode != RecordMode.FREE)
+                MoviePanel.clickRecordButton();
         }
     }
 
@@ -198,6 +199,7 @@ public class MovieExporter implements FrameListener {
 
     private static final MovieExporter instance = new MovieExporter();
 
-    private MovieExporter() {}
+    private MovieExporter() {
+    }
 
 }
