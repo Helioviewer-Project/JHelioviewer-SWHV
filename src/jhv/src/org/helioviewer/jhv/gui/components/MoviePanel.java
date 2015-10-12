@@ -116,6 +116,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         protected abstract int getSecondsPerSecond();
     }
 
+    private enum RecordMode {
+        LOOP, SHOT, FREE
+    };
+
     // Status
     private static boolean isAdvanced = false;
     private static boolean wasPlaying = false;
@@ -196,7 +200,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
 
-        RecordButton recordButton = new RecordButton();
+        final RecordButton recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
         buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
@@ -257,61 +261,62 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         animationModeComboBox.addActionListener(this);
         modePanel.add(animationModeComboBox);
 
+        mainPanel.add(modePanel);
+
         radioButtonPanel = new JPanel(new GridBagLayout());
+        radioButtonPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
+
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
-        c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        JRadioButton freeRecordButton = new JRadioButton("Record freely");
-        JRadioButton loopButton = new JRadioButton("Record by looping once");
-        JRadioButton screenshotButton = new JRadioButton("Record screenshot");
-        radioButtonPanel.add(freeRecordButton, c);
-        c.gridy = 1;
+        final JRadioButton loopButton = new JRadioButton("One loop");
+        loopButton.setSelected(true);
+        final JRadioButton shotButton = new JRadioButton("Screenshot");
+        final JRadioButton freeButton = new JRadioButton("Unlimited");
+
+        c.gridx = 0;
         radioButtonPanel.add(loopButton, c);
-        c.gridy = 2;
-        radioButtonPanel.add(screenshotButton, c);
-        //Group the radio buttons.
+        c.gridx = 1;
+        radioButtonPanel.add(shotButton, c);
+        c.gridx = 2;
+        radioButtonPanel.add(freeButton, c);
+
         ButtonGroup group = new ButtonGroup();
-        group.add(freeRecordButton);
         group.add(loopButton);
-        group.add(screenshotButton);
+        group.add(shotButton);
+        group.add(freeButton);
 
-        //Register a listener for the radio buttons.
-        ActionListener freeRecordButtonActionListener = new ActionListener() {
+        ActionListener recordModeActionListener = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
+            public void actionPerformed(ActionEvent e) {
+                JRadioButton aButton = (JRadioButton) e.getSource();
+                if (aButton == loopButton)
+                    recordButton.setMode(RecordMode.LOOP);
+                else if (aButton == shotButton)
+                    recordButton.setMode(RecordMode.SHOT);
+                else if (aButton == freeButton)
+                    recordButton.setMode(RecordMode.FREE);
             }
         };
-        ActionListener loopButtonActionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
-            }
-        };
-        ActionListener screenshotButtonActionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                AbstractButton aButton = (AbstractButton) actionEvent.getSource();
-            }
-        };
-        freeRecordButton.addActionListener(freeRecordButtonActionListener);
-        loopButton.addActionListener(loopButtonActionListener);
-        screenshotButton.addActionListener(screenshotButtonActionListener);
-        freeRecordButton.setSelected(true);
 
-        mainPanel.add(modePanel);
+        loopButton.addActionListener(recordModeActionListener);
+        shotButton.addActionListener(recordModeActionListener);
+        freeButton.addActionListener(recordModeActionListener);
+
         mainPanel.add(radioButtonPanel);
+
         setEnabledState(false);
         setAdvanced(isAdvanced);
         sliderTimer.start();
     }
 
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
+
+        private RecordMode mode = RecordMode.LOOP;
 
         public RecordButton() {
             super("REC", recordIcon);
@@ -343,6 +348,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 setText("REC");
                 MovieExporter.stop();
             }
+        }
+
+        public void setMode(RecordMode _mode) {
+            mode = _mode;
         }
 
     }
