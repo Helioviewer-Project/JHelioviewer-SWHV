@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import java.awt.Dimension;
 import java.awt.Point;
 
 import com.jogamp.opengl.GL2;
@@ -43,6 +44,10 @@ public class GLHelper {
 
     public static Point GL2AWTPoint(Point p) {
         return new Point((int) (p.x / GLInfo.pixelScaleFloat[0]), (int) (p.y / GLInfo.pixelScaleFloat[1]));
+    }
+
+    public static Dimension GL2AWTDimension(Dimension d) {
+        return new Dimension((int) (d.width / GLInfo.pixelScaleFloat[0]), (int) (d.height / GLInfo.pixelScaleFloat[1]));
     }
 
 }

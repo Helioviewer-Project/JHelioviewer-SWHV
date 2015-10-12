@@ -41,6 +41,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.MovieExporter;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
@@ -48,6 +49,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -120,6 +122,33 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         LOOP, SHOT, FREE
     };
 
+    private enum RecordSize {
+        H720 {
+            @Override
+            public String toString() {
+                return "1280x720";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(1280, 720);
+            }
+        },
+        ORIGINAL {
+            @Override
+            public String toString() {
+                return "Original";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return GLHelper.GL2AWTDimension(Displayer.getViewport().getSize());
+            }
+        };
+
+        protected abstract Dimension getSize();
+    }
+
     // Status
     private static boolean isAdvanced = false;
     private static boolean wasPlaying = false;
@@ -134,7 +163,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
-    private static JPanel radioButtonPanel;
+    private static JPanel recordPanel;
 
     private static JPanel modePanel;
     private static JPanel speedPanel;
@@ -263,8 +292,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        radioButtonPanel = new JPanel(new GridBagLayout());
-        radioButtonPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
+        recordPanel = new JPanel(new GridBagLayout());
+        recordPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -279,35 +308,49 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         final JRadioButton freeButton = new JRadioButton("Unlimited");
 
         c.gridx = 0;
-        radioButtonPanel.add(loopButton, c);
+        recordPanel.add(loopButton, c);
         c.gridx = 1;
-        radioButtonPanel.add(shotButton, c);
+        recordPanel.add(shotButton, c);
         c.gridx = 2;
-        radioButtonPanel.add(freeButton, c);
+        recordPanel.add(freeButton, c);
 
         ButtonGroup group = new ButtonGroup();
         group.add(loopButton);
         group.add(shotButton);
         group.add(freeButton);
 
-        ActionListener recordModeActionListener = new ActionListener() {
+        ActionListener recordModeListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JRadioButton aButton = (JRadioButton) e.getSource();
                 if (aButton == loopButton)
-                    recordButton.setMode(RecordMode.LOOP);
+                    recordButton.setRecordMode(RecordMode.LOOP);
                 else if (aButton == shotButton)
-                    recordButton.setMode(RecordMode.SHOT);
+                    recordButton.setRecordMode(RecordMode.SHOT);
                 else if (aButton == freeButton)
-                    recordButton.setMode(RecordMode.FREE);
+                    recordButton.setRecordMode(RecordMode.FREE);
             }
         };
+        loopButton.addActionListener(recordModeListener);
+        shotButton.addActionListener(recordModeListener);
+        freeButton.addActionListener(recordModeListener);
 
-        loopButton.addActionListener(recordModeActionListener);
-        shotButton.addActionListener(recordModeActionListener);
-        freeButton.addActionListener(recordModeActionListener);
+        RecordSize[] sizes = { RecordSize.H720, RecordSize.ORIGINAL };
+        final JComboBox recordSizeCombo = new JComboBox(sizes);
+        recordSizeCombo.setSelectedItem(RecordSize.H720);
+        c.gridy = 1;
+        c.gridx = 2;
+        recordPanel.add(recordSizeCombo, c);
 
-        mainPanel.add(radioButtonPanel);
+        ActionListener recordSizeListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                recordButton.setRecordSize((RecordSize) (recordSizeCombo.getSelectedItem()));
+            }
+        };
+        recordSizeCombo.addActionListener(recordSizeListener);
+
+        mainPanel.add(recordPanel);
 
         setEnabledState(false);
         setAdvanced(isAdvanced);
@@ -317,6 +360,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
 
         private RecordMode mode = RecordMode.LOOP;
+        private RecordSize size = RecordSize.H720;
 
         public RecordButton() {
             super("REC", recordIcon);
@@ -343,15 +387,19 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 setText("BUSY");
-                MovieExporter.start(1280, 720);
+                MovieExporter.start(size.getSize().width, size.getSize().height);
             } else {
                 setText("REC");
                 MovieExporter.stop();
             }
         }
 
-        public void setMode(RecordMode _mode) {
+        public void setRecordMode(RecordMode _mode) {
             mode = _mode;
+        }
+
+        public void setRecordSize(RecordSize _size) {
+            size = _size;
         }
 
     }
@@ -373,7 +421,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         advancedButton.setIcon(advanced ? closeIcon : openIcon);
         modePanel.setVisible(advanced);
         speedPanel.setVisible(advanced);
-        radioButtonPanel.setVisible(advanced);
+        recordPanel.setVisible(advanced);
     }
 
     public void setFrameSlider(int frame) {

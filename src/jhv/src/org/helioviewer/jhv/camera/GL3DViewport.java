@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import java.awt.Dimension;
+
 import org.helioviewer.jhv.display.Displayer;
 
 public class GL3DViewport {
@@ -49,12 +51,16 @@ public class GL3DViewport {
         return 0;
     }
 
-    public void setViewportSize(int width, int height) {
+    public Dimension getSize() {
+        return new Dimension(w, h);
+    }
+
+    public void setSize(int width, int height) {
         w = width;
         h = height;
     }
 
-    public void setViewportOffset(int offsetX, int offsetY) {
+    public void setOffset(int offsetX, int offsetY) {
         x = offsetX;
         y = offsetY;
     }
