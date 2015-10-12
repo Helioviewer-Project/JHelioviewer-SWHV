@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.export;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
