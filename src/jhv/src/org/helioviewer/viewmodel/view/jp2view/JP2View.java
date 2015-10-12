@@ -11,8 +11,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import kdu_jni.Kdu_region_compositor;
-
 import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
@@ -54,7 +52,6 @@ public class JP2View extends AbstractView {
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
-        blockingQueue.add(task);
         executor.submit(task);
     }
 
@@ -96,7 +93,7 @@ public class JP2View extends AbstractView {
             hiResImage = true;
 
         int numOfThread = 1;
-        executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/*rejectedExecutionHandler*/);
+        executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
         frameCountStart = System.currentTimeMillis();
 
         render();
@@ -164,6 +161,7 @@ public class JP2View extends AbstractView {
     }
 
     // if instance was built before cancelling
+    @Override
     public void finalize() {
         if (!isAbolished) {
             EventQueue.invokeLater(new Runnable() {
