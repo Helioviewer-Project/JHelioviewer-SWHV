@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -188,7 +190,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
 
-        JButton recordButton = ButtonCreator.createTextButton(recordIcon, "REC", "Record movie", null);
+        JToggleButton recordButton = new JToggleButton("REC", recordIcon);
+        recordButton.setToolTipText("Record movie");
         recordButton.addActionListener(new RecordActionListener(recordButton));
         buttonPanel.add(recordButton);
 
@@ -196,6 +199,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback and recording", this);
         buttonPanel.add(advancedButton);
+
+        int recordButtonHeight = recordButton.getPreferredSize().height;
+        previousFrameButton.setPreferredSize(new Dimension(previousFrameButton.getPreferredSize().width, recordButtonHeight));
+        playButton.setPreferredSize(new Dimension(playButton.getPreferredSize().width, recordButtonHeight));
+        nextFrameButton.setPreferredSize(new Dimension(nextFrameButton.getPreferredSize().width, recordButtonHeight));
+        advancedButton.setPreferredSize(new Dimension(advancedButton.getPreferredSize().width, recordButtonHeight));
 
         secondLine.add(buttonPanel, BorderLayout.WEST);
 
@@ -251,11 +260,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     private static class RecordActionListener implements ActionListener {
-        private MovieExporter el = null;
         private boolean started = false;
-        private final JButton recordButton;
+        private final JToggleButton recordButton;
 
-        public RecordActionListener(JButton recordButton) {
+        public RecordActionListener(JToggleButton recordButton) {
             this.recordButton = recordButton;
         }
 
@@ -263,10 +271,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (started) {
                 recordButton.setText("REC");
-                el.stop();
+                MovieExporter.stop();
             } else {
                 recordButton.setText("BUSY");
-                el = MovieExporter.exportMovie(1280, 720);
+                MovieExporter.start(1280, 720);
             }
             started = !started;
         }
