@@ -23,7 +23,7 @@ public class ExitHooks {
         @Override
         public void run() {
             try {
-                MovieExporter.getInstance().disposeMovieWriter(false);
+                MovieExporter.disposeMovieWriter(false);
             } catch (Exception e) {
                 Log.warn("Movie was not shut down properly");
             }
