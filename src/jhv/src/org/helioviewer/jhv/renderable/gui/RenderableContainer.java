@@ -6,8 +6,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.opengl.GL3DViewport;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 

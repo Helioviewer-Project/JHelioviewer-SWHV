@@ -1,6 +1,5 @@
-package org.helioviewer.jhv.opengl;
+package org.helioviewer.jhv.camera;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 
 public class GL3DViewport {
