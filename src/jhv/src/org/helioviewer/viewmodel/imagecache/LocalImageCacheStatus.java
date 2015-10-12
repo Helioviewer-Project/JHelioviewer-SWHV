@@ -55,12 +55,4 @@ public class LocalImageCacheStatus implements ImageCacheStatus {
         return maxFrameNumber;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getImageCachedCompletelyUntil() {
-        return maxFrameNumber;
-    }
-
 }

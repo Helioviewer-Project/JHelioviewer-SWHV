@@ -322,7 +322,7 @@ class J2KReader implements Runnable {
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
                             } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;
-                            } else if (parentImageRef.getMaximumAccessibleFrameNumber() < num_layers - 1) {
+                            } else if (cacheStatusRef.getImageCachedPartiallyUntil() < num_layers - 1) {
                                 strategy = CacheStrategy.MISSINGFRAMESFIRST;
                             } else {
                                 strategy = CacheStrategy.ALLFRAMESEQUALLY;
@@ -360,7 +360,7 @@ class J2KReader implements Runnable {
                                 }
                                 // select current step based on strategy
                                 if (strategy == CacheStrategy.MISSINGFRAMESFIRST) {
-                                    current_step = parentImageRef.getMaximumAccessibleFrameNumber() / JPIPConstants.MAX_REQ_LAYERS;
+                                    current_step = cacheStatusRef.getImageCachedPartiallyUntil() / JPIPConstants.MAX_REQ_LAYERS;
                                 } else {
                                     current_step = curLayer / JPIPConstants.MAX_REQ_LAYERS;
                                 }

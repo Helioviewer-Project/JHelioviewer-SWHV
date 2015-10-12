@@ -114,12 +114,4 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         return imagePartialUntil;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getImageCachedCompletelyUntil() {
-        return imageCompleteUntil;
-    }
-
 }
