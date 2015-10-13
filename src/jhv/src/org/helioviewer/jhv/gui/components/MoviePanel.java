@@ -364,7 +364,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     }
 
     public static void clickRecordButton() {
-        recordButton.doClick();
+        if (recordButton.isSelected())
+            recordButton.doClick();
     }
 
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
