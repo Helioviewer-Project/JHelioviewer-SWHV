@@ -67,10 +67,13 @@ public class RenderableContainer implements TableModel, Reorderable {
                 break;
             }
         }
-        mv.renderMiniview(gl, miniview);
-        for (Renderable renderable : renderables) {
-            if (!(renderable instanceof RenderableMiniview))
-                renderable.renderMiniview(gl, miniview);
+
+        if (mv != null) {
+            mv.renderMiniview(gl, miniview);
+            for (Renderable renderable : renderables) {
+                if (!(renderable instanceof RenderableMiniview))
+                    renderable.renderMiniview(gl, miniview);
+            }
         }
     }
 
