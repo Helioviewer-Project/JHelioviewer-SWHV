@@ -368,6 +368,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             recordButton.doClick();
     }
 
+    public static JPanel getRecordPanel() {
+        return recordPanel;
+    }
+
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
 
         private RecordMode mode = RecordMode.LOOP;
