@@ -133,13 +133,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             fullName = "MDI " + measurement.substring(3, 6);
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
-            fullName = instrument + " " + detector;
+            fullName = observatory + " " + detector;
         } else if (detector.equals("EUVI")) {
             observatory = m.get("OBSRVTRY");
             if (measurement == null) {
                 measurement = "" + m.tryGetDouble("WAVELNTH");
             }
-            fullName = instrument + " " + detector + " " + measurement;
+            fullName = observatory + " " + detector + " " + measurement;
         } else {
             fullName = instrument + " " + measurement;
         }
