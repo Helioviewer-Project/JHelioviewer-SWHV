@@ -94,6 +94,7 @@ public class Displayer implements JHVEventHighlightListener {
         activeCamera.deactivate();
         camera.activate(activeCamera);
         viewport.setCamera(camera);
+        render();
     }
 
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
