@@ -5,6 +5,10 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Date;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -20,6 +24,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.layers.FrameListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
@@ -49,21 +54,33 @@ public class MovieExporter implements FrameListener {
 
     private static final int frameRate = 30;
 
+    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("MovieExporter"), new ThreadPoolExecutor.DiscardPolicy());
+
     private static void initMovieWriter(String moviePath, int w, int h) {
         movieWriter = ToolFactory.makeWriter(moviePath);
         movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, w, h);
     }
 
-    public static void disposeMovieWriter(boolean keep) {
+    public void disposeMovieWriter(boolean keep) {
         if (movieWriter != null) {
-            movieWriter.close();
+            blockingQueue.poll();
+            if (keep) {
+                executor.submit(new CloseWriter(movieWriter, moviePath, keep));
+            } else {
+                while (blockingQueue.poll() != null) {
+                }
+                Future<?> f = executor.submit(new CloseWriter(movieWriter, moviePath, keep));
+                try {
+                    f.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
             movieWriter = null;
         }
-        if (!keep && moviePath != null) {
-            File f = new File(moviePath);
-            f.delete();
-        }
-        moviePath = null;
     }
 
     private void init(GL2 gl, int w, int h) {
@@ -110,8 +127,6 @@ public class MovieExporter implements FrameListener {
 
         fbo.unuse(gl);
 
-        ImageUtil.flipImageVertically(screenshot);
-
         return screenshot;
     }
 
@@ -133,6 +148,7 @@ public class MovieExporter implements FrameListener {
         }
 
         if (stopped) {
+            // Log.error("CALL expmfin");
             exportMovieFinish(gl);
             return;
         }
@@ -140,10 +156,15 @@ public class MovieExporter implements FrameListener {
         BufferedImage screenshot = renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
+                ImageUtil.flipImageVertically(screenshot);
                 ImageIO.write(screenshot, "png", new File(imagePath));
                 stop();
             } else {
-                movieWriter.encodeVideo(0, screenshot, (int) (1000 / frameRate * frameNumber), TimeUnit.MILLISECONDS);
+                try {
+                    executor.submit(new FrameConsumer(movieWriter, screenshot, frameNumber));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 frameNumber++;
             }
         } catch (Exception e) {
@@ -152,6 +173,8 @@ public class MovieExporter implements FrameListener {
     }
 
     public static void start(int _w, int _h, RecordMode _mode) {
+        movieWriter = null; // CloseWriter might have had an exception
+
         stopped = false;
         frameNumber = 0;
         currentFrame = 0;
@@ -174,11 +197,12 @@ public class MovieExporter implements FrameListener {
                 Layers.addFrameListener(instance);
                 Layers.setFrame(0);
                 Layers.playMovie();
-             }
+            }
         }
     }
 
     public static void stop() {
+        // Log.error("CALL STOP");
         if (!stopped) {
             stopped = true;
 
@@ -203,6 +227,57 @@ public class MovieExporter implements FrameListener {
     private static final MovieExporter instance = new MovieExporter();
 
     private MovieExporter() {
+    }
+
+    public static MovieExporter getInstance() {
+        return instance;
+    }
+
+    private static class FrameConsumer implements Runnable {
+
+        private final IMediaWriter im;
+        private final BufferedImage el;
+        private final int framenumber;
+
+        public FrameConsumer(IMediaWriter _im, BufferedImage _el, int _framenumber) {
+            im = _im;
+            el = _el;
+            framenumber = _framenumber;
+        }
+
+        @Override
+        public void run() {
+            ImageUtil.flipImageVertically(el);
+            im.encodeVideo(0, el, 1000 / frameRate * framenumber, TimeUnit.MILLISECONDS);
+            // Log.error("EXPORTING " + framenumber);
+        }
+
+    }
+
+    private class CloseWriter implements Runnable {
+
+        private final IMediaWriter im;
+        private final String moviePath;
+        private final boolean keep;
+
+        public CloseWriter(IMediaWriter _im, String _moviePath, boolean _keep) {
+            im = _im;
+            moviePath = _moviePath;
+            keep = _keep;
+        }
+
+        @Override
+        public void run() {
+            // Log.error("CLOSING ");
+
+            if (im != null) {
+                im.close();
+            }
+            if (!keep && moviePath != null) {
+                File f = new File(moviePath);
+                f.delete();
+            }
+        }
     }
 
 }
