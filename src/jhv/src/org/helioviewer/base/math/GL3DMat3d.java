@@ -66,12 +66,6 @@ public class GL3DMat3d {
         return this;
     }
 
-    public void setTranslation(double x, double y, double z) {
-        m[12] = x;
-        m[13] = y;
-        m[14] = z;
-    }
-
     public GL3DMat3d rotation(double degAng, GL3DVec3d axis) {
         return this.rotation(degAng, axis.x, axis.y, axis.z);
     }
