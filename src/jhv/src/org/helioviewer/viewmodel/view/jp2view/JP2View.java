@@ -160,7 +160,7 @@ public class JP2View extends AbstractView {
 
     // if instance was built before cancelling
     @Override
-    public void finalize() {
+    protected void finalize() {
         if (!isAbolished) {
             EventQueue.invokeLater(new Runnable() {
                 @Override
