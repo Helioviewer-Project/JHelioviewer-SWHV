@@ -81,9 +81,9 @@ public class MovieExporter implements FrameListener {
         inited = false;
         vp = null;
 
-        fbo.unbind(gl);
         fbo.detachAll(gl);
         fbo.destroy(gl);
+        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
     }
 
     private BufferedImage renderFrame(GL2 gl) {
