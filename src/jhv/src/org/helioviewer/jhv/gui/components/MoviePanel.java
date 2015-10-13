@@ -19,7 +19,6 @@ import java.awt.event.MouseWheelListener;
 import java.text.ParseException;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -402,10 +401,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 setText("BUSY");
-                MovieExporter.start(size.getSize().width, size.getSize().height, mode);
+                MovieExporter.getInstance().start(size.getSize().width, size.getSize().height, mode);
             } else {
                 setText("REC");
-                MovieExporter.stop();
+                MovieExporter.getInstance().stop();
             }
         }
 
