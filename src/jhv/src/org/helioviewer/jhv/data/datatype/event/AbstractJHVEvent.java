@@ -30,7 +30,7 @@ public abstract class AbstractJHVEvent implements JHVEvent {
 
     @Override
     public void removeHighlightListener(JHVEventHighlightListener l) {
-        listeners.remove(listeners);
+        listeners.remove(l);
     }
 
     @Override
