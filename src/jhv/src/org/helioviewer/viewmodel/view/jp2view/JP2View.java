@@ -255,7 +255,9 @@ public class JP2View extends AbstractView {
             ++frameCount;
         }
 
-        dataHandler.handleData(this, newImageData);
+        if (dataHandler != null) {
+            dataHandler.handleData(this, newImageData);
+        }
     }
 
     @Override
