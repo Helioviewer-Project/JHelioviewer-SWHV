@@ -55,6 +55,11 @@ public class GL3DViewport {
         return new Dimension(w, h);
     }
 
+    public void setSize(Dimension d) {
+        w = d.width;
+        h = d.height;
+    }
+
     public void setSize(int width, int height) {
         w = width;
         h = height;

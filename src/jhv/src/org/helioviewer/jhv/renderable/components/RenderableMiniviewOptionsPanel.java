@@ -13,6 +13,7 @@ import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 @SuppressWarnings("serial")
 public class RenderableMiniviewOptionsPanel extends JPanel {
@@ -52,7 +53,7 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 Integer val = (Integer) xSpinner.getValue();
-                Displayer.getMiniview().setSize(val, val);
+                Displayer.getMiniview().setSize(GLHelper.AWT2GLDimension(new Dimension(val, val)));
                 Displayer.display();
             }
         });
