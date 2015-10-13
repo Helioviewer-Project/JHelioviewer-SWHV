@@ -51,9 +51,7 @@ public class GLTexture {
         gl.glBindTexture(target, texID);
     }
 
-    public void delete(GL2 gl, int target, int unit) {
-        gl.glActiveTexture(unit);
-        gl.glBindTexture(target, 0);
+    public void delete(GL2 gl) {
         gl.glDeleteTextures(1, new int[] { texID }, 0);
         texID = prev_width = -1;
     }

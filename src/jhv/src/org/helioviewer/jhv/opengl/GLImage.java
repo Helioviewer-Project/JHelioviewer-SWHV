@@ -184,9 +184,9 @@ public class GLImage {
     }
 
     public void dispose(GL2 gl) {
-        tex.delete(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
-        lutTex.delete(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
-        diffTex.delete(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+        tex.delete(gl);
+        lutTex.delete(gl);
+        diffTex.delete(gl);
     }
 
     public void setContrast(float contrast) {
