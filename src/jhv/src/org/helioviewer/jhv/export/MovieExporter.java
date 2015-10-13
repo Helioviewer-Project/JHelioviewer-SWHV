@@ -13,6 +13,7 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
@@ -116,6 +117,7 @@ public class MovieExporter implements FrameListener {
 
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
+        ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), true);
 
         try {
             dispose(gl);
@@ -161,6 +163,7 @@ public class MovieExporter implements FrameListener {
         h = _h;
         mode = _mode;
 
+        ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), false);
         ImageViewerGui.getMainComponent().attachExport(instance);
 
         if (mode == RecordMode.SHOT) {

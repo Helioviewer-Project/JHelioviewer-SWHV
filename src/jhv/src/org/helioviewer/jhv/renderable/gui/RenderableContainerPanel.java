@@ -3,7 +3,6 @@ package org.helioviewer.jhv.renderable.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -31,6 +30,7 @@ import javax.swing.border.MatteBorder;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -181,7 +181,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     renderable.setVisible(!renderable.isVisible());
                     Component optionsPanel = renderable.getOptionsPanel();
                     if (optionsPanel != null) {
-                        enableComponents(optionsPanel, renderable.isVisible());
+                        ComponentUtils.enableComponents(optionsPanel, renderable.isVisible());
                     }
 
                     renderableContainer.fireListeners();
@@ -238,7 +238,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     private void setOptionsPanel(Renderable renderable) {
         Component optionsPanel = renderable.getOptionsPanel();
         if (optionsPanel != null) {
-            enableComponents(optionsPanel, renderable.isVisible());
+            ComponentUtils.enableComponents(optionsPanel, renderable.isVisible());
         }
         setOptionsComponent(optionsPanel);
     }
@@ -250,18 +250,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         }
         super.revalidate();
         // super.repaint();
-    }
-
-    private void enableComponents(Component container, boolean enable) {
-        if (container instanceof Container) {
-            Component[] components = ((Container) container).getComponents();
-            for (Component component : components) {
-                component.setEnabled(enable);
-                if (component instanceof Container) {
-                    enableComponents(component, enable);
-                }
-            }
-        }
     }
 
     @Override
