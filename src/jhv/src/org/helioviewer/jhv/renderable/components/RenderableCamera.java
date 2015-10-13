@@ -51,7 +51,6 @@ public class RenderableCamera implements Renderable {
         {
             GLHelper.lineWidth(gl, 1);
 
-            gl.glDisable(GL2.GL_TEXTURE_2D);
             gl.glBegin(GL2.GL_LINE_LOOP);
 
             double x, y, z, n;
@@ -119,7 +118,6 @@ public class RenderableCamera implements Renderable {
                 gl.glVertex3f((float) x, (float) y, (float) z);
             }
             gl.glEnd();
-            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
     }

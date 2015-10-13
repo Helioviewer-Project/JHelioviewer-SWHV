@@ -243,7 +243,6 @@ public class PfssData {
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDepthMask(false);
 
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, VBOVertices);
@@ -254,7 +253,6 @@ public class PfssData {
         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
         gl.glDepthMask(true);
-        gl.glEnable(GL2.GL_TEXTURE_2D);
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);

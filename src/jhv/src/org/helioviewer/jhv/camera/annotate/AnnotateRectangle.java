@@ -67,8 +67,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         if (rectangleStartPoints.size() == 0 && !beingDragged())
             return;
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-
         GLHelper.lineWidth(gl, lineWidth);
 
         gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
@@ -86,8 +84,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
             drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(activeIndex)), toSpherical(camera, rectangleEndPoints.get(activeIndex)));
-
-        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     @Override

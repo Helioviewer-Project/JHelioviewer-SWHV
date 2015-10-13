@@ -46,11 +46,14 @@ public class GLTexture {
         texID = tmp[0];
     }
 
-    public void bind(GL2 gl, int target) {
+    public void bind(GL2 gl, int target, int unit) {
+        gl.glActiveTexture(unit);
         gl.glBindTexture(target, texID);
     }
 
-    public void delete(GL2 gl) {
+    public void delete(GL2 gl, int target, int unit) {
+        gl.glActiveTexture(unit);
+        gl.glBindTexture(target, 0);
         gl.glDeleteTextures(1, new int[] { texID }, 0);
         texID = prev_width = -1;
     }
