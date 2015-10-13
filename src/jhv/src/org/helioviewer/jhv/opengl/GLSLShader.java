@@ -162,24 +162,6 @@ public class GLSLShader {
         gl.glUniform1i(id, texunit);
     }
 
-    public static void bindTexture(GL2 gl, int target, String texname, int texid, int texunit) {
-        gl.glActiveTexture(GL2.GL_TEXTURE0 + texunit);
-        gl.glBindTexture(target, texid);
-        gl.glActiveTexture(GL2.GL_TEXTURE0);
-    }
-
-    public void bindTexture2D(GL2 gl, String texname, int texid, int texunit) {
-        bindTexture(gl, GL2.GL_TEXTURE_2D, texname, texid, texunit);
-    }
-
-    public void bindTexture3D(GL2 gl, String texname, int texid, int texunit) {
-        bindTexture(gl, GL2.GL_TEXTURE_3D, texname, texid, texunit);
-    }
-
-    public void bindTextureRECT(GL2 gl, String texname, int texid, int texunit) {
-        bindTexture(gl, GL2.GL_TEXTURE_RECTANGLE, texname, texid, texunit);
-    }
-
     public static void attachVertexShader(GL2 gl, String vertexText) {
         int iID = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 
