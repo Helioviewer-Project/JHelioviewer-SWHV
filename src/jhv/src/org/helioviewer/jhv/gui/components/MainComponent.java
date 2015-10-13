@@ -37,8 +37,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         GLInfo.update(gl);
         GLInfo.updatePixelScale(this);
 
-        gl.glEnable(GL2.GL_TEXTURE_1D);
-        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_TEXTURE_1D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
 
         gl.glEnable(GL2.GL_POINT_SMOOTH);
         gl.glEnable(GL2.GL_LINE_SMOOTH);

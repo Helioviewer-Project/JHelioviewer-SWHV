@@ -58,7 +58,7 @@ public class GLImage {
         GLSLShader.setFactors(sharpen, 1f / w, 1f / h, 1f);
         applyGLLUT(gl);
 
-        tex.bind(gl, GL2.GL_TEXTURE_2D);
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
 
         if (imageData.getUploaded() == false) {
             imageData.setUploaded(true);
@@ -131,10 +131,8 @@ public class GLImage {
             }
             if (differenceMode && prevFrame != null) {
                 GLSLShader.setTruncationValue(truncation);
-                gl.glActiveTexture(GL2.GL_TEXTURE2);
-                diffTex.bind(gl, GL2.GL_TEXTURE_2D);
+                diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
                 diffTex.copyImageData2D(gl, prevFrame);
-                gl.glActiveTexture(GL2.GL_TEXTURE0);
             }
         } else {
             GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);
@@ -142,8 +140,6 @@ public class GLImage {
     }
 
     private void applyGLLUT(GL2 gl) {
-        gl.glActiveTexture(GL2.GL_TEXTURE1);
-
         LUT currlut;
 
         if (differenceMode || baseDifferenceMode) {
@@ -152,7 +148,7 @@ public class GLImage {
             currlut = lut;
         }
 
-        lutTex.bind(gl, GL2.GL_TEXTURE_1D);
+        lutTex.bind(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
 
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT;
@@ -177,8 +173,6 @@ public class GLImage {
             lutTex.copyBuffer1D(gl, lutBuffer);
         }
         lutChanged = false;
-
-        gl.glActiveTexture(GL2.GL_TEXTURE0);
     }
 
     public void init(GL2 gl) {
@@ -190,9 +184,9 @@ public class GLImage {
     }
 
     public void dispose(GL2 gl) {
-        tex.delete(gl);
-        lutTex.delete(gl);
-        diffTex.delete(gl);
+        tex.delete(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        lutTex.delete(gl, GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE1);
+        diffTex.delete(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
     }
 
     public void setContrast(float contrast) {

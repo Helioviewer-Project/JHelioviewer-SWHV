@@ -52,8 +52,6 @@ public class AnnotateCross extends AbstractAnnotateable {
         if (crossPoints.size() == 0)
             return;
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-
         GLHelper.lineWidth(gl, lineWidth);
 
         gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
@@ -66,8 +64,6 @@ public class AnnotateCross extends AbstractAnnotateable {
         gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
             drawCross(gl, toSpherical(camera, crossPoints.get(activeIndex)));
-
-        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     @Override

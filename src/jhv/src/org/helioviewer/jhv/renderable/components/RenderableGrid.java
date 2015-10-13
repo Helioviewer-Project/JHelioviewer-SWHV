@@ -102,9 +102,7 @@ public class RenderableGrid implements Renderable {
             if (showLabels)
                 drawText(gl);
 
-            gl.glDisable(GL2.GL_TEXTURE_2D);
             drawCircles(gl, cameraMatrix);
-            gl.glEnable(GL2.GL_TEXTURE_2D);
         }
         gl.glPopMatrix();
     }
@@ -122,7 +120,6 @@ public class RenderableGrid implements Renderable {
     private void drawAxes(GL2 gl) {
         GLHelper.lineWidth(gl, 1);
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINES);
         {
             gl.glColor4f(0, 0, 1, 1);
@@ -133,7 +130,6 @@ public class RenderableGrid implements Renderable {
             gl.glVertex3f(0, 1, 0);
         }
         gl.glEnd();
-        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {

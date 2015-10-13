@@ -49,12 +49,12 @@ public class SWHVHEKPluginRenderable implements Renderable {
             graph.dispose();
 
             tex = new GLTexture(gl);
-            tex.bind(gl, GL2.GL_TEXTURE_2D);
+            tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
             tex.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
 
-        tex.bind(gl, GL2.GL_TEXTURE_2D);
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
@@ -102,7 +102,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
         double x, y, z;
         double xrot, yrot, zrot;
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
@@ -177,7 +176,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         gl.glEnd();
-        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     private void drawPolygon(GL2 gl, JHVEvent evt, Date now) {
@@ -207,7 +205,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
         // draw bounds
         JHVPoint oldBoundaryPoint3d = null;
 
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         for (JHVPoint point : points) {
             int divpoints = 10;
 
@@ -226,7 +223,6 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
             oldBoundaryPoint3d = point;
         }
-        gl.glEnable(GL2.GL_TEXTURE_2D);
     }
 
     private void drawIcon(GL2 gl, JHVEvent evt, Date now) {
@@ -279,6 +275,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
         p3.add(targetDir);
 
         gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
             gl.glTexCoord2f(1, 1);
@@ -291,6 +288,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
             gl.glVertex3f((float) p0.x, (float) p0.y, (float) p0.z);
         }
         gl.glEnd();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_CULL_FACE);
     }
 
@@ -363,7 +361,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     @Override
     public void dispose(GL2 gl) {
         for (GLTexture el : iconCacheId.values()) {
-            el.delete(gl);
+            el.delete(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         }
         iconCacheId.clear();
     }
