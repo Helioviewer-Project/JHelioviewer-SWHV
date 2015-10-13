@@ -115,19 +115,19 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
         return diff < 0 ? -1 : (diff > 0 ? +1 : 0);
     }
 
-    /** Overridden equals method */
-    public boolean equals(ImmutableDateTime _dt) {
-        if (_dt == null)
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ImmutableDateTime)) {
             return false;
-
-        return compareTo(_dt) == 0;
+        }
+        ImmutableDateTime dt = (ImmutableDateTime) o;
+        return getMillis() == dt.getMillis();
     }
-
-    /** Overridden hashCode method */
 
     @Override
     public int hashCode() {
-        return (int) (calendar.getTimeInMillis() ^ (calendar.getTimeInMillis() >>> 32));
+        long millis = getMillis();
+        return (int) (millis ^ (millis >>> 32));
     }
 
     public String getCachedDate() {
