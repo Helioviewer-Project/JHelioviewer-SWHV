@@ -123,12 +123,13 @@ public class GLImage {
                 }
             }
 
-            ImageData prevFrame = imageData;
+            ImageData prevFrame;
             if (!baseDifferenceMode) {
                 prevFrame = prevImageData;
             } else {
                 prevFrame = baseImageData;
             }
+
             if (differenceMode && prevFrame != null) {
                 GLSLShader.setTruncationValue(truncation);
                 diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);

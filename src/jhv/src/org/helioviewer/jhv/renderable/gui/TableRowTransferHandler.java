@@ -57,7 +57,7 @@ public class TableRowTransferHandler extends TransferHandler {
             return null;
         }
         createImageOfRow(row);
-        return new DataHandler(new Integer(grid.getSelectedRow()), integerObjectFlavor.getMimeType());
+        return new DataHandler(Integer.valueOf(grid.getSelectedRow()), integerObjectFlavor.getMimeType());
     }
 
     @Override

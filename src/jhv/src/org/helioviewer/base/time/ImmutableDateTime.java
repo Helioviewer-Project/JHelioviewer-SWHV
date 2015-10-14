@@ -146,12 +146,12 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
                 String[] secondDivide1 = firstDivide[0].split("[-/]");
                 String[] secondDivide2 = firstDivide[1].split(":");
                 String[] thirdDivide = secondDivide2[2].split("\\.");
-                year = Integer.valueOf(secondDivide1[0]);
-                month = Integer.valueOf(secondDivide1[1]);
-                day = Integer.valueOf(secondDivide1[2]);
-                hour = Integer.valueOf(secondDivide2[0]);
-                minute = Integer.valueOf(secondDivide2[1]);
-                second = Integer.valueOf(thirdDivide[0]);
+                year = Integer.parseInt(secondDivide1[0]);
+                month = Integer.parseInt(secondDivide1[1]);
+                day = Integer.parseInt(secondDivide1[2]);
+                hour = Integer.parseInt(secondDivide2[0]);
+                minute = Integer.parseInt(secondDivide2[1]);
+                second = Integer.parseInt(thirdDivide[0]);
             } catch (Exception e) {
                 year = 0;
                 month = 0;

@@ -86,7 +86,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         truncateLabel = new JLabel("Contrast boost", JLabel.RIGHT);
 
         truncateSpinner = new JSpinner();
-        truncateSpinner.setModel(new SpinnerNumberModel(new Float(0.8f), new Float(0), new Float(0.99), new Float(0.01f)));
+        truncateSpinner.setModel(new SpinnerNumberModel(Float.valueOf(0.8f), Float.valueOf(0), Float.valueOf(0.99f), Float.valueOf(0.01f)));
         truncateSpinner.addChangeListener(this);
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(truncateSpinner, "0%");
         truncateSpinner.setEditor(editor);

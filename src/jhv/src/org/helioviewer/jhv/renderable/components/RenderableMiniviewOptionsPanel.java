@@ -46,7 +46,7 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
 
     public void createXSpinner() {
         xSpinner = new JSpinner();
-        xSpinner.setModel(new SpinnerNumberModel(new Integer(DEFAULT), new Integer(5), new Integer(15), new Integer(1)));
+        xSpinner.setModel(new SpinnerNumberModel(Integer.valueOf(DEFAULT), Integer.valueOf(5), Integer.valueOf(15), Integer.valueOf(1)));
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {

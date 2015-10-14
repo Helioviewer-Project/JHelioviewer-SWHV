@@ -82,11 +82,18 @@ public class JPIPQuery implements Cloneable {
 
     /** Returns a String representing this query. */
     public String toString() {
-        String ret = "";
-        for (String field : fields.keySet())
-            ret += field + "=" + fields.get(field) + "&";
+        StringBuilder buf = new StringBuilder();
+        for (String field : fields.keySet()) {
+            buf.append(field);
+            buf.append("=");
+            buf.append(fields.get(field));
+            buf.append("&");
+        }
+
+        String ret = buf.toString();
         if (ret.length() > 0)
             ret = ret.substring(0, ret.length() - 1);
+
         return ret;
     }
 

@@ -158,7 +158,7 @@ public class RenderableGridOptionsPanel extends JPanel {
 
     public void createGridResolutionX(RenderableGrid renderableGrid) {
         gridResolutionXSpinner = new JSpinner();
-        gridResolutionXSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLonstepDegrees()), new Double(min), new Double(max), new Double(0.1)));
+        gridResolutionXSpinner.setModel(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLonstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionXSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -171,7 +171,7 @@ public class RenderableGridOptionsPanel extends JPanel {
 
     public void createGridResolutionY(RenderableGrid renderableGrid) {
         gridResolutionYSpinner = new JSpinner();
-        gridResolutionYSpinner.setModel(new SpinnerNumberModel(new Double(renderableGrid.getLatstepDegrees()), new Double(min), new Double(max), new Double(0.1)));
+        gridResolutionYSpinner.setModel(new SpinnerNumberModel(Double.valueOf(renderableGrid.getLatstepDegrees()), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.1)));
         gridResolutionYSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {

@@ -105,7 +105,7 @@ public class DayViewController implements CalendarViewController {
 
         for (int i = 1; i <= numberOfDaysInMonth; i++) {
             cal.set(Calendar.DAY_OF_MONTH, i);
-            data[cal.get(Calendar.WEEK_OF_MONTH) - offset][cal.get(Calendar.DAY_OF_WEEK) - 1] = new Integer(i);
+            data[cal.get(Calendar.WEEK_OF_MONTH) - offset][cal.get(Calendar.DAY_OF_WEEK) - 1] = Integer.valueOf(i);
         }
 
         return data;
