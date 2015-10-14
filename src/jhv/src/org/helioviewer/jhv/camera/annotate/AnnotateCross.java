@@ -85,11 +85,11 @@ public class AnnotateCross extends AbstractAnnotateable {
             activeIndex = crossPoints.size() - 1;
             Displayer.display();
         } else if (code == KeyEvent.VK_N) {
-            activeIndex++;
-            if (activeIndex >= crossPoints.size()) {
-                activeIndex = 0;
+            if (activeIndex >= 0) {
+                activeIndex++;
+                activeIndex = activeIndex % crossPoints.size();
+                Displayer.display();
             }
-            Displayer.display();
         }
     }
 

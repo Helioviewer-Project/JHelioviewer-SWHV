@@ -120,11 +120,11 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             activeIndex = rectangleEndPoints.size() - 1;
             Displayer.display();
         } else if (code == KeyEvent.VK_N) {
-            activeIndex++;
-            if (activeIndex >= rectangleEndPoints.size()) {
-                activeIndex = 0;
+            if (activeIndex >= 0) {
+                activeIndex++;
+                activeIndex = activeIndex % rectangleStartPoints.size();
+                Displayer.display();
             }
-            Displayer.display();
         }
     }
 
