@@ -333,7 +333,6 @@ public class Layers {
         layerListeners.remove(layerListener);
     }
 
-
     public static void addTimeListener(TimeListener timeListener) {
         timeListeners.add(timeListener);
     }

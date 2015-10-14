@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -18,7 +19,9 @@ import com.jogamp.opengl.GL2;
 public class RenderableMiniview implements Renderable, LayersListener {
 
     private boolean isVisible = true;
-    RenderableMiniviewOptionsPanel optionsPanel;
+    private RenderableMiniviewOptionsPanel optionsPanel;
+
+    private GL3DViewport miniview = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera(), true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -77,7 +80,7 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public void setVisible(boolean isVisible) {
         this.isVisible = isVisible;
-        Displayer.getMiniview().setVisible(isVisible);
+        miniview.setVisible(isVisible);
     }
 
     @Override
@@ -101,13 +104,21 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public void layerAdded(View view) {
         activeLayerChanged(view);
-
     }
 
     @Override
     public void activeLayerChanged(View view) {
         if (view != null)
-            Displayer.getMiniview().getCamera().zoomToFitMiniview();
+            miniview.getCamera().zoomToFitMiniview();
+    }
+
+    public GL3DViewport getViewport() {
+        int vpw = Displayer.getViewport().getWidth();
+        int offset = (int) (vpw * 0.01);
+        int size = (int) (vpw * optionsPanel.scale * 0.01);
+        miniview.setSize(offset, offset, size, size);
+
+        return miniview;
     }
 
 }
