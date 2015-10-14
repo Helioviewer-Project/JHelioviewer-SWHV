@@ -111,7 +111,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         renderableContainer.addTableModelListener(grid);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setPreferredSize(new Dimension(-1, ROW_HEIGHT * NUMBEROFVISIBLEROWS + ROW_HEIGHT / 2));
+        jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS));
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());

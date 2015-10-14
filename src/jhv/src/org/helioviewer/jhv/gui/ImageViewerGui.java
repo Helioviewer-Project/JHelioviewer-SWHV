@@ -56,10 +56,10 @@ import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
  */
 public class ImageViewerGui {
 
-    public static int LEFT_SCROLL_PANE_WIDTH_INCR = 20;
+    public static final int SIDE_PANEL_WIDTH = 320;
 
     private static JFrame mainFrame;
-    private static JSplitPane midSplitPane;
+    public static JSplitPane midSplitPane;
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;
@@ -122,7 +122,7 @@ public class ImageViewerGui {
         leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
-        //leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 
         mainComponent = new MainComponent();
         inputController = new InputController(mainComponent);
@@ -130,12 +130,11 @@ public class ImageViewerGui {
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
-        midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + LEFT_SCROLL_PANE_WIDTH_INCR);
 
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
-        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + LEFT_SCROLL_PANE_WIDTH_INCR, 5);
+        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + 20, 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
@@ -250,7 +249,7 @@ public class ImageViewerGui {
         if (lastLocation > 10) {
             midSplitPane.setDividerLocation(lastLocation);
         } else {
-            midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + LEFT_SCROLL_PANE_WIDTH_INCR);
+            midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + 20);
         }
     }
 
