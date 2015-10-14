@@ -249,11 +249,6 @@ public class GL3DVec4d {
         return false;
     }
 
-    @Override
-    public Object clone() {
-        return new GL3DVec4d(this);
-    }
-
     public static double[] toArray(GL3DVec4d[] vecs) {
         double[] arr = new double[vecs.length * 4];
         for (int i = 0; i < vecs.length; i++) {

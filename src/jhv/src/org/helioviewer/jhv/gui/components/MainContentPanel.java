@@ -21,7 +21,7 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
  * 
  * @author Stephan Pagel
  * */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class MainContentPanel extends JPanel implements ActionListener {
 
     private final LinkedList<MainContentPanelPlugin> pluginList = new LinkedList<MainContentPanelPlugin>();

@@ -77,15 +77,15 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
             @Override
             public void actionPerformed(ActionEvent e) {
                 String str = (String) (uiSelectionComboBox.getSelectedItem());
-                if (str == "Image data") {
+                if (str.equals("Image data")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.images.url");
                     JHVGlobals.openURL(url);
                 }
-                if (str == "1D time series") {
+                if (str.equals("1D time series")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.timelines.url");
                     JHVGlobals.openURL(url);
                 }
-                if (str == "Radio data") {
+                if (str.equals("Radio data")) {
                     String url = Settings.getSingletonInstance().getProperty("availability.radio.url");
                     JHVGlobals.openURL(url);
                 }

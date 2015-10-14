@@ -58,8 +58,6 @@ public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
 
-    private static ImageViewerGui instance;
-
     private static JFrame mainFrame;
     private static JSplitPane midSplitPane;
     private static JScrollPane leftScrollPane;
@@ -80,17 +78,6 @@ public class ImageViewerGui {
     private static RenderableContainer renderableContainer;
     private static RenderableCamera renderableCamera;
     private static RenderableMiniview renderableMiniview;
-
-    private ImageViewerGui() {
-    }
-
-    public static ImageViewerGui getSingletonInstance() {
-        if (instance == null) {
-            prepareGui();
-            instance = new ImageViewerGui();
-        }
-        return instance;
-    }
 
     public static void prepareGui() {
         mainFrame = createMainFrame();

@@ -165,11 +165,11 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (comboBox.getSelectedItem() == combolist[0]) {
+                if (comboBox.getSelectedItem().equals(combolist[0])) {
                     setDifferenceModetoJP2View(false, false, false);
-                } else if (comboBox.getSelectedItem() == combolist[1]) {
+                } else if (comboBox.getSelectedItem().equals(combolist[1])) {
                     setDifferenceModetoJP2View(true, true, false);
-                } else if (comboBox.getSelectedItem() == combolist[2]) {
+                } else if (comboBox.getSelectedItem().equals(combolist[2])) {
                     setDifferenceModetoJP2View(true, true, true);
                 }
                 Displayer.display();
@@ -180,7 +180,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         diffRot.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (comboBox.getSelectedItem() == combolist[2]) {
+                if (comboBox.getSelectedItem().equals(combolist[2])) {
                     image.setBaseDifferenceNoRot(!diffRot.isSelected());
                 } else {
                     image.setRunDiffNoRot(!diffRot.isSelected());
