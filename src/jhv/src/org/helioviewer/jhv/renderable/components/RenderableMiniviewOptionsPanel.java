@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -12,6 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.opengl.GLHelper;
 
@@ -45,12 +47,17 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
     }
 
     public void createXSpinner() {
+        int min = 5, max = 15;
+
         xSpinner = new JSpinner();
-        xSpinner.setModel(new SpinnerNumberModel(Integer.valueOf(DEFAULT), Integer.valueOf(5), Integer.valueOf(15), Integer.valueOf(1)));
+        xSpinner.setModel(new SpinnerNumberModel(Double.valueOf(DEFAULT), Double.valueOf(min), Double.valueOf(max), Double.valueOf(1)));
+        JFormattedTextField f = ((JSpinner.DefaultEditor) xSpinner.getEditor()).getTextField();
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%%", min, max));
+
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                scale = (Integer) xSpinner.getValue();
+                scale = ((Double) xSpinner.getValue()).intValue();
                 Displayer.display();
             }
         });

@@ -27,7 +27,7 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
@@ -163,7 +163,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         fovSpinner = new JSpinner();
         fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(0.8), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new DegreeFormatterFactory("%.2f\u00B0", min, max));
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
 
         Displayer.getViewport().getCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
 
