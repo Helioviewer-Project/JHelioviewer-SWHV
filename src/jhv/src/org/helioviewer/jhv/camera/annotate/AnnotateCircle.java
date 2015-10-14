@@ -111,11 +111,11 @@ public class AnnotateCircle extends AbstractAnnotateable {
             activeIndex = circleEndPoints.size() - 1;
             Displayer.display();
         } else if (code == KeyEvent.VK_N) {
-            activeIndex++;
-            if (activeIndex >= circleEndPoints.size()) {
-                activeIndex = 0;
+            if (activeIndex >= 0) {
+                activeIndex++;
+                activeIndex = activeIndex % circleEndPoints.size();
+                Displayer.display();
             }
-            Displayer.display();
         }
     }
 
