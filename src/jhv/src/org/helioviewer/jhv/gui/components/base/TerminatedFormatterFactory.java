@@ -8,14 +8,16 @@ import javax.swing.text.DefaultFormatter;
 import org.helioviewer.base.logging.Log;
 
 @SuppressWarnings("serial")
-public class DegreeFormatterFactory extends AbstractFormatterFactory {
+public class TerminatedFormatterFactory extends AbstractFormatterFactory {
 
     private final String format;
+    private final String terminator;
     private final double min, max;
 
-    public DegreeFormatterFactory(String format, double min, double max) {
+    public TerminatedFormatterFactory(String format, String terminator, double min, double max) {
         super();
-        this.format = format;
+        this.format = format + terminator;
+        this.terminator = terminator;
 
         if (min > max)
             max = min;
@@ -31,7 +33,7 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
             public Object stringToValue(String string) {
                 Double value = 0.;
                 if (string != null && string.length() != 0) {
-                    if (string.charAt(string.length() - 1) == '\u00B0') {
+                    if (string.charAt(string.length() - 1) == terminator.charAt(0)) {
                         try {
                             value = Double.parseDouble(string.substring(0, string.length() - 1));
                         } catch (NumberFormatException ex2) {

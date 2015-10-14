@@ -21,7 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.components.base.DegreeFormatterFactory;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
@@ -101,7 +101,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
-        fx.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0", min, max));
+        fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.WEST;
@@ -115,7 +115,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
         gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
-        fy.setFormatterFactory(new DegreeFormatterFactory("%.1f\u00B0", min, max));
+        fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
