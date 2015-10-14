@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -107,11 +108,15 @@ public class MovieExporter implements FrameListener {
         GLHelper.unitScale = true;
         fbo.bind(gl);
 
+        GL3DCamera camera = vp.getCamera();
+
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+        camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
         gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-        vp.getCamera().applyPerspective(gl);
+        camera.applyPerspective(gl);
         ImageViewerGui.getRenderableContainer().render(gl, vp);
+
+        camera.getAnnotateInteraction().drawInteractionFeedback(gl);
 
         fbo.unbind(gl);
         GLHelper.unitScale = false;
