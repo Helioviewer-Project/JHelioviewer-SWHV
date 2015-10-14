@@ -133,7 +133,8 @@ public class JavaHelioViewer {
 
                 // after loading plugins fix the minimum width of left pane
                 JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
-                leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.LEFT_SCROLL_PANE_WIDTH_INCR, -1));
+                leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + 20, -1));
+                ImageViewerGui.getMainFrame().pack();
             }
 
             private String[] theArgs;
