@@ -194,7 +194,6 @@ public class MovieExporter implements FrameListener {
         } else {
             initMovieWriter(moviePath, w, h);
             if (mode == RecordMode.LOOP) {
-                MoviePanel.setEnabledState(false);
                 Layers.addFrameListener(instance);
                 Layers.setFrame(0);
                 Layers.playMovie();
@@ -207,10 +206,8 @@ public class MovieExporter implements FrameListener {
         if (!stopped) {
             stopped = true;
 
-            if (mode == RecordMode.LOOP) {
+            if (mode == RecordMode.LOOP)
                 Layers.removeFrameListener(instance);
-                MoviePanel.setEnabledState(true);
-            }
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
         }
