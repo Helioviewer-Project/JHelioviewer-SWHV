@@ -29,7 +29,7 @@ public class DegreeFormatterFactory extends AbstractFormatterFactory {
         return new DefaultFormatter() {
             @Override
             public Object stringToValue(String string) {
-                Double value = new Double(0.);
+                Double value = 0.;
                 if (string != null && string.length() != 0) {
                     if (string.charAt(string.length() - 1) == '\u00B0') {
                         try {

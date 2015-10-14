@@ -76,7 +76,7 @@ public class YearViewController implements CalendarViewController {
         int year = calendar.get(Calendar.YEAR) - 6;
 
         for (int i = 0; i < 12; i++) {
-            data[i / 4][i % 4] = new Integer(year + i);
+            data[i / 4][i % 4] = Integer.valueOf(year + i);
         }
 
         return data;
