@@ -40,6 +40,7 @@ public class MovieExporter implements FrameListener {
 
     private static int w;
     private static int h;
+    private static int fps;
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
 
@@ -177,7 +178,7 @@ public class MovieExporter implements FrameListener {
         }
     }
 
-    public static void start(int _w, int _h, RecordMode _mode) {
+    public static void start(int _w, int _h, int _fps, RecordMode _mode) {
         movieWriter = null; // CloseWriter might have had an exception
 
         stopped = false;
@@ -189,6 +190,7 @@ public class MovieExporter implements FrameListener {
         imagePath = prefix + ".png";
         w = _w;
         h = _h;
+        fps = _fps;
         mode = _mode;
 
         ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), false);
@@ -253,7 +255,7 @@ public class MovieExporter implements FrameListener {
         @Override
         public void run() {
             ImageUtil.flipImageVertically(el);
-            im.encodeVideo(0, el, 1000 / frameRate * framenumber, TimeUnit.MILLISECONDS);
+            im.encodeVideo(0, el, 1000 / fps * framenumber, TimeUnit.MILLISECONDS);
             // Log.error("EXPORTING " + framenumber);
         }
 

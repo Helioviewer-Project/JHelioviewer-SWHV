@@ -401,7 +401,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 setText("BUSY");
-                MovieExporter.getInstance().start(size.getSize().width, size.getSize().height, mode);
+                int fps = 30;
+                if (speedUnitComboBox.getSelectedItem().equals(SpeedUnit.FRAMESPERSECOND))
+                    fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
+                MovieExporter.getInstance().start(size.getSize().width, size.getSize().height, fps, mode);
             } else {
                 setText("REC");
                 MovieExporter.getInstance().stop();
