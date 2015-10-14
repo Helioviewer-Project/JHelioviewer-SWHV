@@ -55,14 +55,16 @@ public class GL3DViewport {
         return new Dimension(w, h);
     }
 
-    public void setSize(Dimension d) {
-        w = d.width;
-        h = d.height;
+    public void setSize(int _x, int _y, int _w, int _h) {
+        w = _w;
+        h = _h;
+        x = _x;
+        y = _y;
     }
 
-    public void setSize(int width, int height) {
-        w = width;
-        h = height;
+    public void setSize(int _w, int _h) {
+        w = _w;
+        h = _h;
     }
 
     public void setOffset(int offsetX, int offsetY) {

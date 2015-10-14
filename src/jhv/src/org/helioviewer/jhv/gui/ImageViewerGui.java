@@ -79,6 +79,7 @@ public class ImageViewerGui {
 
     private static RenderableContainer renderableContainer;
     private static RenderableCamera renderableCamera;
+    private static RenderableMiniview renderableMiniview;
 
     private ImageViewerGui() {
     }
@@ -127,7 +128,8 @@ public class ImageViewerGui {
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
         renderableContainer.addRenderable(new RenderableTimeStamp());
-        renderableContainer.addRenderable(new RenderableMiniview());
+        renderableMiniview = new RenderableMiniview();
+        renderableContainer.addRenderable(renderableMiniview);
         RenderableContainerPanel renderableContainerPanel = new RenderableContainerPanel(renderableContainer);
 
         leftPane.add("Image Layers", renderableContainerPanel, true);
@@ -310,6 +312,10 @@ public class ImageViewerGui {
 
     public static RenderableCamera getRenderableCamera() {
         return renderableCamera;
+    }
+
+    public static RenderableMiniview getRenderableMiniview() {
+        return renderableMiniview;
     }
 
     public static RenderableContainer getRenderableContainer() {

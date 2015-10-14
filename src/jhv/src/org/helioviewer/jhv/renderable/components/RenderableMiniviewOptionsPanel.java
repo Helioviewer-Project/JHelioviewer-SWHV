@@ -19,13 +19,11 @@ import org.helioviewer.jhv.opengl.GLHelper;
 public class RenderableMiniviewOptionsPanel extends JPanel {
 
     private JSpinner xSpinner;
-    //private JSpinner ySpinner;
-    int MINSIZE = 50;
-    int MAXSIZE = 300;
+    private static final int DEFAULT = 10;
+    protected int scale = DEFAULT;
 
     public RenderableMiniviewOptionsPanel() {
         createXSpinner();
-        //createYSpinner();
 
         GridBagLayout gridBagLayout = new GridBagLayout();
         setLayout(gridBagLayout);
@@ -48,12 +46,11 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
 
     public void createXSpinner() {
         xSpinner = new JSpinner();
-        xSpinner.setModel(new SpinnerNumberModel(new Integer(Displayer.getMiniview().getWidth()), new Integer(MINSIZE), new Integer(MAXSIZE), new Integer(10)));
+        xSpinner.setModel(new SpinnerNumberModel(new Integer(DEFAULT), new Integer(5), new Integer(15), new Integer(1)));
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                Integer val = (Integer) xSpinner.getValue();
-                Displayer.getMiniview().setSize(GLHelper.AWT2GLDimension(new Dimension(val, val)));
+                scale = (Integer) xSpinner.getValue();
                 Displayer.display();
             }
         });

@@ -103,7 +103,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         Displayer.getViewport().getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
 
-        GL3DViewport vp = Displayer.getMiniview();
+        GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
             vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
