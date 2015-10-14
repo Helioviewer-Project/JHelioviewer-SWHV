@@ -42,11 +42,11 @@ public class RenderableMiniview implements Renderable, LayersListener {
 
             gl.glColor4f(0, 0, 0, 1);
             GLHelper.drawRectangle(gl, -30, -30, 60, 60);
-
+ 
             gl.glColor4f(1, 0, 0, 1);
             GLHelper.drawCircle(gl, 0, 0, 1, 100);
 
-            gl.glColor4f(0, 1, 0, 0.2f);
+            gl.glColor4f(0, 1, 0, 0.5f);
             View v = Layers.getActiveView();
             if (v != null) {
                 MetaData m = v.getMetaData(new ImmutableDateTime(0));
