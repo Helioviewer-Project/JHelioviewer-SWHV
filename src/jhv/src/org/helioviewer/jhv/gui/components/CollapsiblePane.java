@@ -14,7 +14,6 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 /**
@@ -62,7 +61,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         } else {
             toggleButton.setIcon(IconBank.getIcon(JHVIcon.RIGHT2));
         }
-        toggleButton.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, BUTTONHEIGHT));
+        toggleButton.setPreferredSize(new Dimension(-1, BUTTONHEIGHT));
         toggleButton.addActionListener(this);
 
         this.component = new JPanel(new BorderLayout());

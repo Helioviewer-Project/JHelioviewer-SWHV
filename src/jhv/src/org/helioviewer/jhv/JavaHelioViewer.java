@@ -1,5 +1,6 @@
 package org.helioviewer.jhv;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -131,8 +132,8 @@ public class JavaHelioViewer {
                 }
 
                 // after loading plugins fix the minimum width of left pane
-                JComponent leftPane = ImageViewerGui.getLeftScrollPane();
-                leftPane.setMinimumSize(leftPane.getPreferredSize());
+                JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
+                leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.LEFT_SCROLL_PANE_WIDTH_INCR, -1));
             }
 
             private String[] theArgs;
