@@ -111,6 +111,8 @@ public class JP2Image {
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
+    boolean somethingWasActuallyRead = false;
+
     /**
      * Constructor
      *
