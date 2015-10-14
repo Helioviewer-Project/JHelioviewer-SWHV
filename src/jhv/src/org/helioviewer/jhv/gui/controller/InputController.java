@@ -96,11 +96,14 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mouseReleased(e);
 
+        GL3DCamera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            component.setCursor(UIGlobals.openHandCursor);
+            if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
+                component.setCursor(UIGlobals.openHandCursor);
+            }
             buttonDown = false;
         }
-        Displayer.getViewport().getCamera().getCurrentInteraction().mouseReleased(e);
+        camera.getCurrentInteraction().mouseReleased(e);
     }
 
     @Override
