@@ -9,6 +9,7 @@ import java.util.TimerTask;
 
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
+import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_channel_mapping;
@@ -236,7 +237,12 @@ public class JP2Image {
     }
 
     private void configureLUT() throws KduException {
-        Jp2_palette palette = jpxSrc.Access_codestream(0).Access_palette();
+        Jpx_codestream_source stream = jpxSrc.Access_codestream(0);
+        if (!stream.Exists()) {
+            throw new KduException(">> stream doesn't exist");
+        }
+
+        Jp2_palette palette = stream.Access_palette();
 
         numLUTs = palette.Get_num_luts();
         if (numLUTs == 0)
@@ -286,6 +292,9 @@ public class JP2Image {
                 }
 
                 Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
+                if (!stream.Exists()) {
+                    throw new KduException(">> stream doesn't exist");
+                }
 
                 // Retrieve the number of components
                 {
