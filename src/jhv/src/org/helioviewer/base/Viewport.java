@@ -26,13 +26,17 @@ public class Viewport {
         return sizeVector;
     }
 
-    public boolean equals(Viewport v) {
-        if (!(v instanceof Viewport)) {
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Viewport)) {
             return false;
         }
+
+        Viewport v = (Viewport) o;
         return v.getHeight() == getHeight() && v.getWidth() == getWidth();
     }
 
+    @Override
     public String toString() {
         return "[Viewport: Size: " + sizeVector + "]";
     }
