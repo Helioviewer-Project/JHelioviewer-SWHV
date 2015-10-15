@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
@@ -19,6 +20,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -55,6 +57,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     private static final int TITLE_WIDTH = 140;
 
     private static final int VISIBLEROW = 0;
+
     private static final int TITLEROW = 1;
     public static final int TIMEROW = 2;
     private static final int REMOVEROW = 3;
@@ -134,7 +137,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
-
         JButton addLayerButton = new JButton(addLayerAction);
         addLayerButton.setBorder(null);
         addLayerButton.setText("Add layer");
@@ -142,10 +144,19 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
-        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
 
+        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
+        JCheckBox multiview = new JCheckBox("multiview", Displayer.multiview);
+        multiview.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Displayer.multiview = multiview.isSelected();
+                ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
+            }
+        });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
+        addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
 
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
@@ -216,11 +227,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
                 Renderable renderable = (Renderable) renderableContainer.getValueAt(row, col);
-
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
+                    Displayer.getViewports()[0].computeActive();
                     renderableContainer.fireListeners();
                     Displayer.display();
+                    renderableContainer.arrangeMultiView(Displayer.multiview);
                 }
                 if (col == TITLEROW && renderable instanceof RenderableImageLayer) {
                     Layers.setActiveView(((RenderableImageLayer) renderable).getView());

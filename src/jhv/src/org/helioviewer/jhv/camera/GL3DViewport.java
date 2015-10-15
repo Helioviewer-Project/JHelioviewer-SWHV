@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.awt.Dimension;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class GL3DViewport {
 
@@ -21,7 +22,7 @@ public class GL3DViewport {
 
     }
 
-    private final boolean active;
+    private boolean active;
 
     public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave, boolean _movieExport, boolean _active) {
 
@@ -107,6 +108,6 @@ public class GL3DViewport {
     }
 
     public void computeActive() {
-        //active = ImageViewerGui.getRenderableContainer().isViewportActive(idx);
+        active = ImageViewerGui.getRenderableContainer().isViewportActive(idx);
     }
 }

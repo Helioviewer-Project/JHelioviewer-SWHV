@@ -11,6 +11,7 @@ import javax.swing.Timer;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
@@ -96,7 +97,7 @@ public class Layers {
     public static void pauseMovie() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
-        Displayer.render(); /*! force update for on the fly resolution change */
+        Displayer.render(); /* ! force update for on the fly resolution change */
     }
 
     public static void toggleMovie() {
@@ -255,6 +256,9 @@ public class Layers {
             setActiveView(getLayer(layers.size() - 1));
 
         view.abolish();
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
     }
 
     public static void addLayer(View view) {
@@ -267,6 +271,9 @@ public class Layers {
 
         view.render();
         setFrame(0); // force sync
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
     }
 
     private static void fireLayerAdded(View view) {
