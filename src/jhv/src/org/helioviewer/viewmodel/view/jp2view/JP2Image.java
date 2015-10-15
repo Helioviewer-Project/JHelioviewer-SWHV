@@ -111,8 +111,6 @@ public class JP2Image {
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
-    boolean somethingWasActuallyRead;
-
     /**
      * Constructor
      *
@@ -373,7 +371,6 @@ public class JP2Image {
     protected void startReader(JP2View view) {
         if (cache != null) { // remote
             imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
-            somethingWasActuallyRead = false;
             try {
                 reader = new J2KReader(view, this);
                 reader.start();
@@ -382,7 +379,6 @@ public class JP2Image {
             }
         } else {
             imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
-            somethingWasActuallyRead = true;
         }
     }
 
