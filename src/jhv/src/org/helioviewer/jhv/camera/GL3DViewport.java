@@ -14,17 +14,15 @@ public class GL3DViewport {
     private final int idx;
     private boolean isVisible = true;
     private GL3DCamera camera;
-    private final boolean slave;
-    private final boolean movieExport;
 
-    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave) {
-        this(_idx, _x, _y, _w, _h, _camera, _slave, false, false);
+    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera) {
+        this(_idx, _x, _y, _w, _h, _camera, false);
 
     }
 
     private boolean active;
 
-    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave, boolean _movieExport, boolean _active) {
+    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _active) {
 
         idx = _idx;
         w = _w;
@@ -32,8 +30,6 @@ public class GL3DViewport {
         x = _x;
         y = _y;
         camera = _camera;
-        slave = _slave;
-        movieExport = _movieExport;
         active = _active;
     }
 
@@ -54,15 +50,11 @@ public class GL3DViewport {
     }
 
     public int getOffsetX() {
-        if (slave)
-            return x;
-        return 0;
+        return x;
     }
 
     public int getOffsetY() {
-        if (slave)
-            return Displayer.getGLHeight() - h - y;
-        return 0;
+        return Displayer.getGLHeight() - h - y;
     }
 
     public Dimension getSize() {

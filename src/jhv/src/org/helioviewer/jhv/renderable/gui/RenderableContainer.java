@@ -117,7 +117,7 @@ public class RenderableContainer implements TableModel, Reorderable {
             this.insertRow(toIndex, toMove);
         }
         fireListeners();
-        ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
+        arrangeMultiView(Displayer.multiview);
 
     }
 

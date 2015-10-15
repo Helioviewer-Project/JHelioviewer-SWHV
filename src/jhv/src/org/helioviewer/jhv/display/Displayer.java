@@ -39,10 +39,10 @@ public class Displayer implements JHVEventHighlightListener {
         return glHeight;
     }
 
-    private static GL3DViewport viewport0 = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), false, false, true);
-    private static GL3DViewport viewport1 = new GL3DViewport(1, 0, 0, 100, 100, viewport0.getCamera(), false, false, false);
-    private static GL3DViewport viewport2 = new GL3DViewport(2, 0, 0, 100, 100, viewport0.getCamera(), false, false, false);
-    private static GL3DViewport viewport3 = new GL3DViewport(3, 0, 0, 100, 100, viewport0.getCamera(), false, false, false);
+    private static GL3DViewport viewport0 = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), true);
+    private static GL3DViewport viewport1 = new GL3DViewport(1, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static GL3DViewport viewport2 = new GL3DViewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static GL3DViewport viewport3 = new GL3DViewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
     private static GL3DViewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
 
     public static GL3DViewport[] getViewports() {
@@ -114,20 +114,22 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static void reshape2() {
         int w = Displayer.getGLWidth();
+        int halfw = w / 2;
         int h = Displayer.getGLHeight();
         GL3DViewport[] viewports = Displayer.getViewports();
         boolean first = true;
+
         for (GL3DViewport vp : viewports) {
             if (vp.isActive()) {
                 if (first) {
-                    vp.getCamera().updateCameraWidthAspect(w / 2 / (double) h);
-                    vp.setSize(w / 2, h);
+                    vp.getCamera().updateCameraWidthAspect(halfw / (double) h);
+                    vp.setSize(halfw, h);
                     vp.setOffset(0, 0);
                     first = false;
                 } else {
-                    vp.getCamera().updateCameraWidthAspect(w / 2 / (double) h);
-                    vp.setSize(w / 2, h);
-                    vp.setOffset(w / 2, 0);
+                    vp.getCamera().updateCameraWidthAspect(halfw / (double) h);
+                    vp.setSize(halfw, h);
+                    vp.setOffset(halfw, 0);
                 }
             }
         }
