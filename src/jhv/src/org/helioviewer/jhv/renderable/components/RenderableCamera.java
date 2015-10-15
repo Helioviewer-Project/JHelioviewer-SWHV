@@ -10,11 +10,11 @@ import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableCamera implements Renderable {
+public class RenderableCamera extends AbstractRenderable {
 
     private final Component optionsPanel;
     private static final double epsilon = 0.01;
@@ -29,7 +29,6 @@ public class RenderableCamera implements Renderable {
     private static final float twoGreen = secondcolor.getGreen() / 255f;
     private static final float twoBlue = secondcolor.getBlue() / 255f;
 
-    private boolean isVisible = false;
     private String timeString = null;
 
     public RenderableCamera() {
@@ -38,7 +37,7 @@ public class RenderableCamera implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        if (!isVisible)
+        if (!isVisible[vp.getIndex()])
             return;
 
         GL3DCamera activeCamera = vp.getCamera();
@@ -135,16 +134,6 @@ public class RenderableCamera implements Renderable {
     @Override
     public String getName() {
         return "Camera";
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
     }
 
     @Override

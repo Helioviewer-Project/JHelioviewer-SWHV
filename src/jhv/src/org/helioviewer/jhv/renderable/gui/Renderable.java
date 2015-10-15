@@ -8,13 +8,15 @@ import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    void render(GL2 gl, GL3DViewport vp);
+    public void render(GL2 gl, GL3DViewport vp);
 
     public void remove(GL2 gl);
 
     public Component getOptionsPanel();
 
     public String getName();
+
+    public boolean isVisible(int i);
 
     public boolean isVisible();
 
@@ -28,6 +30,10 @@ public interface Renderable {
 
     public void dispose(GL2 gl);
 
-    void renderMiniview(GL2 gl, GL3DViewport vp);
+    public void renderMiniview(GL2 gl, GL3DViewport vp);
+
+    public void prerender(GL2 gl);
+
+    public void setVisible(int ctImages);
 
 }

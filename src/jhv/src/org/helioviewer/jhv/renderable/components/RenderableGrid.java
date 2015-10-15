@@ -16,13 +16,13 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableGrid implements Renderable {
+public class RenderableGrid extends AbstractRenderable {
 
     private static final int SUBDIVISIONS = 120;
     private float lonstepDegrees = 15f;
@@ -39,10 +39,10 @@ public class RenderableGrid implements Renderable {
 
     private final Component optionsPanel;
     private final String name = "Grid";
-    private boolean isVisible = true;
 
     public RenderableGrid() {
         optionsPanel = new RenderableGridOptionsPanel(this);
+        this.setVisible(true);
     }
 
     private float oldFontSize = -1;
@@ -55,7 +55,7 @@ public class RenderableGrid implements Renderable {
         GL3DCamera activeCamera = vp.getCamera();
 
         renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
-        if (!isVisible)
+        if (!isVisible[vp.getIndex()])
             return;
 
         if (showAxes)
@@ -355,16 +355,6 @@ public class RenderableGrid implements Renderable {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return this.isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
     }
 
     public double getLonstepDegrees() {
