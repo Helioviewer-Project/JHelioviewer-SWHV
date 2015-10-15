@@ -235,27 +235,35 @@ public abstract class GL3DCamera {
         return rotatedHitPoint;
     }
 
-    public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
-        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+    private static double computeNormalizedX(Point viewportCoordinates) {
+        return +2. * ((viewportCoordinates.getX() - Displayer.getViewport().getOffsetX()) / Displayer.getViewport().getWidth() - 0.5);
+    }
 
-        GL3DVec3d hitPoint;
-        double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= 1.) {
-            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
-            hitPoint = localRotation.rotateInverseVector(currentDragRotation.rotateInverseVector(hitPoint));
-            return hitPoint;
+    private static double computeNormalizedY(Point viewportCoordinates) {
+        return -2. * ((viewportCoordinates.getY() - Displayer.getViewport().getOffsetY()) / Displayer.getViewport().getHeight() - 0.5);
+    }
+
+    private double computeUpX(Point viewportCoordinates) {
+        double up1x = computeNormalizedX(viewportCoordinates) * cameraWidthTimesAspect - translation.x;
+        return up1x;
+    }
+
+    private double computeUpY(Point viewportCoordinates) {
+        double up1y = computeNormalizedY(viewportCoordinates) * cameraWidth - translation.y;
+        return up1y;
+    }
+
+    public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
+        GL3DVec3d hitPoint = getVectorFromSphereAlt(viewportCoordinates);
+        if (hitPoint != null) {
+            return localRotation.rotateInverseVector(hitPoint);
         }
         return null;
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
-        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+        double up1x = computeUpX(viewportCoordinates);
+        double up1y = computeUpY(viewportCoordinates);
 
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
@@ -268,21 +276,16 @@ public abstract class GL3DCamera {
     }
 
     public double getRadiusFromSphereAlt(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
-        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
+        double up1x = computeUpX(viewportCoordinates);
+        double up1y = computeUpY(viewportCoordinates);
 
         double radius2 = Math.sqrt(up1x * up1x + up1y * up1y);
         return radius2;
     }
 
     public GL3DVec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
-        double normalizedScreenpos_x = +2. * (viewportCoordinates.getX() / Displayer.getViewport().getWidth() - 0.5);
-        double normalizedScreenpos_y = -2. * (viewportCoordinates.getY() / Displayer.getViewport().getHeight() - 0.5);
-        double up1x = normalizedScreenpos_x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos_y * cameraWidth - translation.y;
-
+        double up1x = computeUpX(viewportCoordinates);
+        double up1y = computeUpY(viewportCoordinates);
         GL3DVec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= Sun.Radius2 / 2.) {
