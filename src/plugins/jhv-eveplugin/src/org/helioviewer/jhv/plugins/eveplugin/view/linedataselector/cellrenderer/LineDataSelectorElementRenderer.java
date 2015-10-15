@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
@@ -27,7 +27,7 @@ public class LineDataSelectorElementRenderer extends DefaultTableCellRenderer {
                 label.setText("<html><font color='red'>" + layerName);
                 label.setToolTipText(layerName + ": No data for selected interval");
             }
-            label.setBorder(LineDateSelectorTablePanel.commonBorder);
+            label.setBorder(LineDataSelectorTablePanel.commonBorder);
             return label;
         } else {
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

@@ -10,8 +10,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
+@SuppressWarnings("serial")
 public class LineColorRenderer extends DefaultTableCellRenderer {
 
     @Override
@@ -23,10 +24,10 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
                 if (ldse.getDataColor() != null) {
                     LineColorPanel lineColorPanel = new LineColorPanel(ldse.getDataColor());
                     lineColorPanel.setBackground(p.getBackground());
-                    lineColorPanel.setBorder(LineDateSelectorTablePanel.commonBorder);
+                    lineColorPanel.setBorder(LineDataSelectorTablePanel.commonBorder);
                     return lineColorPanel;
                 } else {
-                    p.setBorder(LineDateSelectorTablePanel.commonBorder);
+                    p.setBorder(LineDataSelectorTablePanel.commonBorder);
                     p.setText(null);
                     return p;
                 }
