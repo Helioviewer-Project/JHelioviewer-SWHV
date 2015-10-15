@@ -10,6 +10,7 @@ import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
@@ -59,6 +60,9 @@ public class RenderableImageLayer extends AbstractRenderable {
     @Override
     public void setVisible(boolean isVisible) {
         super.setVisible(isVisible);
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
     }
 
     @Override
