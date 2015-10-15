@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -7,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
@@ -65,6 +67,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public TopToolBar() {
         setRollover(true);
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
 
         try {
             displayMode = DisplayMode.valueOf(Settings.getSingletonInstance().getProperty("display.toolbar").toUpperCase());
@@ -264,11 +267,11 @@ public class TopToolBar extends JToolBar implements MouseListener {
     }
 
     public void addToolbarPlugin(JToggleButton button) {
-        this.pluginList.add(button);
+        pluginList.add(button);
     }
 
     public void removeToolbarPlugin(AbstractButton button) {
-        this.pluginList.remove(button);
+        pluginList.remove(button);
     }
 
     /**
