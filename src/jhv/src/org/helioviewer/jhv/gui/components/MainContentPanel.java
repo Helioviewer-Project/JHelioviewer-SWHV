@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -30,10 +31,10 @@ public class MainContentPanel extends JPanel implements ActionListener {
     private static JPanel pluginContainer;
     private static CollapsiblePane collapsiblePane;
 
-    public MainContentPanel(Component mainComponent) {
-        pluginContainer = new JPanel();
-        pluginContainer.setLayout(new BorderLayout());
+    private int defaultDividerSize;
 
+    public MainContentPanel(Component mainComponent) {
+        pluginContainer = new JPanel(new BorderLayout());
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
         collapsiblePane.toggleButton.addActionListener(this);
 
@@ -43,10 +44,11 @@ public class MainContentPanel extends JPanel implements ActionListener {
         container.add(mainComponent, BorderLayout.CENTER);
 
         splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
+        splitpane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
         splitpane.setTopComponent(container);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
-        splitpane.setDividerSize(6);
+        defaultDividerSize = splitpane.getDividerSize();
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
@@ -100,7 +102,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(6);
+                splitpane.setDividerSize(defaultDividerSize);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -114,7 +116,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle("Plugins");
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(6);
+                splitpane.setDividerSize(defaultDividerSize);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);

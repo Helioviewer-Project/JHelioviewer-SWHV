@@ -122,7 +122,7 @@ public class ImageViewerGui {
         leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
-        leftScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        leftScrollPane.getVerticalScrollBar().setUnitIncrement(20); // size of renderable row height
 
         mainComponent = new MainComponent();
         inputController = new InputController(mainComponent);
