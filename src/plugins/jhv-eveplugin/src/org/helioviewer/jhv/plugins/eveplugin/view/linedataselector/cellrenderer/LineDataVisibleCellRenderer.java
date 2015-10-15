@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
@@ -28,7 +28,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
                 label.setToolTipText("Click to show");
             }
             label.setText(null);
-            label.setBorder(LineDateSelectorTablePanel.commonLeftBorder);
+            label.setBorder(LineDataSelectorTablePanel.commonLeftBorder);
             return label;
 
         } else {

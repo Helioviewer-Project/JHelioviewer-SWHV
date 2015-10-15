@@ -38,7 +38,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
-public class LineDateSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
+public class LineDataSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     public static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -63,7 +63,7 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
     private int lastSelectedIndex = -1;
 
-    public LineDateSelectorTablePanel() {
+    public LineDataSelectorTablePanel() {
         intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
         tableModel = LineDataSelectorModel.getSingletonInstance();

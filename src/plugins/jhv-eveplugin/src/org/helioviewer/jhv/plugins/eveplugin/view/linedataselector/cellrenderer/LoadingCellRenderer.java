@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
@@ -26,13 +26,13 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
             if (element.isDownloading()) {
                 downloadProgressBar.setIndeterminate(true);
                 downloadProgressBar.setVisible(element.isDownloading());
-                downloadProgressBar.setBorder(LineDateSelectorTablePanel.commonBorder);
+                downloadProgressBar.setBorder(LineDataSelectorTablePanel.commonBorder);
                 downloadProgressBar.setOpaque(false);
                 downloadProgressBar.setPreferredSize(new Dimension(20, downloadProgressBar.getPreferredSize().height));
                 return downloadProgressBar;
             } else {
                 JLabel p = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                p.setBorder(LineDateSelectorTablePanel.commonBorder);
+                p.setBorder(LineDataSelectorTablePanel.commonBorder);
                 p.setText(null);
                 return p;
             }

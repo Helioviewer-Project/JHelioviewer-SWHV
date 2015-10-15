@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDateSelectorTablePanel;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
 //Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
@@ -25,12 +25,12 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
                 label.setText(null);
                 label.setToolTipText("Click to remove");
-                label.setBorder(LineDateSelectorTablePanel.commonRightBorder);
+                label.setBorder(LineDataSelectorTablePanel.commonRightBorder);
                 return label;
             } else {
                 label.setIcon(null);
                 label.setText(null);
-                label.setBorder(LineDateSelectorTablePanel.commonBorder);
+                label.setBorder(LineDataSelectorTablePanel.commonBorder);
                 return label;
             }
         } else {
