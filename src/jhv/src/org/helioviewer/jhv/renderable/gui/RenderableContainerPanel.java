@@ -154,8 +154,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid.getColumnModel().getColumn(TIMEROW).setCellRenderer(new RenderableTimeCellRenderer());
 
         grid.getColumnModel().getColumn(REMOVEROW).setCellRenderer(new RenderableRemoveCellRenderer());
-        grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH);
-        grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH + 2);
 
         grid.addMouseListener(new MouseAdapter() {
 

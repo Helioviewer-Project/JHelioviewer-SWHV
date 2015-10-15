@@ -132,8 +132,8 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         grid.getColumnModel().getColumn(LOADING_ROW).setMaxWidth(20);
 
         grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RemoveCellRenderer());
-        grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH);
-        grid.getColumnModel().getColumn(REMOVE_ROW).setMaxWidth(ICON_WIDTH);
+        grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_ROW).setMaxWidth(ICON_WIDTH + 2);
 
         grid.addMouseListener(new MouseAdapter() {
 

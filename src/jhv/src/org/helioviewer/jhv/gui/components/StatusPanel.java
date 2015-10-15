@@ -46,7 +46,7 @@ public class StatusPanel extends JPanel {
      */
     public StatusPanel(int leftMargin, int rightMargin) {
         super(new BorderLayout());
-        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.gray));
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
 
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.EAST);

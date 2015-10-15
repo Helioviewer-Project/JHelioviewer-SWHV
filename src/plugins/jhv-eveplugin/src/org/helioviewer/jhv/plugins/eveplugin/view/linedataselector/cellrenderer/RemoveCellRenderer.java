@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
@@ -21,20 +22,23 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
             // (getAccessibleChild(int i) of JTable )
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            label.setText(null);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setBorder(LineDataSelectorTablePanel.commonRightBorder);
+
             if (lineDataElement.isDeletable()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-                label.setText(null);
                 label.setToolTipText("Click to remove");
-                label.setBorder(LineDataSelectorTablePanel.commonRightBorder);
-                return label;
             } else {
                 label.setIcon(null);
-                label.setText(null);
-                label.setBorder(LineDataSelectorTablePanel.commonBorder);
-                return label;
+                label.setToolTipText(null);
             }
+
+            return label;
         } else {
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
+
 }

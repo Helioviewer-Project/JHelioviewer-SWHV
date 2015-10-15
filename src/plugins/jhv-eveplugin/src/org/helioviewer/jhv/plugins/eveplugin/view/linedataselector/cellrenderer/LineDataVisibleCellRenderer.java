@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
@@ -20,6 +21,11 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
             // (getAccessibleChild(int i) of JTable )
             LineDataSelectorElement lineDataElement = (LineDataSelectorElement) value;
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            label.setText(null);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setBorder(LineDataSelectorTablePanel.commonLeftBorder);
+
             if (lineDataElement.isVisible()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 label.setToolTipText("Click to hide");
@@ -27,13 +33,11 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
                 label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
                 label.setToolTipText("Click to show");
             }
-            label.setText(null);
-            label.setBorder(LineDataSelectorTablePanel.commonLeftBorder);
-            return label;
 
+            return label;
         } else {
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
-
     }
+
 }
