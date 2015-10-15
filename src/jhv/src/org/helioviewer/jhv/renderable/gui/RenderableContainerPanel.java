@@ -96,9 +96,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     private final JTable grid;
     private final JPanel optionsPanelWrapper;
+    private final RenderableContainer renderableContainer;
 
-    public RenderableContainerPanel(final RenderableContainer renderableContainer) {
-        this.setLayout(new GridBagLayout());
+    public RenderableContainerPanel(RenderableContainer _renderableContainer) {
+        renderableContainer = _renderableContainer;
+
+        setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -107,7 +110,22 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         gc.weighty = 0;
         gc.fill = GridBagConstraints.BOTH;
 
-        grid = new JTable(renderableContainer);
+        grid = new JTable(renderableContainer) {
+                    @Override
+                    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                        if (columnIndex == VISIBLEROW || columnIndex == REMOVEROW) {
+                            // prevent changing selection
+                            return;
+                        }
+                        super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                    }
+
+                    @Override
+                    public void clearSelection() {
+                        // prevent losing selection
+                    }
+                };
+
         renderableContainer.addTableModelListener(grid);
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -261,8 +279,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     public void activeLayerChanged(View view) {
         if (view != null) {
             setOptionsPanel(view.getImageLayer());
-            ImageViewerGui.getRenderableContainer().fireListeners();
-            int index = ImageViewerGui.getRenderableContainer().getRowIndex(view.getImageLayer());
+            renderableContainer.fireListeners();
+            int index = renderableContainer.getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
         } else {
             setOptionsComponent(new JPanel());
