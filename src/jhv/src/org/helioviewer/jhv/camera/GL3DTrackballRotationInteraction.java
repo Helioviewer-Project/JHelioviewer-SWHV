@@ -52,7 +52,9 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+        setActiveView(e);
+
+        this.currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
     }
 
 }
