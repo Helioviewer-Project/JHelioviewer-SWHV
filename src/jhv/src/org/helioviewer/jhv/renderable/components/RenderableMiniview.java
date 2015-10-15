@@ -18,7 +18,6 @@ import com.jogamp.opengl.GL2;
 
 public class RenderableMiniview extends AbstractRenderable implements LayersListener {
 
-    private final boolean isVisible = true;
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
     private final GL3DViewport miniview = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), true);
@@ -111,4 +110,22 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         return miniview;
     }
 
+    @Override
+    public boolean isVisible(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return miniview.isVisible();
+    }
+
+    @Override
+    public void setVisible(boolean _isVisible) {
+        miniview.setVisible(_isVisible);
+    }
+
+    @Override
+    public void setVisible(int j) {
+    }
 }
