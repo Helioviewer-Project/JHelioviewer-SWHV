@@ -118,7 +118,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid = new JTable(renderableContainer) {
                     @Override
                     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == TIMEROW)
+                        if (columnIndex == TIMEROW || columnIndex == REMOVEROW)
                             super.changeSelection(rowIndex, columnIndex, toggle, extend);
                         // otherwise prevent changing selection
                     }
@@ -146,7 +146,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         addLayerButton.setContentAreaFilled(false);
 
         addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        JCheckBox multiview = new JCheckBox("multiview", Displayer.multiview);
+        final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -196,7 +196,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         });
 
         grid.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -241,7 +240,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
                 }
             }
-
         });
 
         grid.addMouseMotionListener(new MouseAdapter() {
@@ -291,9 +289,9 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
+            renderableContainer.fireListeners();
             int index = renderableContainer.getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
-            renderableContainer.fireListeners();
         }
     }
 

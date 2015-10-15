@@ -240,6 +240,37 @@ public class Layers {
         return latest == null ? null : latest.getDate();
     }
 
+   /**
+     * Check if the given index is valid
+     *
+     * @param idx
+     *            - index of the layer in question
+     * @return true if the index is valid
+     */
+    private static boolean isValidIndex(int idx) {
+        if (idx >= 0 && idx < layers.size()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Calculate a new activeLayer after the old Layer has been deleted
+     *
+     * @param oldActiveLayerIdx
+     *            - index of old active, but deleted, layer
+     * @return the index of the new active layer to choose, or -1 if no suitable
+     *         new layer can be found
+     */
+    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
+        int candidate = oldActiveLayerIdx;
+        if (!isValidIndex(candidate)) {
+            candidate = layers.size() - 1;
+        }
+
+        return candidate;
+    }
+
     /**
      * Remove the layer in question
      *
@@ -247,13 +278,15 @@ public class Layers {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(View view) {
+        int index = layers.indexOf(view);
+
         Displayer.removeRenderListener(view);
         view.removeDataHandler();
 
         layers.remove(view);
 
         if (view == activeView)
-            setActiveView(getLayer(layers.size() - 1));
+            setActiveView(getLayer(determineNewActiveLayer(index)));
 
         view.abolish();
         if (Displayer.multiview) {
