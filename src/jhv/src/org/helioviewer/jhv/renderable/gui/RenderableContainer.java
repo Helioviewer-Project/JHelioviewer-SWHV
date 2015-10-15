@@ -117,6 +117,8 @@ public class RenderableContainer implements TableModel, Reorderable {
             this.insertRow(toIndex, toMove);
         }
         fireListeners();
+        ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
+
     }
 
     @Override
@@ -207,4 +209,49 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
+    public boolean isViewportActive(int idx) {
+        for (Renderable renderable : this.renderables) {
+            if (renderable instanceof RenderableImageLayer && renderable.isVisible(idx))
+                return true;
+        }
+        return false;
+    }
+
+    public void arrangeMultiView(boolean multiview) {
+        int ctImages = 0;
+
+        if (multiview) {
+            for (Renderable r : this.renderables) {
+                if (r instanceof RenderableImageLayer && r.isVisible()) {
+                    RenderableImageLayer im = (RenderableImageLayer) r;
+                    r.setVisible(ctImages);
+                    im.getglImage().setOpacity(1f);
+                    ctImages++;
+                }
+            }
+        } else {
+            for (Renderable r : this.renderables) {
+                if (r instanceof RenderableImageLayer && r.isVisible()) {
+                    RenderableImageLayer im = (RenderableImageLayer) r;
+                    View view = im.getView();
+                    r.setVisible(0);
+                    float opacity;
+                    if (view.getName().contains("LASCO") || view.getName().contains("COR"))
+                        opacity = 1.f;
+                    else {
+                        opacity = (float) (1. / (1. + ctImages));
+                        ctImages++;
+                    }
+                    im.getglImage().setOpacity(opacity);
+                    ctImages++;
+                }
+            }
+        }
+        for (GL3DViewport vp : Displayer.getViewports()) {
+            vp.computeActive();
+        }
+        Displayer.reshapeAll();
+        Displayer.getViewport().getCamera().updateCameraWidthAspect(Displayer.getGLWidth() / (double) Displayer.getGLHeight());
+        Displayer.render();
+    }
 }
