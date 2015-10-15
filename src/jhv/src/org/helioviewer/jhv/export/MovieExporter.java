@@ -106,31 +106,42 @@ public class MovieExporter implements FrameListener {
 
     private BufferedImage renderFrame(GL2 gl) {
         GLHelper.unitScale = true;
-        fbo.bind(gl);
-        ImageViewerGui.getRenderableContainer().prerender(gl);
-        for (GL3DViewport vp : Displayer.getViewports()) {
-            if (vp.isVisible() && vp.isActive()) {
-                vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                vp.getCamera().applyPerspective(gl);
-                ImageViewerGui.getRenderableContainer().render(gl, vp);
-                vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
+        BufferedImage screenshot;
+
+        int _w = Displayer.getGLWidth();
+        int _h = Displayer.getGLHeight();
+        Displayer.setGLSize(w, h);
+        Displayer.reshapeAll();
+        {
+            fbo.bind(gl);
+            gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+            ImageViewerGui.getRenderableContainer().prerender(gl);
+            for (GL3DViewport vp : Displayer.getViewports()) {
+                if (vp.isVisible() && vp.isActive()) {
+                    vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                    gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
+                    vp.getCamera().applyPerspective(gl);
+                    ImageViewerGui.getRenderableContainer().render(gl, vp);
+                    vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
+                }
             }
+            fbo.unbind(gl);
+            GLHelper.unitScale = false;
+
+            fbo.use(gl, fboTex);
+
+            screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
+            ByteBuffer fb = ByteBuffer.wrap(array);
+            gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
+            gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
+            gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
+
+            fbo.unuse(gl);
         }
-        fbo.unbind(gl);
-        GLHelper.unitScale = false;
-
-        fbo.use(gl, fboTex);
-
-        BufferedImage screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-        byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
-        ByteBuffer fb = ByteBuffer.wrap(array);
-        gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
-        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
-
-        fbo.unuse(gl);
-
+        Displayer.setGLSize(_w, _h);
+        Displayer.reshapeAll();
         return screenshot;
     }
 
@@ -186,6 +197,7 @@ public class MovieExporter implements FrameListener {
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date());
         moviePath = prefix + ".mp4";
         imagePath = prefix + ".png";
+
         w = _w;
         h = _h;
         fps = _fps;
