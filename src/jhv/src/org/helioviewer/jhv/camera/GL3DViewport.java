@@ -10,17 +10,30 @@ public class GL3DViewport {
     private int h;
     private int x;
     private int y;
+    private final int idx;
     private boolean isVisible = true;
     private GL3DCamera camera;
     private final boolean slave;
+    private final boolean movieExport;
 
-    public GL3DViewport(int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave) {
+    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave) {
+        this(_idx, _x, _y, _w, _h, _camera, _slave, false, false);
+
+    }
+
+    private final boolean active;
+
+    public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _slave, boolean _movieExport, boolean _active) {
+
+        idx = _idx;
         w = _w;
         h = _h;
         x = _x;
         y = _y;
         camera = _camera;
         slave = _slave;
+        movieExport = _movieExport;
+        active = _active;
     }
 
     public GL3DCamera getCamera() {
@@ -47,7 +60,7 @@ public class GL3DViewport {
 
     public int getOffsetY() {
         if (slave)
-            return Displayer.getViewport().getHeight() - h - y;
+            return Displayer.getGLHeight() - h - y;
         return 0;
     }
 
@@ -85,4 +98,15 @@ public class GL3DViewport {
         return "Offset: " + this.getOffsetX() + "," + this.getOffsetY() + " Size: " + this.getWidth() + "," + this.getHeight();
     }
 
+    public int getIndex() {
+        return idx;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void computeActive() {
+        //active = ImageViewerGui.getRenderableContainer().isViewportActive(idx);
+    }
 }

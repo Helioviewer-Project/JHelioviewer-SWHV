@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -87,7 +86,7 @@ public class MovieExporter implements FrameListener {
 
     private void init(GL2 gl, int w, int h) {
         inited = true;
-        vp = new GL3DViewport(0, 0, w, h, Displayer.getViewport().getCamera(), false);
+        vp = new GL3DViewport(0, 0, 0, w, h, Displayer.getViewport().getCamera(), false);
 
         fbo.init(gl, w, h, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true);
@@ -108,17 +107,16 @@ public class MovieExporter implements FrameListener {
     private BufferedImage renderFrame(GL2 gl) {
         GLHelper.unitScale = true;
         fbo.bind(gl);
-
-        GL3DCamera camera = vp.getCamera();
-
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-        gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-        camera.applyPerspective(gl);
-        ImageViewerGui.getRenderableContainer().render(gl, vp);
-
-        camera.getAnnotateInteraction().drawInteractionFeedback(gl);
-
+        ImageViewerGui.getRenderableContainer().prerender(gl);
+        for (GL3DViewport vp : Displayer.getViewports()) {
+            if (vp.isVisible() && vp.isActive()) {
+                vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
+                vp.getCamera().applyPerspective(gl);
+                ImageViewerGui.getRenderableContainer().render(gl, vp);
+                vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
+            }
+        }
         fbo.unbind(gl);
         GLHelper.unitScale = false;
 
@@ -286,5 +284,4 @@ public class MovieExporter implements FrameListener {
             }
         }
     }
-
 }
