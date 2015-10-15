@@ -80,9 +80,30 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
         jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 4));
         jsp.getViewport().setBackground(Color.WHITE);
+
         JPanel jspContainer = new JPanel(new BorderLayout());
-        jspContainer.setBorder(BorderFactory.createTitledBorder(""));
-        jspContainer.add(jsp, BorderLayout.NORTH);
+
+        JButton addLayerButton = new JButton();
+        addLayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ImageViewerGui.getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
+            }
+        });
+
+        addLayerButton.setBorder(null);
+        addLayerButton.setText("Add layer");
+        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        addLayerButton.setBorderPainted(false);
+        addLayerButton.setFocusPainted(false);
+        addLayerButton.setContentAreaFilled(false);
+        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
+
+        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
+
+        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
+        jspContainer.add(jsp, BorderLayout.SOUTH);
         this.add(jspContainer, gc);
 
         grid.setTableHeader(null);
@@ -171,28 +192,6 @@ public class LineDateSelectorTablePanel extends JPanel implements TableModelList
 
         optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         optionsPanelWrapper.add(intervalOptionPanel, BorderLayout.PAGE_END);
-
-        JButton addLayerButton = new JButton();
-        addLayerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ImageViewerGui.getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
-            }
-        });
-
-        addLayerButton.setBorder(null);
-        addLayerButton.setText("Add layer");
-        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
-        addLayerButton.setBorderPainted(false);
-        addLayerButton.setFocusPainted(false);
-        addLayerButton.setContentAreaFilled(false);
-
-        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
-
-        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
-
-        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
