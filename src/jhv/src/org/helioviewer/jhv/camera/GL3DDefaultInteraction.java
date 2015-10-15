@@ -24,6 +24,7 @@ public abstract class GL3DDefaultInteraction extends GL3DInteraction {
             camera.reset();
             Displayer.render();
         }
+        setActiveView(e);
     }
 
     @Override

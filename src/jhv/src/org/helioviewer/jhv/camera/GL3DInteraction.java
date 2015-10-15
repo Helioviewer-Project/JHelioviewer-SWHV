@@ -8,6 +8,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import org.helioviewer.jhv.display.Displayer;
+
 import com.jogamp.opengl.GL2;
 
 /**
@@ -81,4 +83,17 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
     public void keyReleased(KeyEvent e) {
     }
 
+    public void setActiveView(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+        GL3DViewport[] viewports = Displayer.getViewports();
+        for (int i = 0; i < viewports.length; i++) {
+            GL3DViewport vp = viewports[i];
+            if (vp.isActive()) {
+                if (x >= vp.getOffsetX() && x <= vp.getOffsetX() + vp.getWidth() && y >= vp.getOffsetY() && y <= vp.getOffsetY() + vp.getHeight()) {
+                    Displayer.setViewport(vp);
+                }
+            }
+        }
+    }
 }
