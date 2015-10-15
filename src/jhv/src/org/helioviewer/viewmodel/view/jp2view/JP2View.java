@@ -350,8 +350,7 @@ public class JP2View extends AbstractView {
         // ping reader
         jp2Image.signalReader(imageViewParams);
 
-        if (jp2Image.somethingWasActuallyRead)
-            queueSubmitTask(new J2KRender(this, imageViewParams));
+        queueSubmitTask(new J2KRender(this, imageViewParams));
     }
 
     @Override
