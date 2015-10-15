@@ -240,38 +240,6 @@ public class Layers {
     }
 
     /**
-     * Check if the given index is valid, given the current state of the
-     * ViewChain
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the index is valid
-     */
-    private static boolean isValidIndex(int idx) {
-        if (idx >= 0 && idx < layers.size()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Calculate a new activeLayer after the old Layer has been deleted
-     *
-     * @param oldActiveLayerIdx
-     *            - index of old active, but deleted, layer
-     * @return the index of the new active layer to choose, or -1 if no suitable
-     *         new layer can be found
-     */
-    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
-        int candidate = oldActiveLayerIdx;
-        if (!isValidIndex(candidate)) {
-            candidate = layers.size() - 1;
-        }
-
-        return candidate;
-    }
-
-    /**
      * Remove the layer in question
      *
      * @param view
@@ -284,7 +252,7 @@ public class Layers {
         view.removeDataHandler();
 
         layers.remove(view);
-        setActiveView(getLayer(determineNewActiveLayer(index)));
+        setActiveView(getLayer(layers.size() - 1));
 
         view.abolish();
     }

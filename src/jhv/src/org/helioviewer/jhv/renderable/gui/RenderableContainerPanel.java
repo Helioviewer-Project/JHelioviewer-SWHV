@@ -26,6 +26,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.TimeUtils;
@@ -113,11 +115,9 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid = new JTable(renderableContainer) {
                     @Override
                     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == VISIBLEROW || columnIndex == REMOVEROW) {
-                            // prevent changing selection
-                            return;
-                        }
-                        super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                        if (columnIndex == TIMEROW)
+                            super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                        // otherwise prevent changing selection
                     }
 
                     @Override
@@ -149,7 +149,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
-        this.add(jspContainer, gc);
+        add(jspContainer, gc);
 
         grid.setTableHeader(null);
         grid.setShowGrid(false);
@@ -174,6 +174,15 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid.getColumnModel().getColumn(REMOVEROW).setCellRenderer(new RenderableRemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH + 2);
+
+        grid.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    setOptionsPanel((Renderable) renderableContainer.getValueAt(grid.getSelectedRow(), 0));
+                }
+            }
+        });
 
         grid.addMouseListener(new MouseAdapter() {
 
@@ -210,19 +219,11 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
                 if (col == VISIBLEROW) {
                     renderable.setVisible(!renderable.isVisible());
-                    Component optionsPanel = renderable.getOptionsPanel();
-                    if (optionsPanel != null) {
-                        ComponentUtils.enableComponents(optionsPanel, renderable.isVisible());
-                    }
-
                     renderableContainer.fireListeners();
                     Displayer.display();
                 }
-                if (col == TITLEROW || col == TIMEROW) {
-                    if (col == TITLEROW && renderable instanceof RenderableImageLayer) {
-                        Layers.setActiveView(((RenderableImageLayer) renderable).getView());
-                    }
-                    setOptionsPanel(renderable);
+                if (col == TITLEROW && renderable instanceof RenderableImageLayer) {
+                    Layers.setActiveView(((RenderableImageLayer) renderable).getView());
                 }
                 if (col == REMOVEROW && renderable.isDeletable()) {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
@@ -278,12 +279,9 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
-            setOptionsPanel(view.getImageLayer());
-            renderableContainer.fireListeners();
             int index = renderableContainer.getRowIndex(view.getImageLayer());
             grid.getSelectionModel().setSelectionInterval(index, index);
-        } else {
-            setOptionsComponent(new JPanel());
+            renderableContainer.fireListeners();
         }
     }
 
