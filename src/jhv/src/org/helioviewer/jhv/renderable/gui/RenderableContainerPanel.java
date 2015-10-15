@@ -116,8 +116,21 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
-        jspContainer.setBorder(BorderFactory.createTitledBorder(""));
-        jspContainer.add(jsp, BorderLayout.NORTH);
+
+        JButton addLayerButton = new JButton(addLayerAction);
+        addLayerButton.setBorder(null);
+        addLayerButton.setText("Add layer");
+        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        addLayerButton.setBorderPainted(false);
+        addLayerButton.setFocusPainted(false);
+        addLayerButton.setContentAreaFilled(false);
+        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
+
+        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
+        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
+
+        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
+        jspContainer.add(jsp, BorderLayout.SOUTH);
         this.add(jspContainer, gc);
 
         grid.setTableHeader(null);
@@ -197,7 +210,9 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
                 }
             }
+
         });
+
         grid.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent arg0) {
@@ -209,25 +224,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 }
             }
         });
+
         grid.setDragEnabled(true);
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         optionsPanelWrapper = new JPanel(new BorderLayout());
-
-        JButton addLayerButton = new JButton(addLayerAction);
-        addLayerButton.setBorder(null);
-        addLayerButton.setText("Add layer");
-        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
-        addLayerButton.setBorderPainted(false);
-        addLayerButton.setFocusPainted(false);
-        addLayerButton.setContentAreaFilled(false);
-
-        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
-
-        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
-        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
