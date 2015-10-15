@@ -57,6 +57,7 @@ import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
+    public static final int SIDE_PANEL_WIDTH_EXTRA = 10;
     public static final int SPLIT_DIVIDER_SIZE = 3;
 
     private static JFrame mainFrame;
@@ -137,7 +138,7 @@ public class ImageViewerGui {
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
-        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + 20, 5);
+        StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA, 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
@@ -252,7 +253,7 @@ public class ImageViewerGui {
         if (lastLocation > 10) {
             midSplitPane.setDividerLocation(lastLocation);
         } else {
-            midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + 20);
+            midSplitPane.setDividerLocation(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA);
         }
     }
 

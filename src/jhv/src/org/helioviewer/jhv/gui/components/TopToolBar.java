@@ -67,7 +67,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
     public TopToolBar() {
         setRollover(true);
-        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
         try {
             displayMode = DisplayMode.valueOf(Settings.getSingletonInstance().getProperty("display.toolbar").toUpperCase());

@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.IconBank;
@@ -19,6 +20,11 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
+
+            label.setText(null);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setBorder(RenderableContainerPanel.commonLeftBorder);
+
             if (renderable.isVisible()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
                 label.setToolTipText("Click to hide");
@@ -26,8 +32,6 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
                 label.setIcon(IconBank.getIcon(JHVIcon.HIDDEN));
                 label.setToolTipText("Click to show");
             }
-            label.setBorder(RenderableContainerPanel.commonLeftBorder);
-            label.setText(null);
         }
 
         return label;
