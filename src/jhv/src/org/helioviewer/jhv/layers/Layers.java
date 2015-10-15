@@ -246,13 +246,13 @@ public class Layers {
      *            - View that can be associated with the layer in question
      */
     public static void removeLayer(View view) {
-        int index = layers.indexOf(view);
-
         Displayer.removeRenderListener(view);
         view.removeDataHandler();
 
         layers.remove(view);
-        setActiveView(getLayer(layers.size() - 1));
+
+        if (view == activeView)
+            setActiveView(getLayer(layers.size() - 1));
 
         view.abolish();
     }
