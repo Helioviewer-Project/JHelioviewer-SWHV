@@ -1,9 +1,11 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -44,6 +46,7 @@ public class StatusPanel extends JPanel {
      */
     public StatusPanel(int leftMargin, int rightMargin) {
         super(new BorderLayout());
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.gray));
 
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.EAST);

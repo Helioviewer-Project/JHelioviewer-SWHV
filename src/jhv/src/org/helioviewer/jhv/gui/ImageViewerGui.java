@@ -57,6 +57,7 @@ import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
+    public static final int SPLIT_DIVIDER_SIZE = 3;
 
     private static JFrame mainFrame;
     public static JSplitPane midSplitPane;
@@ -122,6 +123,7 @@ public class ImageViewerGui {
         leftPane.add("Image Layers", renderableContainerPanel, true);
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
+        leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(20); // size of renderable row height
 
         mainComponent = new MainComponent();
@@ -130,6 +132,7 @@ public class ImageViewerGui {
 
         midSplitPane.setLeftComponent(leftScrollPane);
         midSplitPane.setRightComponent(mainContentPanel);
+        midSplitPane.setDividerSize(SPLIT_DIVIDER_SIZE);
 
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);

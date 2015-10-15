@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 
 /**
@@ -31,8 +32,6 @@ public class MainContentPanel extends JPanel implements ActionListener {
     private static JPanel pluginContainer;
     private static CollapsiblePane collapsiblePane;
 
-    private int defaultDividerSize;
-
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, true);
@@ -48,7 +47,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
         splitpane.setTopComponent(container);
         splitpane.setResizeWeight(0.66);
         splitpane.setOneTouchExpandable(false);
-        defaultDividerSize = splitpane.getDividerSize();
+        splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
 
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension());
@@ -102,7 +101,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle(pluginList.get(0).getTabName());
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(defaultDividerSize);
+                splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
             } else if (!(pluginList.size() == 1 && pluginList.get(0).getVisualInterfaces().size() == 0) && pluginList.size() > 0) {
                 JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -116,7 +115,7 @@ public class MainContentPanel extends JPanel implements ActionListener {
                 collapsiblePane.setTitle("Plugins");
 
                 splitpane.setBottomComponent(collapsiblePane);
-                splitpane.setDividerSize(defaultDividerSize);
+                splitpane.setDividerSize(ImageViewerGui.SPLIT_DIVIDER_SIZE);
             }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
