@@ -10,22 +10,23 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableMiniview implements Renderable, LayersListener {
+public class RenderableMiniview extends AbstractRenderable implements LayersListener {
 
-    private boolean isVisible = true;
-    private RenderableMiniviewOptionsPanel optionsPanel;
+    private final boolean isVisible = true;
+    private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private GL3DViewport miniview = new GL3DViewport(0, 0, 100, 100, new GL3DObserverCamera(), true);
+    private final GL3DViewport miniview = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
         optionsPanel = new RenderableMiniviewOptionsPanel();
+        this.setVisible(true);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class RenderableMiniview implements Renderable, LayersListener {
 
             gl.glColor4f(0, 0, 0, 1);
             GLHelper.drawRectangle(gl, -30, -30, 60, 60);
- 
+
             gl.glColor4f(1, 0, 0, 1);
             GLHelper.drawCircle(gl, 0, 0, 1, 100);
 
@@ -70,17 +71,6 @@ public class RenderableMiniview implements Renderable, LayersListener {
     @Override
     public String getName() {
         return "Miniview";
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
-        miniview.setVisible(isVisible);
     }
 
     @Override

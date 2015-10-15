@@ -8,12 +8,12 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableTimeStamp implements Renderable {
+public class RenderableTimeStamp extends AbstractRenderable {
 
     private Font font;
     private float oldFontSize = -1;
@@ -21,14 +21,13 @@ public class RenderableTimeStamp implements Renderable {
     private TextRenderer textRenderer;
 
     private final String name = "Timestamp";
-    private boolean isVisible = false;
 
     public RenderableTimeStamp() {
     }
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        if (!isVisible)
+        if (!isVisible[vp.getIndex()])
             return;
 
         float fontSize = (int) (vp.getHeight() * vpScale);
@@ -67,16 +66,6 @@ public class RenderableTimeStamp implements Renderable {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return this.isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
     }
 
     @Override

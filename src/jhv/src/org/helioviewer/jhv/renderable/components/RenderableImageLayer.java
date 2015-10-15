@@ -15,7 +15,7 @@ import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLShader;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
@@ -23,7 +23,7 @@ import org.helioviewer.viewmodel.view.View;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class RenderableImageLayer implements Renderable {
+public class RenderableImageLayer extends AbstractRenderable {
 
     private static boolean showCorona = true;
 
@@ -33,7 +33,6 @@ public class RenderableImageLayer implements Renderable {
 
     private int positionBufferSize;
     private final View view;
-    private boolean isVisible = true;
 
     private final GLImage glImage;
 
@@ -54,6 +53,12 @@ public class RenderableImageLayer implements Renderable {
 
         glImage = new GLImage(view.getDefaultLUT());
         glImage.setOpacity(opacity);
+        this.setVisible(true);
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        super.setVisible(isVisible);
     }
 
     @Override
@@ -78,6 +83,14 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
+    public void prerender(GL2 gl) {
+        if (imageData == null) {
+            return;
+        }
+        glImage.streamImage(gl, imageData, prevImageData, baseImageData);
+    }
+
+    @Override
     public void render(GL2 gl, GL3DViewport vp) {
         _render(gl, vp, new double[] { 1., 1., 0., 1. });
     }
@@ -88,7 +101,10 @@ public class RenderableImageLayer implements Renderable {
     }
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
-        if (!isVisible || imageData == null)
+        if (imageData == null) {
+            return;
+        }
+        if (!isVisible[vp.getIndex()])
             return;
 
         GLSLShader.bind(gl);
@@ -305,16 +321,6 @@ public class RenderableImageLayer implements Renderable {
     }
 
     @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean _isVisible) {
-        isVisible = _isVisible;
-    }
-
-    @Override
     public String getName() {
         return view.getName();
     }
@@ -370,6 +376,10 @@ public class RenderableImageLayer implements Renderable {
 
     public ImageData getImageData() {
         return imageData;
+    }
+
+    public GLImage getglImage() {
+        return glImage;
     }
 
 }

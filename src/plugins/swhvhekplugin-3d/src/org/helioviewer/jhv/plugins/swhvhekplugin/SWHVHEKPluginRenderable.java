@@ -26,11 +26,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 
-public class SWHVHEKPluginRenderable implements Renderable {
+public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final SWHVHEKImagePanelEventPopupController controller = new SWHVHEKImagePanelEventPopupController();
 
@@ -38,7 +38,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
     private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
-    private boolean isVisible = true;
+    private final boolean[] isVisible = { true, false, false, false };
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -294,7 +294,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        if (isVisible) {
+        if (isVisible[vp.getIndex()]) {
             Date currentTime = Layers.getLastUpdatedTimestamp();
             ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
             for (JHVEvent evt : toDraw) {
@@ -330,13 +330,20 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public boolean isVisible() {
-        return isVisible;
+        for (int i = 0; i < this.isVisible.length; i++) {
+            if (this.isVisible[i])
+                return true;
+        }
+        return false;
     }
 
     @Override
-    public void setVisible(boolean _isVisible) {
-        isVisible = _isVisible;
+    public void setVisible(boolean isVisible) {
+        for (int i = 0; i < this.isVisible.length; i++) {
+            this.isVisible[i] = isVisible;
+        }
         if (isVisible)
+
             ImageViewerGui.getInputController().addPlugin(controller);
         else
             ImageViewerGui.getInputController().removePlugin(controller);
@@ -354,7 +361,7 @@ public class SWHVHEKPluginRenderable implements Renderable {
 
     @Override
     public void init(GL2 gl) {
-        if (isVisible)
+        if (isVisible())
             ImageViewerGui.getInputController().addPlugin(controller);
     }
 

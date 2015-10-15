@@ -9,22 +9,22 @@ import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableDummy implements Renderable {
+public class RenderableDummy extends AbstractRenderable {
 
     private Font font;
     private float oldFontSize = -1;
     private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
-    private SwingWorker<?,?> worker;
+    private final SwingWorker<?, ?> worker;
 
     private final String name = "Loading...";
 
-    public RenderableDummy(SwingWorker<?,?> _worker) {
+    public RenderableDummy(SwingWorker<?, ?> _worker) {
         worker = _worker;
     }
 
@@ -64,15 +64,6 @@ public class RenderableDummy implements Renderable {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return true;
-    }
-
-    @Override
-    public void setVisible(boolean b) {
     }
 
     @Override

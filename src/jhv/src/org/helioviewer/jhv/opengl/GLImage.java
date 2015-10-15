@@ -44,6 +44,25 @@ public class GLImage {
         setLUT(newLUT, false);
     }
 
+    public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        if (imageData.getUploaded() == false) {
+            imageData.setUploaded(true);
+            tex.copyImageData2D(gl, imageData);
+        }
+        ImageData prevFrame = imageData;
+        if (!baseDifferenceMode) {
+            prevFrame = prevImageData;
+        } else {
+            prevFrame = baseImageData;
+        }
+        if (differenceMode && prevFrame != null) {
+            GLSLShader.setTruncationValue(truncation);
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+            diffTex.copyImageData2D(gl, prevFrame);
+        }
+    }
+
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         copyScreenToTexture(gl, imageData, prevImageData, baseImageData);
         applyRunningDifferenceGL(gl, imageData, prevImageData, baseImageData);
@@ -133,7 +152,6 @@ public class GLImage {
             if (differenceMode && prevFrame != null) {
                 GLSLShader.setTruncationValue(truncation);
                 diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-                diffTex.copyImageData2D(gl, prevFrame);
             }
         } else {
             GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);

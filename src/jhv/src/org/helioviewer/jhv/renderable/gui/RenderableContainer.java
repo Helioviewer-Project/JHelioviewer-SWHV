@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
+import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -51,9 +52,16 @@ public class RenderableContainer implements TableModel, Reorderable {
         Displayer.display();
     }
 
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void prerender(GL2 gl) {
         removeRenderables(gl);
         initRenderables(gl);
+
+        for (Renderable renderable : renderables) {
+            renderable.prerender(gl);
+        }
+    }
+
+    public void render(GL2 gl, GL3DViewport vp) {
 
         for (Renderable renderable : renderables) {
             renderable.render(gl, vp);

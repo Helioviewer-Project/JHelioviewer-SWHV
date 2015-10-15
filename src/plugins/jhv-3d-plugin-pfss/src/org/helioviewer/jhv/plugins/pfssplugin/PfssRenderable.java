@@ -10,7 +10,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
-import org.helioviewer.jhv.renderable.gui.Renderable;
+import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
 import org.helioviewer.viewmodel.view.View;
 
@@ -19,9 +19,8 @@ import com.jogamp.opengl.GL2;
 /**
  * @author Stefan Meier (stefan.meier@fhnw.ch)
  * */
-public class PfssRenderable implements Renderable, LayersListener {
+public class PfssRenderable extends AbstractRenderable implements LayersListener {
 
-    private boolean isVisible = false;
     private final PfssPluginPanel optionsPanel;
     private PfssData previousPfssData = null;
 
@@ -34,7 +33,7 @@ public class PfssRenderable implements Renderable, LayersListener {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        if (isVisible) {
+        if (isVisible[vp.getIndex()]) {
             PfssData pfssData;
             long millis = Layers.getLastUpdatedTimestamp().getTime();
             if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
@@ -66,16 +65,6 @@ public class PfssRenderable implements Renderable, LayersListener {
     @Override
     public String getName() {
         return "PFSS model";
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
     }
 
     private String datetime = null;
