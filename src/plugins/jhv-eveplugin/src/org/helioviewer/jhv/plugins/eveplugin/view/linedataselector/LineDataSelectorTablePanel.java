@@ -67,8 +67,24 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         intervalOptionPanel = new IntervalOptionPanel();
         this.setLayout(new GridBagLayout());
         tableModel = LineDataSelectorModel.getSingletonInstance();
-        grid = new JTable(tableModel);
+
+        grid = new JTable(tableModel) {
+                    @Override
+                    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                        if (columnIndex == VISIBLE_ROW || columnIndex == REMOVE_ROW) {
+                            // prevent changing selection
+                            return;
+                        }
+                        super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                    }
+
+                    @Override
+                    public void clearSelection() {
+                        // prevent losing selection
+                    }
+                };
         tableModel.addTableModelListener(grid);
+
         grid.getSelectionModel().addListSelectionListener(this);
         gc.gridx = 0;
         gc.gridy = 0;
@@ -172,7 +188,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
                     LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
                     renderable.setVisibility(!renderable.isVisible());
                 }
-                if (col == TITLE_ROW || col == VISIBLE_ROW || col == LOADING_ROW || col == LINECOLOR_ROW) {
+                if (col == TITLE_ROW || col == LOADING_ROW || col == LINECOLOR_ROW) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
