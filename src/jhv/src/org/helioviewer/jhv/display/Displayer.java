@@ -44,27 +44,32 @@ public class Displayer implements JHVEventHighlightListener {
     private static GL3DViewport viewport2 = new GL3DViewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
     private static GL3DViewport viewport3 = new GL3DViewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
     private static GL3DViewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
+    private static GL3DViewport viewport = viewport0;
 
     public static GL3DViewport[] getViewports() {
         return viewports;
     }
 
     public static GL3DViewport getViewport() {
-        return viewport0;
+        return viewport;
     }
 
     public static void setViewport(GL3DViewport _viewport) {
-        viewport0 = _viewport;
+        viewport = _viewport;
     }
 
-    public static void reshapeAll() {
-
+    public static int countActiveLayers() {
         int ct = 0;
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isActive()) {
                 ct++;
             }
         }
+        return ct;
+    }
+
+    public static void reshapeAll() {
+        int ct = countActiveLayers();
         switch (ct) {
         case 0:
             reshape();

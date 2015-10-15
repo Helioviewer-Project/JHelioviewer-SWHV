@@ -190,6 +190,8 @@ public class MovieExporter implements FrameListener {
     public static void start(int _w, int _h, int _fps, RecordMode _mode) {
         movieWriter = null; // CloseWriter might have had an exception
 
+        int ct = Displayer.countActiveLayers();
+        Displayer.setViewport(new GL3DViewport(0, 0, 0, _w / ct, _h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
         frameNumber = 0;
         currentFrame = 0;
@@ -227,6 +229,7 @@ public class MovieExporter implements FrameListener {
                 Layers.removeFrameListener(instance);
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
+            Displayer.setViewport(Displayer.getViewports()[0]);
         }
     }
 
