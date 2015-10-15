@@ -90,20 +90,22 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     private void displayEvents() {
-        JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
-        data = result.getAvailableEvents();
-        ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
-        for (String eventType : data.keySet()) {
-            for (Date sDate : data.get(eventType).keySet()) {
-                for (Date eDate : data.get(eventType).get(sDate).keySet()) {
-                    for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
-                        events.add(event);
+        if (beginDate != null && endDate != null) {
+            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
+            data = result.getAvailableEvents();
+            ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
+            for (String eventType : data.keySet()) {
+                for (Date sDate : data.get(eventType).keySet()) {
+                    for (Date eDate : data.get(eventType).get(sDate).keySet()) {
+                        for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
+                            events.add(event);
+                        }
                     }
                 }
             }
+            this.events = events;
+            Displayer.display();
         }
-        this.events = events;
-        Displayer.display();
     }
 
     public Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> getData() {
