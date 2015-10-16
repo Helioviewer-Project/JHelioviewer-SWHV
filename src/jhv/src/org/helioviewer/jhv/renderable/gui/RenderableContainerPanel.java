@@ -117,8 +117,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid = new JTable(renderableContainer) {
                     @Override
                     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == TIME_COL || columnIndex == REMOVE_COL ||
-                           (columnIndex == TITLE_COL && !(grid.getValueAt(rowIndex, 0) instanceof RenderableImageLayer)))
+                        if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
                             super.changeSelection(rowIndex, columnIndex, toggle, extend);
                         // otherwise prevent changing selection
                     }
@@ -190,7 +189,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    setOptionsPanel((Renderable) renderableContainer.getValueAt(grid.getSelectedRow(), 0));
+                    setOptionsPanel((Renderable) grid.getValueAt(grid.getSelectedRow(), 0));
                 }
             }
         });
@@ -236,6 +235,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                 }
                 if (col == TITLE_COL && renderable instanceof RenderableImageLayer) {
                     Layers.setActiveView(((RenderableImageLayer) renderable).getView());
+                    renderableContainer.fireListeners();
                 }
                 if (col == REMOVE_COL && renderable.isDeletable()) {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
@@ -285,15 +285,12 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     @Override
     public void layerAdded(View view) {
+        int idx = renderableContainer.getRowIndex(view.getImageLayer());
+        grid.getSelectionModel().setSelectionInterval(idx, idx);
     }
 
     @Override
     public void activeLayerChanged(View view) {
-        if (view != null) {
-            renderableContainer.fireListeners();
-            int index = renderableContainer.getRowIndex(view.getImageLayer());
-            grid.getSelectionModel().setSelectionInterval(index, index);
-        }
     }
 
 }
