@@ -94,8 +94,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         // magic
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
-        if (detector.equalsIgnoreCase("C2"))
-            outerRadius *= 0.9625;
         if (instrument.equals("MDI") || instrument.equals("HMI"))
             outerRadius = 1;
     }
@@ -173,6 +171,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
             distanceObs = p.rad;
+            if (observatory.equals("SOHO")) {
+                //L1 point is approx 1% closer to the Sun
+                distanceObs *= 0.99;
+            }
         }
 
         double stonyhurstLatitude, theta;
@@ -216,39 +218,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
             double radiusSunInArcsec = Math.atan2(Sun.Radius, distanceObs) * MathUtils.radeg * 3600;
             newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
-        } else if (instrument.equals("EIT")) {
-            newSolarPixelRadius = m.tryGetDouble("SOLAR_R");
-            if (newSolarPixelRadius == 0) {
-                if (pixelWidth == 1024) {
-                    newSolarPixelRadius = 360;
-                } else if (pixelWidth == 512) {
-                    newSolarPixelRadius = 180;
-                }
-            }
-        } else if (detector.equals("C2") || detector.equals("C3")) {
-            newSolarPixelRadius = m.tryGetDouble("RSUN");
 
-            if (newSolarPixelRadius == 0) {
-                if (detector.equals("C2")) {
-                    newSolarPixelRadius = 80.814221;
-                } else if (detector.equals("C3")) {
-                    newSolarPixelRadius = 17.173021;
-                }
-
-            }
-        } else if (instrument.equals("MDI")) {
-            newSolarPixelRadius = m.tryGetDouble("R_SUN");
-        } else if (detector.equals("COR1") || detector.equals("COR2") || detector.equals("EUVI")) {
-            double solarRadiusArcSec = m.tryGetDouble("RSUN");
-            double arcSecPerPixel = m.tryGetDouble("CDELT1");
-            double arcSecPerPixel2 = m.tryGetDouble("CDELT2");
-            if (arcSecPerPixel != arcSecPerPixel2) {
-                Log.warn("HelioviewerMetaData.retrievePixelParameters(): Inconsistent STEREO metadata: resolution not the same in x and y direction (1: " + arcSecPerPixel + ", 2: " + arcSecPerPixel2 + ")");
-            }
-            double solarRadiusPixel = solarRadiusArcSec / arcSecPerPixel;
-            newSolarPixelRadius = solarRadiusPixel;
-        // pixel based
-        } else if (instrument.equals("CALLISTO")) {
+            // pixel based
+        } else {
             setPhysicalLowerLeftCorner(new GL3DVec2d(0, 0));
             setPhysicalSize(new GL3DVec2d(pixelWidth, pixelHeight));
             return;
