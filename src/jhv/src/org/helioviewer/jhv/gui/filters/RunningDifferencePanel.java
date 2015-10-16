@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -16,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -36,7 +34,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.jp2view.JP2View;
@@ -58,23 +55,44 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     private JCheckBox diffRot;
     private final static String[] combolist = { "No difference images", "Running difference", "Base difference" };
-    private Action downloadLayerAction;
-    private Action showMetaAction;
     private final JButton downloadLayerButton;
     private final JButton showMetaButton;
     private final JPanel topPanel;
     private final JPanel radPanel;
     private final JComboBox comboBox;
 
+    private View view;
+
     public RunningDifferencePanel() {
-        downloadLayerButton = new JButton();
+        downloadLayerButton = new JButton(new AbstractAction() {
+            {
+                putValue(SHORT_DESCRIPTION, "Download selected layer");
+                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                downloadLayer((JP2View) view);
+            }
+        });
         downloadLayerButton.setBorder(null);
         downloadLayerButton.setText(null);
         downloadLayerButton.setBorderPainted(false);
         downloadLayerButton.setFocusPainted(false);
         downloadLayerButton.setContentAreaFilled(false);
 
-        showMetaButton = new JButton();
+        showMetaButton = new JButton(new AbstractAction() {
+            {
+                putValue(SHORT_DESCRIPTION, "Show metadata of selected layer");
+                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                MetaDataDialog dialog = new MetaDataDialog(view);
+                dialog.showDialog();
+            }
+        });
         showMetaButton.setBorder(null);
         showMetaButton.setText(null);
         showMetaButton.setBorderPainted(false);
@@ -103,7 +121,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     private void setDifferenceMode(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
         if (showExtraPanel) {
             final GridBagConstraints c = new GridBagConstraints();
-            c.insets = new Insets(0, 0, 0, 0);
             c.weightx = 1;
             c.weighty = 1;
             c.gridwidth = 1;
@@ -133,7 +150,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         } else {
             comboBox.setSelectedItem(combolist[2]);
         }
-
     }
 
     private void addRadioButtons() {
@@ -141,7 +157,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         diffRot = new JCheckBox("Rotation correction");
         diffRot.setSelected(true);
         final GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 1;
 
@@ -191,7 +206,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
         radPanel.setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(0, 0, 0, 0);
         gc.weightx = 1;
         gc.gridx = 0;
         gc.gridwidth = 1;
@@ -225,47 +239,20 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         }
 
         truncateSpinner.setValue(1.f - image.getTruncation());
+    }
 
-        final View view = Layers.getActiveView();
-
-        downloadLayerAction = new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Download selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.DOWNLOAD));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                if (view instanceof JP2View)
-                    downloadLayer((JP2View) view);
-            }
-        };
-        downloadLayerButton.setAction(downloadLayerAction);
-        showMetaAction = new AbstractAction() {
-            {
-                putValue(SHORT_DESCRIPTION, "Show metadata of selected layer");
-                putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                showMetaInfo(Layers.getActiveView());
-            }
-        };
-        showMetaButton.setAction(showMetaAction);
-        showMetaButton.revalidate();
+    public void setView(View _view) {
+        view = _view;
         if (view instanceof JP2View) {
-            downloadLayerButton.setEnabled(true);
+            downloadLayerButton.setVisible(true); // enabled no good
         } else {
-            downloadLayerButton.setEnabled(false);
+            downloadLayerButton.setVisible(false);
         }
     }
 
     public Component getPanel() {
-        return this.diffPanel;
+        return diffPanel;
     }
-
-    // weird location for the following functions
 
     /**
      * Trigger downloading the layer in question
@@ -321,20 +308,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             e.printStackTrace();
             return;
         }
-    }
-
-    /**
-     * Trigger showing a dialog displaying the meta data of the layer in
-     * question.
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     *
-     * @see org.helioviewer.jhv.gui.dialogs.MetaDataDialog
-     */
-    private static void showMetaInfo(View view) {
-        MetaDataDialog dialog = new MetaDataDialog(view);
-        dialog.showDialog();
     }
 
 }
