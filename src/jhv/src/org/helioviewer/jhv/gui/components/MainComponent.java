@@ -91,6 +91,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
         ImageViewerGui.getRenderableContainer().prerender(gl);
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
@@ -102,10 +103,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             }
         }
 
-        Displayer.getViewport().getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
-
         GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
-
         if (vp.isVisible()) {
             vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
             vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());

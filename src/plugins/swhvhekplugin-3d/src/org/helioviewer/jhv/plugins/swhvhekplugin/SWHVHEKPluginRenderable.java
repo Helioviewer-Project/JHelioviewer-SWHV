@@ -38,7 +38,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
-    private final boolean[] isVisible = { true, false, false, false };
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -329,21 +328,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public boolean isVisible() {
-        for (int i = 0; i < this.isVisible.length; i++) {
-            if (this.isVisible[i])
-                return true;
-        }
-        return false;
-    }
-
-    @Override
     public void setVisible(boolean isVisible) {
-        for (int i = 0; i < this.isVisible.length; i++) {
-            this.isVisible[i] = isVisible;
-        }
-        if (isVisible)
+        super.setVisible(isVisible);
 
+        if (isVisible)
             ImageViewerGui.getInputController().addPlugin(controller);
         else
             ImageViewerGui.getInputController().removePlugin(controller);

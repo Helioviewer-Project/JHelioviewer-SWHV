@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import com.jogamp.opengl.GL2;
 
 public abstract class AbstractRenderable implements Renderable {
+
     protected final boolean[] isVisible = { false, false, false, false };
 
     @Override

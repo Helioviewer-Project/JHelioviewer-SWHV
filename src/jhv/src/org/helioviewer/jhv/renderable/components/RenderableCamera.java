@@ -32,7 +32,7 @@ public class RenderableCamera extends AbstractRenderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        this.optionsPanel = new GL3DCameraOptionsPanel(Displayer.getViewport().getCamera());
+        optionsPanel = new GL3DCameraOptionsPanel(Displayer.getViewport().getCamera());
     }
 
     @Override
