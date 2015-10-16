@@ -50,7 +50,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         retrievePixelParameters(m);
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
-
     }
 
     // magic
@@ -94,8 +93,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         // magic
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
-        //if (detector.equalsIgnoreCase("C2"))
-        //outerRadius *= 0.9625;
         if (instrument.equals("MDI") || instrument.equals("HMI"))
             outerRadius = 1;
     }
@@ -205,8 +202,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         pixelWidth = m.tryGetInt("NAXIS1");
         pixelHeight = m.tryGetInt("NAXIS2");
 
-        double newSolarPixelRadius = -1.0;
-
         boolean isCallisto = instrument.equals("CALLISTO");
         if (!isCallisto) {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
@@ -219,29 +214,24 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
             double radiusSunInArcsec = Math.atan2(Sun.Radius, distanceObs) * MathUtils.radeg * 3600;
-            newSolarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
+            double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
+            unitPerPixel = Sun.Radius / solarPixelRadius;
 
-            // pixel based
-        } else {
+            double sunX = m.tryGetDouble("CRPIX1") - 1;
+            double sunY = m.tryGetDouble("CRPIX2") - 1;
+            sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
+
+            setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
+            setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
+        } else { // pixel based
             setPhysicalLowerLeftCorner(new GL3DVec2d(0, 0));
             setPhysicalSize(new GL3DVec2d(pixelWidth, pixelHeight));
-            return;
         }
-
-        double sunX = m.tryGetDouble("CRPIX1") - 1;
-        double sunY = m.tryGetDouble("CRPIX2") - 1;
-        sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
-
-        unitPerPixel = Sun.Radius / newSolarPixelRadius;
-        setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
-        setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return new Region((roi.x / zoompercent - sunPixelPosition.x) * unitPerPixel,
-                          (roi.y / zoompercent - sunPixelPosition.y) * unitPerPixel,
-                          roi.width * unitPerPixel / zoompercent,
-                          roi.height * unitPerPixel / zoompercent);
+        return new Region((roi.x / zoompercent - sunPixelPosition.x) * unitPerPixel, (roi.y / zoompercent - sunPixelPosition.y) * unitPerPixel,
+                          roi.width * unitPerPixel / zoompercent, roi.height * unitPerPixel / zoompercent);
     }
 
     /**
