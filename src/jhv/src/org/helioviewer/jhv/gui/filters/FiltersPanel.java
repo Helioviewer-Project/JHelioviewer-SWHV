@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.opengl.GLImage;
+import org.helioviewer.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class FiltersPanel extends JPanel {
@@ -87,6 +88,10 @@ public class FiltersPanel extends JPanel {
         gammaCorrectionPanel.setGLImage(image);
         contrastPanel.setGLImage(image);
         sharpenPanel.setGLImage(image);
+    }
+
+    public void setView(View view) {
+        runningDifferencePanel.setView(view);
     }
 
 }

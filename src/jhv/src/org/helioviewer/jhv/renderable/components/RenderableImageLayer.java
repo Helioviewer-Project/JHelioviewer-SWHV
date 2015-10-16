@@ -321,6 +321,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     public Component getOptionsPanel() {
         FiltersPanel fp = ImageViewerGui.getFiltersPanel();
         fp.setActiveImage(glImage);
+        fp.setView(view);
         return fp;
     }
 
