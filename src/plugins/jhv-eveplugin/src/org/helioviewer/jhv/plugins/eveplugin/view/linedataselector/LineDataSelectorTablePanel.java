@@ -47,11 +47,11 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
     private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 16;
 
-    private static final int VISIBLE_ROW = 0;
-    private static final int TITLE_ROW = 1;
-    private static final int LOADING_ROW = 2;
-    private static final int LINECOLOR_ROW = 3;
-    private static final int REMOVE_ROW = 4;
+    private static final int VISIBLE_COL = 0;
+    private static final int TITLE_COL = 1;
+    private static final int LOADING_COL = 2;
+    private static final int LINECOLOR_COL = 3;
+    private static final int REMOVE_COL = 4;
 
     private final JTable grid;
 
@@ -71,7 +71,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         grid = new JTable(tableModel) {
                     @Override
                     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == VISIBLE_ROW || columnIndex == REMOVE_ROW) {
+                        if (columnIndex == VISIBLE_COL || columnIndex == REMOVE_COL) {
                             // prevent changing selection
                             return;
                         }
@@ -131,25 +131,25 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         tableModel.addTableModelListener(this);
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setCellRenderer(new LineDataVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(VISIBLE_ROW).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new LineDataVisibleCellRenderer());
+        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(TITLE_ROW).setCellRenderer(new LineDataSelectorElementRenderer());
-        // grid.getColumnModel().getColumn(TITLE_ROW).setPreferredWidth(80);
-        // grid.getColumnModel().getColumn(TITLE_ROW).setMaxWidth(80);
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new LineDataSelectorElementRenderer());
+        // grid.getColumnModel().getColumn(TITLE_COL).setPreferredWidth(80);
+        // grid.getColumnModel().getColumn(TITLE_COL).setMaxWidth(80);
 
-        grid.getColumnModel().getColumn(LINECOLOR_ROW).setCellRenderer(new LineColorRenderer());
-        grid.getColumnModel().getColumn(LINECOLOR_ROW).setPreferredWidth(20);
-        grid.getColumnModel().getColumn(LINECOLOR_ROW).setMaxWidth(20);
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new LineColorRenderer());
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(LOADING_ROW).setCellRenderer(new LoadingCellRenderer());
-        grid.getColumnModel().getColumn(LOADING_ROW).setPreferredWidth(20);
-        grid.getColumnModel().getColumn(LOADING_ROW).setMaxWidth(20);
+        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new LoadingCellRenderer());
+        grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_ROW).setCellRenderer(new RemoveCellRenderer());
-        grid.getColumnModel().getColumn(REMOVE_ROW).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(REMOVE_ROW).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.addMouseListener(new MouseAdapter() {
 
@@ -184,15 +184,15 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
-                if (col == VISIBLE_ROW) {
+                if (col == VISIBLE_COL) {
                     LineDataSelectorElement renderable = (LineDataSelectorElement) model.getValueAt(row, col);
                     renderable.setVisibility(!renderable.isVisible());
                 }
-                if (col == TITLE_ROW || col == LOADING_ROW || col == LINECOLOR_ROW) {
+                if (col == TITLE_COL || col == LOADING_COL || col == LINECOLOR_COL) {
                     LineDataSelectorElement lineDataElement = (LineDataSelectorElement) model.getValueAt(row, col);
                     setOptionsPanel(lineDataElement);
                 }
-                if (col == REMOVE_ROW) {
+                if (col == REMOVE_COL) {
                     model.removeRow(row);
                 }
                 revalidate();
