@@ -155,7 +155,7 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
-        addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
+        // addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
 
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
