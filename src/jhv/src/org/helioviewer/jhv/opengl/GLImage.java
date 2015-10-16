@@ -57,7 +57,6 @@ public class GLImage {
             prevFrame = baseImageData;
         }
         if (differenceMode && prevFrame != null) {
-            GLSLShader.setTruncationValue(truncation);
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
             diffTex.copyImageData2D(gl, prevFrame);
         }
@@ -78,11 +77,6 @@ public class GLImage {
         applyGLLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
-
-        if (imageData.getUploaded() == false) {
-            imageData.setUploaded(true);
-            tex.copyImageData2D(gl, imageData);
-        }
     }
 
     private void copyScreenToTexture(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
@@ -142,17 +136,8 @@ public class GLImage {
                 }
             }
 
-            ImageData prevFrame;
-            if (!baseDifferenceMode) {
-                prevFrame = prevImageData;
-            } else {
-                prevFrame = baseImageData;
-            }
-
-            if (differenceMode && prevFrame != null) {
-                GLSLShader.setTruncationValue(truncation);
-                diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-            }
+            GLSLShader.setTruncationValue(truncation);
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
         } else {
             GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);
         }
