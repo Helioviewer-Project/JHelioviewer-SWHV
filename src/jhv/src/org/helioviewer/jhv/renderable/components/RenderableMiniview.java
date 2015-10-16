@@ -102,7 +102,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     public GL3DViewport getViewport() {
-        int vpw = Displayer.getViewport().getWidth();
+        int vpw = Displayer.getGLWidth();
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * optionsPanel.scale * 0.01);
         miniview.setSize(offset, offset, size, size);
