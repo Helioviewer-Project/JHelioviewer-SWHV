@@ -4,12 +4,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.helioviewer.base.math.MathUtils;
 import org.helioviewer.base.time.JulianDay;
 
-import org.apache.commons.lang3.time.DateUtils;
-
 public class Sun {
+
+    public static final double MassEarth = 5.97237e24;
+    public static final double MassSun = 1.98855e30;
+    //https://en.wikipedia.org/wiki/Lagrangian_point#L1
+    public static final double L1Factor = 1 - Math.cbrt(MassEarth / 3 / MassSun);
 
     public static final double Radius = 1;
     public static final double Radius2 = Radius * Radius;
