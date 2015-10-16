@@ -81,18 +81,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Displayer.reshapeAll();
     }
 
-    @Override
-    public void display(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(this);
-
-        if (exporter != null) {
-            exporter.handleMovieExport(gl);
-        }
-
+    public static void renderScene(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-        ImageViewerGui.getRenderableContainer().prerender(gl);
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
                 vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
@@ -102,7 +92,19 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
             }
         }
+    }
 
+    @Override
+    public void display(GLAutoDrawable drawable) {
+        GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(this);
+
+        ImageViewerGui.getRenderableContainer().prerender(gl);
+
+        if (exporter != null) {
+            exporter.handleMovieExport(gl);
+        }
+        renderScene(gl);
         GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
@@ -114,5 +116,4 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         drawable.swapBuffers();
     }
-
 }

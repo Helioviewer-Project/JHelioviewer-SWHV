@@ -19,6 +19,7 @@ import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.layers.FrameListener;
@@ -105,29 +106,18 @@ public class MovieExporter implements FrameListener {
     }
 
     private BufferedImage renderFrame(GL2 gl) {
-        GLHelper.unitScale = true;
         BufferedImage screenshot;
 
         int _w = Displayer.getGLWidth();
         int _h = Displayer.getGLHeight();
+
+        GLHelper.unitScale = true;
         Displayer.setGLSize(w, h);
         Displayer.reshapeAll();
         {
             fbo.bind(gl);
-            gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-            ImageViewerGui.getRenderableContainer().prerender(gl);
-            for (GL3DViewport vp : Displayer.getViewports()) {
-                if (vp.isVisible() && vp.isActive()) {
-                    vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
-                    gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                    vp.getCamera().applyPerspective(gl);
-                    ImageViewerGui.getRenderableContainer().render(gl, vp);
-                    vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
-                }
-            }
+            MainComponent.renderScene(gl);
             fbo.unbind(gl);
-            GLHelper.unitScale = false;
 
             fbo.use(gl, fboTex);
 
@@ -142,6 +132,8 @@ public class MovieExporter implements FrameListener {
         }
         Displayer.setGLSize(_w, _h);
         Displayer.reshapeAll();
+        GLHelper.unitScale = false;
+
         return screenshot;
     }
 
