@@ -28,7 +28,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
@@ -234,16 +233,18 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         recordButton = new RecordButton();
         buttonPanel.add(recordButton);
 
-        buttonPanel.add(new JSeparator(SwingConstants.VERTICAL));
-
         advancedButton = ButtonCreator.createTextButton(IconBank.getIcon(JHVIcon.SHOW_MORE), "Options", "Options to control playback and recording", this);
+        advancedButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        advancedButton.setBorderPainted(false);
+        advancedButton.setFocusPainted(false);
+        advancedButton.setContentAreaFilled(false);
         buttonPanel.add(advancedButton);
 
-        int recordButtonHeight = recordButton.getPreferredSize().height;
-        previousFrameButton.setPreferredSize(new Dimension(previousFrameButton.getPreferredSize().width, recordButtonHeight));
-        playButton.setPreferredSize(new Dimension(playButton.getPreferredSize().width, recordButtonHeight));
-        nextFrameButton.setPreferredSize(new Dimension(nextFrameButton.getPreferredSize().width, recordButtonHeight));
-        advancedButton.setPreferredSize(new Dimension(advancedButton.getPreferredSize().width, recordButtonHeight));
+        int recordButtonHeight = recordButton.getMinimumSize().height;
+        previousFrameButton.setPreferredSize(new Dimension(previousFrameButton.getMinimumSize().width, recordButtonHeight));
+        playButton.setPreferredSize(new Dimension(playButton.getMinimumSize().width, recordButtonHeight));
+        nextFrameButton.setPreferredSize(new Dimension(nextFrameButton.getMinimumSize().width, recordButtonHeight));
+        advancedButton.setPreferredSize(new Dimension(advancedButton.getMinimumSize().width, recordButtonHeight));
 
         secondLine.add(buttonPanel, BorderLayout.WEST);
 

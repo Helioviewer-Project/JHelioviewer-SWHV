@@ -57,7 +57,7 @@ import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
-    public static final int SIDE_PANEL_WIDTH_EXTRA = 10;
+    public static final int SIDE_PANEL_WIDTH_EXTRA = 20;
     public static final int SPLIT_DIVIDER_SIZE = 3;
 
     private static JFrame mainFrame;
