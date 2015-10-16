@@ -94,6 +94,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         // magic
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
+        //if (detector.equalsIgnoreCase("C2"))
+        //outerRadius *= 0.9625;
         if (instrument.equals("MDI") || instrument.equals("HMI"))
             outerRadius = 1;
     }
@@ -206,7 +208,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         double newSolarPixelRadius = -1.0;
 
-        if (instrument.contains("HMI") || instrument.contains("AIA") || instrument.contains("SWAP") || instrument.contains("VSM") || instrument.contains("NRH") || instrument.contains("GONG") || instrument.contains("H-alpha")) {
+        boolean isCallisto = instrument.equals("CALLISTO");
+        if (!isCallisto) {
             double arcsecPerPixelX = m.tryGetDouble("CDELT1");
             double arcsecPerPixelY = m.tryGetDouble("CDELT2");
             if (Double.isNaN(arcsecPerPixelX) || Double.isNaN(arcsecPerPixelY)) {
