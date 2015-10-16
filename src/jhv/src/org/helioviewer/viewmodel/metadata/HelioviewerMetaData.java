@@ -174,8 +174,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
             distanceObs = p.rad;
             if (observatory.equals("SOHO")) {
-                //L1 point is approx 1% closer to the Sun
-                distanceObs *= 0.99;
+                distanceObs *= Sun.L1Factor;
             }
         }
 
