@@ -56,14 +56,13 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
     private static final int ICON_WIDTH = 16;
     private static final int TITLE_WIDTH = 140;
 
-    private static final int VISIBLEROW = 0;
+    private static final int VISIBLE_COL = 0;
+    private static final int TITLE_COL = 1;
+    public static final int TIME_COL = 2;
+    private static final int REMOVE_COL = 3;
 
-    private static final int TITLEROW = 1;
-    public static final int TIMEROW = 2;
-    private static final int REMOVEROW = 3;
-    public static final int NUMBEROFCOLUMNS = 4;
-
-    public static final int NUMBEROFVISIBLEROWS = 7;
+    public static final int NUMBER_COLUMNS = 4;
+    private static final int NUMBEROFVISIBLEROWS = 7;
 
     private final Action addLayerAction = new AbstractAction() {
         /**
@@ -118,7 +117,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid = new JTable(renderableContainer) {
                     @Override
                     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex == TIMEROW || columnIndex == REMOVEROW)
+                        if (columnIndex == TIME_COL || columnIndex == REMOVE_COL ||
+                           (columnIndex == TITLE_COL && !(grid.getValueAt(rowIndex, 0) instanceof RenderableImageLayer)))
                             super.changeSelection(rowIndex, columnIndex, toggle, extend);
                         // otherwise prevent changing selection
                     }
@@ -172,19 +172,19 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
 
-        grid.getColumnModel().getColumn(VISIBLEROW).setCellRenderer(new RenderableVisibleCellRenderer());
-        grid.getColumnModel().getColumn(VISIBLEROW).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(VISIBLEROW).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new RenderableVisibleCellRenderer());
+        grid.getColumnModel().getColumn(VISIBLE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(TITLEROW).setCellRenderer(new RenderableCellRenderer());
-        grid.getColumnModel().getColumn(TITLEROW).setPreferredWidth(TITLE_WIDTH);
-        grid.getColumnModel().getColumn(TITLEROW).setMaxWidth(TITLE_WIDTH);
+        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RenderableCellRenderer());
+        grid.getColumnModel().getColumn(TITLE_COL).setPreferredWidth(TITLE_WIDTH);
+        grid.getColumnModel().getColumn(TITLE_COL).setMaxWidth(TITLE_WIDTH);
 
-        grid.getColumnModel().getColumn(TIMEROW).setCellRenderer(new RenderableTimeCellRenderer());
+        grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RenderableTimeCellRenderer());
 
-        grid.getColumnModel().getColumn(REMOVEROW).setCellRenderer(new RenderableRemoveCellRenderer());
-        grid.getColumnModel().getColumn(REMOVEROW).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(REMOVEROW).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer());
+        grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -225,18 +225,19 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
             public void mouseClicked(MouseEvent e) {
                 int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
                 int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
-                Renderable renderable = (Renderable) renderableContainer.getValueAt(row, col);
-                if (col == VISIBLEROW) {
+                Renderable renderable = (Renderable) grid.getValueAt(row, col);
+
+                if (col == VISIBLE_COL) {
                     renderable.setVisible(!renderable.isVisible());
                     Displayer.getViewports()[0].computeActive();
                     renderableContainer.fireListeners();
                     Displayer.display();
                     renderableContainer.arrangeMultiView(Displayer.multiview);
                 }
-                if (col == TITLEROW && renderable instanceof RenderableImageLayer) {
+                if (col == TITLE_COL && renderable instanceof RenderableImageLayer) {
                     Layers.setActiveView(((RenderableImageLayer) renderable).getView());
                 }
-                if (col == REMOVEROW && renderable.isDeletable()) {
+                if (col == REMOVE_COL && renderable.isDeletable()) {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
                 }
             }

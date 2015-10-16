@@ -128,7 +128,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public int getColumnCount() {
-        return RenderableContainerPanel.NUMBEROFCOLUMNS;
+        return RenderableContainerPanel.NUMBER_COLUMNS;
     }
 
     @Override
@@ -188,7 +188,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         if (idx < 0 || idx >= this.renderables.size())
             return;
         for (TableModelListener listener : this.listeners) {
-            TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIMEROW, TableModelEvent.UPDATE);
+            TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIME_COL, TableModelEvent.UPDATE);
             listener.tableChanged(e);
         }
     }
@@ -254,4 +254,5 @@ public class RenderableContainer implements TableModel, Reorderable {
         Displayer.getViewport().getCamera().updateCameraWidthAspect(Displayer.getGLWidth() / (double) Displayer.getGLHeight());
         Displayer.render();
     }
+
 }
