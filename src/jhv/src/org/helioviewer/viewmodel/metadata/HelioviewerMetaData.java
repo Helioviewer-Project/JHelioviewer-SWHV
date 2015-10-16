@@ -53,11 +53,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     }
 
+    // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
             cutOffValue = (float) this.getPhysicalUpperLeft().y;
             double maskRotation = 2 * Math.toRadians(m.tryGetDouble("CROTA")) / MathUtils.radeg;
-            cutOffDirection = new GL3DVec3d(Math.sin(maskRotation), Math.cos(maskRotation), 0);
+            // double magic
+            cutOffDirection = new GL3DVec3d(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }
     }
 
@@ -92,8 +94,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         // magic
         if (detector.equalsIgnoreCase("C3"))
-            innerRadius *= 1.05;
-        // outerRadius *= 0.9625;
+            innerRadius *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI"))
             outerRadius = 1;
     }
