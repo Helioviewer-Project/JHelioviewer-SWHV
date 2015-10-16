@@ -62,7 +62,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void render(GL2 gl, GL3DViewport vp) {
-
         for (Renderable renderable : renderables) {
             renderable.render(gl, vp);
         }
