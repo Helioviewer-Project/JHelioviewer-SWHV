@@ -32,15 +32,14 @@ import com.jogamp.opengl.FBObject.Attachment.Type;
 import com.jogamp.opengl.FBObject.TextureAttachment;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.ImageUtil;
-import com.xuggle.mediatool.IMediaWriter;
-import com.xuggle.mediatool.ToolFactory;
-import com.xuggle.xuggler.ICodec;
 
-public class MovieExporter implements FrameListener {
+public class ExportMovie implements FrameListener {
+
+    private static MovieInterface exporter;
 
     private static int w;
     private static int h;
-    private static int fps;
+
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
 
@@ -49,30 +48,22 @@ public class MovieExporter implements FrameListener {
     private static String imagePath;
     private static boolean inited = false;
     private static boolean stopped = false;
-    private static IMediaWriter movieWriter;
 
     private static GL3DViewport vp;
     private static int frameNumber = 0;
 
-    private static final int frameRate = 30;
-
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("MovieExporter"), new ThreadPoolExecutor.DiscardPolicy());
 
-    private static void initMovieWriter(String moviePath, int w, int h) {
-        movieWriter = ToolFactory.makeWriter(moviePath);
-        movieWriter.addVideoStream(0, 0, ICodec.ID.CODEC_ID_MPEG4, w, h);
-    }
-
     public void disposeMovieWriter(boolean keep) {
-        if (movieWriter != null) {
+        if (exporter != null) {
             blockingQueue.poll();
             if (keep) {
-                executor.submit(new CloseWriter(movieWriter, moviePath, keep));
+                executor.submit(new CloseWriter(exporter, moviePath, keep));
             } else {
                 while (blockingQueue.poll() != null) {
                 }
-                Future<?> f = executor.submit(new CloseWriter(movieWriter, moviePath, keep));
+                Future<?> f = executor.submit(new CloseWriter(exporter, moviePath, keep));
                 try {
                     f.get();
                 } catch (InterruptedException e) {
@@ -81,7 +72,7 @@ public class MovieExporter implements FrameListener {
                     e.printStackTrace();
                 }
             }
-            movieWriter = null;
+            exporter = null;
         }
     }
 
@@ -168,7 +159,7 @@ public class MovieExporter implements FrameListener {
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(movieWriter, screenshot, frameNumber));
+                    executor.submit(new FrameConsumer(exporter, screenshot, frameNumber));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -179,9 +170,7 @@ public class MovieExporter implements FrameListener {
         }
     }
 
-    public static void start(int _w, int _h, int _fps, RecordMode _mode) {
-        movieWriter = null; // CloseWriter might have had an exception
-
+    public static void start(int _w, int _h, float fps, RecordMode _mode) {
         int ct = Displayer.countActiveLayers();
         Displayer.setViewport(new GL3DViewport(0, 0, 0, _w / ct, _h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
@@ -194,7 +183,6 @@ public class MovieExporter implements FrameListener {
 
         w = _w;
         h = _h;
-        fps = _fps;
         mode = _mode;
 
         ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), false);
@@ -203,7 +191,8 @@ public class MovieExporter implements FrameListener {
         if (mode == RecordMode.SHOT) {
             Displayer.display();
         } else {
-            initMovieWriter(moviePath, w, h);
+            exporter = new XuggleSimple();
+            exporter.open(moviePath, w, h, fps);
             if (mode == RecordMode.LOOP) {
                 Layers.addFrameListener(instance);
                 Layers.setFrame(0);
@@ -236,23 +225,23 @@ public class MovieExporter implements FrameListener {
             currentFrame = frame;
     }
 
-    private static final MovieExporter instance = new MovieExporter();
+    private static final ExportMovie instance = new ExportMovie();
 
-    private MovieExporter() {
+    private ExportMovie() {
     }
 
-    public static MovieExporter getInstance() {
+    public static ExportMovie getInstance() {
         return instance;
     }
 
     private static class FrameConsumer implements Runnable {
 
-        private final IMediaWriter im;
+        private final MovieInterface movieExporter;
         private final BufferedImage el;
         private final int framenumber;
 
-        public FrameConsumer(IMediaWriter _im, BufferedImage _el, int _framenumber) {
-            im = _im;
+        public FrameConsumer(MovieInterface _movieExporter, BufferedImage _el, int _framenumber) {
+            movieExporter = _movieExporter;
             el = _el;
             framenumber = _framenumber;
         }
@@ -260,7 +249,7 @@ public class MovieExporter implements FrameListener {
         @Override
         public void run() {
             ImageUtil.flipImageVertically(el);
-            im.encodeVideo(0, el, 1000 / fps * framenumber, TimeUnit.MILLISECONDS);
+            movieExporter.encode(el, framenumber);
             // Log.error("EXPORTING " + framenumber);
         }
 
@@ -268,12 +257,12 @@ public class MovieExporter implements FrameListener {
 
     private class CloseWriter implements Runnable {
 
-        private final IMediaWriter im;
+        private final MovieInterface movieExporter;
         private final String moviePath;
         private final boolean keep;
 
-        public CloseWriter(IMediaWriter _im, String _moviePath, boolean _keep) {
-            im = _im;
+        public CloseWriter(MovieInterface _movieExporter, String _moviePath, boolean _keep) {
+            movieExporter = _movieExporter;
             moviePath = _moviePath;
             keep = _keep;
         }
@@ -282,8 +271,8 @@ public class MovieExporter implements FrameListener {
         public void run() {
             // Log.error("CLOSING ");
 
-            if (im != null) {
-                im.close();
+            if (movieExporter != null) {
+                movieExporter.close();
             }
             if (!keep && moviePath != null) {
                 File f = new File(moviePath);
@@ -291,4 +280,5 @@ public class MovieExporter implements FrameListener {
             }
         }
     }
+
 }

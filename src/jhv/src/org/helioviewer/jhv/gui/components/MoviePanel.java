@@ -40,7 +40,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.export.MovieExporter;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ButtonCreator;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -405,10 +405,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 int fps = 30;
                 if (speedUnitComboBox.getSelectedItem().equals(SpeedUnit.FRAMESPERSECOND))
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-                MovieExporter.getInstance().start(size.getSize().width, size.getSize().height, fps, mode);
+                ExportMovie.getInstance().start(size.getSize().width, size.getSize().height, fps, mode);
             } else {
                 setText("REC");
-                MovieExporter.getInstance().stop();
+                ExportMovie.getInstance().stop();
             }
         }
 
