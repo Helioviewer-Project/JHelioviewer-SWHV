@@ -61,6 +61,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double principleAngle = 0;
         double angularWidth = 0;
         double distSun = 1.;
+        double speed = 500;
 
         for (JHVEventParameter param : params) {
             String name = param.getParameterName();
@@ -75,8 +76,13 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             if (name.equals("event_coord2")) {
                 distSun = Double.parseDouble(value);
             }
+            if (name.equals("cme_radiallinvel")) {
+                speed = Double.parseDouble(value);
+            }
         }
-
+        double factor = (Sun.RadiusMeter / 1000) * (1000);
+        double distSunBegin = distSun;
+        distSun += speed * (Layers.getLastUpdatedTimestamp().getTime() - evt.getStartDate().getTime()) / factor;
         double arcResolution = 100;
         double lineResolution = 2;
 
@@ -104,7 +110,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glBegin(GL2.GL_LINE_STRIP);
         for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
+            r = alpha * distSunBegin + (1 - alpha) * (distSun + 5);
             theta = thetaStart;
 
             x = r * Math.cos(theta) * Math.sin(phi);
@@ -133,7 +139,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         for (int i = 0; i <= lineResolution; i++) {
             alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
+            r = alpha * distSunBegin + (1 - alpha) * (distSun + 5);
             theta = principleAngle;
 
             x = r * Math.cos(theta) * Math.sin(phi);
@@ -162,7 +168,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         for (int i = 0; i <= lineResolution / 2; i++) {
             alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
+            r = alpha * distSunBegin + (1 - alpha) * (distSun + 5);
             theta = thetaEnd;
 
             x = r * Math.cos(theta) * Math.sin(phi);
