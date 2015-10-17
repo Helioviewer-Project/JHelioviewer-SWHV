@@ -35,7 +35,7 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 
 public class ExportMovie implements FrameListener {
 
-    private static MovieInterface exporter;
+    private static MovieExporter exporter;
 
     private static int w;
     private static int h;
@@ -236,11 +236,11 @@ public class ExportMovie implements FrameListener {
 
     private static class FrameConsumer implements Runnable {
 
-        private final MovieInterface movieExporter;
+        private final MovieExporter movieExporter;
         private final BufferedImage el;
         private final int framenumber;
 
-        public FrameConsumer(MovieInterface _movieExporter, BufferedImage _el, int _framenumber) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _el, int _framenumber) {
             movieExporter = _movieExporter;
             el = _el;
             framenumber = _framenumber;
@@ -257,11 +257,11 @@ public class ExportMovie implements FrameListener {
 
     private class CloseWriter implements Runnable {
 
-        private final MovieInterface movieExporter;
+        private final MovieExporter movieExporter;
         private final String moviePath;
         private final boolean keep;
 
-        public CloseWriter(MovieInterface _movieExporter, String _moviePath, boolean _keep) {
+        public CloseWriter(MovieExporter _movieExporter, String _moviePath, boolean _keep) {
             movieExporter = _movieExporter;
             moviePath = _moviePath;
             keep = _keep;
