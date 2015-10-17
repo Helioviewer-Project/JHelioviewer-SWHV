@@ -10,7 +10,7 @@ import com.xuggle.xuggler.IStreamCoder;
 import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
 
-public class XuggleSimple implements MovieInterface {
+public class XuggleSimple implements MovieExporter {
 
     private IMediaWriter movieWriter;
     private IConverter converter;

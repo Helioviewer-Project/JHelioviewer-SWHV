@@ -2,7 +2,7 @@ package org.helioviewer.jhv.export;
 
 import java.awt.image.BufferedImage;
 
-public interface MovieInterface {
+public interface MovieExporter {
 
     public void open(String path, int w, int h, float fps);
 
