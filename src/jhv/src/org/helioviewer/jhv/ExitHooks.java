@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.JOptionPane;
 
 import org.helioviewer.base.logging.Log;
-import org.helioviewer.jhv.export.MovieExporter;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -21,7 +21,7 @@ public class ExitHooks {
         @Override
         public void run() {
             try {
-                MovieExporter.getInstance().disposeMovieWriter(false);
+                ExportMovie.getInstance().disposeMovieWriter(false);
             } catch (Exception e) {
                 Log.warn("Movie was not shut down properly");
             }

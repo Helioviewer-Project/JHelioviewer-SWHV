@@ -2,7 +2,7 @@ package org.helioviewer.jhv.gui.components;
 
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.export.MovieExporter;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -65,9 +65,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         GLSLShader.dispose(gl);
     }
 
-    private MovieExporter exporter;
+    private ExportMovie exporter;
 
-    public void attachExport(MovieExporter me) {
+    public void attachExport(ExportMovie me) {
         exporter = me;
     }
 
@@ -104,7 +104,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         if (exporter != null) {
             exporter.handleMovieExport(gl);
         }
+
         renderScene(gl);
+
         GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
