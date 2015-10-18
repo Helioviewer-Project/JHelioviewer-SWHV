@@ -121,6 +121,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     };
 
     private enum RecordSize {
+        H1080 {
+            @Override
+            public String toString() {
+                return "1920x1080";
+            }
+
+            @Override
+            protected Dimension getSize() {
+                return new Dimension(1920, 1080);
+            }
+        },
         H720 {
             @Override
             public String toString() {
@@ -342,9 +353,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         c.gridx = 1;
         recordPanel.add(new JLabel("Size", JLabel.RIGHT), c);
 
-        RecordSize[] sizes = { RecordSize.H720, RecordSize.ORIGINAL };
+        RecordSize[] sizes = { RecordSize.ORIGINAL, RecordSize.H720, RecordSize.H1080 };
         final JComboBox recordSizeCombo = new JComboBox(sizes);
-        recordSizeCombo.setSelectedItem(RecordSize.H720);
+        recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
         c.gridx = 2;
         recordPanel.add(recordSizeCombo, c);
 
@@ -375,7 +386,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
 
         private RecordMode mode = RecordMode.LOOP;
-        private RecordSize size = RecordSize.H720;
+        private RecordSize size = RecordSize.ORIGINAL;
 
         public RecordButton() {
             super("REC", recordIcon);
