@@ -29,8 +29,6 @@ public class XuggleExporter implements MovieExporter {
 
         IPixelFormat.Type pixFmt = IPixelFormat.Type.YUV420P;
         IStreamCoder coder = movieWriter.getContainer().getStream(0).getStreamCoder();
-        coder.setWidth(w);
-        coder.setHeight(h);
         coder.setTimeBase(frameRate);
         coder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, true);
         coder.setGlobalQuality(0);

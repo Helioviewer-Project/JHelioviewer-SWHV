@@ -54,7 +54,7 @@ public class RenderableImageLayer extends AbstractRenderable {
 
         glImage = new GLImage(view.getDefaultLUT());
         glImage.setOpacity(opacity);
-        this.setVisible(true);
+        setVisible(true);
     }
 
     @Override

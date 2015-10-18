@@ -168,18 +168,18 @@ public class ExportMovie implements FrameListener {
     }
 
     public static void start(int _w, int _h, int fps, RecordMode _mode) {
+        w = (_w / 2) * 2; // wiser for video formats
+        h = (_h / 2) * 2;
+        mode = _mode;
+
         int ct = Displayer.countActiveLayers();
-        Displayer.setViewport(new GL3DViewport(0, 0, 0, _w / ct, _h / ct, Displayer.getViewport().getCamera()));
+        Displayer.setViewport(new GL3DViewport(0, 0, 0, w / ct, h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
         currentFrame = 0;
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
         moviePath = prefix + ".mp4";
         imagePath = prefix + ".png";
-
-        w = _w;
-        h = _h;
-        mode = _mode;
 
         ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), false);
         ImageViewerGui.getMainComponent().attachExport(instance);
