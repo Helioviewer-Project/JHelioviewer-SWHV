@@ -355,8 +355,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public void init(GL2 gl) {
-        if (isVisible())
-            ImageViewerGui.getInputController().addPlugin(controller);
+        setVisible(true);
     }
 
     @Override
