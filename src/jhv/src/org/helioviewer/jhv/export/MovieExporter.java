@@ -4,10 +4,10 @@ import java.awt.image.BufferedImage;
 
 public interface MovieExporter {
 
-    public void open(String path, int w, int h, float fps);
+    public void open(String path, int w, int h, int fps) throws Exception;
 
-    public void encode(BufferedImage im);
+    public void encode(BufferedImage im) throws Exception;
 
-    public void close();
+    public void close() throws Exception;
 
 }
