@@ -167,7 +167,7 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    public static void start(int _w, int _h, float fps, RecordMode _mode) {
+    public static void start(int _w, int _h, int fps, RecordMode _mode) {
         int ct = Displayer.countActiveLayers();
         Displayer.setViewport(new GL3DViewport(0, 0, 0, _w / ct, _h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
@@ -187,8 +187,13 @@ public class ExportMovie implements FrameListener {
         if (mode == RecordMode.SHOT) {
             Displayer.display();
         } else {
-            exporter = new XuggleSimple();
-            exporter.open(moviePath, w, h, fps);
+            try {
+                exporter = new XuggleExporter();
+                exporter.open(moviePath, w, h, fps);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             if (mode == RecordMode.LOOP) {
                 Layers.addFrameListener(instance);
                 Layers.setFrame(0);
@@ -241,8 +246,12 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            ImageUtil.flipImageVertically(el);
-            movieExporter.encode(el);
+            try {
+                ImageUtil.flipImageVertically(el);
+                movieExporter.encode(el);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -261,12 +270,16 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            if (movieExporter != null) {
-                movieExporter.close();
-            }
-            if (!keep && moviePath != null) {
-                File f = new File(moviePath);
-                f.delete();
+            try {
+                if (movieExporter != null) {
+                    movieExporter.close();
+                }
+                if (!keep && moviePath != null) {
+                    File f = new File(moviePath);
+                    f.delete();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
