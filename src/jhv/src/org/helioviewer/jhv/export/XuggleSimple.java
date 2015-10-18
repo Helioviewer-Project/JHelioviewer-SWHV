@@ -7,6 +7,7 @@ import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IPixelFormat;
 import com.xuggle.xuggler.IStreamCoder;
+import com.xuggle.xuggler.IVideoPicture;
 import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
 
@@ -15,6 +16,7 @@ public class XuggleSimple implements MovieExporter {
     private IMediaWriter movieWriter;
     private IConverter converter;
     private float fps;
+    private long position = 0;
 
     @Override
     public void open(String path, int w, int h, float _fps) {
@@ -34,8 +36,11 @@ public class XuggleSimple implements MovieExporter {
     }
 
     @Override
-    public void encode(BufferedImage im, int frame) {
-        movieWriter.encodeVideo(0, converter.toPicture(im, (long) (1e6 / fps * frame)));
+    public void encode(BufferedImage im) {
+        IVideoPicture pic = converter.toPicture(im, position);
+        pic.setQuality(0);
+        movieWriter.encodeVideo(0, pic);
+        position += (1e6 / fps);
     }
 
     @Override

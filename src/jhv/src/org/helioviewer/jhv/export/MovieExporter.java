@@ -6,7 +6,7 @@ public interface MovieExporter {
 
     public void open(String path, int w, int h, float fps);
 
-    public void encode(BufferedImage im, int frame);
+    public void encode(BufferedImage im);
 
     public void close();
 

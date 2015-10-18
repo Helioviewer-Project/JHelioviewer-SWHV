@@ -50,7 +50,6 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped = false;
 
     private static GL3DViewport vp;
-    private static int frameNumber = 0;
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("ExportMovie"), new ThreadPoolExecutor.DiscardPolicy());
@@ -134,7 +133,7 @@ public class ExportMovie implements FrameListener {
 
         try {
             dispose(gl);
-            disposeMovieWriter(frameNumber > 0);
+            disposeMovieWriter(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,7 +145,6 @@ public class ExportMovie implements FrameListener {
         }
 
         if (stopped) {
-            // Log.error("CALL expmfin");
             exportMovieFinish(gl);
             return;
         }
@@ -159,11 +157,10 @@ public class ExportMovie implements FrameListener {
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, frameNumber));
+                    executor.submit(new FrameConsumer(exporter, screenshot));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                frameNumber++;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,7 +171,6 @@ public class ExportMovie implements FrameListener {
         int ct = Displayer.countActiveLayers();
         Displayer.setViewport(new GL3DViewport(0, 0, 0, _w / ct, _h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
-        frameNumber = 0;
         currentFrame = 0;
 
         String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date());
@@ -202,7 +198,6 @@ public class ExportMovie implements FrameListener {
     }
 
     public static void stop() {
-        // Log.error("CALL STOP");
         if (!stopped) {
             stopped = true;
 
@@ -238,19 +233,16 @@ public class ExportMovie implements FrameListener {
 
         private final MovieExporter movieExporter;
         private final BufferedImage el;
-        private final int framenumber;
 
-        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _el, int _framenumber) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _el) {
             movieExporter = _movieExporter;
             el = _el;
-            framenumber = _framenumber;
         }
 
         @Override
         public void run() {
             ImageUtil.flipImageVertically(el);
-            movieExporter.encode(el, framenumber);
-            // Log.error("EXPORTING " + framenumber);
+            movieExporter.encode(el);
         }
 
     }
@@ -269,8 +261,6 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
-            // Log.error("CLOSING ");
-
             if (movieExporter != null) {
                 movieExporter.close();
             }
