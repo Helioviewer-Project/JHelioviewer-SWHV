@@ -31,7 +31,7 @@ public class XuggleExporter implements MovieExporter {
         IStreamCoder coder = movieWriter.getContainer().getStream(0).getStreamCoder();
         coder.setWidth(w);
         coder.setHeight(h);
-        coder.setFrameRate(frameRate);
+        coder.setTimeBase(frameRate);
         coder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, true);
         coder.setGlobalQuality(0);
         coder.setNumPicturesInGroupOfPictures(fps);
@@ -42,9 +42,10 @@ public class XuggleExporter implements MovieExporter {
 
     @Override
     public void encode(BufferedImage im) throws Exception {
-        IVideoPicture pic = converter.toPicture(im, position);
-        pic.setQuality(0);
-        movieWriter.encodeVideo(0, pic);
+        IVideoPicture frame = converter.toPicture(im, position);
+        frame.setQuality(0);
+
+        movieWriter.encodeVideo(0, frame);
         position += deltat;
     }
 

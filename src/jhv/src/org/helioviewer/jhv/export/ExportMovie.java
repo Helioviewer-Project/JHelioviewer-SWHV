@@ -173,7 +173,7 @@ public class ExportMovie implements FrameListener {
         stopped = false;
         currentFrame = 0;
 
-        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + "__" + TimeUtils.filenameDateFormat.format(new Date());
+        String prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.filenameDateFormat.format(new Date());
         moviePath = prefix + ".mp4";
         imagePath = prefix + ".png";
 
