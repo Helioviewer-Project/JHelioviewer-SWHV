@@ -289,7 +289,6 @@ public class Layers {
 
         if (view == activeView) {
             setActiveView(getLayer(determineNewActiveLayer(index)));
-            ImageViewerGui.getRenderableContainer().fireListeners(); // update indication
         }
 
         view.abolish();

@@ -48,13 +48,15 @@ public class RenderableContainer implements TableModel, Reorderable {
     public void removeRenderable(Renderable renderable) {
         renderables.remove(renderable);
         removedRenderables.add(renderable);
-        fireListeners();
+        // fireListeners();
         Displayer.display();
     }
 
     public void prerender(GL2 gl) {
-        removeRenderables(gl);
+        int count = removeRenderables(gl);
         initRenderables(gl);
+        if (count > 0)
+            fireListeners();
 
         for (Renderable renderable : renderables) {
             renderable.prerender(gl);
@@ -83,11 +85,13 @@ public class RenderableContainer implements TableModel, Reorderable {
         newRenderables.clear();
     }
 
-    private void removeRenderables(GL2 gl) {
+    private int removeRenderables(GL2 gl) {
+        int count = removedRenderables.size();
         for (Renderable renderable : removedRenderables) {
             renderable.remove(gl);
         }
         removedRenderables.clear();
+        return count;
     }
 
     private void insertRow(int row, Renderable rowData) {
@@ -117,7 +121,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
         fireListeners();
         arrangeMultiView(Displayer.multiview);
-
     }
 
     @Override
