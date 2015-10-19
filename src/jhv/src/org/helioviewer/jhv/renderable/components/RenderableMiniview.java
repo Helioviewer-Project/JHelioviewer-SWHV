@@ -3,7 +3,6 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Component;
 
 import org.helioviewer.base.math.GL3DMat4d;
-import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
@@ -49,7 +48,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
             gl.glColor4f(0, 1, 0, 0.5f);
             View v = Layers.getActiveView();
             if (v != null) {
-                MetaData m = v.getMetaData(new ImmutableDateTime(0));
+                MetaData m = v.getImageLayer().getImageData().getMetaData();
                 GLHelper.drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
             }
         }
@@ -98,7 +97,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     @Override
     public void activeLayerChanged(View view) {
         if (view != null)
-            miniview.getCamera().zoomToFitMiniview();
+            miniview.getCamera().zoomToFit();
     }
 
     public GL3DViewport getViewport() {
@@ -128,4 +127,5 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     @Override
     public void setVisible(int j) {
     }
+
 }
