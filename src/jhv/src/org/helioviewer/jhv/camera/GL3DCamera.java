@@ -54,22 +54,22 @@ public abstract class GL3DCamera {
     private GL3DInteraction currentInteraction;
 
     public GL3DCamera() {
-        this.cameraTransformation = GL3DMat4d.identity();
-        this.rotation = new GL3DQuatd();
-        this.currentDragRotation = new GL3DQuatd();
-        this.localRotation = new GL3DQuatd();
-        this.translation = new GL3DVec3d();
-        this.fov = INITFOV;
-        this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
-        this.panInteraction = new GL3DPanInteraction(this);
-        this.annotateInteraction = new GL3DAnnotateInteraction(this);
-        this.currentInteraction = this.rotationInteraction;
+        cameraTransformation = GL3DMat4d.identity();
+        rotation = new GL3DQuatd();
+        currentDragRotation = new GL3DQuatd();
+        localRotation = new GL3DQuatd();
+        translation = new GL3DVec3d();
+        fov = INITFOV;
+        rotationInteraction = new GL3DTrackballRotationInteraction(this);
+        panInteraction = new GL3DPanInteraction(this);
+        annotateInteraction = new GL3DAnnotateInteraction(this);
+        currentInteraction = rotationInteraction;
     }
 
     public void reset() {
-        this.translation = new GL3DVec3d(0, 0, this.translation.z);
-        this.currentDragRotation.clear();
-        this.currentInteraction.reset();
+        translation = new GL3DVec3d(0, 0, translation.z);
+        currentDragRotation.clear();
+        currentInteraction.reset();
         zoomToFit();
     }
 
@@ -81,24 +81,24 @@ public abstract class GL3DCamera {
      */
     public void activate(GL3DCamera precedingCamera) {
         if (precedingCamera != null) {
-            this.rotation = precedingCamera.rotation.copy();
-            this.translation = precedingCamera.translation.copy();
-            this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
+            rotation = precedingCamera.rotation.copy();
+            translation = precedingCamera.translation.copy();
+            FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
-            this.updateCameraTransformation();
-            this.updateCameraWidthAspect(precedingCamera.previousAspect);
+            updateCameraTransformation();
+            updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
             if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
-                this.setCurrentInteraction(this.getRotateInteraction());
+                setCurrentInteraction(getRotateInteraction());
             } else if (precedingInteraction.equals(precedingCamera.getPanInteraction())) {
-                this.setCurrentInteraction(this.getPanInteraction());
+                setCurrentInteraction(getPanInteraction());
             } else if (precedingInteraction.equals(precedingCamera.getAnnotateInteraction())) {
-                this.setCurrentInteraction(this.getAnnotateInteraction());
+                setCurrentInteraction(getAnnotateInteraction());
             }
         } else {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
-            this.reset();
+            reset();
         }
     }
 
@@ -127,7 +127,7 @@ public abstract class GL3DCamera {
     }
 
     public double getFOVAngleToDraw() {
-        return this.FOVangleToDraw;
+        return FOVangleToDraw;
     }
 
     public void setPanning(double x, double y) {
@@ -141,31 +141,31 @@ public abstract class GL3DCamera {
     }
 
     public double getZTranslation() {
-        return this.translation.z;
+        return translation.z;
     }
 
     public GL3DVec3d getTranslation() {
-        return this.translation;
+        return translation;
     }
 
     public GL3DQuatd getLocalRotation() {
-        return this.localRotation;
+        return localRotation;
     }
 
     public void resetCurrentDragRotation() {
-        this.currentDragRotation.clear();
+        currentDragRotation.clear();
     }
 
-    public void setLocalRotation(GL3DQuatd localRotation) {
-        this.localRotation = localRotation;
-        this.rotation.clear();
-        this.updateCameraTransformation();
+    public void setLocalRotation(GL3DQuatd _localRotation) {
+        localRotation = _localRotation;
+        rotation.clear();
+        updateCameraTransformation();
     }
 
-    public void rotateCurrentDragRotation(GL3DQuatd currentDragRotation) {
-        this.currentDragRotation.rotate(currentDragRotation);
-        this.rotation.clear();
-        this.updateCameraTransformation();
+    public void rotateCurrentDragRotation(GL3DQuatd _currentDragRotation) {
+        currentDragRotation.rotate(currentDragRotation);
+        rotation.clear();
+        updateCameraTransformation();
     }
 
     // quantization bits per half width camera
@@ -189,7 +189,6 @@ public abstract class GL3DCamera {
         orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
         if (this == Displayer.getViewport().getCamera()) {
-            // Displayer.render();
             ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
         }
     }
@@ -269,7 +268,6 @@ public abstract class GL3DCamera {
     public double getRadiusFromSphereAlt(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
-
         return Math.sqrt(up1x * up1x + up1y * up1y);
     }
 
@@ -289,7 +287,6 @@ public abstract class GL3DCamera {
     public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DQuatd rot) {
         GL3DQuatd cameraDifferenceRotation = rotation.copy();
         cameraDifferenceRotation.rotateWithConjugate(rot);
-
         return cameraDifferenceRotation;
     }
 
@@ -298,9 +295,9 @@ public abstract class GL3DCamera {
      * translation information.
      */
     public void updateCameraTransformation() {
-        this.rotation = this.currentDragRotation.copy();
-        this.rotation.rotate(this.localRotation);
-        cameraTransformation = this.rotation.toMatrix().translate(this.translation);
+        rotation = currentDragRotation.copy();
+        rotation.rotate(localRotation);
+        cameraTransformation = rotation.toMatrix().translate(translation);
     }
 
     public double getCameraFOV() {
@@ -323,8 +320,8 @@ public abstract class GL3DCamera {
         return getName();
     }
 
-    public void setTrackingMode(boolean trackingMode) {
-        this.trackingMode = trackingMode;
+    public void setTrackingMode(boolean _trackingMode) {
+        trackingMode = trackingMode;
     }
 
     public boolean getTrackingMode() {
@@ -343,27 +340,27 @@ public abstract class GL3DCamera {
     }
 
     public void setFOVangleDegrees(double fovAngle) {
-        this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
+        FOVangleToDraw = fovAngle * Math.PI / 180.0;
     }
 
-    public void setCurrentInteraction(GL3DInteraction currentInteraction) {
-        this.currentInteraction = currentInteraction;
+    public void setCurrentInteraction(GL3DInteraction _currentInteraction) {
+        currentInteraction = _currentInteraction;
     }
 
     public GL3DInteraction getCurrentInteraction() {
-        return this.currentInteraction;
+        return currentInteraction;
     }
 
     public GL3DInteraction getPanInteraction() {
-        return this.panInteraction;
+        return panInteraction;
     }
 
     public GL3DInteraction getRotateInteraction() {
-        return this.rotationInteraction;
+        return rotationInteraction;
     }
 
     public GL3DInteraction getAnnotateInteraction() {
-        return this.annotateInteraction;
+        return annotateInteraction;
     }
 
     public abstract String getName();
@@ -376,15 +373,14 @@ public abstract class GL3DCamera {
 
     public void zoomToFit() {
         double size = Layers.getLargestPhysicalSize();
-
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan(- size / 2. / this.getZTranslation()));
+            setCameraFOV(2. * Math.atan(- size / 2. / getZTranslation()));
     }
 
     public GL3DMat4d getRotation() {
-        return this.rotation.toMatrix();
+        return rotation.toMatrix();
     }
 
 }
