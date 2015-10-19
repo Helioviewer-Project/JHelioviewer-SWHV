@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -24,7 +25,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         // GUI events can lead to context destruction and invalidation of GL objects and state
         setSharedAutoDrawable(sharedDrawable);
-        setAutoSwapBufferMode(false);
 
         addGLEventListener(this);
         Displayer.setDisplayComponent(this);
@@ -51,7 +51,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glDepthFunc(GL2.GL_LEQUAL);
 
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gl.glClearColor(0, 0, 0, 0);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         GLSLShader.init(gl);
@@ -85,11 +85,12 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (GL3DViewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                GL3DCamera camera = vp.getCamera();
+                camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                vp.getCamera().applyPerspective(gl);
+                camera.applyPerspective(gl);
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
-                vp.getCamera().getAnnotateInteraction().drawInteractionFeedback(gl);
+                camera.getAnnotateInteraction().drawInteractionFeedback(gl);
             }
         }
     }
@@ -109,13 +110,13 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
-            vp.getCamera().updateRotation(Layers.getLastUpdatedTimestamp(), null);
-            vp.getCamera().updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+            GL3DCamera camera = vp.getCamera();
+            camera.updateRotation(Layers.getLastUpdatedTimestamp(), null);
+            camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
             gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-            vp.getCamera().applyPerspective(gl);
+            camera.applyPerspective(gl);
             ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
         }
-
-        drawable.swapBuffers();
     }
+
 }
