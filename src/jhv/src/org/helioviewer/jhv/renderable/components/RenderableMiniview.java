@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
-import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -24,7 +23,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     public RenderableMiniview() {
         Layers.addLayersListener(this);
         optionsPanel = new RenderableMiniviewOptionsPanel();
-        this.setVisible(true);
+        setVisible(true);
     }
 
     @Override
@@ -39,17 +38,11 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         {
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
 
-            gl.glColor4f(0, 0, 0, 1);
+            gl.glColor4f(0, 1, 0, 0.2f);
             GLHelper.drawRectangle(gl, -30, -30, 60, 60);
 
             gl.glColor4f(1, 0, 0, 1);
             GLHelper.drawCircle(gl, 0, 0, 1, 100);
-
-            Region r = Layers.getLargestPhysicalRegion();
-            if (r != null) {
-                gl.glColor4f(0, 1, 0, 0.5f);
-                GLHelper.drawRectangle(gl, r.getLowerLeftCorner().x, r.getLowerLeftCorner().y, r.getWidth(), r.getHeight());
-            }
         }
         gl.glPopMatrix();
         gl.glDepthRange(0, 1);

@@ -8,8 +8,6 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.time.ImmutableDateTime;
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
@@ -513,32 +511,6 @@ public class Layers {
             }
         }
         return size;
-    }
-
-    public static Region getLargestPhysicalRegion() {
-        double newSize, size = 0;
-        GL3DVec2d ll = null, sz = null;
-
-        for (View v : layers) {
-            MetaData m;
-            ImageData d = v.getImageLayer().getImageData();
-            if (d == null) // not yet decoded
-                m = v.getMetaData(new ImmutableDateTime(0));
-            else
-                m = d.getMetaData();
-
-            newSize = m.getPhysicalSize().y;
-            if (newSize > size) {
-                size = newSize;
-                ll = m.getPhysicalLowerLeft();
-                sz = m.getPhysicalSize();
-            }
-        }
-
-        if (ll != null && sz != null)
-            return new Region(ll, sz);
-        else
-            return null;
     }
 
 }
