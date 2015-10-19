@@ -287,8 +287,10 @@ public class Layers {
 
         layers.remove(view);
 
-        if (view == activeView)
+        if (view == activeView) {
             setActiveView(getLayer(determineNewActiveLayer(index)));
+            ImageViewerGui.getRenderableContainer().fireListeners(); // update indication
+        }
 
         view.abolish();
         if (Displayer.multiview) {
