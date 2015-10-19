@@ -101,7 +101,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         instrument = m.get("INSTRUME");
         if (instrument == null)
             return;
-        instrument = instrument.split("_")[0];
+        instrument = instrument.split("_", 2)[0];
 
         detector = m.get("DETECTOR");
         if (detector == null) {
@@ -121,7 +121,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             fullName = "NSO-SOLIS " + measurement;
         } else if (instrument.contains("HMI")) {
             measurement = m.get("CONTENT");
-            fullName = "HMI " + measurement.substring(0, 1) + measurement.substring(1, 3).toLowerCase();
+            String str[] = measurement.split(" ", 2);
+            fullName = "HMI " + str[0].toLowerCase();
         } else if (detector.equals("C2") || detector.equals("C3")) {
             String measurement1 = m.get("FILTER");
             String measurement2 = m.get("POLAR");
@@ -129,7 +130,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             fullName = "LASCO " + detector;
         } else if (instrument.equals("MDI")) {
             measurement = m.get("DPC_OBSR");
-            fullName = "MDI " + measurement.substring(3, 6);
+            fullName = "MDI " + measurement.substring(measurement.indexOf('_') + 1).toLowerCase();
         } else if (detector.equals("COR1") || detector.equals("COR2")) {
             observatory = m.get("OBSRVTRY");
             fullName = observatory + " " + detector;
