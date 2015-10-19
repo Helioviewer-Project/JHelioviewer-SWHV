@@ -9,7 +9,6 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
@@ -52,9 +51,6 @@ public class LoadURITask extends SwingWorker<View, Void> {
                 if (view != null) {
                     RenderableImageLayer renderable = new RenderableImageLayer(view);
                     ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
-                    view.setImageLayer(renderable);
-
-                    Layers.addLayer(view);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
