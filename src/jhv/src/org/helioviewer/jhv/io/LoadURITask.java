@@ -9,21 +9,20 @@ import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.renderable.components.RenderableDummy;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 
 public class LoadURITask extends SwingWorker<View, Void> {
 
-    private final RenderableDummy dummy;
+    private final RenderableImageLayer imageLayer;
     protected final URI uri, downloadURI;
 
     public LoadURITask(URI _uri, URI _downloadURI) {
         uri = _uri;
         downloadURI = _downloadURI;
 
-        dummy = new RenderableDummy(this);
-        ImageViewerGui.getRenderableContainer().addBeforeRenderable(dummy);
+        imageLayer = new RenderableImageLayer(this);
+        ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         Displayer.display(); // ensures the dummy text is displayed
     }
 
@@ -44,17 +43,16 @@ public class LoadURITask extends SwingWorker<View, Void> {
     @Override
     protected void done() {
         if (!isCancelled()) {
-            ImageViewerGui.getRenderableContainer().removeRenderable(dummy);
-
             try {
                 View view = get();
                 if (view != null) {
-                    RenderableImageLayer renderable = new RenderableImageLayer(view);
-                    ImageViewerGui.getRenderableContainer().addBeforeRenderable(renderable);
+                    imageLayer.setView(view);
+                    return;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            ImageViewerGui.getRenderableContainer().removeRenderable(imageLayer);
         }
     }
 

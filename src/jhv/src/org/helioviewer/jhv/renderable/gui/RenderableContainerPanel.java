@@ -241,13 +241,13 @@ public class RenderableContainerPanel extends JPanel {
                     renderableContainer.arrangeMultiView(Displayer.multiview);
                 }
                 if (col == TITLE_COL && renderable instanceof RenderableImageLayer) {
-                    Layers.setActiveView(((RenderableImageLayer) renderable).getView());
+                    ((RenderableImageLayer) renderable).setActiveImageLayer();
                     renderableContainer.fireListeners();
                 }
                 if (col == REMOVE_COL && renderable.isDeletable()) {
                     ((RenderableContainer) grid.getModel()).removeRow(row);
                     int idx = grid.getSelectedRow();
-                    if (row < idx)
+                    if (row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
                 }
             }

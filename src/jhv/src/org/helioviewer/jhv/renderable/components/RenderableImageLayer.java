@@ -1,9 +1,14 @@
 package org.helioviewer.jhv.renderable.components;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+
+import javax.swing.SwingWorker;
 
 import org.helioviewer.base.Pair;
 import org.helioviewer.base.math.GL3DMat4d;
@@ -12,6 +17,7 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -23,6 +29,7 @@ import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableImageLayer extends AbstractRenderable {
 
@@ -33,15 +40,29 @@ public class RenderableImageLayer extends AbstractRenderable {
     private int indexBufferSize;
 
     private int positionBufferSize;
-    private final View view;
+    private View view;
 
-    private final GLImage glImage;
+    private final GLImage glImage = new GLImage();
 
-    public RenderableImageLayer(View _view) {
+    private Font font;
+    private float oldFontSize = -1;
+    private static final double vpScale = 0.04;
+    private TextRenderer textRenderer;
+    private final SwingWorker<?, ?> worker;
+
+    private final String loading = "Loading...";
+
+    public RenderableImageLayer(SwingWorker<?, ?> _worker) {
+        worker = _worker;
+        setVisible(true);
+    }
+
+    public void setView(View _view) {
+        if (view != null)
+            return;
         view = _view;
 
-        float opacity = 1f;
-
+        float opacity = 1;
         if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
             int count = 0;
             for (int i = 0; i < Layers.getNumLayers(); i++) {
@@ -51,10 +72,12 @@ public class RenderableImageLayer extends AbstractRenderable {
             }
             opacity = (float) (1. / (1 + count));
         }
-
-        glImage = new GLImage(view.getDefaultLUT());
         glImage.setOpacity(opacity);
-        setVisible(true);
+        glImage.setLUT(view.getDefaultLUT(), false);
+
+        view.setImageLayer(this);
+        Layers.addLayer(view);
+        ImageViewerGui.getRenderableContainer().fireListeners();
     }
 
     @Override
@@ -84,15 +107,13 @@ public class RenderableImageLayer extends AbstractRenderable {
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        view.setImageLayer(this);
-        Layers.addLayer(view);
     }
 
     @Override
     public void remove(GL2 gl) {
         Layers.removeLayer(view);
         imageData = prevImageData = baseImageData = null;
+        worker.cancel(true);
         dispose(gl);
     }
 
@@ -116,6 +137,7 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
         if (imageData == null) {
+            renderDummy(gl, vp);
             return;
         }
         if (!isVisible[vp.getIndex()])
@@ -170,6 +192,27 @@ public class RenderableImageLayer extends AbstractRenderable {
             gl.glDisable(GL2.GL_CULL_FACE);
         }
         GLSLShader.unbind(gl);
+    }
+
+    public void renderDummy(GL2 gl, GL3DViewport vp) {
+        float fontSize = (int) (vp.getHeight() * vpScale);
+        if (textRenderer == null || fontSize != oldFontSize) {
+            oldFontSize = fontSize;
+            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
+            if (textRenderer != null) {
+                textRenderer.dispose();
+            }
+            textRenderer = new TextRenderer(font, true, true);
+            textRenderer.setUseVertexArrays(true);
+            textRenderer.setSmoothing(false);
+            textRenderer.setColor(Color.WHITE);
+        }
+
+        int delta = (int) (vp.getHeight() * 0.01);
+        textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
+        Rectangle2D rect = textRenderer.getBounds(loading);
+        textRenderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
+        textRenderer.endRendering();
     }
 
     private int generate(GL2 gl) {
@@ -249,16 +292,16 @@ public class RenderableImageLayer extends AbstractRenderable {
         faceIndices.add(beginPositionNumberCorona + 2);
         faceIndices.add(beginPositionNumberCorona + 0);
         faceIndices.add(beginPositionNumberCorona + 3);
+
         FloatBuffer positionBuffer = FloatBuffer.allocate(vertices.size());
         for (Float vert : vertices) {
             if (vert == 0f)
                 vert = Math.nextAfter(vert, vert + 1.0f);
             positionBuffer.put(vert);
-
         }
         positionBuffer.flip();
-        IntBuffer indexBuffer = IntBuffer.allocate(faceIndices.size());
 
+        IntBuffer indexBuffer = IntBuffer.allocate(faceIndices.size());
         for (int i : faceIndices) {
             indexBuffer.put(i);
         }
@@ -322,6 +365,9 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public Component getOptionsPanel() {
+        if (view == null)
+            return null;
+
         FiltersPanel fp = ImageViewerGui.getFiltersPanel();
         fp.setActiveImage(glImage);
         fp.setView(view);
@@ -330,7 +376,7 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return view.getName();
+        return view == null ? loading : view.getName();
     }
 
     @Override
@@ -341,17 +387,19 @@ public class RenderableImageLayer extends AbstractRenderable {
         return imageData.getMetaData().getDateObs().getCachedDate();
     }
 
-    public View getView() {
-        return view;
-    }
-
     @Override
     public boolean isDeletable() {
-        return true;
+        return view == null ? false : true;
     }
 
     @Override
     public void dispose(GL2 gl) {
+        if (textRenderer != null) {
+            textRenderer.dispose();
+            textRenderer = null;
+        }
+        oldFontSize = -1;
+
         disablePositionVBO(gl);
         disableIndexVBO(gl);
         deletePositionVBO(gl);
@@ -361,6 +409,11 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     public boolean isActiveImageLayer() {
         return Layers.getActiveView() == view;
+    }
+
+    public void setActiveImageLayer() {
+        if (view != null)
+            Layers.setActiveView(view);
     }
 
     private ImageData imageData;
@@ -386,7 +439,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         return imageData;
     }
 
-    public GLImage getglImage() {
+    public GLImage getGLImage() {
         return glImage;
     }
 
