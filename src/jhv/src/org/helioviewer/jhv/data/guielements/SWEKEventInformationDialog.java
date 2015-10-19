@@ -111,8 +111,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     public void windowDeactivated(WindowEvent e) {
     }
 
-    private void initDialog(JHVEvent event) {
-        this.event = event;
+    private void initDialog(JHVEvent _event) {
+        event = _event;
         nrOfWindowsOpened = 0;
         eventDescriptionPanel = new EventDescriptionPanel(event);
 
@@ -120,14 +120,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         initParameterCollapsiblePanels();
         setCollapsiblePanels();
 
-        this.setLayout(new GridBagLayout());
-        // this.setUndecorated(true);
-        // this.setMinimumSize(new Dimension(250, 50));
-
-        // this.addWindowFocusListener(this);
-        // this.addFocusListener(this);
-
-        this.setAlwaysOnTop(false);
+        setLayout(new GridBagLayout());
 
         GridBagConstraints eventDescriptionConstraint = new GridBagConstraints();
         eventDescriptionConstraint.gridx = 0;
@@ -146,8 +139,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         allTablePanelConstraint.weightx = 1;
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
-        this.add(new JScrollPane(allTablePanel), allTablePanelConstraint);
-        // this.add(allTablePanel, allTablePanelConstraint);
+        add(new JScrollPane(allTablePanel), allTablePanelConstraint);
     }
 
     /**

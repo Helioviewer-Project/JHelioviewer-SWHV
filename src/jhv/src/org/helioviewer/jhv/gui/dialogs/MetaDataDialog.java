@@ -58,7 +58,7 @@ import org.w3c.dom.NodeList;
  * @author Alen Agheksanterian
  * @author Stephan Pagel
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
     private static class LocalTableModel extends DefaultTableModel {
         public LocalTableModel(Object[][] object, Object[] objects) {
@@ -88,9 +88,8 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      */
     public MetaDataDialog(View view) {
         super(ImageViewerGui.getMainFrame(), "Image Information");
-        setAlwaysOnTop(true);
+
         setLayout(new BorderLayout());
-        setResizable(false);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -121,14 +120,11 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         c.gridy = 2;
         sp.add(new JScrollPane(jhBox), c);
 
-        //JScrollPane listScroller = new JScrollPane(sp);
         add(sp, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.PAGE_END);
 
-        // add action listeners to the buttons
         closeButton.addActionListener(this);
         exportFitsButton.addActionListener(this);
-        // exportButton.addActionListener(this);
 
         setMetaData(view);
     }
@@ -219,17 +215,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         }
     }
 
-    /**
-     * Sets the full document which can be found reading the given MetaDataView.
-     *
-     * @param metaDataView
-     *            Source to read
-     * @see #addDataItem(String)
-     */
     private void setMetaData(View v) {
-        if (v == null)
-            return;
-
         MetaData metaData = v.getImageLayer().getImageData().getMetaData();
         if (!(metaData instanceof HelioviewerMetaData)) {
             metaDataOK = false;
