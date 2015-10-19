@@ -30,6 +30,8 @@ import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.base.time.TimeUtils;
@@ -41,12 +43,11 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class RenderableContainerPanel extends JPanel implements LayersListener {
+public class RenderableContainerPanel extends JPanel {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
@@ -100,11 +101,8 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
     private final JTable grid;
     private final JPanel optionsPanelWrapper;
-    private final RenderableContainer renderableContainer;
 
-    public RenderableContainerPanel(RenderableContainer _renderableContainer) {
-        renderableContainer = _renderableContainer;
-
+    public RenderableContainerPanel(final RenderableContainer renderableContainer) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -128,7 +126,16 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
                     }
                 };
 
-        renderableContainer.addTableModelListener(grid);
+        renderableContainer.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                if (e.getType() == TableModelEvent.INSERT) {
+                    int idx = e.getFirstRow();
+                    if (grid.getValueAt(idx, 0) instanceof RenderableImageLayer)
+                        grid.getSelectionModel().setSelectionInterval(idx, idx);
+                }
+            }
+        });
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -266,7 +273,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
-        Layers.addLayersListener(this);
     }
 
     private void setOptionsPanel(Renderable renderable) {
@@ -284,16 +290,6 @@ public class RenderableContainerPanel extends JPanel implements LayersListener {
         }
         super.revalidate();
         // super.repaint();
-    }
-
-    @Override
-    public void layerAdded(View view) {
-        int idx = renderableContainer.getRowIndex(view.getImageLayer());
-        grid.getSelectionModel().setSelectionInterval(idx, idx);
-    }
-
-    @Override
-    public void activeLayerChanged(View view) {
     }
 
 }
