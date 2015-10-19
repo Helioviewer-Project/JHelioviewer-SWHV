@@ -84,6 +84,16 @@ public class RenderableImageLayer extends AbstractRenderable {
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
         gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexBuffer.capacity() * Buffers.SIZEOF_INT, indexBuffer, GL2.GL_STATIC_DRAW);
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        view.setImageLayer(this);
+        Layers.addLayer(view);
+    }
+
+    @Override
+    public void remove(GL2 gl) {
+        Layers.removeLayer(view);
+        imageData = prevImageData = baseImageData = null;
+        dispose(gl);
     }
 
     @Override
@@ -192,13 +202,6 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     private void deleteIndexVBO(GL2 gl) {
         gl.glDeleteBuffers(1, new int[] { indexBufferID }, 0);
-    }
-
-    @Override
-    public void remove(GL2 gl) {
-        Layers.removeLayer(view);
-        imageData = prevImageData = baseImageData = null;
-        dispose(gl);
     }
 
     private static Pair<FloatBuffer, IntBuffer> makeIcosphere(int level) {
