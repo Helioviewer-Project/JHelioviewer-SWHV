@@ -35,6 +35,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final SWHVHEKImagePanelEventPopupController controller = new SWHVHEKImagePanelEventPopupController();
 
     private static final double LINEWIDTH = 0.5;
+    private static final double LINEWIDTH_CACTUS = 1.01;
+
     private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
@@ -56,11 +58,31 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
+    private void interPolatedDraw(GL2 gl, double mres, double r_start, double r_end, double t_start, double t_end, double phi, double thetaDelta) {
+        gl.glBegin(GL2.GL_LINE_STRIP);
+        for (int i = 0; i <= mres; i++) {
+            double alpha = 1. - i / mres;
+            double r = alpha * r_start + (1 - alpha) * (r_end);
+            double theta = alpha * t_start + (1 - alpha) * (t_end);
+
+            double x = r * Math.cos(theta) * Math.sin(phi);
+            double z = r * Math.cos(theta) * Math.cos(phi);
+            double y = r * Math.sin(theta);
+            double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            double xrot = x;
+
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+        }
+        gl.glEnd();
+    }
+
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
         double principleAngle = 0;
         double angularWidth = 0;
-        double distSun = 2.;
+        double distSun = 2.4;
+        double speed = 500;
 
         for (JHVEventParameter param : params) {
             String name = param.getParameterName();
@@ -72,15 +94,23 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             if (name.equals("event_coord1")) {
                 principleAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
             }
-
+            if (name.equals("event_coord2")) {
+                distSun = Double.parseDouble(value);
+            }
+            if (name.equals("cme_radiallinvel")) {
+                speed = Double.parseDouble(value);
+            }
         }
-        double arcResolution = 100;
-        double lineResolution = 2;
+        double factor = (Sun.RadiusMeter / 1000) * (1000);
+        double distSunBegin = distSun;
+        distSun += speed * (Layers.getLastUpdatedTimestamp().getTime() - evt.getStartDate().getTime()) / factor;
+        int arcResolution = 50;
+        int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Position.Latitudinal p = Sun.getEarth(date);
 
-        double thetaDelta = p.lat;
+        double thetaDelta = -p.lat;
         double thetaStart = principleAngle - angularWidth / 2.;
         double thetaEnd = principleAngle + angularWidth / 2.;
 
@@ -90,88 +120,79 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (color == null) {
             color = evt.getColor();
         }
+
+        gl.glColor3f(0f, 0f, 0f);
+        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
+
+        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principleAngle, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, principleAngle, thetaEnd, phi, thetaDelta);
+
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principleAngle, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, principleAngle, thetaEnd, phi, thetaDelta);
 
-        double r, alpha, theta;
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, phi, thetaDelta);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principleAngle, principleAngle, phi, thetaDelta);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, phi, thetaDelta);
+
+        double r, theta;
         double x, y, z;
         double xrot, yrot, zrot;
-
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        for (int i = 0; i <= lineResolution / 2; i++) {
-            alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
-            theta = thetaStart;
-
+        String type = evt.getJHVEventType().getEventType();
+        bindTexture(gl, type, evt.getIcon());
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        gl.glColor3f(1, 1, 1);
+        gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double deltatheta = 0.1 / distSun;
+            r = distSun - 0.1;
+            theta = principleAngle - deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
             y = r * Math.sin(theta);
             yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
             zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             xrot = x;
-
+            gl.glTexCoord2f(0f, 0f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-        }
-
-        for (int i = 0; i < (int) (arcResolution / 2); i++) {
-            alpha = 1. - i / arcResolution;
-            theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
-
-            x = distSun * Math.cos(theta) * Math.sin(phi);
-            z = distSun * Math.cos(theta) * Math.cos(phi);
-            y = distSun * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-        }
-
-        for (int i = 0; i <= lineResolution; i++) {
-            alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
-            theta = principleAngle;
-
+            r = distSun - 0.1;
+            theta = principleAngle + deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
             y = r * Math.sin(theta);
             yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
             zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             xrot = x;
-
+            gl.glTexCoord2f(0f, 1f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-        }
-
-        for (int i = (int) (arcResolution / 2); i <= arcResolution; i++) {
-            alpha = 1. - i / arcResolution;
-            theta = alpha * thetaStart + (1 - alpha) * thetaEnd;
-
-            x = distSun * Math.cos(theta) * Math.sin(phi);
-            z = distSun * Math.cos(theta) * Math.cos(phi);
-            y = distSun * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-        }
-
-        for (int i = 0; i <= lineResolution / 2; i++) {
-            alpha = 1. - i / arcResolution;
-            r = alpha * distSun + (1 - alpha) * (distSun + 5);
-            theta = thetaEnd;
-
+            r = distSun + 0.1;
+            theta = principleAngle + deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
             y = r * Math.sin(theta);
             yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
             zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
             xrot = x;
-
+            gl.glTexCoord2f(1f, 1f);
+            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+            r = distSun + 0.1;
+            theta = principleAngle - deltatheta;
+            x = r * Math.cos(theta) * Math.sin(phi);
+            z = r * Math.cos(theta) * Math.cos(phi);
+            y = r * Math.sin(theta);
+            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+            xrot = x;
+            gl.glTexCoord2f(1f, 0f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
         }
         gl.glEnd();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_CULL_FACE);
     }
 
     private void drawPolygon(GL2 gl, JHVEvent evt, Date now) {
