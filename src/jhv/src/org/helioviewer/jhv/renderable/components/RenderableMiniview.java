@@ -2,6 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
+import org.helioviewer.base.Region;
 import org.helioviewer.base.math.GL3DMat4d;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -10,7 +11,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
-import org.helioviewer.viewmodel.metadata.MetaData;
 import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
@@ -45,11 +45,10 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
             gl.glColor4f(1, 0, 0, 1);
             GLHelper.drawCircle(gl, 0, 0, 1, 100);
 
-            gl.glColor4f(0, 1, 0, 0.5f);
-            View v = Layers.getActiveView();
-            if (v != null) {
-                MetaData m = v.getImageLayer().getImageData().getMetaData();
-                GLHelper.drawRectangle(gl, m.getPhysicalLowerLeft().x, m.getPhysicalLowerLeft().y, m.getPhysicalSize().x, m.getPhysicalSize().y);
+            Region r = Layers.getLargestPhysicalRegion();
+            if (r != null) {
+                gl.glColor4f(0, 1, 0, 0.5f);
+                GLHelper.drawRectangle(gl, r.getLowerLeftCorner().x, r.getLowerLeftCorner().y, r.getWidth(), r.getHeight());
             }
         }
         gl.glPopMatrix();
