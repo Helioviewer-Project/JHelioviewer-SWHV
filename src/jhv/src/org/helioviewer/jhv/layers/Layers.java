@@ -13,6 +13,7 @@ import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.View;
 import org.helioviewer.viewmodel.view.View.AnimationMode;
 
@@ -494,12 +495,20 @@ public class Layers {
 
     public static double getLargestPhysicalSize() {
         double sz = 0;
-        for (View layer : layers) {
-            double newsz = layer.getMetaData(new ImmutableDateTime(0)).getPhysicalSize().y;
+        for (View v : layers) {
+            double newsz;
+
+            ImageData imData = v.getImageLayer().getImageData();
+            if (imData == null) // not yet decoded
+                newsz = v.getMetaData(new ImmutableDateTime(0)).getPhysicalSize().y;
+            else
+                newsz = imData.getMetaData().getPhysicalSize().y;
+
             if (newsz > sz) {
                 sz = newsz;
             }
         }
+
         return sz;
     }
 }
