@@ -103,17 +103,17 @@ public class RenderableContainer implements TableModel, Reorderable {
         if (toIndex > renderables.size()) {
             return;
         }
-        Renderable toMove = renderables.get(fromIndex);
-        Renderable moveTo = renderables.get(Math.max(0, toIndex - 1));
+        Renderable toMove = this.renderables.get(fromIndex);
+        Renderable moveTo = this.renderables.get(Math.max(0, toIndex - 1));
 
         if (!(toMove instanceof RenderableImageLayer) || !(moveTo instanceof RenderableImageLayer)) {
             return;
         }
         renderables.remove(fromIndex);
         if (fromIndex < toIndex) {
-            insertRow(toIndex - 1, toMove);
+            this.insertRow(toIndex - 1, toMove);
         } else {
-            insertRow(toIndex, toMove);
+            this.insertRow(toIndex, toMove);
         }
         fireListeners();
         arrangeMultiView(Displayer.multiview);
@@ -122,7 +122,7 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public int getRowCount() {
-        return renderables.size();
+        return this.renderables.size();
     }
 
     @Override
@@ -162,53 +162,54 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public void addTableModelListener(TableModelListener l) {
-        listeners.add(l);
+        this.listeners.add(l);
     }
 
     @Override
     public void removeTableModelListener(TableModelListener l) {
-        listeners.remove(l);
+        this.listeners.remove(l);
     }
 
     public void removeRow(int row) {
-        removeRenderable(renderables.get(row));
+        Renderable el = this.renderables.get(row);
+        this.removeRenderable(el);
     }
 
     public void fireListeners() {
-        for (TableModelListener listener : listeners) {
+        for (TableModelListener listener : this.listeners) {
             TableModelEvent e = new TableModelEvent(this);
             listener.tableChanged(e);
         }
     }
 
     public void fireTimeUpdated(Renderable renderable) {
-        int idx = renderables.indexOf(renderable);
-        if (idx < 0 || idx >= renderables.size())
+        int idx = this.renderables.indexOf(renderable);
+        if (idx < 0 || idx >= this.renderables.size())
             return;
-        for (TableModelListener listener : listeners) {
+        for (TableModelListener listener : this.listeners) {
             TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIME_COL, TableModelEvent.UPDATE);
             listener.tableChanged(e);
         }
     }
 
     public int getRowIndex(Renderable renderable) {
-        return renderables.indexOf(renderable);
+        return this.renderables.indexOf(renderable);
     }
 
     public void init(GL2 gl) {
-        for (Renderable renderable : renderables) {
+        for (Renderable renderable : this.renderables) {
             renderable.init(gl);
         }
     }
 
     public void dispose(GL2 gl) {
-        for (Renderable renderable : renderables) {
+        for (Renderable renderable : this.renderables) {
             renderable.dispose(gl);
         }
     }
 
     public boolean isViewportActive(int idx) {
-        for (Renderable renderable : renderables) {
+        for (Renderable renderable : this.renderables) {
             if (renderable instanceof RenderableImageLayer && renderable.isVisible(idx))
                 return true;
         }
@@ -219,7 +220,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         int ctImages = 0;
 
         if (multiview) {
-            for (Renderable r : renderables) {
+            for (Renderable r : this.renderables) {
                 if (r instanceof RenderableImageLayer && r.isVisible()) {
                     RenderableImageLayer im = (RenderableImageLayer) r;
                     r.setVisible(ctImages);
@@ -228,7 +229,7 @@ public class RenderableContainer implements TableModel, Reorderable {
                 }
             }
         } else {
-            for (Renderable r : renderables) {
+            for (Renderable r : this.renderables) {
                 if (r instanceof RenderableImageLayer && r.isVisible()) {
                     RenderableImageLayer im = (RenderableImageLayer) r;
                     View view = im.getView();
