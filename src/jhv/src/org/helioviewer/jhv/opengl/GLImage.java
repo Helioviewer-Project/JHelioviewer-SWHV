@@ -40,10 +40,6 @@ public class GLImage {
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
 
-    public GLImage(LUT newLUT) {
-        setLUT(newLUT, false);
-    }
-
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (imageData.getUploaded() == false) {

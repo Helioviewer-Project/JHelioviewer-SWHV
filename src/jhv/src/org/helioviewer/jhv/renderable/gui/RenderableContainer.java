@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
-import org.helioviewer.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
@@ -233,7 +232,7 @@ public class RenderableContainer implements TableModel, Reorderable {
                 if (r instanceof RenderableImageLayer && r.isVisible()) {
                     RenderableImageLayer im = (RenderableImageLayer) r;
                     r.setVisible(ctImages);
-                    im.getglImage().setOpacity(1f);
+                    im.getGLImage().setOpacity(1);
                     ctImages++;
                 }
             }
@@ -241,16 +240,15 @@ public class RenderableContainer implements TableModel, Reorderable {
             for (Renderable r : renderables) {
                 if (r instanceof RenderableImageLayer && r.isVisible()) {
                     RenderableImageLayer im = (RenderableImageLayer) r;
-                    View view = im.getView();
                     r.setVisible(0);
                     float opacity;
-                    if (view.getName().contains("LASCO") || view.getName().contains("COR"))
-                        opacity = 1.f;
+                    if (im.getName().contains("LASCO") || im.getName().contains("COR"))
+                        opacity = 1;
                     else {
                         opacity = (float) (1. / (1. + ctImages));
                         ctImages++;
                     }
-                    im.getglImage().setOpacity(opacity);
+                    im.getGLImage().setOpacity(opacity);
                     ctImages++;
                 }
             }
