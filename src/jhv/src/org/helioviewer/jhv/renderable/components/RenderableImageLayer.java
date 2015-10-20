@@ -112,8 +112,11 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public void remove(GL2 gl) {
-        if (view != null)
+        if (view != null) {
+            view.setImageLayer(null);
             Layers.removeLayer(view);
+            view = null;
+        }
         if (worker != null)
             worker.cancel(true);
 
@@ -131,17 +134,18 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        _render(gl, vp, new double[] { 1., 1., 0., 1. });
+        _render(gl, vp, new double[] { 1., 1., 0., 1. }, false);
     }
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
-        _render(gl, vp, new double[] { 0., 0., 0., 0. });
+        _render(gl, vp, new double[] { 0., 0., 0., 0. }, true);
     }
 
-    private void _render(GL2 gl, GL3DViewport vp, double[] depthrange) {
+    private void _render(GL2 gl, GL3DViewport vp, double[] depthrange, boolean isMiniview) {
         if (imageData == null) {
-            renderDummy(gl, vp);
+            if (isMiniview == false)
+                renderDummy(gl, vp);
             return;
         }
         if (!isVisible[vp.getIndex()])
