@@ -70,36 +70,8 @@
                 },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "AR_McIntoshCls",
-                    "parameter_display_name"    : "McIntosh classification",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "AR_MtWilsonCls",
-                    "parameter_display_name"    : "Mount Wilson Classification",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "AR_ZurichCls",
-                    "parameter_display_name"    : "Zurich Classification",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "AR_CompactnessCls",
-                    "parameter_display_name"    : "Compactness Classification",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
-                    "parameter_display_name"    : "NOAA number",
+                    "parameter_display_name"    : "NOAA Number",
                     "filter"                    : null,
                     "default_visible"           : true
                 },
@@ -190,7 +162,7 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Bound_CCNsteps",
-                    "parameter_display_name"    : "CCN steps",
+                    "parameter_display_name"    : "CCN Steps",
                     "filter"                    : null,
                     "default_visible"           : false
                 },
@@ -225,7 +197,7 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "BoundBox_C2LL",
-                    "parameter_display_name"    : "Bound Bo C2LL",
+                    "parameter_display_name"    : "Bound Box C2LL",
                     "filter"                    : null,
                     "default_visible"           : false
                 },
@@ -346,7 +318,34 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_SpotAreaRepr",
-                    "parameter_display_name"    : "Sunspot area",
+                    "parameter_display_name"    : "Sunspot Area",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_McIntoshCls",
+                    "parameter_display_name"    : "McIntosh Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_MtWilsonCls",
+                    "parameter_display_name"    : "Mount Wilson Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_ZurichCls",
+                    "parameter_display_name"    : "Zurich Classification",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_CompactnessCls",
+                    "parameter_display_name"    : "Compactness Classification",
                     "filter"                    : null,
                     "default_visible"           : true
                 }
