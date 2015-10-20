@@ -48,7 +48,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     private float oldFontSize = -1;
     private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
-    private final SwingWorker<?, ?> worker;
+    private SwingWorker<?, ?> worker;
 
     private final String loading = "Loading...";
 
@@ -61,6 +61,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         if (view != null)
             return;
         view = _view;
+        worker = null; // drop reference
 
         float opacity = 1;
         if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
@@ -111,9 +112,12 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public void remove(GL2 gl) {
-        Layers.removeLayer(view);
+        if (view != null)
+            Layers.removeLayer(view);
+        if (worker != null)
+            worker.cancel(true);
+
         imageData = prevImageData = baseImageData = null;
-        worker.cancel(true);
         dispose(gl);
     }
 
@@ -389,7 +393,7 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public boolean isDeletable() {
-        return view == null ? false : true;
+        return true;
     }
 
     @Override
