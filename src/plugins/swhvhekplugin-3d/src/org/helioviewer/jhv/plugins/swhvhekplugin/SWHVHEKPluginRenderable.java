@@ -41,6 +41,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
+    private static double ICON_SIZE = 0.1;
+    private static double ICON_SIZE_HIGHLIGHTED = 0.16;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -145,9 +147,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         bindTexture(gl, type, evt.getIcon());
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
-        double sz = 0.1;
+        double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
-            sz = 0.16;
+            sz = ICON_SIZE_HIGHLIGHTED;
         }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -232,9 +234,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 JHVPoint pt = el.centralPoint();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
-                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.16, 0.16);
+                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
-                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), 0.1, 0.1);
+                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE, ICON_SIZE);
                 }
             }
         }
