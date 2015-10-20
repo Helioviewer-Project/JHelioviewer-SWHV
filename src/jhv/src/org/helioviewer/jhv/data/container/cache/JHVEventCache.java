@@ -379,18 +379,18 @@ public class JHVEventCache {
             if (activeEventTypes.contains(event.getJHVEventType())) {
                 NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> datesPerType = new TreeMap<Date, NavigableMap<Date, List<JHVEvent>>>();
                 NavigableMap<Date, List<JHVEvent>> endDatesPerStartDate = new TreeMap<Date, List<JHVEvent>>();
-                List<JHVEvent> events = new ArrayList<JHVEvent>();
+                List<JHVEvent> eventsToAdd = new ArrayList<JHVEvent>();
                 if (eventsResult.containsKey(event.getJHVEventType().getEventType())) {
                     datesPerType = eventsResult.get(event.getJHVEventType().getEventType());
                     if (datesPerType.containsKey(event.getStartDate())) {
                         endDatesPerStartDate = datesPerType.get(event.getStartDate());
                         if (endDatesPerStartDate.containsKey(event.getEndDate())) {
-                            events = endDatesPerStartDate.get(event.getEndDate());
+                            eventsToAdd = endDatesPerStartDate.get(event.getEndDate());
                         }
                     }
                 }
-                events.add(event);
-                endDatesPerStartDate.put(event.getEndDate(), events);
+                eventsToAdd.add(event);
+                endDatesPerStartDate.put(event.getEndDate(), eventsToAdd);
                 datesPerType.put(event.getStartDate(), endDatesPerStartDate);
                 eventsResult.put(event.getJHVEventType().getEventType(), datesPerType);
             }
@@ -403,7 +403,6 @@ public class JHVEventCache {
 
     public void removeRequestedIntervals(JHVEventType eventType, Interval<Date> interval) {
         downloadedCache.get(eventType).removeRequestedIntervals(interval);
-
     }
 
     public void eventTypeActivated(JHVEventType eventType) {
