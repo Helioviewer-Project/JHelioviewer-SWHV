@@ -20,9 +20,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
-import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -191,9 +189,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
         final Interval<Date> downloadInterval = new Interval<Date>(availableInterval.getStart(), calendar.getTime());
-        final BandType[] bandTypes = BandController.getSingletonInstance().getAllAvailableBandTypes();
 
-        DownloadController.getSingletonInstance().updateBands(bandTypes, downloadInterval, selectedInterval);
+        DownloadController.getSingletonInstance().updateBands(downloadInterval, selectedInterval);
 
         // check if selected interval is in available interval and correct it if
         // needed

@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,17 +23,19 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandController;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandControllerListener;
+import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
+import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVECacheController;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVECacheControllerListener;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.EVEValues;
 import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
+import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
 /**
  * @author Stephan Pagel
  * */
-public class EVEDrawController implements BandControllerListener, TimingListener, EVECacheControllerListener, PlotAreaSpaceListener, ValueSpaceListener {
+public class EVEDrawController implements TimingListener, EVECacheControllerListener, PlotAreaSpaceListener, ValueSpaceListener {
 
     // //////////////////////////////////////////////////////////////////////////////
     // Definitions
@@ -40,7 +43,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private final Map<YAxisElement, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<YAxisElement, Map<Band, EVEValues>>();
     private final DrawController drawController;
-
+    private final Set<BandType> bandTypes;
     private final Map<YAxisElement, EVEDrawableElement> eveDrawableElementMap;
     private final Map<Band, YAxisElement> yAxisElementMap;
     private final Map<YAxisElement, List<Band>> bandsPerYAxis;
@@ -49,6 +52,7 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     private final Timer selectedIntervalChangedTimer;
     private boolean selectedIntervalChanged;
     private boolean keepFullValueRange;
+    private final LineDataSelectorModel selectorModel;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -56,12 +60,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
 
     private EVEDrawController() {
 
-        BandController.getSingletonInstance().addBandControllerListener(this);
         DrawController.getSingletonInstance().addTimingListener(this);
         EVECacheController.getSingletonInstance().addControllerListener(this);
-
+        selectorModel = LineDataSelectorModel.getSingletonInstance();
         drawController = DrawController.getSingletonInstance();
         eveDrawableElementMap = new HashMap<YAxisElement, EVEDrawableElement>();
+        bandTypes = new HashSet<BandType>();
         yAxisElementMap = new HashMap<Band, YAxisElement>();
         bandsPerYAxis = new HashMap<YAxisElement, List<Band>>();
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
@@ -235,17 +239,17 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     // Band Controller Listener
     // //////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void bandAdded(final Band band) {
-        addToMap(band);
+    public void bandAdded(final BandType bandType) {
+        if (!bandTypes.contains(bandType)) {
+            bandTypes.add(bandType);
+            Band band = new Band(bandType);
+            band.setDataColor(BandColors.getNextColor());
+            selectorModel.addLineData(band);
+            DownloadController.getSingletonInstance().updateBand(band, DrawController.getSingletonInstance().getAvailableInterval(), DrawController.getSingletonInstance().getSelectedInterval());
+            addToMap(band);
+        }
     }
 
-    @Override
-    public void bandRemoved(final Band band) {
-        removeFromMap(band);
-    }
-
-    @Override
     public void bandUpdated(final Band band) {
         if (band.isVisible()) {
             addToMap(band);
@@ -254,22 +258,11 @@ public class EVEDrawController implements BandControllerListener, TimingListener
         }
     }
 
-    @Override
-    public void bandGroupChanged() {
-        Interval<Date> interval = drawController.getSelectedInterval();
-        Rectangle plotArea = drawController.getPlotArea();
-
-        final Band[] activeBands = BandController.getSingletonInstance().getBands();
-
-        for (final Band band : activeBands) {
-            YAxisElement yAxisElement = yAxisElementMap.get(band);
-            if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
-                dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
-            }
-            dataMapPerUnitLabel.get(yAxisElement).put(band, retrieveData(band, interval, plotArea));
-        }
-
-        fireRedrawRequest(true);
+    public void bandRemoved(final Band band) {
+        bandTypes.remove(band.getBandType());
+        selectorModel.removeLineData(band);
+        DownloadController.getSingletonInstance().stopDownloads(band);
+        removeFromMap(band);
     }
 
     // //////////////////////////////////////////////////////////////////////////////
@@ -379,6 +372,14 @@ public class EVEDrawController implements BandControllerListener, TimingListener
                 fireRedrawRequest(keepFullValueRange);
             }
         }
+    }
+
+    public Set<Band> getAllBands() {
+        return yAxisElementMap.keySet();
+    }
+
+    public boolean containsBandType(BandType value) {
+        return bandTypes.contains(value);
     }
 
 }

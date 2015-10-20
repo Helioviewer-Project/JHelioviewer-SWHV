@@ -86,11 +86,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
         return isDownloading;
     }
 
-    @Override
-    public boolean isAvailable() {
-        return true;
-    }
-
     public void setDownloading(boolean isDownloading) {
         this.isDownloading = isDownloading;
     }

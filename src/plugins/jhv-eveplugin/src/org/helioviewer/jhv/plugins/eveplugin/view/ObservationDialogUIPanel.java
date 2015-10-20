@@ -21,7 +21,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
-import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandController;
+import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
@@ -97,7 +97,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private void updateGroupValues() {
-        final BandController bandController = BandController.getSingletonInstance();
+        final EVEDrawController eveDrawController = EVEDrawController.getSingletonInstance();
         final DefaultComboBoxModel model = (DefaultComboBoxModel) comboBoxData.getModel();
         final BandGroup selectedGroup = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType[] values = BandTypeAPI.getSingletonInstance().getBandTypes(selectedGroup);
@@ -105,7 +105,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         model.removeAllElements();
 
         for (final BandType value : values) {
-            if (bandController.getBand(value) == null) {
+            if (!eveDrawController.containsBandType(value)) {
                 model.addElement(value);
             }
         }
@@ -152,7 +152,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     }
 
     private boolean updateBandController() {
-        final BandController bandController = BandController.getSingletonInstance();
 
         final BandGroup group = (BandGroup) comboBoxGroup.getSelectedItem();
         final BandType bandType = (BandType) comboBoxData.getSelectedItem();
@@ -178,8 +177,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
          * bandController.removeAllBands(identifier); }
          */
 
-        bandController.selectBandGroup(group);
-        bandController.addBand(bandType);
+        EVEDrawController.getSingletonInstance().bandAdded(bandType);
 
         return true;
     }

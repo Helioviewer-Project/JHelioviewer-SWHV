@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,6 +22,7 @@ import org.helioviewer.base.DownloadStream;
 import org.helioviewer.base.interval.Interval;
 import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVEAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
@@ -51,9 +53,10 @@ public class DownloadController {
         return singletonInstance;
     }
 
-    public void updateBands(final BandType[] bandTypes, final Interval<Date> interval, final Interval<Date> priorityInterval) {
-        for (int i = 0; i < bandTypes.length; ++i) {
-            updateBand(new Band(bandTypes[i]), interval, priorityInterval);
+    public void updateBands(final Interval<Date> interval, final Interval<Date> priorityInterval) {
+        Set<Band> bands = EVEDrawController.getSingletonInstance().getAllBands();
+        for (Band b : bands) {
+            updateBand(b, interval, priorityInterval);
         }
     }
 
