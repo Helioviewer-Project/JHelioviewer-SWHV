@@ -50,7 +50,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     private TextRenderer textRenderer;
     private SwingWorker<?, ?> worker;
 
-    private final String loading = "Loading...";
+    private static final String loading = "Loading...";
 
     public RenderableImageLayer(SwingWorker<?, ?> _worker) {
         worker = _worker;

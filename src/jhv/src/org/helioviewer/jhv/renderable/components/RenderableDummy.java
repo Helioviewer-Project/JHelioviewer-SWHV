@@ -22,7 +22,7 @@ public class RenderableDummy extends AbstractRenderable {
     private TextRenderer textRenderer;
     private final SwingWorker<?, ?> worker;
 
-    private final String name = "Loading...";
+    private static final String name = "Loading...";
 
     public RenderableDummy(SwingWorker<?, ?> _worker) {
         worker = _worker;

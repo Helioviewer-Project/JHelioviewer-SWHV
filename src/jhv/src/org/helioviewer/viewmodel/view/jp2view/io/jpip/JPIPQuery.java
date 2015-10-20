@@ -1,5 +1,6 @@
 package org.helioviewer.viewmodel.view.jp2view.io.jpip;
 
+import java.util.Map.Entry;
 import java.util.Hashtable;
 
 /**
@@ -83,10 +84,10 @@ public class JPIPQuery implements Cloneable {
     /** Returns a String representing this query. */
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        for (String field : fields.keySet()) {
-            buf.append(field);
+        for (Entry<String, String> entry : fields.entrySet()) {
+            buf.append(entry.getKey());
             buf.append("=");
-            buf.append(fields.get(field));
+            buf.append(entry.getValue());
             buf.append("&");
         }
 

@@ -20,7 +20,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
     private static final double vpScale = 0.035;
     private TextRenderer textRenderer;
 
-    private final String name = "Timestamp";
+    private static final String name = "Timestamp";
 
     public RenderableTimeStamp() {
     }

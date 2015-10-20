@@ -38,7 +38,7 @@ public class RenderableGrid extends AbstractRenderable {
     private final float textScale = 0.08f;
 
     private final Component optionsPanel;
-    private final String name = "Grid";
+    private static final String name = "Grid";
 
     public RenderableGrid() {
         optionsPanel = new RenderableGridOptionsPanel(this);
