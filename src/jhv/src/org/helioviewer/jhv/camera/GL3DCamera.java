@@ -253,6 +253,19 @@ public abstract class GL3DCamera {
         return null;
     }
 
+    public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
+        double up1x = computeUpX(viewportCoordinates);
+        double up1y = computeUpY(viewportCoordinates);
+        GL3DVec3d altnormal = currentDragRotation.rotateVector(GL3DVec3d.ZAxis);
+        if (altnormal.z == 0) {
+            return null;
+        }
+        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
+
+        GL3DVec3d hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
+        return localRotation.rotateInverseVector(currentDragRotation.rotateInverseVector(hitPoint));
+    }
+
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
@@ -380,7 +393,7 @@ public abstract class GL3DCamera {
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan(- size / 2. / this.getZTranslation()));
+            setCameraFOV(2. * Math.atan(-size / 2. / this.getZTranslation()));
     }
 
     public GL3DMat4d getRotation() {
