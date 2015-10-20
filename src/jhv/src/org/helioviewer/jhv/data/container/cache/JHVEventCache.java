@@ -106,19 +106,22 @@ public class JHVEventCache {
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
-            for (Date sDate : events.keySet()) {
+            for (Map.Entry<Date, Map<Date, List<JHVEvent>>> entry : events.entrySet()) {
+                Date sDate = entry.getKey();
+                Map<Date, List<JHVEvent>> endDatesEvents = entry.getValue();
+
                 // event starts after interval start but before interval end
                 if (startDate.getTime() - sDate.getTime() <= 0 && endDate.getTime() - sDate.getTime() >= 0) {
-                    for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
+                    for (List<JHVEvent> tempEvent : endDatesEvents.values()) {
                         addEventsToResult(eventsResult, tempEvent);
                     }
                 }
                 // event start before interval start and end after interval
                 // start
-                Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
-                for (Date eDate : endDatesEvents.keySet()) {
+                for (Map.Entry<Date, List<JHVEvent>> entry2: endDatesEvents.entrySet()) {
+                    Date eDate = entry2.getKey();
                     if (startDate.getTime() - sDate.getTime() >= 0 && startDate.getTime() - eDate.getTime() <= 0) {
-                        addEventsToResult(eventsResult, endDatesEvents.get(eDate));
+                        addEventsToResult(eventsResult, entry2.getValue());
                     }
                 }
 
