@@ -612,7 +612,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      *
      * @author Stephan Pagel
      */
-    private class SelectionTableModel extends DefaultTableModel {
+    private static class SelectionTableModel extends DefaultTableModel {
 
         public SelectionTableModel(Object[][] data, String[] columnNames) {
             super(data, columnNames);
@@ -638,7 +638,7 @@ public class JHVCalendar extends JPanel implements ComponentListener {
      * @author Stephan Pagel
      *
      */
-    private class CenterTableCellRenderer extends DefaultTableCellRenderer {
+    private static class CenterTableCellRenderer extends DefaultTableCellRenderer {
 
         public CenterTableCellRenderer() {
             setHorizontalAlignment(CENTER);

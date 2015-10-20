@@ -182,7 +182,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         add(fovPanel, c);
     }
 
-    private class CameraComboboxModel implements ComboBoxModel {
+    private static class CameraComboboxModel implements ComboBoxModel {
         private Object selectedItem;
         private final ArrayList<ListDataListener> listDataListeners = new ArrayList<ListDataListener>();
         private final ArrayList<String> combolist = new ArrayList<String>();

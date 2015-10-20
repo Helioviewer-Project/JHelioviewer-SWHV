@@ -162,6 +162,7 @@ class J2KRender implements Runnable {
             try {
                 parentImageRef.destroyCompositor();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
             e.printStackTrace();
         }
