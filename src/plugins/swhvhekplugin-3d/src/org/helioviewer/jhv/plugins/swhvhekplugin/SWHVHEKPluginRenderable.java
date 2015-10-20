@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
+import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -76,6 +77,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glEnd();
     }
+
+    private final GL3DVec2d[] texcoords = { new GL3DVec2d(0, 0), new GL3DVec2d(0, 1), new GL3DVec2d(1, 1), new GL3DVec2d(1, 0) };
+    private final int texCoordHelpers[][] = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };;
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
@@ -150,47 +154,21 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
-            double deltatheta = sz / distSun;
-            r = distSun - sz;
-            theta = principleAngle - deltatheta;
-            x = r * Math.cos(theta) * Math.sin(phi);
-            z = r * Math.cos(theta) * Math.cos(phi);
-            y = r * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-            gl.glTexCoord2f(0f, 0f);
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun - sz;
-            theta = principleAngle + deltatheta;
-            x = r * Math.cos(theta) * Math.sin(phi);
-            z = r * Math.cos(theta) * Math.cos(phi);
-            y = r * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-            gl.glTexCoord2f(0f, 1f);
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun + sz;
-            theta = principleAngle + deltatheta;
-            x = r * Math.cos(theta) * Math.sin(phi);
-            z = r * Math.cos(theta) * Math.cos(phi);
-            y = r * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-            gl.glTexCoord2f(1f, 1f);
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun + sz;
-            theta = principleAngle - deltatheta;
-            x = r * Math.cos(theta) * Math.sin(phi);
-            z = r * Math.cos(theta) * Math.cos(phi);
-            y = r * Math.sin(theta);
-            yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            xrot = x;
-            gl.glTexCoord2f(1f, 0f);
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+            for (int i = 0; i < texCoordHelpers.length; i++) {
+                int[] el = texCoordHelpers[i];
+                double deltatheta = sz / distSun * (el[1] * 2 - 1);
+                double deltar = sz * (el[0] * 2 - 1);
+                r = distSun + deltar;
+                theta = principleAngle + deltatheta;
+                x = r * Math.cos(theta) * Math.sin(phi);
+                z = r * Math.cos(theta) * Math.cos(phi);
+                y = r * Math.sin(theta);
+                yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
+                zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
+                xrot = x;
+                gl.glTexCoord2f(el[0], el[1]);
+                gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+            }
         }
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
