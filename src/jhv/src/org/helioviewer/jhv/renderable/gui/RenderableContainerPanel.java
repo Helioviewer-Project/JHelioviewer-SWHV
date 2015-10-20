@@ -54,7 +54,7 @@ public class RenderableContainerPanel extends JPanel {
     static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     private static final int ROW_HEIGHT = 20;
-    private static final int ICON_WIDTH = 16;
+    private static final int ICON_WIDTH = 20;
     private static final int TITLE_WIDTH = 140;
 
     private static final int VISIBLE_COL = 0;
@@ -138,8 +138,8 @@ public class RenderableContainerPanel extends JPanel {
         });
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS));
+        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS + 1));
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
