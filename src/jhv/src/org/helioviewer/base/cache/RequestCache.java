@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.helioviewer.base.interval.Interval;
 
 public class RequestCache {
+
     private final Map<Date, Interval<Date>> requestedAndDownloadedCache;
     private final Map<Date, Interval<Date>> requestedCache;
 
@@ -37,13 +38,17 @@ public class RequestCache {
         Interval<Date> previousInterval = null;
         boolean startFound = false;
         boolean endFound = false;
-        for (Date iStartDate : requestedAndDownloadedCache.keySet()) {
+
+        for (Map.Entry<Date, Interval<Date>> entry : requestedAndDownloadedCache.entrySet()) {
+            Date iStartDate = entry.getKey();
+            Interval<Date> rcInterval = entry.getValue();
+
             // define start
             if (!startFound) {
                 if (startDate.before(iStartDate)) {
                     if (previousInterval == null) {
                         startFound = true;
-                        previousInterval = requestedAndDownloadedCache.get(iStartDate);
+                        previousInterval = rcInterval;
                     } else {
                         // There was a previous interval. Check if start lies
                         // within previous interval
@@ -59,7 +64,7 @@ public class RequestCache {
                                     break;
                                 } else {
                                     intervalsToRemove.add(iStartDate);
-                                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
+                                    previousInterval = rcInterval;
                                 }
                             }
                             startFound = true;
@@ -71,11 +76,11 @@ public class RequestCache {
                                 endFound = true;
                                 break;
                             }
-                            previousInterval = requestedAndDownloadedCache.get(iStartDate);
+                            previousInterval = rcInterval;
                         }
                     }
                 } else {
-                    previousInterval = requestedAndDownloadedCache.get(iStartDate);
+                    previousInterval = rcInterval;
                 }
             } else {
                 // define end
@@ -90,7 +95,7 @@ public class RequestCache {
                         break;
                     } else {
                         intervalsToRemove.add(previousInterval.getStart());
-                        previousInterval = requestedAndDownloadedCache.get(iStartDate);
+                        previousInterval = rcInterval;
                         continue;
                     }
                 }
@@ -134,8 +139,11 @@ public class RequestCache {
         List<Interval<Date>> intervalsToAdd = new ArrayList<Interval<Date>>();
         List<Date> intervalsToRemove = new ArrayList<Date>();
         Date start = remInterval.getStart();
-        for (Date isDate : requestedAndDownloadedCache.keySet()) {
-            Interval<Date> rcInterval = requestedAndDownloadedCache.get(isDate);
+
+        for (Map.Entry<Date, Interval<Date>> entry : requestedAndDownloadedCache.entrySet()) {
+            Date isDate = entry.getKey();
+            Interval<Date> rcInterval = entry.getValue();
+
             if (start.before(rcInterval.getStart()) || start.equals(rcInterval.getStart())) {
                 if (remInterval.getEnd().after(rcInterval.getStart())) {
                     intervalsToRemove.add(isDate);
@@ -161,15 +169,14 @@ public class RequestCache {
                     }
                 }
             }
-
         }
+
         for (Date date : intervalsToRemove) {
             requestedAndDownloadedCache.remove(date);
         }
         for (Interval<Date> intToAdd : intervalsToAdd) {
             requestedAndDownloadedCache.put(intToAdd.getStart(), intToAdd);
         }
-
     }
 
     public Collection<Interval<Date>> getAllRequestIntervals() {
@@ -291,6 +298,6 @@ public class RequestCache {
             }
         }
         return missingIntervals;
-
     }
+
 }
