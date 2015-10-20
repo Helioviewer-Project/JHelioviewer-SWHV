@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
 
@@ -160,7 +162,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
-            drawText(new String[] { "CME Speed : " + speed + " km/s", "Principle angle : " + principleAngleDegree, "Angular width : " + angularWidthDegree });
+            drawText(evt);//new String[] { "CME Speed : " + speed + " km/s", "Principle angle : " + principleAngleDegree, "Angular width : " + angularWidthDegree });
         }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -245,6 +247,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 JHVPoint pt = el.centralPoint();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
+                    drawText(evt);
                     this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
                     this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE, ICON_SIZE);
@@ -307,7 +310,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private Font font;
     private float oldFontSize = -1;
 
-    public void drawText(String[] txtList) {
+    public void drawText(JHVEvent evt) {
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
 
@@ -329,7 +332,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
         textRenderer.beginRendering(width, height, true);
-        for (String txt : txtList) {
+        Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
+        for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
+            String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
             textRenderer.draw(txt, pt.x + deltaX, height - pt.y - deltaY);
             deltaY += fontSize * 1.1;
         }
