@@ -119,7 +119,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double factor = (Sun.RadiusMeter / 1000) * (1000);
         double distSunBegin = distSun;
         distSun += speed * (Layers.getLastUpdatedTimestamp().getTime() - evt.getStartDate().getTime()) / factor;
-        int arcResolution = 50;
         int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
@@ -139,14 +138,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glColor3f(0f, 0f, 0f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
 
-        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
-        interPolatedDraw(gl, arcResolution, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
+        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
-        interPolatedDraw(gl, arcResolution, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
+        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
 
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, phi, thetaDelta);
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, phi, thetaDelta);
