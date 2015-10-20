@@ -94,9 +94,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             if (name.equals("event_coord1")) {
                 principleAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
             }
-            if (name.equals("event_coord2")) {
-                distSun = Double.parseDouble(value);
-            }
             if (name.equals("cme_radiallinvel")) {
                 speed = Double.parseDouble(value);
             }
@@ -143,13 +140,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         String type = evt.getJHVEventType().getEventType();
         bindTexture(gl, type, evt.getIcon());
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+
+        double sz = 0.1;
+        if (evt.isHighlighted()) {
+            sz = 0.16;
+        }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
-            double deltatheta = 0.1 / distSun;
-            r = distSun - 0.1;
+            double deltatheta = sz / distSun;
+            r = distSun - sz;
             theta = principleAngle - deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
@@ -159,7 +161,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             xrot = x;
             gl.glTexCoord2f(0f, 0f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun - 0.1;
+            r = distSun - sz;
             theta = principleAngle + deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
@@ -169,7 +171,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             xrot = x;
             gl.glTexCoord2f(0f, 1f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun + 0.1;
+            r = distSun + sz;
             theta = principleAngle + deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
@@ -179,7 +181,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             xrot = x;
             gl.glTexCoord2f(1f, 1f);
             gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
-            r = distSun + 0.1;
+            r = distSun + sz;
             theta = principleAngle - deltatheta;
             x = r * Math.cos(theta) * Math.sin(phi);
             z = r * Math.cos(theta) * Math.cos(phi);
