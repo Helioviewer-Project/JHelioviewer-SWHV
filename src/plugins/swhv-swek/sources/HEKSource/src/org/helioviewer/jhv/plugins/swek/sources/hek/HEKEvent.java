@@ -255,14 +255,14 @@ public class HEKEvent extends AbstractJHVEvent {
         if (configured) {
             if (visible) {
                 allVisibleParameters.put(parameter.getParameterName(), parameter);
-                if (parameter.getParameterValue() == null) {
+                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
                     allVisibleNullParameters.put(parameter.getParameterName(), parameter);
                 } else {
                     allVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
                 }
             } else {
                 allNonVisibleParameters.put(parameter.getParameterName(), parameter);
-                if (parameter.getParameterValue() == null) {
+                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
                     allNonVisibleNullParameters.put(parameter.getParameterName(), parameter);
                 } else {
                     allNonVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
