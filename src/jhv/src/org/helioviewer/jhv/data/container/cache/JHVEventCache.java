@@ -24,6 +24,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
 
 public class JHVEventCache {
+
     /** singleton instance of JHVevent cache */
     private static JHVEventCache instance;
 
@@ -124,7 +125,6 @@ public class JHVEventCache {
                         addEventsToResult(eventsResult, entry2.getValue());
                     }
                 }
-
             }
         }
 
@@ -412,4 +412,5 @@ public class JHVEventCache {
             downloadedCache.put(eventType, new RequestCache());
         }
     }
+
 }
