@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,7 +162,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
-            drawText(evt);
         }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -246,7 +246,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 JHVPoint pt = el.centralPoint();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
-                    drawText(evt);
                     this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
                     this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE, ICON_SIZE);
@@ -309,7 +308,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private Font font;
     private float oldFontSize = -1;
 
-    public void drawText(JHVEvent evt) {
+    public void drawText(GL2 gl, JHVEvent evt) {
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
 
@@ -331,9 +330,47 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
         textRenderer.beginRendering(width, height, true);
-        Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
+        Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
+        GL3DVec2d bd = new GL3DVec2d(0, 0);
+        int ct = 0;
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
+            Rectangle2D bound = textRenderer.getBounds(txt);
+            if (bd.x < bound.getWidth())
+                bd.x = bound.getWidth();
+            ct++;
+        }
+        bd.y = fontSize * 1.1 * (ct);
+        // applyCamera
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
+        int leftMargin = 10;
+        int rightMargin = 10;
+        int topMargin = 5;
+        int bottomMargin = 5;
+        float left = pt.x + deltaX - leftMargin;
+        float bottom = pt.y + deltaY - fontSize - topMargin;
+        float w = (float) bd.x + leftMargin + rightMargin;
+        float h = (float) (bd.y + bottomMargin + topMargin);
+        {
+            gl.glBegin(GL2.GL_QUADS);
+
+            gl.glVertex2f(left, height - bottom);
+            gl.glVertex2f(left, height - bottom - h);
+            gl.glVertex2f(left + w, height - bottom - h);
+            gl.glVertex2f(left + w, height - bottom);
+            gl.glEnd();
+
+        }
+        gl.glPopMatrix();
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glColor4f(1, 1, 1, 1);
+
+        for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
+            String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
+
             textRenderer.draw(txt, pt.x + deltaX, height - pt.y - deltaY);
             deltaY += fontSize * 1.1;
         }
@@ -343,6 +380,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
+            JHVEvent highLightedEvent = null;
             ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
@@ -354,6 +392,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     drawIcon(gl, evt, controller.currentTime);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
+                if (evt.isHighlighted()) {
+                    highLightedEvent = evt;
+                }
+            }
+            if (highLightedEvent != null) {
+                drawText(gl, highLightedEvent);
             }
             SWHVHEKSettings.resetCactusColor();
         }
