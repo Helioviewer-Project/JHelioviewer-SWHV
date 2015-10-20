@@ -118,7 +118,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         double factor = (Sun.RadiusMeter / 1000) * (1000);
         double distSunBegin = distSun;
-        distSun += speed * (Layers.getLastUpdatedTimestamp().getTime() - evt.getStartDate().getTime()) / factor;
+        distSun += speed * (controller.currentTime.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
@@ -343,16 +343,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
-            Date currentTime = Layers.getLastUpdatedTimestamp();
-            ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
-            for (JHVEvent evt : toDraw) {
+            for (JHVEvent evt : controller.eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
-                    drawCactusArc(gl, evt, currentTime);
+                    drawCactusArc(gl, evt, controller.currentTime);
                 } else {
-                    drawPolygon(gl, evt, currentTime);
+                    drawPolygon(gl, evt, controller.currentTime);
 
                     gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIcon(gl, evt, currentTime);
+                    drawIcon(gl, evt, controller.currentTime);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
@@ -380,10 +378,13 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     public void setVisible(boolean isVisible) {
         super.setVisible(isVisible);
 
-        if (isVisible)
+        if (isVisible) {
+            controller.timeChanged(Layers.addTimeListener(controller));
             ImageViewerGui.getInputController().addPlugin(controller);
-        else
+        } else {
             ImageViewerGui.getInputController().removePlugin(controller);
+            Layers.removeTimeListener(controller);
+        }
     }
 
     @Override

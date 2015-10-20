@@ -22,7 +22,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
 /**
@@ -37,7 +37,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
  * @author Malte Nuhn
  *
  */
-public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin {
+public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -49,12 +49,18 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
 
-    /**
-     * {@inheritDoc}
-     */
+    public ArrayList<JHVEvent> eventsToDraw;
+    public Date currentTime;
+
     @Override
     public void setComponent(Component _component) {
         component = _component;
+    }
+
+    @Override
+    public void timeChanged(Date date) {
+        currentTime = date;
+        eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
@@ -148,7 +154,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     @Override
     public void mouseMoved(MouseEvent e) {
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-        Date currentDate = Layers.getLastUpdatedTimestamp();
 
         GL3DVec3d hitpoint = null;
         GL3DVec3d hitpointPlane = null;
@@ -159,8 +164,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         hitpoint = getHitPoint(e);
         hitpointPlane = getHitPointPlane(e);
 
-        ArrayList<JHVEvent> toDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentDate);
-        for (JHVEvent evt : toDraw) {
+        for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             if (evt.getName().equals("Coronal Mass Ejection")) {
                 double principalAngle = 0;
@@ -179,7 +183,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                 }
                 double factor = (Sun.RadiusMeter / 1000) * (1000);
 
-                distSun += speed * (Layers.getLastUpdatedTimestamp().getTime() - evt.getStartDate().getTime()) / factor;
+                distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / factor;
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Position.Latitudinal p = Sun.getEarth(date);
@@ -249,4 +253,5 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     private GL3DVec3d getHitPoint(MouseEvent e) {
         return Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
     }
+
 }
