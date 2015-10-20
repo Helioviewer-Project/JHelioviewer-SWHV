@@ -91,7 +91,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final GL3DVec2d[] texcoords = { new GL3DVec2d(0, 0), new GL3DVec2d(0, 1), new GL3DVec2d(1, 1), new GL3DVec2d(1, 0) };
     private final int texCoordHelpers[][] = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };;
 
-    private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
+    private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
         double principalAngle = 0;
         double principalAngleDegree = 0;
@@ -119,7 +119,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         double factor = (Sun.RadiusMeter / 1000) * (1000);
         double distSunBegin = distSun;
-        distSun += speed * (controller.currentTime.getTime() - evt.getStartDate().getTime()) / factor;
+        distSun += speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
@@ -189,7 +189,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_CULL_FACE);
     }
 
-    private void drawPolygon(GL2 gl, JHVEvent evt, Date now) {
+    private void drawPolygon(GL2 gl, JHVEvent evt, Date timestamp) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
@@ -236,7 +236,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawIcon(GL2 gl, JHVEvent evt, Date now) {
+    private void drawIcon(GL2 gl, JHVEvent evt, Date timestamp) {
         String type = evt.getJHVEventType().getEventType();
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
@@ -325,12 +325,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             textRenderer.setColor(Color.WHITE);
         }
 
-        final int deltaX = 45;
-        int deltaY = 45;
-
         Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
+
         textRenderer.beginRendering(width, height, true);
+
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
+
         GL3DVec2d bd = new GL3DVec2d(0, 0);
         int ct = 0;
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
@@ -341,20 +341,19 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             ct++;
         }
         bd.y = fontSize * 1.1 * (ct);
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
+
         int leftMargin = 10;
         int rightMargin = 10;
         int topMargin = 5;
         int bottomMargin = 5;
 
         Point textInit = new Point(pt.x, pt.y);
-        float w = (float) bd.x + leftMargin + rightMargin;
+        float w = (float) (bd.x + leftMargin + rightMargin);
         float h = (float) (bd.y + bottomMargin + topMargin);
 
-        //Correct if out of view
+        int deltaX = 45;
+        int deltaY = 45;
+        // Correct if out of view
         if (w + pt.x + deltaX - leftMargin > width) {
             textInit.x -= (w + pt.x + deltaX - leftMargin - width);
         }
@@ -364,9 +363,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         float left = textInit.x + deltaX - leftMargin;
         float bottom = textInit.y + deltaY - fontSize - topMargin;
 
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.75f);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
         {
             gl.glBegin(GL2.GL_QUADS);
-
             gl.glVertex2f(left, height - bottom);
             gl.glVertex2f(left, height - bottom - h);
             gl.glVertex2f(left + w, height - bottom - h);
@@ -375,15 +377,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         }
         gl.glPopMatrix();
+
         gl.glEnable(GL2.GL_TEXTURE_2D);
         textRenderer.setColor(Color.WHITE);
-
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
             textRenderer.draw(txt, textInit.x + deltaX, height - textInit.y - deltaY);
             deltaY += fontSize * 1.1;
         }
         textRenderer.endRendering();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
     @Override
