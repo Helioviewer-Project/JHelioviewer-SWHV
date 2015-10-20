@@ -341,7 +341,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             ct++;
         }
         bd.y = fontSize * 1.1 * (ct);
-        // applyCamera
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glPushMatrix();
@@ -350,10 +349,21 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         int rightMargin = 10;
         int topMargin = 5;
         int bottomMargin = 5;
-        float left = pt.x + deltaX - leftMargin;
-        float bottom = pt.y + deltaY - fontSize - topMargin;
+
+        Point textInit = new Point(pt.x, pt.y);
         float w = (float) bd.x + leftMargin + rightMargin;
         float h = (float) (bd.y + bottomMargin + topMargin);
+
+        //Correct if out of view
+        if (w + pt.x + deltaX - leftMargin > width) {
+            textInit.x -= (w + pt.x + deltaX - leftMargin - width);
+        }
+        if (h + pt.y + deltaY - fontSize - topMargin > height) {
+            textInit.y -= (h + pt.y + deltaY - fontSize - topMargin - height);
+        }
+        float left = textInit.x + deltaX - leftMargin;
+        float bottom = textInit.y + deltaY - fontSize - topMargin;
+
         {
             gl.glBegin(GL2.GL_QUADS);
 
@@ -366,12 +376,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glPopMatrix();
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glColor4f(1, 1, 1, 1);
+        textRenderer.setColor(Color.WHITE);
 
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-
-            textRenderer.draw(txt, pt.x + deltaX, height - pt.y - deltaY);
+            textRenderer.draw(txt, textInit.x + deltaX, height - textInit.y - deltaY);
             deltaY += fontSize * 1.1;
         }
         textRenderer.endRendering();
