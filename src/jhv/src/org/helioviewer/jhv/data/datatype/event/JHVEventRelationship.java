@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
@@ -16,6 +13,7 @@ import java.util.Map;
  *
  */
 public class JHVEventRelationship {
+
     /** Events following this event */
     private final Map<String, JHVEventRelation> nextEvents;
     /** Events preceding this event */
@@ -92,16 +90,17 @@ public class JHVEventRelationship {
     }
 
     private void mergeTwoLists(Map<String, JHVEventRelation> currentList, Map<String, JHVEventRelation> newList) {
-        for (String identifier : newList.keySet()) {
+        for (Map.Entry<String, JHVEventRelation> entry : newList.entrySet()) {
+            String identifier = entry.getKey();
             if (!currentList.containsKey(identifier)) {
-                JHVEventRelation newRelatedEvent = newList.get(identifier);
+                JHVEventRelation newRelatedEvent = entry.getValue();
                 currentList.put(identifier, newRelatedEvent);
 
                 if (newRelatedEvent.getTheEvent() != null) {
                     newRelatedEvent.getTheEvent().getEventRelationShip().setRelationshipColor(relationshipColor);
                 }
-
             }
         }
     }
+
 }
