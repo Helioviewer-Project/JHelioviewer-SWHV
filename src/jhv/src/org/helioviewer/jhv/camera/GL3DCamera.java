@@ -21,8 +21,8 @@ public abstract class GL3DCamera {
     public static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     public static final double MIN_FOV = INITFOV * 0.02;
     public static final double MAX_FOV = INITFOV * 30;
-    private final double clipNear = Sun.Radius * 3;
-    private final double clipFar = Sun.Radius * 10000;
+    private static final double clipNear = Sun.Radius * 3;
+    private static final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
 
     private double previousAspect = -1.0;

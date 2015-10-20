@@ -26,19 +26,21 @@ import org.json.JSONTokener;
 
 public class GL3DPositionLoading {
 
-    private final String LOADEDSTATE = "Loaded";
-    private final String FAILEDSTATE = "Failed";
-    private final String PARTIALSTATE = "Partial";
+    private static final String LOADEDSTATE = "Loaded";
+    private static final String FAILEDSTATE = "Failed";
+    private static final String PARTIALSTATE = "Partial";
+
+    private static final String baseUrl = "http://swhv.oma.be/position?";
+    private static final String target = "SUN";
+    private String observer = "Earth";
+
+    private String beginDate = "2014-05-28T00:00:00";
+    private String endDate = "2014-05-28T00:00:00";
+    private Date beginDatems = new Date(0);
+    private Date endDatems = new Date();
 
     private boolean isLoaded = false;
     private Position.Latitudinal[] position;
-    private String beginDate = "2014-05-28T00:00:00";
-    private String endDate = "2014-05-28T00:00:00";
-    private final String target = "SUN";
-    private String observer = "Earth";
-    private final String baseUrl = "http://swhv.oma.be/position?";
-    private Date beginDatems = new Date(0);
-    private Date endDatems = new Date();
     private SwingWorker<Void, Void> worker;
     private final GL3DExpertCamera camera;
 
@@ -127,7 +129,7 @@ public class GL3DPositionLoading {
     private void setLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
         if (isLoaded) {
-            this.fireLoaded(this.LOADEDSTATE);
+            this.fireLoaded(LOADEDSTATE);
         }
     }
 
@@ -157,13 +159,13 @@ public class GL3DPositionLoading {
             }
             this.position = positionHelper;
         } catch (JSONException e) {
-            this.fireLoaded(this.PARTIALSTATE);
+            this.fireLoaded(PARTIALSTATE);
             Log.warn("JSON response parse failure", e);
         } catch (ParseException e) {
-            this.fireLoaded(this.PARTIALSTATE);
+            this.fireLoaded(PARTIALSTATE);
             Log.warn("JSON response parse failure", e);
         } catch (NumberFormatException e) {
-            this.fireLoaded(this.PARTIALSTATE);
+            this.fireLoaded(PARTIALSTATE);
             Log.warn("JSON response parse failure", e);
         }
     }
