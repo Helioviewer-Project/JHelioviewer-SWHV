@@ -2,7 +2,9 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,13 +25,16 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
@@ -86,7 +91,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
         double principleAngle = 0;
+        double principleAngleDegree = 0;
         double angularWidth = 0;
+        double angularWidthDegree = 0;
+
         double distSun = 2.4;
         double speed = 500;
 
@@ -95,10 +103,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             String value = param.getParameterValue();
 
             if (name.equals("cme_angularwidth")) {
-                angularWidth = Double.parseDouble(value) * Math.PI / 180.;
+                angularWidthDegree = Double.parseDouble(value);
+                angularWidth = Math.toRadians(angularWidthDegree);
             }
             if (name.equals("event_coord1")) {
-                principleAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
+                principleAngleDegree = Double.parseDouble(value);
+                principleAngle = Math.PI / 2. - Math.toRadians(principleAngleDegree);
             }
             if (name.equals("cme_radiallinvel")) {
                 speed = Double.parseDouble(value);
@@ -150,6 +160,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
+            drawText(new String[] { "CME Speed : " + speed + " km/s", "Principle angle : " + principleAngleDegree, "Angular width : " + angularWidthDegree });
         }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -289,6 +300,40 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_CULL_FACE);
+    }
+
+    private static final double vpScale = 0.019;
+    private TextRenderer textRenderer;
+    private Font font;
+    private float oldFontSize = -1;
+
+    public void drawText(String[] txtList) {
+        int height = Displayer.getGLHeight();
+        int width = Displayer.getGLWidth();
+
+        float fontSize = (int) (height * vpScale);
+        if (textRenderer == null || fontSize != oldFontSize) {
+            oldFontSize = fontSize;
+            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
+            if (textRenderer != null) {
+                textRenderer.dispose();
+            }
+            textRenderer = new TextRenderer(font, true, true);
+            textRenderer.setUseVertexArrays(true);
+            textRenderer.setSmoothing(false);
+            textRenderer.setColor(Color.WHITE);
+        }
+
+        final int deltaX = 45;
+        int deltaY = 45;
+
+        Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
+        textRenderer.beginRendering(width, height, true);
+        for (String txt : txtList) {
+            textRenderer.draw(txt, pt.x + deltaX, height - pt.y - deltaY);
+            deltaY += fontSize * 1.1;
+        }
+        textRenderer.endRendering();
     }
 
     @Override
