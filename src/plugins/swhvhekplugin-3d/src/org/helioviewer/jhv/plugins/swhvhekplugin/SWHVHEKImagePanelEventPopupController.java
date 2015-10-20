@@ -49,7 +49,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
 
-    public ArrayList<JHVEvent> eventsToDraw;
     public Date currentTime;
 
     @Override
@@ -60,7 +59,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     @Override
     public void timeChanged(Date date) {
         currentTime = date;
-        eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
@@ -164,6 +162,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         hitpoint = getHitPoint(e);
         hitpointPlane = getHitPointPlane(e);
 
+        ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             if (evt.getName().equals("Coronal Mass Ejection")) {
@@ -199,6 +198,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                 double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
                 double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
                 double xrot = x;
+
                 GL3DVec3d pt = new GL3DVec3d(xrot, yrot, zrot);
                 if (pt != null) {
                     if (hitpointPlane != null) {
@@ -214,7 +214,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
             }
             else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
-
                 if (pt != null) {
                     if (hitpoint != null) {
                         double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
