@@ -344,8 +344,9 @@ public class Layers {
         layerListeners.remove(layerListener);
     }
 
-    public static void addTimeListener(TimeListener timeListener) {
+    public static Date addTimeListener(TimeListener timeListener) {
         timeListeners.add(timeListener);
+        return lastTimestamp;
     }
 
     public static void removeTimeListener(TimeListener timeListener) {
