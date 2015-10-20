@@ -163,7 +163,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         for (JHVEvent evt : toDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             if (evt.getName().equals("Coronal Mass Ejection")) {
-                double principleAngle = 0;
+                double principalAngle = 0;
                 Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
                 double distSun = 2.4;
                 double speed = 500;
@@ -171,7 +171,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                     String name = param.getParameterName();
                     String value = param.getParameterValue();
                     if (name.equals("event_coord1")) {
-                        principleAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
+                        principalAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
                     }
                     if (name.equals("cme_radiallinvel")) {
                         speed = Double.parseDouble(value);
@@ -188,7 +188,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
                 double phi = -Math.PI / 2. - p.lon;
                 double r = distSun;
-                double theta = principleAngle;
+                double theta = principalAngle;
                 double x = r * Math.cos(theta) * Math.sin(phi);
                 double z = r * Math.cos(theta) * Math.cos(phi);
                 double y = r * Math.sin(theta);

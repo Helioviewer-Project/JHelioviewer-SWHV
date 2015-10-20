@@ -92,8 +92,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date now) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
-        double principleAngle = 0;
-        double principleAngleDegree = 0;
+        double principalAngle = 0;
+        double principalAngleDegree = 0;
         double angularWidth = 0;
         double angularWidthDegree = 0;
 
@@ -109,8 +109,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 angularWidth = Math.toRadians(angularWidthDegree);
             }
             if (name.equals("event_coord1")) {
-                principleAngleDegree = Double.parseDouble(value);
-                principleAngle = Math.PI / 2. - Math.toRadians(principleAngleDegree);
+                principalAngleDegree = Double.parseDouble(value);
+                principalAngle = Math.PI / 2. - Math.toRadians(principalAngleDegree);
             }
             if (name.equals("cme_radiallinvel")) {
                 speed = Double.parseDouble(value);
@@ -126,8 +126,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         Position.Latitudinal p = Sun.getEarth(date);
 
         double thetaDelta = -p.lat;
-        double thetaStart = principleAngle - angularWidth / 2.;
-        double thetaEnd = principleAngle + angularWidth / 2.;
+        double thetaStart = principalAngle - angularWidth / 2.;
+        double thetaEnd = principalAngle + angularWidth / 2.;
 
         double phi = -Math.PI / 2. - p.lon;
 
@@ -139,17 +139,17 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glColor3f(0f, 0f, 0f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
 
-        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principleAngle, phi, thetaDelta);
-        interPolatedDraw(gl, arcResolution, distSun, distSun, principleAngle, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principleAngle, phi, thetaDelta);
-        interPolatedDraw(gl, arcResolution, distSun, distSun, principleAngle, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
+        interPolatedDraw(gl, arcResolution, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
 
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, phi, thetaDelta);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principleAngle, principleAngle, phi, thetaDelta);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, phi, thetaDelta);
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, phi, thetaDelta);
 
         double r, theta;
@@ -162,7 +162,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
-            drawText(evt);//new String[] { "CME Speed : " + speed + " km/s", "Principle angle : " + principleAngleDegree, "Angular width : " + angularWidthDegree });
+            drawText(evt);
         }
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -174,7 +174,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double deltatheta = sz / distSun * (el[1] * 2 - 1);
                 double deltar = sz * (el[0] * 2 - 1);
                 r = distSun + deltar;
-                theta = principleAngle + deltatheta;
+                theta = principalAngle + deltatheta;
                 x = r * Math.cos(theta) * Math.sin(phi);
                 z = r * Math.cos(theta) * Math.cos(phi);
                 y = r * Math.sin(theta);
