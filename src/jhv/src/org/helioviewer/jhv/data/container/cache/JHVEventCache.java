@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.container.cache;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,15 +106,9 @@ public class JHVEventCache {
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
         Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
         if (!activeEventTypes.isEmpty()) {
-            Calendar intervalS = Calendar.getInstance();
-            intervalS.setTime(startDate);
-            Calendar intervalE = Calendar.getInstance();
-            intervalE.setTime(endDate);
             for (Date sDate : events.keySet()) {
-                Calendar tempS = Calendar.getInstance();
-                tempS.setTime(sDate);
                 // event starts after interval start but before interval end
-                if (intervalS.compareTo(tempS) <= 0 && intervalE.compareTo(tempS) >= 0) {
+                if (startDate.getTime() - sDate.getTime() <= 0 && endDate.getTime() - sDate.getTime() >= 0) {
                     for (List<JHVEvent> tempEvent : events.get(sDate).values()) {
                         addEventsToResult(eventsResult, tempEvent);
                     }
@@ -124,9 +117,7 @@ public class JHVEventCache {
                 // start
                 Map<Date, List<JHVEvent>> endDatesEvents = events.get(sDate);
                 for (Date eDate : endDatesEvents.keySet()) {
-                    Calendar tempE = Calendar.getInstance();
-                    tempE.setTime(eDate);
-                    if (intervalS.compareTo(tempS) >= 0 && intervalS.compareTo(tempE) <= 0) {
+                    if (startDate.getTime() - sDate.getTime() >= 0 && startDate.getTime() - eDate.getTime() <= 0) {
                         addEventsToResult(eventsResult, endDatesEvents.get(eDate));
                     }
                 }
