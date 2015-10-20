@@ -84,7 +84,6 @@ public class Band implements LineDataSelectorElement {
         return this.getGraphColor();
     }
 
-    @Override
     public void setDataColor(Color c) {
         this.setGraphColor(c);
     }
@@ -94,7 +93,6 @@ public class Band implements LineDataSelectorElement {
         return DownloadController.getSingletonInstance().isDownloadActive(this);
     }
 
-    @Override
     public String getUnitLabel() {
         return bandType.getUnitLabel();
     }

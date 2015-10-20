@@ -40,17 +40,8 @@ public class EventsSelectorElement implements LineDataSelectorElement {
     }
 
     @Override
-    public void setDataColor(Color c) {
-    }
-
-    @Override
     public boolean isDownloading() {
         return false;
-    }
-
-    @Override
-    public String getUnitLabel() {
-        return "";
     }
 
     @Override

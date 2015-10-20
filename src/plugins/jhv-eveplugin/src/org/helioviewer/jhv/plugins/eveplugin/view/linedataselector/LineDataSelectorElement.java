@@ -15,13 +15,9 @@ public interface LineDataSelectorElement {
 
     public abstract Color getDataColor();
 
-    public abstract void setDataColor(Color c);
-
     public abstract boolean isDownloading();
 
     public abstract boolean hasData();
-
-    public abstract String getUnitLabel();
 
     public abstract Component getOptionsPanel();
 

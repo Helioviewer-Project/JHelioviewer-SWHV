@@ -78,21 +78,12 @@ public class DownloadRequestData implements LineDataSelectorElement {
     }
 
     @Override
-    public void setDataColor(Color c) {
-    }
-
-    @Override
     public boolean isDownloading() {
         return isDownloading;
     }
 
     public void setDownloading(boolean isDownloading) {
         this.isDownloading = isDownloading;
-    }
-
-    @Override
-    public String getUnitLabel() {
-        return "Don't know yet";
     }
 
     /**
