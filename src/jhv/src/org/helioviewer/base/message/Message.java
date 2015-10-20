@@ -46,6 +46,9 @@ public class Message {
      *            the program exits when the value true will be passed.
      */
     public static void err(final String _title, final Object _msg, final boolean _exitImmediately) {
+        if (Thread.currentThread().isInterrupted())
+            return;
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 JOptionPane.showMessageDialog(null, ((_title == null ? "" : _title + "\n") + (_msg == null ? "No error details available." : _msg.toString())), (_exitImmediately ? "Fatal Error!" : "Error!"), JOptionPane.ERROR_MESSAGE);
@@ -64,6 +67,9 @@ public class Message {
      *            the message which has to be displayed.
      */
     public static void warn(final String _title, final Object _msg) {
+        if (Thread.currentThread().isInterrupted())
+            return;
+
         final String msg = _msg.toString();
 
         EventQueue.invokeLater(new Runnable() {
@@ -82,6 +88,9 @@ public class Message {
      *            the message which has to be displayed.
      */
     public static void warnTitle(final String _title, final Object _msg) {
+        if (Thread.currentThread().isInterrupted())
+            return;
+
         final String msg = _msg.toString();
 
         EventQueue.invokeLater(new Runnable() {

@@ -202,7 +202,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         GLSLShader.unbind(gl);
     }
 
-    public void renderDummy(GL2 gl, GL3DViewport vp) {
+    private void renderDummy(GL2 gl, GL3DViewport vp) {
         float fontSize = (int) (vp.getHeight() * vpScale);
         if (textRenderer == null || fontSize != oldFontSize) {
             oldFontSize = fontSize;
