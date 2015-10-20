@@ -218,12 +218,14 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
         }
     }
 
+/*
     private void updateDescriptionTextToDisplay(final Graphics g) {
         descLabel.setText(" ");
         final int contentWidth = list.getSize().width - list.getVerticalScrollBar().getSize().width;
         final int maxDescLabelWidth = contentWidth - buttonPane.getSize().width - descPane.getPreferredSize().width;
         descLabel.setText(reduceTextLength(getDescriptionText(), maxDescLabelWidth, g));
     }
+*/
 
     // Mouse Listener
 

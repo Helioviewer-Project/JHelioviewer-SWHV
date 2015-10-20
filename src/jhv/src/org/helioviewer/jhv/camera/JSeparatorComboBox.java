@@ -127,7 +127,7 @@ public class JSeparatorComboBox extends JComboBox implements KeyListener {
     /**
      * Class to render the JSeparator compenent
      */
-    class SeparatorRenderer extends BasicComboBoxRenderer {
+    private static class SeparatorRenderer extends BasicComboBoxRenderer {
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

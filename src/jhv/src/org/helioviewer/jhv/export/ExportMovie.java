@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 
 import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -49,8 +48,6 @@ public class ExportMovie implements FrameListener {
     private static boolean inited = false;
     private static boolean stopped = false;
 
-    private static GL3DViewport vp;
-
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("ExportMovie"), new ThreadPoolExecutor.DiscardPolicy());
 
@@ -77,7 +74,6 @@ public class ExportMovie implements FrameListener {
 
     private void init(GL2 gl, int w, int h) {
         inited = true;
-        vp = new GL3DViewport(0, 0, 0, w, h, Displayer.getViewport().getCamera(), false);
 
         fbo.init(gl, w, h, 0);
         fboTex = fbo.attachTexture2D(gl, 0, true);
@@ -88,7 +84,6 @@ public class ExportMovie implements FrameListener {
 
     private void dispose(GL2 gl) {
         inited = false;
-        vp = null;
 
         fbo.detachAll(gl);
         fbo.destroy(gl);
@@ -172,8 +167,8 @@ public class ExportMovie implements FrameListener {
         h = (_h / 2) * 2;
         mode = _mode;
 
-        int ct = Displayer.countActiveLayers();
-        Displayer.setViewport(new GL3DViewport(0, 0, 0, w / ct, h / ct, Displayer.getViewport().getCamera()));
+        // int ct = Displayer.countActiveLayers();
+        // Displayer.setViewport(new GL3DViewport(0, 0, 0, w / ct, h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
         currentFrame = 0;
 
@@ -186,6 +181,7 @@ public class ExportMovie implements FrameListener {
 
         if (mode == RecordMode.SHOT) {
             Displayer.display();
+            ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), true);
         } else {
             try {
                 exporter = new XuggleExporter();
@@ -225,15 +221,6 @@ public class ExportMovie implements FrameListener {
             currentFrame = frame;
     }
 
-    private static final ExportMovie instance = new ExportMovie();
-
-    private ExportMovie() {
-    }
-
-    public static ExportMovie getInstance() {
-        return instance;
-    }
-
     private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
@@ -256,7 +243,7 @@ public class ExportMovie implements FrameListener {
 
     }
 
-    private class CloseWriter implements Runnable {
+    private static class CloseWriter implements Runnable {
 
         private final MovieExporter movieExporter;
         private final String moviePath;
@@ -282,6 +269,15 @@ public class ExportMovie implements FrameListener {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static final ExportMovie instance = new ExportMovie();
+
+    private ExportMovie() {
+    }
+
+    public static ExportMovie getInstance() {
+        return instance;
     }
 
 }

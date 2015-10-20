@@ -264,7 +264,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @author Stephan Pagel
      * */
-    private class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
+    private static class TimeSelectionPanel extends JPanel implements JHVCalendarListener, ObservationDialogDateModelListener {
 
         private final TimeTextField textStartTime;
         private final TimeTextField textEndTime;
@@ -432,8 +432,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @author Stephan Pagel
      * */
-    @SuppressWarnings("unused")
-    private class CadencePanel extends JPanel implements ActionListener {
+    private static class CadencePanel extends JPanel implements ActionListener {
 
         private final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 

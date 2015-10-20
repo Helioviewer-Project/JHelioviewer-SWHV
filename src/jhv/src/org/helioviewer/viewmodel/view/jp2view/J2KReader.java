@@ -201,10 +201,6 @@ class J2KReader implements Runnable {
         return query;
     }
 
-    private boolean isConnected() {
-        return (socket != null && socket.isConnected());
-    }
-
     private void signalRender() {
         if (stop)
             return;
