@@ -343,7 +343,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
-            for (JHVEvent evt : controller.eventsToDraw) {
+            ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVEvent evt : eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evt, controller.currentTime);
                 } else {
