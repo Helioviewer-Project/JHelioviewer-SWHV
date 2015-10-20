@@ -65,13 +65,13 @@ public class Band implements LineDataSelectorElement {
 
     @Override
     public void removeLineData() {
-        BandController.getSingletonInstance().removeBand(this);
+        EVEDrawController.getSingletonInstance().bandRemoved(this);
     }
 
     @Override
     public void setVisibility(boolean visible) {
         this.setVisible(visible);
-        BandController.getSingletonInstance().setBandVisibility(bandType, visible);
+        EVEDrawController.getSingletonInstance().bandUpdated(this);
     }
 
     @Override
@@ -92,11 +92,6 @@ public class Band implements LineDataSelectorElement {
     @Override
     public boolean isDownloading() {
         return DownloadController.getSingletonInstance().isDownloadActive(this);
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return BandController.getSingletonInstance().isBandAvailable(this);
     }
 
     @Override

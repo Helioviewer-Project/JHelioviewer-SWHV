@@ -49,11 +49,6 @@ public class EventsSelectorElement implements LineDataSelectorElement {
     }
 
     @Override
-    public boolean isAvailable() {
-        return true;
-    }
-
-    @Override
     public String getUnitLabel() {
         return "";
     }

@@ -19,8 +19,6 @@ public interface LineDataSelectorElement {
 
     public abstract boolean isDownloading();
 
-    public abstract boolean isAvailable();
-
     public abstract boolean hasData();
 
     public abstract String getUnitLabel();
