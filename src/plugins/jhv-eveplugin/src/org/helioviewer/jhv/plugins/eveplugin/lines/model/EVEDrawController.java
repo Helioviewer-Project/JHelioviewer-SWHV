@@ -258,13 +258,12 @@ public class EVEDrawController implements BandControllerListener, TimingListener
     public void bandGroupChanged() {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
-        dataMapPerUnitLabel.clear();
 
         final Band[] activeBands = BandController.getSingletonInstance().getBands();
 
         for (final Band band : activeBands) {
             YAxisElement yAxisElement = yAxisElementMap.get(band);
-            if (!dataMapPerUnitLabel.containsKey(band.getUnitLabel())) {
+            if (!dataMapPerUnitLabel.containsKey(yAxisElement)) {
                 dataMapPerUnitLabel.put(yAxisElement, new HashMap<Band, EVEValues>());
             }
             dataMapPerUnitLabel.get(yAxisElement).put(band, retrieveData(band, interval, plotArea));
