@@ -159,6 +159,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+            highlightedMousePosition = e.getPoint();
 
             if (evt.getName().equals("Coronal Mass Ejection")) {
                 double principalAngle = 0;
@@ -230,12 +231,10 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     protected static Point highlightedMousePosition = new Point(0, 0);
 
     private GL3DVec3d getHitPointPlane(MouseEvent e) {
-        highlightedMousePosition = e.getPoint();
         return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        highlightedMousePosition = e.getPoint();
         return Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
     }
 
