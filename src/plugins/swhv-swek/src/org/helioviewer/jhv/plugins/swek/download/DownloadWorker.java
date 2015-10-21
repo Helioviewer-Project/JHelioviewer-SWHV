@@ -79,26 +79,6 @@ public class DownloadWorker implements Runnable {
     private final Interval<Date> requestInterval;
 
     /**
-     * Default constructor.
-     */
-    public DownloadWorker() {
-        isStopped = false;
-        eventType = null;
-        swekSource = null;
-        supplier = null;
-        requestInterval = new Interval<Date>(new Date(), new Date());
-        eventRequestDate = new Date();
-        downloadStartDate = new Date();
-        downloadEndDate = new Date();
-        sourceManager = SWEKSourceManager.getSingletonInstance();
-        listeners = new ArrayList<DownloadWorkerListener>();
-        isFireForceStoppedCalled = false;
-        eventContainer = JHVEventContainer.getSingletonInstance();
-        params = new ArrayList<SWEKParam>();
-        relatedEvents = new ArrayList<SWEKRelatedEvents>();
-    }
-
-    /**
      * Creates a worker thread to download the events of the given event type
      * from the given source for a given date.
      *
@@ -115,20 +95,7 @@ public class DownloadWorker implements Runnable {
      *
      */
     public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
-        isStopped = false;
-        this.swekSource = swekSource;
-        this.eventType = eventType;
-        this.supplier = supplier;
-        requestInterval = new Interval<Date>(date, date);
-        eventRequestDate = date;
-        downloadStartDate = new Date(getCurrentDate(eventRequestDate).getTime() - this.eventType.getRequestIntervalExtension());
-        downloadEndDate = new Date(getNextDate(eventRequestDate).getTime() + this.eventType.getRequestIntervalExtension());
-        listeners = new ArrayList<DownloadWorkerListener>();
-        sourceManager = SWEKSourceManager.getSingletonInstance();
-        isFireForceStoppedCalled = false;
-        eventContainer = JHVEventContainer.getSingletonInstance();
-        this.params = params;
-        relatedEvents = relatedEventRules;
+        this(eventType, swekSource, supplier, new Interval<Date>(date, date), params, relatedEventRules);
     }
 
     /**
