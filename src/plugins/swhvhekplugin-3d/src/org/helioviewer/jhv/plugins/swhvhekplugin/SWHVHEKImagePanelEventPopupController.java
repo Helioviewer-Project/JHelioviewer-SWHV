@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -154,18 +155,16 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
 
         GL3DVec3d hitpoint = null;
-        GL3DVec3d hitpointPlane = null;
 
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
 
         hitpoint = getHitPoint(e);
-        hitpointPlane = getHitPointPlane(e);
-
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             if (evt.getName().equals("Coronal Mass Ejection")) {
+
                 double principalAngle = 0;
                 Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
                 double distSun = 2.4;
@@ -186,7 +185,8 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Position.Latitudinal p = Sun.getEarth(date);
-
+                GL3DQuatd localRotation = new GL3DQuatd(p.lat, p.lon);
+                GL3DVec3d hitpointPlane = localRotation.rotateInverseVector(getHitPointPlane(e));
                 double thetaDelta = -p.lat;
 
                 double phi = -Math.PI / 2. - p.lon;
