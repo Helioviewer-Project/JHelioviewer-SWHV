@@ -311,6 +311,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
+        SWHVHEKImagePanelEventPopupController.highlightedMousePosition = new Point(0, 0);
 
         textRenderer.beginRendering(width, height, true);
 
