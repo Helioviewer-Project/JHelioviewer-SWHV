@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
 import org.helioviewer.base.math.GL3DMat4d;
+import org.helioviewer.base.math.GL3DQuatd;
 import org.helioviewer.base.math.GL3DVec2d;
 import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -69,27 +70,21 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void interPolatedDraw(GL2 gl, double mres, double r_start, double r_end, double t_start, double t_end, double phi, double thetaDelta) {
+    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, GL3DQuatd q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
-        for (int i = 0; i <= mres; i++) {
-            double alpha = 1. - i / mres;
-            double r = alpha * r_start + (1 - alpha) * (r_end);
-            double theta = alpha * t_start + (1 - alpha) * (t_end);
-
-            double x = r * Math.cos(theta) * Math.sin(phi);
-            double z = r * Math.cos(theta) * Math.cos(phi);
-            double y = r * Math.sin(theta);
-            double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-            double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-            double xrot = x;
-
-            gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+        {
+            for (int i = 0; i <= mres; i++) {
+                double alpha = 1. - i / (double) mres;
+                double r = alpha * r_start + (1 - alpha) * (r_end);
+                double theta = alpha * t_start + (1 - alpha) * (t_end);
+                GL3DVec3d res = q.rotateInverseVector(new GL3DVec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
+                gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
+            }
         }
         gl.glEnd();
     }
 
-    private final GL3DVec2d[] texcoords = { new GL3DVec2d(0, 0), new GL3DVec2d(0, 1), new GL3DVec2d(1, 1), new GL3DVec2d(1, 0) };
-    private final int texCoordHelpers[][] = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };;
+    private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };;
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
         Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
@@ -111,25 +106,23 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             }
             if (name.equals("event_coord1")) {
                 principalAngleDegree = Double.parseDouble(value);
-                principalAngle = Math.PI / 2. - Math.toRadians(principalAngleDegree);
+                principalAngle = Math.toRadians(principalAngleDegree) + Math.PI / 2;
             }
             if (name.equals("cme_radiallinvel")) {
                 speed = Double.parseDouble(value);
             }
         }
-        double factor = (Sun.RadiusMeter / 1000) * (1000);
+        double factor = Sun.RadiusMeter;
         double distSunBegin = distSun;
         distSun += speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Position.Latitudinal p = Sun.getEarth(date);
+        GL3DQuatd q = new GL3DQuatd(p.lat, p.lon);
 
-        double thetaDelta = -p.lat;
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
-
-        double phi = -Math.PI / 2. - p.lon;
 
         Color color = evt.getEventRelationShip().getRelationshipColor();
         if (color == null) {
@@ -138,23 +131,20 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         gl.glColor3f(0f, 0f, 0f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
-
-        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
-        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
+        int angularResolution = (int) (angularWidthDegree / 4);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, thetaStart, principalAngle, phi, thetaDelta);
-        interPolatedDraw(gl, angularWidthDegree / 4, distSun, distSun, principalAngle, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, phi, thetaDelta);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, phi, thetaDelta);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, phi, thetaDelta);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q);
 
-        double r, theta;
-        double x, y, z;
-        double xrot, yrot, zrot;
         String type = evt.getJHVEventType().getEventType();
         bindTexture(gl, type, evt.getIcon());
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
@@ -172,16 +162,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 int[] el = texCoordHelpers[i];
                 double deltatheta = sz / distSun * (el[1] * 2 - 1);
                 double deltar = sz * (el[0] * 2 - 1);
-                r = distSun + deltar;
-                theta = principalAngle + deltatheta;
-                x = r * Math.cos(theta) * Math.sin(phi);
-                z = r * Math.cos(theta) * Math.cos(phi);
-                y = r * Math.sin(theta);
-                yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-                zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-                xrot = x;
+                double r = distSun + deltar;
+                double theta = principalAngle + deltatheta;
+                GL3DVec3d res = q.rotateInverseVector(new GL3DVec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glTexCoord2f(el[0], el[1]);
-                gl.glVertex3f((float) xrot, (float) yrot, (float) zrot);
+                gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
         }
         gl.glEnd();
