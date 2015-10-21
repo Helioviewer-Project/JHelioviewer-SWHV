@@ -269,6 +269,10 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         if (dwMapOnDate != null) {
             dwMapOnDate.remove(worker.getDownloadStartDate());
         }
+        else {
+            Log.warn("Key should exist already");
+            Thread.dumpStack();
+        }
     }
 
     /**
