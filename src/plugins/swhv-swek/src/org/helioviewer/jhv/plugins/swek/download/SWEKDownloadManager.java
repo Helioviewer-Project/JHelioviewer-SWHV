@@ -443,9 +443,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the supplier providing the events
      */
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource source, Date date, SWEKSupplier supplier) {
-        List<SWEKParam> params = defineParameters(eventType, source, supplier);
-        DownloadWorker dw = new DownloadWorker(eventType, source, supplier, date, params, configInstance.getSWEKRelatedEvents());
         if (!inBusyAndFinishedJobs(eventType, supplier, date)) {
+            List<SWEKParam> params = defineParameters(eventType, source, supplier);
+            DownloadWorker dw = new DownloadWorker(eventType, source, supplier, date, params, configInstance.getSWEKRelatedEvents());
             dw.addDownloadWorkerListener(this);
             addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
             addToBusyAndFinishedJobs(eventType, supplier, date);
