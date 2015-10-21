@@ -350,11 +350,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the supplier to producing the event
      */
     private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-        List<Date> allDates = requestManager.getAllRequestedDates();
-
-        for (Date date : allDates) {
-            startDownloadEventType(eventType, swekSource, date, supplier);
-        }
 
         Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
         for (Interval<Date> interval : allIntervals) {
