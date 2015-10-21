@@ -19,8 +19,6 @@ import org.helioviewer.base.logging.Log;
  */
 public class JHVGlobals {
 
-    private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany", "seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
-
     public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
 
     private static String agent = "JHV/SWHV-";
