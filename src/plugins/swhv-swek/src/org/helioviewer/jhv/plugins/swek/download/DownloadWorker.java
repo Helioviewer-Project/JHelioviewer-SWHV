@@ -79,26 +79,6 @@ public class DownloadWorker implements Runnable {
     private final Interval<Date> requestInterval;
 
     /**
-     * Creates a worker thread to download the events of the given event type
-     * from the given source for a given date.
-     *
-     * @param eventType
-     *            the type to download
-     * @param swekSource
-     *            the source from which to download
-     * @param swekSupplier
-     *            the supplier providing the events
-     * @param date
-     *            the date for which to download the events
-     * @param param
-     *            the parameters to use in the downloader
-     *
-     */
-    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Date date, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
-        this(eventType, swekSource, supplier, new Interval<Date>(date, date), params, relatedEventRules);
-    }
-
-    /**
      * Creates a worker thread to download the events of the given event type,
      * from the given source for a given interval.
      *
