@@ -263,7 +263,7 @@ public abstract class GL3DCamera {
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
 
         GL3DVec3d hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
-        return localRotation.rotateInverseVector(currentDragRotation.rotateInverseVector(hitPoint));
+        return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
     public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
