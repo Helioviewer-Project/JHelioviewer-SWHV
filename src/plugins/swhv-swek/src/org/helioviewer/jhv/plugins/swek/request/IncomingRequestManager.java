@@ -16,15 +16,11 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
     /** The listeners */
     private final List<IncomingRequestManagerListener> listeners;
 
-    /** List of requested dates */
-    private final List<Date> dateList;
-
     /**
      * Private constructor.
      */
     private IncomingRequestManager() {
         listeners = new ArrayList<IncomingRequestManagerListener>();
-        dateList = new ArrayList<Date>();
     }
 
     /**
@@ -57,16 +53,6 @@ public class IncomingRequestManager implements JHVEventContainerRequestHandler {
      */
     public void removeRequestManagerListener(IncomingRequestManagerListener l) {
         listeners.remove(l);
-    }
-
-    /**
-     * Gets all the requested dates
-     *
-     * @return the list of all requested dates
-     */
-    public List<Date> getAllRequestedDates() {
-        return dateList;
-
     }
 
     @Override
