@@ -173,13 +173,13 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                     String name = param.getParameterName();
                     String value = param.getParameterValue();
                     if (name.equals("event_coord1")) {
-                        principalAngle = Math.PI / 2. - Double.parseDouble(value) * Math.PI / 180.;
+                        principalAngle = Double.parseDouble(value) * Math.PI / 180. + Math.PI / 2;
                     }
                     if (name.equals("cme_radiallinvel")) {
                         speed = Double.parseDouble(value);
                     }
                 }
-                double factor = (Sun.RadiusMeter / 1000) * (1000);
+                double factor = Sun.RadiusMeter;
 
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / factor;
 
@@ -187,19 +187,10 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                 Position.Latitudinal p = Sun.getEarth(date);
                 GL3DQuatd localRotation = new GL3DQuatd(p.lat, p.lon);
                 GL3DVec3d hitpointPlane = localRotation.rotateInverseVector(getHitPointPlane(e));
-                double thetaDelta = -p.lat;
 
-                double phi = -Math.PI / 2. - p.lon;
-                double r = distSun;
-                double theta = principalAngle;
-                double x = r * Math.cos(theta) * Math.sin(phi);
-                double z = r * Math.cos(theta) * Math.cos(phi);
-                double y = r * Math.sin(theta);
-                double yrot = y * Math.cos(thetaDelta) + z * Math.sin(thetaDelta);
-                double zrot = -y * Math.sin(thetaDelta) + z * Math.cos(thetaDelta);
-                double xrot = x;
+                GL3DQuatd q = new GL3DQuatd(p.lat, p.lon);
+                GL3DVec3d pt = q.rotateInverseVector(new GL3DVec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
 
-                GL3DVec3d pt = new GL3DVec3d(xrot, yrot, zrot);
                 if (pt != null) {
                     if (hitpointPlane != null) {
                         double deltaX = Math.abs(hitpointPlane.x - pt.x);
