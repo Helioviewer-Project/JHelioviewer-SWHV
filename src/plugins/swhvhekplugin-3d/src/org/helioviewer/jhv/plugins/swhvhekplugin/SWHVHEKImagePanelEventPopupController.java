@@ -153,18 +153,14 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     @Override
     public void mouseMoved(MouseEvent e) {
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
-
-        GL3DVec3d hitpoint = null;
-
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
 
-        hitpoint = getHitPoint(e);
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-            if (evt.getName().equals("Coronal Mass Ejection")) {
 
+            if (evt.getName().equals("Coronal Mass Ejection")) {
                 double principalAngle = 0;
                 Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
                 double distSun = 2.4;
@@ -179,9 +175,8 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                         speed = Double.parseDouble(value);
                     }
                 }
-                double factor = Sun.RadiusMeter;
 
-                distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / factor;
+                distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Position.Latitudinal p = Sun.getEarth(date);
@@ -202,18 +197,17 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                         }
                     }
                 }
-            }
-            else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+            } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                GL3DVec3d hitpoint = getHitPoint(e);
                 JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
-                if (pt != null) {
-                    if (hitpoint != null) {
-                        double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
-                        double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
-                        double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
-                        if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                            mouseOverJHVEvent = evt;
-                            mouseOverPosition = new Point(e.getX(), e.getY());
-                        }
+
+                if (pt != null && hitpoint != null) {
+                    double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
+                    double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
+                    double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
+                    if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
+                        mouseOverJHVEvent = evt;
+                        mouseOverPosition = new Point(e.getX(), e.getY());
                     }
                 }
             }
