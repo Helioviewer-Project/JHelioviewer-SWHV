@@ -299,8 +299,10 @@ public class JP2View extends AbstractView {
     public void setFrame(int frame, Date masterTime) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
-            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE)
+            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
+                _jp2Image.signalReader(calculateParameter(_jp2Image, masterTime, frame)); // wake up reader
                 return;
+            }
 
             targetFrame = frame;
             targetMasterTime = masterTime;
