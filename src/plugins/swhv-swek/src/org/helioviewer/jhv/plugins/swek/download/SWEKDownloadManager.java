@@ -362,28 +362,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *
      * @param eventType
      *            the type that should be checked
-     * @param supplier
-     *            the source that provides the event type
-     * @param date
-     *            the date that should be checked
-     * @return true if the combination was found, false if not
-     */
-    private boolean inBusyAndFinishedJobs(SWEKEventType eventType, SWEKSupplier supplier, Date date) {
-        Map<SWEKSupplier, Set<Date>> suppliersAndDatesForEvent = busyAndFinishedJobs.get(eventType);
-        if (suppliersAndDatesForEvent != null) {
-            Set<Date> datesForEventAndSource = suppliersAndDatesForEvent.get(supplier);
-            if (datesForEventAndSource != null) {
-                return datesForEventAndSource.contains(date);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a job is already busy or finished.
-     *
-     * @param eventType
-     *            the type that should be checked
      * @param swekSupplier
      *            the supplier that provides the event type
      * @param interval
@@ -422,29 +400,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             if (datesForEventAndSource != null) {
                 datesForEventAndSource.remove(date);
             }
-        }
-    }
-
-    /**
-     * Starts downloading for one particular source the given event type.
-     *
-     * @param eventType
-     *            The event type to download
-     * @param source
-     *            The source from which to download the event type
-     * @param date
-     *            the date for which to start downloading
-     * @param supplier
-     *            the supplier providing the events
-     */
-    private void startDownloadEventType(SWEKEventType eventType, SWEKSource source, Date date, SWEKSupplier supplier) {
-        if (!inBusyAndFinishedJobs(eventType, supplier, date)) {
-            List<SWEKParam> params = defineParameters(eventType, source, supplier);
-            DownloadWorker dw = new DownloadWorker(eventType, source, supplier, date, params, configInstance.getSWEKRelatedEvents());
-            dw.addDownloadWorkerListener(this);
-            addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
-            addToBusyAndFinishedJobs(eventType, supplier, date);
-            downloadEventPool.execute(dw);
         }
     }
 
