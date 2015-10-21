@@ -39,6 +39,32 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
+        EventRequester eventRequester = EventRequester.getSingletonInstance();
+        DrawController.getSingletonInstance().addTimingListener(eventRequester);
+        eventRequester.addListener(EventModel.getSingletonInstance());
+        DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
+        DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
+        // Create an instance of eveDrawController and leave it here.
+        EVEDrawController.getSingletonInstance();
+        RadioDataManager.getSingletonInstance();
+        RadioPlotModel.getSingletonInstance();
+        // Avoid concurrent modification error.
+        TimeIntervalLockModel.getInstance();
+        pluginPanes.add(plotOne);
+
+        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+        ImageViewerGui.getLeftContentPane().revalidate();
+
+        ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
+
+        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+
+        RadioPlotModel.getSingletonInstance();
+        EventModel.getSingletonInstance().activateEvents();
+
+        Layers.addLayersListener(DrawController.getSingletonInstance());
+        Layers.addTimeListener(DrawController.getSingletonInstance());
         SwingWorker<Void, Void> installPlugin = new SwingWorker<Void, Void>() {
 
             @Override
@@ -50,32 +76,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
             @Override
             public void done() {
-                EventRequester eventRequester = EventRequester.getSingletonInstance();
-                DrawController.getSingletonInstance().addTimingListener(eventRequester);
-                eventRequester.addListener(EventModel.getSingletonInstance());
-                DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
-                DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
-                // Create an instance of eveDrawController and leave it here.
-                EVEDrawController.getSingletonInstance();
-                RadioDataManager.getSingletonInstance();
-                RadioPlotModel.getSingletonInstance();
-                // Avoid concurrent modification error.
-                TimeIntervalLockModel.getInstance();
-                pluginPanes.add(plotOne);
 
-                ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
-                ImageViewerGui.getLeftContentPane().revalidate();
-
-                ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-
-                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
-
-                RadioPlotModel.getSingletonInstance();
-                EventModel.getSingletonInstance().activateEvents();
-
-                Layers.addLayersListener(DrawController.getSingletonInstance());
-                Layers.addTimeListener(DrawController.getSingletonInstance());
             }
         };
         installPlugin.execute();
