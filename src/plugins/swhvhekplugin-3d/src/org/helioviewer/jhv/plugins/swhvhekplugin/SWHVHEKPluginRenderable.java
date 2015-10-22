@@ -27,7 +27,6 @@ import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -182,7 +181,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-        List<JHVPoint> points = el.getBoundCC();
+        List<GL3DVec3d> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
             points = el.getBoundBox();
             if (points == null || points.size() == 0) {
@@ -199,18 +198,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
-        JHVPoint oldBoundaryPoint3d = null;
+        GL3DVec3d oldBoundaryPoint3d = null;
 
-        for (JHVPoint point : points) {
+        for (GL3DVec3d point : points) {
             int divpoints = 10;
 
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
                 for (int j = 0; j <= divpoints; j++) {
                     double alpha = 1. - j / (double) divpoints;
-                    double xnew = alpha * oldBoundaryPoint3d.getCoordinate1() + (1 - alpha) * point.getCoordinate1();
-                    double ynew = alpha * oldBoundaryPoint3d.getCoordinate2() + (1 - alpha) * point.getCoordinate2();
-                    double znew = alpha * oldBoundaryPoint3d.getCoordinate3() + (1 - alpha) * point.getCoordinate3();
+                    double xnew = alpha * oldBoundaryPoint3d.x + (1 - alpha) * point.x;
+                    double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * point.y;
+                    double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * point.z;
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
                 }
@@ -228,12 +227,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
-                JHVPoint pt = el.centralPoint();
+                GL3DVec3d pt = el.centralPoint();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
-                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                    this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
-                    this.drawImage3d(gl, pt.getCoordinate1(), pt.getCoordinate2(), pt.getCoordinate3(), ICON_SIZE, ICON_SIZE);
+                    this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
                 }
             }
         }

@@ -7,9 +7,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.helioviewer.base.astronomy.Position;
 import org.helioviewer.base.astronomy.Sun;
@@ -18,7 +18,6 @@ import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
@@ -155,61 +154,40 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
+        GL3DVec3d pt = null;
+        GL3DVec3d hitpoint = null;
 
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             highlightedMousePosition = e.getPoint();
-
             if (evt.getName().equals("Coronal Mass Ejection")) {
-                double principalAngle = 0;
-                Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
+                Map<String, JHVEventParameter> params = evt.getAllEventParameters();
                 double distSun = 2.4;
-                double speed = 500;
-                for (JHVEventParameter param : params) {
-                    String name = param.getParameterName();
-                    String value = param.getParameterValue();
-                    if (name.equals("event_coord1")) {
-                        principalAngle = Double.parseDouble(value) * Math.PI / 180. + Math.PI / 2;
-                    }
-                    if (name.equals("cme_radiallinvel")) {
-                        speed = Double.parseDouble(value);
-                    }
-                }
-
+                double principalAngle = SWHVHEKData.readCMEPrincipalAngle(params);
+                double speed = SWHVHEKData.readCMESpeed(params);
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Position.Latitudinal p = Sun.getEarth(date);
                 GL3DQuatd localRotation = new GL3DQuatd(p.lat, p.lon);
-                GL3DVec3d hitpointPlane = localRotation.rotateInverseVector(getHitPointPlane(e));
+                hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
 
                 GL3DQuatd q = new GL3DQuatd(p.lat, p.lon);
-                GL3DVec3d pt = q.rotateInverseVector(new GL3DVec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+                pt = q.rotateInverseVector(new GL3DVec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
 
-                if (pt != null) {
-                    if (hitpointPlane != null) {
-                        double deltaX = Math.abs(hitpointPlane.x - pt.x);
-                        double deltaY = Math.abs(hitpointPlane.y - pt.y);
-                        double deltaZ = Math.abs(hitpointPlane.z - pt.z);
-                        if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                            mouseOverJHVEvent = evt;
-                            mouseOverPosition = new Point(e.getX(), e.getY());
-                        }
-                    }
-                }
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-                GL3DVec3d hitpoint = getHitPoint(e);
-                JHVPoint pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
-
-                if (pt != null && hitpoint != null) {
-                    double deltaX = Math.abs(hitpoint.x - pt.getCoordinate1());
-                    double deltaY = Math.abs(hitpoint.y + pt.getCoordinate2());
-                    double deltaZ = Math.abs(hitpoint.z - pt.getCoordinate3());
-                    if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                        mouseOverJHVEvent = evt;
-                        mouseOverPosition = new Point(e.getX(), e.getY());
-                    }
+                hitpoint = getHitPoint(e);
+                pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
+            }
+            if (pt != null && hitpoint != null) {
+                double deltaX = Math.abs(hitpoint.x - pt.x);
+                double deltaY = Math.abs(hitpoint.y - pt.y);
+                double deltaZ = Math.abs(hitpoint.z - pt.z);
+                if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
+                    mouseOverJHVEvent = evt;
+                    mouseOverPosition = new Point(e.getX(), e.getY());
+                    break;
                 }
             }
         }
@@ -235,7 +213,10 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
     }
 
     private GL3DVec3d getHitPoint(MouseEvent e) {
-        return Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        GL3DVec3d hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        if (hp != null)
+            hp.y = -hp.y;
+        return hp;
     }
 
 }

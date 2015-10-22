@@ -12,6 +12,7 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -129,4 +130,24 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         return activeEvents;
     }
 
+    public static double readCMESpeed(Map<String, JHVEventParameter> params) {
+        double speed = 500;
+        try {
+            if (params.containsKey("cme_radiallinvel"))
+                speed = Double.parseDouble(params.get("cme_radiallinvel").getParameterValue());
+        } catch (Exception e) {
+
+        }
+        return speed;
+    }
+
+    public static double readCMEPrincipalAngle(Map<String, JHVEventParameter> params) {
+        double principalAngle = 0;
+        try {
+            if (params.containsKey("event_coord1"))
+                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue()) * Math.PI / 180. + Math.PI / 2;
+        } catch (Exception e) {
+        }
+        return principalAngle;
+    }
 }

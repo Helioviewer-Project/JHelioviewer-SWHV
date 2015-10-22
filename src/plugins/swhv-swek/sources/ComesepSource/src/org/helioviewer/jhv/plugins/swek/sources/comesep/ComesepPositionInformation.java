@@ -2,8 +2,8 @@ package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.util.List;
 
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 public class ComesepPositionInformation implements JHVPositionInformation {
@@ -15,19 +15,19 @@ public class ComesepPositionInformation implements JHVPositionInformation {
     }
 
     @Override
-    public List<JHVPoint> getBoundBox() {
+    public List<GL3DVec3d> getBoundBox() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public JHVPoint centralPoint() {
+    public GL3DVec3d centralPoint() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<JHVPoint> getBoundCC() {
+    public List<GL3DVec3d> getBoundCC() {
         // TODO Auto-generated method stub
         return null;
     }

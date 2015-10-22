@@ -2,15 +2,15 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 
 import java.util.List;
 
+import org.helioviewer.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.event.JHVPoint;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
  * Defines the HEK event position information.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class HEKPositionInformation implements JHVPositionInformation {
 
@@ -18,18 +18,18 @@ public class HEKPositionInformation implements JHVPositionInformation {
     private final JHVCoordinateSystem coordinateSystem;
 
     /** bound box */
-    private final List<JHVPoint> boundBox;
+    private final List<GL3DVec3d> boundBox;
 
     /** bound cc */
-    private final List<JHVPoint> boundCC;
+    private final List<GL3DVec3d> boundCC;
 
     /** central point */
-    private final JHVPoint centralPoint;
+    private final GL3DVec3d centralPoint;
 
     /**
      * Create a HEKPositionInformation for the given coordinate system, bound
      * box and central point.
-     * 
+     *
      * @param coordinateSystem
      *            the coordinate system.
      * @param boundBox
@@ -37,8 +37,8 @@ public class HEKPositionInformation implements JHVPositionInformation {
      * @param centralPoint
      *            the central point
      */
-    public HEKPositionInformation(JHVCoordinateSystem coordinateSystem, List<JHVPoint> boundBox, List<JHVPoint> boundCC,
-            JHVPoint centralPoint) {
+    public HEKPositionInformation(JHVCoordinateSystem coordinateSystem, List<GL3DVec3d> boundBox, List<GL3DVec3d> boundCC,
+            GL3DVec3d centralPoint) {
         this.coordinateSystem = coordinateSystem;
         this.boundBox = boundBox;
         this.centralPoint = centralPoint;
@@ -51,17 +51,17 @@ public class HEKPositionInformation implements JHVPositionInformation {
     }
 
     @Override
-    public List<JHVPoint> getBoundBox() {
+    public List<GL3DVec3d> getBoundBox() {
         return boundBox;
     }
 
     @Override
-    public JHVPoint centralPoint() {
+    public GL3DVec3d centralPoint() {
         return centralPoint;
     }
 
     @Override
-    public List<JHVPoint> getBoundCC() {
+    public List<GL3DVec3d> getBoundCC() {
         return boundCC;
     }
 
