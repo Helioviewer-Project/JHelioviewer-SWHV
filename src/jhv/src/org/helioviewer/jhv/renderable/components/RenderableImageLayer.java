@@ -129,7 +129,9 @@ public class RenderableImageLayer extends AbstractRenderable {
         if (imageData == null) {
             return;
         }
-        glImage.streamImage(gl, imageData, prevImageData, baseImageData);
+        glImage.streamImage(gl, imageData, prevImageData, baseImageData, false);
+        glImage.streamImage(gl, miniViewImageData, prevMiniViewImageData, baseMiniViewImageData, true);
+
     }
 
     @Override
@@ -153,7 +155,16 @@ public class RenderableImageLayer extends AbstractRenderable {
         {
             gl.glEnable(GL2.GL_CULL_FACE);
             gl.glCullFace(GL2.GL_BACK);
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
+            ImageData _imageData = imageData;
+            ImageData _prevImageData = prevImageData;
+            ImageData _baseImageData = baseImageData;
+
+            if (isMiniview) {
+                _imageData = miniViewImageData;
+                _prevImageData = prevMiniViewImageData;
+                _baseImageData = baseMiniViewImageData;
+            }
+            glImage.applyFilters(gl, _imageData, _prevImageData, _baseImageData, isMiniview);
 
             GLSLShader.setViewport(vp.getWidth(), vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
             if (!RenderableImageLayer.showCorona) {
@@ -161,18 +172,18 @@ public class RenderableImageLayer extends AbstractRenderable {
             }
             GLSLShader.filter(gl);
 
-            MetaData m = imageData.getMetaData();
+            MetaData m = _imageData.getMetaData();
             GL3DCamera camera = vp.getCamera();
 
-            camera.push(imageData.getMasterTime(), null);
+            camera.push(_imageData.getMasterTime(), null);
             GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
             vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(m.getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(_baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(_prevImageData.getMetaData().getRotationObs()));
             }
             camera.pop();
 
@@ -428,11 +439,15 @@ public class RenderableImageLayer extends AbstractRenderable {
     private ImageData imageData;
     private ImageData prevImageData;
     private ImageData baseImageData;
+    private ImageData miniViewImageData;
+    private ImageData prevMiniViewImageData;
+    private ImageData baseMiniViewImageData;
 
-    public void setImageData(ImageData newImageData) {
+    public void setImageData(ImageData newImageData, ImageData miniViewData, ImageData prevData) {
         int frame = newImageData.getFrameNumber();
         if (frame == 0) {
             baseImageData = newImageData;
+            baseMiniViewImageData = miniViewData;
         }
 
         if (imageData == null || (prevImageData != null && prevImageData.getFrameNumber() - frame > 2)) {
@@ -441,11 +456,29 @@ public class RenderableImageLayer extends AbstractRenderable {
             prevImageData = imageData;
         }
 
+        if (prevData != null && glImage.getDifferenceMode()) {
+            prevImageData = prevData;
+        }
+        if (prevData != null && glImage.getBaseDifferenceMode()) {
+            baseImageData = prevData;
+        }
+
+        if (miniViewImageData == null || (prevMiniViewImageData != null && prevMiniViewImageData.getFrameNumber() - frame > 2)) {
+            prevMiniViewImageData = newImageData;
+        } else if (frame != miniViewImageData.getFrameNumber()) {
+            prevMiniViewImageData = miniViewImageData;
+        }
+
         imageData = newImageData;
+        miniViewImageData = miniViewData;
     }
 
     public ImageData getImageData() {
         return imageData;
+    }
+
+    public ImageData getMiniViewImageData() {
+        return miniViewImageData;
     }
 
     public GLImage getGLImage() {
