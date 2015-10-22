@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.helioviewer.base.Region;
 import org.helioviewer.base.Viewport;
+import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.viewmodel.imagedata.ImageData;
 import org.helioviewer.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
@@ -36,14 +37,14 @@ public class JP2CallistoView extends JP2View {
     }
 
     @Override
-    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
+    void setSubimageData(ImageData newImageData, JP2ImageParameter params, ImageData miniViewData, JP2ImageParameter miniviewParams, ImageData prevData, JP2ImageParameter prevParams) {
         if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData);
+            dataHandler.handleData(this, newImageData, null, null);
         }
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(GL3DViewport vp, JP2Image jp2Image, Date masterTime, int frameNumber) {
         double rWidth = region.getWidth();
         double rHeight = region.getHeight();
 
@@ -52,13 +53,13 @@ public class JP2CallistoView extends JP2View {
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
 
         ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.getWidth() / rWidth * maxWidth),
-                                                        2 * (int) Math.ceil(viewport.getHeight() / rHeight * maxHeight));
+                2 * (int) Math.ceil(viewport.getHeight() / rHeight * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
         SubImage subImage = new SubImage((int) (region.getLowerLeftCorner().x / maxWidth * rect.width),
-                                         (int) (region.getLowerLeftCorner().y / maxHeight * rect.height),
-                                         (int) Math.ceil(rWidth / maxWidth * rect.width),
-                                         (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
+                (int) (region.getLowerLeftCorner().y / maxHeight * rect.height),
+                (int) Math.ceil(rWidth / maxWidth * rect.width),
+                (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 
         return new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
     }

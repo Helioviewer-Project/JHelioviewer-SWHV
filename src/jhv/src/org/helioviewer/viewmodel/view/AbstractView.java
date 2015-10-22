@@ -3,7 +3,6 @@ package org.helioviewer.viewmodel.view;
 import java.util.Date;
 
 import org.helioviewer.base.time.ImmutableDateTime;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -26,7 +25,7 @@ public abstract class AbstractView implements View {
     @Override
     public void render() {
         if (dataHandler != null) {
-            dataHandler.handleData(this, imageData);
+            dataHandler.handleData(this, imageData, imageData, null);
         }
     }
 

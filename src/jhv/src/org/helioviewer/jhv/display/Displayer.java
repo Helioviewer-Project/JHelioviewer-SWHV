@@ -217,8 +217,8 @@ public class Displayer implements JHVEventHighlightListener {
     private static class DisplayDataHandler implements ViewDataHandler {
 
         @Override
-        public void handleData(View view, ImageData imageData) {
-            view.getImageLayer().setImageData(imageData);
+        public void handleData(View view, ImageData imageData, ImageData miniViewData, ImageData prevData) {
+            view.getImageLayer().setImageData(imageData, miniViewData, prevData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }
