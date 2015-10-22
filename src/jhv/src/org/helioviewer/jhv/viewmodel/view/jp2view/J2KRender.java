@@ -39,21 +39,18 @@ class J2KRender implements Runnable {
     private final JP2View parentViewRef;
 
     private final JP2ImageParameter currParams;
-    private final JP2ImageParameter miniViewParams;
-    private final JP2ImageParameter prevParams;
 
-    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, JP2ImageParameter _miniViewParams, JP2ImageParameter _prevParams) {
+    J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams) {
         parentViewRef = _parentViewRef;
 
         currParams = _currParams;
-        miniViewParams = _miniViewParams;
-        prevParams = _prevParams;
 
         parentImageRef = currParams.jp2Image;
     }
 
-    private ImageData renderLayer(Kdu_region_compositor compositor, JP2ImageParameter params) throws KduException {
-        int numLayer = params.compositionLayer;
+    private void renderLayer(Kdu_region_compositor compositor) throws KduException {
+
+        int numLayer = currParams.compositionLayer;
 
         // compositor.Refresh();
         compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
@@ -70,9 +67,9 @@ class J2KRender implements Runnable {
 
         parentImageRef.updateResolutionSet(compositor, numLayer);
 
-        compositor.Set_scale(false, false, false, params.resolution.getZoomPercent());
+        compositor.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
 
-        SubImage roi = params.subImage;
+        SubImage roi = currParams.subImage;
         Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
         compositor.Set_buffer_surface(requestedBufferedRegion);
 
@@ -137,46 +134,31 @@ class J2KRender implements Runnable {
         } else {
             imdata = new ARGBInt32ImageData(false, roi.width, roi.height, IntBuffer.wrap(intBuffer));
         }
-        return imdata;
+        setImageData(imdata, currParams);
     }
 
-    private void setImageData(ImageData newImdata, JP2ImageParameter newParams, ImageData miniViewData, JP2ImageParameter miniViewParams, ImageData prevData, JP2ImageParameter prevParams) {
+    private void setImageData(ImageData newImdata, JP2ImageParameter newParams) {
         EventQueue.invokeLater(new Runnable() {
             private ImageData theImdata;
             private JP2ImageParameter theParams;
-            private ImageData theMiniViewData;
-            private JP2ImageParameter theMiniViewParams;
-            private ImageData thePrevData;
-            private JP2ImageParameter thePrevParams;
 
             @Override
             public void run() {
-                parentViewRef.setSubimageData(theImdata, theParams, theMiniViewData, theMiniViewParams, thePrevData, thePrevParams);
+                parentViewRef.setSubimageData(theImdata, theParams);
             }
 
-            public Runnable init(ImageData imdata, JP2ImageParameter params, ImageData miniViewData, JP2ImageParameter miniViewParams, ImageData prevData, JP2ImageParameter prevParams) {
+            public Runnable init(ImageData imdata, JP2ImageParameter params) {
                 theImdata = imdata;
                 theParams = params;
-                theMiniViewData = miniViewData;
-                theMiniViewParams = miniViewParams;
-                thePrevData = prevData;
-                thePrevParams = prevParams;
                 return this;
             }
-        }.init(newImdata, newParams, miniViewData, miniViewParams, prevData, prevParams));
+        }.init(newImdata, newParams));
     }
 
     @Override
     public void run() {
         try {
-            ImageData imdata = renderLayer(parentImageRef.getCompositor(threadEnv.get()), currParams);
-            ImageData miniViewData = renderLayer(parentImageRef.getCompositor(threadEnv.get()), miniViewParams);
-            ImageData prevData = null;
-            if (prevParams != null)
-                prevData = renderLayer(parentImageRef.getCompositor(threadEnv.get()), prevParams);
-
-            setImageData(imdata, currParams, miniViewData, miniViewParams, prevData, prevParams);
-
+            renderLayer(parentImageRef.getCompositor(threadEnv.get()));
         } catch (KduException e) {
             // reboot the compositor
             try {

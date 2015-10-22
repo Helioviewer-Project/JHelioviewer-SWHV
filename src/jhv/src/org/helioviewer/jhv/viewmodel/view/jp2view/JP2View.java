@@ -16,9 +16,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -30,8 +28,8 @@ import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of View for JPG2000 images.
@@ -176,8 +174,8 @@ public class JP2View extends AbstractView {
     private JP2ImageParameter oldImageViewParams;
 
     // Recalculates the image parameters used within the jp2-package
-    protected JP2ImageParameter calculateParameter(GL3DViewport vp, JP2Image jp2Image, Date masterTime, int frameNumber) {
-        GL3DCamera camera = vp.getCamera();
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
+        GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.updateROI(camera, masterTime, m);
 
@@ -186,7 +184,7 @@ public class JP2View extends AbstractView {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = 2 * camera.getCameraWidth() / vp.getHeight();
+        double ratio = 2 * camera.getCameraWidth() / Displayer.getViewport().getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;
@@ -242,7 +240,7 @@ public class JP2View extends AbstractView {
      * @param prevData
      */
 
-    void setSubimageData(ImageData newImageData, JP2ImageParameter params, ImageData miniviewData, JP2ImageParameter miniviewParams, ImageData prevData, JP2ImageParameter prevParams) {
+    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
         int frame = params.compositionLayer;
         MetaData metaData = params.jp2Image.metaDataList[frame];
 
@@ -254,36 +252,13 @@ public class JP2View extends AbstractView {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
         }
 
-        if (miniviewParams != null) {
-            frame = miniviewParams.compositionLayer;
-            metaData = miniviewParams.jp2Image.metaDataList[frame];
-            miniviewData.setFrameNumber(frame);
-            miniviewData.setMetaData(metaData);
-            miniviewData.setMasterTime(miniviewParams.masterTime);
-
-            if (metaData instanceof HelioviewerMetaData) {
-                miniviewData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(miniviewParams.subImage, miniviewParams.resolution.getZoomPercent()));
-            }
-        }
-        if (prevParams != null) {
-            frame = prevParams.compositionLayer;
-            metaData = prevParams.jp2Image.metaDataList[frame];
-            prevData.setFrameNumber(frame);
-            prevData.setMetaData(metaData);
-            prevData.setMasterTime(this.metaDataArray[frame].getDateObs().getDate());
-
-            if (metaData instanceof HelioviewerMetaData) {
-                prevData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(prevParams.subImage, prevParams.resolution.getZoomPercent()));
-            }
-        }
-
         if (frame != trueFrame) {
             trueFrame = frame;
             ++frameCount;
         }
 
         if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData, miniviewData, prevData);
+            dataHandler.handleData(this, newImageData);
         }
     }
 
@@ -327,7 +302,7 @@ public class JP2View extends AbstractView {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-                _jp2Image.signalReader(calculateParameter(Displayer.getViewport(), _jp2Image, masterTime, frame)); // wake up reader
+                _jp2Image.signalReader(calculateParameter(_jp2Image, masterTime, frame)); // wake up reader
                 return;
             }
 
@@ -372,23 +347,14 @@ public class JP2View extends AbstractView {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(Displayer.getViewport(), jp2Image, targetMasterTime, targetFrame);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame);
         if (imageViewParams == null)
             return;
-        JP2ImageParameter miniViewParams = calculateParameter(ImageViewerGui.getRenderableMiniview().getViewport(), jp2Image, targetMasterTime, targetFrame);
-        JP2ImageParameter prevParams = null;
-        if (!Layers.isMoviePlaying()) {
-            int differenceFrame = Math.max(0, targetFrame - 1);
-            if (this.getImageLayer().getGLImage().getBaseDifferenceMode()) {
-                differenceFrame = 0;
-            }
-            prevParams = calculateParameter(Displayer.getViewport(), jp2Image, targetMasterTime, differenceFrame);
-        }
 
         // ping reader
         jp2Image.signalReader(imageViewParams);
 
-        queueSubmitTask(new J2KRender(this, imageViewParams, miniViewParams, prevParams));
+        queueSubmitTask(new J2KRender(this, imageViewParams));
     }
 
     @Override

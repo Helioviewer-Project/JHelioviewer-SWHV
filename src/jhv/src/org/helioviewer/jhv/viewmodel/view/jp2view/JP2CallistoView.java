@@ -5,12 +5,11 @@ import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.Viewport;
-import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 public class JP2CallistoView extends JP2View {
 
@@ -37,14 +36,14 @@ public class JP2CallistoView extends JP2View {
     }
 
     @Override
-    void setSubimageData(ImageData newImageData, JP2ImageParameter params, ImageData miniViewData, JP2ImageParameter miniviewParams, ImageData prevData, JP2ImageParameter prevParams) {
+    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
         if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData, null, null);
+            dataHandler.handleData(this, newImageData);
         }
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(GL3DViewport vp, JP2Image jp2Image, Date masterTime, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
         double rWidth = region.getWidth();
         double rHeight = region.getHeight();
 
