@@ -50,6 +50,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private static double ICON_SIZE = 0.1;
     private static double ICON_SIZE_HIGHLIGHTED = 0.16;
+    private static int LEFT_MARGIN_TEXT = 10;
+    private static int RIGHT_MARGIN_TEXT = 10;
+    private static int TOP_MARGIN_TEXT = 5;
+    private static int BOTTOM_MARGIN_TEXT = 5;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -308,26 +312,21 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         bd.y = fontSize * 1.1 * (ct);
 
-        int leftMargin = 10;
-        int rightMargin = 10;
-        int topMargin = 5;
-        int bottomMargin = 5;
-
         Point textInit = new Point(pt.x, pt.y);
-        float w = (float) (bd.x + leftMargin + rightMargin);
-        float h = (float) (bd.y + bottomMargin + topMargin);
+        float w = (float) (bd.x + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
+        float h = (float) (bd.y + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
 
         int deltaX = 45;
         int deltaY = 45;
         // Correct if out of view
-        if (w + pt.x + deltaX - leftMargin > width) {
-            textInit.x -= (w + pt.x + deltaX - leftMargin - width);
+        if (w + pt.x + deltaX - LEFT_MARGIN_TEXT > width) {
+            textInit.x -= (w + pt.x + deltaX - LEFT_MARGIN_TEXT - width);
         }
-        if (h + pt.y + deltaY - fontSize - topMargin > height) {
-            textInit.y -= (h + pt.y + deltaY - fontSize - topMargin - height);
+        if (h + pt.y + deltaY - fontSize - TOP_MARGIN_TEXT > height) {
+            textInit.y -= (h + pt.y + deltaY - fontSize - TOP_MARGIN_TEXT - height);
         }
-        float left = textInit.x + deltaX - leftMargin;
-        float bottom = textInit.y + deltaY - fontSize - topMargin;
+        float left = textInit.x + deltaX - LEFT_MARGIN_TEXT;
+        float bottom = textInit.y + deltaY - fontSize - TOP_MARGIN_TEXT;
 
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.75f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
