@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.data.container.util.DateUtil;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
@@ -82,8 +82,8 @@ public class JHVEventCache {
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
             allEvents.put(event.getUniqueID(), event);
-            Date startDate = DateUtil.getCurrentDate(event.getStartDate());
-            Date endDate = DateUtil.getNextDate(event.getEndDate());
+            Date startDate = TimeUtils.getCurrentDate(event.getStartDate());
+            Date endDate = TimeUtils.getNextDate(event.getEndDate());
             addToList(startDate, endDate, event);
             eventIDs.add(event.getUniqueID());
             checkAndFixRelationShip(event);
