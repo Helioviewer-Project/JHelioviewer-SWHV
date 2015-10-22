@@ -4,9 +4,9 @@ import java.io.File;
 
 import javax.swing.SwingWorker;
 
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;

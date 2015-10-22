@@ -5,9 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssCache;
 import org.helioviewer.jhv.threads.JHVThread;
 
