@@ -175,7 +175,6 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
                 Quatd q = new Quatd(p.lat, p.lon);
                 pt = q.rotateInverseVector(new Vec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
-
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e);
                 pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
@@ -206,7 +205,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         }
     }
 
-    protected static Point highlightedMousePosition = new Point(0, 0);
+    protected static Point highlightedMousePosition;
 
     private Vec3d getHitPointPlane(MouseEvent e) {
         return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());

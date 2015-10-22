@@ -281,6 +281,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private float oldFontSize = -1;
 
     public void drawText(GL2 gl, JHVEvent evt) {
+        Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
+        if (pt == null)
+            return;
+        SWHVHEKImagePanelEventPopupController.highlightedMousePosition = null;
+
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
 
@@ -296,9 +301,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);
         }
-
-        Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
-        SWHVHEKImagePanelEventPopupController.highlightedMousePosition = new Point(0, 0);
 
         textRenderer.beginRendering(width, height, true);
 
