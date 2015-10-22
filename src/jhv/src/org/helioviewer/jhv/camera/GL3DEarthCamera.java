@@ -2,14 +2,14 @@ package org.helioviewer.jhv.camera;
 
 import java.util.Date;
 
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.math.GL3DQuatd;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.GL3DQuatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
-import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class GL3DEarthCamera extends GL3DCamera {
 

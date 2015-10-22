@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.swing.JOptionPane;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 /**
  * Interface for GUI objects to react to changes of layers

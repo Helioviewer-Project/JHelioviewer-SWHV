@@ -5,12 +5,12 @@ import java.util.Date;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.ViewDataHandler;
-import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
 
 public class DownloadedJPXData implements ViewDataHandler {
 

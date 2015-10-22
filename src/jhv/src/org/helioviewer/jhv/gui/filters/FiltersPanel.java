@@ -6,7 +6,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class FiltersPanel extends JPanel {

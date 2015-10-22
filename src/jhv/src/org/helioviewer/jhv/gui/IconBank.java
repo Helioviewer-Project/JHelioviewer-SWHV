@@ -11,7 +11,7 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.base.FileUtils;
+import org.helioviewer.jhv.base.FileUtils;
 
 /**
  * This class provides access to all images, icons and cursors which are used by

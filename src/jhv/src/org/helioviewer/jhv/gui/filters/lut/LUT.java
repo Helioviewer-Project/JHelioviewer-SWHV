@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 
 /**
  * Representing a single color lookup. Each lookup has a name assigned and gives

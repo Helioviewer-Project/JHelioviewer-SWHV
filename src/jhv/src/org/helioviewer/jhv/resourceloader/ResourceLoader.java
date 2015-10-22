@@ -18,11 +18,11 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.UploadStream;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.UploadStream;
+import org.helioviewer.jhv.base.logging.Log;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

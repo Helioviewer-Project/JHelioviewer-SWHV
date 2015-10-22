@@ -15,18 +15,18 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.EventDispatchQueue;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.fitsview.FITSView;
-import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.JP2View;
-import org.helioviewer.viewmodel.view.simpleimageview.SimpleImageView;
+import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.EventDispatchQueue;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
+import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
 
 /**
  * This class provides methods to download files from a server.

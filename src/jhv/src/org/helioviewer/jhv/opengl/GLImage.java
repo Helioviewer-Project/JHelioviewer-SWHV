@@ -2,12 +2,12 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.IntBuffer;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 

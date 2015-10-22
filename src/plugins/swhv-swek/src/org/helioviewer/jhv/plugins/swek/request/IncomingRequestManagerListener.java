@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek.request;
 
 import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**

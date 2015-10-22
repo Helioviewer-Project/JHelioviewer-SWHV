@@ -14,11 +14,11 @@ import java.util.Iterator;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

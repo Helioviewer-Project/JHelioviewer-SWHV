@@ -25,10 +25,10 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
-import org.helioviewer.base.time.TimeUtils;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;

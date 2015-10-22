@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.base.cache.RequestCache;
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.cache.RequestCache;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 
 /**

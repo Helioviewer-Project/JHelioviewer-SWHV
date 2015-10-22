@@ -5,7 +5,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 
 import java.util.Date;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 
 /**
  * Adapts the plot area space of the plots in case the interval is locked.

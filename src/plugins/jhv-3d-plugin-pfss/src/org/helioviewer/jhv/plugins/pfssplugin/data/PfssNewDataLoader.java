@@ -15,9 +15,9 @@ import java.util.TreeMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.base.Pair;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 import org.helioviewer.jhv.threads.CancelTask;

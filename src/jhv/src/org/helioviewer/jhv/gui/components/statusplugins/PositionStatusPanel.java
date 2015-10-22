@@ -7,8 +7,8 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 

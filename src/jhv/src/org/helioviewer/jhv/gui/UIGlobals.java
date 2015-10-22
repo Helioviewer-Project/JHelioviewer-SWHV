@@ -12,8 +12,8 @@ import java.util.Hashtable;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 
 public class UIGlobals {

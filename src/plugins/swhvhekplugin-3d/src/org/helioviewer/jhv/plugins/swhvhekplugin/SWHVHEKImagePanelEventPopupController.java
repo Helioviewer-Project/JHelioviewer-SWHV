@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.GL3DQuatd;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;

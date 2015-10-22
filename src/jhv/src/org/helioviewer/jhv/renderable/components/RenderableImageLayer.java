@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.Pair;
-import org.helioviewer.base.math.GL3DMat4d;
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.Pair;
+import org.helioviewer.jhv.base.math.GL3DMat4d;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
@@ -23,9 +23,9 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;

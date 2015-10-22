@@ -2,9 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.io.InputStream;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.math.GL3DQuatd;
+import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 import com.jogamp.opengl.GL2;
 

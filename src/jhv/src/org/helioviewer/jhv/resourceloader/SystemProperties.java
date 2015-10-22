@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.resourceloader;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 
 /**
  * Helper class to set platform dependent system properties for example in order

@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.GL3DVec3d;
-import org.helioviewer.base.math.MathUtils;
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;

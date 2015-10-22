@@ -10,9 +10,9 @@ import nom.tam.fits.BinaryTableHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 

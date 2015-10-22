@@ -11,12 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.imageformat.ARGB32ImageFormat;
-import org.helioviewer.viewmodel.imageformat.ImageFormat;
-import org.helioviewer.viewmodel.imageformat.RGB24ImageFormat;
-import org.helioviewer.viewmodel.imageformat.SingleChannelImageFormat;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imageformat.ARGB32ImageFormat;
+import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
+import org.helioviewer.jhv.viewmodel.imageformat.RGB24ImageFormat;
+import org.helioviewer.jhv.viewmodel.imageformat.SingleChannelImageFormat;
 
 import com.jogamp.opengl.GL2;
 

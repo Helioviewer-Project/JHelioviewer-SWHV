@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.viewmodel.imagedata.ColorMask;
+import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 /**
  * Panel containing three check boxes to modify the color mask of an image.

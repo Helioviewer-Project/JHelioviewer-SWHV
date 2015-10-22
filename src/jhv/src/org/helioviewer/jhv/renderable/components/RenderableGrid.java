@@ -5,10 +5,10 @@ import java.awt.Component;
 import java.awt.Font;
 import java.nio.FloatBuffer;
 
-import org.helioviewer.base.astronomy.Position;
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.math.GL3DMat4d;
-import org.helioviewer.base.math.MathUtils;
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.GL3DMat4d;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;

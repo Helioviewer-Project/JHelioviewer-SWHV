@@ -24,9 +24,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
