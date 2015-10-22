@@ -37,6 +37,12 @@ public class Viewport {
     }
 
     @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
+    @Override
     public String toString() {
         return "[Viewport: Size: " + sizeVector + "]";
     }

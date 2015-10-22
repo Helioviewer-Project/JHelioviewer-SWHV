@@ -75,13 +75,17 @@ public class JPIPQuery implements Cloneable {
     }
 
     /** Clones the query. */
-    public JPIPQuery clone() {
+    @Override
+    public JPIPQuery clone() throws CloneNotSupportedException {
+        super.clone();
+
         JPIPQuery ret = new JPIPQuery();
         ret.fields.putAll(this.fields);
         return ret;
     }
 
     /** Returns a String representing this query. */
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         for (Entry<String, String> entry : fields.entrySet()) {

@@ -242,13 +242,6 @@ public class Vec4d {
         return new double[] { x, y, z, w };
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Vec4d)
-            return isApproxEqual((Vec4d) o, 0);
-        return false;
-    }
-
     public static double[] toArray(Vec4d[] vecs) {
         double[] arr = new double[vecs.length * 4];
         for (int i = 0; i < vecs.length; i++) {
@@ -259,6 +252,19 @@ public class Vec4d {
             arr[i * 4 + 3] = v.w;
         }
         return arr;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Vec4d)
+            return isApproxEqual((Vec4d) o, 0);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
     }
 
     @Override

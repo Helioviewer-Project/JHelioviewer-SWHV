@@ -200,13 +200,6 @@ public class Vec2d {
         return new double[] { x, y };
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Vec2d)
-            return isApproxEqual((Vec2d) o, 0.0);
-        return false;
-    }
-
     public static double[] toArray(Vec2d[] vecs) {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
@@ -215,11 +208,6 @@ public class Vec2d {
             arr[i * 2 + 1] = v.y;
         }
         return arr;
-    }
-
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ")";
     }
 
     public static Vec2d scale(Vec2d vec, double scale) {
@@ -232,7 +220,6 @@ public class Vec2d {
 
     public static Vec2d invertedScale(Vec2d vec, Vec2d scale) {
         return new Vec2d(vec.x / scale.x, vec.y / scale.y);
-
     }
 
     public Vec2d getYVector() {
@@ -254,4 +241,23 @@ public class Vec2d {
     public static Vec2d componentMax(final Vec2d v1, final Vec2d v2) {
         return new Vec2d(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Vec2d)
+            return isApproxEqual((Vec2d) o, 0.0);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
 }
