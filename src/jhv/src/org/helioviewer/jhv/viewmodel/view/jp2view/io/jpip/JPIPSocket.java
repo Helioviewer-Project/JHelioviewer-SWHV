@@ -43,6 +43,8 @@ public class JPIPSocket extends HTTPSocket {
     /** Time when received the last reply data */
     private long replyDataTm = 0;
 
+    private static final String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
+
     /** Default constructor. */
     public JPIPSocket() {
         super();
@@ -84,7 +86,6 @@ public class JPIPSocket extends HTTPSocket {
             throw new IOException("The server did not send a response after connection.");
 
         HashMap<String, String> map = null;
-        String[] cnewParams = { "cid", "transport", "host", "path", "port", "auxport" };
         if (res.getHeader("JPIP-cnew") != null) {
             map = new HashMap<String, String>();
             String[] parts = res.getHeader("JPIP-cnew").split(",");

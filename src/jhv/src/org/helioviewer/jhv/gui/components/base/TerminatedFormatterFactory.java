@@ -35,13 +35,13 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
                 if (string != null && string.length() != 0) {
                     if (string.charAt(string.length() - 1) == terminator.charAt(0)) {
                         try {
-                            value = Double.parseDouble(string.substring(0, string.length() - 1));
+                            value = Double.valueOf(string.substring(0, string.length() - 1));
                         } catch (NumberFormatException ex2) {
                             Log.warn("Could not parse number");
                         }
                     } else {
                         try {
-                            value = Double.parseDouble(string);
+                            value = Double.valueOf(string);
                         } catch (NumberFormatException ex) {
                             Log.warn("Could not parse number");
                         }
