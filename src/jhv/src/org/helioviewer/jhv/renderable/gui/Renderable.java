@@ -10,6 +10,8 @@ public interface Renderable {
 
     public void render(GL2 gl, GL3DViewport vp);
 
+    public void renderFloat(GL2 gl, GL3DViewport vp);
+
     public void remove(GL2 gl);
 
     public Component getOptionsPanel();

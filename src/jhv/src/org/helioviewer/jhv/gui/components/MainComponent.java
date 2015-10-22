@@ -95,6 +95,17 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
     }
 
+    public static void renderFloatScene(GL2 gl) {
+        for (GL3DViewport vp : Displayer.getViewports()) {
+            if (vp.isVisible() && vp.isActive()) {
+                GL3DCamera camera = vp.getCamera();
+                camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
+                ImageViewerGui.getRenderableContainer().renderFloat(gl, vp);
+            }
+        }
+    }
+
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
@@ -117,6 +128,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             camera.applyPerspective(gl);
             ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
         }
+        renderFloatScene(gl);
     }
 
 }
