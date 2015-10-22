@@ -5,14 +5,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.StringTokenizer;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -34,8 +30,8 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
  * 
  * @author Stephan Pagel
  * */
-@SuppressWarnings({"serial"})
-public class PluginListEntry extends AbstractListEntry implements MouseListener, ComponentListener {
+@SuppressWarnings("serial")
+public class PluginListEntry extends AbstractListEntry implements MouseListener {
 
     private final PluginContainer plugin;
     private final List list;
@@ -55,7 +51,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
         this.plugin = plugin;
         this.list = list;
         initVisualComponents();
-        list.addComponentListener(this);
     }
 
     /**
@@ -175,36 +170,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
     }
 
     /**
-     * Computes the length of a given string in pixel.
-     * */
-    private int getStringLength(final Graphics g, final String text) {
-        return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
-    }
-
-    /**
-     * Truncates a given string word wise so it is not longer than a given pixel
-     * length.
-     * */
-    private String reduceTextLength(final String text, final int maxPixelLength, final Graphics g) {
-        if (getStringLength(g, text) < maxPixelLength) {
-            return text;
-        }
-
-        final StringTokenizer in = new StringTokenizer(text, " ");
-        final StringBuilder out = new StringBuilder();
-
-        while (in.hasMoreTokens()) {
-            final String next = in.nextToken() + " ";
-            if (getStringLength(g, out.toString() + next) >= maxPixelLength) {
-                break;
-            }
-            out.append(next);
-        }
-
-        return out.toString();
-    }
-
-    /**
      * Remove the plug-in and deletes the plug-in file of selected entry.
      */
     private void deletePlugin() {
@@ -212,20 +177,10 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
             if (!PluginManager.getSingletonInstance().deletePlugin(plugin, new File(JHVDirectory.PLUGINS.getPath() + JHVGlobals.TEMP_FILENAME_DELETE_PLUGIN_FILES))) {
                 Message.err("An error occured while deleting the plugin file!", "Please check manually!", false);
             }
-
             list.removeEntry(plugin.getName());
             list.fireItemChanged();
         }
     }
-
-/*
-    private void updateDescriptionTextToDisplay(final Graphics g) {
-        descLabel.setText(" ");
-        final int contentWidth = list.getSize().width - list.getVerticalScrollBar().getSize().width;
-        final int maxDescLabelWidth = contentWidth - buttonPane.getSize().width - descPane.getPreferredSize().width;
-        descLabel.setText(reduceTextLength(getDescriptionText(), maxDescLabelWidth, g));
-    }
-*/
 
     // Mouse Listener
 
@@ -268,34 +223,6 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener,
      * {@inheritDoc}
      * */
     public void mouseReleased(final MouseEvent e) {
-    }
-
-    // Component Listener
-
-    /**
-     * {@inheritDoc}
-     * */
-    public void componentHidden(final ComponentEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    public void componentMoved(final ComponentEvent e) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    public void componentResized(final ComponentEvent e) {
-        // updateDescriptionTextToDisplay(e.getComponent().getGraphics());
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    public void componentShown(final ComponentEvent e) {
-        // updateDescriptionTextToDisplay(e.getComponent().getGraphics());
     }
 
     // Link Label
