@@ -16,8 +16,6 @@ public class GLImage {
     private GLTexture tex;
     private GLTexture lutTex;
     private GLTexture diffTex;
-    private GLTexture miniViewTex;
-    private GLTexture diffMiniViewTex;
 
     private float contrast = 0f;
     private float gamma = 1f;
@@ -42,18 +40,12 @@ public class GLImage {
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
 
-    public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, boolean isMiniView) {
-        GLTexture _tex = tex;
-        GLTexture _diffTex = diffTex;
-        if (isMiniView) {
-            _tex = this.miniViewTex;
-            _diffTex = diffMiniViewTex;
-        }
+    public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
 
-        _tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (imageData.getUploaded() == false) {
             imageData.setUploaded(true);
-            _tex.copyImageData2D(gl, imageData);
+            tex.copyImageData2D(gl, imageData);
         }
         ImageData prevFrame = imageData;
         if (!baseDifferenceMode) {
@@ -62,14 +54,14 @@ public class GLImage {
             prevFrame = baseImageData;
         }
         if (differenceMode && prevFrame != null) {
-            _diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
-            _diffTex.copyImageData2D(gl, prevFrame);
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+            diffTex.copyImageData2D(gl, prevFrame);
         }
     }
 
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, boolean isMiniView) {
         copyScreenToTexture(gl, imageData, prevImageData, baseImageData);
-        applyRunningDifferenceGL(gl, imageData, prevImageData, baseImageData, isMiniView);
+        applyRunningDifferenceGL(gl, imageData, prevImageData, baseImageData);
 
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
@@ -80,10 +72,7 @@ public class GLImage {
         int h = imageData.getHeight();
         GLSLShader.setFactors(sharpen, 1f / w, 1f / h, 1f);
         applyGLLUT(gl);
-        if (isMiniView)
-            miniViewTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
-        else
-            tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+        tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
     private void copyScreenToTexture(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
@@ -127,11 +116,8 @@ public class GLImage {
         }
     }
 
-    private void applyRunningDifferenceGL(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, boolean isMiniView) {
-        GLTexture _diffTex = diffTex;
-        if (isMiniView) {
-            _diffTex = diffMiniViewTex;
-        }
+    private void applyRunningDifferenceGL(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+
         if (baseDifferenceMode || differenceMode) {
             if (baseDifferenceMode) {
                 if (baseDifferenceNoRot) {
@@ -148,7 +134,7 @@ public class GLImage {
             }
 
             GLSLShader.setTruncationValue(truncation);
-            _diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
+            diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
         } else {
             GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);
         }
@@ -194,8 +180,6 @@ public class GLImage {
         tex = new GLTexture(gl);
         lutTex = new GLTexture(gl);
         diffTex = new GLTexture(gl);
-        miniViewTex = new GLTexture(gl);
-        diffMiniViewTex = new GLTexture(gl);
 
         lutChanged = true;
     }
@@ -207,10 +191,6 @@ public class GLImage {
             lutTex.delete(gl);
         if (diffTex != null)
             diffTex.delete(gl);
-        if (miniViewTex != null)
-            miniViewTex.delete(gl);
-        if (diffMiniViewTex != null)
-            diffMiniViewTex.delete(gl);
     }
 
     public void setContrast(float contrast) {
