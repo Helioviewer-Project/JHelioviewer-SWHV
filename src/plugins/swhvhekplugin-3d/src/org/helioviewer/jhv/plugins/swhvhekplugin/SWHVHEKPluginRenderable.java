@@ -56,6 +56,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final static int BOTTOM_MARGIN_TEXT = 5;
     private final static int MOUSE_OFFSET_X = 45;
     private final static int MOUSE_OFFSET_Y = 45;
+    private JHVEvent highLightedEvent = null;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -358,8 +359,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
-            JHVEvent highLightedEvent = null;
             ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            highLightedEvent = null;
             for (JHVEvent evt : eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evt, controller.currentTime);
@@ -374,10 +375,15 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     highLightedEvent = evt;
                 }
             }
-            if (highLightedEvent != null) {
-                drawText(gl, highLightedEvent);
-            }
+
             SWHVHEKSettings.resetCactusColor();
+        }
+    }
+
+    @Override
+    public void renderFloat(GL2 gl, GL3DViewport vp) {
+        if (highLightedEvent != null) {
+            drawText(gl, highLightedEvent);
         }
     }
 

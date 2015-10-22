@@ -27,6 +27,10 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
+    }
+
+    @Override
+    public void renderFloat(GL2 gl, GL3DViewport vp) {
         if (!isVisible[vp.getIndex()])
             return;
 
