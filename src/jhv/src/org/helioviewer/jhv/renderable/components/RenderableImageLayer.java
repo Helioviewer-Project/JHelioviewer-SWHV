@@ -144,8 +144,6 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     private void _render(GL2 gl, GL3DViewport vp, double[] depthrange, boolean isMiniview) {
         if (imageData == null) {
-            if (isMiniview == false)
-                renderDummy(gl, vp);
             return;
         }
         if (!isVisible[vp.getIndex()])
@@ -202,25 +200,28 @@ public class RenderableImageLayer extends AbstractRenderable {
         GLSLShader.unbind(gl);
     }
 
-    private void renderDummy(GL2 gl, GL3DViewport vp) {
-        float fontSize = (int) (vp.getHeight() * vpScale);
-        if (textRenderer == null || fontSize != oldFontSize) {
-            oldFontSize = fontSize;
-            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
-            if (textRenderer != null) {
-                textRenderer.dispose();
+    @Override
+    public void renderFloat(GL2 gl, GL3DViewport vp) {
+        if (imageData == null) {
+            float fontSize = (int) (vp.getHeight() * vpScale);
+            if (textRenderer == null || fontSize != oldFontSize) {
+                oldFontSize = fontSize;
+                font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
+                if (textRenderer != null) {
+                    textRenderer.dispose();
+                }
+                textRenderer = new TextRenderer(font, true, true);
+                textRenderer.setUseVertexArrays(true);
+                textRenderer.setSmoothing(false);
+                textRenderer.setColor(Color.WHITE);
             }
-            textRenderer = new TextRenderer(font, true, true);
-            textRenderer.setUseVertexArrays(true);
-            textRenderer.setSmoothing(false);
-            textRenderer.setColor(Color.WHITE);
-        }
 
-        int delta = (int) (vp.getHeight() * 0.01);
-        textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-        Rectangle2D rect = textRenderer.getBounds(loading);
-        textRenderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
-        textRenderer.endRendering();
+            int delta = (int) (vp.getHeight() * 0.01);
+            textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
+            Rectangle2D rect = textRenderer.getBounds(loading);
+            textRenderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
+            textRenderer.endRendering();
+        }
     }
 
     private int generate(GL2 gl) {
