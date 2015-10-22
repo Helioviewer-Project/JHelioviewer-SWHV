@@ -163,9 +163,9 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
             highlightedMousePosition = e.getPoint();
             if (evt.getName().equals("Coronal Mass Ejection")) {
                 Map<String, JHVEventParameter> params = evt.getAllEventParameters();
-                double distSun = 2.4;
-                double principalAngle = SWHVHEKData.readCMEPrincipalAngle(params);
+                double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(params));
                 double speed = SWHVHEKData.readCMESpeed(params);
+                double distSun = 2.4;
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);

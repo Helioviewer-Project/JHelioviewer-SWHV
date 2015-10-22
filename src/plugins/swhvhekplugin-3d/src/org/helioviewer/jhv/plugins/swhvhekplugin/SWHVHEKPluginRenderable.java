@@ -8,7 +8,6 @@ import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -86,34 +85,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };;
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
-        Collection<JHVEventParameter> params = evt.getAllEventParameters().values();
-        double principalAngle = 0;
-        double principalAngleDegree = 0;
         double angularWidth = 0;
         double angularWidthDegree = 0;
 
-        double distSun = 2.4;
-        double speed = 500;
-
-        for (JHVEventParameter param : params) {
-            String name = param.getParameterName();
-            String value = param.getParameterValue();
-
-            if (name.equals("cme_angularwidth")) {
-                angularWidthDegree = Double.parseDouble(value);
-                angularWidth = Math.toRadians(angularWidthDegree);
-            }
-            if (name.equals("event_coord1")) {
-                principalAngleDegree = Double.parseDouble(value);
-                principalAngle = Math.toRadians(principalAngleDegree) + Math.PI / 2;
-            }
-            if (name.equals("cme_radiallinvel")) {
-                speed = Double.parseDouble(value);
-            }
-        }
+        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
+        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params);
+        double principalAngle = Math.toRadians(principalAngleDegree);
+        double speed = SWHVHEKData.readCMESpeed(params);
         double factor = Sun.RadiusMeter;
-        double distSunBegin = distSun;
-        distSun += speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
+        double distSunBegin = 2.4;
+        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);

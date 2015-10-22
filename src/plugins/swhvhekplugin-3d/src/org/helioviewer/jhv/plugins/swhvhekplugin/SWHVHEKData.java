@@ -141,11 +141,11 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         return speed;
     }
 
-    public static double readCMEPrincipalAngle(Map<String, JHVEventParameter> params) {
+    public static double readCMEPrincipalAngleDegree(Map<String, JHVEventParameter> params) {
         double principalAngle = 0;
         try {
             if (params.containsKey("event_coord1"))
-                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue()) * Math.PI / 180. + Math.PI / 2;
+                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue());
         } catch (Exception e) {
         }
         return principalAngle;
