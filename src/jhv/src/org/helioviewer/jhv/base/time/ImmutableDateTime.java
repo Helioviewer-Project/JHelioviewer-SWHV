@@ -5,8 +5,8 @@ import java.util.Date;
 
 public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
 
-    private String cachedDate;
-    private Date date;
+    private final String string;
+    private final Date date;
 
     /**
      * No arguments may be negative or an exception will be thrown.
@@ -15,14 +15,12 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
     public ImmutableDateTime(int _year, int _month, int _day, int _hour, int _minute, int _second) {
         if ((_year | _month | _day | _hour | _minute | _second) < 0)
             throw new IllegalArgumentException("Arguments cannot be negative!");
-        try {
-            Calendar c = Calendar.getInstance(TimeUtils.UTC);
-            c.clear();
-            c.set(_year, _month, _day, _hour, _minute, _second);
-            date = c.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        Calendar c = Calendar.getInstance(TimeUtils.UTC);
+        c.clear();
+        c.set(_year, _month, _day, _hour, _minute, _second);
+        date = c.getTime();
+        string = TimeUtils.utcDateFormat.format(date);
     }
 
     public ImmutableDateTime(long millis) {
@@ -30,29 +28,11 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
             throw new IllegalArgumentException("Arguments cannot be negative!");
         }
 
-        try {
-            Calendar c = Calendar.getInstance(TimeUtils.UTC);
-            c.clear();
-            c.setTimeInMillis(millis);
-            date = c.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ImmutableDateTime(ImmutableDateTime original) {
-        if (original == null) {
-            throw new IllegalArgumentException("Can not copy null object");
-        }
-
-        try {
-            Calendar c = Calendar.getInstance(TimeUtils.UTC);
-            c.clear();
-            c.setTimeInMillis(original.getMillis());
-            date = c.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Calendar c = Calendar.getInstance(TimeUtils.UTC);
+        c.clear();
+        c.setTimeInMillis(millis);
+        date = c.getTime();
+        string = TimeUtils.utcDateFormat.format(date);
     }
 
     public long getMillis() {
@@ -89,11 +69,8 @@ public class ImmutableDateTime implements Comparable<ImmutableDateTime> {
     }
 
     @Override
-    public String toString() {
-        if (cachedDate == null) {
-            cachedDate = TimeUtils.utcDateFormat.format(date);
-        }
-        return cachedDate;
+    public final String toString() {
+        return string;
     }
 
     public static ImmutableDateTime parseDateTime(String dateTime) {
