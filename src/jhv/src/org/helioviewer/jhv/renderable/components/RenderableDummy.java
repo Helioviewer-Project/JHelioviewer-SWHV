@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.SwingWorker;
@@ -16,7 +15,6 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableDummy extends AbstractRenderable {
 
-    private Font font;
     private float oldFontSize = -1;
     private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
@@ -33,11 +31,10 @@ public class RenderableDummy extends AbstractRenderable {
         float fontSize = (int) (vp.getHeight() * vpScale);
         if (textRenderer == null || fontSize != oldFontSize) {
             oldFontSize = fontSize;
-            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             if (textRenderer != null) {
                 textRenderer.dispose();
             }
-            textRenderer = new TextRenderer(font, true, true);
+            textRenderer = new TextRenderer(UIGlobals.UIFontRoboto.deriveFont(fontSize), true, true);
             textRenderer.setUseVertexArrays(true);
             textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -39,12 +38,10 @@ public class RenderableImageLayer extends AbstractRenderable {
     private int indexBufferID;
     private int indexBufferSize;
 
-    private int positionBufferSize;
     private View view;
 
     private final GLImage glImage = new GLImage();
 
-    private Font font;
     private float oldFontSize = -1;
     private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
@@ -96,7 +93,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         FloatBuffer positionBuffer = bufferPair.a;
         IntBuffer indexBuffer = bufferPair.b;
 
-        positionBufferSize = positionBuffer.capacity();
+        int positionBufferSize = positionBuffer.capacity();
         positionBufferID = generate(gl);
 
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
@@ -206,11 +203,10 @@ public class RenderableImageLayer extends AbstractRenderable {
             float fontSize = (int) (vp.getHeight() * vpScale);
             if (textRenderer == null || fontSize != oldFontSize) {
                 oldFontSize = fontSize;
-                font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
                 if (textRenderer != null) {
                     textRenderer.dispose();
                 }
-                textRenderer = new TextRenderer(font, true, true);
+                textRenderer = new TextRenderer(UIGlobals.UIFontRoboto.deriveFont(fontSize), true, true);
                 textRenderer.setUseVertexArrays(true);
                 textRenderer.setSmoothing(false);
                 textRenderer.setColor(Color.WHITE);
