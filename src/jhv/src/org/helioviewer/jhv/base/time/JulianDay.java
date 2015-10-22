@@ -4,6 +4,7 @@ package org.helioviewer.jhv.base.time;
 public class JulianDay {
 
     public static final double DJM0 = 2400000.5;
+    public static final double UNIX_EPOCH_MJD = (2440587.5 - DJM0);
 
     /* Earliest year allowed (4800BC) */
     private static final int IYMIN = -4799;

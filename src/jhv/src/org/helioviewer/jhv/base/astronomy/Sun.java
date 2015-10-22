@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.base.astronomy;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JulianDay;
 
@@ -19,19 +16,11 @@ public class Sun {
     public static final double Radius2 = Radius * Radius;
     public static final double RadiusMeter = 6.96e8;
 
-    public static final double MeanEarthDistanceMeter = 149597870700.0;
+    public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
 
-    private static final Calendar calendar = new GregorianCalendar();
-
-    private static double date2mjd(Date date) {
-        calendar.setTime(date);
-        int y = calendar.get(Calendar.YEAR);
-        int m = calendar.get(Calendar.MONTH) + 1;
-        int d = calendar.get(Calendar.DATE);
-        double f = DateUtils.getFragmentInMilliseconds(calendar, Calendar.DATE) / (double) DateUtils.MILLIS_PER_DAY;
-
-        return JulianDay.cal2mjd(y, m, d) + f;
+    private static double milli2mjd(long milli) {
+        return JulianDay.UNIX_EPOCH_MJD + milli / (86400 * 1000.);
     }
 
     private static double mjd2jcy(double mjd, double epoch) {
@@ -47,7 +36,7 @@ public class Sun {
             return prevEarth;
         }
 
-        double mjd = date2mjd(date);
+        double mjd = milli2mjd(milli);
         double t = mjd2jcy(mjd, 2415020.);
 
         // Geometric Mean Longitude (deg)
@@ -93,7 +82,7 @@ public class Sun {
 
     // better precison, to be recovered later
     private static double getL0Degree(Date date) {
-        double mjd = date2mjd(date);
+        double mjd = milli2mjd(date.getTime());
         double t = mjd2jcy(mjd, 2451545.);
 
         double mnl = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;
