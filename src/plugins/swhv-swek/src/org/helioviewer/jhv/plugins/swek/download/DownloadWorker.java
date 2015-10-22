@@ -8,8 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;

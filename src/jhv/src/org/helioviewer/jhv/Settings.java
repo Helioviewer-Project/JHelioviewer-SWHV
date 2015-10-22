@@ -11,8 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 
 /**
  * A class that stores and reads default values in a settings file.

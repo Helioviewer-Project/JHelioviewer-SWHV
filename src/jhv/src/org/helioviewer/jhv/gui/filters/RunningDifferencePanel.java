@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -35,8 +34,8 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.FileDownloader;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.jp2view.JP2View;
+import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 
 /**
  * Panel to control running differences

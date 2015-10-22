@@ -8,15 +8,15 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.base.time.ImmutableDateTime;
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.viewmodel.imagedata.ImageData;
-import org.helioviewer.viewmodel.metadata.MetaData;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.View.AnimationMode;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
 public class Layers {
 

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek.download;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 
 public enum SWEKOperand {
     EQUALS("="), NOT_EQUAL("!="), BIGGER(">"), SMALLER("<"), BIGGER_OR_EQUAL(">="), SMALLER_OR_EQUAL("<="), LIKE("like");

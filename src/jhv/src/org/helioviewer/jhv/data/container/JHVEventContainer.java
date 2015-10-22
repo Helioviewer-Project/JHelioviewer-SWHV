@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;

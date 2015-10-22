@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 /**

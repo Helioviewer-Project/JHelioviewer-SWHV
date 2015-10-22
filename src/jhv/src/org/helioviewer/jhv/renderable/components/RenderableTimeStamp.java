@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;

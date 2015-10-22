@@ -12,7 +12,7 @@ import org.helioviewer.jhv.plugins.pfssplugin.data.PfssData;
 import org.helioviewer.jhv.plugins.pfssplugin.data.PfssNewDataLoader;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.CancelTask;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 

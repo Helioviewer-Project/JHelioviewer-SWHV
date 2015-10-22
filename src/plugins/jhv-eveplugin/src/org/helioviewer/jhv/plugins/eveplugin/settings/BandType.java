@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 
 public class BandType {
     private String baseUrl;

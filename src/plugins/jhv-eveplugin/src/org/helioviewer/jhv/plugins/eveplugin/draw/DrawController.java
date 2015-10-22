@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
@@ -25,7 +25,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 public class DrawController implements LineDataSelectorModelListener, JHVEventHighlightListener, LayersListener, TimeListener, PlotAreaSpaceListener {
 

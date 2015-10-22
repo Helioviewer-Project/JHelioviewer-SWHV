@@ -15,9 +15,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.base.message.Message;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;

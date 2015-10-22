@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;

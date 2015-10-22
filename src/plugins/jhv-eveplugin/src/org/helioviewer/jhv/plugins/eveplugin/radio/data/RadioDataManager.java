@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.base.Region;
-import org.helioviewer.base.Viewport;
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.Viewport;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
@@ -21,11 +21,11 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.viewmodel.view.jp2view.JP2CallistoView;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image;
-import org.helioviewer.viewmodel.view.jp2view.JP2Image.ReaderMode;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 /**
  * The radio data manager manages all the downloaded data for radio

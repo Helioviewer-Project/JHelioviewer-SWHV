@@ -13,7 +13,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;

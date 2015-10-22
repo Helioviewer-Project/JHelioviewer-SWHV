@@ -48,9 +48,9 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.viewmodel.view.View;
-import org.helioviewer.viewmodel.view.View.AnimationMode;
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
+import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
 /**
  * Panel containing the movie controls.

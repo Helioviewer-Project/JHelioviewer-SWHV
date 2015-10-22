@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.EVEPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;

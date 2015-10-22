@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 /**

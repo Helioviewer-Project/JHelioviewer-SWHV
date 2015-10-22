@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.helioviewer.base.FileUtils;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
-import org.helioviewer.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

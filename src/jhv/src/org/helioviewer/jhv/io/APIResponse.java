@@ -7,7 +7,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;

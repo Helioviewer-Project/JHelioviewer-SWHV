@@ -5,12 +5,12 @@ import java.net.URI;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.message.Message;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 public class LoadURITask extends SwingWorker<View, Void> {
 

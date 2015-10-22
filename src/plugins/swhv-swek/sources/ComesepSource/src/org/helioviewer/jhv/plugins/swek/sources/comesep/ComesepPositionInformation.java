@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.util.List;
 
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 

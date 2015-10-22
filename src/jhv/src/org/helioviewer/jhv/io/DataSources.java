@@ -15,11 +15,11 @@ import java.util.TreeSet;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.AlphanumComparator;
-import org.helioviewer.base.DownloadStream;
-import org.helioviewer.base.logging.Log;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.base.AlphanumComparator;
+import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;

@@ -14,8 +14,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;

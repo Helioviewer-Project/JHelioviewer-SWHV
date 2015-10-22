@@ -7,7 +7,7 @@ import java.util.Date;
 
 import javax.swing.JTextField;
 
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.time.TimeUtils;
 
 /**
  * This offers a text field to edit the time at a day. A normal

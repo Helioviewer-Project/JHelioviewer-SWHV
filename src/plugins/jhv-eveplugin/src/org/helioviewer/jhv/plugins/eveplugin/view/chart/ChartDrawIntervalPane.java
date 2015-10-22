@@ -21,8 +21,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.base.interval.Interval;
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -30,7 +30,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 /**
  *

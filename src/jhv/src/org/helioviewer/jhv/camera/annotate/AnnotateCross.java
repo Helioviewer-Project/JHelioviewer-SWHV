@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;

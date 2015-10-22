@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;

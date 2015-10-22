@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;

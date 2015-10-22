@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 
 public interface RadioDataManagerListener {
 

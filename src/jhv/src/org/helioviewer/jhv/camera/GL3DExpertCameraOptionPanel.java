@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.base.time.TimeUtils;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;

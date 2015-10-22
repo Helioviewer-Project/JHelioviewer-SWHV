@@ -19,8 +19,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.logging.LogSettings;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.gui.ClipBoardCopier;
 
 /**

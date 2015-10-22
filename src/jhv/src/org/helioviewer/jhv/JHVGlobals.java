@@ -9,7 +9,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 
 /**
  * Intended to be a class for static functions and fields relevant to the

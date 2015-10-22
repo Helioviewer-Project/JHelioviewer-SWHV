@@ -15,8 +15,8 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.base.DownloadStream;
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.DownloadStream;
 
 /**
  * a TreeModel that organizes the structure of the nodes in the tree and creates

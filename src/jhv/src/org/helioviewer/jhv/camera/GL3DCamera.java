@@ -3,16 +3,16 @@ package org.helioviewer.jhv.camera;
 import java.awt.Point;
 import java.util.Date;
 
-import org.helioviewer.base.astronomy.Sun;
-import org.helioviewer.base.logging.Log;
-import org.helioviewer.base.math.GL3DMat4d;
-import org.helioviewer.base.math.GL3DQuatd;
-import org.helioviewer.base.math.GL3DVec2d;
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.math.GL3DMat4d;
+import org.helioviewer.jhv.base.math.GL3DQuatd;
+import org.helioviewer.jhv.base.math.GL3DVec2d;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.viewmodel.metadata.MetaData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 

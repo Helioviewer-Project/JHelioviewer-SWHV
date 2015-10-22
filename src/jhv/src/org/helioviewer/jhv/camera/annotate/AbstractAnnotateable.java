@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
 
-import org.helioviewer.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.GL3DVec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 
 public abstract class AbstractAnnotateable implements Annotateable {

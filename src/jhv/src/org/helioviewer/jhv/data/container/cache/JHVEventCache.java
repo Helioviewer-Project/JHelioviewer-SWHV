@@ -13,8 +13,8 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.helioviewer.base.cache.RequestCache;
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.cache.RequestCache;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.util.DateUtil;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;

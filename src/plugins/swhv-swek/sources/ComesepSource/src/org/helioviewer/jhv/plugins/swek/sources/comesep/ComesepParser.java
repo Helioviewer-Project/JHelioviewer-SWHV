@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.helioviewer.base.logging.Log;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;

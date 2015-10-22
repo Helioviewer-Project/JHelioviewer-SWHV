@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 
 /**
  *

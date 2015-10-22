@@ -4,9 +4,9 @@ import java.awt.Rectangle;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.base.interval.Interval;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
-import org.helioviewer.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class RadioImage {
     private Interval<Date> imageTimeInterval;

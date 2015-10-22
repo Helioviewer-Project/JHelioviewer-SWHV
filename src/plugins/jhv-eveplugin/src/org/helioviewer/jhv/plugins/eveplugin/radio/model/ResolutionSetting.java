@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
 import java.awt.Rectangle;
 
-import org.helioviewer.base.math.Vector2dInt;
+import org.helioviewer.jhv.base.math.Vector2dInt;
 
 public class ResolutionSetting {
 
