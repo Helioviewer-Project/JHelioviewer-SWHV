@@ -1,37 +1,37 @@
 package org.helioviewer.jhv.base;
 
-import org.helioviewer.jhv.base.math.GL3DVec2d;
+import org.helioviewer.jhv.base.math.Vec2d;
 
 public class Region {
 
-    private final GL3DVec2d lowerLeftCorner;
-    private final GL3DVec2d sizeVector;
+    private final Vec2d lowerLeftCorner;
+    private final Vec2d sizeVector;
 
     public Region(double newLowerLeftX, double newLowerLeftY, double newWidth, double newHeight) {
-        lowerLeftCorner = new GL3DVec2d(newLowerLeftX, newLowerLeftY);
-        sizeVector = new GL3DVec2d(newWidth, newHeight);
+        lowerLeftCorner = new Vec2d(newLowerLeftX, newLowerLeftY);
+        sizeVector = new Vec2d(newWidth, newHeight);
     }
 
-    public Region(GL3DVec2d newLowerLeftCorner, double newWidth, double newHeight) {
+    public Region(Vec2d newLowerLeftCorner, double newWidth, double newHeight) {
         lowerLeftCorner = newLowerLeftCorner;
-        sizeVector = new GL3DVec2d(newWidth, newHeight);
+        sizeVector = new Vec2d(newWidth, newHeight);
     }
 
-    public Region(double newLowerLeftX, double newLowerLeftY, GL3DVec2d newSizeVector) {
-        lowerLeftCorner = new GL3DVec2d(newLowerLeftX, newLowerLeftY);
+    public Region(double newLowerLeftX, double newLowerLeftY, Vec2d newSizeVector) {
+        lowerLeftCorner = new Vec2d(newLowerLeftX, newLowerLeftY);
         sizeVector = newSizeVector;
     }
 
-    public Region(GL3DVec2d newLowerLeftCorner, GL3DVec2d newSizeVector) {
+    public Region(Vec2d newLowerLeftCorner, Vec2d newSizeVector) {
         lowerLeftCorner = newLowerLeftCorner;
         sizeVector = newSizeVector;
     }
 
-    public GL3DVec2d getLowerLeftCorner() {
+    public Vec2d getLowerLeftCorner() {
         return lowerLeftCorner;
     }
 
-    public GL3DVec2d getSize() {
+    public Vec2d getSize() {
         return sizeVector;
     }
 
@@ -43,16 +43,16 @@ public class Region {
         return sizeVector.x;
     }
 
-    public GL3DVec2d getLowerRightCorner() {
-        return new GL3DVec2d(lowerLeftCorner.x + sizeVector.x, lowerLeftCorner.y);
+    public Vec2d getLowerRightCorner() {
+        return new Vec2d(lowerLeftCorner.x + sizeVector.x, lowerLeftCorner.y);
     }
 
-    public GL3DVec2d getUpperLeftCorner() {
-        return new GL3DVec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    public Vec2d getUpperLeftCorner() {
+        return new Vec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
     }
 
-    public GL3DVec2d getUpperRightCorner() {
-        return GL3DVec2d.add(lowerLeftCorner, sizeVector);
+    public Vec2d getUpperRightCorner() {
+        return Vec2d.add(lowerLeftCorner, sizeVector);
     }
 
     public boolean equals(Object o) {

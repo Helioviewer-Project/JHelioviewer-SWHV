@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.display.Displayer;
 
 /**
@@ -33,7 +33,7 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         int y = p.y - lastMousePoint.y;
         double m = 2. * camera.getCameraWidth() / Displayer.getViewport().getHeight();
 
-        GL3DVec3d tran = camera.getTranslation();
+        Vec3d tran = camera.getTranslation();
         tran.x += x * m;
         tran.y -= y * m;
         camera.setPanning(tran.x, tran.y);

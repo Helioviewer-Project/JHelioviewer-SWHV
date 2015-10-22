@@ -1,22 +1,22 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
 public abstract class AbstractMetaData implements MetaData {
 
-    private GL3DVec2d lowerLeftCorner;
-    private GL3DVec2d sizeVector;
+    private Vec2d lowerLeftCorner;
+    private Vec2d sizeVector;
 
     protected int pixelWidth;
     protected int pixelHeight;
 
     protected ImmutableDateTime dateObs = TimeUtils.epoch;
-    protected GL3DQuatd rotationObs = GL3DQuatd.ZERO;
+    protected Quatd rotationObs = Quatd.ZERO;
     protected double distanceObs = Sun.MeanEarthDistance;
     protected double innerRadius = 0.;
     protected double outerRadius = 40.;
@@ -24,7 +24,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     //Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
-    protected GL3DVec3d cutOffDirection;
+    protected Vec3d cutOffDirection;
 
     public AbstractMetaData() {
         lowerLeftCorner = null;
@@ -44,8 +44,8 @@ public abstract class AbstractMetaData implements MetaData {
      *            Physical height of the corresponding image
      */
     public AbstractMetaData(double newLowerLeftCornerX, double newLowerLeftCornerY, double newWidth, double newHeight) {
-        lowerLeftCorner = new GL3DVec2d(newLowerLeftCornerX, newLowerLeftCornerY);
-        sizeVector = new GL3DVec2d(newWidth, newHeight);
+        lowerLeftCorner = new Vec2d(newLowerLeftCornerX, newLowerLeftCornerY);
+        sizeVector = new Vec2d(newWidth, newHeight);
     }
 
     /**
@@ -54,7 +54,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newImageSize
      *            Physical size of the corresponding image
      */
-    protected void setPhysicalSize(GL3DVec2d newImageSize) {
+    protected void setPhysicalSize(Vec2d newImageSize) {
         sizeVector = newImageSize;
     }
 
@@ -64,22 +64,22 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newlLowerLeftCorner
      *            Physical lower left corner the corresponding image
      */
-    protected void setPhysicalLowerLeftCorner(GL3DVec2d newlLowerLeftCorner) {
+    protected void setPhysicalLowerLeftCorner(Vec2d newlLowerLeftCorner) {
         lowerLeftCorner = newlLowerLeftCorner;
     }
 
     @Override
-    public GL3DVec2d getPhysicalLowerLeft() {
+    public Vec2d getPhysicalLowerLeft() {
         return lowerLeftCorner;
     }
 
     @Override
-    public GL3DVec2d getPhysicalUpperLeft() {
-        return new GL3DVec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    public Vec2d getPhysicalUpperLeft() {
+        return new Vec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
     }
 
     @Override
-    public GL3DVec2d getPhysicalSize() {
+    public Vec2d getPhysicalSize() {
         return sizeVector;
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public GL3DQuatd getRotationObs() {
+    public Quatd getRotationObs() {
         return rotationObs;
     }
 
@@ -124,7 +124,7 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public GL3DVec3d getCutOffDirection() {
+    public Vec3d getCutOffDirection() {
         return cutOffDirection;
     }
 

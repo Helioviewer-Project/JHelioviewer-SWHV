@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
+import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -202,8 +202,8 @@ public class JP2View extends AbstractView {
         int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
         int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
 
-        GL3DVec2d rUpperLeft = r.getUpperLeftCorner();
-        GL3DVec2d mUpperLeft = m.getPhysicalUpperLeft();
+        Vec2d rUpperLeft = r.getUpperLeftCorner();
+        Vec2d mUpperLeft = m.getPhysicalUpperLeft();
         double displacementX = rUpperLeft.x - mUpperLeft.x;
         double displacementY = rUpperLeft.y - mUpperLeft.y;
 

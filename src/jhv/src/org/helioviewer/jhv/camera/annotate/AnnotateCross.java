@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -13,18 +13,18 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
-    private final ArrayList<GL3DVec3d> crossPoints = new ArrayList<GL3DVec3d>();
+    private final ArrayList<Vec3d> crossPoints = new ArrayList<Vec3d>();
 
     public AnnotateCross(GL3DCamera _camera) {
         super(_camera);
     }
 
-    private void drawCross(GL2 gl, GL3DVec3d bp) {
+    private void drawCross(GL2 gl, Vec3d bp) {
         double delta = Math.PI * 2.5 / 180;
-        GL3DVec3d p1 = new GL3DVec3d(radius, bp.y - delta, bp.z);
-        GL3DVec3d p2 = new GL3DVec3d(radius, bp.y + delta, bp.z);
-        GL3DVec3d p3 = new GL3DVec3d(radius, bp.y, bp.z - delta);
-        GL3DVec3d p4 = new GL3DVec3d(radius, bp.y, bp.z + delta);
+        Vec3d p1 = new Vec3d(radius, bp.y - delta, bp.z);
+        Vec3d p2 = new Vec3d(radius, bp.y + delta, bp.z);
+        Vec3d p3 = new Vec3d(radius, bp.y, bp.z - delta);
+        Vec3d p4 = new Vec3d(radius, bp.y, bp.z + delta);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
         interpolatedDraw(gl, p1, p2);
@@ -35,14 +35,14 @@ public class AnnotateCross extends AbstractAnnotateable {
         gl.glEnd();
     }
 
-    private void interpolatedDraw(GL2 gl, GL3DVec3d p1s, GL3DVec3d p2s) {
+    private void interpolatedDraw(GL2 gl, Vec3d p1s, Vec3d p2s) {
         int subdivisions = 2;
 
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            GL3DVec3d pc = toCart(camera, radius, y, z);
+            Vec3d pc = toCart(camera, radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
@@ -101,7 +101,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        GL3DVec3d pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3d pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             crossPoints.add(pt);
             activeIndex = crossPoints.size() - 1;

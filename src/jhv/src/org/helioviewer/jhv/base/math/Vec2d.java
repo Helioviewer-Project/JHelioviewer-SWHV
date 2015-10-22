@@ -2,13 +2,13 @@ package org.helioviewer.jhv.base.math;
 
 import org.helioviewer.jhv.base.logging.Log;
 
-public class GL3DVec2d {
+public class Vec2d {
     /**
      * Predefined Vectors
      */
-    public static final GL3DVec2d ZERO = new GL3DVec2d(0.0, 0.0);
-    public static final GL3DVec2d NEGATIVE_INFINITY_VECTOR = new GL3DVec2d(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-    public static final GL3DVec2d POSITIVE_INFINITY_VECTOR = new GL3DVec2d(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    public static final Vec2d ZERO = new Vec2d(0.0, 0.0);
+    public static final Vec2d NEGATIVE_INFINITY_VECTOR = new Vec2d(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+    public static final Vec2d POSITIVE_INFINITY_VECTOR = new Vec2d(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
     /**
      * Coordinates
@@ -18,21 +18,21 @@ public class GL3DVec2d {
 
     // Constructors
 
-    public GL3DVec2d(double x, double y) {
+    public Vec2d(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public GL3DVec2d(GL3DVec2d vector) {
+    public Vec2d(Vec2d vector) {
         this.x = vector.x;
         this.y = vector.y;
     }
 
-    public GL3DVec2d() {
-        this(GL3DVec2d.ZERO);
+    public Vec2d() {
+        this(Vec2d.ZERO);
     }
 
-    public GL3DVec2d(double[] coordinates) {
+    public Vec2d(double[] coordinates) {
         if (coordinates == null || coordinates.length < 2) {
             throw new IllegalArgumentException("Coordinate Array must contain at least 3 dimensions");
         }
@@ -40,11 +40,11 @@ public class GL3DVec2d {
         this.y = coordinates[1];
     }
 
-    public GL3DVec2d(Vector2dInt newLowerLeftCorner) {
+    public Vec2d(Vector2dInt newLowerLeftCorner) {
         this(newLowerLeftCorner.getX(), newLowerLeftCorner.getY());
     }
 
-    public void add(GL3DVec2d vec) {
+    public void add(Vec2d vec) {
         this.x += vec.x;
         this.y += vec.y;
     }
@@ -54,15 +54,15 @@ public class GL3DVec2d {
         this.y += s;
     }
 
-    public static GL3DVec2d add(GL3DVec2d vec1, GL3DVec2d vec2) {
-        return new GL3DVec2d(vec1.x + vec2.x, vec1.y + vec2.y);
+    public static Vec2d add(Vec2d vec1, Vec2d vec2) {
+        return new Vec2d(vec1.x + vec2.x, vec1.y + vec2.y);
     }
 
-    public static GL3DVec2d add(GL3DVec2d vec1, double s) {
-        return new GL3DVec2d(vec1.x + s, vec1.y + s);
+    public static Vec2d add(Vec2d vec1, double s) {
+        return new Vec2d(vec1.x + s, vec1.y + s);
     }
 
-    public void subtract(GL3DVec2d vec) {
+    public void subtract(Vec2d vec) {
         this.x -= vec.x;
         this.y -= vec.y;
     }
@@ -72,15 +72,15 @@ public class GL3DVec2d {
         this.y -= s;
     }
 
-    public static GL3DVec2d subtract(GL3DVec2d vec1, GL3DVec2d vec2) {
-        return new GL3DVec2d(vec1.x - vec2.x, vec1.y - vec2.y);
+    public static Vec2d subtract(Vec2d vec1, Vec2d vec2) {
+        return new Vec2d(vec1.x - vec2.x, vec1.y - vec2.y);
     }
 
-    public static GL3DVec2d subtract(GL3DVec2d vec1, double s) {
-        return new GL3DVec2d(vec1.x - s, vec1.y - s);
+    public static Vec2d subtract(Vec2d vec1, double s) {
+        return new Vec2d(vec1.x - s, vec1.y - s);
     }
 
-    public void divide(GL3DVec2d vec) {
+    public void divide(Vec2d vec) {
         if (vec.x == 0.0 || vec.y == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
@@ -94,19 +94,19 @@ public class GL3DVec2d {
         this.y /= s;
     }
 
-    public static GL3DVec2d divide(GL3DVec2d vec1, GL3DVec2d vec2) {
+    public static Vec2d divide(Vec2d vec1, Vec2d vec2) {
         if (vec2.x == 0.0 || vec2.y == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new GL3DVec2d(vec1.x / vec2.x, vec1.y / vec2.y);
+        return new Vec2d(vec1.x / vec2.x, vec1.y / vec2.y);
     }
 
-    public static GL3DVec2d divide(GL3DVec2d vec1, double s) {
+    public static Vec2d divide(Vec2d vec1, double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new GL3DVec2d(vec1.x / s, vec1.y / s);
+        return new Vec2d(vec1.x / s, vec1.y / s);
     }
 
-    public void multiply(GL3DVec2d vec) {
+    public void multiply(Vec2d vec) {
         this.x *= vec.x;
         this.y *= vec.y;
     }
@@ -116,19 +116,19 @@ public class GL3DVec2d {
         this.y *= s;
     }
 
-    public static GL3DVec2d multiply(GL3DVec2d vec1, GL3DVec2d vec2) {
-        return new GL3DVec2d(vec1.x * vec2.x, vec1.y * vec2.y);
+    public static Vec2d multiply(Vec2d vec1, Vec2d vec2) {
+        return new Vec2d(vec1.x * vec2.x, vec1.y * vec2.y);
     }
 
-    public static GL3DVec2d multiply(GL3DVec2d vec1, double s) {
-        return new GL3DVec2d(vec1.x * s, vec1.y * s);
+    public static Vec2d multiply(Vec2d vec1, double s) {
+        return new Vec2d(vec1.x * s, vec1.y * s);
     }
 
-    public double dot(GL3DVec2d vec) {
-        return GL3DVec2d.dot(this, vec);
+    public double dot(Vec2d vec) {
+        return Vec2d.dot(this, vec);
     }
 
-    public static double dot(GL3DVec2d u, GL3DVec2d v) {
+    public static double dot(Vec2d u, Vec2d v) {
         return (u.x * v.x) + (u.y * v.y);
     }
 
@@ -137,17 +137,17 @@ public class GL3DVec2d {
         this.y = -this.y;
     }
 
-    public static GL3DVec2d negate(GL3DVec2d vec) {
-        GL3DVec2d newVec = vec.copy();
+    public static Vec2d negate(Vec2d vec) {
+        Vec2d newVec = vec.copy();
         newVec.negate();
         return newVec;
     }
 
-    private GL3DVec2d copy() {
-        return new GL3DVec2d(this.x, this.y);
+    private Vec2d copy() {
+        return new Vec2d(this.x, this.y);
     }
 
-    public boolean isApproxEqual(GL3DVec2d vec, double tolerance) {
+    public boolean isApproxEqual(Vec2d vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance;
     }
 
@@ -202,15 +202,15 @@ public class GL3DVec2d {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof GL3DVec2d)
-            return isApproxEqual((GL3DVec2d) o, 0.0);
+        if (o instanceof Vec2d)
+            return isApproxEqual((Vec2d) o, 0.0);
         return false;
     }
 
-    public static double[] toArray(GL3DVec2d[] vecs) {
+    public static double[] toArray(Vec2d[] vecs) {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
-            GL3DVec2d v = vecs[i];
+            Vec2d v = vecs[i];
             arr[i * 2 + 0] = v.x;
             arr[i * 2 + 1] = v.y;
         }
@@ -222,36 +222,36 @@ public class GL3DVec2d {
         return "(" + x + ", " + y + ")";
     }
 
-    public static GL3DVec2d scale(GL3DVec2d vec, double scale) {
-        return new GL3DVec2d(vec.x * scale, vec.y * scale);
+    public static Vec2d scale(Vec2d vec, double scale) {
+        return new Vec2d(vec.x * scale, vec.y * scale);
     }
 
-    public static GL3DVec2d scale(GL3DVec2d vec, GL3DVec2d scale) {
-        return new GL3DVec2d(vec.x * scale.x, vec.y * scale.y);
+    public static Vec2d scale(Vec2d vec, Vec2d scale) {
+        return new Vec2d(vec.x * scale.x, vec.y * scale.y);
     }
 
-    public static GL3DVec2d invertedScale(GL3DVec2d vec, GL3DVec2d scale) {
-        return new GL3DVec2d(vec.x / scale.x, vec.y / scale.y);
+    public static Vec2d invertedScale(Vec2d vec, Vec2d scale) {
+        return new Vec2d(vec.x / scale.x, vec.y / scale.y);
 
     }
 
-    public GL3DVec2d getYVector() {
-        return new GL3DVec2d(0., this.y);
+    public Vec2d getYVector() {
+        return new Vec2d(0., this.y);
     }
 
-    public GL3DVec2d getXVector() {
-        return new GL3DVec2d(this.x, 0.);
+    public Vec2d getXVector() {
+        return new Vec2d(this.x, 0.);
     }
 
-    public static GL3DVec2d crop(GL3DVec2d v, GL3DVec2d min, GL3DVec2d max) {
-        return new GL3DVec2d(Math.min(max.x, Math.max(min.x, v.x)), Math.min(max.x, Math.max(min.x, v.y)));
+    public static Vec2d crop(Vec2d v, Vec2d min, Vec2d max) {
+        return new Vec2d(Math.min(max.x, Math.max(min.x, v.x)), Math.min(max.x, Math.max(min.x, v.y)));
     }
 
-    public static GL3DVec2d componentMin(final GL3DVec2d v1, final GL3DVec2d v2) {
-        return new GL3DVec2d(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y));
+    public static Vec2d componentMin(final Vec2d v1, final Vec2d v2) {
+        return new Vec2d(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y));
     }
 
-    public static GL3DVec2d componentMax(final GL3DVec2d v1, final GL3DVec2d v2) {
-        return new GL3DVec2d(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
+    public static Vec2d componentMax(final Vec2d v1, final Vec2d v2) {
+        return new Vec2d(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y));
     }
 }

@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 
 /**
@@ -26,7 +26,7 @@ public interface MetaData {
      *
      * @return Physical image size
      */
-    public GL3DVec2d getPhysicalSize();
+    public Vec2d getPhysicalSize();
 
     /**
      * Returns the physical position of the lower left corner of the
@@ -34,9 +34,9 @@ public interface MetaData {
      *
      * @return Physical position of the lower left corner
      */
-    public GL3DVec2d getPhysicalLowerLeft();
+    public Vec2d getPhysicalLowerLeft();
 
-    public GL3DVec2d getPhysicalUpperLeft();
+    public Vec2d getPhysicalUpperLeft();
 
     /**
      * Returns the width of the image in pixels.
@@ -54,7 +54,7 @@ public interface MetaData {
 
     public ImmutableDateTime getDateObs();
 
-    public GL3DQuatd getRotationObs();
+    public Quatd getRotationObs();
 
     public double getDistanceObs();
 
@@ -64,6 +64,6 @@ public interface MetaData {
 
     float getCutOffValue();
 
-    GL3DVec3d getCutOffDirection();
+    Vec3d getCutOffDirection();
 
 }

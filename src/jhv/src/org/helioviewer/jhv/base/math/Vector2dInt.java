@@ -39,7 +39,7 @@ public final class Vector2dInt {
         y = v.y;
     }
 
-    public Vector2dInt(final GL3DVec2d v) {
+    public Vector2dInt(final Vec2d v) {
         x = (int) Math.round(v.x);
         y = (int) Math.round(v.y);
     }

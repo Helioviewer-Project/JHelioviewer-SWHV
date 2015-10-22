@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.base.math;
 
-public class GL3DMat4d {
+public class Mat4d {
     /**
      * 0 4 8 12 1 5 9 13 2 6 10 14 3 7 11 15
      */
     public final double[] m = new double[16];
 
-    public GL3DMat4d(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
+    public Mat4d(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
         m[8] = M8;
@@ -25,10 +25,10 @@ public class GL3DMat4d {
         m[15] = M15;
     }
 
-    private GL3DMat4d() {
+    private Mat4d() {
     }
 
-    public GL3DMat4d(GL3DMat4d mat) {
+    public Mat4d(Mat4d mat) {
         set(mat);
     }
 
@@ -41,18 +41,18 @@ public class GL3DMat4d {
     }
 
     public final void setIdentity() {
-        this.set(GL3DMat4d.identity());
+        this.set(Mat4d.identity());
     }
 
-    public final static GL3DMat4d identity() {
-        return new GL3DMat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    public final static Mat4d identity() {
+        return new Mat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
-    public final static GL3DMat4d orthoIdentity() {
-        return new GL3DMat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+    public final static Mat4d orthoIdentity() {
+        return new Mat4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
     }
 
-    public final GL3DMat4d set(GL3DMat4d A) {
+    public final Mat4d set(Mat4d A) {
         m[0] = A.m[0];
         m[4] = A.m[4];
         m[8] = A.m[8];
@@ -73,7 +73,7 @@ public class GL3DMat4d {
         return this;
     }
 
-    public final GL3DMat4d set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
+    public final Mat4d set(double M0, double M4, double M8, double M12, double M1, double M5, double M9, double M13, double M2, double M6, double M10, double M14, double M3, double M7, double M11, double M15) {
         m[0] = M0;
         m[4] = M4;
         m[8] = M8;
@@ -94,7 +94,7 @@ public class GL3DMat4d {
         return this;
     }
 
-    public final GL3DMat4d set(int index, double f) {
+    public final Mat4d set(int index, double f) {
         if (index < 0 || index > 15)
             throw new IndexOutOfBoundsException("Mat4 has 16 fields");
 
@@ -109,7 +109,7 @@ public class GL3DMat4d {
         return m[index];
     }
 
-    public final GL3DMat4d multiply(GL3DMat4d A) {
+    public final Mat4d multiply(Mat4d A) {
         set(m[0] * A.m[0] + m[4] * A.m[1] + m[8] * A.m[2] + m[12] * A.m[3], // row 1
                 m[0] * A.m[4] + m[4] * A.m[5] + m[8] * A.m[6] + m[12] * A.m[7], m[0] * A.m[8] + m[4] * A.m[9] + m[8] * A.m[10] + m[12] * A.m[11], m[0] * A.m[12] + m[4] * A.m[13] + m[8] * A.m[14] + m[12] * A.m[15], m[1] * A.m[0] + m[5] * A.m[1] + m[9] * A.m[2] + m[13] * A.m[3], // row 2
                 m[1] * A.m[4] + m[5] * A.m[5] + m[9] * A.m[6] + m[13] * A.m[7], m[1] * A.m[8] + m[5] * A.m[9] + m[9] * A.m[10] + m[13] * A.m[11], m[1] * A.m[12] + m[5] * A.m[13] + m[9] * A.m[14] + m[13] * A.m[15], m[2] * A.m[0] + m[6] * A.m[1] + m[10] * A.m[2] + m[14] * A.m[3], // row 3
@@ -118,22 +118,22 @@ public class GL3DMat4d {
         return this;
     }
 
-    public final GL3DVec3d multiply(GL3DVec3d v) {
+    public final Vec3d multiply(Vec3d v) {
         double W = m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15];
-        return new GL3DVec3d((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
+        return new Vec3d((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
     }
 
-    public final GL3DVec3d multiplyTranspose(GL3DVec3d v) {
+    public final Vec3d multiplyTranspose(Vec3d v) {
         double W = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
-        return new GL3DVec3d((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
+        return new Vec3d((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
     }
 
-    public final GL3DVec4d multiply(GL3DVec4d v) {
-        return new GL3DVec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
+    public final Vec4d multiply(Vec4d v) {
+        return new Vec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
 
-    public final GL3DVec3d translation() {
-        return new GL3DVec3d(m[12], m[13], m[14]);
+    public final Vec3d translation() {
+        return new Vec3d(m[12], m[13], m[14]);
     }
 
     public final void setTranslation(double x, double y, double z) {
@@ -142,8 +142,8 @@ public class GL3DMat4d {
         m[14] = z;
     }
 
-    public final GL3DMat4d inverse() {
-        GL3DMat4d inverse = new GL3DMat4d();
+    public final Mat4d inverse() {
+        Mat4d inverse = new Mat4d();
         // Cache the matrix values (makes for huge speed increases!)
         double a00 = this.m[0], a01 = this.m[1], a02 = this.m[2], a03 = this.m[3];
         double a10 = this.m[4], a11 = this.m[5], a12 = this.m[6], a13 = this.m[7];
@@ -250,55 +250,55 @@ public class GL3DMat4d {
     // return I;
     // }
 
-    public final GL3DMat4d translate(GL3DVec3d t) {
+    public final Mat4d translate(Vec3d t) {
         m[12] += t.x;
         m[13] += t.y;
         m[14] += t.z;
         return this;
     }
 
-    public final GL3DMat4d translate(double x, double y, double z) {
+    public final Mat4d translate(double x, double y, double z) {
         m[12] += x;
         m[13] += y;
         m[14] += z;
         return this;
     }
 
-    public final static GL3DMat4d translation(GL3DVec3d t) {
-        return new GL3DMat4d(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
+    public final static Mat4d translation(Vec3d t) {
+        return new Mat4d(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
 
-    public final GL3DMat4d scale(GL3DVec3d s) {
+    public final Mat4d scale(Vec3d s) {
         m[0] *= s.x;
         m[5] *= s.y;
         m[10] *= s.z;
         return this;
     }
 
-    public final GL3DMat4d scale(double sx, double sy, double sz) {
+    public final Mat4d scale(double sx, double sy, double sz) {
         m[0] *= sx;
         m[5] *= sy;
         m[10] *= sz;
         return this;
     }
 
-    public final static GL3DMat4d scaling(double sx, double sy, double sz) {
-        return new GL3DMat4d(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
+    public final static Mat4d scaling(double sx, double sy, double sz) {
+        return new Mat4d(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
 
-    public final GL3DMat4d rotate(double angle, GL3DVec3d axis) {
+    public final Mat4d rotate(double angle, Vec3d axis) {
         return this.rotate(angle, axis.x, axis.y, axis.z);
     }
 
-    public final GL3DMat4d rotate(double angle, double axisx, double axisy, double axisz) {
-        return this.multiply(GL3DMat4d.rotation(angle, axisx, axisy, axisz));
+    public final Mat4d rotate(double angle, double axisx, double axisy, double axisz) {
+        return this.multiply(Mat4d.rotation(angle, axisx, axisy, axisz));
     }
 
-    public final GL3DMat4d invert() {
+    public final Mat4d invert() {
         return this.set(this.inverse());
     }
 
-    public final GL3DMat4d transpose() {
+    public final Mat4d transpose() {
         double temp;
         temp = m[1];
         m[1] = m[4];
@@ -321,25 +321,25 @@ public class GL3DMat4d {
         return this;
     }
 
-    public final GL3DMat4d swap(int i1, int i2) {
+    public final Mat4d swap(int i1, int i2) {
         double temp = get(i1);
         set(i1, get(i2));
         set(i2, temp);
         return this;
     }
 
-    public final static GL3DMat4d rotation(GL3DQuatd q) {
-        return GL3DMat4d.rotation(q.getAngle(), q.getRotationAxis());
+    public final static Mat4d rotation(Quatd q) {
+        return Mat4d.rotation(q.getAngle(), q.getRotationAxis());
     }
 
-    public final static GL3DMat4d rotation(double angle, GL3DVec3d axis) {
-        return GL3DMat4d.rotation(angle, axis.x, axis.y, axis.z);
+    public final static Mat4d rotation(double angle, Vec3d axis) {
+        return Mat4d.rotation(angle, axis.x, axis.y, axis.z);
     }
 
-    public final static GL3DMat4d rotation(double angle, double axisx, double axisy, double axisz) {
+    public final static Mat4d rotation(double angle, double axisx, double axisy, double axisz) {
         // Quaterniond quat = new Quaterniond(degAng, axisx, axisy, axisz);
         // return buildRotationMatrix(quat);
-        GL3DMat4d r = GL3DMat4d.identity();
+        Mat4d r = Mat4d.identity();
         double RadAng = angle;
         double ca = Math.cos(RadAng);
         double sa = Math.sin(RadAng);
@@ -408,19 +408,19 @@ public class GL3DMat4d {
         return r;
     }
 
-    public final static GL3DMat4d frustum(double l, double r, double b, double t, double n, double f) {
-        return new GL3DMat4d((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
+    public final static Mat4d frustum(double l, double r, double b, double t, double n, double f) {
+        return new Mat4d((2 * n) / (r - l), 0, (r + l) / (r - l), 0, 0, (2 * n) / (t - b), (t + b) / (t - b), 0, 0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n), 0, 0, -1, 0);
     }
 
-    public final static GL3DMat4d ortho(double l, double r, double b, double t, double n, double f) {
-        return new GL3DMat4d(2. / (r - l), 0., 0., -(r + l) / (r - l), 0., 2 / (t - b), 0., -(t + b) / (t - b), 0., 0., -2. / (f - n), -(f + n) / (f - n), 0., 0., 0., 1.);
+    public final static Mat4d ortho(double l, double r, double b, double t, double n, double f) {
+        return new Mat4d(2. / (r - l), 0., 0., -(r + l) / (r - l), 0., 2 / (t - b), 0., -(t + b) / (t - b), 0., 0., -2. / (f - n), -(f + n) / (f - n), 0., 0., 0., 1.);
     }
 
-    public final static GL3DMat4d orthoInverse(double l, double r, double b, double t, double n, double f) {
-        return new GL3DMat4d((r - l) / 2., 0., 0., -(r + l) / 2., 0., (t - b) / 2., 0., (t + b) / 2., 0., 0., (n - f) / 2., -(f + n) / 2., 0., 0., 0., 1.);
+    public final static Mat4d orthoInverse(double l, double r, double b, double t, double n, double f) {
+        return new Mat4d((r - l) / 2., 0., 0., -(r + l) / 2., 0., (t - b) / 2., 0., (t + b) / 2., 0., 0., (n - f) / 2., -(f + n) / 2., 0., 0., 0., 1.);
     }
 
-    public final static GL3DMat4d perspective(double fov, double aspect, double n, double f) {
+    public final static Mat4d perspective(double fov, double aspect, double n, double f) {
         double t = Math.tan(Math.toRadians(fov * 0.5)) * n;
         double b = -t;
         double r = t * aspect;
@@ -428,19 +428,19 @@ public class GL3DMat4d {
         return frustum(l, r, b, t, n, f);
     }
 
-    public final static GL3DMat4d viewport(double x, double y, double ww, double wh, double n, double f) {
+    public final static Mat4d viewport(double x, double y, double ww, double wh, double n, double f) {
         double ww2 = ww * 0.5;
         double wh2 = wh * 0.5;
         // negate the first wh because windows has topdown window coords
-        return new GL3DMat4d(ww2, 0, 0, ww2 + x, 0, -wh2, 0, wh2 + y, 0, 0, (f - n) * 0.5, (f + n) * 0.5, 0, 0, 0, 1);
+        return new Mat4d(ww2, 0, 0, ww2 + x, 0, -wh2, 0, wh2 + y, 0, 0, (f - n) * 0.5, (f + n) * 0.5, 0, 0, 0, 1);
     }
 
-    public final GL3DMat3d mat3() {
-        return new GL3DMat3d(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
+    public final Mat3d mat3() {
+        return new Mat3d(m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]);
     }
 
-    public final GL3DMat4d copy() {
-        return new GL3DMat4d(this);
+    public final Mat4d copy() {
+        return new Mat4d(this);
     }
 
     @Override

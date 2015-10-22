@@ -13,8 +13,8 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -154,8 +154,8 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
         JHVEvent lastJHVEvent = mouseOverJHVEvent;
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
-        GL3DVec3d pt = null;
-        GL3DVec3d hitpoint = null;
+        Vec3d pt = null;
+        Vec3d hitpoint = null;
 
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
@@ -170,11 +170,11 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
                 Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Position.Latitudinal p = Sun.getEarth(date);
-                GL3DQuatd localRotation = new GL3DQuatd(p.lat, p.lon);
+                Quatd localRotation = new Quatd(p.lat, p.lon);
                 hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
 
-                GL3DQuatd q = new GL3DQuatd(p.lat, p.lon);
-                pt = q.rotateInverseVector(new GL3DVec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+                Quatd q = new Quatd(p.lat, p.lon);
+                pt = q.rotateInverseVector(new Vec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
 
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e);
@@ -208,12 +208,12 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
     protected static Point highlightedMousePosition = new Point(0, 0);
 
-    private GL3DVec3d getHitPointPlane(MouseEvent e) {
+    private Vec3d getHitPointPlane(MouseEvent e) {
         return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());
     }
 
-    private GL3DVec3d getHitPoint(MouseEvent e) {
-        GL3DVec3d hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+    private Vec3d getHitPoint(MouseEvent e) {
+        Vec3d hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (hp != null)
             hp.y = -hp.y;
         return hp;

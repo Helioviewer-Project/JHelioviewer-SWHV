@@ -18,10 +18,10 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DMat4d;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -75,14 +75,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, GL3DQuatd q) {
+    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quatd q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
             for (int i = 0; i <= mres; i++) {
                 double alpha = 1. - i / (double) mres;
                 double r = alpha * r_start + (1 - alpha) * (r_end);
                 double theta = alpha * t_start + (1 - alpha) * (t_end);
-                GL3DVec3d res = q.rotateInverseVector(new GL3DVec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3d res = q.rotateInverseVector(new Vec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
         }
@@ -106,7 +106,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Position.Latitudinal p = Sun.getEarth(date);
-        GL3DQuatd q = new GL3DQuatd(p.lat, p.lon);
+        Quatd q = new Quatd(p.lat, p.lon);
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
@@ -151,7 +151,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double deltar = sz * (el[0] * 2 - 1);
                 double r = distSun + deltar;
                 double theta = principalAngle + deltatheta;
-                GL3DVec3d res = q.rotateInverseVector(new GL3DVec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3d res = q.rotateInverseVector(new Vec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glTexCoord2f(el[0], el[1]);
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
@@ -169,7 +169,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-        List<GL3DVec3d> points = el.getBoundCC();
+        List<Vec3d> points = el.getBoundCC();
         if (points == null || points.size() == 0) {
             points = el.getBoundBox();
             if (points == null || points.size() == 0) {
@@ -186,9 +186,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
-        GL3DVec3d oldBoundaryPoint3d = null;
+        Vec3d oldBoundaryPoint3d = null;
 
-        for (GL3DVec3d point : points) {
+        for (Vec3d point : points) {
             int divpoints = 10;
 
             gl.glBegin(GL2.GL_LINE_STRIP);
@@ -215,7 +215,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
-                GL3DVec3d pt = el.centralPoint();
+                Vec3d pt = el.centralPoint();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
                     this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -235,18 +235,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double width2 = width / 2.;
         double height2 = height / 2.;
 
-        GL3DVec3d sourceDir = new GL3DVec3d(0, 0, 1);
-        GL3DVec3d targetDir = new GL3DVec3d(x, y, z);
+        Vec3d sourceDir = new Vec3d(0, 0, 1);
+        Vec3d targetDir = new Vec3d(x, y, z);
 
-        GL3DVec3d axis = sourceDir.cross(targetDir);
+        Vec3d axis = sourceDir.cross(targetDir);
         axis.normalize();
-        GL3DMat4d r = GL3DMat4d.rotation(Math.atan2(x, z), GL3DVec3d.YAxis);
-        r.rotate(-Math.asin(y / targetDir.length()), GL3DVec3d.XAxis);
+        Mat4d r = Mat4d.rotation(Math.atan2(x, z), Vec3d.YAxis);
+        r.rotate(-Math.asin(y / targetDir.length()), Vec3d.XAxis);
 
-        GL3DVec3d p0 = new GL3DVec3d(-width2, -height2, 0);
-        GL3DVec3d p1 = new GL3DVec3d(-width2, height2, 0);
-        GL3DVec3d p2 = new GL3DVec3d(width2, height2, 0);
-        GL3DVec3d p3 = new GL3DVec3d(width2, -height2, 0);
+        Vec3d p0 = new Vec3d(-width2, -height2, 0);
+        Vec3d p1 = new Vec3d(-width2, height2, 0);
+        Vec3d p2 = new Vec3d(width2, height2, 0);
+        Vec3d p3 = new Vec3d(width2, -height2, 0);
 
         p0 = r.multiply(p0);
         p1 = r.multiply(p1);
@@ -304,7 +304,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
 
-        GL3DVec2d bd = new GL3DVec2d(0, 0);
+        Vec2d bd = new Vec2d(0, 0);
         int ct = 0;
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
-import org.helioviewer.jhv.base.math.GL3DMat4d;
+import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.camera.GL3DObserverCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
@@ -32,7 +32,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
-        GL3DMat4d cameraMatrix = vp.getCamera().getLocalRotation().toMatrix();
+        Mat4d cameraMatrix = vp.getCamera().getLocalRotation().toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
+import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -125,7 +125,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         double l = -currentL + p.lon;
         double d = currentDistance;
 
-        localRotation = new GL3DQuatd(b, l);
+        localRotation = new Quatd(b, l);
         setZTranslation(-d);
         updateCameraTransformation();
     }

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.List;
 
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Vec3d;
 
 /**
  * Interface defining the position of a JHVEvent.
@@ -23,20 +23,20 @@ public interface JHVPositionInformation {
      *
      * @return a list with coordinates defining the bounding box
      */
-    public abstract List<GL3DVec3d> getBoundBox();
+    public abstract List<Vec3d> getBoundBox();
 
     /**
      * Gets the central point of the event.
      *
      * @return the central point.
      */
-    public abstract GL3DVec3d centralPoint();
+    public abstract Vec3d centralPoint();
 
     /**
      * Gets the bound coordinates. Finer grained than the bound box.
      *
      * @return the bound coordinates
      */
-    public abstract List<GL3DVec3d> getBoundCC();
+    public abstract List<Vec3d> getBoundCC();
 
 }

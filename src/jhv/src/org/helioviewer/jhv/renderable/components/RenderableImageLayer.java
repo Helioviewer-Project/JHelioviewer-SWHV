@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.math.GL3DMat4d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
@@ -176,8 +176,8 @@ public class RenderableImageLayer extends AbstractRenderable {
             GL3DCamera camera = vp.getCamera();
 
             camera.push(_imageData.getMasterTime(), null);
-            GL3DMat4d vpmi = camera.getOrthoMatrixInverse();
-            vpmi.translate(new GL3DVec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
+            Mat4d vpmi = camera.getOrthoMatrixInverse();
+            vpmi.translate(new Vec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(m.getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
