@@ -26,6 +26,7 @@ import org.helioviewer.jhv.base.FileUtils;
  * 
  */
 public class LogSettings {
+
     private Logger logger = Logger.getRootLogger();
 
     private static LogSettings instance;
@@ -370,4 +371,5 @@ public class LogSettings {
         }
         return null;
     }
+
 }
