@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
  *
  */
 public class DownloadWorker implements Runnable {
+
     /** The event type to download */
     private final SWEKEventType eventType;
 
@@ -349,43 +349,6 @@ public class DownloadWorker implements Runnable {
     }
 
     /**
-     * Gets the date of give date with hour, minute, seconds, milliseconds to 0.
-     *
-     * @param date
-     *            the date to round
-     * @return the rounded date
-     */
-    private Date getCurrentDate(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
-    }
-
-    /**
-     * Gets the date rounded up to the following day. So day+1, hour, minute,
-     * second, millisecond 0.
-     *
-     * @param date
-     *            The date to round up.
-     * @return The rounded up date on the day
-     */
-    private Date getNextDate(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
-
-    }
-
-    /**
      * Inform the download worker listeners the download worker was forced to
      * stop.
      */
@@ -400,7 +363,6 @@ public class DownloadWorker implements Runnable {
                         for (DownloadWorkerListener l : listeners) {
                             l.workerForcedToStop(DownloadWorker.this);
                         }
-
                     }
 
                 });
@@ -412,7 +374,6 @@ public class DownloadWorker implements Runnable {
                 e.printStackTrace();
             }
             isFireForceStoppedCalled = true;
-
         }
     }
 
@@ -463,7 +424,6 @@ public class DownloadWorker implements Runnable {
             Log.error("Invoke and wait interrupted", e);
             e.printStackTrace();
         }
-
     }
 
     public JHVEventType getJHVEventType() {
