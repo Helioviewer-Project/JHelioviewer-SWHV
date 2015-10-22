@@ -94,17 +94,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         if (beginDate != null && endDate != null) {
             JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
             data = result.getAvailableEvents();
-            ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
-            for (String eventType : data.keySet()) {
-                for (Date sDate : data.get(eventType).keySet()) {
-                    for (Date eDate : data.get(eventType).get(sDate).keySet()) {
-                        for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
-                            events.add(event);
-                        }
-                    }
-                }
-            }
-            this.events = events;
             Displayer.display();
         }
     }
@@ -115,16 +104,23 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     public ArrayList<JHVEvent> getActiveEvents(Date currentDate) {
         ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
-        if (events != null) {
-            for (JHVEvent event : events) {
-                if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
-                    if (event.getStartDate().getTime() <= currentDate.getTime() && event.getEndDate().getTime() >= currentDate.getTime()) {
-                        activeEvents.add(event);
+        if (data != null) {
+            for (String eventType : data.keySet()) {
+                for (Date sDate : data.get(eventType).keySet()) {
+                    for (Date eDate : data.get(eventType).get(sDate).keySet()) {
+                        for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
+                            if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
+                                if (event.getStartDate().getTime() <= currentDate.getTime() && event.getEndDate().getTime() >= currentDate.getTime()) {
+                                    activeEvents.add(event);
+                                }
+                                event.addHighlightListener(Displayer.getSingletonInstance());
+                            } else {
+                                Log.warn("Possibly something strange is going on with incoming events. Either the date or the event is null");
+                            }
+                        }
                     }
-                    event.addHighlightListener(Displayer.getSingletonInstance());
-                } else {
-                    Log.warn("Possibly something strange is going on with incoming events. Either the date or the event is null");
                 }
+
             }
         }
         return activeEvents;
