@@ -232,8 +232,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("Instrument", m.getInstrument());
             addDataItem("Detector", m.getDetector());
             addDataItem("Measurement", m.getMeasurement());
-            addDataItem("Date", m.getDateObs().getFormattedDate());
-            addDataItem("Time", m.getDateObs().getFormattedTime());
+            addDataItem("Observation Date", String.valueOf(m.getDateObs()));
 
             String xmlText = null;
             if (v instanceof JP2View) {
