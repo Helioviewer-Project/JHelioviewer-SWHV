@@ -182,16 +182,9 @@ public class ResolutionSet {
             throw new CloneNotSupportedException();
         }
 
-        /** The toString method */
-
         @Override
         public String toString() {
-            String ret = "[";
-            ret += " [ZoomPercent=" + getZoomPercent() + "]";
-            ret += " [ZoomLevel=" + discardLayers + "]";
-            ret += " [ZoomDims=" + dims.toString() + "]";
-            ret += "]";
-            return ret;
+            return "[[ZoomPercent=" + getZoomPercent() + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + dims.toString() + "]]";
         }
     }
 

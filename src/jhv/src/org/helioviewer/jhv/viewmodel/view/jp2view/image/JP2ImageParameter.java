@@ -39,18 +39,12 @@ public class JP2ImageParameter {
         compositionLayer = _compositionLayer;
     }
 
-    /** The toString method. */
+    @Override
     public String toString() {
-        String ret = "ImageViewParams[";
-        ret += " " + jp2Image.toString();
-        ret += " " + subImage.toString();
-        ret += " " + resolution.toString();
-        ret += " [CurrentLayerNum=" + compositionLayer + "]";
-        ret += " ]";
-        return ret;
+        return "ImageViewParams[ " + jp2Image + " " + masterTime + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "]]";
     }
 
-    /** The equals method. */
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof JP2ImageParameter)) {
             return false;

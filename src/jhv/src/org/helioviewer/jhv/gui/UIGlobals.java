@@ -45,9 +45,6 @@ public class UIGlobals {
                 map.put(TextAttribute.SIZE, 12);
 
                 Font font = new Font(map);
-                if (font == null)
-                    return instance;
-
                 UIFont = font;
 
                 map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
@@ -72,7 +69,7 @@ public class UIGlobals {
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
-            if (value != null && value instanceof FontUIResource)
+            if (value instanceof FontUIResource)
                 UIManager.put(key, f);
         }
     }

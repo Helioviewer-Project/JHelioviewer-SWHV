@@ -254,7 +254,7 @@ public class RequestCache {
                             // date}, continue with interval: {current start
                             // time, end time}
                             if (!previousInterval.containsPointInclusive(endDate)) {
-                                if (endDate.before(iStartDate) || endDate.equals(iStartDate)) {
+                                if (endDate.compareTo(iStartDate) <= 0) {
                                     // 1)
                                     if (currentStartDate.after(previousInterval.getEnd())) {
                                         missingIntervals.add(new Interval<Date>(currentStartDate, endDate));
