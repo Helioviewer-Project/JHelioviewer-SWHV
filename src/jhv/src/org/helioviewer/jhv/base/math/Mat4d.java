@@ -445,8 +445,8 @@ public class Mat4d {
 
     @Override
     public final String toString() {
-        StringBuffer sb = new StringBuffer();
         String format = "%01.02f";
+        StringBuilder sb = new StringBuilder();
         sb.append(String.format(format, m[0]) + ", ");
         sb.append(String.format(format, m[4]) + ", ");
         sb.append(String.format(format, m[8]) + ", ");

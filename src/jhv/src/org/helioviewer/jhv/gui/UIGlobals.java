@@ -7,7 +7,7 @@ import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -37,7 +37,7 @@ public class UIGlobals {
             }
 
             if (System.getProperty("jhv.os").equals("mac")) {
-                Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
+                HashMap<TextAttribute, Object> map = new HashMap<TextAttribute, Object>();
                 map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
                 map.put(TextAttribute.FAMILY, "HelveticaNeue");
 

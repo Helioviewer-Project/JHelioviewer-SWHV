@@ -16,10 +16,12 @@ public abstract class AbstractJHVEvent implements JHVEvent {
 
     @Override
     public void highlight(boolean isHighlighted, Object owner) {
-        if ((isHighlighted || (!isHighlighted && owner == this.owner)) && isHighlighted != highlighted) {
-            highlighted = isHighlighted;
-            this.owner = owner;
-            fireHighlightChanged();
+        if (isHighlighted != highlighted) {
+            if (isHighlighted || (!isHighlighted && owner == this.owner)) {
+                highlighted = isHighlighted;
+                this.owner = owner;
+                fireHighlightChanged();
+            }
         }
     }
 
