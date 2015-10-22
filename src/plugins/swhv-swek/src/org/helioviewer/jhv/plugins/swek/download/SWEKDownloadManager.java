@@ -450,30 +450,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     }
 
     /**
-     * Add event type, source, date to busy and finished jobs.
-     *
-     * @param eventType
-     *            the event type to add
-     * @param supplier
-     *            the supplier to add
-     * @param date
-     *            the date to add
-     */
-    private void addToBusyAndFinishedJobs(SWEKEventType eventType, SWEKSupplier supplier, Date date) {
-        Map<SWEKSupplier, Set<Date>> sourcesForEventType = new HashMap<SWEKSupplier, Set<Date>>();
-        Set<Date> dates = new HashSet<Date>();
-        if (busyAndFinishedJobs.containsKey(eventType)) {
-            sourcesForEventType = busyAndFinishedJobs.get(eventType);
-            if (sourcesForEventType.containsKey(supplier)) {
-                dates = sourcesForEventType.get(supplier);
-            }
-        }
-        dates.add(date);
-        sourcesForEventType.put(supplier, dates);
-        busyAndFinishedJobs.put(eventType, sourcesForEventType);
-    }
-
-    /**
      * Adds event type, source, interval to busy and finished jobs.
      *
      * @param eventType
