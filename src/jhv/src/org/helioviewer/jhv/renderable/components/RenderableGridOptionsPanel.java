@@ -42,7 +42,7 @@ public class RenderableGridOptionsPanel extends JPanel {
         }
     }
 
-    private final double min = 5, max = 90;
+    private static final double min = 5, max = 90;
 
     private JSpinner gridResolutionXSpinner;
     private JSpinner gridResolutionYSpinner;

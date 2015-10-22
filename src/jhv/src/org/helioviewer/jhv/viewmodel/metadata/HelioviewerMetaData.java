@@ -110,10 +110,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
         measurement = m.get("WAVELNTH");
         if (measurement == null) {
-            measurement = "" + m.tryGetInt("WAVELNTH");
+            measurement = String.valueOf(m.tryGetInt("WAVELNTH"));
         }
         if (measurement == null) {
-            measurement = "" + m.tryGetDouble("WAVELNTH");
+            measurement = String.valueOf(m.tryGetDouble("WAVELNTH"));
         }
         observatory = m.get("TELESCOP");
 
@@ -136,9 +136,6 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             fullName = observatory + " " + detector;
         } else if (detector.equals("EUVI")) {
             observatory = m.get("OBSRVTRY");
-            if (measurement == null) {
-                measurement = "" + m.tryGetDouble("WAVELNTH");
-            }
             fullName = observatory + " " + detector + " " + measurement;
         } else {
             fullName = instrument + " " + measurement;
