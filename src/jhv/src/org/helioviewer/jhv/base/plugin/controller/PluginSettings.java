@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugin.controller;
+package org.helioviewer.jhv.base.plugin.controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;

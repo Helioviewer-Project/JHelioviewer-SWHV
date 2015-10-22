@@ -8,10 +8,10 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequester;

@@ -11,11 +11,11 @@ import org.helioviewer.jhv.base.FileUtils;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.base.plugin.controller.PluginManager;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
-import org.helioviewer.jhv.plugin.controller.PluginManager;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 

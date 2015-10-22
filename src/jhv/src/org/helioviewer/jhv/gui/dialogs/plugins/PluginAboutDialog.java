@@ -16,9 +16,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 /**
  * Dialog that is used to display information about a plug-in.

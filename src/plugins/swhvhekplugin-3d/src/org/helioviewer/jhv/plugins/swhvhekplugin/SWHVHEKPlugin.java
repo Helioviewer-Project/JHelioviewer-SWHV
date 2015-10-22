@@ -2,9 +2,9 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.net.URL;
 
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
 
 public class SWHVHEKPlugin implements Plugin {
 

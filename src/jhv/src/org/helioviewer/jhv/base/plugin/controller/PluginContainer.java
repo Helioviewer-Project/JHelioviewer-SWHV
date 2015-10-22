@@ -1,9 +1,9 @@
-package org.helioviewer.jhv.plugin.controller;
+package org.helioviewer.jhv.base.plugin.controller;
 
 import java.net.URI;
 
-import org.helioviewer.jhv.plugin.interfaces.Container;
-import org.helioviewer.jhv.plugin.interfaces.Plugin;
+import org.helioviewer.jhv.base.plugin.interfaces.Container;
+import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 
 /**
  * The basic class which manages the interface between JHV and the contained
