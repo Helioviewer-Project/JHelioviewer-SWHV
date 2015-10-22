@@ -55,6 +55,7 @@ public class Region {
         return Vec2d.add(lowerLeftCorner, sizeVector);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Region)) {
             return false;
@@ -63,6 +64,13 @@ public class Region {
         return r.getSize().equals(sizeVector) && r.getLowerLeftCorner().equals(lowerLeftCorner);
     }
 
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
+    @Override
     public String toString() {
         return "[Region: Corner: " + lowerLeftCorner + ", Size: " + sizeVector + "]";
     }

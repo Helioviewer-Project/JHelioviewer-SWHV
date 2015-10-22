@@ -258,13 +258,6 @@ public class Vec3d {
         return new Vec2d(x, y);
     }
 
-    @Override
-    public final boolean equals(Object o) {
-        if (o instanceof Vec3d)
-            return isApproxEqual((Vec3d) o, 0.0);
-        return false;
-    }
-
     public final Vec3d copy() {
         return new Vec3d(this);
     }
@@ -278,6 +271,19 @@ public class Vec3d {
             arr[i * 3 + 2] = v.z;
         }
         return arr;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o instanceof Vec3d)
+            return isApproxEqual((Vec3d) o, 0.0);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
     }
 
     @Override

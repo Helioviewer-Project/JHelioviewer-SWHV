@@ -52,7 +52,10 @@ public class JPIPDataSegment implements Cloneable {
     }
 
     /** Returns a completely disjoint clone of the JPIPDataSegment */
-    public JPIPDataSegment clone() {
+    @Override
+    public JPIPDataSegment clone() throws CloneNotSupportedException {
+        super.clone();
+
         JPIPDataSegment ret = new JPIPDataSegment();
         ret.aux = this.aux;
         ret.binID = this.binID;
@@ -68,6 +71,7 @@ public class JPIPDataSegment implements Cloneable {
     }
 
     /** Returns a string representation of the JPIP data segment. */
+    @Override
     public String toString() {
         String res;
         res = getClass().getName() + " [";

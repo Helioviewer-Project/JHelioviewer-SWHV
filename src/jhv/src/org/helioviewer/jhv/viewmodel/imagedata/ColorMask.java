@@ -90,12 +90,19 @@ public class ColorMask {
         return mask;
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (!(o instanceof ColorMask)) {
             return false;
         }
         ColorMask m = (ColorMask) o;
         return m.red == red && m.green == green && m.blue == blue;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
     }
 
 }
