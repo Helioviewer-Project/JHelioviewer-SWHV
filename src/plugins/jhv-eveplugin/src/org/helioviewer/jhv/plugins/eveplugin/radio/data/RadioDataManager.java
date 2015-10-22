@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.Viewport;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
@@ -540,11 +539,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                 Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
                 FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
-                    Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
-
                     JP2CallistoView jp2View = jpxData.getView();
                     if (jp2View != null) {
-                        jp2View.setViewport(new Viewport(viewport.width, viewport.height));
+                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
+                        jp2View.setViewport(viewport);
 
                         Rectangle roi = ri.getROI();
                         if (!jp2View.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()))) {
@@ -665,7 +663,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         } else {
                             lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
                         }
-                        jp2CallistoView.setViewport(new Viewport(lastUsedResolutionSetting.getVec2dIntRepresentation()));
+                        jp2CallistoView.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
