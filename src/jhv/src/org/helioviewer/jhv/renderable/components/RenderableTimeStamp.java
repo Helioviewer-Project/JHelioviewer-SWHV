@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -15,7 +14,6 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableTimeStamp extends AbstractRenderable {
 
-    private Font font;
     private float oldFontSize = -1;
     private static final double vpScale = 0.035;
     private TextRenderer textRenderer;
@@ -37,11 +35,10 @@ public class RenderableTimeStamp extends AbstractRenderable {
         float fontSize = (int) (vp.getHeight() * vpScale);
         if (textRenderer == null || fontSize != oldFontSize) {
             oldFontSize = fontSize;
-            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             if (textRenderer != null) {
                 textRenderer.dispose();
             }
-            textRenderer = new TextRenderer(font, true, true);
+            textRenderer = new TextRenderer(UIGlobals.UIFontRoboto.deriveFont(fontSize), true, true);
             textRenderer.setUseVertexArrays(true);
             textRenderer.setSmoothing(false);
             textRenderer.setColor(Color.WHITE);

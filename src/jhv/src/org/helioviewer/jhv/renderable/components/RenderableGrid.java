@@ -35,7 +35,7 @@ public class RenderableGrid extends AbstractRenderable {
     private Font font;
     private TextRenderer textRenderer;
     // the height of the text in solar radii
-    private final float textScale = 0.08f;
+    private static final float textScale = 0.08f;
 
     private final Component optionsPanel;
     private static final String name = "Grid";
