@@ -145,9 +145,20 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         double principalAngle = 0;
         try {
             if (params.containsKey("event_coord1"))
-                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue());
+                principalAngle = Double.parseDouble(params.get("event_coord1").getParameterValue()) + 90;
         } catch (Exception e) {
         }
         return principalAngle;
     }
+
+    public static double readCMEAngularWidthDegree(Map<String, JHVEventParameter> params) {
+        double angularWidthDegree = 0;
+        try {
+            if (params.containsKey("cme_angularwidth"))
+                angularWidthDegree = Double.parseDouble(params.get("cme_angularwidth").getParameterValue());
+        } catch (Exception e) {
+        }
+        return angularWidthDegree;
+    }
+
 }

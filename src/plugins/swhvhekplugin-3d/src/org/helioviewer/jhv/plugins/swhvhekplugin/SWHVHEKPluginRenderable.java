@@ -85,10 +85,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };;
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
-        double angularWidth = 0;
-        double angularWidthDegree = 0;
 
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
+        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
+        double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params);
         double principalAngle = Math.toRadians(principalAngleDegree);
         double speed = SWHVHEKData.readCMESpeed(params);
