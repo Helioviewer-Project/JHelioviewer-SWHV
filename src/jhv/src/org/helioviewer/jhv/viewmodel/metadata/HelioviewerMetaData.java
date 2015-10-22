@@ -6,9 +6,9 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
@@ -33,7 +33,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
-    private GL3DVec2d sunPixelPosition;
+    private Vec2d sunPixelPosition;
 
     /**
      * Default constructor.
@@ -57,7 +57,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (detector.equals("C2")) {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
             cutOffValue = (float) (-this.getPhysicalUpperLeft().x);
-            cutOffDirection = new GL3DVec3d(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
+            cutOffDirection = new Vec3d(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }
     }
 
@@ -196,7 +196,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
         phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
-        rotationObs = new GL3DQuatd(theta, phi);
+        rotationObs = new Quatd(theta, phi);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
@@ -220,13 +220,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
             double sunX = m.tryGetDouble("CRPIX1") - 1;
             double sunY = m.tryGetDouble("CRPIX2") - 1;
-            sunPixelPosition = new GL3DVec2d(sunX, pixelHeight - 1 - sunY);
+            sunPixelPosition = new Vec2d(sunX, pixelHeight - 1 - sunY);
 
-            setPhysicalLowerLeftCorner(new GL3DVec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
-            setPhysicalSize(new GL3DVec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
+            setPhysicalLowerLeftCorner(new Vec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
+            setPhysicalSize(new Vec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
         } else { // pixel based
-            setPhysicalLowerLeftCorner(new GL3DVec2d(0, 0));
-            setPhysicalSize(new GL3DVec2d(pixelWidth, pixelHeight));
+            setPhysicalLowerLeftCorner(new Vec2d(0, 0));
+            setPhysicalSize(new Vec2d(pixelWidth, pixelHeight));
         }
     }
 

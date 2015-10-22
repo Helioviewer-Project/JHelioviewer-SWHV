@@ -7,7 +7,7 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DMat4d;
+import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -80,17 +80,17 @@ public class RenderableGrid extends AbstractRenderable {
             textRenderer.setColor(Color.WHITE);
         }
 
-        GL3DMat4d cameraMatrix;
+        Mat4d cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:
             cameraMatrix = activeCamera.getLocalRotation().toMatrix();
             break;
         case HCI:
             //TBD
-            cameraMatrix = GL3DMat4d.identity();
+            cameraMatrix = Mat4d.identity();
             break;
         default:
-            cameraMatrix = GL3DMat4d.identity();
+            cameraMatrix = Mat4d.identity();
             break;
         }
 
@@ -132,7 +132,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private void drawCircles(GL2 gl, GL3DMat4d cameraMatrix) {
+    private void drawCircles(GL2 gl, Mat4d cameraMatrix) {
         GLHelper.lineWidth(gl, 0.25);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);

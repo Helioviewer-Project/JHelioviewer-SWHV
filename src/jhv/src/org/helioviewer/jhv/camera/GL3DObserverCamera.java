@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.util.Date;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
+import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -76,7 +76,7 @@ public class GL3DObserverCamera extends GL3DCamera {
 
         double d;
         if (m == null) {
-            localRotation = GL3DQuatd.ZERO;
+            localRotation = Quatd.ZERO;
             d = Sun.MeanEarthDistance;
         } else {
             localRotation = m.getRotationObs();

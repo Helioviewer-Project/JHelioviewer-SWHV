@@ -3,16 +3,16 @@ package org.helioviewer.jhv.viewmodel.view;
 import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
     private static final double resolution = 5.;
-    private static final GL3DVec2d[] pointlist = new GL3DVec2d[((int) resolution + 1) * 2 * 2];
+    private static final Vec2d[] pointlist = new Vec2d[((int) resolution + 1) * 2 * 2];
 
     private static final ViewROI instance = new ViewROI();
 
@@ -20,13 +20,13 @@ public class ViewROI {
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (i / resolution - 0.5), -2. * (j - 0.5));
+                pointlist[count] = new Vec2d(2. * (i / resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= resolution; j++) {
-                pointlist[count] = new GL3DVec2d(2. * (i - 0.5), -2. * (j / resolution - 0.5));
+                pointlist[count] = new Vec2d(2. * (i - 0.5), -2. * (j / resolution - 0.5));
                 count++;
             }
         }
@@ -40,9 +40,9 @@ public class ViewROI {
 
         camera.push(masterTime, m);
 
-        GL3DQuatd camDiff = camera.getCameraDifferenceRotationQuatd(m.getRotationObs());
+        Quatd camDiff = camera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
-            GL3DVec3d hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
+            Vec3d hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
             minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
             maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
@@ -58,7 +58,7 @@ public class ViewROI {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        GL3DVec2d metPhysicalSize = m.getPhysicalSize();
+        Vec2d metPhysicalSize = m.getPhysicalSize();
         double metLLX = m.getPhysicalLowerLeft().x;
         double metLLY = m.getPhysicalLowerLeft().y;
         double metURX = metLLX + metPhysicalSize.x;

@@ -5,10 +5,10 @@ import java.util.Date;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.GL3DMat4d;
-import org.helioviewer.jhv.base.math.GL3DQuatd;
-import org.helioviewer.jhv.base.math.GL3DVec2d;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -27,18 +27,18 @@ public abstract class GL3DCamera {
 
     private double previousAspect = -1.0;
 
-    private GL3DMat4d cameraTransformation;
+    private Mat4d cameraTransformation;
 
-    private GL3DQuatd rotation;
-    private GL3DVec3d translation;
+    private Quatd rotation;
+    private Vec3d translation;
 
-    private final GL3DQuatd currentDragRotation;
+    private final Quatd currentDragRotation;
 
-    protected GL3DQuatd localRotation;
+    protected Quatd localRotation;
 
     private boolean trackingMode;
 
-    private GL3DMat4d orthoMatrixInverse = GL3DMat4d.identity();
+    private Mat4d orthoMatrixInverse = Mat4d.identity();
 
     private double cameraWidth = 1.;
     private double previousCameraWidth = -1;
@@ -54,11 +54,11 @@ public abstract class GL3DCamera {
     private GL3DInteraction currentInteraction;
 
     public GL3DCamera() {
-        this.cameraTransformation = GL3DMat4d.identity();
-        this.rotation = new GL3DQuatd();
-        this.currentDragRotation = new GL3DQuatd();
-        this.localRotation = new GL3DQuatd();
-        this.translation = new GL3DVec3d();
+        this.cameraTransformation = Mat4d.identity();
+        this.rotation = new Quatd();
+        this.currentDragRotation = new Quatd();
+        this.localRotation = new Quatd();
+        this.translation = new Vec3d();
         this.fov = INITFOV;
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
@@ -67,7 +67,7 @@ public abstract class GL3DCamera {
     }
 
     public void reset() {
-        this.translation = new GL3DVec3d(0, 0, this.translation.z);
+        this.translation = new Vec3d(0, 0, this.translation.z);
         this.currentDragRotation.clear();
         this.currentInteraction.reset();
         zoomToFit();
@@ -102,10 +102,10 @@ public abstract class GL3DCamera {
         }
     }
 
-    private GL3DQuatd saveRotation;
-    private GL3DQuatd saveLocalRotation;
-    private GL3DVec3d saveTranslation;
-    private GL3DMat4d saveTransformation;
+    private Quatd saveRotation;
+    private Quatd saveLocalRotation;
+    private Vec3d saveTranslation;
+    private Mat4d saveTransformation;
 
     public void push(Date date, MetaData m) {
         if (!trackingMode) {
@@ -144,11 +144,11 @@ public abstract class GL3DCamera {
         return this.translation.z;
     }
 
-    public GL3DVec3d getTranslation() {
+    public Vec3d getTranslation() {
         return this.translation;
     }
 
-    public GL3DQuatd getLocalRotation() {
+    public Quatd getLocalRotation() {
         return this.localRotation;
     }
 
@@ -156,13 +156,13 @@ public abstract class GL3DCamera {
         this.currentDragRotation.clear();
     }
 
-    public void setLocalRotation(GL3DQuatd localRotation) {
+    public void setLocalRotation(Quatd localRotation) {
         this.localRotation = localRotation;
         this.rotation.clear();
         this.updateCameraTransformation();
     }
 
-    public void rotateCurrentDragRotation(GL3DQuatd currentDragRotation) {
+    public void rotateCurrentDragRotation(Quatd currentDragRotation) {
         this.currentDragRotation.rotate(currentDragRotation);
         this.rotation.clear();
         this.updateCameraTransformation();
@@ -186,7 +186,7 @@ public abstract class GL3DCamera {
         cameraWidthTimesAspect = cameraWidth * aspect;
 
         //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-        orthoMatrixInverse = GL3DMat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        orthoMatrixInverse = Mat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
         if (this == Displayer.getViewport().getCamera()) {
             // Displayer.render();
@@ -194,7 +194,7 @@ public abstract class GL3DCamera {
         }
     }
 
-    public GL3DMat4d getOrthoMatrixInverse() {
+    public Mat4d getOrthoMatrixInverse() {
         return orthoMatrixInverse.copy();
     }
 
@@ -208,23 +208,23 @@ public abstract class GL3DCamera {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public GL3DVec3d getVectorFromSphereOrPlane(GL3DVec2d normalizedScreenpos, GL3DQuatd cameraDifferenceRotation) {
+    public Vec3d getVectorFromSphereOrPlane(Vec2d normalizedScreenpos, Quatd cameraDifferenceRotation) {
         double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
         double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
 
-        GL3DVec3d hitPoint;
-        GL3DVec3d rotatedHitPoint;
+        Vec3d hitPoint;
+        Vec3d rotatedHitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1) {
-            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
+            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(1. - radius2));
             rotatedHitPoint = cameraDifferenceRotation.rotateInverseVector(hitPoint);
             if (rotatedHitPoint.z > 0.) {
                 return rotatedHitPoint;
             }
         }
-        GL3DVec3d altnormal = cameraDifferenceRotation.rotateVector(GL3DVec3d.ZAxis);
+        Vec3d altnormal = cameraDifferenceRotation.rotateVector(Vec3d.ZAxis);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-        hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
+        hitPoint = new Vec3d(up1x, up1y, zvalue);
 
         return cameraDifferenceRotation.rotateInverseVector(hitPoint);
     }
@@ -245,35 +245,35 @@ public abstract class GL3DCamera {
         return computeNormalizedY(viewportCoordinates) * cameraWidth - translation.y;
     }
 
-    public GL3DVec3d getVectorFromSphere(Point viewportCoordinates) {
-        GL3DVec3d hitPoint = getVectorFromSphereAlt(viewportCoordinates);
+    public Vec3d getVectorFromSphere(Point viewportCoordinates) {
+        Vec3d hitPoint = getVectorFromSphereAlt(viewportCoordinates);
         if (hitPoint != null) {
             return localRotation.rotateInverseVector(hitPoint);
         }
         return null;
     }
 
-    public GL3DVec3d getVectorFromPlane(Point viewportCoordinates) {
+    public Vec3d getVectorFromPlane(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
-        GL3DVec3d altnormal = currentDragRotation.rotateVector(GL3DVec3d.ZAxis);
+        Vec3d altnormal = currentDragRotation.rotateVector(Vec3d.ZAxis);
         if (altnormal.z == 0) {
             return null;
         }
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
 
-        GL3DVec3d hitPoint = new GL3DVec3d(up1x, up1y, zvalue);
+        Vec3d hitPoint = new Vec3d(up1x, up1y, zvalue);
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
-    public GL3DVec3d getVectorFromSphereAlt(Point viewportCoordinates) {
+    public Vec3d getVectorFromSphereAlt(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
 
-        GL3DVec3d hitPoint;
+        Vec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
-            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(1. - radius2));
+            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(1. - radius2));
             return currentDragRotation.rotateInverseVector(hitPoint);
         }
         return null;
@@ -286,21 +286,21 @@ public abstract class GL3DCamera {
         return Math.sqrt(up1x * up1x + up1y * up1y);
     }
 
-    public GL3DVec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
+    public Vec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
-        GL3DVec3d hitPoint;
+        Vec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= Sun.Radius2 / 2.) {
-            hitPoint = new GL3DVec3d(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
+            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         } else {
-            hitPoint = new GL3DVec3d(up1x, up1y, Sun.Radius2 / (2. * Math.sqrt(radius2)));
+            hitPoint = new Vec3d(up1x, up1y, Sun.Radius2 / (2. * Math.sqrt(radius2)));
         }
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
-    public GL3DQuatd getCameraDifferenceRotationQuatd(GL3DQuatd rot) {
-        GL3DQuatd cameraDifferenceRotation = rotation.copy();
+    public Quatd getCameraDifferenceRotationQuatd(Quatd rot) {
+        Quatd cameraDifferenceRotation = rotation.copy();
         cameraDifferenceRotation.rotateWithConjugate(rot);
 
         return cameraDifferenceRotation;
@@ -396,7 +396,7 @@ public abstract class GL3DCamera {
             setCameraFOV(2. * Math.atan(-size / 2. / this.getZTranslation()));
     }
 
-    public GL3DMat4d getRotation() {
+    public Mat4d getRotation() {
         return this.rotation.toMatrix();
     }
 

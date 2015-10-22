@@ -16,7 +16,7 @@ import java.util.Scanner;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.GL3DVec3d;
+import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -65,30 +65,30 @@ public class HEKParser implements SWEKParser {
     private double coordinate3;
 
     /** HGC coordinates */
-    private List<GL3DVec3d> hgcBoundedBox;
-    private List<GL3DVec3d> hgcBoundCC;
-    private GL3DVec3d hgcCentralPoint;
+    private List<Vec3d> hgcBoundedBox;
+    private List<Vec3d> hgcBoundCC;
+    private Vec3d hgcCentralPoint;
     private Double hgcX;
     private Double hgcY;
 
     /** HGS coordinates */
-    private List<GL3DVec3d> hgsBoundedBox;
-    private List<GL3DVec3d> hgsBoundCC;
-    private GL3DVec3d hgsCentralPoint;
+    private List<Vec3d> hgsBoundedBox;
+    private List<Vec3d> hgsBoundCC;
+    private Vec3d hgsCentralPoint;
     private Double hgsX;
     private Double hgsY;
 
     /** HPC coordinates */
-    private List<GL3DVec3d> hpcBoundedBox;
-    private List<GL3DVec3d> hpcBoundCC;
-    private GL3DVec3d hpcCentralPoint;
+    private List<Vec3d> hpcBoundedBox;
+    private List<Vec3d> hpcBoundCC;
+    private Vec3d hpcCentralPoint;
     private Double hpcX;
     private Double hpcY;
 
     /** HRC coordinates */
-    private List<GL3DVec3d> hrcBoundedBox;
-    private List<GL3DVec3d> hrcBoundCC;
-    private GL3DVec3d hrcCentralPoint;
+    private List<Vec3d> hrcBoundedBox;
+    private List<Vec3d> hrcBoundCC;
+    private Vec3d hrcCentralPoint;
     private Double hrcA;
     private Double hrcR;
 
@@ -583,8 +583,8 @@ public class HEKParser implements SWEKParser {
      *            the value to parse
      * @return a list of JHV points
      */
-    private List<GL3DVec3d> parsePolygon(String value) {
-        List<GL3DVec3d> polygonPoints = new ArrayList<GL3DVec3d>();
+    private List<Vec3d> parsePolygon(String value) {
+        List<Vec3d> polygonPoints = new ArrayList<Vec3d>();
         if (value.toLowerCase().contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
@@ -593,7 +593,7 @@ public class HEKParser implements SWEKParser {
             s.useDelimiter(",");
             while (s.hasNext()) {
                 String coordinateString = s.next();
-                GL3DVec3d tempPoint = parseCoordinates(coordinateString);
+                Vec3d tempPoint = parseCoordinates(coordinateString);
                 if (tempPoint != null) {
                     polygonPoints.add(tempPoint);
                 }
@@ -610,7 +610,7 @@ public class HEKParser implements SWEKParser {
      *            the point to parse
      * @return The GL3DVec3d or null if it could not be parsed.
      */
-    private GL3DVec3d parsePoint(String value) {
+    private Vec3d parsePoint(String value) {
         if (value.toLowerCase().contains("point")) {
             String coordinates = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
             return parseCoordinates(coordinates);
@@ -626,7 +626,7 @@ public class HEKParser implements SWEKParser {
      *            the string to parse
      * @return the GL3DVec3d or null of it could not be parsed
      */
-    private GL3DVec3d parseCoordinates(String coordinateString) {
+    private Vec3d parseCoordinates(String coordinateString) {
         Double coordinate1 = 0.0;
         Double coordinate2 = 0.0;
         Double coordinate3 = 0.0;
@@ -653,11 +653,11 @@ public class HEKParser implements SWEKParser {
         coordinatesScanner.close();
 
         if (coordinate1OK && coordinate2OK && coordinate3OK) {
-            return new GL3DVec3d(coordinate1, coordinate2, coordinate3);
+            return new Vec3d(coordinate1, coordinate2, coordinate3);
         } else if (coordinate1OK && coordinate2OK) {
-            return new GL3DVec3d(coordinate1, coordinate2, 0);
+            return new Vec3d(coordinate1, coordinate2, 0);
         } else if (coordinate1OK) {
-            return new GL3DVec3d(coordinate1, 0, 0);
+            return new Vec3d(coordinate1, 0, 0);
         }
         return null;
     }
@@ -684,7 +684,7 @@ public class HEKParser implements SWEKParser {
             double maxX = 0.0;
             double maxY = 0.0;
             boolean first = true;
-            for (GL3DVec3d p : hgsBoundedBox) {
+            for (Vec3d p : hgsBoundedBox) {
                 if (first) {
                     minX = p.x;
                     maxX = p.x;
@@ -717,8 +717,8 @@ public class HEKParser implements SWEKParser {
         if (coordinateSystemString != null) {
             JHVCoordinateSystem coorSys = parseCoordinateSystemString();
             if (coorSys != null) {
-                GL3DVec3d centralPoint = new GL3DVec3d(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(coorSys, new HEKPositionInformation(coorSys, new ArrayList<GL3DVec3d>(), new ArrayList<GL3DVec3d>(), centralPoint));
+                Vec3d centralPoint = new Vec3d(coordinate1, coordinate2, coordinate3);
+                currentEvent.addJHVPositionInformation(coorSys, new HEKPositionInformation(coorSys, new ArrayList<Vec3d>(), new ArrayList<Vec3d>(), centralPoint));
             }
         }
     }
@@ -753,9 +753,9 @@ public class HEKParser implements SWEKParser {
      */
     private void handleHGCCoordinates(HEKEvent currentEvent) {
         if (hgcBoundedBox != null || hgcCentralPoint != null || (hgcX != null && hgcY != null) || hgcBoundCC != null) {
-            List<GL3DVec3d> localHGCBoundedBox = new ArrayList<GL3DVec3d>();
-            GL3DVec3d localHGCCentralPoint = null;
-            List<GL3DVec3d> localHGCBoundCC = new ArrayList<GL3DVec3d>();
+            List<Vec3d> localHGCBoundedBox = new ArrayList<Vec3d>();
+            Vec3d localHGCCentralPoint = null;
+            List<Vec3d> localHGCBoundCC = new ArrayList<Vec3d>();
             if (hgcBoundedBox != null) {
                 localHGCBoundedBox = hgcBoundedBox;
             }
@@ -766,7 +766,7 @@ public class HEKParser implements SWEKParser {
                 localHGCCentralPoint = hgcCentralPoint;
             } else {
                 if (hgcX != null && hgcY != null) {
-                    localHGCCentralPoint = new GL3DVec3d(hgcX, hgcY, 0);
+                    localHGCCentralPoint = new Vec3d(hgcX, hgcY, 0);
                 }
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGC, new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC, localHGCCentralPoint));
@@ -783,9 +783,9 @@ public class HEKParser implements SWEKParser {
      */
     private void handleHGSCoordinates(HEKEvent currentEvent) {
         if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
-            List<GL3DVec3d> localHGSBoundedBox = new ArrayList<GL3DVec3d>();
-            List<GL3DVec3d> localHGSBoundCC = new ArrayList<GL3DVec3d>();
-            GL3DVec3d localHGSCentralPoint = null;
+            List<Vec3d> localHGSBoundedBox = new ArrayList<Vec3d>();
+            List<Vec3d> localHGSBoundCC = new ArrayList<Vec3d>();
+            Vec3d localHGSCentralPoint = null;
             if (hgsBoundedBox != null) {
                 localHGSBoundedBox = hgsBoundedBox;
             }
@@ -796,38 +796,38 @@ public class HEKParser implements SWEKParser {
                 localHGSCentralPoint = hgsCentralPoint;
             } else {
                 if (hgsX != null && hgsY != null) {
-                    localHGSCentralPoint = new GL3DVec3d(hgsX, hgsY, 0);
+                    localHGSCentralPoint = new Vec3d(hgsX, hgsY, 0);
                 }
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
 
-            ArrayList<GL3DVec3d> jhvBoundedBox = new ArrayList<GL3DVec3d>();
-            for (GL3DVec3d el : localHGSBoundedBox) {
+            ArrayList<Vec3d> jhvBoundedBox = new ArrayList<Vec3d>();
+            for (Vec3d el : localHGSBoundedBox) {
                 jhvBoundedBox.add(convertHGSJHV(el, currentEvent));
             }
 
-            ArrayList<GL3DVec3d> jhvBoundCC = new ArrayList<GL3DVec3d>();
-            for (GL3DVec3d el : localHGSBoundCC) {
+            ArrayList<Vec3d> jhvBoundCC = new ArrayList<Vec3d>();
+            for (Vec3d el : localHGSBoundCC) {
                 jhvBoundCC.add(convertHGSJHV(el, currentEvent));
             }
 
-            GL3DVec3d jhvCentralPoint = null;
+            Vec3d jhvCentralPoint = null;
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.JHV, new HEKPositionInformation(JHVCoordinateSystem.JHV, jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
 
-            ArrayList<GL3DVec3d> jhvBoundedBox2D = new ArrayList<GL3DVec3d>();
-            for (GL3DVec3d el : localHGSBoundedBox) {
+            ArrayList<Vec3d> jhvBoundedBox2D = new ArrayList<Vec3d>();
+            for (Vec3d el : localHGSBoundedBox) {
                 jhvBoundedBox2D.add(convertHGSJHV2D(el, currentEvent));
             }
 
-            ArrayList<GL3DVec3d> jhvBoundCC2D = new ArrayList<GL3DVec3d>();
-            for (GL3DVec3d el : localHGSBoundCC) {
+            ArrayList<Vec3d> jhvBoundCC2D = new ArrayList<Vec3d>();
+            for (Vec3d el : localHGSBoundCC) {
                 jhvBoundCC2D.add(convertHGSJHV2D(el, currentEvent));
             }
 
-            GL3DVec3d jhvCentralPoint2D = null;
+            Vec3d jhvCentralPoint2D = null;
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint2D = convertHGSJHV2D(localHGSCentralPoint, currentEvent);
             }
@@ -835,16 +835,16 @@ public class HEKParser implements SWEKParser {
         }
     }
 
-    public GL3DVec3d convertHGSJHV2D(GL3DVec3d el, HEKEvent evt) {
+    public Vec3d convertHGSJHV2D(Vec3d el, HEKEvent evt) {
         double theta = el.y / MathUtils.radeg;
         double phi = el.x / MathUtils.radeg;
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
-        return new GL3DVec3d(x, y, z);
+        return new Vec3d(x, y, z);
     }
 
-    public GL3DVec3d convertHGSJHV(GL3DVec3d el, HEKEvent evt) {
+    public Vec3d convertHGSJHV(Vec3d el, HEKEvent evt) {
         double theta = el.y / MathUtils.radeg;
 
         Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
@@ -854,7 +854,7 @@ public class HEKParser implements SWEKParser {
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
-        return new GL3DVec3d(x, y, z);
+        return new Vec3d(x, y, z);
     }
 
     /**
@@ -867,9 +867,9 @@ public class HEKParser implements SWEKParser {
      */
     private void handleHRCCoordinates(HEKEvent currentEvent) {
         if (hrcBoundedBox != null || hrcCentralPoint != null || (hrcA != null && hrcR != null) || hrcBoundCC != null) {
-            List<GL3DVec3d> localHRCBoundedBox = new ArrayList<GL3DVec3d>();
-            List<GL3DVec3d> localHRCBoundCC = new ArrayList<GL3DVec3d>();
-            GL3DVec3d localHRCCentralPoint = null;
+            List<Vec3d> localHRCBoundedBox = new ArrayList<Vec3d>();
+            List<Vec3d> localHRCBoundCC = new ArrayList<Vec3d>();
+            Vec3d localHRCCentralPoint = null;
             if (hrcBoundedBox != null) {
                 localHRCBoundedBox = hrcBoundedBox;
             }
@@ -880,7 +880,7 @@ public class HEKParser implements SWEKParser {
                 localHRCCentralPoint = hrcCentralPoint;
             } else {
                 if (hrcA != null && hrcR != null) {
-                    localHRCCentralPoint = new GL3DVec3d(hrcA, hrcR, 0);
+                    localHRCCentralPoint = new Vec3d(hrcA, hrcR, 0);
                 }
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
@@ -897,9 +897,9 @@ public class HEKParser implements SWEKParser {
      */
     private void handleHPCCoordiantes(HEKEvent currentEvent) {
         if (hpcBoundedBox != null || hpcCentralPoint != null || (hpcX != null && hpcY != null) || hpcBoundCC != null) {
-            List<GL3DVec3d> localHPCBoundedBox = new ArrayList<GL3DVec3d>();
-            List<GL3DVec3d> localHPCBoundCC = new ArrayList<GL3DVec3d>();
-            GL3DVec3d localHPCCentralPoint = null;
+            List<Vec3d> localHPCBoundedBox = new ArrayList<Vec3d>();
+            List<Vec3d> localHPCBoundCC = new ArrayList<Vec3d>();
+            Vec3d localHPCCentralPoint = null;
             if (hpcBoundedBox != null) {
                 localHPCBoundedBox = hpcBoundedBox;
             }
@@ -910,7 +910,7 @@ public class HEKParser implements SWEKParser {
                 localHPCCentralPoint = hpcCentralPoint;
             } else {
                 if (hpcX != null && hpcY != null) {
-                    localHPCCentralPoint = new GL3DVec3d(hpcX, hpcY, 0);
+                    localHPCCentralPoint = new Vec3d(hpcX, hpcY, 0);
                 }
             }
             currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
