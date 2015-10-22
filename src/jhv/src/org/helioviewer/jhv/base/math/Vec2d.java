@@ -40,10 +40,6 @@ public class Vec2d {
         this.y = coordinates[1];
     }
 
-    public Vec2d(Vector2dInt newLowerLeftCorner) {
-        this(newLowerLeftCorner.getX(), newLowerLeftCorner.getY());
-    }
-
     public void add(Vec2d vec) {
         this.x += vec.x;
         this.y += vec.y;

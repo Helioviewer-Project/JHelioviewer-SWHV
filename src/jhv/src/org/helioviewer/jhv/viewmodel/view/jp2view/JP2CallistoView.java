@@ -4,7 +4,6 @@ import java.awt.Rectangle;
 import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.Viewport;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -14,13 +13,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 public class JP2CallistoView extends JP2View {
 
     private Region region;
-    private Viewport viewport = new Viewport(86400, 380);
+    private Rectangle viewport = new Rectangle(86400, 380);
 
     public JP2Image getJP2Image() {
         return _jp2Image;
     }
 
-    public void setViewport(Viewport v) {
+    public void setViewport(Rectangle v) {
         viewport = v;
     }
 
@@ -51,8 +50,8 @@ public class JP2CallistoView extends JP2View {
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
 
-        ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.getWidth() / rWidth * maxWidth),
-                2 * (int) Math.ceil(viewport.getHeight() / rHeight * maxHeight));
+        ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.width / rWidth * maxWidth),
+                2 * (int) Math.ceil(viewport.height / rHeight * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
         SubImage subImage = new SubImage((int) (region.getLowerLeftCorner().x / maxWidth * rect.width),
