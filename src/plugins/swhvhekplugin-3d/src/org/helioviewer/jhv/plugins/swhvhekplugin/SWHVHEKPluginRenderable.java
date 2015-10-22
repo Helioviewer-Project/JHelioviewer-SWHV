@@ -48,12 +48,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final double LINEWIDTH_HI = 1;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
-    private static double ICON_SIZE = 0.1;
-    private static double ICON_SIZE_HIGHLIGHTED = 0.16;
-    private static int LEFT_MARGIN_TEXT = 10;
-    private static int RIGHT_MARGIN_TEXT = 10;
-    private static int TOP_MARGIN_TEXT = 5;
-    private static int BOTTOM_MARGIN_TEXT = 5;
+    private final static double ICON_SIZE = 0.1;
+    private final static double ICON_SIZE_HIGHLIGHTED = 0.16;
+    private final static int LEFT_MARGIN_TEXT = 10;
+    private final static int RIGHT_MARGIN_TEXT = 10;
+    private final static int TOP_MARGIN_TEXT = 5;
+    private final static int BOTTOM_MARGIN_TEXT = 5;
+    private final static int MOUSE_OFFSET_X = 45;
+    private final static int MOUSE_OFFSET_Y = 45;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -316,17 +318,15 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         float w = (float) (bd.x + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
         float h = (float) (bd.y + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
 
-        int deltaX = 45;
-        int deltaY = 45;
         // Correct if out of view
-        if (w + pt.x + deltaX - LEFT_MARGIN_TEXT > width) {
-            textInit.x -= (w + pt.x + deltaX - LEFT_MARGIN_TEXT - width);
+        if (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT > width) {
+            textInit.x -= (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT - width);
         }
-        if (h + pt.y + deltaY - fontSize - TOP_MARGIN_TEXT > height) {
-            textInit.y -= (h + pt.y + deltaY - fontSize - TOP_MARGIN_TEXT - height);
+        if (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT > height) {
+            textInit.y -= (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT - height);
         }
-        float left = textInit.x + deltaX - LEFT_MARGIN_TEXT;
-        float bottom = textInit.y + deltaY - fontSize - TOP_MARGIN_TEXT;
+        float left = textInit.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT;
+        float bottom = textInit.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT;
 
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.75f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -345,9 +345,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
         textRenderer.setColor(Color.WHITE);
+        int deltaY = MOUSE_OFFSET_Y;
         for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            textRenderer.draw(txt, textInit.x + deltaX, height - textInit.y - deltaY);
+            textRenderer.draw(txt, textInit.x + MOUSE_OFFSET_X, height - textInit.y - deltaY);
             deltaY += fontSize * 1.1;
         }
         textRenderer.endRendering();
