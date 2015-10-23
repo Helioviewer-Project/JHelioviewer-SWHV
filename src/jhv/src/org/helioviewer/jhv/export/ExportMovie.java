@@ -169,17 +169,25 @@ public class ExportMovie implements FrameListener {
             scrw = Math.max(1, EVEImage.getWidth());
             scrh = EVEImage.getHeight();
         }
-        canvasWidth = (_w / 2) * 2; // wiser for video formats
+
+        mode = _mode;
+        if (mode == RecordMode.SHOT)
+            canvasWidth = _w;
+        else
+            canvasWidth = (_w / 2) * 2; // wiser for video formats
 
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
         if (isInternal)
             canvasHeight = _h - sh;
         else
             canvasHeight = _h;
-        exportHeight = ((canvasHeight + sh) / 2) * 2;
-        canvasHeight = exportHeight - sh;
 
-        mode = _mode;
+        if (mode == RecordMode.SHOT)
+            exportHeight = canvasHeight + sh;
+        else
+            exportHeight = ((canvasHeight + sh) / 2) * 2; // wiser for video formats
+
+        canvasHeight = exportHeight - sh;
 
         stopped = false;
         currentFrame = 0;
