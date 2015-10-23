@@ -29,7 +29,7 @@ public class JHVEventContainer {
     /** the event handler cache */
     private final JHVEventHandlerCache eventHandlerCache;
 
-    private final double factor = 0.2;
+    private static final double factor = 0.2;
 
     /**
      * Private constructor.

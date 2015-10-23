@@ -28,7 +28,6 @@ public class GLImage {
 
     private boolean invertLUT = false;
     private boolean lastInverted = false;
-    private IntBuffer lutBuffer;
 
     private boolean lutChanged = true;
 
@@ -41,7 +40,6 @@ public class GLImage {
     private float truncation = 1f - 0.8f;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
         if (imageData.getUploaded() == false) {
             imageData.setUploaded(true);
@@ -167,7 +165,7 @@ public class GLImage {
                 intLUT = currlut.getLut8();
             }
 
-            lutBuffer = IntBuffer.wrap(intLUT);
+            IntBuffer lutBuffer = IntBuffer.wrap(intLUT);
             lastLut = currlut;
             lastInverted = invertLUT;
 
