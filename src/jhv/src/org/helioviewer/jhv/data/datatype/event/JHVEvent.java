@@ -157,7 +157,7 @@ public interface JHVEvent {
      * @param isHighlighted
      * @param object
      */
-    public abstract void highlight(boolean isHighlighted, Object owner);
+    public abstract void highlight(boolean isHighlighted);
 
     /**
      *
@@ -176,4 +176,5 @@ public interface JHVEvent {
      * @param listener
      */
     public abstract void removeHighlightListener(JHVEventHighlightListener listener);
+
 }

@@ -384,8 +384,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public void renderFloat(GL2 gl, GL3DViewport vp) {
-        if (highLightedEvent != null) {
-            drawText(gl, highLightedEvent);
+        if (isVisible[vp.getIndex()]) {
+            if (SWHVHEKImagePanelEventPopupController.mouseOverJHVEvent != null) {
+                drawText(gl, SWHVHEKImagePanelEventPopupController.mouseOverJHVEvent);
+            }
         }
     }
 
