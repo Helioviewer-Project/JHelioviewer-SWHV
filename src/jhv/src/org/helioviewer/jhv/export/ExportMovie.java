@@ -273,16 +273,18 @@ public class ExportMovie implements FrameListener {
 
         @Override
         public void run() {
+            boolean failed = false;
             try {
                 if (movieExporter != null) {
                     movieExporter.close();
                 }
-                if (!keep && moviePath != null) {
-                    File f = new File(moviePath);
-                    f.delete();
-                }
             } catch (Exception e) {
                 e.printStackTrace();
+                failed = true;
+            }
+            if (moviePath != null && (!keep || failed)) {
+                File f = new File(moviePath);
+                f.delete();
             }
         }
     }
