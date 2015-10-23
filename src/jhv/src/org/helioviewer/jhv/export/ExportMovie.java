@@ -172,12 +172,13 @@ public class ExportMovie implements FrameListener {
         }
         canvasWidth = (_w / 2) * 2; // wiser for video formats
 
-        int sh = (int) (scrh / (double) scrw * canvasWidth);
+        int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
         if (isInternal)
             canvasHeight = _h - sh;
         else
             canvasHeight = _h;
         exportHeight = ((canvasHeight + sh) / 2) * 2;
+        canvasHeight = exportHeight - sh;
 
         mode = _mode;
 
