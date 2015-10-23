@@ -146,7 +146,6 @@ public class BandTypeAPI extends APIAbstract {
                     group.setGroupLabel(job.getString("groupLabel"));
                 }
                 if (job.has("key")) {
-                    group.setKey(job.getString("key"));
                     groups.put(job.getString("key"), group);
                     orderedGroups.add(group);
                 }
