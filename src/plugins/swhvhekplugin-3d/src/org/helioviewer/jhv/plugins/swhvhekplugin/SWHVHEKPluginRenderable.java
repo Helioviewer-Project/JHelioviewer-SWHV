@@ -284,7 +284,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         Point pt = SWHVHEKPopupController.highlightedMousePosition;
         if (pt == null)
             return;
-        SWHVHEKPopupController.highlightedMousePosition = null;
 
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();

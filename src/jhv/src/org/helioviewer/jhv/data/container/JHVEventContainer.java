@@ -206,4 +206,5 @@ public class JHVEventContainer {
         }
         lastHighlighted = event;
     }
+
 }

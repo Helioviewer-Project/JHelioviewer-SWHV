@@ -114,7 +114,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     public void mouseExited(MouseEvent e) {
         mouseOverPosition = null;
         mouseOverJHVEvent = null;
-        JHVEventContainer.highlight(mouseOverJHVEvent);
+        highlightedMousePosition = null;
+        JHVEventContainer.highlight(null);
     }
 
     /**
@@ -189,7 +190,6 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         } else {
             component.setCursor(lastCursor);
         }
-        Displayer.display();
     }
 
     protected static Point highlightedMousePosition;
