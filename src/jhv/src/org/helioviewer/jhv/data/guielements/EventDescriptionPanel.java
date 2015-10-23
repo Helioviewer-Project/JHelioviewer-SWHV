@@ -202,7 +202,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-        event.highlight(false);
+        JHVEventContainer.highlight(null);
     }
 
 }
