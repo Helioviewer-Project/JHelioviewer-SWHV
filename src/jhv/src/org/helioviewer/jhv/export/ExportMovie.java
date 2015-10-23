@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.export;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -34,15 +30,14 @@ import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
 import com.jogamp.opengl.FBObject.TextureAttachment;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.ImageUtil;
 
 public class ExportMovie implements FrameListener {
 
     private static MovieExporter exporter;
 
-    private static int w;
-    private static int h;
-    private static int sh;
+    private static int canvasWidth;
+    private static int canvasHeight;
+    private static int exportHeight;
 
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
@@ -103,7 +98,7 @@ public class ExportMovie implements FrameListener {
         int _h = Displayer.getGLHeight();
 
         GLHelper.unitScale = true;
-        Displayer.setGLSize(w, h);
+        Displayer.setGLSize(canvasWidth, canvasHeight);
         Displayer.reshapeAll();
         {
             fbo.bind(gl);
@@ -141,33 +136,9 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    private static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
-
-        //do some calculate first
-        int wid = w;
-        int height = sh + h;
-        //create a new buffer and draw two image into the new image
-        BufferedImage newImage = new BufferedImage(wid, height, img1.getType());
-        Graphics2D g2 = newImage.createGraphics();
-        Color oldColor = g2.getColor();
-        //fill background
-        g2.setPaint(Color.WHITE);
-        g2.fillRect(0, 0, wid, height);
-        //draw image
-        g2.setColor(oldColor);
-        AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-        tx.translate(0, -img2.getHeight(null));
-        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-        img2 = op.filter(img2, null);
-        g2.drawImage(img2, 0, 0, w, sh, 0, 0, img2.getWidth(), img2.getHeight(), null);
-        g2.drawImage(img1, null, 0, sh);
-        g2.dispose();
-        return newImage;
-    }
-
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
-            init(gl, w, h);
+            init(gl, canvasWidth, canvasHeight);
         }
 
         if (stopped) {
@@ -178,13 +149,11 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
-                BufferedImage combinedImage = joinBufferedImage(screenshot, EVEImage);
-                ImageUtil.flipImageVertically(combinedImage);
-                ImageIO.write(combinedImage, "png", new File(imagePath));
+                ImageIO.write(ExportUtils.pasteCanvases(screenshot, EVEImage, exportHeight), "png", new File(imagePath));
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage));
+                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage, exportHeight));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -201,16 +170,15 @@ public class ExportMovie implements FrameListener {
             scrw = Math.max(1, EVEImage.getWidth());
             scrh = EVEImage.getHeight();
         }
-        w = (_w / 2) * 2; // wiser for video formats
+        canvasWidth = (_w / 2) * 2; // wiser for video formats
 
-        if (isInternal) {
-            sh = scrh * w / scrw;
-            h = (_h - sh) / 2 * 2;
-        }
-        else {
-            sh = w * scrh / scrw;
-            h = ((_h + sh) / 2) * 2;
-        }
+        int sh = (int) (scrh / (double) scrw * canvasWidth);
+        if (isInternal)
+            canvasHeight = _h - sh;
+        else
+            canvasHeight = _h;
+        exportHeight = ((canvasHeight + sh) / 2) * 2;
+
         mode = _mode;
 
         stopped = false;
@@ -229,7 +197,7 @@ public class ExportMovie implements FrameListener {
         } else {
             try {
                 exporter = new XuggleExporter();
-                exporter.open(moviePath, w, h + sh, fps);
+                exporter.open(moviePath, canvasWidth, exportHeight, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -270,25 +238,19 @@ public class ExportMovie implements FrameListener {
         private final MovieExporter movieExporter;
         private final BufferedImage mainImage;
         private final BufferedImage eve;
+        private final int height;
 
-        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eve) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eve, int _height) {
             movieExporter = _movieExporter;
             mainImage = _mainImage;
             eve = _eve;
+            height = _height;
         }
 
         @Override
         public void run() {
             try {
-                if (eve != null) {
-                    BufferedImage combinedImage = joinBufferedImage(mainImage, eve);
-                    ImageUtil.flipImageVertically(combinedImage);
-                    movieExporter.encode(combinedImage);
-                }
-                else {
-                    ImageUtil.flipImageVertically(mainImage);
-                    movieExporter.encode(mainImage);
-                }
+                movieExporter.encode(ExportUtils.pasteCanvases(mainImage, eve, height));
             } catch (Exception e) {
                 e.printStackTrace();
             }
