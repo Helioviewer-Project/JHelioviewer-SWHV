@@ -40,7 +40,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
-    private static final SWHVHEKImagePanelEventPopupController controller = new SWHVHEKImagePanelEventPopupController();
+    private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
 
     private static final double LINEWIDTH = 0.5;
     private static final double LINEWIDTH_CACTUS = 1.01;
@@ -281,10 +281,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private float oldFontSize = -1;
 
     public void drawText(GL2 gl, JHVEvent evt) {
-        Point pt = SWHVHEKImagePanelEventPopupController.highlightedMousePosition;
+        Point pt = SWHVHEKPopupController.highlightedMousePosition;
         if (pt == null)
             return;
-        SWHVHEKImagePanelEventPopupController.highlightedMousePosition = null;
+        SWHVHEKPopupController.highlightedMousePosition = null;
 
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
@@ -385,8 +385,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void renderFloat(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
-            if (SWHVHEKImagePanelEventPopupController.mouseOverJHVEvent != null) {
-                drawText(gl, SWHVHEKImagePanelEventPopupController.mouseOverJHVEvent);
+            if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
+                drawText(gl, SWHVHEKPopupController.mouseOverJHVEvent);
             }
         }
     }
