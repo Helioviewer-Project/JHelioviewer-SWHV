@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Vec2d;
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -317,7 +317,7 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public int getFrame(ImmutableDateTime time) {
+    public int getFrame(JHVDate time) {
         int frame = -1;
         long timeMillis = time.getMillis();
         long lastDiff, currentDiff = -Long.MAX_VALUE;

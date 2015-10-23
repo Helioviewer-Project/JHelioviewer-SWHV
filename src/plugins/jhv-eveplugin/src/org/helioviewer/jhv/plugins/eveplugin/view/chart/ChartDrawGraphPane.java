@@ -35,7 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -444,7 +444,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime());
 
-        Layers.setTime(new ImmutableDateTime(millis));
+        Layers.setTime(new JHVDate(millis));
     }
 
     // Mouse Input Listener

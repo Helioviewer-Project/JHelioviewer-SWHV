@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -110,7 +110,7 @@ public class Layers {
         }
     }
 
-    public static void setTime(ImmutableDateTime dateTime) {
+    public static void setTime(JHVDate dateTime) {
         if (activeView == null || !activeView.isMultiFrame())
             return;
 
@@ -142,7 +142,7 @@ public class Layers {
         return lastTimestamp;
     }
 
-    private static void syncTime(ImmutableDateTime dateTime) {
+    private static void syncTime(JHVDate dateTime) {
         lastTimestamp = dateTime.getDate();
 
         Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
@@ -164,19 +164,19 @@ public class Layers {
         MoviePanel.getInstance().setFrameSlider(activeFrame);
     }
 
-    private static ImmutableDateTime getStartDateImmutable(View view) {
+    private static JHVDate getStartDateImmutable(View view) {
         return view.getFrameDateTime(0);
     }
 
-    private static ImmutableDateTime getEndDateImmutable(View view) {
+    private static JHVDate getEndDateImmutable(View view) {
         return view.getFrameDateTime(view.getMaximumFrameNumber());
     }
 
-    private static ImmutableDateTime getStartDateImmutable(int idx) {
+    private static JHVDate getStartDateImmutable(int idx) {
         return getStartDateImmutable(getLayer(idx));
     }
 
-    private static ImmutableDateTime getEndDateImmutable(int idx) {
+    private static JHVDate getEndDateImmutable(int idx) {
         return getEndDateImmutable(getLayer(idx));
     }
 
@@ -211,11 +211,11 @@ public class Layers {
      *         information available
      */
     public static Date getFirstDate() {
-        ImmutableDateTime earliest = null;
+        JHVDate earliest = null;
 
         int size = layers.size();
         for (int idx = 0; idx < size; idx++) {
-            ImmutableDateTime start = getStartDateImmutable(idx);
+            JHVDate start = getStartDateImmutable(idx);
             if (earliest == null || start.compareTo(earliest) < 0) {
                 earliest = start;
             }
@@ -230,11 +230,11 @@ public class Layers {
      *         information available
      */
     public static Date getLastDate() {
-        ImmutableDateTime latest = null;
+        JHVDate latest = null;
 
         int size = layers.size();
         for (int idx = 0; idx < size; idx++) {
-            ImmutableDateTime end = getEndDateImmutable(idx);
+            JHVDate end = getEndDateImmutable(idx);
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
@@ -503,7 +503,7 @@ public class Layers {
             MetaData m;
             ImageData d = v.getImageLayer().getImageData();
             if (d == null) // not yet decoded
-                m = v.getMetaData(new ImmutableDateTime(0));
+                m = v.getMetaData(new JHVDate(0));
             else
                 m = d.getMetaData();
 
