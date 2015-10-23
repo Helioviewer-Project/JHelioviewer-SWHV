@@ -22,7 +22,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     /** The event */
@@ -179,20 +179,14 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

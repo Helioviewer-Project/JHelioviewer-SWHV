@@ -147,10 +147,10 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     public void prepareTable(JTable t) {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(t.getModel());
         t.setRowSorter(sorter);
-        JTextField tf = new JTextField();
-        t.setRowSelectionAllowed(true);
-        t.setColumnSelectionAllowed(true);
-        t.setCellSelectionEnabled(true);
+        //JTextField tf = new JTextField();
+        //t.setRowSelectionAllowed(true);
+        //t.setColumnSelectionAllowed(true);
+        //t.setCellSelectionEnabled(true);
     }
 
     /**

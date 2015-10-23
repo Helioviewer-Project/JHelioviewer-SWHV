@@ -76,7 +76,6 @@ public class TableRowTransferHandler extends TransferHandler {
 
     @Override
     public boolean importData(TransferHandler.TransferSupport info) {
-
         JTable target = (JTable) info.getComponent();
         JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
         int index = dl.getRow();
@@ -95,7 +94,6 @@ public class TableRowTransferHandler extends TransferHandler {
                     index--;
                 return true;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
