@@ -1,5 +1,9 @@
 package org.helioviewer.jhv.export;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -38,6 +42,7 @@ public class ExportMovie implements FrameListener {
 
     private static int w;
     private static int h;
+    private static int sh;
 
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
@@ -50,6 +55,7 @@ public class ExportMovie implements FrameListener {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("ExportMovie"), new ThreadPoolExecutor.DiscardPolicy());
+    public static BufferedImage EVEImage;
 
     public void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
@@ -102,6 +108,7 @@ public class ExportMovie implements FrameListener {
         {
             fbo.bind(gl);
             MainComponent.renderScene(gl);
+            MainComponent.renderFloatScene(gl);
             fbo.unbind(gl);
 
             fbo.use(gl, fboTex);
@@ -134,6 +141,30 @@ public class ExportMovie implements FrameListener {
         }
     }
 
+    private static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+
+        //do some calculate first
+        int wid = w;
+        int height = sh + h;
+        //create a new buffer and draw two image into the new image
+        BufferedImage newImage = new BufferedImage(wid, height, img1.getType());
+        Graphics2D g2 = newImage.createGraphics();
+        Color oldColor = g2.getColor();
+        //fill background
+        g2.setPaint(Color.WHITE);
+        g2.fillRect(0, 0, wid, height);
+        //draw image
+        g2.setColor(oldColor);
+        AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+        tx.translate(0, -img2.getHeight(null));
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        img2 = op.filter(img2, null);
+        g2.drawImage(img2, 0, 0, w, sh, 0, 0, img2.getWidth(), img2.getHeight(), null);
+        g2.drawImage(img1, null, 0, sh);
+        g2.dispose();
+        return newImage;
+    }
+
     public void handleMovieExport(GL2 gl) {
         if (!inited) {
             init(gl, w, h);
@@ -147,12 +178,13 @@ public class ExportMovie implements FrameListener {
         BufferedImage screenshot = renderFrame(gl);
         try {
             if (mode == RecordMode.SHOT) {
-                ImageUtil.flipImageVertically(screenshot);
-                ImageIO.write(screenshot, "png", new File(imagePath));
+                BufferedImage combinedImage = joinBufferedImage(screenshot, EVEImage);
+                ImageUtil.flipImageVertically(combinedImage);
+                ImageIO.write(combinedImage, "png", new File(imagePath));
                 stop();
             } else {
                 try {
-                    executor.submit(new FrameConsumer(exporter, screenshot));
+                    executor.submit(new FrameConsumer(exporter, screenshot, EVEImage));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -162,13 +194,25 @@ public class ExportMovie implements FrameListener {
         }
     }
 
-    public static void start(int _w, int _h, int fps, RecordMode _mode) {
+    public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
+        int scrw = 1;
+        int scrh = 0;
+        if (EVEImage != null && ImageViewerGui.getMainContentPanel().mainContentPluginsActive()) {
+            scrw = Math.max(1, EVEImage.getWidth());
+            scrh = EVEImage.getHeight();
+        }
         w = (_w / 2) * 2; // wiser for video formats
-        h = (_h / 2) * 2;
+
+        if (isInternal) {
+            sh = scrh * w / scrw;
+            h = (_h - sh) / 2 * 2;
+        }
+        else {
+            sh = w * scrh / scrw;
+            h = ((_h + sh) / 2) * 2;
+        }
         mode = _mode;
 
-        // int ct = Displayer.countActiveLayers();
-        // Displayer.setViewport(new GL3DViewport(0, 0, 0, w / ct, h / ct, Displayer.getViewport().getCamera()));
         stopped = false;
         currentFrame = 0;
 
@@ -185,7 +229,7 @@ public class ExportMovie implements FrameListener {
         } else {
             try {
                 exporter = new XuggleExporter();
-                exporter.open(moviePath, w, h, fps);
+                exporter.open(moviePath, w, h + sh, fps);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -224,18 +268,27 @@ public class ExportMovie implements FrameListener {
     private static class FrameConsumer implements Runnable {
 
         private final MovieExporter movieExporter;
-        private final BufferedImage el;
+        private final BufferedImage mainImage;
+        private final BufferedImage eve;
 
-        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _el) {
+        public FrameConsumer(MovieExporter _movieExporter, BufferedImage _mainImage, BufferedImage _eve) {
             movieExporter = _movieExporter;
-            el = _el;
+            mainImage = _mainImage;
+            eve = _eve;
         }
 
         @Override
         public void run() {
             try {
-                ImageUtil.flipImageVertically(el);
-                movieExporter.encode(el);
+                if (eve != null) {
+                    BufferedImage combinedImage = joinBufferedImage(mainImage, eve);
+                    ImageUtil.flipImageVertically(combinedImage);
+                    movieExporter.encode(combinedImage);
+                }
+                else {
+                    ImageUtil.flipImageVertically(mainImage);
+                    movieExporter.encode(mainImage);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
