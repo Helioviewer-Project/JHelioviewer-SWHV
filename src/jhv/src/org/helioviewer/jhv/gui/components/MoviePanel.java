@@ -131,6 +131,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             protected Dimension getSize() {
                 return new Dimension(1920, 1080);
             }
+
+            @Override
+            protected boolean isInternal() {
+                return true;
+            }
         },
         H720 {
             @Override
@@ -141,6 +146,11 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             @Override
             protected Dimension getSize() {
                 return new Dimension(1280, 720);
+            }
+
+            @Override
+            protected boolean isInternal() {
+                return true;
             }
         },
         ORIGINAL {
@@ -153,7 +163,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             protected Dimension getSize() {
                 return GLHelper.GL2AWTDimension(Displayer.getViewport().getSize());
             }
+
+            @Override
+            protected boolean isInternal() {
+                return false;
+            }
         };
+        protected abstract boolean isInternal();
 
         protected abstract Dimension getSize();
     }
@@ -280,13 +296,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel.add(speedSpinner);
 
         SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /*
-                                                          * SpeedUnit.
-                                                          * MINUTESPERSECOND,
-                                                          * SpeedUnit
-                                                          * .HOURSPERSECOND,
-                                                          * SpeedUnit
-                                                          * .DAYSPERSECOND
-                                                          */};
+                                                         * SpeedUnit.
+                                                         * MINUTESPERSECOND,
+                                                         * SpeedUnit
+                                                         * .HOURSPERSECOND,
+                                                         * SpeedUnit
+                                                         * .DAYSPERSECOND
+                                                         */};
         speedUnitComboBox = new JComboBox(units);
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
@@ -416,7 +432,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 int fps = 30;
                 if (speedUnitComboBox.getSelectedItem().equals(SpeedUnit.FRAMESPERSECOND))
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-                ExportMovie.getInstance().start(size.getSize().width, size.getSize().height, fps, mode);
+                ExportMovie.getInstance().start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
                 setText("REC");
                 ExportMovie.getInstance().stop();

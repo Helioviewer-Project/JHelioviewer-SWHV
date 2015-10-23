@@ -120,4 +120,8 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
     }
 
+    public boolean isCollapsed() {
+        return !component.isVisible();
+    }
+
 }

@@ -38,6 +38,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.ImmutableDateTime;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -177,6 +178,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             gleftAxisPart.dispose();
             g.dispose();
         }
+        ExportMovie.EVEImage = screenImage;
         this.repaint();
         movieLineRequest = false;
         forceRedrawGraph = false;
