@@ -31,6 +31,8 @@ public class JHVEventContainer {
 
     private static final double factor = 0.2;
 
+    private static JHVEvent lastHighlighted = null;
+
     /**
      * Private constructor.
      */
@@ -193,4 +195,15 @@ public class JHVEventContainer {
         fireEventCacheChanged();
     }
 
+    public static void highlight(JHVEvent event) {
+        if (event == lastHighlighted)
+            return;
+        if (event != null) {
+            event.highlight(true);
+        }
+        if (lastHighlighted != null) {
+            lastHighlighted.highlight(false);
+        }
+        lastHighlighted = event;
+    }
 }

@@ -79,7 +79,8 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public void draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
+    public JHVEvent draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
+        JHVEvent highlightedEvent = null;
         int spacePerLine = Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue()));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + offset;
         drawPosition = new Rectangle((new Double(Math.floor(graphArea.width * scaledX0))).intValue(), startPosition, (new Double(Math.floor(graphArea.width * (scaledX1 - scaledX0)))).intValue() + 1, spacePerLine);
@@ -104,16 +105,11 @@ public class EventPlotConfiguration {
             drawPosition.height = drawPosition.height + 2;
             shouldRedraw = true;
             spacePerLine = drawPosition.height;
-            if (!event.isHighlighted()) {
-                event.highlight(true, EventModel.getSingletonInstance());
-            }
-        }
-        if (!containsMouse && event.isHighlighted()) {
-            shouldRedraw = false;
-            event.highlight(false, EventModel.getSingletonInstance());
-        }
-        if (containsMouse || eventWasHightlighted) {
 
+        }
+        if (mousePosition != null && containsMouse)
+            highlightedEvent = event;
+        if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
         }
@@ -123,6 +119,7 @@ public class EventPlotConfiguration {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x + drawPosition.width - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
         }
+        return highlightedEvent;
     }
 
     /**

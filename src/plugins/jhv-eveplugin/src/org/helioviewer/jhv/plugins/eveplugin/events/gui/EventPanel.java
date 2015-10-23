@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -36,12 +38,17 @@ public class EventPanel implements DrawableElement {
             float dash1[] = { 10.0f };
             BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
             Stroke normalStroke = g.getStroke();
+            JHVEvent highlightedEvent = null;
             for (String eventType : epcs.keySet()) {
                 boolean first = true;
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
                 for (EventPlotConfiguration epc : epcs.get(eventType)) {
-                    epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
+                    JHVEvent rEvent = epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
+                    if (rEvent != null) {
+                        highlightedEvent = rEvent;
+                    }
+
                     if (epc.shouldRedraw()) {
                         shouldRedraw = epc;
                     }
@@ -66,6 +73,8 @@ public class EventPanel implements DrawableElement {
                 }
                 eventTypeNr++;
             }
+            if (mousePosition != null)
+                JHVEventContainer.highlight(highlightedEvent);
         }
     }
 

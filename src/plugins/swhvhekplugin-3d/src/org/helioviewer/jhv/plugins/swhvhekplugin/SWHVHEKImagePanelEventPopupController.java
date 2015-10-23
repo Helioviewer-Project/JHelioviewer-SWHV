@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -25,18 +26,6 @@ import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
-/**
- * Implementation of ImagePanelPlugin for showing event popups.
- *
- * <p>
- * This plugin provides the capability to open an event popup when clicking on
- * an event icon within the main image. Apart from that, it changes the mouse
- * pointer when hovering over an event icon to indicate that it is clickable.
- *
- * @author Markus Langenberg
- * @author Malte Nuhn
- *
- */
 public class SWHVHEKImagePanelEventPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
@@ -45,7 +34,7 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
 
     private Component component;
 
-    private JHVEvent mouseOverJHVEvent = null;
+    protected static JHVEvent mouseOverJHVEvent = null;
     private Point mouseOverPosition = null;
     private Cursor lastCursor;
 
@@ -123,6 +112,9 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void mouseExited(MouseEvent e) {
+        mouseOverPosition = null;
+        mouseOverJHVEvent = null;
+        JHVEventContainer.highlight(mouseOverJHVEvent);
     }
 
     /**
@@ -151,12 +143,10 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        JHVEvent lastJHVEvent = mouseOverJHVEvent;
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
         Vec3d pt = null;
         Vec3d hitpoint = null;
-
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
@@ -190,19 +180,14 @@ public class SWHVHEKImagePanelEventPopupController implements MouseListener, Mou
                 }
             }
         }
-
+        JHVEventContainer.highlight(mouseOverJHVEvent);
         if (mouseOverJHVEvent != null) {
-            mouseOverJHVEvent.highlight(true, this);
-        }
-        if (lastJHVEvent != mouseOverJHVEvent && lastJHVEvent != null) {
-            lastJHVEvent.highlight(false, this);
-        }
-        if (lastJHVEvent == null && mouseOverJHVEvent != null) {
             lastCursor = component.getCursor();
             component.setCursor(helpCursor);
-        } else if (lastJHVEvent != null && mouseOverJHVEvent == null) {
+        } else {
             component.setCursor(lastCursor);
         }
+        Displayer.display();
     }
 
     protected static Point highlightedMousePosition;
