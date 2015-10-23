@@ -45,12 +45,14 @@ public class GLImage {
             imageData.setUploaded(true);
             tex.copyImageData2D(gl, imageData);
         }
-        ImageData prevFrame = imageData;
+
+        ImageData prevFrame;
         if (!baseDifferenceMode) {
             prevFrame = prevImageData;
         } else {
             prevFrame = baseImageData;
         }
+
         if (differenceMode && prevFrame != null) {
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
             diffTex.copyImageData2D(gl, prevFrame);

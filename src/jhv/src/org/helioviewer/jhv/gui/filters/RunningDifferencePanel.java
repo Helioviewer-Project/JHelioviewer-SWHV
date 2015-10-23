@@ -132,7 +132,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
             image.setRunDiffNoRot(!diffRot.isSelected());
         } else
             topPanel.remove(radPanel);
-
     }
 
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
@@ -141,7 +140,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         image.setBaseDifferenceMode(baseDifferenceMode);
     }
 
-    private void setDifferenceModetoChangeCombobox(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+    private void setDifferenceModetoChangeCombobox(boolean differenceMode, boolean baseDifferenceMode) {
         if (!differenceMode) {
             comboBox.setSelectedItem(combolist[0]);
         } else if (!baseDifferenceMode) {
@@ -232,9 +231,9 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         boolean differenceMode = image.getDifferenceMode();
         if (differenceMode) {
             boolean baseDifferenceMode = image.getBaseDifferenceMode();
-            setDifferenceModetoChangeCombobox(false, differenceMode, baseDifferenceMode);
+            setDifferenceModetoChangeCombobox(differenceMode, baseDifferenceMode);
         } else {
-            setDifferenceModetoChangeCombobox(false, false, false);
+            setDifferenceModetoChangeCombobox(false, false);
         }
 
         truncateSpinner.setValue(1.f - image.getTruncation());

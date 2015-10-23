@@ -126,11 +126,7 @@ public class IconBank {
      * @return Image for the given name or null if it fails to load the image.
      * */
     public static BufferedImage getImage(JHVIcon icon) {
-        ImageIcon imageIcon = getIcon(icon);
-        if (imageIcon == null)
-            return null;
-
-        Image image = imageIcon.getImage();
+        Image image = getIcon(icon).getImage();
         if (image != null && image.getWidth(null) > 0 && image.getHeight(null) > 0) {
             BufferedImage bi = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 
