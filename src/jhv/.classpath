@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="../lib/json.jar"/>
 	<classpathentry kind="lib" path="../lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="../lib/gluegen-rt.jar"/>
-    <classpathentry kind="lib" path="../lib/fits.jar"/>
+	<classpathentry kind="lib" path="../lib/fits.jar"/>
 	<classpathentry kind="lib" path="../resources"/>
 	<classpathentry kind="lib" path="../lib/jogl-all.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-api-1.7.12.jar"/>
@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="../lib/slf4j-nop-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="lib" path="../lib/commons-lang3-3.4.jar"/>
+	<classpathentry kind="lib" path="../lib/humble-video-arch-x86_64-apple-darwin12-0.2.1.jar"/>
+	<classpathentry kind="lib" path="../lib/humble-video-noarch-0.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
