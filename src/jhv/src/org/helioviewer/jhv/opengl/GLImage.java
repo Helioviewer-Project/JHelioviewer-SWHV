@@ -58,8 +58,8 @@ public class GLImage {
     }
 
     public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, boolean isMiniView) {
-        copyScreenToTexture(gl, imageData, prevImageData, baseImageData);
-        applyRunningDifferenceGL(gl, imageData, prevImageData, baseImageData);
+        applyRegion(imageData, prevImageData, baseImageData);
+        applyRunningDifference(gl);
 
         GLSLShader.colorMask = colorMask;
         GLSLShader.setContrast(contrast);
@@ -69,11 +69,13 @@ public class GLImage {
         int w = imageData.getWidth();
         int h = imageData.getHeight();
         GLSLShader.setFactors(sharpen, 1f / w, 1f / h, 1f);
-        applyGLLUT(gl);
+
+        applyLUT(gl);
+
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void copyScreenToTexture(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         Region region = imageData.getRegion();
 
         double xOffset = region.getLowerLeftCorner().x;
@@ -114,8 +116,7 @@ public class GLImage {
         }
     }
 
-    private void applyRunningDifferenceGL(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-
+    private void applyRunningDifference(GL2 gl) {
         if (baseDifferenceMode || differenceMode) {
             if (baseDifferenceMode) {
                 if (baseDifferenceNoRot) {
@@ -138,7 +139,7 @@ public class GLImage {
         }
     }
 
-    private void applyGLLUT(GL2 gl) {
+    private void applyLUT(GL2 gl) {
         LUT currlut;
 
         if (differenceMode || baseDifferenceMode) {
