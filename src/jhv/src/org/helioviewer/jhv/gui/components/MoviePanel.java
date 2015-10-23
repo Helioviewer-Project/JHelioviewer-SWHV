@@ -162,7 +162,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
             @Override
             protected Dimension getSize() {
-                return GLHelper.GL2AWTDimension(Displayer.getViewport().getSize());
+                return GLHelper.GL2AWTDimension(Displayer.getGLSize());
             }
 
             @Override
