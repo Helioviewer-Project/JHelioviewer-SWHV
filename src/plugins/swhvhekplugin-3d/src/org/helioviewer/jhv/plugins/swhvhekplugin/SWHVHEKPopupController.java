@@ -35,8 +35,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     private Component component;
 
     protected static JHVEvent mouseOverJHVEvent = null;
-    private Point mouseOverPosition = null;
-    private Cursor lastCursor;
+    protected static Point mouseOverPosition = null;
+    private static Cursor lastCursor;
 
     public Date currentTime;
 
@@ -114,7 +114,6 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     public void mouseExited(MouseEvent e) {
         mouseOverPosition = null;
         mouseOverJHVEvent = null;
-        highlightedMousePosition = null;
         JHVEventContainer.highlight(null);
     }
 
@@ -151,7 +150,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-            highlightedMousePosition = e.getPoint();
+
             if (evt.getName().equals("Coronal Mass Ejection")) {
                 Map<String, JHVEventParameter> params = evt.getAllEventParameters();
                 double principalAngle = Math.toRadians(SWHVHEKData.readCMEPrincipalAngleDegree(params));
@@ -170,13 +169,14 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 hitpoint = getHitPoint(e);
                 pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
             }
+
             if (pt != null && hitpoint != null) {
                 double deltaX = Math.abs(hitpoint.x - pt.x);
                 double deltaY = Math.abs(hitpoint.y - pt.y);
                 double deltaZ = Math.abs(hitpoint.z - pt.z);
                 if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
                     mouseOverJHVEvent = evt;
-                    mouseOverPosition = new Point(e.getX(), e.getY());
+                    mouseOverPosition = e.getPoint();
                     break;
                 }
             }
@@ -191,8 +191,6 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
             component.setCursor(lastCursor);
         }
     }
-
-    protected static Point highlightedMousePosition;
 
     private Vec3d getHitPointPlane(MouseEvent e) {
         return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());

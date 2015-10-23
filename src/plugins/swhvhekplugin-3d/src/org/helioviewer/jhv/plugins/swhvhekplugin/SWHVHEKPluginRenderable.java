@@ -281,7 +281,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private float oldFontSize = -1;
 
     public void drawText(GL2 gl, JHVEvent evt) {
-        Point pt = SWHVHEKPopupController.highlightedMousePosition;
+        Point pt = SWHVHEKPopupController.mouseOverPosition;
         if (pt == null)
             return;
 
