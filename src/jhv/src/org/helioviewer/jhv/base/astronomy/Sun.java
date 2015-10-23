@@ -109,8 +109,8 @@ public class Sun {
         double x = Math.atan(-Math.cos(lamda2 / MathUtils.radeg) * Math.tan(ob1t / MathUtils.radeg)) * MathUtils.radeg;
         double y = Math.atan(-Math.cos(diff) * Math.tan(i / MathUtils.radeg)) * MathUtils.radeg;
 
-        y = -Math.sin(diff) * Math.cos(i / MathUtils.radeg);
-        x = -Math.cos(diff);
+        //y = -Math.sin(diff) * Math.cos(i / MathUtils.radeg);
+        //x = -Math.cos(diff);
         double eta = Math.atan2(y, x) * MathUtils.radeg + 360.;
         double long0 = (eta - theta) % 360. + 360.;
         return long0;
