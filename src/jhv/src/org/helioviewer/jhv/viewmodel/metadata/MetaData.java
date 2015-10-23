@@ -3,7 +3,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 
 /**
  * Basic interface for meta data.
@@ -52,7 +52,7 @@ public interface MetaData {
      */
     public int getPixelHeight();
 
-    public ImmutableDateTime getDateObs();
+    public JHVDate getDateObs();
 
     public Quatd getRotationObs();
 

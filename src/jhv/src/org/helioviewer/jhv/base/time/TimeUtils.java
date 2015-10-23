@@ -20,7 +20,7 @@ public class TimeUtils {
     public static final FastDateFormat filenameDateFormat = FastDateFormat.getInstance("yyyy-MM-dd_HH.mm.ss");
     public static final FastDateFormat timeDateFormat = FastDateFormat.getInstance("HH:mm:ss");
 
-    public static final ImmutableDateTime epoch = ImmutableDateTime.parseDateTime("2000-01-01T00:00:00");
+    public static final JHVDate epoch = JHVDate.parseDateTime("2000-01-01T00:00:00");
 
     private static final TimeUtils instance = new TimeUtils();
 

@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 /**
@@ -159,7 +159,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         // otherwise default epoch
 
         if (observedDate != null)
-            dateObs = ImmutableDateTime.parseDateTime(observedDate);
+            dateObs = JHVDate.parseDateTime(observedDate);
     }
 
     private void retrievePosition(MetaDataContainer m) {

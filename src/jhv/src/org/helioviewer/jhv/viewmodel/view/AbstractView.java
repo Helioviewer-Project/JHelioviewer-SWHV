@@ -2,7 +2,7 @@ package org.helioviewer.jhv.viewmodel.view;
 
 import java.util.Date;
 
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -62,17 +62,17 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public int getFrame(ImmutableDateTime time) {
+    public int getFrame(JHVDate time) {
         return 0;
     }
 
     @Override
-    public MetaData getMetaData(ImmutableDateTime time) {
+    public MetaData getMetaData(JHVDate time) {
         return metaDataArray[getFrame(time)];
     }
 
     @Override
-    public ImmutableDateTime getFrameDateTime(int frame) {
+    public JHVDate getFrameDateTime(int frame) {
         if (frame <= 0)
             return metaDataArray[0].getDateObs();
         if (frame >= getMaximumFrameNumber())

@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
-import org.helioviewer.jhv.base.time.ImmutableDateTime;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
 public abstract class AbstractMetaData implements MetaData {
@@ -15,7 +15,7 @@ public abstract class AbstractMetaData implements MetaData {
     protected int pixelWidth;
     protected int pixelHeight;
 
-    protected ImmutableDateTime dateObs = TimeUtils.epoch;
+    protected JHVDate dateObs = TimeUtils.epoch;
     protected Quatd rotationObs = Quatd.ZERO;
     protected double distanceObs = Sun.MeanEarthDistance;
     protected double innerRadius = 0.;
@@ -94,7 +94,7 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public ImmutableDateTime getDateObs() {
+    public JHVDate getDateObs() {
         return dateObs;
     }
 
