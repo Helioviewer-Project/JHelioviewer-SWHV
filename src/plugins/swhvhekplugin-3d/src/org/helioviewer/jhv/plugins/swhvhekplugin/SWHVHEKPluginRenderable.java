@@ -280,11 +280,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private Font font;
     private float oldFontSize = -1;
 
-    public void drawText(GL2 gl, JHVEvent evt) {
-        Point pt = SWHVHEKPopupController.mouseOverPosition;
-        if (pt == null)
-            return;
-
+    public void drawText(GL2 gl, JHVEvent evt, Point pt) {
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
 
@@ -385,7 +381,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     public void renderFloat(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
             if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
-                drawText(gl, SWHVHEKPopupController.mouseOverJHVEvent);
+                drawText(gl, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
             }
         }
     }
