@@ -17,7 +17,6 @@ public class GL3DViewport {
 
     public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera) {
         this(_idx, _x, _y, _w, _h, _camera, false);
-
     }
 
     private boolean active;
@@ -102,4 +101,5 @@ public class GL3DViewport {
     public void computeActive() {
         active = ImageViewerGui.getRenderableContainer().isViewportActive(idx);
     }
+
 }
