@@ -235,10 +235,8 @@ public class RenderableContainerPanel extends JPanel {
 
                 if (col == VISIBLE_COL) {
                     renderable.setVisible(!renderable.isVisible());
-                    Displayer.getViewports()[0].computeActive();
                     renderableContainer.fireListeners();
                     Displayer.display();
-                    renderableContainer.arrangeMultiView(Displayer.multiview);
                 }
                 if (col == TITLE_COL && renderable instanceof RenderableImageLayer) {
                     ((RenderableImageLayer) renderable).setActiveImageLayer();
