@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.display;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -37,6 +38,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static int getGLHeight() {
         return glHeight;
+    }
+
+    public static Dimension getGLSize() {
+        return new Dimension(glWidth, glHeight);
     }
 
     private static GL3DViewport viewport0 = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), true);
