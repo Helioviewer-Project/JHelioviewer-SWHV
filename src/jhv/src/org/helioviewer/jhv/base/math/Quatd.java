@@ -80,9 +80,7 @@ public class Quatd {
         double x = (a1 * x2 + x1 * a2 + y1 * z2 - z1 * y2);
         double y = (a1 * y2 - x1 * z2 + y1 * a2 + z1 * x2);
         double z = (a1 * z2 + x1 * y2 - y1 * x2 + z1 * a2);
-        Quatd res = new Quatd(a, x, y, z);
-
-        return res;
+        return new Quatd(a, x, y, z);
     }
 
     public Mat4d toMatrix() {

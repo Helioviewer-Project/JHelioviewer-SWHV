@@ -313,7 +313,7 @@ public class APIRequestManager {
      *             found, etc.)
      */
     public static View loadView(URI uri, URI downloadURI) throws IOException {
-        if (uri == null || uri.getScheme() == null || uri.toString() == null) {
+        if (uri == null || uri.getScheme() == null) {
             throw new IOException("Invalid URI");
         }
 
