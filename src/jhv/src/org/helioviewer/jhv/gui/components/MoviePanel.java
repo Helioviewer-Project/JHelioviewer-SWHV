@@ -42,6 +42,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ButtonCreator;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -395,8 +396,8 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             recordButton.doClick();
     }
 
-    public static JPanel getRecordPanel() {
-        return recordPanel;
+    public static void recordPanelSetEnabled(boolean enabled) {
+        ComponentUtils.enableComponents(recordPanel, enabled);
     }
 
     private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {

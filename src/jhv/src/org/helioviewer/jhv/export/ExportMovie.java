@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -126,7 +125,7 @@ public class ExportMovie implements FrameListener {
 
     private void exportMovieFinish(GL2 gl) {
         ImageViewerGui.getMainComponent().detachExport();
-        ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), true);
+        MoviePanel.recordPanelSetEnabled(true);
 
         try {
             dispose(gl);
@@ -189,12 +188,11 @@ public class ExportMovie implements FrameListener {
         moviePath = prefix + ".mp4";
         imagePath = prefix + ".png";
 
-        ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), false);
+        MoviePanel.recordPanelSetEnabled(false);
         ImageViewerGui.getMainComponent().attachExport(instance);
 
         if (mode == RecordMode.SHOT) {
             Displayer.display();
-            ComponentUtils.enableComponents(MoviePanel.getRecordPanel(), true);
         } else {
             try {
                 exporter = new XuggleExporter();
@@ -220,6 +218,7 @@ public class ExportMovie implements FrameListener {
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
             Displayer.setViewport(Displayer.getViewports()[0]);
+            Displayer.display(); // force detach
         }
     }
 
