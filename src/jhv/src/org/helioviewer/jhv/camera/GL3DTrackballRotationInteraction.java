@@ -18,7 +18,6 @@ import org.helioviewer.jhv.display.Displayer;
 public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     private Vec3d currentRotationStartPoint;
-    private Vec3d currentRotationEndPoint;
     private Quatd currentDragRotation;
 
     protected GL3DTrackballRotationInteraction(GL3DCamera camera) {
@@ -27,7 +26,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+        Vec3d currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
         if (currentRotationStartPoint != null && currentRotationEndPoint != null) {
             currentDragRotation = Quatd.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         }
@@ -39,7 +38,6 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     @Override
     public void mouseReleased(MouseEvent e) {
         currentRotationStartPoint = null;
-        currentRotationEndPoint = null;
     }
 
     @Override
@@ -53,8 +51,7 @@ public class GL3DTrackballRotationInteraction extends GL3DDefaultInteraction {
     @Override
     public void mousePressed(MouseEvent e) {
         setActiveView(e);
-
-        this.currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+        currentRotationStartPoint = camera.getVectorFromSphereTrackball(e.getPoint());
     }
 
 }
