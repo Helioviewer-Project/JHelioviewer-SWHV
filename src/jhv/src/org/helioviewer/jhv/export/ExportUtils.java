@@ -19,7 +19,7 @@ public class ExportUtils {
         Graphics2D g2 = ret.createGraphics();
         g2.drawImage(im1, null, 0, 0);
 
-        AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(1, 1), AffineTransformOp.TYPE_BILINEAR);
+        AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(1, 1), AffineTransformOp.TYPE_BICUBIC);
         im2 = op.filter(im2, null);
         g2.drawImage(im2, 0, im1.getHeight(), im1.getWidth(), ret.getHeight() - im1.getHeight(), null);
         g2.dispose();
