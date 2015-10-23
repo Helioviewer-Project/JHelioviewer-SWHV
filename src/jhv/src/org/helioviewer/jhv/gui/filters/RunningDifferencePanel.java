@@ -117,7 +117,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         addRadioButtons();
     }
 
-    private void setDifferenceMode(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
+    private void setDifferenceMode(boolean showExtraPanel) {
         if (showExtraPanel) {
             final GridBagConstraints c = new GridBagConstraints();
             c.weightx = 1;
@@ -136,7 +136,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     }
 
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
-        setDifferenceMode(showExtraPanel, differenceMode, baseDifferenceMode);
+        setDifferenceMode(showExtraPanel);
         image.setDifferenceMode(differenceMode);
         image.setBaseDifferenceMode(baseDifferenceMode);
     }
