@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -494,12 +495,29 @@ public class JP2Image {
         return resolutionSet;
     }
 
+    private volatile boolean isAbolished = false;
+
+    // if instance was built before cancelling
+    @Override
+    protected void finalize() {
+        if (!isAbolished) {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    abolish();
+                }
+            });
+        }
+    }
+
     /**
      * Closes the image out. Destroys all objects and performs cleanup
      * operations. I use the 'abolish' name to distinguish it from what the
      * Kakadu library uses.
      */
     protected void abolish() {
+        isAbolished = true;
+
         if (reader != null) {
             reader.abolish();
             reader = null;
