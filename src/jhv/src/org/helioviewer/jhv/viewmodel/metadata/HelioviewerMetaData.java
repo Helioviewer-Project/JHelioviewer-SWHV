@@ -11,18 +11,6 @@ import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
-/**
- * Implementation of MetaData representing solar images.
- *
- * <p>
- * This class is supposed to be for solar images. Currently, it supports the
- * observatory SOHO with its instruments EIT, LASCO and MDI, as well as some
- * instruments on board of the observatory STEREO.
- *
- * @author Ludwig Schmidt
- * @author Andre Dau
- *
- */
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
 
     private String instrument = "";
@@ -33,26 +21,21 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     private Vec2d sunPixelPosition;
 
-    /**
-     * Default constructor.
-     *
-     * Tries to read all informations required.
-     *
-     * @param m
-     *            Meta data container serving as a base for the construction
-     */
     public HelioviewerMetaData(MetaDataContainer m) {
         identifyObservation(m);
         retrieveDateTime(m);
         retrievePosition(m);
         retrievePixelParameters(m);
-        retrieveOcculterRadii(m);
-        retrieveOcculterLinearCutOff(m);
+
+        if (instrument.equals("LASCO") || detector.equals("COR1") || detector.equals("COR2")) {
+            retrieveOcculterRadii(m);
+            retrieveOcculterLinearCutOff(m);
+        }
     }
 
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
-        if (detector.equals("C2")) {
+        if (detector.equalsIgnoreCase("C2")) {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
             cutOffValue = (float) (-this.getPhysicalUpperLeft().x);
             cutOffDirection = new Vec3d(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
