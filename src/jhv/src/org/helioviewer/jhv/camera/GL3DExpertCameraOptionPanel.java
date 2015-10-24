@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
@@ -82,7 +83,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
         c.gridy = 3;
 
         addObjectCombobox(c);
-        exactDateCheckBox = new JCheckBox("Use active layer timestamps", true);
+        exactDateCheckBox = new JCheckBox("Use master layer timestamps", true);
         c.gridy = 4;
         add(exactDateCheckBox, c);
         c.gridy = 5;
@@ -242,7 +243,11 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     void syncWithLayerBeginTime(boolean applyChanges) {
-        JHVDate startDate = Layers.getStartDate();
+        View view = Layers.getActiveView();
+        if (view == null)
+            return;
+
+        JHVDate startDate = Layers.getStartDate(view);
         if (startDate == null) {
             startDate = new JHVDate(System.currentTimeMillis());
         }
@@ -281,7 +286,11 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     void syncWithLayerEndTime(boolean applyChanges) {
-        JHVDate endDate = Layers.getEndDate();
+        View view = Layers.getActiveView();
+        if (view == null)
+            return;
+
+        JHVDate endDate = Layers.getEndDate(view);
         if (endDate == null) {
             endDate = new JHVDate(System.currentTimeMillis());
         }
