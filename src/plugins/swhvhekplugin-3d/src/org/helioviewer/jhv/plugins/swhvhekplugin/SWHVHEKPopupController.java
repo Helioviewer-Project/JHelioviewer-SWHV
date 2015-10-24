@@ -38,7 +38,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     protected static Point mouseOverPosition = null;
     private static Cursor lastCursor;
 
-    public Date currentTime;
+    protected Date currentTime;
 
     @Override
     public void setComponent(Component _component) {
@@ -158,8 +158,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 double distSun = 2.4;
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
-                Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-                Position.Latitudinal p = Sun.getEarth(date);
+                Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Quatd localRotation = new Quatd(p.lat, p.lon);
                 hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
 

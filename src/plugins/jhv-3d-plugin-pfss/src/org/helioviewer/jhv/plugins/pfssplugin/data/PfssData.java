@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.pfssplugin.data;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
-import java.util.Date;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.BinaryTableHDU;
@@ -117,8 +116,7 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             dateString = date.substring(11, 30);
 
-            Date dd = TimeUtils.utcDateFormat.parse(dateString);
-            Position.Latitudinal p = Sun.getEarth(dd);
+            Position.Latitudinal p = Sun.getEarth(TimeUtils.utcDateFormat.parse(dateString).getTime());
             double phi = p.lon;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);

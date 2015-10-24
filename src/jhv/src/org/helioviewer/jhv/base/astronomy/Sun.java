@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.base.astronomy;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JulianDay;
 
@@ -30,9 +28,8 @@ public class Sun {
     private static Position.Latitudinal prevEarth = new Position.Latitudinal(0, 0, 0, 0);
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    public static Position.Latitudinal getEarth(Date date) {
-        long milli;
-        if ((milli = date.getTime()) == prevEarth.milli) {
+    public static Position.Latitudinal getEarth(long milli) {
+        if (milli == prevEarth.milli) {
             return prevEarth;
         }
 
@@ -81,8 +78,8 @@ public class Sun {
     }
 
     // better precison, to be recovered later
-    private static double getL0Degree(Date date) {
-        double mjd = milli2mjd(date.getTime());
+    private static double getL0Degree(long milli) {
+        double mjd = milli2mjd(milli);
         double t = mjd2jcy(mjd, 2451545.);
 
         double mnl = 280.46645 + 36000.76983 * t + 0.0003032 * t * t;

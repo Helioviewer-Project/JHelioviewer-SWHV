@@ -91,7 +91,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };;
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
-
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
         double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -103,8 +102,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
-        Date date = new Date((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        Position.Latitudinal p = Sun.getEarth(date);
+        Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         Quatd q = new Quatd(p.lat, p.lon);
 
         double thetaStart = principalAngle - angularWidth / 2.;
@@ -160,9 +158,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_CULL_FACE);
     }
 
-    private void drawPolygon(GL2 gl, JHVEvent evt, Date timestamp) {
+    private void drawPolygon(GL2 gl, JHVEvent evt) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
             return;
         }
@@ -207,14 +204,13 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawIcon(GL2 gl, JHVEvent evt, Date timestamp) {
-        String type = evt.getJHVEventType().getEventType();
+    private void drawIcon(GL2 gl, JHVEvent evt) {
         HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
                 Vec3d pt = el.centralPoint();
+                String type = evt.getJHVEventType().getEventType();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
                     this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -360,10 +356,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evt, controller.currentTime);
                 } else {
-                    drawPolygon(gl, evt, controller.currentTime);
+                    drawPolygon(gl, evt);
 
                     gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIcon(gl, evt, controller.currentTime);
+                    drawIcon(gl, evt);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
