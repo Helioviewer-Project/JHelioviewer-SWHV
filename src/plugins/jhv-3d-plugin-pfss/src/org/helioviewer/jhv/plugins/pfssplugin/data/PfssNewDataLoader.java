@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssPlugin;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
@@ -26,20 +27,20 @@ public class PfssNewDataLoader implements Runnable {
 
     private static int TIMEOUT_DOWNLOAD_SECONDS = 120;
 
-    private final Date start;
-    private final Date end;
+    private final JHVDate start;
+    private final JHVDate end;
     private final static SortedMap<Integer, ArrayList<Pair<String, Long>>> parsedCache = new TreeMap<Integer, ArrayList<Pair<String, Long>>>();
 
-    public PfssNewDataLoader(Date start, Date end) {
-        this.start = start;
-        this.end = end;
+    public PfssNewDataLoader(JHVDate _start, JHVDate _end) {
+        start = _start;
+        end = _end;
     }
 
     @Override
     public void run() {
-        if (start != null && end != null && start.before(end)) {
+        if (start != null && end != null && start.getTime() <= end.getTime()) {
             final Calendar startCal = GregorianCalendar.getInstance();
-            startCal.setTime(start);
+            startCal.setTime(start.getDate());
 
             final Calendar endCal = GregorianCalendar.getInstance();
             endCal.setTime(new Date(end.getTime() + 31 * 24 * 60 * 60 * 1000));

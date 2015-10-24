@@ -123,7 +123,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private void setDateRange() {
         View view = Layers.getActiveView();
         if (view != null && view.isMultiFrame()) {
-            Interval<Date> interval = new Interval<Date>(Layers.getStartDate(view), Layers.getEndDate(view));
+            Interval<Date> interval = new Interval<Date>(Layers.getStartDate(view).getDate(), Layers.getEndDate(view).getDate());
             DrawController.getSingletonInstance().setSelectedInterval(interval, true);
         }
     }

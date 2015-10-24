@@ -39,17 +39,17 @@ public class LogSettings {
     /**
      * Log levels sorted from ALL to OFF
      */
-    public final Level[] LEVELS = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.FATAL, Level.OFF };
+    public static final Level[] LEVELS = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.FATAL, Level.OFF };
 
     /**
      * Identifier for the file appender
      */
-    public final String FILE_LOGGER = "file";
+    public static final String FILE_LOGGER = "file";
 
     /**
      * Identifier for the console appender
      */
-    public final String CONSOLE_LOGGER = "console";
+    public static final String CONSOLE_LOGGER = "console";
 
     private Properties defaultSettings;
 

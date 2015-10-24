@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
@@ -242,14 +243,13 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     void syncWithLayerBeginTime(boolean applyChanges) {
-        Date startDate = null;
-        startDate = Layers.getFirstDate();
+        JHVDate startDate = Layers.getStartDate();
         if (startDate == null) {
-            startDate = new Date(System.currentTimeMillis());
+            startDate = new JHVDate(System.currentTimeMillis());
         }
 
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate));
+        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate.getDate()));
         setBeginTime(applyChanges);
     }
 
@@ -282,13 +282,12 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     void syncWithLayerEndTime(boolean applyChanges) {
-        Date endDate = null;
-        endDate = Layers.getLastDate();
+        JHVDate endDate = Layers.getEndDate();
         if (endDate == null) {
-            endDate = new Date(System.currentTimeMillis());
+            endDate = new JHVDate(System.currentTimeMillis());
         }
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(endDate));
+        endTimePicker.setText(TimeUtils.timeDateFormat.format(endDate.getDate()));
         setEndTime(applyChanges);
     }
 
