@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -121,6 +122,8 @@ public class GL3DPositionLoading {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (CancellationException e) {
                 e.printStackTrace();
             }
 
