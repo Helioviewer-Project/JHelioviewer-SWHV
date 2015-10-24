@@ -248,10 +248,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             return;
 
         JHVDate startDate = Layers.getStartDate(view);
-        if (startDate == null) {
-            startDate = new JHVDate(System.currentTimeMillis());
-        }
-
         beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate.getDate()));
         setBeginTime(applyChanges);
@@ -291,9 +287,6 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
             return;
 
         JHVDate endDate = Layers.getEndDate(view);
-        if (endDate == null) {
-            endDate = new JHVDate(System.currentTimeMillis());
-        }
         endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeUtils.timeDateFormat.format(endDate.getDate()));
         setEndTime(applyChanges);
