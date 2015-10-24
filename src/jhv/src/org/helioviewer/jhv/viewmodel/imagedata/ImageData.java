@@ -2,9 +2,9 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -47,9 +47,9 @@ public interface ImageData {
 
     public MetaData getMetaData();
 
-    public void setMasterTime(Date masterTime);
+    public void setMasterTime(JHVDate masterTime);
 
-    public Date getMasterTime();
+    public JHVDate getMasterTime();
 
     public boolean getUploaded();
 

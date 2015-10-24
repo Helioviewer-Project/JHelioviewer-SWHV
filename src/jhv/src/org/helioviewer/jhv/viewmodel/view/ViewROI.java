@@ -1,11 +1,10 @@
 package org.helioviewer.jhv.viewmodel.view;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -32,7 +31,7 @@ public class ViewROI {
         }
     }
 
-    public static Region updateROI(GL3DCamera camera, Date masterTime, MetaData m) {
+    public static Region updateROI(GL3DCamera camera, JHVDate masterTime, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 
-import java.util.Date;
-
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
@@ -17,7 +16,7 @@ public class JP2ImageParameter {
 
     public final JP2Image jp2Image;
 
-    public final Date masterTime;
+    public final JHVDate masterTime;
 
     /** Essentially an immutable Rectangle */
     public final SubImage subImage;
@@ -29,7 +28,7 @@ public class JP2ImageParameter {
     public final int compositionLayer;
 
     /** This constructor assigns all variables... throw NPE if any args are null */
-    public JP2ImageParameter(JP2Image _jp2Image, Date _masterTime, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
+    public JP2ImageParameter(JP2Image _jp2Image, JHVDate _masterTime, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
         if (_roi == null || _resolution == null)
             throw new NullPointerException();
         jp2Image = _jp2Image;
@@ -50,7 +49,7 @@ public class JP2ImageParameter {
             return false;
         }
         JP2ImageParameter params = (JP2ImageParameter) o;
-        return jp2Image.equals(params.jp2Image) && masterTime.getTime() == params.masterTime.getTime() && subImage.equals(params.subImage) && resolution.equals(params.resolution) && compositionLayer == params.compositionLayer;
+        return jp2Image.equals(params.jp2Image) && masterTime.equals(params.masterTime) && subImage.equals(params.subImage) && resolution.equals(params.resolution) && compositionLayer == params.compositionLayer;
     }
 
 }

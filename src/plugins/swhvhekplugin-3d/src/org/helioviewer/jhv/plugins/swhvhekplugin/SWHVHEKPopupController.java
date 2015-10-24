@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -46,8 +47,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     }
 
     @Override
-    public void timeChanged(Date date) {
-        currentTime = date;
+    public void timeChanged(JHVDate date) {
+        currentTime = date.getDate();
     }
 
     private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
@@ -232,8 +233,8 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     @Override
-    public void timeChanged(Date date) {
-        fireRedrawRequestMovieFrameChanged(date);
+    public void timeChanged(JHVDate date) {
+        fireRedrawRequestMovieFrameChanged(date.getDate());
     }
 
     public Date getLastDateWithData() {

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.Point;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
@@ -9,6 +8,7 @@ import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -107,7 +107,7 @@ public abstract class GL3DCamera {
     private Vec3d saveTranslation;
     private Mat4d saveTransformation;
 
-    public void push(Date date, MetaData m) {
+    public void push(JHVDate date, MetaData m) {
         if (!trackingMode) {
             saveRotation = rotation.copy();
             saveLocalRotation = localRotation.copy();
@@ -384,13 +384,12 @@ public abstract class GL3DCamera {
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
-    public abstract void timeChanged(Date date);
+    public abstract void timeChanged(JHVDate date);
 
-    public abstract void updateRotation(Date date, MetaData m);
+    public abstract void updateRotation(JHVDate date, MetaData m);
 
     public void zoomToFit() {
         double size = Layers.getLargestPhysicalSize();
-
         if (size == 0)
             setCameraFOV(INITFOV);
         else

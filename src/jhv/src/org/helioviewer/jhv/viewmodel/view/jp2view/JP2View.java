@@ -3,7 +3,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.net.URI;
-import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -61,7 +60,7 @@ public class JP2View extends AbstractView {
     private boolean hiResImage = false;
     private static final int hiDpiCutoff = 1024;
 
-    private Date targetMasterTime;
+    private JHVDate targetMasterTime;
 
     private int targetFrame = 0;
     private int trueFrame;
@@ -84,7 +83,7 @@ public class JP2View extends AbstractView {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
-        targetMasterTime = metaDataArray[0].getDateObs().getDate();
+        targetMasterTime = metaDataArray[0].getDateObs();
 
         _jp2Image.startReader(this);
 
@@ -174,7 +173,7 @@ public class JP2View extends AbstractView {
     private JP2ImageParameter oldImageViewParams;
 
     // Recalculates the image parameters used within the jp2-package
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.updateROI(camera, masterTime, m);
@@ -298,7 +297,7 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame, Date masterTime) {
+    public void setFrame(int frame, JHVDate masterTime) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {

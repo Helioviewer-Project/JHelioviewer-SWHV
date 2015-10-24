@@ -51,7 +51,7 @@ public class FITSView extends AbstractView {
         imageData.setRegion(new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize()));
         imageData.setMetaData(metaDataArray[0]);
         imageData.setFrameNumber(0);
-        imageData.setMasterTime(metaDataArray[0].getDateObs().getDate());
+        imageData.setMasterTime(metaDataArray[0].getDateObs());
     }
 
     /**

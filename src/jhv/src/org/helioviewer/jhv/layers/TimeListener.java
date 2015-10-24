@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.layers;
 
-import java.util.Date;
+import org.helioviewer.jhv.base.time.JHVDate;
 
 public interface TimeListener {
 
-    public void timeChanged(Date date);
+    public void timeChanged(JHVDate date);
 
 }

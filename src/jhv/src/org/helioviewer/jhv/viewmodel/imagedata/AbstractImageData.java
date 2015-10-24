@@ -2,9 +2,9 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 /**
@@ -26,7 +26,7 @@ public abstract class AbstractImageData implements ImageData {
     private int frameNumber;
     private Region region;
     private MetaData metaData;
-    private Date masterTime;
+    private JHVDate masterTime;
     private boolean uploaded = false;
 
     /**
@@ -122,12 +122,12 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
-    public void setMasterTime(Date _masterTime) {
+    public void setMasterTime(JHVDate _masterTime) {
         masterTime = _masterTime;
     }
 
     @Override
-    public Date getMasterTime() {
+    public JHVDate getMasterTime() {
         return masterTime;
     }
 

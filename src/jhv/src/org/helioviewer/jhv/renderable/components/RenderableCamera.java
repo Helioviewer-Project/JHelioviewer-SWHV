@@ -2,9 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.Date;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.camera.GL3DViewport;
@@ -141,8 +139,8 @@ public class RenderableCamera extends AbstractRenderable {
         return timeString;
     }
 
-    public void setTimeString(Date date) {
-        timeString = TimeUtils.utcDateFormat.format(date);
+    public void setTimeString(String _timeString) {
+        timeString = _timeString;
     }
 
     @Override
