@@ -85,7 +85,7 @@ public abstract class GL3DCamera {
             this.translation = precedingCamera.translation.copy();
             this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
-            this.updateCameraTransformation();
+            this.updateRotation(Layers.getLastUpdatedTimestamp(), null);
             this.updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
