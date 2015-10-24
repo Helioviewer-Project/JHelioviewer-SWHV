@@ -352,7 +352,8 @@ public abstract class GL3DCamera {
     }
 
     public void zoom(int wr) {
-        setCameraFOV(fov + 0.0005 * wr);
+        double newfov = Math.atan2(cameraWidth * (1 + 0.015 * wr), -translation.z) * 2.;
+        setCameraFOV(newfov);
     }
 
     public void setFOVangleDegrees(double fovAngle) {
