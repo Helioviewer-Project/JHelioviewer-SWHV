@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.Rectangle;
-import java.util.Date;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -42,7 +42,7 @@ public class JP2CallistoView extends JP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Date masterTime, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber) {
         double rWidth = region.getWidth();
         double rHeight = region.getHeight();
 

@@ -126,7 +126,6 @@ public class GL3DPositionLoading {
 
             if (!this.isCancelled()) {
                 if (report == null && result != null) {
-
                     result = null;
                     if (newPosition != null && newPosition.length > 0) {
                         positionLoading.setLoaded(true);

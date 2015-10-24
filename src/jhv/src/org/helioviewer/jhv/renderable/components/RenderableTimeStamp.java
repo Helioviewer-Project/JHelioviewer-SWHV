@@ -3,7 +3,6 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
@@ -46,7 +45,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
         int delta = (int) (vp.getHeight() * 0.01);
         textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-        textRenderer.draw(TimeUtils.utcDateFormat.format(Layers.getLastUpdatedTimestamp()), delta, delta);
+        textRenderer.draw(Layers.getLastUpdatedTimestamp().toString(), delta, delta);
         textRenderer.endRendering();
     }
 

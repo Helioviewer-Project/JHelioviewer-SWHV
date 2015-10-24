@@ -5,6 +5,7 @@ import java.util.Date;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -57,7 +58,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     @Override
-    public void timeChanged(Date date) {
+    public void timeChanged(JHVDate date) {
         if (!this.getTrackingMode()) {
             updateRotation(date, null);
         } else {
@@ -65,7 +66,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         }
     }
 
-    private Date forceTimeChanged(Date date) {
+    private JHVDate forceTimeChanged(JHVDate date) {
         if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
@@ -86,18 +87,17 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 } else {
                     currentCameraTime = tPositionEnd;
                 }
-
             } else {
                 currentCameraTime = dateTime;
             }
+
             Position.Latitudinal p = positionLoading.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
-                date = new Date(p.milli);
+                date = new JHVDate(p.milli);
                 currentDistance = p.rad;
                 currentL = p.lon;
                 currentB = p.lat;
             }
-
         } else {
             Position.Latitudinal p = Sun.getEarth(date.getTime());
             currentDistance = p.rad;
@@ -107,15 +107,15 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
-            renderableCamera.setTimeString(date);
+            renderableCamera.setTimeString(date.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
         return date;
     }
 
     @Override
-    public void updateRotation(Date date, MetaData m) {
-        Date ndate = forceTimeChanged(date);
+    public void updateRotation(JHVDate date, MetaData m) {
+        JHVDate ndate = forceTimeChanged(date);
         Position.Latitudinal p = Sun.getEarth(ndate.getTime());
 
         double b = currentB;
@@ -166,14 +166,6 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             positionLoading.setEndDate(Layers.getEndDate(view).getDate(), true);
             Displayer.render();
         }
-    }
-
-    public Date getBeginTime() {
-        return positionLoading.getBeginDate();
-    }
-
-    public Date getEndTime() {
-        return positionLoading.getEndDate();
     }
 
     @Override

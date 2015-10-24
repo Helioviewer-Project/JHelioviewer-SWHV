@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -44,7 +42,7 @@ public class GL3DObserverCamera extends GL3DCamera {
     }
 
     @Override
-    public void timeChanged(Date date) {
+    public void timeChanged(JHVDate date) {
         if (!this.getTrackingMode()) {
             forceTimeChanged(date);
         } else {
@@ -52,7 +50,7 @@ public class GL3DObserverCamera extends GL3DCamera {
         }
     }
 
-    private void forceTimeChanged(Date date) {
+    private void forceTimeChanged(JHVDate date) {
         if (date == null)
             return;
 
@@ -60,17 +58,17 @@ public class GL3DObserverCamera extends GL3DCamera {
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
-            renderableCamera.setTimeString(date);
+            renderableCamera.setTimeString(date.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
 
     @Override
-    public void updateRotation(Date date, MetaData m) {
+    public void updateRotation(JHVDate date, MetaData m) {
        if (m == null) {
             View view = Layers.getActiveView();
             if (view != null) {
-                m = view.getMetaData(new JHVDate(date.getTime()));
+                m = view.getMetaData(date);
             }
         }
 

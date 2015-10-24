@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 
 import javax.swing.Timer;
@@ -136,14 +135,14 @@ public class Layers {
         }
     }
 
-    private static Date lastTimestamp = TimeUtils.epoch.getDate();
+    private static JHVDate lastTimestamp = TimeUtils.epoch;
 
-    public static Date getLastUpdatedTimestamp() {
+    public static JHVDate getLastUpdatedTimestamp() {
         return lastTimestamp;
     }
 
     private static void syncTime(JHVDate dateTime) {
-        lastTimestamp = dateTime.getDate();
+        lastTimestamp = dateTime;
 
         Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
         for (TimeListener listener : timeListeners) {
@@ -326,7 +325,7 @@ public class Layers {
         layerListeners.remove(layerListener);
     }
 
-    public static Date addTimeListener(TimeListener timeListener) {
+    public static JHVDate addTimeListener(TimeListener timeListener) {
         timeListeners.add(timeListener);
         return lastTimestamp;
     }
