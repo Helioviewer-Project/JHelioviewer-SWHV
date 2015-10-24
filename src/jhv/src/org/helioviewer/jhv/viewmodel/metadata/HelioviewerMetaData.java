@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -171,8 +169,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     private void retrievePosition(MetaDataContainer m) {
-        Date obsDate = dateObs.getDate();
-        Position.Latitudinal p = Sun.getEarth(obsDate.getTime());
+        Position.Latitudinal p = Sun.getEarth(dateObs.getTime());
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
             distanceObs = p.rad;

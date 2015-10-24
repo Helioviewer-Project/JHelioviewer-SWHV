@@ -6,7 +6,7 @@ import java.util.Date;
 public class JHVDate implements Comparable<JHVDate> {
 
     private final String string;
-    private final Date date;
+    private final long milli;
 
     /**
      * No arguments may be negative or an exception will be thrown.
@@ -19,8 +19,10 @@ public class JHVDate implements Comparable<JHVDate> {
         Calendar c = Calendar.getInstance(TimeUtils.UTC);
         c.clear();
         c.set(_year, _month, _day, _hour, _minute, _second);
-        date = c.getTime();
+
+        Date date = c.getTime();
         string = TimeUtils.utcDateFormat.format(date);
+        milli = date.getTime();
     }
 
     public JHVDate(long millis) {
@@ -31,25 +33,23 @@ public class JHVDate implements Comparable<JHVDate> {
         Calendar c = Calendar.getInstance(TimeUtils.UTC);
         c.clear();
         c.setTimeInMillis(millis);
-        date = c.getTime();
+
+        Date date = c.getTime();
         string = TimeUtils.utcDateFormat.format(date);
+        milli = date.getTime();
     }
 
-    public long getMillis() {
-        return date.getTime();
+    public long getTime() {
+        return milli;
     }
 
     public Date getDate() {
-        return date;
+        return new Date(milli);
     }
 
-    /**
-     * Via the Comparable interface. This method will be used to sort the
-     * DataTime objects.
-     */
     @Override
     public int compareTo(JHVDate dt) {
-        long diff = (getMillis() - dt.getMillis());
+        long diff = (milli - dt.milli);
         return diff < 0 ? -1 : (diff > 0 ? +1 : 0);
     }
 
@@ -59,13 +59,12 @@ public class JHVDate implements Comparable<JHVDate> {
             return false;
         }
         JHVDate dt = (JHVDate) o;
-        return getMillis() == dt.getMillis();
+        return milli == dt.milli;
     }
 
     @Override
     public int hashCode() {
-        long millis = getMillis();
-        return (int) (millis ^ (millis >>> 32));
+        return (int) (milli ^ (milli >>> 32));
     }
 
     @Override
@@ -97,7 +96,6 @@ public class JHVDate implements Comparable<JHVDate> {
                 second = 0;
             }
         }
-
         return new JHVDate(year, month != 0 ? month - 1 : 0, day, hour, minute, second);
     }
 
