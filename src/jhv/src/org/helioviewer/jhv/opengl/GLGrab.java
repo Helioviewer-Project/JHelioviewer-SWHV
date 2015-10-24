@@ -35,7 +35,6 @@ public class GLGrab {
     public void dispose(GL2 gl) {
         fbo.detachAll(gl);
         fbo.destroy(gl);
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
     }
 
     public BufferedImage renderFrame(GL2 gl) {
@@ -58,9 +57,11 @@ public class GLGrab {
             screenshot = new BufferedImage(fbo.getWidth(), fbo.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             byte[] array = ((DataBufferByte) screenshot.getRaster().getDataBuffer()).getData();
             ByteBuffer fb = ByteBuffer.wrap(array);
+
             gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
             gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
             gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, fb);
+            gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
 
             fbo.unuse(gl);
         }
