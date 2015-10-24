@@ -102,7 +102,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 currentB = p.lat;
             }
         } else {
-            Position.Latitudinal p = Sun.getEarth(date);
+            Position.Latitudinal p = Sun.getEarth(date.getTime());
             currentDistance = p.rad;
             currentL = 0;
             currentB = p.lat;
@@ -119,7 +119,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     @Override
     public void updateRotation(Date date, MetaData m) {
-        Position.Latitudinal p = Sun.getEarth(date);
+        Position.Latitudinal p = Sun.getEarth(date.getTime());
 
         double b = currentB;
         double l = -currentL + p.lon;

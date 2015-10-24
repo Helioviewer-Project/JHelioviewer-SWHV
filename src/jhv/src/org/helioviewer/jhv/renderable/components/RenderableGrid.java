@@ -215,7 +215,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glRotatef(-90, 0, 1, 0);
             gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
             {
-                Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+                Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().getTime());
                 gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
                 gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
