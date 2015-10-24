@@ -232,7 +232,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             addDataItem("Instrument", m.getInstrument());
             addDataItem("Detector", m.getDetector());
             addDataItem("Measurement", m.getMeasurement());
-            addDataItem("Observation Date", String.valueOf(m.getDateObs()));
+            addDataItem("Observation Date", m.getDateObs().toString());
 
             String xmlText = null;
             if (v instanceof JP2View) {

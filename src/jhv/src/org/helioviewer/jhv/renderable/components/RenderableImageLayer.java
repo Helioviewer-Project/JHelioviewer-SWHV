@@ -389,7 +389,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         if (imageData == null) {
             return "N/A";
         }
-        return String.valueOf(imageData.getMetaData().getDateObs());
+        return imageData.getMetaData().getDateObs().toString();
     }
 
     @Override
