@@ -105,9 +105,8 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
                 if (selected) {
                     setBeginTime(false);
                     setEndTime(true);
-                } else
-                    camera.setInterpolation(selected);
-
+                }
+                camera.setInterpolation(selected);
             }
         });
     }
