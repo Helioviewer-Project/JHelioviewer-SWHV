@@ -18,11 +18,11 @@ public abstract class AbstractMetaData implements MetaData {
     protected JHVDate dateObs = TimeUtils.epoch;
     protected Quatd rotationObs = Quatd.ZERO;
     protected double distanceObs = Sun.MeanEarthDistance;
-    protected double innerRadius = 0.;
-    protected double outerRadius = 40.;
-    protected double unitPerPixel = 1.;
+    protected double innerRadius = 0;
+    protected double outerRadius = Double.MAX_VALUE;
+    protected double unitPerPixel = 1;
 
-    //Serves only for LASCO cutOff edges
+    // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected Vec3d cutOffDirection;
 
