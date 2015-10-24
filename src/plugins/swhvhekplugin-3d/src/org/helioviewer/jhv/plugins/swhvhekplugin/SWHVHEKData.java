@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
@@ -49,15 +50,21 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     public void requestEvents() {
         boolean request = false;
-        Date first = Layers.getFirstDate();
-        Date last = Layers.getLastDate();
-        if (beginDate == null || (first != null && first.getTime() < beginDate.getTime())) {
-            beginDate = first;
-            request = true;
+        JHVDate first = Layers.getStartDate();
+        JHVDate last = Layers.getEndDate();
+
+        if (first != null) {
+            if (beginDate == null || first.getTime() < beginDate.getTime()) {
+                beginDate = first.getDate();
+                request = true;
+            }
         }
-        if (endDate == null || (last != null && last.getTime() > endDate.getTime())) {
-            endDate = last;
-            request = true;
+
+        if (last != null) {
+            if (endDate == null || last.getTime() > endDate.getTime()) {
+                endDate = last.getDate();
+                request = true;
+            }
         }
 
         if (request) {

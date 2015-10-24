@@ -91,7 +91,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        Interval<Date> movieInterval = new Interval<Date>(Layers.getFirstDate(), Layers.getLastDate());
+        Interval<Date> movieInterval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
         if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
             return movieInterval;
         } else {
@@ -226,7 +226,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(View view) {
-        Date start = Layers.getStartDate(view);
+        Date start = Layers.getStartDate(view).getDate();
         calendarStartDate.setDate(start);
         ObservationDialogDateModel.getInstance().setStartDate(start, false);
     }

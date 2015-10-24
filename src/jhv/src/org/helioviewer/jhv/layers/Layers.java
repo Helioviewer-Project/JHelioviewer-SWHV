@@ -164,22 +164,6 @@ public class Layers {
         MoviePanel.getInstance().setFrameSlider(activeFrame);
     }
 
-    private static JHVDate getStartDateImmutable(View view) {
-        return view.getFrameDateTime(0);
-    }
-
-    private static JHVDate getEndDateImmutable(View view) {
-        return view.getFrameDateTime(view.getMaximumFrameNumber());
-    }
-
-    private static JHVDate getStartDateImmutable(int idx) {
-        return getStartDateImmutable(getLayer(idx));
-    }
-
-    private static JHVDate getEndDateImmutable(int idx) {
-        return getEndDateImmutable(getLayer(idx));
-    }
-
     /**
      * Return the timestamp of the first available image data of the layer in
      * question
@@ -188,8 +172,8 @@ public class Layers {
      *            - View that can be associated with the layer in question
      * @return timestamp of the first available image data
      */
-    public static Date getStartDate(View view) {
-        return getStartDateImmutable(view).getDate();
+    public static JHVDate getStartDate(View view) {
+        return view.getFrameDateTime(0);
     }
 
     /**
@@ -200,8 +184,8 @@ public class Layers {
      *            - View that can be associated with the layer in question
      * @return timestamp of the last available image data
      */
-    public static Date getEndDate(View view) {
-        return getEndDateImmutable(view).getDate();
+    public static JHVDate getEndDate(View view) {
+        return view.getFrameDateTime(view.getMaximumFrameNumber());
     }
 
     /**
@@ -210,17 +194,16 @@ public class Layers {
      * @return timestamp of the first available image data, null if no
      *         information available
      */
-    public static Date getFirstDate() {
+    public static JHVDate getStartDate() {
         JHVDate earliest = null;
 
-        int size = layers.size();
-        for (int idx = 0; idx < size; idx++) {
-            JHVDate start = getStartDateImmutable(idx);
+        for (View view : layers) {
+            JHVDate start = getStartDate(view);
             if (earliest == null || start.compareTo(earliest) < 0) {
                 earliest = start;
             }
         }
-        return earliest == null ? null : earliest.getDate();
+        return earliest;
     }
 
     /**
@@ -229,17 +212,16 @@ public class Layers {
      * @return timestamp of the last available image data, null if no
      *         information available
      */
-    public static Date getLastDate() {
+    public static JHVDate getEndDate() {
         JHVDate latest = null;
 
-        int size = layers.size();
-        for (int idx = 0; idx < size; idx++) {
-            JHVDate end = getEndDateImmutable(idx);
+        for (View view : layers) {
+            JHVDate end = getEndDate(view);
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
         }
-        return latest == null ? null : latest.getDate();
+        return latest;
     }
 
    /**

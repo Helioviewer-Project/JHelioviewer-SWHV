@@ -34,6 +34,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -74,8 +75,8 @@ public class RenderableContainerPanel extends JPanel {
             // Check the dates if possible
             View activeView = Layers.getActiveView();
             if (activeView != null && activeView.isMultiFrame()) {
-                Date start = Layers.getStartDate(activeView);
-                Date end = Layers.getEndDate(activeView);
+                JHVDate start = Layers.getStartDate(activeView);
+                JHVDate end = Layers.getEndDate(activeView);
                 try {
                     Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
                     Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
@@ -83,10 +84,10 @@ public class RenderableContainerPanel extends JPanel {
                     final int tolerance = 60 * 60 * 1000;
                     if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
                         if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                            ObservationDialogDateModel.getInstance().setStartDate(start, false);
+                            ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
                         }
                         if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                            ObservationDialogDateModel.getInstance().setEndDate(end, false);
+                            ObservationDialogDateModel.getInstance().setEndDate(end.getDate(), false);
                         }
                     }
                 } catch (ParseException e) {

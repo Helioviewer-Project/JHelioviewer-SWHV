@@ -164,8 +164,8 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     @Override
     public void activeLayerChanged(View view) {
         if (view != null && !interpolation) {
-            positionLoading.setBeginDate(Layers.getStartDate(view), false);
-            positionLoading.setEndDate(Layers.getEndDate(view), true);
+            positionLoading.setBeginDate(Layers.getStartDate(view).getDate(), false);
+            positionLoading.setEndDate(Layers.getEndDate(view).getDate(), true);
             Displayer.render();
         }
     }
