@@ -15,28 +15,27 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
-    private final GL3DExpertCameraOptionPanel followObjectCameraOptionPanel;
+    private final GL3DExpertCameraOptionPanel expertCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
 
-    private Date cameraDate;
     private boolean interpolation = false;
 
     public GL3DExpertCamera() {
         super();
-        followObjectCameraOptionPanel = new GL3DExpertCameraOptionPanel(this);
+        expertCameraOptionPanel = new GL3DExpertCameraOptionPanel(this);
         positionLoading = new GL3DPositionLoading(this);
         this.timeChanged(Layers.getLastUpdatedTimestamp());
-        followObjectCameraOptionPanel.syncWithLayerBeginTime(false);
-        followObjectCameraOptionPanel.syncWithLayerEndTime(true);
+        expertCameraOptionPanel.syncWithLayerBeginTime(false);
+        expertCameraOptionPanel.syncWithLayerEndTime(true);
     }
 
     @Override
     public void reset() {
         super.reset();
-        forceTimeChanged(cameraDate);
+        updateRotation(Layers.getLastUpdatedTimestamp(), null);
     }
 
     @Override
@@ -54,22 +53,19 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     @Override
     public String getName() {
-        return "Follow object camera";
+        return "Expert camera";
     }
 
     @Override
     public void timeChanged(Date date) {
         if (!this.getTrackingMode()) {
-            forceTimeChanged(date);
+            updateRotation(date, null);
         } else {
             Displayer.render();
         }
     }
 
-    private void forceTimeChanged(Date date) {
-        if (date == null)
-            return;
-
+    private Date forceTimeChanged(Date date) {
         if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             if (interpolation) {
@@ -90,17 +86,18 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
                 } else {
                     currentCameraTime = tPositionEnd;
                 }
+
             } else {
                 currentCameraTime = dateTime;
             }
-
             Position.Latitudinal p = positionLoading.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
-                cameraDate = date = new Date(p.milli);
+                date = new Date(p.milli);
                 currentDistance = p.rad;
                 currentL = p.lon;
                 currentB = p.lat;
             }
+
         } else {
             Position.Latitudinal p = Sun.getEarth(date.getTime());
             currentDistance = p.rad;
@@ -108,18 +105,18 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
             currentB = p.lat;
         }
 
-        updateRotation(date, null);
-
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
             renderableCamera.setTimeString(date);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
+        return date;
     }
 
     @Override
     public void updateRotation(Date date, MetaData m) {
-        Position.Latitudinal p = Sun.getEarth(date.getTime());
+        Date ndate = forceTimeChanged(date);
+        Position.Latitudinal p = Sun.getEarth(ndate.getTime());
 
         double b = currentB;
         double l = -currentL + p.lon;
@@ -131,7 +128,8 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     public void fireNewLoaded(String state) {
-        followObjectCameraOptionPanel.fireLoaded(state);
+        expertCameraOptionPanel.fireLoaded(state);
+        updateRotation(Layers.getLastUpdatedTimestamp(), null);
         Displayer.render();
     }
 
@@ -180,7 +178,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     @Override
     public GL3DCameraOptionPanel getOptionPanel() {
-        return followObjectCameraOptionPanel;
+        return expertCameraOptionPanel;
     }
 
 }
