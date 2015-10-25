@@ -51,7 +51,7 @@ public class JP2View extends AbstractView {
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
-        executor.submit(task);
+        executor.execute(task);
     }
 
     // Member related to JP2
@@ -130,7 +130,6 @@ public class JP2View extends AbstractView {
 
                 @Override
                 public void run() {
-                    executor.shutdown();
                     view._jp2Image.abolish();
                     view._jp2Image = null;
                 }
@@ -152,7 +151,8 @@ public class JP2View extends AbstractView {
 
         AbolishThread thread = new AbolishThread();
         thread.init(this);
-        executor.submit(thread);
+        executor.execute(thread);
+        executor.shutdown();
     }
 
     // if instance was built before cancelling

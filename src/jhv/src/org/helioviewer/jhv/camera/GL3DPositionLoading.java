@@ -11,8 +11,6 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
@@ -115,22 +113,17 @@ public class GL3DPositionLoading {
 
         @Override
         protected void done() {
-            Latitudinal[] newPosition = null;
-            try {
-                newPosition = this.get();
-                positionLoading.setPosition(newPosition);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (CancellationException e) {
-                e.printStackTrace();
-            }
-
             if (!this.isCancelled()) {
+                Latitudinal[] newPosition = null;
+                try {
+                    newPosition = this.get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (report == null && result != null) {
                     result = null;
                     if (newPosition != null && newPosition.length > 0) {
+                        positionLoading.setPosition(newPosition);
                         positionLoading.setLoaded(true);
                     } else if (newPosition == null) {
                         report = "response is void";
