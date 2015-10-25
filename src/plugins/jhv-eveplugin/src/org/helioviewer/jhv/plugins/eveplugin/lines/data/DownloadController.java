@@ -14,10 +14,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,8 +46,7 @@ public class DownloadController {
     private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     private final LineDataSelectorModel selectorModel;
-    private static final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
-    public static final ExecutorService downloadPool = new ThreadPoolExecutor(0, 5, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("EVE download"), new ThreadPoolExecutor.DiscardPolicy());
+    public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE download"), new ThreadPoolExecutor.AbortPolicy());
 
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();
