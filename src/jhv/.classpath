@@ -15,7 +15,5 @@
 	<classpathentry kind="lib" path="../lib/slf4j-nop-1.7.12.jar"/>
 	<classpathentry kind="lib" path="../lib/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="lib" path="../lib/commons-lang3-3.4.jar"/>
-	<classpathentry kind="lib" path="../lib/humble-video-arch-x86_64-apple-darwin12-0.2.1.jar"/>
-	<classpathentry kind="lib" path="../lib/humble-video-noarch-0.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
