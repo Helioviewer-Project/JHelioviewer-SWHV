@@ -21,7 +21,6 @@ public class GL3DEarthCamera extends GL3DCamera {
 
     @Override
     public void reset() {
-        this.resetCurrentDragRotation();
         super.reset();
         this.forceTimeChanged(Layers.getLastUpdatedTimestamp());
     }
