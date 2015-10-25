@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
@@ -91,42 +92,46 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     protected Interval<Date> defineInterval(Date date) {
-        Interval<Date> movieInterval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
-        if (movieInterval.getStart() != null && movieInterval.getEnd() != null && movieInterval.containsPointInclusive(date)) {
-            return movieInterval;
-        } else {
-            GregorianCalendar gce = new GregorianCalendar();
+        JHVDate start = Layers.getStartDate();
+        JHVDate end = Layers.getEndDate();
+        if (start != null && end != null) {
+            Interval<Date> movieInterval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
+
+            if (movieInterval.containsPointInclusive(date)) {
+                return new Interval<Date>(null, null);
+            }
+        }
+        GregorianCalendar gce = new GregorianCalendar();
+        gce.clear();
+        gce.setTime(date);
+        gce.set(Calendar.HOUR, 0);
+        gce.set(Calendar.MINUTE, 0);
+        gce.set(Calendar.SECOND, 0);
+        gce.set(Calendar.MILLISECOND, 0);
+        gce.add(Calendar.DAY_OF_MONTH, 1);
+        Date endDate = gce.getTime();
+
+        if (endDate.after(new Date())) {
             gce.clear();
-            gce.setTime(date);
+            gce.setTime(new Date());
             gce.set(Calendar.HOUR, 0);
             gce.set(Calendar.MINUTE, 0);
             gce.set(Calendar.SECOND, 0);
             gce.set(Calendar.MILLISECOND, 0);
-            gce.add(Calendar.DAY_OF_MONTH, 1);
-            Date endDate = gce.getTime();
-
-            if (endDate.after(new Date())) {
-                gce.clear();
-                gce.setTime(new Date());
-                gce.set(Calendar.HOUR, 0);
-                gce.set(Calendar.MINUTE, 0);
-                gce.set(Calendar.SECOND, 0);
-                gce.set(Calendar.MILLISECOND, 0);
-                endDate = gce.getTime();
-            }
-
-            GregorianCalendar gcs = new GregorianCalendar();
-            gcs.clear();
-            gcs.setTime(endDate);
-            gcs.set(Calendar.HOUR, 0);
-            gcs.set(Calendar.MINUTE, 0);
-            gcs.set(Calendar.SECOND, 0);
-            gcs.set(Calendar.MILLISECOND, 0);
-            gcs.add(Calendar.DAY_OF_MONTH, -2);
-            Date startDate = gcs.getTime();
-
-            return new Interval<Date>(startDate, endDate);
+            endDate = gce.getTime();
         }
+
+        GregorianCalendar gcs = new GregorianCalendar();
+        gcs.clear();
+        gcs.setTime(endDate);
+        gcs.set(Calendar.HOUR, 0);
+        gcs.set(Calendar.MINUTE, 0);
+        gcs.set(Calendar.SECOND, 0);
+        gcs.set(Calendar.MILLISECOND, 0);
+        gcs.add(Calendar.DAY_OF_MONTH, -2);
+        Date startDate = gcs.getTime();
+
+        return new Interval<Date>(startDate, endDate);
     }
 
     private void startRadioDownload() {
