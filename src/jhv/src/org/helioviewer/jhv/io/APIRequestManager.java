@@ -117,7 +117,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws MalformedURLException, IOException {
+    private static View loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
@@ -162,7 +162,7 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws MalformedURLException, IOException {
+    private static View loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws IOException {
         String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
