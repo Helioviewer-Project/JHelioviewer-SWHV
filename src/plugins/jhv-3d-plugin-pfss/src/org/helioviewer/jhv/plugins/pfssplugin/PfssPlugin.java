@@ -26,7 +26,7 @@ public class PfssPlugin implements Plugin {
     public static final ScheduledExecutorService pfssReaperPool = Executors.newSingleThreadScheduledExecutor(new JHVThread.NamedThreadFactory("PFSS Abolish"));
     public static final ExecutorService pfssNewLoadPool = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("PFSS NewLoad"));
     private static final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
-    public static final ExecutorService pfssDataPool = new ThreadPoolExecutor(0, 5, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("PFSS DataLoad"), new ThreadPoolExecutor.DiscardPolicy());
+    public static final ExecutorService pfssDataPool = new ThreadPoolExecutor(0, 5, 600000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("PFSS DataLoad"), new ThreadPoolExecutor.DiscardPolicy());
 
     public PfssPlugin() {
         pfssCache = new PfssCache();
