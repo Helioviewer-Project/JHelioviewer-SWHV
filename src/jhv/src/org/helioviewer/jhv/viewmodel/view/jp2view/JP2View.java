@@ -47,7 +47,7 @@ public class JP2View extends AbstractView {
 
     private final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
     private final RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
-    private ExecutorService executor;
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
@@ -91,8 +91,6 @@ public class JP2View extends AbstractView {
         if (JHVGlobals.GoForTheBroke && fullFrame.width * fullFrame.height > hiDpiCutoff * hiDpiCutoff)
             hiResImage = true;
 
-        int numOfThread = 1;
-        executor = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render " + _jp2Image.getName(0)), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
         frameCountStart = System.currentTimeMillis();
     }
 
