@@ -340,8 +340,10 @@ public class JP2Image {
     private Kdu_region_compositor compositorRender;
 
     Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException {
-        if (compositorRender == null)
+        if (compositorRender == null) {
+            Thread.currentThread().setName("Render " + getName(0));
             compositorRender = createCompositor(jpxSrc, threadEnv);
+        }
         return compositorRender;
     }
 
