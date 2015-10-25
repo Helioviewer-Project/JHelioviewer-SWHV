@@ -152,10 +152,6 @@ public abstract class GL3DCamera {
         return this.localRotation;
     }
 
-    private void resetCurrentDragRotation() {
-        this.currentDragRotation.clear();
-    }
-
     public void setLocalRotation(Quatd localRotation) {
         this.localRotation = localRotation;
         this.rotation.clear();
