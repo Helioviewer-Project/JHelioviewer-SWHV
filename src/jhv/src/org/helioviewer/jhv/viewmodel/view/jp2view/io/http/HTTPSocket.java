@@ -77,8 +77,7 @@ public class HTTPSocket extends Socket {
     }
 
     /**
-     * Sends a HTTP message. Currently it is only supported to send HTTP
-     * requests.
+     * Sends a HTTP message. Only HTTP requests supported
      *
      * @param _msg
      *            A <code>HTTPMessage</code> object with the message.
@@ -94,25 +93,32 @@ public class HTTPSocket extends Socket {
             HTTPRequest req = (HTTPRequest) _msg;
             String msgBody = req.getMessageBody();
 
-            // Adds the URI line.
-            str.append(req.getMethod() + " ");
-            str.append(req.getURI() + " ");
-            str.append(versionText + CRLF);
+            // Adds the URI line
+            str.append(req.getMethod());
+            str.append(" ");
+            str.append(req.getURI());
+            str.append(" ");
+            str.append(versionText);
+            str.append(CRLF);
 
-            // Sets the content length header if its a POST
+            // Sets the content length header if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
                 req.setHeader(HTTPHeaderKey.CONTENT_LENGTH.toString(), String.valueOf(msgBody.getBytes().length));
 
             // Adds the headers
-            for (String key : req.getHeaders())
-                str.append(key + ": " + req.getHeader(key) + CRLF);
+            for (String key : req.getHeaders()) {
+                str.append(key);
+                str.append(": ");
+                str.append(req.getHeader(key));
+                str.append(CRLF);
+            }
             str.append(CRLF);
 
-            // Adds the message body if its POST
+            // Adds the message body if it's a POST
             if (req.getMethod() == HTTPRequest.Method.POST)
                 str.append(msgBody);
 
-            // Writes the result to the output stream.
+            // Writes the result to the output stream
             getOutputStream().write(str.toString().getBytes());
         } else {
             throw new ProtocolException("Responses sending not yet supported!");

@@ -170,27 +170,35 @@ public class JPIPSocket extends HTTPSocket {
 
         StringBuilder str = new StringBuilder();
 
-        // Adds the URI line.
-        str.append(_req.getMethod() + " ");
-        str.append(jpipPath);
-        if (_req.getMethod() == Method.GET)
-            str.append("?" + queryStr);
+        // Adds the URI line
+        str.append(_req.getMethod());
         str.append(" ");
-        str.append(versionText + CRLF);
-
-        // Adds the headers
-        for (String key : _req.getHeaders())
-            str.append(key + ": " + _req.getHeader(key) + CRLF);
+        str.append(jpipPath);
+        if (_req.getMethod() == Method.GET) {
+            str.append("?");
+            str.append(queryStr);
+        }
+        str.append(" ");
+        str.append(versionText);
         str.append(CRLF);
 
-        // Adds the message body if necessary.
+        // Adds the headers
+        for (String key : _req.getHeaders()) {
+            str.append(key);
+            str.append(": ");
+            str.append(_req.getHeader(key));
+            str.append(CRLF);
+        }
+        str.append(CRLF);
+
+        // Adds the message body if necessary
         if (_req.getMethod() == HTTPRequest.Method.POST)
             str.append(queryStr);
 
         if (!isConnected()) {
             reconnect();
         }
-        // Writes the result to the output stream.
+        // Writes the result to the output stream
         getOutputStream().write(str.toString().getBytes());
     }
 
