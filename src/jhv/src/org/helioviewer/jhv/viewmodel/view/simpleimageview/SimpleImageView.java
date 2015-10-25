@@ -2,7 +2,6 @@ package org.helioviewer.jhv.viewmodel.view.simpleimageview;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 
 import javax.imageio.ImageIO;
@@ -29,7 +28,7 @@ public class SimpleImageView extends AbstractView {
      * @throws IOException
      *             thrown, if the image is not readable
      */
-    public SimpleImageView(URI _uri) throws MalformedURLException, IOException {
+    public SimpleImageView(URI _uri) throws IOException {
         uri = _uri;
         image = ImageIO.read(uri.toURL());
 
