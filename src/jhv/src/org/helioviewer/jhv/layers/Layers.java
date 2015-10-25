@@ -110,14 +110,14 @@ public class Layers {
     }
 
     public static void setTime(JHVDate dateTime) {
-        if (activeView == null || !activeView.isMultiFrame())
+        if (activeView == null /*|| !activeView.isMultiFrame()*/)
             return;
 
         syncTime(activeView.getFrameDateTime(activeView.getFrame(dateTime)));
     }
 
     public static void setFrame(int frame) {
-        if (activeView == null || !activeView.isMultiFrame())
+        if (activeView == null /*|| !activeView.isMultiFrame()*/)
             return;
 
         syncTime(activeView.getFrameDateTime(frame));
