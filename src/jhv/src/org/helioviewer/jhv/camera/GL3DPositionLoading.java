@@ -50,7 +50,6 @@ public class GL3DPositionLoading {
 
     private static class LoadPositionWorker extends SwingWorker<Latitudinal[], Void> {
         private String report = null;
-        private JSONObject result = null;
         private final String beginDate;
         private final String endDate;
         private final Date beginDatems;
@@ -79,6 +78,9 @@ public class GL3DPositionLoading {
         @Override
         protected Latitudinal[] doInBackground() throws Exception {
             Thread.currentThread().setName("GL3DPositionLoading--Main");
+
+            Latitudinal[] ret = null;
+            JSONObject result;
             try {
                 long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
                 final long max = 100000;
@@ -91,6 +93,7 @@ public class GL3DPositionLoading {
                 Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                 if (!ds.getResponse400()) {
                     result = new JSONObject(new JSONTokener(reader));
+                    ret = positionLoading.parseData(result);
                 } else {
                     JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                     if (jsonObject.has("faultstring")) {
@@ -107,8 +110,11 @@ public class GL3DPositionLoading {
                 report = FAILEDSTATE + ": JSON parse problem";
             } catch (URISyntaxException e) {
                 report = FAILEDSTATE + ": wrong URI";
+            } finally {
+                result = null;
             }
-            return positionLoading.parseData(result);
+
+            return ret;
         }
 
         @Override
@@ -120,8 +126,8 @@ public class GL3DPositionLoading {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (report == null && result != null) {
-                    result = null;
+
+                if (report == null) {
                     if (newPosition != null && newPosition.length > 0) {
                         positionLoading.setPosition(newPosition);
                         positionLoading.setLoaded(true);
