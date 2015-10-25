@@ -100,6 +100,7 @@ public abstract class GL3DCamera {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
             this.reset();
         }
+        Displayer.render();
     }
 
     private Quatd saveRotation;
