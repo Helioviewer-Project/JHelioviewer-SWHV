@@ -128,13 +128,13 @@ public class GL3DPositionLoading {
                 }
 
                 if (report == null) {
-                    if (newPosition != null && newPosition.length > 0) {
+                    if (newPosition == null) {
+                        report = "response is void";
+                    } else if (newPosition.length == 0) {
+                        report = "response is zero length array";
+                    } else {
                         positionLoading.setPosition(newPosition);
                         positionLoading.setLoaded(true);
-                    } else if (newPosition == null) {
-                        report = "response is void";
-                    } else {
-                        report = "response is zero length array";
                     }
                 }
                 if (report != null) {
