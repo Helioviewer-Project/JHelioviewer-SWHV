@@ -8,7 +8,7 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4d;
-import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -105,6 +105,7 @@ public class RenderableGrid extends AbstractRenderable {
             drawCircles(gl, cameraMatrix);
         }
         gl.glPopMatrix();
+        drawEarthCircles(gl);
     }
 
     private void renderBlackCircle(GL2 gl, double[] matrix) {
@@ -130,6 +131,33 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glVertex3f(0, 1, 0);
         }
         gl.glEnd();
+    }
+
+    private void drawEarthCircles(GL2 gl) {
+        gl.glColor4f(1, 1, 0, 1);
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+        {
+            Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().getTime());
+            {
+                gl.glPushMatrix();
+                Quatd longitudeRotation = new Quatd(0, p.lon + Math.PI / 2);
+                longitudeRotation.conjugate();
+                gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+                gl.glPopMatrix();
+                gl.glPushMatrix();
+                Quatd latitudeRotation = new Quatd(p.lat + Math.PI / 2, p.lon);
+                latitudeRotation.conjugate();
+                gl.glMultMatrixd(latitudeRotation.toMatrix().m, 0);
+                gl.glRotatef((float) (-p.lat), 0, 0, 1);
+                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+                gl.glPopMatrix();
+            }
+        }
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
     private void drawCircles(GL2 gl, Mat4d cameraMatrix) {
@@ -208,22 +236,6 @@ public class RenderableGrid extends AbstractRenderable {
 
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 
-            // last: Earth circles - static color, undo rotation
-            gl.glColor4f(1, 1, 0, 1);
-
-            gl.glPushMatrix();
-            gl.glRotatef(-90, 0, 1, 0);
-            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
-            {
-                Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().getTime());
-                gl.glRotatef(90 - (float) (p.lon * MathUtils.radeg), 0, 1, 0);
-                gl.glRotatef((float) -(p.lat * MathUtils.radeg), 0, 0, 1);
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-
-                gl.glRotatef(90, 1, 0, 0);
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-            }
-            gl.glPopMatrix();
         }
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
