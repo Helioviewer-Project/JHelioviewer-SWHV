@@ -25,6 +25,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.RadioObservationDialogUIPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.PlotPanel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  *
@@ -39,47 +40,48 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        EventRequester eventRequester = EventRequester.getSingletonInstance();
-        DrawController.getSingletonInstance().addTimingListener(eventRequester);
-        eventRequester.addListener(EventModel.getSingletonInstance());
-        DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
-        DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
-        // Create an instance of eveDrawController and leave it here.
-        EVEDrawController.getSingletonInstance();
-        RadioDataManager.getSingletonInstance();
-        RadioPlotModel.getSingletonInstance();
-        // Avoid concurrent modification error.
-        TimeIntervalLockModel.getInstance();
-        pluginPanes.add(plotOne);
-
-        ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
-        ImageViewerGui.getLeftContentPane().revalidate();
-
-        ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
-
-        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
-
-        RadioPlotModel.getSingletonInstance();
-        EventModel.getSingletonInstance().activateEvents();
-
-        Layers.addLayersListener(DrawController.getSingletonInstance());
-        Layers.addTimeListener(DrawController.getSingletonInstance());
-        SwingWorker<Void, Void> installPlugin = new SwingWorker<Void, Void>() {
+        JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override
-            protected Void doInBackground() throws Exception {
-                // call BandType API in background => loads the datasets.
+            protected Void backgroundWork() throws Exception {
+                // call BandType API in background => loads the datasets
                 BandTypeAPI.getSingletonInstance();
                 return null;
             }
 
             @Override
             public void done() {
+                EventRequester eventRequester = EventRequester.getSingletonInstance();
+                DrawController.getSingletonInstance().addTimingListener(eventRequester);
+                eventRequester.addListener(EventModel.getSingletonInstance());
+                DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
+                DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
+                // Create an instance of eveDrawController and leave it here
+                EVEDrawController.getSingletonInstance();
+                RadioDataManager.getSingletonInstance();
+                RadioPlotModel.getSingletonInstance();
+                // Avoid concurrent modification error
+                TimeIntervalLockModel.getInstance();
+                pluginPanes.add(plotOne);
 
+                ImageViewerGui.getLeftContentPane().add("Timeline Layers", timelinePluginPanel, true);
+                ImageViewerGui.getLeftContentPane().revalidate();
+
+                ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
+
+                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+
+                RadioPlotModel.getSingletonInstance();
+                EventModel.getSingletonInstance().activateEvents();
+
+                Layers.addLayersListener(DrawController.getSingletonInstance());
+                Layers.addTimeListener(DrawController.getSingletonInstance());
             }
         };
-        installPlugin.execute();
+
+        loadSources.setThreadName("EVE--LoadSources");
+        EVESettings.getExecutorService().execute(loadSources);
     }
 
     @Override
