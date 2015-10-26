@@ -14,6 +14,7 @@ import sun.awt.AppContext;
 public class JHVExecutor {
 
     public static synchronized void setSwingWorkersExecutorService(int MAX_WORKER_THREADS) {
+/*
         final AppContext appContext = AppContext.getAppContext();
         ExecutorService executorService = (ExecutorService) appContext.get(SwingWorker.class);
         if (executorService == null) {
@@ -24,6 +25,7 @@ public class JHVExecutor {
 
             appContext.put(SwingWorker.class, executorService);
         }
+*/
     }
 
     public static synchronized ExecutorService getJHVWorkersExecutorService(String name, int MAX_WORKER_THREADS) {

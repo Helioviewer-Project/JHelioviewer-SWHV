@@ -23,6 +23,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
@@ -340,8 +341,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 }
             }
         };
-        currentSwingWorker.setThreadName("EventModel--EVE");
-        currentSwingWorker.execute();
+        currentSwingWorker.setThreadName("EVE--EventModel");
+        EVESettings.getExecutorService().execute(currentSwingWorker);
     }
 
     private int defineMaximumDateLine(ArrayList<Date> endDates) {
