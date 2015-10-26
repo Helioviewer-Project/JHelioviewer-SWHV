@@ -46,7 +46,7 @@ public class DownloadController {
     private final HashMap<Band, List<Future<?>>> futureJobs = new HashMap<Band, List<Future<?>>>();
 
     private final LineDataSelectorModel selectorModel;
-    public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE download"), new ThreadPoolExecutor.AbortPolicy());
+    public static final ExecutorService downloadPool = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JHVThread.NamedThreadFactory("EVE Download"), new ThreadPoolExecutor.AbortPolicy());
 
     private DownloadController() {
         selectorModel = LineDataSelectorModel.getSingletonInstance();

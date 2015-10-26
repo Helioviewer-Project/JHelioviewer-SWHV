@@ -26,6 +26,7 @@ import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManagerListener;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
+import org.helioviewer.jhv.threads.JHVThread;
 
 /**
  *
@@ -76,7 +77,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private SWEKDownloadManager() {
         swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
-        downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads")));
+        downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads")), new JHVThread.NamedThreadFactory("SWEK Download"));
         dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
         activeEventTypes = new HashMap<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>>();
         requestManager = IncomingRequestManager.getSingletonInstance();

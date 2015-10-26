@@ -38,7 +38,7 @@ public class ExportMovie implements FrameListener {
     private static boolean stopped = false;
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("ExportMovie"), new ThreadPoolExecutor.DiscardPolicy());
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Export Movie"), new ThreadPoolExecutor.DiscardPolicy());
     public static BufferedImage EVEImage;
 
     public void disposeMovieWriter(boolean keep) {
