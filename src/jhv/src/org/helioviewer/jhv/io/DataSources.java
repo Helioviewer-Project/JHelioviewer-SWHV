@@ -13,13 +13,12 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -385,11 +384,10 @@ public class DataSources {
             Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
         }
 
-        SwingWorker<Void, Void> reloadSources = new SwingWorker<Void, Void>() {
+        JHVWorker<Void, Void> reloadSources = new JHVWorker<Void, Void>() {
 
             @Override
-            protected Void doInBackground() {
-                Thread.currentThread().setName("ReloadServer");
+            protected Void backgroundWork() {
                 reload();
                 return null;
             }
@@ -402,6 +400,7 @@ public class DataSources {
             }
 
         };
+        reloadSources.setThreadName("ReloadServer");
         reloadSources.execute();
     }
 

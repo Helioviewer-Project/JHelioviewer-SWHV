@@ -28,13 +28,12 @@ public class LoadRemoteTask extends LoadURITask {
         instrument = _instrument;
         measurement = _measurement;
         detector = _detector;
+        setThreadName("LoadRemote");
     }
 
     @Override
-    protected View doInBackground() {
-        Thread.currentThread().setName("LoadRemote");
+    protected View backgroundWork() {
         View view = null;
-
         try {
             if (image)
                 view = APIRequestManager.requestAndOpenRemoteFile(null, starttime, "", observation, instrument, measurement, detector, true);
