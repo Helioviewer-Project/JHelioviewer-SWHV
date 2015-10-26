@@ -98,7 +98,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
             Interval<Date> movieInterval = new Interval<Date>(Layers.getStartDate().getDate(), Layers.getEndDate().getDate());
 
             if (movieInterval.containsPointInclusive(date)) {
-                return new Interval<Date>(null, null);
+                return movieInterval;
             }
         }
         GregorianCalendar gce = new GregorianCalendar();
