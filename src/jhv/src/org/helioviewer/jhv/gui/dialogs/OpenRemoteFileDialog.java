@@ -25,6 +25,7 @@ import javax.swing.JTree;
 import javax.swing.text.BadLocationException;
 import javax.swing.tree.TreePath;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -349,7 +350,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
         try {
             URI uri = new URI(srv + img);
             LoadURIDownloadTask uriTask = new LoadURIDownloadTask(uri, uri);
-            uriTask.execute();
+            JHVGlobals.getExecutorService().execute(uriTask);
             dispose();
         } catch (URISyntaxException e1) {
             e1.printStackTrace();

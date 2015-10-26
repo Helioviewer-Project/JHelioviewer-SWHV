@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.astronomy.Position.Latitudinal;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -63,7 +64,6 @@ public class GL3DPositionLoading {
             beginDatems = _beginDatems;
             endDatems = _endDatems;
             observer = _observer;
-            setThreadName("GL3DPositionLoading");
         }
 
         @Override
@@ -142,8 +142,10 @@ public class GL3DPositionLoading {
             worker.cancel(false);
         }
         fireLoaded("Loading...");
+
         worker = new LoadPositionWorker(this, beginDate, endDate, beginDatems, endDatems, observer);
-        worker.execute();
+        worker.setThreadName("MAIN--GL3DPositionLoading");
+        JHVGlobals.getExecutorService().execute(worker);
     }
 
     public void setPosition(Latitudinal[] newPosition) {

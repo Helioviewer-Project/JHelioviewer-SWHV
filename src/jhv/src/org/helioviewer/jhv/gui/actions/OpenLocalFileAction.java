@@ -10,6 +10,7 @@ import java.net.URI;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.filefilters.AllSupportedImageTypesFilenameFilter;
@@ -51,7 +52,7 @@ public class OpenLocalFileAction extends AbstractAction {
 
                 URI uri = selectedFile.toURI();
                 LoadURITask uriTask = new LoadURITask(uri, uri);
-                uriTask.execute();
+                JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
     }

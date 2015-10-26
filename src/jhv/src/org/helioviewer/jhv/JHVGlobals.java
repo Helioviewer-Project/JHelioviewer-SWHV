@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.threads.JHVExecutor;
 
 /**
  * Intended to be a class for static functions and fields relevant to the
@@ -29,6 +31,15 @@ public class JHVGlobals {
     private JHVGlobals() {}
 
     public static final boolean GoForTheBroke = true;
+
+    private static ExecutorService executorService;
+
+    public static ExecutorService getExecutorService() {
+        if (executorService == null) {
+            executorService = JHVExecutor.getJHVWorkersExecutorService("MAIN", 10);
+        }
+        return executorService;
+    }
 
     /**
      * @return standard read timeout

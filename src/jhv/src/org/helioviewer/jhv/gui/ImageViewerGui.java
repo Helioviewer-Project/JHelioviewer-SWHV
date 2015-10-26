@@ -224,21 +224,21 @@ public class ImageViewerGui {
         for (URI jpxUrl : jpxUrls) {
             if (jpxUrl != null) {
                 LoadURITask uriTask = new LoadURITask(jpxUrl, jpxUrl);
-                uriTask.execute();
+                JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
         // -jpip
         for (URI jpipUri : jpipUris) {
             if (jpipUri != null) {
                 LoadURITask uriTask = new LoadURITask(jpipUri, jpipUri);
-                uriTask.execute();
+                JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
         // -download
         for (URI downloadAddress : downloadAddresses) {
             if (downloadAddress != null) {
                 LoadURIDownloadTask uriTask = new LoadURIDownloadTask(downloadAddress, downloadAddress);
-                uriTask.execute();
+                JHVGlobals.getExecutorService().execute(uriTask);
             }
         }
     }

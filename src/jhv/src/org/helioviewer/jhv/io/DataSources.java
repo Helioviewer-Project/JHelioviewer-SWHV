@@ -384,7 +384,7 @@ public class DataSources {
             Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
         }
 
-        JHVWorker<Void, Void> reloadSources = new JHVWorker<Void, Void>() {
+        JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
 
             @Override
             protected Void backgroundWork() {
@@ -400,8 +400,8 @@ public class DataSources {
             }
 
         };
-        reloadSources.setThreadName("ReloadServer");
-        reloadSources.execute();
+        reloadTask.setThreadName("MAIN--ReloadServer");
+        JHVGlobals.getExecutorService().execute(reloadTask);
     }
 
     public String[] getServerList() {

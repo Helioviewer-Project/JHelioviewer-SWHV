@@ -25,6 +25,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
@@ -96,7 +97,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             if (isFirst || !donotloadStartup) {
                 isFirst = false;
                 SetupTimeTask setupTimeTask = new SetupTimeTask(getCadence(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
-                setupTimeTask.execute();
+                JHVGlobals.getExecutorService().execute(setupTimeTask);
             }
         } else {
             Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
@@ -194,7 +195,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
         // download and open the requested movie in a separated thread and hide
         // loading animation when finished
         LoadRemoteTask remoteTask = new LoadRemoteTask(isImage, getCadence(), getStartTime(), getEndTime(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
-        remoteTask.execute();
+        JHVGlobals.getExecutorService().execute(remoteTask);
     }
 
     // Methods derived from Observation Dialog Panel
