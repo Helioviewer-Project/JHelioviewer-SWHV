@@ -7,8 +7,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Vec3d;
@@ -25,6 +23,7 @@ import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -45,11 +44,11 @@ public class RenderableImageLayer extends AbstractRenderable {
     private float oldFontSize = -1;
     private static final double vpScale = 0.04;
     private TextRenderer textRenderer;
-    private SwingWorker<?, ?> worker;
+    private JHVWorker<?, ?> worker;
 
     private static final String loading = "Loading...";
 
-    public RenderableImageLayer(SwingWorker<?, ?> _worker) {
+    public RenderableImageLayer(JHVWorker<?, ?> _worker) {
         worker = _worker;
         setVisible(true);
     }
