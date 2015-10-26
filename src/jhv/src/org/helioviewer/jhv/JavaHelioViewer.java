@@ -18,6 +18,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.threads.JHVExecutor;
 
 /**
  * This class starts the applications.
@@ -102,6 +103,7 @@ public class JavaHelioViewer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                JHVExecutor.getWorkersExecutorService(20); // tbd
                 TimeUtils.getSingletonInstance(); // instantiate class
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
