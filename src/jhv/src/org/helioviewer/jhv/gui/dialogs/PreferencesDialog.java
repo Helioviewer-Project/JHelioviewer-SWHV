@@ -88,7 +88,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-        JButton acceptBtn = new JButton("Accept");
+        JButton acceptBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
         JButton resetBtn = new JButton("Reset");
 
@@ -359,7 +359,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             TableModel model = table.getModel();
             model.setValueAt(JHVDirectory.EXPORTS.getPath(), 0, 1);
             model.setValueAt(JHVDirectory.HOME.getPath(), 1, 1);
-            model.setValueAt("jpip://delphi.nascom.nasa.gov:8090", 2, 1);
+            model.setValueAt("jpip://swhv.oma.be:8090", 2, 1);
         }
     }
 

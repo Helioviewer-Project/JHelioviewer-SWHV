@@ -34,7 +34,7 @@ public class JHVExecutor {
                };
 
            executorService =
-               new ThreadPoolExecutor(MAX_WORKER_THREADS, MAX_WORKER_THREADS,
+               new ThreadPoolExecutor(MAX_WORKER_THREADS/2, MAX_WORKER_THREADS,
                                       10L, TimeUnit.MINUTES,
                                       new LinkedBlockingQueue<Runnable>(),
                                       threadFactory);
