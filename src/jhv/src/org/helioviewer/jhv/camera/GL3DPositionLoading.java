@@ -12,13 +12,12 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.astronomy.Position.Latitudinal;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,14 +40,14 @@ public class GL3DPositionLoading {
 
     private boolean isLoaded = false;
     private Latitudinal[] position;
-    private SwingWorker<Latitudinal[], Void> worker;
+    private JHVWorker<Latitudinal[], Void> worker;
     private final GL3DExpertCamera camera;
 
     public GL3DPositionLoading(GL3DExpertCamera camera) {
         this.camera = camera;
     }
 
-    private static class LoadPositionWorker extends SwingWorker<Latitudinal[], Void> {
+    private static class LoadPositionWorker extends JHVWorker<Latitudinal[], Void> {
         private String report = null;
         private final String beginDate;
         private final String endDate;
@@ -64,21 +63,11 @@ public class GL3DPositionLoading {
             beginDatems = _beginDatems;
             endDatems = _endDatems;
             observer = _observer;
-        }
-
-        private URL buildRequestURL(long deltat) {
-            try {
-                return new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat + "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
-            } catch (MalformedURLException e) {
-                Log.error("Wrong URL", e);
-            }
-            return null;
+            setThreadName("GL3DPositionLoading");
         }
 
         @Override
-        protected Latitudinal[] doInBackground() throws Exception {
-            Thread.currentThread().setName("GL3DPositionLoading--Main");
-
+        protected Latitudinal[] backgroundWork() throws Exception {
             Latitudinal[] ret = null;
             JSONObject result;
             try {
@@ -88,7 +77,8 @@ public class GL3DPositionLoading {
                 if (span / deltat > max)
                     deltat = span / max;
 
-                URL url = buildRequestURL(deltat);
+                URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat +
+                                            "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                 Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                 if (!ds.getResponse400()) {
@@ -102,6 +92,8 @@ public class GL3DPositionLoading {
                         report = "Invalid network response";
                     }
                 }
+            } catch (MalformedURLException e) {
+                Log.error("Wrong URL", e);
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {

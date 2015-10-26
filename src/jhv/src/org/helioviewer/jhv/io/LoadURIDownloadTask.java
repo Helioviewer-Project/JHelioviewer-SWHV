@@ -11,16 +11,15 @@ public class LoadURIDownloadTask extends LoadURITask {
 
     public LoadURIDownloadTask(URI _uri, URI _downloadURI) {
         super(_uri, _downloadURI);
+        setThreadName("LoadURIDownload");
     }
 
     @Override
-    protected View doInBackground() {
-        Thread.currentThread().setName("LoadURIDownload");
-        View view = null;
-
+    protected View backgroundWork() {
         FileDownloader filedownloader = new FileDownloader();
         URI newUri = filedownloader.downloadFromHTTP(uri, true);
 
+        View view = null;
         try {
             view = APIRequestManager.loadView(newUri, uri);
         } catch (IOException e) {

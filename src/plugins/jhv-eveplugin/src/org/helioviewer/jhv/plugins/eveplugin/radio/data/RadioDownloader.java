@@ -11,12 +11,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 public class RadioDownloader {
     // Make connection with server to request the jpx
@@ -26,7 +25,7 @@ public class RadioDownloader {
     private final List<RadioDownloaderListener> listeners;
     private final RadioImageCache cache;
     private final Set<Date> requestDateCache;
-    private SwingWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker;
+    private JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker;
 
     private final long MAXIMUM_DAYS = 172800000;
 
@@ -52,11 +51,10 @@ public class RadioDownloader {
 
     public void requestAndOpenRemoteFile(final String startDateString, final String endDateString) {
         fireRemoveRadioSpectrogram();
-        SwingWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new SwingWorker<ImageDownloadWorkerResult, Void>() {
+        JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
 
             @Override
-            protected ImageDownloadWorkerResult doInBackground() {
-                Thread.currentThread().setName("RadioDownloader1--EVE");
+            protected ImageDownloadWorkerResult backgroundWork() {
                 try {
                     List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
@@ -138,6 +136,7 @@ public class RadioDownloader {
                 }
             }
         };
+        imageDownloadWorker.setThreadName("RadioDownloader1--EVE");
         imageDownloadWorker.execute();
     }
 
@@ -190,13 +189,12 @@ public class RadioDownloader {
             }
         }
 
-        imageDownloadWorker = new SwingWorker<ImageDownloadWorkerResult, Void>() {
+        imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
 
             private List<Date> datesToDownload;
 
             @Override
-            protected ImageDownloadWorkerResult doInBackground() {
-                Thread.currentThread().setName("RadioDownloader2--EVE");
+            protected ImageDownloadWorkerResult backgroundWork() {
                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                 List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 for (Date date : datesToDownload) {
@@ -250,13 +248,13 @@ public class RadioDownloader {
                 }
             }
 
-            public SwingWorker<ImageDownloadWorkerResult, Void> init(List<Date> toDownload) {
+            public JHVWorker<ImageDownloadWorkerResult, Void> init(List<Date> toDownload) {
                 datesToDownload = toDownload;
                 return this;
             }
         }.init(toDownloadStartDates);
+        imageDownloadWorker.setThreadName("RadioDownloader2--EVE");
         imageDownloadWorker.execute();
-
     }
 
     private void fireAdditionalJPXDataAvailable(List<DownloadedJPXData> jpxList, Long downloadID, double ratioX, double ratioY) {

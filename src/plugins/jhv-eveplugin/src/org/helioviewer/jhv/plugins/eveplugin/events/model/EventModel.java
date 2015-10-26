@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -25,6 +23,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  *
@@ -50,7 +49,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     private final EventPanel eventPanel;
 
     /** The swing worker creating the event type plot configurations */
-    private SwingWorker<EventTypePlotConfiguration, Void> currentSwingWorker;
+    private JHVWorker<EventTypePlotConfiguration, Void> currentSwingWorker;
 
     private final EventsSelectorElement eventSelectorElement;
 
@@ -157,13 +156,12 @@ public class EventModel implements TimingListener, EventRequesterListener {
     }
 
     private void createEventPlotConfiguration() {
-
         if (currentSwingWorker != null) {
             currentSwingWorker.cancel(true);
         }
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
 
-        currentSwingWorker = new SwingWorker<EventTypePlotConfiguration, Void>() {
+        currentSwingWorker = new JHVWorker<EventTypePlotConfiguration, Void>() {
 
             private final Set<String> uniqueIDs = new HashSet<String>();
             private final Map<String, Integer> eventLocations = new HashMap<String, Integer>();
@@ -182,8 +180,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
             private int maxEventLines = 0;
 
             @Override
-            public EventTypePlotConfiguration doInBackground() {
-                Thread.currentThread().setName("EventModel--EVE");
+            public EventTypePlotConfiguration backgroundWork() {
                 if (events.size() > 0) {
                     for (String eventType : events.keySet()) {
                         endDates = new ArrayList<Date>();
@@ -249,7 +246,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
                                 plotConfig.add(creatEventPlotConfiguration(relEvent, relatedEventPosition, localRelationNr));
                             }
                         }
-
                     }
                     return true;
                 } else {
@@ -344,6 +340,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 }
             }
         };
+        currentSwingWorker.setThreadName("EventModel--EVE");
         currentSwingWorker.execute();
     }
 

@@ -3,16 +3,15 @@ package org.helioviewer.jhv.io;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class LoadURITask extends SwingWorker<View, Void> {
+public class LoadURITask extends JHVWorker<View, Void> {
 
     private final RenderableImageLayer imageLayer;
     protected final URI uri, downloadURI;
@@ -24,13 +23,12 @@ public class LoadURITask extends SwingWorker<View, Void> {
         imageLayer = new RenderableImageLayer(this);
         ImageViewerGui.getRenderableContainer().addBeforeRenderable(imageLayer);
         Displayer.display(); // ensures the dummy text is displayed
+        setThreadName("LoadURI");
     }
 
     @Override
-    protected View doInBackground() {
-        Thread.currentThread().setName("LoadURI");
+    protected View backgroundWork() {
         View view = null;
-
         try {
             view = APIRequestManager.loadView(uri, downloadURI);
         } catch (IOException e) {

@@ -3,13 +3,12 @@ package org.helioviewer.jhv.io;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
+import org.helioviewer.jhv.threads.JHVWorker;
 
-public class SetupTimeTask extends SwingWorker<Date, Void> {
+public class SetupTimeTask extends JHVWorker<Date, Void> {
 
     private final int cadence;
     private final String observatory;
@@ -24,11 +23,11 @@ public class SetupTimeTask extends SwingWorker<Date, Void> {
         instrument = _instrument;
         detector = _detector;
         measurement = _measurement;
+        setThreadName("SetupTime");
     }
 
     @Override
-    protected Date doInBackground() {
-        Thread.currentThread().setName("SetupTime");
+    protected Date backgroundWork() {
         return APIRequestManager.getLatestImageDate(observatory, instrument, detector, measurement, true);
     }
 
