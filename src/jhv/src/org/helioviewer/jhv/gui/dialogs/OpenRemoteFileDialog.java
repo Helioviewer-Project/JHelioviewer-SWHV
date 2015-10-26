@@ -403,7 +403,7 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
         try {
             LoadURITask uriTask = new LoadURITask(new URI(srv + img), new URI(httpPath));
-            uriTask.execute();
+            JHVGlobals.getExecutorService().execute(uriTask);
             if (advancedOptions == false) {
                 Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
             }
