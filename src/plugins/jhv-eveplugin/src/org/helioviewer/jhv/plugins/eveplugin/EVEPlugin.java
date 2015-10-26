@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.JComponent;
-import javax.swing.SwingWorker;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
