@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadFactory;
 
 public class JHVThread {
 
+    // this creates daemon threads
     public static class NamedThreadFactory implements ThreadFactory {
 
         private final String name;
@@ -14,24 +15,9 @@ public class JHVThread {
 
         @Override
         public Thread newThread(Runnable r) {
-            return new BagThread(r, name);
-        }
-    }
-
-    public static class BagThread extends Thread {
-
-        private Object var;
-
-        public BagThread(Runnable r, String name) {
-            super(r, name);
-        }
-
-        public Object getVar() {
-            return var;
-        }
-
-        public void setVar(Object var) {
-            this.var = var;
+            Thread thread = new Thread(r, name);
+            thread.setDaemon(true);
+            return thread;
         }
     }
 

@@ -28,7 +28,7 @@ public class LoadRemoteTask extends LoadURITask {
         instrument = _instrument;
         measurement = _measurement;
         detector = _detector;
-        setThreadName("LoadRemote");
+        setThreadName("MAIN--LoadRemote");
     }
 
     @Override

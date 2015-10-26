@@ -23,7 +23,7 @@ public class SetupTimeTask extends JHVWorker<Date, Void> {
         instrument = _instrument;
         detector = _detector;
         measurement = _measurement;
-        setThreadName("SetupTime");
+        setThreadName("MAIN--SetupTime");
     }
 
     @Override
@@ -52,4 +52,5 @@ public class SetupTimeTask extends JHVWorker<Date, Void> {
             e.printStackTrace();
         }
     }
+
 }

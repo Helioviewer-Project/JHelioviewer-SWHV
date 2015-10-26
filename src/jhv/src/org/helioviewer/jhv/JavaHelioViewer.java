@@ -103,7 +103,8 @@ public class JavaHelioViewer {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JHVExecutor.getWorkersExecutorService(20); // tbd
+                JHVExecutor.setSwingWorkersExecutorService(10);
+
                 TimeUtils.getSingletonInstance(); // instantiate class
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing

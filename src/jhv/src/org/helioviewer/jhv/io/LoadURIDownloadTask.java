@@ -11,7 +11,7 @@ public class LoadURIDownloadTask extends LoadURITask {
 
     public LoadURIDownloadTask(URI _uri, URI _downloadURI) {
         super(_uri, _downloadURI);
-        setThreadName("LoadURIDownload");
+        setThreadName("MAIN--LoadURIDownload");
     }
 
     @Override
