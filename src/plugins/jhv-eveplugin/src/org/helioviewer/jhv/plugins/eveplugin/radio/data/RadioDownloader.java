@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.jhv.threads.JHVWorker;
 
@@ -136,8 +137,9 @@ public class RadioDownloader {
                 }
             }
         };
-        imageDownloadWorker.setThreadName("RadioDownloader1--EVE");
-        imageDownloadWorker.execute();
+
+        imageDownloadWorker.setThreadName("EVE--RadioDownloader1");
+        EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
     protected void fireNoDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID) {
@@ -253,8 +255,9 @@ public class RadioDownloader {
                 return this;
             }
         }.init(toDownloadStartDates);
-        imageDownloadWorker.setThreadName("RadioDownloader2--EVE");
-        imageDownloadWorker.execute();
+
+        imageDownloadWorker.setThreadName("EVE--RadioDownloader2");
+        EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
     private void fireAdditionalJPXDataAvailable(List<DownloadedJPXData> jpxList, Long downloadID, double ratioX, double ratioY) {
