@@ -2,8 +2,7 @@ package org.helioviewer.jhv.plugins.swek;
 
 import java.io.File;
 
-import javax.swing.SwingWorker;
-
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -12,6 +11,7 @@ import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 import org.helioviewer.jhv.plugins.swek.view.SWEKPluginPanel;
+import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  * Part of these developments are based on the work done in the HEKPlugin
@@ -68,10 +68,10 @@ public class SWEKPlugin implements Plugin {
     @Override
     public void installPlugin() {
         createPluginDirectoryStructure();
-        SwingWorker<Void, Void> loadPlugin = new SwingWorker<Void, Void>() {
+        JHVWorker<Void, Void> loadPlugin = new JHVWorker<Void, Void>() {
 
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void backgroundWork() throws Exception {
                 SWEKConfig.loadConfiguration();
                 SWEKSources.loadSources();
                 return null;
@@ -83,8 +83,10 @@ public class SWEKPlugin implements Plugin {
                 ImageViewerGui.getLeftContentPane().add("Space Weather Event Knowledgebase", SWEKPluginPanel.getSWEKPluginPanelInstance(), true);
                 ImageViewerGui.getLeftContentPane().revalidate();
             }
+
         };
-        loadPlugin.execute();
+        loadPlugin.setThreadName("SWEK--LoadPlugin");
+        JHVGlobals.getExecutorService().execute(loadPlugin);
     }
 
     @Override
