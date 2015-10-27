@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
@@ -43,6 +44,9 @@ public class RenderableGrid extends AbstractRenderable {
     public RenderableGrid() {
         optionsPanel = new RenderableGridOptionsPanel(this);
         this.setVisible(true);
+
+        makeLatLabels();
+        makeLonLabels();
     }
 
     private float oldFontSize = -1;
@@ -249,66 +253,88 @@ public class RenderableGrid extends AbstractRenderable {
         return txt;
     }
 
-    private void drawText(GL2 gl) {
-        float zdist = 0f;
+    private static class GridLabel {
+        protected String txt;
+        protected float x;
+        protected float y;
+        protected float theta;
 
-        double size = Sun.Radius * 1.06;
-        // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / font.getSize();
+        protected GridLabel(String _txt, float _x, float _y, float _theta) {
+            txt = _txt;
+            x = _x;
+            y = _y;
+            theta = _theta;
+        }
+    }
+
+    private ArrayList<GridLabel> latLabels = new ArrayList<GridLabel>();
+    private ArrayList<GridLabel> lonLabels = new ArrayList<GridLabel>();
+
+    private void makeLatLabels() {
+        double size = Sun.Radius * 1.1;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
         float horizontalAdjustment = textScale / 2f;
         float verticalAdjustment = textScale / 3f;
 
-        textRenderer.begin3DRendering();
+        latLabels.clear();
+
         for (double phi = 0; phi <= 90; phi += latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = formatStrip(phi);
 
-            textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+            latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             if (phi != 90) {
-                textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+                latLabels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             }
         }
         for (double phi = -latstepDegrees; phi >= -90; phi -= latstepDegrees) {
             double angle = (90 - phi) * Math.PI / 180.;
             String txt = formatStrip(phi);
 
-            textRenderer.draw3D(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+            latLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             if (phi != -90) {
-                textRenderer.draw3D(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), zdist, textScaleFactor);
+                latLabels.add(new GridLabel(txt, (float) (-Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
             }
         }
-        textRenderer.end3DRendering();
+    }
 
-        size = Sun.Radius * 1.02;
+    private void makeLonLabels() {
+        double size = Sun.Radius * 1.05;
+
+        lonLabels.clear();
 
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
             String txt = formatStrip(theta);
-
-            gl.glPushMatrix();
-            {
-                gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
-                gl.glRotatef((float) theta, 0, 1, 0);
-
-                textRenderer.begin3DRendering();
-                textRenderer.draw3D(txt, 0, 0, 0, textScaleFactor);
-                textRenderer.end3DRendering();
-            }
-            gl.glPopMatrix();
+            lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
-
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
             String txt = formatStrip(theta);
+            lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
+        }
+    }
 
+    private void drawText(GL2 gl) {
+        // the scale factor has to be divided by the current font size
+        float textScaleFactor = textScale / font.getSize();
+
+        textRenderer.begin3DRendering();
+        for (int i = 0; i < latLabels.size(); ++i) {
+            GridLabel label = latLabels.get(i);
+            textRenderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
+        }
+        textRenderer.end3DRendering();
+
+        for (int i = 0; i < lonLabels.size(); ++i) {
             gl.glPushMatrix();
             {
-                gl.glTranslatef((float) (Math.cos(angle) * size), 0, (float) (Math.sin(angle) * size));
-                gl.glRotatef((float) theta, 0, 1, 0);
+                GridLabel label = lonLabels.get(i);
+                gl.glTranslatef(label.x, 0, label.y);
+                gl.glRotatef(label.theta, 0, 1, 0);
 
                 textRenderer.begin3DRendering();
-                textRenderer.draw3D(txt, 0, 0, 0, textScaleFactor);
+                textRenderer.draw3D(label.txt, 0, 0, 0, textScaleFactor);
                 textRenderer.end3DRendering();
             }
             gl.glPopMatrix();
@@ -375,6 +401,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     public void setLonstepDegrees(double lonstepDegrees) {
         this.lonstepDegrees = (float) lonstepDegrees;
+        makeLonLabels();
     }
 
     public double getLatstepDegrees() {
@@ -383,6 +410,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     public void setLatstepDegrees(double latstepDegrees) {
         this.latstepDegrees = (float) latstepDegrees;
+        makeLatLabels();
     }
 
     public void showLabels(boolean show) {
