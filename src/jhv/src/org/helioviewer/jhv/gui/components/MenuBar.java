@@ -7,6 +7,7 @@ import javax.swing.JMenuBar;
 
 import org.helioviewer.jhv.gui.actions.ClearAnnotationsAction;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
+import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.gui.actions.OpenLocalFileAction;
 import org.helioviewer.jhv.gui.actions.OpenURLinBrowserAction;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
@@ -40,6 +41,7 @@ public class MenuBar extends JMenuBar {
 
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(new NewLayerAction(true, false));
         fileMenu.add(new OpenLocalFileAction());
         // fileMenu.add(new ShowDialogAction("Open Remote Image...", OpenRemoteFileDialog.class));
 
@@ -73,7 +75,7 @@ public class MenuBar extends JMenuBar {
 
         JMenu pluginsMenu = new JMenu("Plug-ins");
         pluginsMenu.setMnemonic(KeyEvent.VK_I);
-        pluginsMenu.add(new ShowDialogAction("Manage Plug-ins...", PluginsDialog.class));
+        pluginsMenu.add(new ShowDialogAction("Manage plug-ins...", PluginsDialog.class));
         add(pluginsMenu);
 
         if (System.getProperty("jhv.os").equals("mac")) {
@@ -94,13 +96,13 @@ public class MenuBar extends JMenuBar {
             helpMenu.add(new ShowDialogAction("About JHelioviewer...", AboutDialog.class));
         }
 
-        helpMenu.add(new OpenURLinBrowserAction("Open User Manual", "http://swhv.oma.be/user_manual/"));
-        helpMenu.add(new ShowDialogAction("Show Shortcuts...", HelpDialog.class));
+        helpMenu.add(new OpenURLinBrowserAction("Open user manual", "http://swhv.oma.be/user_manual/"));
+        helpMenu.add(new ShowDialogAction("Show shortcuts...", HelpDialog.class));
         helpMenu.addSeparator();
-        helpMenu.add(new OpenURLinBrowserAction("Report a Bug", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
-        helpMenu.add(new OpenURLinBrowserAction("Submit a Feature Request", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
+        helpMenu.add(new OpenURLinBrowserAction("Report a bug", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
+        helpMenu.add(new OpenURLinBrowserAction("Submit a feature request", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
         helpMenu.addSeparator();
-        helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
+        helpMenu.add(new OpenURLinBrowserAction("Open website", "http://www.jhelioviewer.org"));
         add(helpMenu);
     }
 
