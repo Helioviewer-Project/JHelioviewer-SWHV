@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 
 /**
@@ -176,9 +175,6 @@ public class YAxisElement extends AbstractValueSpace {
 
         Double scaledAvailableStart = scaledSelectedRange.min - diffSelStartAvailStart * ratio;
         Double scaledAvailableEnd = scaledSelectedRange.max + diffSelEndAvailEnd * ratio;
-        if (scaledAvailableStart.isNaN() || scaledAvailableEnd.isNaN()) {
-            Log.debug("NAN");
-        }
         scaledAvailableRange = new Range(scaledAvailableStart, scaledAvailableEnd);
 
     }
