@@ -4,22 +4,25 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.message.Message;
-import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+//import org.helioviewer.jhv.gui.IconBank;
+//import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
@@ -97,11 +100,11 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         buttonPane.add(btnClose);
         buttonPane.add(btnImages);
 
-        btnImages.setIcon(IconBank.getIcon(JHVIcon.ADD));
-        btnImages.setToolTipText("Request the selected data and display it");
+        // btnImages.setIcon(IconBank.getIcon(JHVIcon.ADD));
+        // btnImages.setToolTipText("Request the selected data and display it");
 
-        btnClose.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
-        btnClose.setToolTipText("Close this dialog");
+        // btnClose.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));
+        // btnClose.setToolTipText("Close this dialog");
 
         final int btnWidth = Math.max(btnClose.getPreferredSize().getSize().width, btnImages.getPreferredSize().getSize().width);
 
@@ -110,6 +113,20 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
         btnClose.setPreferredSize(new Dimension(btnWidth, 25));
         btnClose.addActionListener(this);
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closePressed();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addPressed();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -202,7 +219,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
         pack();
-        getRootPane().setDefaultButton(btnImages);
 
         setVisible(true);
     }
@@ -228,6 +244,20 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
 
     // Action Listener
+    private void addPressed() {
+        boolean result = true;
+        if (selectedPane != null) {
+            result = selectedPane.loadButtonPressed();
+        }
+        if (result) {
+            closeDialog();
+        }
+    }
+
+    private void closePressed() {
+        selectedPane.cancelButtonPressed();
+        closeDialog();
+    }
 
     /**
      * Reacts on user input.
@@ -237,17 +267,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         if (e.getSource().equals(uiSelectionComboBox)) {
             setUIContainerPane((String) uiSelectionComboBox.getSelectedItem());
         } else if (e.getSource().equals(btnImages)) {
-            boolean result = true;
-
-            if (selectedPane != null) {
-                result = selectedPane.loadButtonPressed();
-            }
-            if (result) {
-                closeDialog();
-            }
+            addPressed();
         } else if (e.getSource().equals(btnClose)) {
-            selectedPane.cancelButtonPressed();
-            closeDialog();
+            closePressed();
         }
     }
 
