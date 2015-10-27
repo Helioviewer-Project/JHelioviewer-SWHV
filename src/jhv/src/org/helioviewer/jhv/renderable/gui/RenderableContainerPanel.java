@@ -12,11 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.ParseException;
-import java.util.Date;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
@@ -33,19 +29,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
-import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.gui.actions.NewLayerAction;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
-import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
 public class RenderableContainerPanel extends JPanel {
@@ -65,40 +56,6 @@ public class RenderableContainerPanel extends JPanel {
 
     public static final int NUMBER_COLUMNS = 4;
     private static final int NUMBEROFVISIBLEROWS = 7;
-
-    private final Action addLayerAction = new AbstractAction() {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            // Check the dates if possible
-            View activeView = Layers.getActiveView();
-            if (activeView != null && activeView.isMultiFrame()) {
-                JHVDate start = Layers.getStartDate(activeView);
-                JHVDate end = Layers.getEndDate(activeView);
-                try {
-                    Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                    Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
-                    // only updates if it's really necessary with a tolerance of an hour
-                    final int tolerance = 60 * 60 * 1000;
-                    if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
-                        if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
-                            ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
-                        }
-                        if (ObservationDialogDateModel.getInstance().getEndDate() == null || !ObservationDialogDateModel.getInstance().isEndDateSetByUser()) {
-                            ObservationDialogDateModel.getInstance().setEndDate(end.getDate(), false);
-                        }
-                    }
-                } catch (ParseException e) {
-                    // Should not happen
-                    Log.error("Cannot update observation dialog", e);
-                }
-            }
-            // Show dialog
-            ImageViewerGui.getObservationDialog().showDialog();
-        }
-    };
 
     private final JTable grid;
     private final JPanel optionsPanelWrapper;
@@ -144,15 +101,20 @@ public class RenderableContainerPanel extends JPanel {
         jsp.getViewport().setBackground(Color.WHITE);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
-        JButton addLayerButton = new JButton(addLayerAction);
+        JButton addLayerButton = new JButton("Add layer", IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.setBorder(null);
-        addLayerButton.setText("Add layer");
         addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
+        addLayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NewLayerAction layerAction = new NewLayerAction(true, false);
+                layerAction.actionPerformed(new ActionEvent(this, 0, ""));
+            }
+        });
 
-        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
         final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.addActionListener(new ActionListener() {
             @Override
