@@ -23,7 +23,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class NewLayerAction extends AbstractAction {
 
     public NewLayerAction(boolean small, boolean useIcon) {
-        super("Add new layer...", useIcon ? IconBank.getIcon(JHVIcon.ADD) : null);
+        super("New layer...", useIcon ? IconBank.getIcon(JHVIcon.ADD) : null);
         putValue(SHORT_DESCRIPTION, "Add new layer");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }

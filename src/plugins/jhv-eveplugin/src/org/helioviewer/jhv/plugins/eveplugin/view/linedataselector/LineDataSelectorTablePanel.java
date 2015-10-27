@@ -97,27 +97,23 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * 4 + 1));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JPanel jspContainer = new JPanel(new BorderLayout());
-
-        JButton addLayerButton = new JButton();
+        JButton addLayerButton = new JButton("New layer", IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ImageViewerGui.getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
             }
         });
-
-        addLayerButton.setBorder(null);
-        addLayerButton.setText("Add layer");
+        // addLayerButton.setBorder(null);
         addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
         addLayerButton.setBorderPainted(false);
         addLayerButton.setFocusPainted(false);
         addLayerButton.setContentAreaFilled(false);
-        addLayerButton.setIcon(IconBank.getIcon(JHVIcon.ADD));
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
 
+        JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
         this.add(jspContainer, gc);
