@@ -4,8 +4,8 @@ import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -23,10 +23,13 @@ public class PfssPlugin implements Plugin {
     private static PfssCache pfssCache;
     private final PfssRenderable renderable;
 
-    public static final ScheduledExecutorService pfssReaperPool = Executors.newSingleThreadScheduledExecutor(new JHVThread.NamedThreadFactory("PFSS Abolish"));
-    public static final ExecutorService pfssNewLoadPool = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("PFSS NewLoad"));
+    private static final BlockingQueue<Runnable> newLoadBlockingQueue = new ArrayBlockingQueue<Runnable>(1);
+    public static final ExecutorService pfssNewLoadPool = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.MINUTES, newLoadBlockingQueue, new JHVThread.NamedThreadFactory("PFSS NewLoad"), new ThreadPoolExecutor.DiscardPolicy());
+
+    public static final ScheduledExecutorService pfssReaperPool = new ScheduledThreadPoolExecutor(1, new JHVThread.NamedThreadFactory("PFSS Reaper"), new ThreadPoolExecutor.DiscardPolicy());
+
     private static final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1024);
-    public static final ExecutorService pfssDataPool = new ThreadPoolExecutor(0, 5, 600000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("PFSS DataLoad"), new ThreadPoolExecutor.DiscardPolicy());
+    public static final ExecutorService pfssDataPool = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.MINUTES, blockingQueue, new JHVThread.NamedThreadFactory("PFSS DataLoad"), new ThreadPoolExecutor.DiscardPolicy());
 
     public PfssPlugin() {
         pfssCache = new PfssCache();
