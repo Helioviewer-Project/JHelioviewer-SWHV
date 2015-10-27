@@ -37,9 +37,6 @@ public class DownloadWorker implements Runnable {
     /** The supplier providing the events */
     private final SWEKSupplier supplier;
 
-    /** The date for which the event was requested */
-    private Date eventRequestDate;
-
     /** Should the download stop */
     private boolean isStopped;
 

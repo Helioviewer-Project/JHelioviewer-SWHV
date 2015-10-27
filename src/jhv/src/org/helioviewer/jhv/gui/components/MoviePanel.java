@@ -431,10 +431,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                 int fps = 30;
                 if (speedUnitComboBox.getSelectedItem().equals(SpeedUnit.FRAMESPERSECOND))
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-                ExportMovie.getInstance().start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
+                ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
                 setText("REC");
-                ExportMovie.getInstance().stop();
+                ExportMovie.stop();
             }
         }
 
