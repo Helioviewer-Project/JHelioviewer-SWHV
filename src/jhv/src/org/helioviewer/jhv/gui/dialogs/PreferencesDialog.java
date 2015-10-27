@@ -197,7 +197,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         if (debugFileCombo != null) {
             Level level = (Level) debugFileCombo.getSelectedItem();
             logSettings.setLoggingLevel("file", level);
-            logSettings.setMaxiumLogFileAge(LogSettings.getSingletonInstance().FILE_LOGGER, Integer.parseInt(debugFileTextField.getText()));
+            logSettings.setMaxiumLogFileAge(LogSettings.FILE_LOGGER, Integer.parseInt(debugFileTextField.getText()));
         }
         if (debugConsoleCombo != null) {
             Level level = (Level) debugConsoleCombo.getSelectedItem();
@@ -236,20 +236,20 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         paramsPanel.add(row0);
 
         LogSettings logSettings = LogSettings.getSingletonInstance();
-        Level fileLoggingLevel = logSettings.getLoggingLevel(LogSettings.getSingletonInstance().FILE_LOGGER);
-        Level consoleLoggingLevel = logSettings.getLoggingLevel(LogSettings.getSingletonInstance().CONSOLE_LOGGER);
+        Level fileLoggingLevel = logSettings.getLoggingLevel(LogSettings.FILE_LOGGER);
+        Level consoleLoggingLevel = logSettings.getLoggingLevel(LogSettings.CONSOLE_LOGGER);
 
         JPanel row4 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         if (fileLoggingLevel != null) {
             row4.add(new JLabel("File log level", JLabel.RIGHT));
-            debugFileCombo = new JComboBox(LogSettings.getSingletonInstance().LEVELS);
+            debugFileCombo = new JComboBox(LogSettings.LEVELS);
             row4.add(debugFileCombo);
             debugFileCombo.setSelectedItem(fileLoggingLevel);
         }
 
         if (consoleLoggingLevel != null) {
             row4.add(new JLabel("Console log level", JLabel.RIGHT));
-            debugConsoleCombo = new JComboBox(LogSettings.getSingletonInstance().LEVELS);
+            debugConsoleCombo = new JComboBox(LogSettings.LEVELS);
             row4.add(debugConsoleCombo);
             debugConsoleCombo.setSelectedItem(consoleLoggingLevel);
         }
@@ -262,7 +262,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         if (fileLoggingLevel != null) {
             row5.add(new JLabel("Delete log files after"));
             debugFileTextField = new JTextField(3);
-            debugFileTextField.setText(Integer.toString(logSettings.getMaxiumLogFileAge(LogSettings.getSingletonInstance().FILE_LOGGER)));
+            debugFileTextField.setText(Integer.toString(logSettings.getMaxiumLogFileAge(LogSettings.FILE_LOGGER)));
             row5.add(debugFileTextField);
             row5.add(new JLabel("days (enter 0 to keep all files)"));
             paramsPanel.add(row5);
