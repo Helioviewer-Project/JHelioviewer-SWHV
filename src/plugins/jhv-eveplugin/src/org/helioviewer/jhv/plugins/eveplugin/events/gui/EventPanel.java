@@ -80,13 +80,10 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public void setYAxisElement(YAxisElement yAxisElement) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public YAxisElement getYAxisElement() {
-        // return yAxisElement;
         return null;
     }
 
