@@ -120,13 +120,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
                 closePressed();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addPressed();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -217,6 +210,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        getRootPane().setDefaultButton(btnImages);
 
         pack();
 
@@ -228,7 +222,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * */
     private void closeDialog() {
         setVisible(false);
-        dispose();
+        // dispose();
     }
 
 
