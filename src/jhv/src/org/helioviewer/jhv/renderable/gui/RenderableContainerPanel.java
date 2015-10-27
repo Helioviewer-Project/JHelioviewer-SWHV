@@ -100,13 +100,7 @@ public class RenderableContainerPanel extends JPanel {
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS + 1));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JPanel jspContainer = new JPanel(new BorderLayout());
-        JButton addLayerButton = new JButton("Add layer", IconBank.getIcon(JHVIcon.ADD));
-        addLayerButton.setBorder(null);
-        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
-        addLayerButton.setBorderPainted(false);
-        addLayerButton.setFocusPainted(false);
-        addLayerButton.setContentAreaFilled(false);
+        JButton addLayerButton = new JButton("New layer", IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,6 +108,11 @@ public class RenderableContainerPanel extends JPanel {
                 layerAction.actionPerformed(new ActionEvent(this, 0, ""));
             }
         });
+        // addLayerButton.setBorder(null);
+        addLayerButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        addLayerButton.setBorderPainted(false);
+        addLayerButton.setFocusPainted(false);
+        addLayerButton.setContentAreaFilled(false);
 
         final JCheckBox multiview = new JCheckBox("Multiview", Displayer.multiview);
         multiview.addActionListener(new ActionListener() {
@@ -127,6 +126,7 @@ public class RenderableContainerPanel extends JPanel {
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
         // addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
 
+        JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
         jspContainer.add(jsp, BorderLayout.SOUTH);
         add(jspContainer, gc);
