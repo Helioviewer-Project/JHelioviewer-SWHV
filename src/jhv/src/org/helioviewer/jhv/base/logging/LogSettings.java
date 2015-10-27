@@ -321,12 +321,12 @@ public class LogSettings {
     }
 
     /**
-     * Log files older than the maxium age (in days) are deleted when
+     * Log files older than the maximum age (in days) are deleted when
      * initializing the file logger
      * 
      * @return Number of days to keep log files
      */
-    public int getMaxiumLogFileAge(String logger) {
+    public int getMaximumLogFileAge(String logger) {
         if (settings == null) {
             return -1;
         }
@@ -334,12 +334,12 @@ public class LogSettings {
     }
 
     /**
-     * Log files older than the maxium age (in days) are deleted when
+     * Log files older than the maximum age (in days) are deleted when
      * initializing the file logger
      * 
      * @return Default number of days to keep log files
      */
-    public int getDefaultMaxiumLogFileAge(String logger) {
+    public int getDefaultMaximumLogFileAge(String logger) {
         if (defaultSettings == null) {
             return -1;
         }
@@ -347,13 +347,13 @@ public class LogSettings {
     }
 
     /**
-     * Log files older than the maxium age (in days) are deleted when
+     * Log files older than the maximum age (in days) are deleted when
      * initializing the file logger
      * 
      * @param days
      *            Number of days to keep log files before thay are deleted
      */
-    public void setMaxiumLogFileAge(String logger, int days) {
+    public void setMaximumLogFileAge(String logger, int days) {
         settings.setProperty("log4j.appender." + logger + ".Days", Integer.toString(days));
     }
 

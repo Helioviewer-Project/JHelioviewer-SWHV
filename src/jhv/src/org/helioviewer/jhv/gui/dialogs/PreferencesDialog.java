@@ -118,7 +118,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
                     if (debugFileCombo != null) {
                         debugFileCombo.setSelectedItem(logSettings.getDefaultLoggingLevel("file"));
-                        debugFileTextField.setText(Integer.toString(logSettings.getDefaultMaxiumLogFileAge("file")));
+                        debugFileTextField.setText(Integer.toString(logSettings.getDefaultMaximumLogFileAge("file")));
                     }
 
                     if (debugConsoleCombo != null) {
@@ -174,7 +174,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         LogSettings logSettings = LogSettings.getSingletonInstance();
         if (debugFileCombo != null) {
             debugFileCombo.setSelectedItem(logSettings.getLoggingLevel("file"));
-            debugFileTextField.setText(Integer.toString(logSettings.getMaxiumLogFileAge("file")));
+            debugFileTextField.setText(Integer.toString(logSettings.getMaximumLogFileAge("file")));
         }
         if (debugConsoleCombo != null) {
             debugConsoleCombo.setSelectedItem(logSettings.getLoggingLevel("console"));
@@ -197,7 +197,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         if (debugFileCombo != null) {
             Level level = (Level) debugFileCombo.getSelectedItem();
             logSettings.setLoggingLevel("file", level);
-            logSettings.setMaxiumLogFileAge(LogSettings.FILE_LOGGER, Integer.parseInt(debugFileTextField.getText()));
+            logSettings.setMaximumLogFileAge(LogSettings.FILE_LOGGER, Integer.parseInt(debugFileTextField.getText()));
         }
         if (debugConsoleCombo != null) {
             Level level = (Level) debugConsoleCombo.getSelectedItem();
@@ -262,7 +262,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         if (fileLoggingLevel != null) {
             row5.add(new JLabel("Delete log files after"));
             debugFileTextField = new JTextField(3);
-            debugFileTextField.setText(Integer.toString(logSettings.getMaxiumLogFileAge(LogSettings.FILE_LOGGER)));
+            debugFileTextField.setText(Integer.toString(logSettings.getMaximumLogFileAge(LogSettings.FILE_LOGGER)));
             row5.add(debugFileTextField);
             row5.add(new JLabel("days (enter 0 to keep all files)"));
             paramsPanel.add(row5);
