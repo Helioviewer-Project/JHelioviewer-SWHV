@@ -97,8 +97,12 @@ public class DownloadWorker implements Runnable {
         requestInterval = interval;
         this.swekSource = swekSource;
         this.eventType = eventType;
-        downloadStartDate = new Date(interval.getStart().getTime() - this.eventType.getRequestIntervalExtension());
-        downloadEndDate = new Date(interval.getEnd().getTime() + this.eventType.getRequestIntervalExtension());
+        // downloadStartDate = new Date(interval.getStart().getTime() -
+        // this.eventType.getRequestIntervalExtension());
+        // downloadEndDate = new Date(interval.getEnd().getTime() +
+        // this.eventType.getRequestIntervalExtension());
+        downloadStartDate = new Date(interval.getStart().getTime());
+        downloadEndDate = new Date(interval.getEnd().getTime());
         listeners = new ArrayList<DownloadWorkerListener>();
         sourceManager = SWEKSourceManager.getSingletonInstance();
         isFireForceStoppedCalled = false;
