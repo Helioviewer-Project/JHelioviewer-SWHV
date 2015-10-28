@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -13,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -22,6 +24,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -56,6 +59,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
     private final Settings settings = Settings.getSingletonInstance();
 
+    private final JButton acceptBtn;
+
     /**
      * The private constructor that sets the fields and the dialog.
      */
@@ -88,7 +93,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-        JButton acceptBtn = new JButton("Save");
+        acceptBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
         JButton resetBtn = new JButton("Reset");
 
@@ -141,7 +146,17 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         mainPanel.add(btnPanel, BorderLayout.SOUTH);
 
         getContentPane().add(mainPanel);
-        pack();
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelPressed();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+    }
+
+    private void cancelPressed() {
+        dispose();
     }
 
     /**
@@ -151,9 +166,11 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     public void showDialog() {
         loadSettings();
 
-        pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        getRootPane().setDefaultButton(acceptBtn);
+
+        pack();
         setVisible(true);
     }
 
