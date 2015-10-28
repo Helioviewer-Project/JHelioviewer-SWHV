@@ -19,12 +19,8 @@ public class EVECache {
     // //////////////////////////////////////////////////////////////////////////////
 
     private final HashMap<Integer, EVEDataOfDay> cacheMap = new HashMap<Integer, EVEDataOfDay>();
-    private final boolean logCache;
-    private static double DISCARD_LOG_LEVEL = 10e-50;
-
-    public EVECache(boolean logCache) {
-        this.logCache = logCache;
-    }
+    private static double DISCARD_LOG_LEVEL_LOW = 1e-10;
+    private static double DISCARD_LOG_LEVEL_HIGH = 1e+4;
 
     // //////////////////////////////////////////////////////////////////////////////
     // Methods
@@ -42,7 +38,7 @@ public class EVECache {
                 cache = new EVEDataOfDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 cacheMap.put(key, cache);
             }
-            if (!logCache || values[i] > DISCARD_LOG_LEVEL) {
+            if (values[i] > DISCARD_LOG_LEVEL_LOW && values[i] < DISCARD_LOG_LEVEL_HIGH) {
                 cache.setValue(calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE), values[i], dates[i]);
             }
         }

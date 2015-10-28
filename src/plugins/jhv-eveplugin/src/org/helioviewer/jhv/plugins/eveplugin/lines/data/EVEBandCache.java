@@ -25,7 +25,7 @@ public class EVEBandCache {
     public void add(Band band, float[] values, long[] dates) {
         EVECache cache = cacheMap.get(band);
         if (cache == null) {
-            cache = new EVECache(band.getBandType().isLogScale());
+            cache = new EVECache();
             cacheMap.put(band, cache);
         }
 
