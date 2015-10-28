@@ -48,12 +48,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     /** Map holding the download workers order by event type and date */
     private final Map<SWEKEventType, Map<Date, DownloadWorker>> dwMap;
 
-    /** Map with all the finished and busy downloads */
-    private final Map<SWEKEventType, Map<SWEKSupplier, Set<Date>>> busyAndFinishedJobs;
-
-    /** Map with all the finished and busy interval downloads */
-    private final Map<SWEKEventType, Map<SWEKSupplier, Map<Date, Set<Date>>>> busyAndFinishedIntervalJobs;
-
     /** Map holding the active event types and its sources */
     private final Map<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>> activeEventTypes;
 
@@ -81,8 +75,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
         activeEventTypes = new HashMap<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>>();
         requestManager = IncomingRequestManager.getSingletonInstance();
-        busyAndFinishedJobs = new HashMap<SWEKEventType, Map<SWEKSupplier, Set<Date>>>();
-        busyAndFinishedIntervalJobs = new HashMap<SWEKEventType, Map<SWEKSupplier, Map<Date, Set<Date>>>>();
         requestManager.addRequestManagerListener(this);
         eventContainer = JHVEventContainer.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
@@ -115,8 +107,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
                 dw.stopWorker();
             }
         }
-        removeFromBusyAndFinishedJobs(eventType);
-        removeFromBusyAndFinishedIntervalJobs(eventType);
+
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
             eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()), keepActive);
         }
@@ -139,8 +130,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
                 }
             }
         }
-        removeFromBusyAndFinishedJobs(eventType, supplier);
-        removeFromBusyAndFinishedIntervalJobs(eventType, supplier);
+
         eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
     }
 
@@ -153,7 +143,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     public void workerForcedToStop(DownloadWorker worker) {
         treeModel.setStopLoading(worker.getEventType(), worker);
         removeWorkerFromMap(worker);
-        removeFromBusyAndFinishedJobs(worker.getEventType(), worker.getSupplier(), worker.getDownloadStartDate());
         JHVEventContainer.getSingletonInstance().intervalsNotDownloaded(worker.getJHVEventType(), worker.getRequestInterval());
     }
 
@@ -202,61 +191,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     public void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter) {
         stopDownloadingEventType(swekEventType, true);
         downloadSelectedSuppliers(swekEventType);
-    }
-
-    /**
-     * Removes the event type from the busy and finished interval jobs.
-     *
-     * @param eventType
-     *            the event type to remove
-     */
-    private void removeFromBusyAndFinishedIntervalJobs(SWEKEventType eventType) {
-        busyAndFinishedIntervalJobs.remove(eventType);
-    }
-
-    /**
-     * Removes the event type from the busy and finished jobs.
-     *
-     * @param eventType
-     *            the event type to remove
-     */
-    private void removeFromBusyAndFinishedJobs(SWEKEventType eventType) {
-        busyAndFinishedJobs.remove(eventType);
-
-    }
-
-    /**
-     * Removes the source for a given event type from the busy and finished
-     * interval jobs.
-     *
-     * @param eventType
-     *            the event type to remove
-     * @param supplier
-     *            the supplier to remove the interval type for
-     */
-    private void removeFromBusyAndFinishedIntervalJobs(SWEKEventType eventType, SWEKSupplier supplier) {
-        if (busyAndFinishedIntervalJobs.containsKey(eventType)) {
-            Map<SWEKSupplier, Map<Date, Set<Date>>> datesPerSource = busyAndFinishedIntervalJobs.get(eventType);
-            datesPerSource.remove(supplier);
-            busyAndFinishedIntervalJobs.put(eventType, datesPerSource);
-        }
-    }
-
-    /**
-     * Removes the source for a given event type from the busy and finished
-     * jobs.
-     *
-     * @param eventType
-     *            the event type to remove
-     * @param supplier
-     *            the supplier to remove the interval type for
-     */
-    private void removeFromBusyAndFinishedJobs(SWEKEventType eventType, SWEKSupplier supplier) {
-        if (busyAndFinishedJobs.containsKey(eventType)) {
-            Map<SWEKSupplier, Set<Date>> datesPerSource = busyAndFinishedJobs.get(eventType);
-            datesPerSource.remove(supplier);
-            busyAndFinishedJobs.put(eventType, datesPerSource);
-        }
     }
 
     /**
@@ -363,52 +297,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     }
 
     /**
-     * Checks if a job is already busy or finished.
-     *
-     * @param eventType
-     *            the type that should be checked
-     * @param swekSupplier
-     *            the supplier that provides the event type
-     * @param interval
-     *            the interval that should be checked
-     * @return true if the combination was found, false if not.
-     */
-    private boolean inBusyAndFinishedIntervalJobs(SWEKEventType eventType, SWEKSupplier swekSupplier, Interval<Date> interval) {
-        Map<SWEKSupplier, Map<Date, Set<Date>>> suppliersAndDatesForEvent = busyAndFinishedIntervalJobs.get(eventType);
-        if (suppliersAndDatesForEvent != null) {
-            Map<Date, Set<Date>> datesForEventTypeAndSource = suppliersAndDatesForEvent.get(swekSupplier);
-            if (datesForEventTypeAndSource != null) {
-                Set<Date> endDatesForStartDate = datesForEventTypeAndSource.get(interval.getStart());
-                if (endDatesForStartDate != null) {
-                    return endDatesForStartDate.contains(interval.getEnd());
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Removes the combination of event type, source and date from the busy and
-     * finished jobs.
-     *
-     * @param eventType
-     *            the event type to remove
-     * @param supplier
-     *            the supplier to remove
-     * @param date
-     *            the date to remove
-     */
-    private void removeFromBusyAndFinishedJobs(SWEKEventType eventType, SWEKSupplier supplier, Date date) {
-        Map<SWEKSupplier, Set<Date>> sourcesAndDatesForEvent = busyAndFinishedJobs.get(eventType);
-        if (sourcesAndDatesForEvent != null) {
-            Set<Date> datesForEventAndSource = sourcesAndDatesForEvent.get(supplier);
-            if (datesForEventAndSource != null) {
-                datesForEventAndSource.remove(date);
-            }
-        }
-    }
-
-    /**
      * Defines the parameters based on filters and provider.
      *
      * @param eventType
@@ -442,41 +330,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
         List<SWEKParam> params = defineParameters(eventType, swekSource, supplier);
         DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, interval, params, configInstance.getSWEKRelatedEvents());
-        if (!inBusyAndFinishedIntervalJobs(eventType, supplier, interval)) {
-            dw.addDownloadWorkerListener(this);
-            addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
-            addToBusyAndFinishedIntervalJobs(eventType, supplier, interval);
-            downloadEventPool.execute(dw);
-        }
-    }
-
-    /**
-     * Adds event type, source, interval to busy and finished jobs.
-     *
-     * @param eventType
-     *            the event type to add
-     * @param swekSource
-     *            the source to add
-     * @param interval
-     *            the interval to add
-     */
-    private void addToBusyAndFinishedIntervalJobs(SWEKEventType eventType, SWEKSupplier supplier, Interval<Date> interval) {
-        Map<SWEKSupplier, Map<Date, Set<Date>>> sourcesForEventType = new HashMap<SWEKSupplier, Map<Date, Set<Date>>>();
-        Map<Date, Set<Date>> datesPerSource = new HashMap<Date, Set<Date>>();
-        Set<Date> endDate = new HashSet<Date>();
-        if (busyAndFinishedIntervalJobs.containsKey(eventType)) {
-            sourcesForEventType = busyAndFinishedIntervalJobs.get(eventType);
-            if (sourcesForEventType.containsKey(supplier)) {
-                datesPerSource = sourcesForEventType.get(supplier);
-                if (datesPerSource.containsKey(interval.getStart())) {
-                    endDate = datesPerSource.get(interval.getStart());
-                }
-            }
-        }
-        endDate.add(interval.getEnd());
-        datesPerSource.put(interval.getStart(), endDate);
-        sourcesForEventType.put(supplier, datesPerSource);
-        busyAndFinishedIntervalJobs.put(eventType, sourcesForEventType);
+        dw.addDownloadWorkerListener(this);
+        addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
+        downloadEventPool.execute(dw);
     }
 
     /**
