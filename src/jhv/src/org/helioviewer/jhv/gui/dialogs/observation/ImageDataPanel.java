@@ -613,10 +613,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                 }
             });
             String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-            if (datasourcesPath.contains("ias")) {
-                comboServer.setSelectedItem(serverList[2]);
-            } else if (datasourcesPath.contains("helioviewer")) {
+            if (datasourcesPath.contains("ias.u-psud.fr")) {
                 comboServer.setSelectedItem(serverList[1]);
+            } else if (datasourcesPath.contains("helioviewer.org")) {
+                comboServer.setSelectedItem(serverList[2]);
             } else {
                 comboServer.setSelectedItem(serverList[0]);
             }
