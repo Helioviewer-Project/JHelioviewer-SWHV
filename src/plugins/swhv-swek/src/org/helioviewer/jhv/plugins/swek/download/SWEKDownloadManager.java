@@ -86,7 +86,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         treeModel = SWEKTreeModel.getSingletonInstance();
         priorityQueue = new PriorityBlockingQueue<Runnable>(2048, new ComparePriority());
         int numOfThread = Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads"));
-        downloadEventPool = new ThreadPoolExecutor(0, numOfThread, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
+        downloadEventPool = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
     }
 
     /**
