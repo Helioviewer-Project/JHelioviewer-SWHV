@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -13,6 +12,7 @@ import kdu_jni.Jp2_family_src;
 import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
+import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
@@ -39,7 +39,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
-import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -63,14 +63,7 @@ public class JP2Image {
 
     /** This is the object in which all transmitted data is stored */
     private JHV_Kdu_cache cache;
-
-    /**
-     * Jp2_family_src can open any file conforming to the jp2 specifications (.jp2, .jpx, .mj2, etc).
-     */
-    private Jp2_family_src familySrc = new Jp2_family_src();
-
-    /** The Jpx_source object is capable of opening jp2 and jpx sources. */
-    protected Jpx_source jpxSrc = new Jpx_source();
+    private Kdu_cache cacheRender;
 
     /** The number of composition layers for the image. */
     private int frameCount;
@@ -140,17 +133,26 @@ public class JP2Image {
         isJpx = name.endsWith(".JPX");
 
         String scheme = uri.getScheme().toUpperCase();
-        if (scheme.equals("JPIP"))
+        if (scheme.equals("JPIP")) {
+            cache = new JHV_Kdu_cache();
+            cacheRender = new JHV_Kdu_cache();
+            cacheRender.Attach_to(cache);
+            // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
             initRemote();
-        else if (scheme.equals("FILE"))
-            initLocal();
-        else
+        } else if (scheme.equals("FILE")) {
+            // nothing
+        } else
             throw new JHV_KduException(scheme + " scheme not supported!");
 
-        createKakaduMachinery();
+        KakaduEngine kdu = new KakaduEngine(cache, uri, null);
+
+        createKakaduMachinery(kdu.getJpxSource(), kdu.getCompositor());
+        configureLUT(kdu.getJpxSource());
 
         metaDataList = new MetaData[frameCount];
-        KakaduUtils.cacheMetaData(familySrc, metaDataList);
+        KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
+
+        kdu.destroy();
     }
 
     /**
@@ -166,11 +168,8 @@ public class JP2Image {
         socket = new JPIPSocket();
 
         try {
-            // Connect to the JPIP server
+            // Connect to the JPIP server and add the first response to cache
             res = (JPIPResponse) socket.connect(uri);
-            // Create the cache object and add the first response to it
-            cache = new JHV_Kdu_cache();
-            // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
             cache.addJPIPResponseData(res, null);
 
             // Download the necessary initial data
@@ -189,15 +188,10 @@ public class JP2Image {
                     socket.connect(uri);
                 }
             } while (!initialDataLoaded && numTries < 5);
-
-            familySrc.Open(cache);
-
         } catch (SocketTimeoutException e) {
             throw new JHV_KduException("Timeout while communicating with the server:" + System.getProperty("line.separator") + e.getMessage(), e);
         } catch (IOException e) {
             throw new JHV_KduException("Error in the server communication:" + System.getProperty("line.separator") + e.getMessage(), e);
-        } catch (KduException e) {
-            throw new JHV_KduException("Kakadu engine error opening the image", e);
         } finally {
             Timer timer = new Timer("WaitForCloseSocket");
             timer.schedule(new TimerTask() {
@@ -216,25 +210,7 @@ public class JP2Image {
         }
     }
 
-    /**
-     * Initializes the Jp2_family_src for a local file.
-     *
-     * @throws JHV_KduException
-     * @throws IOException
-     */
-    private void initLocal() throws JHV_KduException, IOException {
-        // Source is local so it must be a file
-        File file = new File(uri);
-
-        // Open the family source
-        try {
-            familySrc.Open(file.getCanonicalPath(), true);
-        } catch (KduException ex) {
-            throw new JHV_KduException("Failed to open familySrc", ex);
-        }
-    }
-
-    private void configureLUT() throws KduException {
+    private void configureLUT(Jpx_source jpxSrc) throws KduException {
         Jpx_codestream_source stream = jpxSrc.Access_codestream(0);
         if (!stream.Exists()) {
             throw new KduException(">> stream doesn't exist");
@@ -266,14 +242,8 @@ public class JP2Image {
      *
      * @throws JHV_KduException
      */
-    private void createKakaduMachinery() throws JHV_KduException {
+    private void createKakaduMachinery(Jpx_source jpxSrc, Kdu_region_compositor compositor) throws JHV_KduException {
         try {
-            // Open the jpx source from the family source
-            jpxSrc.Open(familySrc, false);
-
-            Kdu_region_compositor compositor = new Kdu_region_compositor();
-            compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-
             // I create references here so the GC doesn't try to collect the
             // Kdu_dims obj
             Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
@@ -323,9 +293,6 @@ public class JP2Image {
             updateResolutionSet(compositor, 0);
             // Remove the layer that was added
             compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-            compositor.Native_destroy();
-
-            configureLUT();
         } catch (KduException ex) {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
@@ -334,38 +301,21 @@ public class JP2Image {
         }
     }
 
-    private Kdu_region_compositor compositorRender;
+    private KakaduEngine kduRender;
 
-    Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException {
-        if (compositorRender == null) {
+    Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException, IOException {
+        if (kduRender == null) {
             Thread.currentThread().setName("Render " + getName(0));
-            compositorRender = createCompositor(jpxSrc, threadEnv);
+            kduRender = new KakaduEngine(cacheRender, uri, threadEnv);
         }
-        return compositorRender;
-    }
-
-    private Kdu_region_compositor createCompositor(Jpx_source jpxSrc, Kdu_thread_env threadEnv) throws KduException {
-        Kdu_region_compositor compositor = new Kdu_region_compositor();
-        // System.out.println(">>>> compositor create " + compositor);
-        compositor.Create(jpxSrc, KakaduConstants.CODESTREAM_CACHE_THRESHOLD);
-        compositor.Set_surface_initialization_mode(false);
-        compositor.Set_thread_env(threadEnv, null);
-        return compositor;
+        return kduRender.getCompositor();
     }
 
     void destroyCompositor() throws KduException {
-        if (compositorRender != null) {
-            destroyCompositor(compositorRender);
-            compositorRender = null;
+        if (kduRender != null) {
+            kduRender.destroy();
+            kduRender = null;
         }
-    }
-
-    private void destroyCompositor(Kdu_region_compositor compositor) throws KduException {
-        // System.out.println(">>>> compositor destroy " + compositor);
-        compositor.Halt_processing();
-        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-        compositor.Set_thread_env(null, null);
-        compositor.Native_destroy();
     }
 
     protected void startReader(JP2View view) {
@@ -527,24 +477,19 @@ public class JP2Image {
         try {
             destroyCompositor();
 
-            if (jpxSrc != null) {
-                jpxSrc.Close();
-                jpxSrc.Native_destroy();
-            }
-            if (familySrc != null) {
-                familySrc.Close();
-                familySrc.Native_destroy();
-            }
             if (cache != null) {
                 cache.Close();
                 cache.Native_destroy();
             }
+            if (cacheRender != null) {
+                cacheRender.Close();
+                cacheRender.Native_destroy();
+            }
         } catch (KduException ex) {
             ex.printStackTrace();
         } finally {
-            jpxSrc = null;
-            familySrc = null;
             cache = null;
+            cacheRender = null;
         }
     }
 
@@ -631,12 +576,18 @@ public class JP2Image {
         return null;
     }
 
+    // very slow
     public String getXML(int boxNumber) {
         String xml = null;
-
         try {
-            xml = KakaduUtils.getXml(familySrc, boxNumber);
-        } catch (JHV_KduException e) {
+            if (kduRender != null) {
+                xml = KakaduUtils.getXml(kduRender.getFamilySrc(), boxNumber);
+            } else {
+                KakaduEngine kduTmp = new KakaduEngine(cache, uri, null);
+                xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
+                kduTmp.destroy();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return xml;

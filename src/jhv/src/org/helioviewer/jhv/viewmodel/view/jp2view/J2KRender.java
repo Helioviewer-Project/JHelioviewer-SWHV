@@ -159,7 +159,7 @@ class J2KRender implements Runnable {
     public void run() {
         try {
             renderLayer(parentImageRef.getCompositor(threadEnv.get()));
-        } catch (KduException e) {
+        } catch (Exception e) {
             // reboot the compositor
             try {
                 parentImageRef.destroyCompositor();

@@ -340,7 +340,7 @@ public class JP2View extends AbstractView {
         signalRender(jp2Image, true);
     }
 
-    void signalRender(JP2Image jp2Image, boolean fromReader) {
+    protected void signalRender(JP2Image jp2Image, boolean fromReader) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;
