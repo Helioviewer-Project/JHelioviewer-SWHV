@@ -390,7 +390,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return "SWEK events";
+        return "SWEK Events";
     }
 
     @Override

@@ -650,7 +650,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticPlayPauseAction extends AbstractAction implements ActionListener {
 
         public StaticPlayPauseAction() {
-            super("Play/Pause movie");
+            super("Play/Pause Movie");
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_MASK));
         }
@@ -676,7 +676,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticPreviousFrameAction extends AbstractAction implements ActionListener {
 
         public StaticPreviousFrameAction() {
-            super("Step to previous frame");
+            super("Step to Previous Frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.ALT_MASK));
         }
@@ -701,7 +701,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     public static class StaticNextFrameAction extends AbstractAction implements ActionListener {
 
         public StaticNextFrameAction() {
-            super("Step to next frame");
+            super("Step to Next Frame");
             putValue(MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.ALT_MASK));
         }

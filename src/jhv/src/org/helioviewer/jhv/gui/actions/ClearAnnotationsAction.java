@@ -16,7 +16,7 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 public class ClearAnnotationsAction extends AbstractAction {
 
     public ClearAnnotationsAction(boolean small, boolean useIcon) {
-        super("Clear annotations", useIcon ? (IconBank.getIcon(JHVIcon.RESET)) : null);
+        super("Clear Annotations", useIcon ? (IconBank.getIcon(JHVIcon.RESET)) : null);
         putValue(SHORT_DESCRIPTION, "Clear any annotation");
     }
 

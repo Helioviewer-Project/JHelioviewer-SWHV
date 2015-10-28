@@ -61,7 +61,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * */
     private void initVisualComponents() {
         // set dialog settings
-        setTitle("Add layer");
+        setTitle("New Layer");
         setContentPane(contentPane);
 
         // set basic layout
