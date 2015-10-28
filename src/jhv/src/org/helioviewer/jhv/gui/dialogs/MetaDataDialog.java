@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +17,7 @@ import java.io.InputStream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -23,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -59,7 +62,9 @@ import org.w3c.dom.NodeList;
  */
 @SuppressWarnings("serial")
 public class MetaDataDialog extends JDialog implements ActionListener, ShowableDialog {
+
     private static class LocalTableModel extends DefaultTableModel {
+
         public LocalTableModel(Object[][] object, Object[] objects) {
             super(object, objects);
         }
@@ -126,6 +131,13 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
         exportFitsButton.addActionListener(this);
 
         setMetaData(view);
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closePressed();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public void prepareList(JList l) {
@@ -185,14 +197,22 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
      */
     @Override
     public void showDialog() {
-        pack();
         if (!metaDataOK)
             setSize(450, 200);
         else
             setSize(450, 600);
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+        getRootPane().setDefaultButton(closeButton);
+
+        pack();
         setVisible(true);
+    }
+
+    private void closePressed() {
+        xmlDoc = null;
+        resetData();
+        dispose();
     }
 
     /**
@@ -201,10 +221,7 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
     @Override
     public void actionPerformed(ActionEvent _a) {
         if (_a.getSource() == closeButton) {
-            xmlDoc = null;
-            resetData();
-            dispose();
-
+            closePressed();
         } else if (_a.getSource() == exportFitsButton) {
             DOMSource source = new DOMSource(xmlDoc.getDocumentElement().getElementsByTagName("fits").item(0));
 

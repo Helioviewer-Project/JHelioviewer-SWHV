@@ -133,7 +133,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
         if (name != null) {
             selectedPane = uiMap.get(name);
-
             if (selectedPane != null) {
                 selectedPane.selected();
             }
