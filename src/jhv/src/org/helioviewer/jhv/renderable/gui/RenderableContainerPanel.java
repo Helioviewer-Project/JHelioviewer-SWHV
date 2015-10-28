@@ -100,7 +100,7 @@ public class RenderableContainerPanel extends JPanel {
         jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS + 1));
         jsp.getViewport().setBackground(Color.WHITE);
 
-        JButton addLayerButton = new JButton("New layer", IconBank.getIcon(JHVIcon.ADD));
+        JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

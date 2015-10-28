@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 public class ToggleFullscreenAction extends AbstractAction {
 
     public ToggleFullscreenAction() {
-        super("Toggle fullscreen");
+        super("Toggle Fullscreen");
         putValue(SHORT_DESCRIPTION, "Toggle fullscreen");
         putValue(MNEMONIC_KEY, KeyEvent.VK_T);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.ALT_MASK));

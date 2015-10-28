@@ -64,7 +64,7 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
 
     @Override
     public String getName() {
-        return "PFSS model";
+        return "PFSS Model";
     }
 
     private String datetime = null;
