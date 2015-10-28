@@ -119,7 +119,7 @@ public class JP2Image {
      * @throws IOException
      * @throws JHV_KduException
      */
-    public JP2Image(URI newUri, URI downloadURI) throws IOException, JHV_KduException, Exception {
+    public JP2Image(URI newUri, URI downloadURI) throws Exception {
         uri = newUri;
         this.downloadURI = downloadURI;
         String name = uri.getPath().toUpperCase();
@@ -132,27 +132,32 @@ public class JP2Image {
 
         isJpx = name.endsWith(".JPX");
 
-        String scheme = uri.getScheme().toUpperCase();
-        if (scheme.equals("JPIP")) {
-            cache = new JHV_Kdu_cache();
-            cacheRender = new JHV_Kdu_cache();
-            cacheRender.Attach_to(cache);
-            // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-            initRemote();
-        } else if (scheme.equals("FILE")) {
-            // nothing
-        } else
-            throw new JHV_KduException(scheme + " scheme not supported!");
+        try {
+            String scheme = uri.getScheme().toUpperCase();
+            if (scheme.equals("JPIP")) {
+                cache = new JHV_Kdu_cache();
+                cacheRender = new JHV_Kdu_cache();
+                cacheRender.Attach_to(cache);
+                // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
+                initRemote();
+            } else if (scheme.equals("FILE")) {
+                // nothing
+            } else
+                throw new JHV_KduException(scheme + " scheme not supported!");
 
-        KakaduEngine kdu = new KakaduEngine(cache, uri, null);
+            KakaduEngine kdu = new KakaduEngine(cache, uri, null);
 
-        createKakaduMachinery(kdu.getJpxSource(), kdu.getCompositor());
-        configureLUT(kdu.getJpxSource());
+            createKakaduMachinery(kdu.getJpxSource(), kdu.getCompositor());
+            configureLUT(kdu.getJpxSource());
 
-        metaDataList = new MetaData[frameCount];
-        KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
+            metaDataList = new MetaData[frameCount];
+            KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
 
-        kdu.destroy();
+            kdu.destroy();
+        } catch (KduException ex) {
+            ex.printStackTrace();
+            throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -242,63 +247,54 @@ public class JP2Image {
      *
      * @throws JHV_KduException
      */
-    private void createKakaduMachinery(Jpx_source jpxSrc, Kdu_region_compositor compositor) throws JHV_KduException {
-        try {
-            // I create references here so the GC doesn't try to collect the
-            // Kdu_dims obj
-            Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
+    private void createKakaduMachinery(Jpx_source jpxSrc, Kdu_region_compositor compositor) throws KduException {
+        // I create references here so the GC doesn't try to collect the
+        // Kdu_dims obj
+        Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
 
-            // A layer must be added to determine the image parameters
-            compositor.Add_ilayer(0, ref1, ref2);
-
+        // A layer must be added to determine the image parameters
+        compositor.Add_ilayer(0, ref1, ref2);
+        {
+            // Retrieve the number of composition layers
             {
-                // Retrieve the number of composition layers
-                {
-                    int[] tempVar = new int[1];
-                    jpxSrc.Count_compositing_layers(tempVar);
-                    frameCount = tempVar[0];
-                }
-
-                Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
-                if (!stream.Exists()) {
-                    throw new KduException(">> stream doesn't exist");
-                }
-
-                // Retrieve the number of components
-                {
-                    // Since it gets tricky here I am just grabbing a bunch of
-                    // values
-                    // and taking the max of them. It is acceptable to think
-                    // that an
-                    // image is color when its not monochromatic, but not the
-                    // other way
-                    // around... so this is just playing it safe.
-                    Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-                    cmap.Configure(stream);
-
-                    int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-
-                    // numComponents = maxComponents == 1 ? 1 : 3;
-                    numComponents = maxComponents; // With new file formats we
-                    // may have 2 components
-
-                    cmap.Clear();
-                    cmap.Native_destroy();
-                    cmap = null;
-                }
-                // Cleanup
-                stream = null;
+                int[] tempVar = new int[1];
+                jpxSrc.Count_compositing_layers(tempVar);
+                frameCount = tempVar[0];
             }
 
-            updateResolutionSet(compositor, 0);
-            // Remove the layer that was added
-            compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-        } catch (KduException ex) {
-            ex.printStackTrace();
-            throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
+            if (!stream.Exists()) {
+                throw new KduException(">> stream doesn't exist");
+            }
+
+            // Retrieve the number of components
+            {
+                // Since it gets tricky here I am just grabbing a bunch of
+                // values
+                // and taking the max of them. It is acceptable to think
+                // that an
+                // image is color when its not monochromatic, but not the
+                // other way
+                // around... so this is just playing it safe.
+                Kdu_channel_mapping cmap = new Kdu_channel_mapping();
+                cmap.Configure(stream);
+
+                int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
+
+                // numComponents = maxComponents == 1 ? 1 : 3;
+                numComponents = maxComponents; // With new file formats we
+                // may have 2 components
+
+                cmap.Clear();
+                cmap.Native_destroy();
+                cmap = null;
+            }
+            // Cleanup
+            stream = null;
         }
+        updateResolutionSet(compositor, 0);
+        // Remove the layer that was added
+        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
     }
 
     private KakaduEngine kduRender;
@@ -311,7 +307,7 @@ public class JP2Image {
         return kduRender.getCompositor();
     }
 
-    void destroyCompositor() throws KduException {
+    void destroyEngine() throws KduException {
         if (kduRender != null) {
             kduRender.destroy();
             kduRender = null;
@@ -475,7 +471,7 @@ public class JP2Image {
         APIResponseDump.getSingletonInstance().removeResponse(uri);
 
         try {
-            destroyCompositor();
+            destroyEngine();
 
             if (cache != null) {
                 cache.Close();
