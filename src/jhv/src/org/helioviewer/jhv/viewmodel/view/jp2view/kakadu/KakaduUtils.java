@@ -393,7 +393,7 @@ public class KakaduUtils {
         return true;
     }
 
-    public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws JHV_KduException, Exception {
+    public static void cacheMetaData(Jp2_family_src src, MetaData[] metaDataList) throws Exception {
         XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
         int num = metaDataList.length;
 
