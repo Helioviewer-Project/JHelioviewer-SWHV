@@ -35,6 +35,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.observation.ServerListPanel;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
@@ -238,6 +239,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         paramsPanel.setBorder(BorderFactory.createTitledBorder(" Configuration "));
         paramsPanel.setLayout(new GridLayout(0, 1));
 
+        JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        row_1.add(new ServerListPanel("Default server"));
+        paramsPanel.add(row_1);
+
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row0.add(new JLabel("At start-up"));
 
@@ -313,16 +318,17 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());
-            setPreferredSize(new Dimension(150, 180));
+            // setPreferredSize(new Dimension(150, 180));
 
             Settings settings = Settings.getSingletonInstance();
 
-            tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") }, { "Default local path", settings.getProperty("default.local.path") }, { "Default remote path", settings.getProperty("default.remote.path") } };
+            tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") },
+                                         { "Default local path", settings.getProperty("default.local.path") } };
 
             table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return ((row == 2) && (column == 1));
+                    return false;
                 }
             });
 
@@ -361,7 +367,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
             model.setValueAt(settings.getProperty("default.save.path"), 0, 1);
             model.setValueAt(settings.getProperty("default.local.path"), 1, 1);
-            model.setValueAt(settings.getProperty("default.remote.path"), 2, 1);
         }
 
         public void saveSettings() {
@@ -369,14 +374,12 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             Settings settings = Settings.getSingletonInstance();
             settings.setProperty("default.save.path", model.getValueAt(0, 1).toString());
             settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
-            settings.setProperty("default.remote.path", model.getValueAt(2, 1).toString());
         }
 
         public void resetSettings() {
             TableModel model = table.getModel();
             model.setValueAt(JHVDirectory.EXPORTS.getPath(), 0, 1);
             model.setValueAt(JHVDirectory.HOME.getPath(), 1, 1);
-            model.setValueAt("jpip://swhv.oma.be:8090", 2, 1);
         }
     }
 
