@@ -62,7 +62,7 @@ public class JP2Image {
     private final URI downloadURI;
 
     /** This is the object in which all transmitted data is stored */
-    private JHV_Kdu_cache cache;
+    private JHV_Kdu_cache cacheReader;
     private Kdu_cache cacheRender;
 
     /** The number of composition layers for the image. */
@@ -119,33 +119,34 @@ public class JP2Image {
      * @throws IOException
      * @throws JHV_KduException
      */
-    public JP2Image(URI newUri, URI downloadURI) throws Exception {
-        uri = newUri;
-        this.downloadURI = downloadURI;
+    public JP2Image(URI _uri, URI _downloadURI) throws Exception {
+        uri = _uri;
+        downloadURI = _downloadURI;
+
         String name = uri.getPath().toUpperCase();
         boolean supported = false;
         for (String ext : SUPPORTED_EXTENSIONS)
             if (name.endsWith(ext))
                 supported = true;
         if (!supported)
-            throw new JHV_KduException("File extension not supported.");
+            throw new JHV_KduException("File extension not supported");
 
         isJpx = name.endsWith(".JPX");
 
         try {
             String scheme = uri.getScheme().toUpperCase();
             if (scheme.equals("JPIP")) {
-                cache = new JHV_Kdu_cache();
-                cacheRender = new JHV_Kdu_cache();
-                cacheRender.Attach_to(cache);
+                cacheReader = new JHV_Kdu_cache();
+                cacheRender = new Kdu_cache();
+                cacheRender.Attach_to(cacheReader);
                 // cache.Set_preferred_memory_limit(60 * 1024 * 1024);
-                initRemote();
+                initRemote(cacheReader);
             } else if (scheme.equals("FILE")) {
                 // nothing
             } else
                 throw new JHV_KduException(scheme + " scheme not supported!");
 
-            KakaduEngine kdu = new KakaduEngine(cache, uri, null);
+            KakaduEngine kdu = new KakaduEngine(cacheReader, uri, null);
 
             createKakaduMachinery(kdu.getJpxSource(), kdu.getCompositor());
             configureLUT(kdu.getJpxSource());
@@ -167,7 +168,7 @@ public class JP2Image {
      * @throws JHV_KduException
      * @throws IOException
      */
-    private void initRemote() throws JHV_KduException {
+    private void initRemote(JHV_Kdu_cache cache) throws JHV_KduException {
         // Create the JPIP-socket necessary for communications
         JPIPResponse res;
         socket = new JPIPSocket();
@@ -315,7 +316,7 @@ public class JP2Image {
     }
 
     protected void startReader(JP2View view) {
-        if (cache != null) { // remote
+        if (cacheReader != null) { // remote
             imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
             try {
                 reader = new J2KReader(view, this);
@@ -473,19 +474,19 @@ public class JP2Image {
         try {
             destroyEngine();
 
-            if (cache != null) {
-                cache.Close();
-                cache.Native_destroy();
-            }
             if (cacheRender != null) {
                 cacheRender.Close();
                 cacheRender.Native_destroy();
             }
+            if (cacheReader != null) {
+                cacheReader.Close();
+                cacheReader.Native_destroy();
+            }
         } catch (KduException ex) {
             ex.printStackTrace();
         } finally {
-            cache = null;
             cacheRender = null;
+            cacheReader = null;
         }
     }
 
@@ -549,7 +550,7 @@ public class JP2Image {
 
     // Returns the cache reference
     protected JHV_Kdu_cache getCacheRef() {
-        return cache;
+        return cacheReader;
     }
 
     protected ImageCacheStatus getImageCacheStatus() {
@@ -579,7 +580,7 @@ public class JP2Image {
             if (kduRender != null) {
                 xml = KakaduUtils.getXml(kduRender.getFamilySrc(), boxNumber);
             } else {
-                KakaduEngine kduTmp = new KakaduEngine(cache, uri, null);
+                KakaduEngine kduTmp = new KakaduEngine(cacheRender, uri, null);
                 xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
                 kduTmp.destroy();
             }
