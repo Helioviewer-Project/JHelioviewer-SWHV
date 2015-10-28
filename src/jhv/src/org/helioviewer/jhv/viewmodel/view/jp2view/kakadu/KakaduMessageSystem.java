@@ -9,7 +9,7 @@ import kdu_jni.Kdu_message_formatter;
  * 
  * @author caplins
  */
-public class KakaduEngine {
+public class KakaduMessageSystem {
 
     /**
      * Static instances of KduSysMessage for both errors and warnings. Although
