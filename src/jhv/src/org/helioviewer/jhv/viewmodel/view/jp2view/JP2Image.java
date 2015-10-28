@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import kdu_jni.Jp2_palette;
-import kdu_jni.Jp2_threadsafe_family_src;
+import kdu_jni.Jp2_family_src;
 import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -65,12 +65,9 @@ public class JP2Image {
     private JHV_Kdu_cache cache;
 
     /**
-     * This extended version of Jp2_threadsafe_family_src can open any file
-     * conforming to the jp2 specifications (.jp2, .jpx, .mj2, etc). The reason
-     * for extending this class is that the Acquire/Release_lock() functions
-     * needed to be implemented.
+     * Jp2_family_src can open any file conforming to the jp2 specifications (.jp2, .jpx, .mj2, etc).
      */
-    private Jp2_threadsafe_family_src familySrc = new Jp2_threadsafe_family_src();
+    private Jp2_family_src familySrc = new Jp2_family_src();
 
     /** The Jpx_source object is capable of opening jp2 and jpx sources. */
     protected Jpx_source jpxSrc = new Jpx_source();
@@ -157,7 +154,7 @@ public class JP2Image {
     }
 
     /**
-     * Initializes the Jp2_threadsafe_family_src for a remote file. (JPIP comms
+     * Initializes the Jp2_family_src for a remote file. (JPIP comms
      * happen here).
      *
      * @throws JHV_KduException
@@ -220,7 +217,7 @@ public class JP2Image {
     }
 
     /**
-     * Initializes the Jp2_threadsafe_family_src for a local file.
+     * Initializes the Jp2_family_src for a local file.
      *
      * @throws JHV_KduException
      * @throws IOException

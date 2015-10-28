@@ -270,7 +270,7 @@ public class JP2View extends AbstractView {
         long delta = currentTime - frameCountStart;
 
         if (delta > 1000) {
-            frameRate = 1000.f * frameCount / delta;
+            frameRate = 1000 * frameCount / (float) delta;
             frameCount = 0;
             frameCountStart = currentTime;
         }
