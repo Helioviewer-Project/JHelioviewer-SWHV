@@ -171,7 +171,8 @@ public class JP2View extends AbstractView {
     private JP2ImageParameter oldImageViewParams;
 
     // Recalculates the image parameters used within the jp2-package
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber) {
+    // Reader signals only for CURRENTFRAME*
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.updateROI(camera, masterTime, m);
@@ -207,7 +208,7 @@ public class JP2View extends AbstractView {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
         JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
-        if (jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
+        if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
             Displayer.display();
             return null;
         }
@@ -299,7 +300,7 @@ public class JP2View extends AbstractView {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-                _jp2Image.signalReader(calculateParameter(_jp2Image, masterTime, frame)); // wake up reader
+                _jp2Image.signalReader(calculateParameter(_jp2Image, masterTime, frame, false)); // wake up reader
                 return;
             }
 
@@ -332,19 +333,19 @@ public class JP2View extends AbstractView {
 
     @Override
     public void render() {
-        signalRender(_jp2Image);
+        signalRender(_jp2Image, false);
     }
 
     void signalRenderFromReader(JP2Image jp2Image) {
-        signalRender(jp2Image);
+        signalRender(jp2Image, true);
     }
 
-    void signalRender(JP2Image jp2Image) {
+    void signalRender(JP2Image jp2Image, boolean fromReader) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame, fromReader);
         if (imageViewParams == null)
             return;
 

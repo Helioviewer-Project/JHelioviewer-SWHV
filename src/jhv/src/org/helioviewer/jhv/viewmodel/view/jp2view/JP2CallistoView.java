@@ -25,7 +25,7 @@ public class JP2CallistoView extends JP2View {
 
     public boolean setRegion(Region r) {
         region = r;
-        signalRender(_jp2Image);
+        signalRender(_jp2Image, false);
         return true;
     }
 
@@ -42,7 +42,7 @@ public class JP2CallistoView extends JP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
         double rWidth = region.getWidth();
         double rHeight = region.getHeight();
 
