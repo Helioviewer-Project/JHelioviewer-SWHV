@@ -335,12 +335,12 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
         List<SWEKParam> params = defineParameters(eventType, swekSource, supplier);
-        // for (Interval<Date> intt : Interval.splitInterval(interval, 7)) {
-        DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, interval, params, configInstance.getSWEKRelatedEvents());
-        dw.addDownloadWorkerListener(this);
-        addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
-        downloadEventPool.execute(dw);
-        // }
+        for (Interval<Date> intt : Interval.splitInterval(interval, 14)) {
+            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
+            dw.addDownloadWorkerListener(this);
+            addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
+            downloadEventPool.execute(dw);
+        }
 
     }
 
