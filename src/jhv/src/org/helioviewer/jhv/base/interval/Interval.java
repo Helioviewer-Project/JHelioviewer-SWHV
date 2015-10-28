@@ -1,5 +1,9 @@
 package org.helioviewer.jhv.base.interval;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -7,10 +11,10 @@ import java.util.Vector;
  * A generic Interval class, used for any type of ranges. Different types of
  * functions are provided, allowing to use this class for open, closed and
  * half-closed intervals.
- * 
+ *
  * @author Malte Nuhn
  * @author Stephan Pagel
- * 
+ *
  */
 public class Interval<TimeFormat extends Comparable<TimeFormat>> implements IntervalComparison<TimeFormat> {
 
@@ -27,7 +31,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * Copyconstructor. Does not deepcopy the start and end fields of the given
      * interval.
-     * 
+     *
      * @param other
      *            - the interval that forms the blueprint of the interval to be
      *            created
@@ -40,7 +44,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * Construct a new Interval with the start and end time given. No checks are
      * performed on the given data.
-     * 
+     *
      * @param start
      *            - Start of the interval
      * @param end
@@ -53,7 +57,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
 
     /**
      * Get the beginning of the interval.
-     * 
+     *
      * @return the interval's start timestamp
      */
     public TimeFormat getStart() {
@@ -62,7 +66,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
 
     /**
      * Get the end of the interval.
-     * 
+     *
      * @return the interval's end timestamp
      */
     public TimeFormat getEnd() {
@@ -71,7 +75,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
 
     /**
      * Set the beginning of the interval.
-     * 
+     *
      * @param start
      */
     public void setStart(TimeFormat start) {
@@ -80,7 +84,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
 
     /**
      * Set the end of the interval.
-     * 
+     *
      * @param end
      */
     public void setEnd(TimeFormat end) {
@@ -90,6 +94,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#contains
      */
+    @Override
     public boolean contains(Interval<TimeFormat> other) {
         return this.containsPoint(other.start) && this.containsPoint(other.end);
     }
@@ -97,6 +102,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsFully
      */
+    @Override
     public boolean containsFully(Interval<TimeFormat> other) {
         return this.containsPointFully(other.start) && this.containsPointFully(other.end);
     }
@@ -104,6 +110,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsInclusive
      */
+    @Override
     public boolean containsInclusive(Interval<TimeFormat> other) {
         return this.containsPointInclusive(other.start) && this.containsPointInclusive(other.end);
     }
@@ -111,6 +118,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPoint
      */
+    @Override
     public boolean containsPoint(TimeFormat time) {
         // start inclusive, end exclusive!
         assert start.compareTo(end) <= 0;
@@ -121,6 +129,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPointFully
      */
+    @Override
     public boolean containsPointFully(TimeFormat time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) > 0) && (time.compareTo(this.end) < 0);
@@ -129,6 +138,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#containsPointInclusive
      */
+    @Override
     public boolean containsPointInclusive(TimeFormat time) {
         assert start.compareTo(end) <= 0;
         return (time.compareTo(this.start) >= 0) && (time.compareTo(this.end) <= 0);
@@ -137,6 +147,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#overlaps
      */
+    @Override
     public boolean overlaps(Interval<TimeFormat> other) {
         return (this.containsPoint(other.start) || this.containsPoint(other.end)) || (other.containsPoint(this.start) || other.containsPoint(this.end));
     }
@@ -144,6 +155,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * @see org.helioviewer.jhv.base.interval.IntervalComparison#overlapsInclusive
      */
+    @Override
     public boolean overlapsInclusive(Interval<TimeFormat> other) {
         return (this.containsPointInclusive(other.start) || this.containsPointInclusive(other.end)) || (other.containsPointInclusive(this.start) || other.containsPointInclusive(this.end));
     }
@@ -169,6 +181,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
     /**
      * Returns a String representation of the Interval, e.g. "[X,Y)"
      */
+    @Override
     public String toString() {
         return "[" + start + "," + end + ")";
     }
@@ -179,8 +192,9 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * This method compares intervals by their start date, thus, sorting a list
      * of intervals using this compeareTo method results in a list, where those
      * intervals that start earliest are in the beginning of the list.
-     * 
+     *
      */
+    @Override
     public int compareTo(Interval<TimeFormat> other) {
         return this.start.compareTo(other.start);
     }
@@ -190,7 +204,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * equal; or in other words, that the interval duration is zero.
      * <p>
      * No special treatment of null values is performed.
-     * 
+     *
      * @return true if the interval is degenerated
      */
     public boolean isDegenerated() {
@@ -206,7 +220,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * is true. If both intervals do not overlap, no change occurs.
      * <p>
      * If the current interval is not valid, the given interval is returned
-     * 
+     *
      * @param other
      *            - the interval to which the current interval should be
      *            extended to
@@ -235,7 +249,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * <p>
      * If both intervals do not overlap the current interval will be returned.
      * If the current interval is not valid, the given interval is returned.
-     * 
+     *
      * @param other
      *            the interval to get the intersection with current one
      * @return the intersected interval, or in special cases, the given or the
@@ -269,18 +283,19 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * <li>
      * <code>this.exclude(other).get(i).containsPoint(x) == true</code> for all
      * x with <code> this.containsPoint(x) && ! other.containsPoint(x) </code></li>
-     * 
+     *
      * Note: Possibly degenerated Intervals are removed from the result set
-     * 
+     *
      * @see Interval#isDegenerated()
-     * 
+     *
      * @param other
      * @return result of the exclusion
      */
     public Vector<Interval<TimeFormat>> exclude(Interval<TimeFormat> other) {
         Vector<Interval<TimeFormat>> result = new Vector<Interval<TimeFormat>>();
-        if (this.equals(other))
+        if (this.equals(other)) {
             return result;
+        }
 
         // this interval is contained in the interval to be excluded: return
         // empty list
@@ -312,10 +327,41 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
         return result;
     }
 
+    public static ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval, int days) {
+        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
+
+        if (interval.getStart() == null || interval.getEnd() == null) {
+            intervals.add(interval);
+            return intervals;
+        }
+
+        final Calendar calendar = new GregorianCalendar();
+        Date startDate = interval.getStart();
+
+        while (true) {
+            calendar.clear();
+            calendar.setTime(startDate);
+            calendar.add(Calendar.DAY_OF_MONTH, days);
+
+            final Date newStartDate = calendar.getTime();
+
+            if (interval.containsPointInclusive(newStartDate)) {
+                calendar.add(Calendar.SECOND, -1);
+                intervals.add(new Interval<Date>(startDate, calendar.getTime()));
+                startDate = newStartDate;
+            } else {
+                intervals.add(new Interval<Date>(startDate, interval.getEnd()));
+                break;
+            }
+        }
+
+        return intervals;
+    }
+
     /**
      * Internal method to remove all degenerated Intervals from a noncontinuous
      * range of intervals.
-     * 
+     *
      * @param toClean
      */
     private void removeDegenerated(Vector<Interval<TimeFormat>> toClean) {
@@ -334,6 +380,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * Two Intervals are equal, if start and end values are equal.
      */
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Interval<?>) {
             Interval<?> s = (Interval<?>) other;
@@ -349,10 +396,11 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * <code> intervalA.hashCode() == intervalB.hashCode() </code> holds iff
      * <code> intervalA.equals(intervalB) </code>
      * <p>
-     * 
+     *
      * @see org.helioviewer.jhv.base.interval.Interval#equals
      */
 
+    @Override
     public int hashCode() {
         return (this.start.toString() + " - " + this.end.toString()).hashCode();
     }
@@ -362,14 +410,16 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
      * <p>
      * <li>neither start nor end are null</li>
      * <li>that start is before or equal to end (using the compareTo method)</li>
-     * 
+     *
      * @return true if the interval is valid
      */
     public boolean isValid() {
-        if (this.start == null || this.end == null)
+        if (this.start == null || this.end == null) {
             return false;
-        if (this.start.compareTo(this.end) > 0)
+        }
+        if (this.start.compareTo(this.end) > 0) {
             return false;
+        }
         return true;
     }
 

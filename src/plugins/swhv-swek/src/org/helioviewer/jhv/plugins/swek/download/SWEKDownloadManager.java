@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.swek.download;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,12 +11,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
@@ -40,6 +44,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
     private static SWEKDownloadManager instance;
 
     /** Threadpool for downloading events */
+    private final PriorityBlockingQueue<Runnable> priorityQueue;
     private final ExecutorService downloadEventPool;
 
     /** The properties specific to the swek plugin */
@@ -71,7 +76,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private SWEKDownloadManager() {
         swekProperties = SWEKProperties.getSingletonInstance().getSWEKProperties();
-        downloadEventPool = Executors.newFixedThreadPool(Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads")), new JHVThread.NamedThreadFactory("SWEK Download"));
         dwMap = new HashMap<SWEKEventType, Map<Date, DownloadWorker>>();
         activeEventTypes = new HashMap<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>>();
         requestManager = IncomingRequestManager.getSingletonInstance();
@@ -80,6 +84,9 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
         treeModel = SWEKTreeModel.getSingletonInstance();
+        priorityQueue = new PriorityBlockingQueue<Runnable>(2048, new ComparePriority());
+        int numOfThread = Integer.parseInt(swekProperties.getProperty("plugin.swek.numberofthreads"));
+        downloadEventPool = new ThreadPoolExecutor(0, numOfThread, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
     }
 
     /**
@@ -203,8 +210,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         Map<Date, DownloadWorker> dwMapOnDate = dwMap.get(worker.getEventType());
         if (dwMapOnDate != null) {
             dwMapOnDate.remove(worker.getDownloadStartDate());
-        }
-        else {
+        } else {
             Log.warn("Key should exist already");
             Thread.dumpStack();
         }
@@ -329,10 +335,13 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      */
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
         List<SWEKParam> params = defineParameters(eventType, swekSource, supplier);
-        DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, interval, params, configInstance.getSWEKRelatedEvents());
-        dw.addDownloadWorkerListener(this);
-        addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
-        downloadEventPool.execute(dw);
+        for (Interval<Date> intt : Interval.splitInterval(interval, 7)) {
+            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
+            dw.addDownloadWorkerListener(this);
+            addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
+            downloadEventPool.execute(dw);
+        }
+
     }
 
     /**
@@ -349,4 +358,15 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             }
         }
     }
+
+    private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
+
+        @Override
+        public int compare(T l1, T l2) {
+            long d1 = l1.getDownloadEndDate().getTime() - Layers.getStartDate().getTime();
+            long d2 = l2.getDownloadEndDate().getTime() - Layers.getStartDate().getTime();
+            return d1 < d2 ? 1 : -1;
+        }
+    }
+
 }
