@@ -326,10 +326,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         double minValue = 0.0;
         double maxValue = 0.0;
         if (yAxisElement.isLogScale()) {
-            if (yAxisElement.getMinValue() > 10e-50 && yAxisElement.getMaxValue() > 10e-50) {
-                minValue = Math.log10(yAxisElement.getMinValue());
-                maxValue = Math.log10(yAxisElement.getMaxValue());
-            }
+            minValue = Math.log10(yAxisElement.getMinValue());
+            maxValue = Math.log10(yAxisElement.getMaxValue());
         } else {
             minValue = yAxisElement.getMinValue();
             maxValue = yAxisElement.getMaxValue();
