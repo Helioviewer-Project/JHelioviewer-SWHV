@@ -131,7 +131,7 @@ public class DownloadController {
         // split intervals (if necessary) into smaller intervals
         final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
         for (final Interval<Date> i : missingIntervals) {
-            intervals.addAll(splitInterval(i));
+            intervals.addAll(Interval.splitInterval(i, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK));
         }
 
         return intervals;
@@ -167,37 +167,6 @@ public class DownloadController {
 
     private void fireDownloadFinished(final Band band, final Interval<Date> interval, final int activeBandDownloads) {
         selectorModel.downloadFinished(band);
-    }
-
-    private ArrayList<Interval<Date>> splitInterval(final Interval<Date> interval) {
-        final ArrayList<Interval<Date>> intervals = new ArrayList<Interval<Date>>();
-
-        if (interval.getStart() == null || interval.getEnd() == null) {
-            intervals.add(interval);
-            return intervals;
-        }
-
-        final Calendar calendar = new GregorianCalendar();
-        Date startDate = interval.getStart();
-
-        while (true) {
-            calendar.clear();
-            calendar.setTime(startDate);
-            calendar.add(Calendar.DAY_OF_MONTH, EVESettings.DOWNLOADER_MAX_DAYS_PER_BLOCK);
-
-            final Date newStartDate = calendar.getTime();
-
-            if (interval.containsPointInclusive(newStartDate)) {
-                calendar.add(Calendar.SECOND, -1);
-                intervals.add(new Interval<Date>(startDate, calendar.getTime()));
-                startDate = newStartDate;
-            } else {
-                intervals.add(new Interval<Date>(startDate, interval.getEnd()));
-                break;
-            }
-        }
-
-        return intervals;
     }
 
     private List<Future<?>> addDownloads(final DownloadThread[] jobs) {
