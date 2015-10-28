@@ -35,7 +35,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.dialogs.observation.ServerListPanel;
+import org.helioviewer.jhv.gui.dialogs.observation.ServerListCombo;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
@@ -240,7 +240,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         paramsPanel.setLayout(new GridLayout(0, 1));
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        row_1.add(new ServerListPanel("Default server"));
+        row_1.add(new JLabel("Default server", JLabel.RIGHT));
+        row_1.add(new ServerListCombo());
         paramsPanel.add(row_1);
 
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
