@@ -155,6 +155,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
         contentPane.add(buttonPane);
         contentPane.revalidate();
+        getRootPane().setDefaultButton(btnImages);
         pack();
     }
 
