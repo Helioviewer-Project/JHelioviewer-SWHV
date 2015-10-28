@@ -8,7 +8,7 @@ import javax.swing.JPanel;
  * 
  * @author Stephan Pagel
  * */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public abstract class ObservationDialogPanel extends JPanel {
 
     protected static final int GRIDLAYOUT_HGAP = 5;
