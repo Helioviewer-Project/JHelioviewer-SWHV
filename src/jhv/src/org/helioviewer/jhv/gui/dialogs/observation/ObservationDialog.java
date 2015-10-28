@@ -44,7 +44,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     private final JPanel uiSelectionPane = new JPanel();
     private final JComboBox uiSelectionComboBox = new JComboBox();
     private final JPanel buttonPane = new JPanel();
-    private final JButton btnImages = new JButton("Add layer");
+    private final JButton btnImages = new JButton("Add");
     private final JButton btnClose = new JButton("Cancel");
 
     private ObservationDialogPanel selectedPane = null;
