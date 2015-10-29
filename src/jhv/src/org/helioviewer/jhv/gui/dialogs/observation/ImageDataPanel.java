@@ -40,7 +40,6 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
 import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.LoadRemoteTask;
-import org.helioviewer.jhv.io.SetupTimeTask;
 
 /**
  * In order to select and load image data from the Helioviewer server this class
@@ -50,7 +49,7 @@ import org.helioviewer.jhv.io.SetupTimeTask;
  * @author Stephan Pagel
  * */
 @SuppressWarnings("serial")
-public class ImageDataPanel extends ObservationDialogPanel implements DataSourcesListener {
+public class ImageDataPanel extends ObservationDialogPanel {
 
     private boolean isSelected = false;
 
@@ -81,27 +80,14 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
 
         add(timePane);
         add(instrumentsPane);
-
-        DataSources.getSingletonInstance().addListener(this);
     }
 
-    /**
-     * Adds available data to the displayed components
-     * */
-    @Override
-    public void serverChanged(boolean donotloadStartup) {
-        instrumentsPanel.setupSources(DataSources.getSingletonInstance());
-        // Check if we were able to set it up
-        if (instrumentsPanel.validSelection()) {
-            // first time ignore donotloadStartup - comes via comboServer.setSelectedItem() below
-            if (isFirst || !donotloadStartup) {
-                isFirst = false;
-                SetupTimeTask setupTimeTask = new SetupTimeTask(this, getObservatory(), getInstrument(), getDetector(), getMeasurement());
-                JHVGlobals.getExecutorService().execute(setupTimeTask);
-            }
-        } else {
-            Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" + System.getProperty("line.separator") + " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
-        }
+    public void setupSources(DataSources source) {
+        instrumentsPanel.setupSources(source);
+    }
+
+    public boolean validSelection() {
+        return instrumentsPanel.validSelection();
     }
 
     /**
@@ -156,7 +142,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected observatory.
      */
-    private String getObservatory() {
+    public String getObservatory() {
         return instrumentsPanel.getObservatory();
     }
 
@@ -165,7 +151,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected instrument.
      * */
-    private String getInstrument() {
+    public String getInstrument() {
         return instrumentsPanel.getInstrument();
     }
 
@@ -174,7 +160,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected detector.
      * */
-    private String getDetector() {
+    public String getDetector() {
         return instrumentsPanel.getDetector();
     }
 
@@ -183,7 +169,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected measurement.
      * */
-    private String getMeasurement() {
+    public String getMeasurement() {
         return instrumentsPanel.getMeasurement();
     }
 
