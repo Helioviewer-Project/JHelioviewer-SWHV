@@ -22,11 +22,11 @@ public class ServerListCombo extends JComboBox {
         });
     }
 
-    public static ServerListCombo getInstance() {
+    public static JComboBox getInstance() {
         if (instance == null) {
             instance = new ServerListCombo();
         }
-        return instance;
+        return new JComboBox(instance.getModel());
     }
 
     private static ServerListCombo instance;

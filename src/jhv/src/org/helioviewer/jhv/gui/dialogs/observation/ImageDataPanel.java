@@ -45,7 +45,6 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
  * provides the corresponding user interface. The UI will be displayed within
  * the {@link ObservationDialog}.
  *
- * @author fuck you and your sort Stephan Pagel
  * */
 @SuppressWarnings("serial")
 public class ImageDataPanel extends ObservationDialogPanel {
