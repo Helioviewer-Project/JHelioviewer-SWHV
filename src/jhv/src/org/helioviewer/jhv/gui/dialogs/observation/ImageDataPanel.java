@@ -38,7 +38,6 @@ import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSources.Item;
-import org.helioviewer.jhv.io.DataSourcesListener;
 import org.helioviewer.jhv.io.LoadRemoteTask;
 
 /**
@@ -46,7 +45,7 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
  * provides the corresponding user interface. The UI will be displayed within
  * the {@link ObservationDialog}.
  *
- * @author Stephan Pagel
+ * @author fuck you and your sort Stephan Pagel
  * */
 @SuppressWarnings("serial")
 public class ImageDataPanel extends ObservationDialogPanel {
@@ -63,7 +62,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * Used format for the API of the data and time
      */
 
-    public ImageDataPanel() {
+    protected ImageDataPanel() {
         super();
         instrumentsPanel = new InstrumentsPanel(this);
 
@@ -505,7 +504,7 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * @author rewritten Helge Dietert
      * @author original Stephan Pagel
      * */
-    private static class InstrumentsPanel extends JPanel implements DataSourcesListener {
+    private static class InstrumentsPanel extends JPanel {
         /**
          * Combobox to select observatory
          */
@@ -519,11 +518,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
          */
         private final JComboBox comboDetectorMeasurement = new JComboBox(new String[] { "Loading..." });
 
-        private final String[] serverList;
-        private final JComboBox comboServer;
-
-        private boolean setFromOutside;
-
         /**
          * Default constructor which will setup the components and add listener
          * to update the available choices
@@ -532,16 +526,11 @@ public class ImageDataPanel extends ObservationDialogPanel {
          */
         public InstrumentsPanel(final ImageDataPanel imageDataPanel) {
             // Setup grid
-            setFromOutside = false;
-            serverList = DataSources.getSingletonInstance().getServerList();
-            DataSources.getSingletonInstance().addListener(this);
-
             setLayout(new GridLayout(4, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
 
             JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
             add(labelServer);
-            comboServer = new JComboBox(serverList);
-            add(comboServer);
+            add(ServerListCombo.getInstance());
 
             JLabel labelObservatory = new JLabel("Observatory", JLabel.RIGHT);
             add(labelObservatory);
@@ -585,23 +574,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
             comboObservatory.setRenderer(itemRenderer);
             comboInstrument.setRenderer(itemRenderer);
             comboDetectorMeasurement.setRenderer(itemRenderer);
-            comboServer.setRenderer(itemRenderer);
-
-            setFromOutside = true;
-            comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
-            setFromOutside = false;
-
-            comboServer.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    if (!setFromOutside) {
-                        String server = (String) comboServer.getSelectedItem();
-                        DataSources.getSingletonInstance().changeServer(server, true);
-                    } else {
-                        setFromOutside = false;
-                    }
-                }
-            });
 
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
@@ -824,12 +796,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return firstItem.getDescription() + " " + secondItem.getDescription();
                 }
             }
-        }
-
-        @Override
-        public void serverChanged(boolean donotloadStartup) {
-            setFromOutside = true;
-            comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
         }
     }
 

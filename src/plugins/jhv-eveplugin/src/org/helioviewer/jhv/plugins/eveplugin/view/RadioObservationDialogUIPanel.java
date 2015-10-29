@@ -16,7 +16,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
         container.setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
         container.add(labelServer);
-        container.add(new ServerListCombo());
+        container.add(ServerListCombo.getInstance());
         add(container);
     }
 
