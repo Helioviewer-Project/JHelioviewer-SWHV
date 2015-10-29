@@ -25,7 +25,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -48,13 +47,9 @@ import org.helioviewer.jhv.io.LoadRemoteTask;
 @SuppressWarnings("serial")
 public class ImageDataPanel extends ObservationDialogPanel {
 
-    private boolean isSelected = false;
-
     private final TimeSelectionPanel timeSelectionPanel = new TimeSelectionPanel();
     private final CadencePanel cadencePanel = new CadencePanel();
     private final InstrumentsPanel instrumentsPanel;
-
-    private boolean isFirst = true;
 
     /**
      * Used format for the API of the data and time
@@ -188,7 +183,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * */
     @Override
     public void selected() {
-        isSelected = true;
     }
 
     /**
@@ -196,7 +190,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * */
     @Override
     public void deselected() {
-        isSelected = false;
     }
 
     /**
