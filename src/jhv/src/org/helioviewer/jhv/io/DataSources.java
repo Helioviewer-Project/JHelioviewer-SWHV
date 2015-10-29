@@ -205,38 +205,6 @@ public class DataSources {
     private final Comparator<String> keyComparator = new AlphanumComparator();
 
     private static void reload() {
-        jsonResult = null;
-
-        while (true) {
-            try {
-                String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-                URL query = new URL(queryString);
-                DownloadStream ds = new DownloadStream(query, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-                Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                jsonResult = new JSONObject(new JSONTokener(reader));
-                break;
-            } catch (MalformedURLException e) {
-                // Should not occur
-                Log.error("Invalid url to retrieve data source", e);
-                break;
-            } catch (JSONException e) {
-                // Should not occur
-                Log.error("While retrieving the available data sources got invalid response", e);
-                break;
-            } catch (IOException e) {
-                // Log.error("Error while reading the available data sources",
-                // e);
-                // Message.err("Cannot Download Source Information",
-                // "When trying to read the available data sources from the internet got:\n"
-                // + e.getMessage(), false);
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e1) {
-                    // Should not occur
-                    Log.error(e1);
-                }
-            }
-        }
     }
 
     /**
@@ -401,15 +369,41 @@ public class DataSources {
 
             @Override
             protected Void backgroundWork() {
-                reload();
+                jsonResult = null;
+
+                while (true) {
+                    try {
+                        String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");
+                        URL query = new URL(queryString);
+                        DownloadStream ds = new DownloadStream(query, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
+                        Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
+                        jsonResult = new JSONObject(new JSONTokener(reader));
+                        break;
+                    } catch (MalformedURLException e) {
+                        Log.error("Invalid url to retrieve data source", e);
+                        break;
+                    } catch (JSONException e) {
+                        Log.error("While retrieving the available data sources got invalid response", e);
+                        break;
+                    } catch (IOException e) {
+                        // Log.error("Error while reading the available data sources", e);
+                        // Message.err("Cannot Download Source Information", "When trying to read the available data sources from the internet got:" + System.getProperty("line.separator") + e.getMessage(), false);
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e1) {
+                            Log.error(e1);
+                            break;
+                        }
+                    }
+                }
                 return null;
             }
 
             @Override
             protected void done() {
                 ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
-                idp.setupSources(DataSources.getSingletonInstance());
 
+                idp.setupSources(DataSources.getSingletonInstance());
                 if (idp.validSelection()) {
                     if (first) {
                         first = false;
@@ -417,9 +411,9 @@ public class DataSources {
                         JHVGlobals.getExecutorService().execute(setupTimeTask);
                     }
                 } else {
-                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" +
+                    Message.err("Could not retrieve data sources", "The list of available data could not be fetched, so you cannot use the GUI to add data." +
                                 System.getProperty("line.separator") +
-                                " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                                "This may happen if you do not have an internet connection or there are server problems. You can still open local files.", false);
                 }
             }
 

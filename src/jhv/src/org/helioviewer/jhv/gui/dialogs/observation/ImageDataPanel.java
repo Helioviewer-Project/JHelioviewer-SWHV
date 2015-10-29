@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -436,7 +435,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
         public CadencePanel() {
             // set up the visual components (GUI)
             setLayout(new GridLayout(1, 2, GRIDLAYOUT_HGAP, GRIDLAYOUT_VGAP));
-            setBorder(new EmptyBorder(3, 0, 0, 0));
 
             spinnerCadence.setPreferredSize(new Dimension(50, 25));
             spinnerCadence.setModel(new SpinnerNumberModel(30, 1, 1000000, 1));
