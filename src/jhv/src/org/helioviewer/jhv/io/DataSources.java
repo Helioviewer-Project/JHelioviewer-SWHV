@@ -18,6 +18,9 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.message.Message;
+import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -407,12 +410,29 @@ public class DataSources {
                 for (DataSourcesListener l : listeners) {
                     l.serverChanged(donotloadStartup);
                 }
+
+                ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
+                idp.setupSources(DataSources.getSingletonInstance());
+
+                if (idp.validSelection()) {
+                    if (first) {
+                        first = false;
+                        SetupTimeTask setupTimeTask = new SetupTimeTask(idp.getObservatory(), idp.getInstrument(), idp.getDetector(), idp.getMeasurement());
+                        JHVGlobals.getExecutorService().execute(setupTimeTask);
+                    }
+                } else {
+                    Message.err("Could not retrieve data sources", "The list of avaible data could not be fetched. So you cannot use the GUI to add data!" +
+                                System.getProperty("line.separator") +
+                                " This may happen if you do not have an internet connection or the there are server problems. You can still open local files.", false);
+                }
             }
 
         };
         reloadTask.setThreadName("MAIN--ReloadServer");
         JHVGlobals.getExecutorService().execute(reloadTask);
     }
+
+    private static boolean first = true;
 
     public String[] getServerList() {
         return serverList;

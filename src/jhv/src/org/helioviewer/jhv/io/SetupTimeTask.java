@@ -5,19 +5,18 @@ import java.util.GregorianCalendar;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class SetupTimeTask extends JHVWorker<Date, Void> {
 
-    private final ImageDataPanel idp;
     private final String observatory;
     private final String instrument;
     private final String detector;
     private final String measurement;
 
     // Sets the latest available image (or now if fails) to the end time and the start 24h earlier.
-    public SetupTimeTask(ImageDataPanel _idp, String _observatory, String _instrument, String _detector, String _measurement) {
-        idp = _idp;
+    public SetupTimeTask(String _observatory, String _instrument, String _detector, String _measurement) {
         observatory = _observatory;
         instrument = _instrument;
         detector = _detector;
@@ -33,6 +32,8 @@ public class SetupTimeTask extends JHVWorker<Date, Void> {
     @Override
     public void done() {
         try {
+            ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
+
             Date endDate = get();
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(endDate);
