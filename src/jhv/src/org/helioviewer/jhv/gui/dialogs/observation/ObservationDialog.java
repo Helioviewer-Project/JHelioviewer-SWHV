@@ -51,9 +51,27 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
 
     private JButton availabilityButton;
 
-    public ObservationDialog(JFrame mainFrame) {
+    private final ImageDataPanel imageObservationPanel;
+
+    private static ObservationDialog instance;
+
+    public static ObservationDialog getInstance() {
+        if (instance == null) {
+            instance = new ObservationDialog(ImageViewerGui.getMainFrame());
+        }
+        return instance;
+    }
+
+    private ObservationDialog(JFrame mainFrame) {
         super(mainFrame, true);
         initVisualComponents();
+
+        imageObservationPanel = new ImageDataPanel();
+        addUserInterface("Image data", imageObservationPanel);
+    }
+
+    public ImageDataPanel getObservationImagePane() {
+        return imageObservationPanel;
     }
 
     /**

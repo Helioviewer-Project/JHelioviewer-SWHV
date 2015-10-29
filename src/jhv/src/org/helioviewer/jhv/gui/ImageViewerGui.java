@@ -30,8 +30,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.InputController;
-import org.helioviewer.jhv.gui.dialogs.observation.ImageDataPanel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.LoadURIDownloadTask;
@@ -71,9 +69,6 @@ public class ImageViewerGui {
     private static MainComponent mainComponent;
     private static MainContentPanel mainContentPanel;
 
-    private static ImageDataPanel imageObservationPanel;
-    private static ObservationDialog observationDialog;
-
     private static ZoomStatusPanel zoomStatus;
     private static FramerateStatusPanel framerateStatus;
 
@@ -108,10 +103,6 @@ public class ImageViewerGui {
         leftPane.add("Movie Controls", MoviePanel.getInstance(), true);
 
         // Layer control
-        imageObservationPanel = new ImageDataPanel();
-        observationDialog = new ObservationDialog(mainFrame);
-        observationDialog.addUserInterface("Image data", imageObservationPanel);
-
         renderableContainer = new RenderableContainer();
         renderableContainer.addRenderable(new RenderableGrid());
         renderableCamera = new RenderableCamera();
@@ -275,14 +266,6 @@ public class ImageViewerGui {
 
     public static MainContentPanel getMainContentPanel() {
         return mainContentPanel;
-    }
-
-    public static ObservationDialog getObservationDialog() {
-        return observationDialog;
-    }
-
-    public static ImageDataPanel getObservationImagePane() {
-        return imageObservationPanel;
     }
 
     public static InputController getInputController() {

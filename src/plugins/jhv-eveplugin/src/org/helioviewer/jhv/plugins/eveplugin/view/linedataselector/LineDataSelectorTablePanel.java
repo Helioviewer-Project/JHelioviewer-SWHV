@@ -29,6 +29,7 @@ import javax.swing.event.TableModelListener;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineColorRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.LineDataSelectorElementRenderer;
@@ -101,7 +102,7 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
         addLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImageViewerGui.getObservationDialog().showDialog(EVESettings.OBSERVATION_UI_NAME);
+                ObservationDialog.getInstance().showDialog(EVESettings.OBSERVATION_UI_NAME);
             }
         });
         // addLayerButton.setBorder(null);

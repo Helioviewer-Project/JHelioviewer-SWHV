@@ -14,8 +14,8 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -36,8 +36,8 @@ public class NewLayerAction extends AbstractAction {
             JHVDate start = Layers.getStartDate(activeView);
             JHVDate end = Layers.getEndDate(activeView);
             try {
-                Date obsStartDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getStartTime());
-                Date obsEndDate = TimeUtils.apiDateFormat.parse(ImageViewerGui.getObservationImagePane().getEndTime());
+                Date obsStartDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getStartTime());
+                Date obsEndDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getEndTime());
                 // only updates if it's really necessary with a tolerance of an hour
                 final int tolerance = 60 * 60 * 1000;
                 if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
@@ -54,7 +54,7 @@ public class NewLayerAction extends AbstractAction {
             }
         }
         // Show dialog
-        ImageViewerGui.getObservationDialog().showDialog();
+        ObservationDialog.getInstance().showDialog();
     }
 
 }

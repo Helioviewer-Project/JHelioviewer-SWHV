@@ -24,6 +24,7 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -32,10 +33,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDownloader;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-//Java 6 does not support generics for JComboBox and DefaultComboBoxModel
-//Should be removed if support for Java 6 is not needed anymore
-//Class will not be serialized so we suppress the warnings
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings("serial")
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
     protected boolean enableLoadButton = true;
@@ -163,7 +161,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void selected() {
-        ImageViewerGui.getObservationDialog().setLoadButtonEnabled(enableLoadButton);
+        ObservationDialog.getInstance().setLoadButtonEnabled(enableLoadButton);
     }
 
     @Override
