@@ -311,8 +311,8 @@ public class OpenRemoteFileDialog extends JDialog implements ShowableDialog, Act
 
             tree.getParent().setSize(tree.getParent().getPreferredSize());
 
-            Settings.getSingletonInstance().setProperty("default.httpRemote.path", imageAddress.getText());
-            Settings.getSingletonInstance().setProperty("default.remote.path", inputAddress.getText());
+            Settings.getSingletonInstance().setProperty("default.httpRemote.path", text /*imageAddress.getText()*/);
+            Settings.getSingletonInstance().setProperty("default.remote.path", text /*inputAddress.getText()*/);
             Settings.getSingletonInstance().save();
             tree.getParent().getParent().repaint();
         } catch (BadLocationException i) {

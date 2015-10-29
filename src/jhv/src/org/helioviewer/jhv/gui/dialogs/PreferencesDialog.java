@@ -315,7 +315,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private class DefaultsSelectionPanel extends JPanel {
 
         private JTable table = null;
-        private Object[][] tableData = null;
 
         public DefaultsSelectionPanel() {
             super(new BorderLayout());
@@ -323,8 +322,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
             Settings settings = Settings.getSingletonInstance();
 
-            tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") },
-                                         { "Default local path", settings.getProperty("default.local.path") } };
+            Object[][] tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") },
+                                                    { "Default local path", settings.getProperty("default.local.path") } };
 
             table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override

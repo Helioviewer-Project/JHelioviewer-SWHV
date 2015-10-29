@@ -204,9 +204,6 @@ public class DataSources {
      */
     private final Comparator<String> keyComparator = new AlphanumComparator();
 
-    private static void reload() {
-    }
-
     /**
      * For the given root this will create a sorted list or items
      *
@@ -424,11 +421,11 @@ public class DataSources {
 
     private static boolean first = true;
 
-    public String[] getServerList() {
+    public static String[] getServerList() {
         return serverList;
     }
 
-    public String getSelectedServer() {
+    public static String getSelectedServer() {
         return selectedServer;
     }
 

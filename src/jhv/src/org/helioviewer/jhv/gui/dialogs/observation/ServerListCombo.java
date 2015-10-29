@@ -10,23 +10,25 @@ import org.helioviewer.jhv.io.DataSources;
 
 public class ServerListCombo extends JComboBox {
 
-    private ServerListCombo() {
-        setModel(new DefaultComboBoxModel(DataSources.getSingletonInstance().getServerList()));
-        setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
-
-        addActionListener(new ActionListener() {
+    private static ActionListener change = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                DataSources.getSingletonInstance().changeServer((String) getSelectedItem());
+            public void actionPerformed(ActionEvent e) {
+                DataSources.changeServer((String) ((JComboBox) e.getSource()).getModel().getSelectedItem());
             }
-        });
+        };
+
+    private ServerListCombo() {
+        setModel(new DefaultComboBoxModel(DataSources.getServerList()));
+        setSelectedItem(DataSources.getSelectedServer());
+        addActionListener(change);
     }
 
     public static JComboBox getInstance() {
         if (instance == null) {
             instance = new ServerListCombo();
-        }
-        return new JComboBox(instance.getModel());
+            return instance;
+        } else
+            return new JComboBox(instance.getModel());
     }
 
     private static ServerListCombo instance;

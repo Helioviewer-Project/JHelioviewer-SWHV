@@ -14,14 +14,11 @@ import kdu_jni.Kdu_thread_env;
 
 public class KakaduEngine {
 
-    private final URI uri;
     private final Jp2_family_src familySrc;
     private final Jpx_source jpxSrc;
     private final Kdu_region_compositor compositor;
 
-    public KakaduEngine(Kdu_cache cache, URI _uri, Kdu_thread_env threadEnv) throws KduException, IOException {
-        uri = _uri;
-
+    public KakaduEngine(Kdu_cache cache, URI uri, Kdu_thread_env threadEnv) throws KduException, IOException {
         familySrc = new Jp2_family_src();
         if (cache == null) { // local
             File file = new File(uri);
