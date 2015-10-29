@@ -106,7 +106,7 @@ public class RenderableGrid extends AbstractRenderable {
             if (showLabels)
                 drawText(gl);
 
-            drawCircles(gl, cameraMatrix);
+            drawCircles(gl);
         }
         gl.glPopMatrix();
         drawEarthCircles(gl);
@@ -164,7 +164,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
-    private void drawCircles(GL2 gl, Mat4d cameraMatrix) {
+    private void drawCircles(GL2 gl) {
         GLHelper.lineWidth(gl, 0.25);
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
