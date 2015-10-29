@@ -182,20 +182,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * {@inheritDoc}
      * */
     @Override
-    public void selected() {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void deselected() {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
     public boolean loadButtonPressed() {
         // Add some data if its nice
         if (!instrumentsPanel.validSelection()) {
@@ -218,20 +204,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
 
         loadRemote(timeSelectionPanel.getStartTime().equals(timeSelectionPanel.getEndTime()));
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void cancelButtonPressed() {
-    }
-
-    /**
-     * {@inheritDoc}
-     * */
-    @Override
-    public void dialogOpened() {
     }
 
     // Time Selection Panel

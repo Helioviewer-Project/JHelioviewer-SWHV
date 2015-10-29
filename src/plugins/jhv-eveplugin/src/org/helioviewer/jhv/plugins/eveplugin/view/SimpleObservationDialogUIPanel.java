@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModelListener;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialogPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -146,29 +145,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     }
 
     @Override
-    public void dialogOpened() {
-        final Interval<Date> interval = DrawController.getSingletonInstance().getAvailableInterval();
-
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(interval.getEnd());
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-
-        // setStartDate(interval.getStart());
-        // setEndDate(calendar.getTime());
-
-        // plotComboBox.setSelectedIndex(0);
-    }
-
-    @Override
-    public void selected() {
-        ObservationDialog.getInstance().setLoadButtonEnabled(enableLoadButton);
-    }
-
-    @Override
-    public void deselected() {
-    }
-
-    @Override
     public boolean loadButtonPressed() {
         // check if start date is before end date -> if not show message
         /*
@@ -199,10 +175,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         return true;
     }
 
-    @Override
-    public void cancelButtonPressed() {
-    }
-
     // JHV Calendar Listener
 
     @Override
@@ -215,16 +187,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
          * !isStartDateBeforeOrEqualEndDate()) {
          * calendarStartDate.setDate(calendarStartDate.getDate()); }
          */
-    }
-
-    // Action Listener
-
-    public void setLoadButtonEnabled(boolean shouldBeEnabled) {
-        enableLoadButton = shouldBeEnabled;
-    }
-
-    public boolean getLoadButtonEnabled() {
-        return enableLoadButton;
     }
 
     @Override
