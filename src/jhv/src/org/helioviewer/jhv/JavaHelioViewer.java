@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.CommandLineProcessor;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.resourceloader.SystemProperties;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduMessageSystem;
 import org.helioviewer.jhv.threads.JHVExecutor;
@@ -108,6 +109,8 @@ public class JavaHelioViewer {
                 TimeUtils.getSingletonInstance(); // instantiate class
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
+
+                DataSources.getSingletonInstance();
 
                 Log.info("Start main window");
                 ExitHooks.attach();

@@ -177,6 +177,16 @@ public class DataSources {
                     }
                 }
             }
+
+            String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
+            if (datasourcesPath.contains("ias.u-psud.fr")) {
+                selectedServer = "IAS";
+            } else if (datasourcesPath.contains("helioviewer.org")) {
+                selectedServer = "GSFC";
+            } else {
+                selectedServer = "ROB";
+            }
+            changeServer(selectedServer, true);
         }
         return instance;
     }
@@ -184,14 +194,14 @@ public class DataSources {
     /**
      * Result with the available data sources
      */
-    private JSONObject jsonResult;
+    private static JSONObject jsonResult;
 
     /**
      * Used comparator to sort the items after the key
      */
     private final Comparator<String> keyComparator = new AlphanumComparator();
 
-    private void reload() {
+    private static void reload() {
         jsonResult = null;
 
         while (true) {
@@ -356,10 +366,10 @@ public class DataSources {
         return jsonResult.getJSONObject(observatory);
     }
 
-    private String selectedServer = "";
-    private final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
+    private static String selectedServer = "";
+    private static final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
 
-    public void changeServer(String server, final boolean donotloadStartup) {
+    public static void changeServer(String server, final boolean donotloadStartup) {
         selectedServer = server;
         if (server.contains("ROB")) {
             Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
