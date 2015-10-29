@@ -96,7 +96,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             // first time ignore donotloadStartup - comes via comboServer.setSelectedItem() below
             if (isFirst || !donotloadStartup) {
                 isFirst = false;
-                SetupTimeTask setupTimeTask = new SetupTimeTask(getCadence(), getObservatory(), getInstrument(), getDetector(), getMeasurement());
+                SetupTimeTask setupTimeTask = new SetupTimeTask(this, getObservatory(), getInstrument(), getDetector(), getMeasurement());
                 JHVGlobals.getExecutorService().execute(setupTimeTask);
             }
         } else {
@@ -147,7 +147,7 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
      *
      * @return selected cadence.
      */
-    private int getCadence() {
+    public int getCadence() {
         return cadencePanel.getCadence();
     }
 

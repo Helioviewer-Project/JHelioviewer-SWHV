@@ -10,6 +10,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
@@ -68,8 +69,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
                 ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
 
-                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-                ImageViewerGui.getObservationDialog().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+                ObservationDialog.getInstance().addUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+                ObservationDialog.getInstance().addUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
 
                 RadioPlotModel.getSingletonInstance();
                 EventModel.getSingletonInstance().activateEvents();
@@ -88,8 +89,8 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         Layers.removeTimeListener(DrawController.getSingletonInstance());
         Layers.removeLayersListener(DrawController.getSingletonInstance());
 
-        ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
-        ImageViewerGui.getObservationDialog().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
+        ObservationDialog.getInstance().removeUserInterface(EVESettings.OBSERVATION_UI_NAME, new ObservationDialogUIPanel());
+        ObservationDialog.getInstance().removeUserInterface(EVESettings.RADIO_OBSERVATION_UI_NAME, new RadioObservationDialogUIPanel());
 
         ImageViewerGui.getMainContentPanel().removePlugin(this);
 

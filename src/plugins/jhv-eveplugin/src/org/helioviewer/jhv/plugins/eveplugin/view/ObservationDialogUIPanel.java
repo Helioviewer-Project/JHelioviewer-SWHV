@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
+import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
@@ -26,13 +27,7 @@ import org.helioviewer.jhv.plugins.eveplugin.settings.BandGroup;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 
-/**
- * @author Stephan Pagel
- */
-// Java 6 does not support generics for JComboBox and DefaultComboBoxModel
-// Should be removed if support for Java 6 is not needed anymore
-// Class will not be serialized so we suppress the warnings
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings("serial")
 public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel implements ActionListener {
 
     private final JComboBox comboBoxGroup;
@@ -115,7 +110,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         }
 
         super.setLoadButtonEnabled(model.getSize() > 0);
-        ImageViewerGui.getObservationDialog().setLoadButtonEnabled(super.getLoadButtonEnabled());
+        ObservationDialog.getInstance().setLoadButtonEnabled(super.getLoadButtonEnabled());
     }
 
     /**
