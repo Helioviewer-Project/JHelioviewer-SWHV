@@ -145,15 +145,11 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
      * */
     private void setUIContainerPane(final String name) {
         if (selectedPane != null) {
-            selectedPane.deselected();
             selectedPane = null;
         }
 
         if (name != null) {
             selectedPane = uiMap.get(name);
-            if (selectedPane != null) {
-                selectedPane.selected();
-            }
         }
 
         resetContentPane();
@@ -201,13 +197,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     }
 
     /**
-     * Enables the load data button.
-     * */
-    public void setLoadButtonEnabled(final boolean enable) {
-        btnImages.setEnabled(enable);
-    }
-
-    /**
      * Shows up the dialog and initializes the UI with the panel of the given
      * name.
      * */
@@ -215,10 +204,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         if (uiMap.size() <= 0) {
             Message.err("Error", "There are no data sources available!", false);
             return;
-        }
-
-        for (final ObservationDialogPanel pane : uiMap.values()) {
-            pane.dialogOpened();
         }
 
         if (dataSourceName != null) {
@@ -267,7 +252,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     }
 
     private void closePressed() {
-        selectedPane.cancelButtonPressed();
         closeDialog();
     }
 

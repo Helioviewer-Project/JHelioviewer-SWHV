@@ -5,9 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -19,7 +17,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.model.ObservationDialogDateModel;
-import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
@@ -38,7 +35,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     public ObservationDialogUIPanel() {
         super();
 
-        // long start = System.currentTimeMillis();
         JLabel labelGroup = new JLabel("Group", JLabel.RIGHT);
         JLabel labelData = new JLabel("Dataset", JLabel.RIGHT);
 
@@ -77,8 +73,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         this.add(container);
 
         initGroups();
-        // Log.debug("ObservationDialogUIPanel time: " +
-        // (System.currentTimeMillis() - start));
     }
 
     private void initGroups() {
@@ -108,9 +102,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         if (model.getSize() > 0) {
             comboBoxData.setSelectedIndex(0);
         }
-
-        super.setLoadButtonEnabled(model.getSize() > 0);
-        ObservationDialog.getInstance().setLoadButtonEnabled(super.getLoadButtonEnabled());
     }
 
     /**
@@ -175,17 +166,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
         EVEDrawController.getSingletonInstance().bandAdded(bandType);
 
         return true;
-    }
-
-    @Override
-    public void dialogOpened() {
-        final Interval<Date> interval = DrawController.getSingletonInstance().getAvailableInterval();
-        final GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(interval.getEnd());
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-
-        // setStartDate(interval.getStart());
-        // setEndDate(calendar.getTime());
     }
 
     @Override
