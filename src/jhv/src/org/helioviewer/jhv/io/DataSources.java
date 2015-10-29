@@ -189,7 +189,7 @@ public class DataSources {
             } else {
                 selectedServer = "ROB";
             }
-            changeServer(selectedServer, true);
+            changeServer(selectedServer);
         }
         return instance;
     }
@@ -372,7 +372,7 @@ public class DataSources {
     private static String selectedServer = "";
     private static final String[] serverList = new String[] { "ROB", "IAS", "GSFC" };
 
-    public static void changeServer(String server, final boolean donotloadStartup) {
+    public static void changeServer(String server) {
         selectedServer = server;
         if (server.contains("ROB")) {
             Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
@@ -407,10 +407,6 @@ public class DataSources {
 
             @Override
             protected void done() {
-                for (DataSourcesListener l : listeners) {
-                    l.serverChanged(donotloadStartup);
-                }
-
                 ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
                 idp.setupSources(DataSources.getSingletonInstance());
 
@@ -440,16 +436,6 @@ public class DataSources {
 
     public String getSelectedServer() {
         return selectedServer;
-    }
-
-    private static final HashSet<DataSourcesListener> listeners = new HashSet<DataSourcesListener>();
-
-    public void addListener(DataSourcesListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(DataSourcesListener listener) {
-        listeners.remove(listener);
     }
 
 }

@@ -241,7 +241,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         row_1.add(new JLabel("Default server", JLabel.RIGHT));
-        row_1.add(new ServerListCombo());
+        row_1.add(ServerListCombo.getInstance());
         paramsPanel.add(row_1);
 
         JPanel row0 = new JPanel(new FlowLayout(FlowLayout.LEADING));
