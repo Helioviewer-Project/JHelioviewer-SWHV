@@ -601,6 +601,10 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
             comboDetectorMeasurement.setRenderer(itemRenderer);
             comboServer.setRenderer(itemRenderer);
 
+            setFromOutside = true;
+            comboServer.setSelectedItem(DataSources.getSingletonInstance().getSelectedServer());
+            setFromOutside = false;
+
             comboServer.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
@@ -612,14 +616,6 @@ public class ImageDataPanel extends ObservationDialogPanel implements DataSource
                     }
                 }
             });
-            String datasourcesPath = Settings.getSingletonInstance().getProperty("API.dataSources.path");
-            if (datasourcesPath.contains("ias.u-psud.fr")) {
-                comboServer.setSelectedItem(serverList[1]);
-            } else if (datasourcesPath.contains("helioviewer.org")) {
-                comboServer.setSelectedItem(serverList[2]);
-            } else {
-                comboServer.setSelectedItem(serverList[0]);
-            }
 
             comboObservatory.addActionListener(new ActionListener() {
                 @Override
