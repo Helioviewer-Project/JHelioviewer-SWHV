@@ -13,27 +13,21 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.apache.log4j.Level;
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.dialogs.observation.ServerListCombo;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
@@ -53,9 +47,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JRadioButton loadDefaultMovieOnStartUp;
     private JRadioButton doNothingOnStartUp;
     private JPanel paramsPanel;
-    private JComboBox debugFileCombo = null;
-    private JComboBox debugConsoleCombo = null;
-    private JTextField debugFileTextField = null;
     private DefaultsSelectionPanel defaultsPanel;
 
     private final Settings settings = Settings.getSingletonInstance();
@@ -75,28 +66,21 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         panel.setLayout(new BorderLayout());
 
         JPanel paramsSubPanel = new JPanel(new BorderLayout());
-        paramsSubPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        paramsSubPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 0, 3));
         paramsSubPanel.add(createParametersPanel(), BorderLayout.CENTER);
 
         JPanel defaultsSubPanel = new JPanel(new BorderLayout());
-        defaultsSubPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        defaultsSubPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 3));
         defaultsSubPanel.add(createDefaultSaveDirPanel(), BorderLayout.CENTER);
-
-        JPanel jpipSupPanel = new JPanel(new BorderLayout());
-        jpipSupPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
         panel.add(paramsSubPanel, BorderLayout.NORTH);
         panel.add(defaultsSubPanel, BorderLayout.CENTER);
-        panel.add(jpipSupPanel, BorderLayout.SOUTH);
 
         mainPanel.add(panel, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-
         acceptBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
-        JButton resetBtn = new JButton("Reset");
 
         acceptBtn.addActionListener(new ActionListener() {
             @Override
@@ -113,33 +97,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             }
         });
 
-        resetBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (JOptionPane.showConfirmDialog(null, "Do you really want to reset the setting values?", "Attention", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    defaultsPanel.resetSettings();
-                    loadDefaultMovieOnStartUp.setSelected(true);
-
-                    LogSettings logSettings = LogSettings.getSingletonInstance();
-
-                    if (debugFileCombo != null) {
-                        debugFileCombo.setSelectedItem(logSettings.getDefaultLoggingLevel("file"));
-                        debugFileTextField.setText(Integer.toString(logSettings.getDefaultMaximumLogFileAge("file")));
-                    }
-
-                    if (debugConsoleCombo != null) {
-                        debugConsoleCombo.setSelectedItem(logSettings.getDefaultLoggingLevel("console"));
-                    }
-                }
-            }
-        });
-
         if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
             btnPanel.add(acceptBtn);
-            btnPanel.add(resetBtn);
             btnPanel.add(cancelBtn);
         } else {
-            btnPanel.add(resetBtn);
             btnPanel.add(cancelBtn);
             btnPanel.add(acceptBtn);
         }
@@ -153,7 +114,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
                 cancelPressed();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-
     }
 
     private void cancelPressed() {
@@ -167,7 +127,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     public void showDialog() {
         loadSettings();
 
-        setSize(getPreferredSize());
+        //setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
         getRootPane().setDefaultButton(acceptBtn);
 
@@ -188,16 +148,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         loadDefaultMovieOnStartUp.setSelected(Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
         doNothingOnStartUp.setSelected(!Boolean.parseBoolean(settings.getProperty("startup.loadmovie")));
 
-        // Debug options
-        LogSettings logSettings = LogSettings.getSingletonInstance();
-        if (debugFileCombo != null) {
-            debugFileCombo.setSelectedItem(logSettings.getLoggingLevel("file"));
-            debugFileTextField.setText(Integer.toString(logSettings.getMaximumLogFileAge("file")));
-        }
-        if (debugConsoleCombo != null) {
-            debugConsoleCombo.setSelectedItem(logSettings.getLoggingLevel("console"));
-        }
-
         // Default values
         defaultsPanel.loadSettings();
     }
@@ -210,22 +160,10 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private void saveSettings() {
         // Start up
         settings.setProperty("startup.loadmovie", Boolean.toString(loadDefaultMovieOnStartUp.isSelected()));
-        // Debug options
-        LogSettings logSettings = LogSettings.getSingletonInstance();
-        if (debugFileCombo != null) {
-            Level level = (Level) debugFileCombo.getSelectedItem();
-            logSettings.setLoggingLevel("file", level);
-            logSettings.setMaximumLogFileAge(LogSettings.FILE_LOGGER, Integer.parseInt(debugFileTextField.getText()));
-        }
-        if (debugConsoleCombo != null) {
-            Level level = (Level) debugConsoleCombo.getSelectedItem();
-            logSettings.setLoggingLevel("console", level);
-        }
 
         // Default values
         defaultsPanel.saveSettings();
         settings.save();
-        LogSettings.getSingletonInstance().update();
     }
 
     /**
@@ -236,7 +174,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
     private JPanel createParametersPanel() {
         paramsPanel = new JPanel();
 
-        paramsPanel.setBorder(BorderFactory.createTitledBorder(" Configuration "));
+        paramsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         paramsPanel.setLayout(new GridLayout(0, 1));
 
         JPanel row_1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
@@ -258,39 +196,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         row0.add(doNothingOnStartUp);
         paramsPanel.add(row0);
 
-        LogSettings logSettings = LogSettings.getSingletonInstance();
-        Level fileLoggingLevel = logSettings.getLoggingLevel(LogSettings.FILE_LOGGER);
-        Level consoleLoggingLevel = logSettings.getLoggingLevel(LogSettings.CONSOLE_LOGGER);
-
-        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        if (fileLoggingLevel != null) {
-            row4.add(new JLabel("File log level", JLabel.RIGHT));
-            debugFileCombo = new JComboBox(LogSettings.LEVELS);
-            row4.add(debugFileCombo);
-            debugFileCombo.setSelectedItem(fileLoggingLevel);
-        }
-
-        if (consoleLoggingLevel != null) {
-            row4.add(new JLabel("Console log level", JLabel.RIGHT));
-            debugConsoleCombo = new JComboBox(LogSettings.LEVELS);
-            row4.add(debugConsoleCombo);
-            debugConsoleCombo.setSelectedItem(consoleLoggingLevel);
-        }
-
-        if (fileLoggingLevel != null || consoleLoggingLevel != null) {
-            paramsPanel.add(row4);
-        }
-
-        JPanel row5 = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        if (fileLoggingLevel != null) {
-            row5.add(new JLabel("Delete log files after"));
-            debugFileTextField = new JTextField(3);
-            debugFileTextField.setText(Integer.toString(logSettings.getMaximumLogFileAge(LogSettings.FILE_LOGGER)));
-            row5.add(debugFileTextField);
-            row5.add(new JLabel("days (enter 0 to keep all files)"));
-            paramsPanel.add(row5);
-        }
-
         return paramsPanel;
     }
 
@@ -301,7 +206,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
      */
     private JPanel createDefaultSaveDirPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(" Defaults "));
+        panel.setBorder(BorderFactory.createTitledBorder(" Locations "));
 
         defaultsPanel = new DefaultsSelectionPanel();
         defaultsPanel.setPreferredSize(new Dimension(450, 100));
@@ -322,8 +227,8 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
             Settings settings = Settings.getSingletonInstance();
 
-            Object[][] tableData = new Object[][] { { "Default save directory", settings.getProperty("default.save.path") },
-                                                    { "Default local path", settings.getProperty("default.local.path") } };
+            Object[][] tableData = new Object[][] { { "Default recording directory", settings.getProperty("default.save.path") },
+                                                    { "Default download path", settings.getProperty("default.local.path") } };
 
             table = new JTable(new DefaultTableModel(tableData, new String[] { "Description", "Value" }) {
                 @Override
@@ -376,11 +281,6 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
             settings.setProperty("default.local.path", model.getValueAt(1, 1).toString());
         }
 
-        public void resetSettings() {
-            TableModel model = table.getModel();
-            model.setValueAt(JHVDirectory.EXPORTS.getPath(), 0, 1);
-            model.setValueAt(JHVDirectory.HOME.getPath(), 1, 1);
-        }
     }
 
     @Override
