@@ -230,6 +230,16 @@ public class RenderableContainer implements TableModel, Reorderable {
         return false;
     }
 
+    public RenderableImageLayer getViewportRenderableImageLayer(int idx) {
+        for (Renderable r : renderables) {
+            if (r instanceof RenderableImageLayer && r.isVisible(idx)) {
+                RenderableImageLayer im = (RenderableImageLayer) r;
+                return im;
+            }
+        }
+        return null;
+    }
+
     public void arrangeMultiView(boolean multiview) {
         int ctImages = 0;
 

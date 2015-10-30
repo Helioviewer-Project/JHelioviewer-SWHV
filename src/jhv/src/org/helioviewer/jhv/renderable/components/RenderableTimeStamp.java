@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 
 import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -43,9 +45,17 @@ public class RenderableTimeStamp extends AbstractRenderable {
             textRenderer.setColor(Color.WHITE);
         }
 
+        String text = Layers.getLastUpdatedTimestamp().toString();
+        if (Displayer.multiview) {
+            RenderableImageLayer im = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(vp.getIndex());
+            if (im != null && im.getImageData() != null) {
+                text = im.getImageData().getMetaData().getDateObs().toString();
+            }
+        }
+
         int delta = (int) (vp.getHeight() * 0.01);
         textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-        textRenderer.draw(Layers.getLastUpdatedTimestamp().toString(), delta, delta);
+        textRenderer.draw(text, delta, delta);
         textRenderer.endRendering();
     }
 
