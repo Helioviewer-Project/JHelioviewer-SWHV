@@ -22,7 +22,6 @@ public class GL3DViewport {
     private boolean active;
 
     public GL3DViewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _active) {
-
         idx = _idx;
         w = _w;
         h = _h;

@@ -6,16 +6,19 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -56,7 +59,7 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         logo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         contentPane.add(logo, BorderLayout.WEST);
 
-        Font font = this.getFont();
+        Font font = getFont();
 
         JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" + "<b>" + getVersionString() + "</b><br>" + '\u00A9' + "2015 ESA JHelioviewer Team<br>" + "Part of the ESA/NASA Helioviewer Project<br><br>" + "JHelioviewer is released under the <br>" + "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" + "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" + "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" + "</font></center></html>");
         content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -120,6 +123,13 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
         add(scrollPane);
 
         setPreferredSize(new Dimension(getPreferredSize().width + 50, 600));
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -137,7 +147,6 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
                 scrollPane.getVerticalScrollBar().setValue(0);
             }
         });
-
         setVisible(true);
     }
 
@@ -146,8 +155,8 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
      */
     @Override
     public void actionPerformed(ActionEvent a) {
-        if (a.getSource() == this.closeButton) {
-            this.dispose();
+        if (a.getSource() == closeButton) {
+            dispose();
         }
     }
 
@@ -185,7 +194,6 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
             revisionString = "-1";
         }
         return JHVGlobals.getProgramName() + " " + versionString + " - Revision " + revisionString;
-
     }
 
     @Override
