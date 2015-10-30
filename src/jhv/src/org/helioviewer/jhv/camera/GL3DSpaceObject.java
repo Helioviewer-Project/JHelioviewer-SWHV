@@ -7,8 +7,8 @@ public class GL3DSpaceObject {
     private final double sizeInMeters;
     private static GL3DSpaceObject objectList[];
     public static GL3DSpaceObject earth;
-    public static int LINESEPPLANETS = 10;
-    public static int LINESEPSATS = 17;
+    public static final int LINESEPPLANETS = 10;
+    public static final int LINESEPSATS = 17;
 
     public static GL3DSpaceObject[] getObjectList() {
         if (objectList == null) {
