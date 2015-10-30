@@ -7,9 +7,13 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 
 public abstract class AbstractAnnotateable implements Annotateable {
 
-    protected static final float[] activeColor = new float[] { Color.red.getRed() / 255f, Color.red.getGreen() / 255f, Color.red.getBlue() / 255f };
-    protected static final float[] dragColor = new float[] { Color.yellow.getRed() / 255f, Color.yellow.getGreen() / 255f, Color.yellow.getBlue() / 255f };
-    protected static final float[] baseColor = new float[] { Color.blue.getRed() / 255f, Color.blue.getGreen() / 255f, Color.blue.getBlue() / 255f };
+    private static final Color colorActive = Color.red;
+    private static final Color colorDrag = Color.yellow;
+    private static final Color colorBase = Color.blue;
+
+    protected static final float[] activeColor = new float[] { colorActive.getRed() / 255f, colorActive.getGreen() / 255f, colorActive.getBlue() / 255f };
+    protected static final float[] dragColor = new float[] { colorDrag.getRed() / 255f, colorDrag.getGreen() / 255f, colorDrag.getBlue() / 255f };
+    protected static final float[] baseColor = new float[] { colorBase.getRed() / 255f, colorBase.getGreen() / 255f, colorBase.getBlue() / 255f };
 
     protected static final double lineWidth = 1;
     protected static final double radius = 1.01;

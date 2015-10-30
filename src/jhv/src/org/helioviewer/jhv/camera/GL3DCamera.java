@@ -373,7 +373,7 @@ public abstract class GL3DCamera {
         return this.rotationInteraction;
     }
 
-    public GL3DInteraction getAnnotateInteraction() {
+    public GL3DAnnotateInteraction getAnnotateInteraction() {
         return this.annotateInteraction;
     }
 
