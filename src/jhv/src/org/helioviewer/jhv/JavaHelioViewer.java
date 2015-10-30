@@ -110,12 +110,12 @@ public class JavaHelioViewer {
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
 
-                DataSources.getSingletonInstance();
-
                 Log.info("Start main window");
                 ExitHooks.attach();
                 ImageViewerGui.prepareGui();
                 ImageViewerGui.loadImagesAtStartup();
+
+                DataSources.getSingletonInstance(); // query server for data
 
                 Log.info("Load plugin settings");
                 PluginManager.getSingletonInstance().loadSettings(JHVDirectory.PLUGINS.getPath());
