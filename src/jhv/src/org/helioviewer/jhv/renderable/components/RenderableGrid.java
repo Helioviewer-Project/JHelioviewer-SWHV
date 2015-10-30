@@ -25,7 +25,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid extends AbstractRenderable {
 
-    private static final int SUBDIVISIONS = 120;
+    private static final int SUBDIVISIONS = 90;
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
     private final Color firstColor = Color.RED;
@@ -100,12 +100,13 @@ public class RenderableGrid extends AbstractRenderable {
 
         double[] matrix = cameraMatrix.transpose().m;
 
+        GLHelper.lineWidth(gl, 0.25);
+
         gl.glPushMatrix();
         gl.glMultMatrixd(matrix, 0);
         {
             if (showLabels)
                 drawText(gl);
-
             drawCircles(gl);
         }
         gl.glPopMatrix();
@@ -151,6 +152,7 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                 gl.glPopMatrix();
+
                 gl.glPushMatrix();
                 Quatd latitudeRotation = new Quatd(p.lat + Math.PI / 2, p.lon);
                 latitudeRotation.conjugate();
@@ -165,8 +167,6 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawCircles(GL2 gl) {
-        GLHelper.lineWidth(gl, 0.25);
-
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
@@ -239,7 +239,6 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glPopMatrix();
 
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
-
         }
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
