@@ -12,11 +12,11 @@ import com.jogamp.opengl.GL2;
 
 public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
-    private enum AnnotationMode {
+    public static enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
         private static AnnotationMode[] vals = values();
 
-        public AnnotationMode next() {
+        protected AnnotationMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -56,10 +56,19 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_M) {
-            this.mode = this.mode.next();
-            switch (mode) {
+        activeAnnotatable.keyPressed(e);
+    }
+
+    @Override
+    public void reset() {
+        aRect.reset();
+        aCircle.reset();
+        aCross.reset();
+        super.reset();
+    }
+
+    public void setMode(AnnotationMode newMode) {
+        switch (newMode) {
             case RECTANGLE:
                 activeAnnotatable = aRect;
                 break;
@@ -71,18 +80,8 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
                 break;
             default:
                 break;
-            }
-        } else {
-            activeAnnotatable.keyPressed(e);
         }
-    }
-
-    @Override
-    public void reset() {
-        aRect.reset();
-        aCircle.reset();
-        aCross.reset();
-        super.reset();
+        mode = newMode;
     }
 
 }

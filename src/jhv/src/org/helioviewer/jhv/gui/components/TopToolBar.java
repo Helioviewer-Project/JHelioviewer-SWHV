@@ -3,10 +3,12 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -19,6 +21,8 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.camera.GL3DAnnotateInteraction.AnnotationMode;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
@@ -174,6 +178,41 @@ public class TopToolBar extends JToolBar implements MouseListener {
         annotateButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         annotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         annotateButton.setToolTipText("Annotate");
+
+        final JPopupMenu annotatePopup = new JPopupMenu();
+        ButtonGroup annotateGroup = new ButtonGroup();
+
+        JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem(new AbstractAction("Rectangle") {
+            public void actionPerformed(ActionEvent e) {
+                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
+            }
+        });
+        annotatePopup.add(rectangleItem);
+        annotateGroup.add(rectangleItem);
+        rectangleItem.setSelected(true);
+
+        JRadioButtonMenuItem circleItem = new JRadioButtonMenuItem(new AbstractAction("Circle") {
+            public void actionPerformed(ActionEvent e) {
+                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
+            }
+        });
+        annotatePopup.add(circleItem);
+        annotateGroup.add(circleItem);
+
+        JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem(new AbstractAction("Cross") {
+            public void actionPerformed(ActionEvent e) {
+                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CROSS);
+            }
+        });
+        annotatePopup.add(crossItem);
+        annotateGroup.add(crossItem);
+
+        annotateButton.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
+            }
+        });
+
         group.add(annotateButton);
         addButton(annotateButton);
 
