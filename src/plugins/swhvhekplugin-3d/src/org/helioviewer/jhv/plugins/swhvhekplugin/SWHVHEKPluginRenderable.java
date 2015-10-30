@@ -137,8 +137,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (evt.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
         }
+
         gl.glColor3f(1, 1, 1);
-        gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
@@ -155,7 +155,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glDisable(GL2.GL_CULL_FACE);
     }
 
     private void drawPolygon(GL2 gl, JHVEvent evt) {
@@ -252,7 +251,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         p2.add(targetDir);
         p3.add(targetDir);
 
-        gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
@@ -267,7 +265,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glEnd();
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glDisable(GL2.GL_CULL_FACE);
     }
 
     private static final double vpScale = 0.019;
