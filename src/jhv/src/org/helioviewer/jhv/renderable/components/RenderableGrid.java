@@ -323,7 +323,7 @@ public class RenderableGrid extends AbstractRenderable {
             GridLabel label = latLabels.get(i);
             textRenderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
         }
-        textRenderer.end3DRendering();
+        textRenderer.flush();
 
         for (int i = 0; i < lonLabels.size(); ++i) {
             gl.glPushMatrix();
@@ -332,12 +332,12 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glTranslatef(label.x, 0, label.y);
                 gl.glRotatef(label.theta, 0, 1, 0);
 
-                textRenderer.begin3DRendering();
                 textRenderer.draw3D(label.txt, 0, 0, 0, textScaleFactor);
-                textRenderer.end3DRendering();
+                textRenderer.flush();
             }
             gl.glPopMatrix();
         }
+        textRenderer.end3DRendering();
     }
 
     @Override
