@@ -48,8 +48,8 @@ public class RenderableTimeStamp extends AbstractRenderable {
         String text = Layers.getLastUpdatedTimestamp().toString();
         if (Displayer.multiview) {
             RenderableImageLayer im = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(vp.getIndex());
-            if (im != null && im.getImageData() != null) {
-                text = im.getImageData().getMetaData().getDateObs().toString();
+            if (im != null) {
+                text = im.getTimeString();
             }
         }
 
