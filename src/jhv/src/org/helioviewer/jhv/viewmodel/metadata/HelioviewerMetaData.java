@@ -27,10 +27,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         retrievePosition(m);
         retrievePixelParameters(m);
 
-        if (instrument.equals("LASCO") || detector.equals("COR1") || detector.equals("COR2")) {
-            retrieveOcculterRadii(m);
-            retrieveOcculterLinearCutOff(m);
-        }
+        retrieveOcculterRadii(m);
+        retrieveOcculterLinearCutOff(m);
     }
 
     // magic
@@ -74,7 +72,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         // magic
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
-        if (instrument.equals("MDI") || instrument.equals("HMI"))
+        if (instrument.equals("MDI") || instrument.equals("HMI") ||
+            observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
+            observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
             outerRadius = 1;
     }
 

@@ -13,7 +13,7 @@ public class GLText {
     private static final int MIN = 10;
     private static final int MAX = 288;
     private static final int STEP = 2;
-    private static final int SIZE = (MAX - MIN) / STEP;
+    private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final TextRenderer[] renderer = new TextRenderer[SIZE];
 
     public static void init(GL2 gl) {
