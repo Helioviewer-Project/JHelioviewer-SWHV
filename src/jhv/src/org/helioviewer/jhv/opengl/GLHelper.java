@@ -11,7 +11,7 @@ public class GLHelper {
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
         gl.glVertex2f((float) x, (float) y);
         for (int n = 0; n <= segments; ++n) {
-            double t = 2 * Math.PI * n / segments;
+            double t = -2 * Math.PI * n / segments;
             gl.glVertex2f((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r));
         }
         gl.glEnd();
