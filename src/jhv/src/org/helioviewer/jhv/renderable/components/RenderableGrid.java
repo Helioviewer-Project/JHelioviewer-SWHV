@@ -54,7 +54,10 @@ public class RenderableGrid extends AbstractRenderable {
     public void render(GL2 gl, GL3DViewport vp) {
         GL3DCamera activeCamera = vp.getCamera();
 
+        gl.glDisable(GL2.GL_CULL_FACE);
         renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
+        gl.glEnable(GL2.GL_CULL_FACE);
+
         if (!isVisible[vp.getIndex()])
             return;
 
@@ -98,7 +101,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glMultMatrixd(matrix, 0);
         {
             gl.glColor3f(0, 0, 0);
-            GLHelper.drawCircle(gl, 0, 0, 0.95, 25);
+            GLHelper.drawCircle(gl, 0, 0, 0.98, 30);
         }
         gl.glPopMatrix();
     }
