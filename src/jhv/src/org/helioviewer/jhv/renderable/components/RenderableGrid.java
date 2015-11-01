@@ -301,11 +301,14 @@ public class RenderableGrid extends AbstractRenderable {
         float textScaleFactor = textScale / renderer.getFont().getSize2D();
 
         renderer.begin3DRendering();
+
+        gl.glDisable(GL2.GL_CULL_FACE);
         for (int i = 0; i < latLabels.size(); ++i) {
             GridLabel label = latLabels.get(i);
             renderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
         }
         renderer.flush();
+        gl.glEnable(GL2.GL_CULL_FACE);
 
         for (int i = 0; i < lonLabels.size(); ++i) {
             gl.glPushMatrix();
