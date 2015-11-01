@@ -2,7 +2,6 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
@@ -12,10 +11,9 @@ import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
-import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
@@ -25,30 +23,29 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid extends AbstractRenderable {
 
+    // height of text in solar radii
+    private static final float textScale = 0.08f;
     private static final int SUBDIVISIONS = 90;
+    private static final Color firstColor = Color.RED;
+    private static final Color secondColor = Color.GREEN;
+
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
-    private final Color firstColor = Color.RED;
-    private final Color secondColor = Color.GREEN;
 
     private boolean showAxes = true;
     private boolean showLabels = true;
-    private TextRenderer textRenderer;
-    // the height of the text in solar radii
-    private static final float textScale = 0.08f;
 
     private final Component optionsPanel;
     private static final String name = "Grid";
 
     public RenderableGrid() {
         optionsPanel = new RenderableGridOptionsPanel(this);
-        this.setVisible(true);
+        setVisible(true);
 
         makeLatLabels();
         makeLonLabels();
     }
 
-    private float oldFontSize = -1;
     private int positionBufferID;
     private int colorBufferID;
     private GridChoiceType gridChoice = GridChoiceType.OBSERVER;
@@ -63,24 +60,6 @@ public class RenderableGrid extends AbstractRenderable {
 
         if (showAxes)
             drawAxes(gl);
-
-        // cameraWidth ever changes so slightly with distance to Sun
-        int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * activeCamera.getCameraWidth()));
-        float fontSize = Math.max(10, Math.min(288, pixelsPerSolarRadius));
-
-        if (showLabels && (textRenderer == null || fontSize != oldFontSize)) {
-            oldFontSize = fontSize;
-            if (textRenderer != null) {
-                textRenderer.dispose();
-            }
-
-            boolean antiAlias = GLInfo.pixelScale[1] == 1 ? false : true;
-            Font font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
-            textRenderer = new TextRenderer(font, antiAlias, antiAlias, null, true);
-            textRenderer.setUseVertexArrays(true);
-            // textRenderer.setSmoothing(false);
-            textRenderer.setColor(Color.WHITE);
-        }
 
         Mat4d cameraMatrix;
         switch (gridChoice) {
@@ -103,8 +82,11 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(matrix, 0);
         {
-            if (showLabels)
-                drawText(gl);
+            if (showLabels) {
+                // cameraWidth changes ever so slightly with distance to Sun
+                int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * activeCamera.getCameraWidth()));
+                drawText(gl, pixelsPerSolarRadius);
+            }
             drawCircles(gl);
         }
         gl.glPopMatrix();
@@ -312,16 +294,17 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private void drawText(GL2 gl) {
+    private void drawText(GL2 gl, int size) {
+        TextRenderer renderer = GLText.getRenderer(size);
         // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / textRenderer.getFont().getSize();
+        float textScaleFactor = textScale / renderer.getFont().getSize2D();
 
-        textRenderer.begin3DRendering();
+        renderer.begin3DRendering();
         for (int i = 0; i < latLabels.size(); ++i) {
             GridLabel label = latLabels.get(i);
-            textRenderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
+            renderer.draw3D(label.txt, label.x, label.y, 0, textScaleFactor);
         }
-        textRenderer.flush();
+        renderer.flush();
 
         for (int i = 0; i < lonLabels.size(); ++i) {
             gl.glPushMatrix();
@@ -330,12 +313,12 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glTranslatef(label.x, 0, label.y);
                 gl.glRotatef(label.theta, 0, 1, 0);
 
-                textRenderer.draw3D(label.txt, 0, 0, 0, textScaleFactor);
-                textRenderer.flush();
+                renderer.draw3D(label.txt, 0, 0, 0, textScaleFactor);
+                renderer.flush();
             }
             gl.glPopMatrix();
         }
-        textRenderer.end3DRendering();
+        renderer.end3DRendering();
     }
 
     @Override
@@ -396,8 +379,8 @@ public class RenderableGrid extends AbstractRenderable {
         return lonstepDegrees;
     }
 
-    public void setLonstepDegrees(double lonstepDegrees) {
-        this.lonstepDegrees = (float) lonstepDegrees;
+    public void setLonstepDegrees(double _lonstepDegrees) {
+        lonstepDegrees = (float) _lonstepDegrees;
         makeLonLabels();
     }
 
@@ -405,8 +388,8 @@ public class RenderableGrid extends AbstractRenderable {
         return latstepDegrees;
     }
 
-    public void setLatstepDegrees(double latstepDegrees) {
-        this.latstepDegrees = (float) latstepDegrees;
+    public void setLatstepDegrees(double _latstepDegrees) {
+        latstepDegrees = (float) _latstepDegrees;
         makeLatLabels();
     }
 
@@ -430,21 +413,16 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-        if (textRenderer != null) {
-            textRenderer.dispose();
-            textRenderer = null;
-        }
         gl.glDeleteBuffers(1, new int[] { positionBufferID }, 0);
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
-        oldFontSize = -1;
     }
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
     }
 
-    public void setCoordinates(GridChoiceType gridChoice) {
-        this.gridChoice = gridChoice;
+    public void setCoordinates(GridChoiceType _gridChoice) {
+        gridChoice = _gridChoice;
     }
 
 }
