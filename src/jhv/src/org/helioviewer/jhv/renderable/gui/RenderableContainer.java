@@ -9,6 +9,7 @@ import javax.swing.table.TableModel;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 
@@ -211,6 +212,7 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void init(GL2 gl) {
+        GLText.init(gl);
         for (Renderable renderable : renderables) {
             renderable.init(gl);
         }
@@ -220,6 +222,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         for (Renderable renderable : renderables) {
             renderable.dispose(gl);
         }
+        GLText.dispose(gl);
     }
 
     public boolean isViewportActive(int idx) {
