@@ -180,7 +180,7 @@ public class RenderableImageLayer extends AbstractRenderable {
                 gl.glDepthRange(depthrange[0], depthrange[1]);
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
 
-                gl.glDepthRange(0.f, 1.f);
+                gl.glDepthRange(0, 1);
             }
             disableIndexVBO(gl);
             disablePositionVBO(gl);
