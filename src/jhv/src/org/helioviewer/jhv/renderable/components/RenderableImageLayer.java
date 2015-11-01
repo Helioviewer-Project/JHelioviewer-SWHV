@@ -142,8 +142,6 @@ public class RenderableImageLayer extends AbstractRenderable {
 
         GLSLShader.bind(gl);
         {
-            gl.glEnable(GL2.GL_CULL_FACE);
-            gl.glCullFace(GL2.GL_BACK);
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData, isMiniview);
 
             GLSLShader.setViewport(vp.getWidth(), vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
@@ -186,7 +184,6 @@ public class RenderableImageLayer extends AbstractRenderable {
             disablePositionVBO(gl);
 
             gl.glColorMask(true, true, true, true);
-            gl.glDisable(GL2.GL_CULL_FACE);
         }
         GLSLShader.unbind(gl);
     }
