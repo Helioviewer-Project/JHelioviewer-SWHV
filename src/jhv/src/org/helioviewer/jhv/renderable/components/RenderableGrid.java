@@ -33,7 +33,6 @@ public class RenderableGrid extends AbstractRenderable {
 
     private boolean showAxes = true;
     private boolean showLabels = true;
-    private Font font;
     private TextRenderer textRenderer;
     // the height of the text in solar radii
     private static final float textScale = 0.08f;
@@ -65,19 +64,18 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        // cameraWidth ever changes so slightly with distance to Sun; 4x pix/Rsun
-        int pixelsPerSolarRadius = (int) (2 * textScale * vp.getHeight() / activeCamera.getCameraWidth());
+        // cameraWidth ever changes so slightly with distance to Sun
+        int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * activeCamera.getCameraWidth()));
         float fontSize = Math.max(10, Math.min(288, pixelsPerSolarRadius));
 
         if (showLabels && (textRenderer == null || fontSize != oldFontSize)) {
             oldFontSize = fontSize;
-            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
-
             if (textRenderer != null) {
                 textRenderer.dispose();
             }
 
             boolean antiAlias = GLInfo.pixelScale[1] == 1 ? false : true;
+            Font font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
             textRenderer = new TextRenderer(font, antiAlias, antiAlias, null, true);
             textRenderer.setUseVertexArrays(true);
             // textRenderer.setSmoothing(false);
@@ -316,7 +314,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void drawText(GL2 gl) {
         // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / font.getSize();
+        float textScaleFactor = textScale / textRenderer.getFont().getSize();
 
         textRenderer.begin3DRendering();
         for (int i = 0; i < latLabels.size(); ++i) {
