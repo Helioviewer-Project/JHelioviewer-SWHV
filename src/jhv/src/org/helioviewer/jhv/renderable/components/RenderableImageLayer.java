@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.renderable.components;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
@@ -14,11 +13,11 @@ import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -36,16 +35,12 @@ public class RenderableImageLayer extends AbstractRenderable {
     private int positionBufferID;
     private int indexBufferID;
     private int indexBufferSize;
-
-    private View view;
-
     private final GLImage glImage = new GLImage();
 
-    private float oldFontSize = -1;
-    private static final double vpScale = 0.04;
-    private TextRenderer textRenderer;
     private JHVWorker<?, ?> worker;
+    private View view;
 
+    private static final double vpScale = 0.04;
     private static final String loading = "Loading...";
 
     public RenderableImageLayer(JHVWorker<?, ?> _worker) {
@@ -199,23 +194,13 @@ public class RenderableImageLayer extends AbstractRenderable {
     @Override
     public void renderFloat(GL2 gl, GL3DViewport vp) {
         if (imageData == null) {
-            float fontSize = (int) (vp.getHeight() * vpScale);
-            if (textRenderer == null || fontSize != oldFontSize) {
-                oldFontSize = fontSize;
-                if (textRenderer != null) {
-                    textRenderer.dispose();
-                }
-                textRenderer = new TextRenderer(UIGlobals.UIFontRoboto.deriveFont(fontSize), true, true);
-                textRenderer.setUseVertexArrays(true);
-                textRenderer.setSmoothing(false);
-                textRenderer.setColor(Color.WHITE);
-            }
-
             int delta = (int) (vp.getHeight() * 0.01);
-            textRenderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-            Rectangle2D rect = textRenderer.getBounds(loading);
-            textRenderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
-            textRenderer.endRendering();
+            TextRenderer renderer = GLText.getRenderer((int) (vp.getHeight() * vpScale));
+            Rectangle2D rect = renderer.getBounds(loading);
+
+            renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
+            renderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
+            renderer.endRendering();
         }
     }
 
@@ -398,12 +383,6 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     @Override
     public void dispose(GL2 gl) {
-        if (textRenderer != null) {
-            textRenderer.dispose();
-            textRenderer = null;
-        }
-        oldFontSize = -1;
-
         disablePositionVBO(gl);
         disableIndexVBO(gl);
         deletePositionVBO(gl);
