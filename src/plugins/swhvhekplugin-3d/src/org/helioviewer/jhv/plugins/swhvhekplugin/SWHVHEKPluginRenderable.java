@@ -2,17 +2,14 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
 
@@ -29,9 +26,9 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
@@ -70,7 +67,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             tex.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
-
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
@@ -138,7 +134,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             sz = ICON_SIZE_HIGHLIGHTED;
         }
 
-        gl.glColor3f(1, 1, 1);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
@@ -158,7 +153,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawPolygon(GL2 gl, JHVEvent evt) {
-        HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
             return;
         }
@@ -182,7 +177,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         // draw bounds
         Vec3d oldBoundaryPoint3d = null;
-
         for (Vec3d point : points) {
             int divpoints = 10;
 
@@ -204,7 +198,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawIcon(GL2 gl, JHVEvent evt) {
-        HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
@@ -212,9 +206,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 String type = evt.getJHVEventType().getEventType();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
-                    this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                    drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
-                    this.drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
+                    drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
                 }
             }
         }
@@ -268,41 +262,26 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private static final double vpScale = 0.019;
-    private TextRenderer textRenderer;
-    private Font font;
-    private float oldFontSize = -1;
 
     public void drawText(GL2 gl, JHVEvent evt, Point pt) {
         int height = Displayer.getGLHeight();
         int width = Displayer.getGLWidth();
 
-        float fontSize = (int) (height * vpScale);
-        if (textRenderer == null || fontSize != oldFontSize) {
-            oldFontSize = fontSize;
-            font = UIGlobals.UIFontRoboto.deriveFont(fontSize);
-            if (textRenderer != null) {
-                textRenderer.dispose();
-            }
-            textRenderer = new TextRenderer(font, true, true);
-            textRenderer.setUseVertexArrays(true);
-            textRenderer.setSmoothing(false);
-            textRenderer.setColor(Color.WHITE);
-        }
-
-        textRenderer.beginRendering(width, height, true);
+        TextRenderer renderer = GLText.getRenderer((int) (height * vpScale));
+        float fontSize = renderer.getFont().getSize2D();
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
 
         Vec2d bd = new Vec2d(0, 0);
         int ct = 0;
-        for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
+        for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            Rectangle2D bound = textRenderer.getBounds(txt);
+            Rectangle2D bound = renderer.getBounds(txt);
             if (bd.x < bound.getWidth())
                 bd.x = bound.getWidth();
             ct++;
         }
-        bd.y = fontSize * 1.1 * (ct);
+        bd.y = fontSize * 1.1 * ct;
 
         Point textInit = new Point(pt.x, pt.y);
         float w = (float) (bd.x + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
@@ -318,7 +297,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         float left = textInit.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT;
         float bottom = textInit.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT;
 
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.75f);
+        renderer.beginRendering(width, height, true);
+
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.8f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glPushMatrix();
         gl.glLoadIdentity();
@@ -332,23 +313,23 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         }
         gl.glPopMatrix();
-
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        textRenderer.setColor(Color.WHITE);
+
+        gl.glColor3f(1, 1, 1);
         int deltaY = MOUSE_OFFSET_Y;
-        for (Entry<String, JHVEventParameter> entry : params.entrySet()) {
+        for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            textRenderer.draw(txt, textInit.x + MOUSE_OFFSET_X, height - textInit.y - deltaY);
+            renderer.draw(txt, textInit.x + MOUSE_OFFSET_X, height - textInit.y - deltaY);
             deltaY += fontSize * 1.1;
         }
-        textRenderer.endRendering();
+        renderer.endRendering();
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
         if (isVisible[vp.getIndex()]) {
-            ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evt, controller.currentTime);
@@ -360,7 +341,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
-
             SWHVHEKSettings.resetCactusColor();
         }
     }
