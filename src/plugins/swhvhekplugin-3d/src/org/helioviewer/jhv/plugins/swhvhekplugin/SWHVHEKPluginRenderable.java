@@ -299,7 +299,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         renderer.beginRendering(width, height, true);
 
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.8f);
+        gl.glColor4f(0.33f, 0.33f, 0.33f, 0.9f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glPushMatrix();
         gl.glLoadIdentity();
