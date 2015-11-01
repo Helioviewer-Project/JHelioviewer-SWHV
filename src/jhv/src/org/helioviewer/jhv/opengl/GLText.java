@@ -38,8 +38,10 @@ public class GLText {
 
     public static void dispose(GL2 gl) {
         for (int i = 0; i < SIZE; i++) {
-            if (renderer[i] != null)
+            if (renderer[i] != null) {
                 renderer[i].dispose();
+                renderer[i] = null;
+            }
         }
     }
 
