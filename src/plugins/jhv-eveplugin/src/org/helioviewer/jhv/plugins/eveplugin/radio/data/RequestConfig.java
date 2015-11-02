@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class RequestConfig {
+
     private Date xStart;
     private Date xEnd;
     private double yStart;

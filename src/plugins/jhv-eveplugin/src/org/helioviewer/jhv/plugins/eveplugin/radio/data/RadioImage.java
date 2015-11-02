@@ -9,6 +9,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 public class RadioImage {
+
     private Interval<Date> imageTimeInterval;
     private FrequencyInterval imageFreqInterval;
     private Interval<Date> visibleImageTimeInterval;
@@ -22,7 +23,7 @@ public class RadioImage {
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(long downloadID, Long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
+    public RadioImage(long downloadID, long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
         super();
         this.downloadID = downloadID;
         imageTimeInterval = timeInterval;
@@ -64,7 +65,6 @@ public class RadioImage {
      * @return True if the radio image is downloading, false if not
      */
     public boolean isDownloading() {
-
         return isDownloading;
     }
 
@@ -263,4 +263,5 @@ public class RadioImage {
             return null;
         }
     }
+
 }

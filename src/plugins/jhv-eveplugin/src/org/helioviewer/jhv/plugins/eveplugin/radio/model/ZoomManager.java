@@ -15,6 +15,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
 public class ZoomManager implements TimingListener, GraphDimensionListener {
+
     private static ZoomManager instance;
     private DrawController drawController;
     private PlotAreaSpace plotAreaSpace;
@@ -31,7 +32,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         listeners = new ArrayList<ZoomManagerListener>();
         isAreaInitialized = false;
         displaySize = new Rectangle();
-
     }
 
     public static ZoomManager getSingletonInstance() {
@@ -51,15 +51,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     }
 
     public void calculateZoomXDirection() {
-
     }
 
     public void calculateZoomYDirection() {
-
     }
 
     public void calculateZoomXYDirection() {
-
     }
 
     public void addZoomDataConfig(Interval<Date> interval, ZoomDataConfigListener zoomDataConfigListener, long ID) {
@@ -220,7 +217,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     public void removeZoomManagerDataConfig(long downloadID) {
         PlotAreaSpace.getSingletonInstance().removePlotAreaSpaceListener(zoomDataConfigMap.get(downloadID));
         zoomDataConfigMap.remove(downloadID);
-
     }
 
     public void addZoomManagerListener(ZoomManagerListener listener) {
@@ -243,4 +239,5 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
             fireDisplaySizeChanged();
         }
     }
+
 }

@@ -52,6 +52,12 @@ public class RadioDownloader {
 
     public void requestAndOpenRemoteFile(final String startDateString, final String endDateString) {
         fireRemoveRadioSpectrogram();
+
+        final Date startDateOuter = parseDate(startDateString);
+        final Date endDateOuter = parseDate(endDateString);
+        if (startDateOuter == null || endDateOuter == null)
+            return;
+
         JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker = new JHVWorker<ImageDownloadWorkerResult, Void>() {
 
             @Override
@@ -62,27 +68,23 @@ public class RadioDownloader {
                     boolean intervalTooBig = false;
                     long duration = calculateFrequencyDuration(startDateString, endDateString);
                     long downloadID = getNextID();
-                    Date startDate = parseDate(startDateString);
-                    Date endDate = parseDate(endDateString);
+                    Date startDate = startDateOuter;
+                    Date endDate = endDateOuter;
                     Date requestedStartDate = new Date(startDate.getTime());
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
-                        if (endDate != null && startDate != null) {
-                            // case there were not more than three days
-                            while (startDate.compareTo(endDate) <= 0) {
-                                JP2CallistoView v = (JP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
-                                if (v != null) {
-                                    long imageID = getNextID();
-                                    DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, downloadID);
-                                    jpxList.add(newJPXData);
-                                    // cache.add(newJPXData);
-                                } else {
-                                    Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
-                                    noDataInterval.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
-
-                                }
-                                startDate = calculateOneDayFurtherAsDate(startDate);
+                        // case there were not more than three days
+                        while (startDate.compareTo(endDate) <= 0) {
+                            JP2CallistoView v = (JP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                            if (v != null) {
+                                long imageID = getNextID();
+                                DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, downloadID);
+                                jpxList.add(newJPXData);
+                                // cache.add(newJPXData);
+                            } else {
+                                Log.error("Received null view in request and open for date " + startDate + " and " + endDate);
+                                noDataInterval.add(new Interval<Date>(startDate, calculateOneDayFurtherAsDate(startDate)));
                             }
-
+                            startDate = calculateOneDayFurtherAsDate(startDate);
                         }
                     } else {
                         intervalTooBig = true;
@@ -140,7 +142,7 @@ public class RadioDownloader {
         EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
-    protected void fireNoDataInDownloadInterval(Interval<Date> requestInterval, Long downloadID) {
+    protected void fireNoDataInDownloadInterval(Interval<Date> requestInterval, long downloadID) {
         for (RadioDownloaderListener l : listeners) {
             l.noDataInDownloadInterval(requestInterval, downloadID);
         }
@@ -163,7 +165,7 @@ public class RadioDownloader {
         }
     }
 
-    public void requestAndOpenIntervals(List<Interval<Date>> intervals, final Long downloadId, final double ratioX, final double ratioY) {
+    public void requestAndOpenIntervals(List<Interval<Date>> intervals, final long downloadId, final double ratioX, final double ratioY) {
         final List<Date> toDownloadStartDates = new ArrayList<Date>();
         for (final Interval<Date> interval : intervals) {
             Date startDate = interval.getStart();
@@ -204,7 +206,7 @@ public class RadioDownloader {
                         Log.error("An error occured while opening the remote file!", e);
                     }
                     if (v != null) {
-                        Long imageID = getNextID();
+                        long imageID = getNextID();
                         DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, date, calculateOneDayFurtherAsDate(date), downloadId);
                         jpxList.add(newJPXData);
                     } else {
@@ -257,13 +259,13 @@ public class RadioDownloader {
         EVESettings.getExecutorService().execute(imageDownloadWorker);
     }
 
-    private void fireAdditionalJPXDataAvailable(List<DownloadedJPXData> jpxList, Long downloadID, double ratioX, double ratioY) {
+    private void fireAdditionalJPXDataAvailable(List<DownloadedJPXData> jpxList, long downloadID, double ratioX, double ratioY) {
         for (RadioDownloaderListener l : listeners) {
             l.newAdditionalDataDownloaded(jpxList, downloadID, ratioX, ratioY);
         }
     }
 
-    private void fireNewJPXDataAvailable(List<DownloadedJPXData> jpxList, Date startDate, Date endDate, Long downloadID) {
+    private void fireNewJPXDataAvailable(List<DownloadedJPXData> jpxList, Date startDate, Date endDate, long downloadID) {
         for (RadioDownloaderListener l : listeners) {
             l.newJPXFilesDownloaded(jpxList, startDate, endDate, downloadID);
         }
@@ -335,7 +337,7 @@ public class RadioDownloader {
         /** The request interval */
         private final Interval<Date> requestInterval;
         /** The download id */
-        private final Long downloadID;
+        private final long downloadID;
         private final List<Date> datesToRemoveFromRequestCache;
 
         /**
@@ -406,8 +408,9 @@ public class RadioDownloader {
          *
          * @return the downloadID
          */
-        public Long getDownloadID() {
+        public long getDownloadID() {
             return downloadID;
         }
     }
+
 }

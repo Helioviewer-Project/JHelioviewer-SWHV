@@ -40,7 +40,7 @@ public class RadioImageCache {
 
     public void add(DownloadedJPXData jpxData) {
         if (dataCache.size() > CACHE_SIZE) {
-            Long key = useCache.firstKey();
+            long key = useCache.firstKey();
             DownloadedJPXData oldestJPXData = useCache.get(key);
             dataCache.remove(oldestJPXData.getImageID());
             startDates.remove(oldestJPXData.getStartDate());
@@ -62,7 +62,7 @@ public class RadioImageCache {
         remove(jpxData.getImageID());
     }
 
-    public void remove(Long ID) {
+    public void remove(long ID) {
         if (dataCache.containsKey(ID)) {
             DownloadedJPXData data = dataCache.get(ID);
             Log.debug("Data for ID : " + data);
@@ -75,7 +75,7 @@ public class RadioImageCache {
         }
     }
 
-    private Date findStartDate(Date start, Long stepsize) {
+    private Date findStartDate(Date start, long stepsize) {
         long divider = 1L;
         if (stepsize < 1000L) {
             divider = 1000L;
@@ -89,7 +89,7 @@ public class RadioImageCache {
         return new Date(start.getTime() - start.getTime() % divider);
     }
 
-    public RadioImageCacheResult getRadioImageCacheResultForInterval(Date start, Date end, Long stepsize) {
+    public RadioImageCacheResult getRadioImageCacheResultForInterval(Date start, Date end, long stepsize) {
         Date localStart = findStartDate(start, stepsize);
         List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
         List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
