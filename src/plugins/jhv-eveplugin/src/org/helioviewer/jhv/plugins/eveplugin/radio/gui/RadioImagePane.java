@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -21,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModelListener;
 
 public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement {
-    ArrayList<BufferedImage> views = new ArrayList<BufferedImage>();
+
     private YAxisElement yAxisElement;
     private boolean intervalTooBig;
 
@@ -78,7 +77,6 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             g.setColor(Color.black);
             g.drawString(text1, x1, y1);
             g.drawString(text2, x2, y2);
-
         }
     }
 
@@ -110,4 +108,5 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     public Date getLastDateWithData() {
         return null;
     }
+
 }

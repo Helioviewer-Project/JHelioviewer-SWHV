@@ -30,7 +30,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     private static SWHVHEKData instance;
     private Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> data;
-    private ArrayList<JHVEvent> events;
     private Date beginDate = null;
     private Date endDate = null;
 
