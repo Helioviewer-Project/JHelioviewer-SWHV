@@ -95,20 +95,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glPopMatrix();
     }
 
-/*
-    private static void renderGreySquare(GL2 gl, double[] matrix, double w) {
-        gl.glPushMatrix();
-        gl.glMultMatrixd(matrix, 0);
-        {
-            gl.glColor4f(0.2f, 0.2f, 0.2f, 0.8f);
-            GLHelper.drawRectangleBack(gl, -w, -w, 2 * w, 2 * w);
-            gl.glColor3f(0, 0, 0);
-            GLHelper.drawCircleBack(gl, 0, 0, 0.98, 30);
-        }
-        gl.glPopMatrix();
-    }
-*/
-
     public static void renderScene(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (GL3DViewport vp : Displayer.getViewports()) {
@@ -118,7 +104,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 camera.applyPerspective(gl);
 
-//              renderGreySquare(gl, camera.getLocalRotation().toMatrix().transpose().m, camera.getCameraWidth());
                 renderBlackCircle(gl, camera.getRotation().transpose().m);
 
                 ImageViewerGui.getRenderableContainer().render(gl, vp);

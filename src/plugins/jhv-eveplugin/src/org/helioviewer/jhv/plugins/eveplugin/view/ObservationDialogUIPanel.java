@@ -30,8 +30,6 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
     private final JComboBox comboBoxGroup;
     private final JComboBox comboBoxData;
 
-    private final JPanel dataPane;
-
     public ObservationDialogUIPanel() {
         super();
 
@@ -40,7 +38,7 @@ public class ObservationDialogUIPanel extends SimpleObservationDialogUIPanel imp
 
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
-        dataPane = new JPanel();
+        JPanel dataPane = new JPanel();
 
         comboBoxGroup.addActionListener(this);
 
