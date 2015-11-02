@@ -124,7 +124,7 @@ public class DownloadController {
     private ArrayList<Interval<Date>> getIntervals(final Band band, final Interval<Date> queryInterval) {
         // get missing data intervals within given interval
         final List<Interval<Date>> missingIntervals = EVECacheController.getSingletonInstance().addRequest(band, queryInterval);
-        if (missingIntervals.size() == 0) {
+        if (missingIntervals.isEmpty()) {
             return null;
         }
 

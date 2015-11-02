@@ -315,20 +315,15 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 try {
                     if (!isCancelled()) {
                         eventPlotConfiguration = get();
-                        if (eventPlotConfiguration.getEventPlotConfigurations().size() != 0 && prevNoPlotConfig) {
+
+                        if (!eventPlotConfiguration.getEventPlotConfigurations().isEmpty() && prevNoPlotConfig) {
                             prevNoPlotConfig = false;
                         }
-                        if (eventPlotConfiguration != null && EventModel.getSingletonInstance().isEventsVisible()) {
+                        if (EventModel.getSingletonInstance().isEventsVisible()) {
                             DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
                         } else {
-
-                            if (eventPlotConfiguration == null) {
-                                Log.debug("event plot configurations null");
-                            } else {
-                                Log.debug("event plot configurations not visible");
-                            }
+                            Log.debug("event plot configurations not visible");
                         }
-
                     }
                 } catch (InterruptedException e) {
                     Log.error("Could not create the event type plot configurations" + e.getMessage());
