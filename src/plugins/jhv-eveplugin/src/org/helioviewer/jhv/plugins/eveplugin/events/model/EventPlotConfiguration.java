@@ -21,7 +21,7 @@ public class EventPlotConfiguration {
     private final double scaledX0;
     private final double scaledX1;
 
-    private final int offset = 3;
+    private static final int offset = 3;
 
     /** the Y position */
     private final int yPosition;
