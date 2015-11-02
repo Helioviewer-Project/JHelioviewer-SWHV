@@ -213,10 +213,11 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         final long timeDiff = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         final double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
+
+        GregorianCalendar tickGreg = new GregorianCalendar();
         String tickText;
         for (int i = 0; i < maxTicks; ++i) {
             final Date tickValue = new Date(availableInterval.getStart().getTime() + (long) (i * ratioTime));
-            GregorianCalendar tickGreg = new GregorianCalendar();
             tickGreg.setTime(tickValue);
             int currentday = tickGreg.get(GregorianCalendar.DAY_OF_MONTH);
             if (day != currentday) {

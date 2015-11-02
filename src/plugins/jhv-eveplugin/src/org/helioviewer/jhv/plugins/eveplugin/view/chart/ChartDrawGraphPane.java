@@ -251,6 +251,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         final int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
         final long tickDifferenceHorizontal = (interval.getEnd().getTime() - interval.getStart().getTime()) / (horizontalTickCount - 1);
 
+        GregorianCalendar tickGreg = new GregorianCalendar();
+        GregorianCalendar previousGreg = new GregorianCalendar();
+
         Date previousDate = null;
         for (int i = 0; i < horizontalTickCount; ++i) {
             final Date tickValue = new Date(interval.getStart().getTime() + i * tickDifferenceHorizontal);
@@ -259,9 +262,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (previousDate == null) {
                 tickText = ChartConstants.FULL_DATE_TIME_FORMAT_REVERSE.format(tickValue);
             } else {
-                GregorianCalendar tickGreg = new GregorianCalendar();
                 tickGreg.setTime(tickValue);
-                GregorianCalendar previousGreg = new GregorianCalendar();
                 previousGreg.setTime(previousDate);
                 if (tickGreg.get(GregorianCalendar.DAY_OF_MONTH) == previousGreg.get(GregorianCalendar.DAY_OF_MONTH) && tickGreg.get(GregorianCalendar.MONTH) == previousGreg.get(GregorianCalendar.MONTH) && tickGreg.get(GregorianCalendar.YEAR) == previousGreg.get(GregorianCalendar.YEAR)) {
                     tickText = ChartConstants.HOUR_TIME_FORMAT.format(tickValue);

@@ -137,7 +137,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
                 }
             }
         }
-
         eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
     }
 
@@ -257,7 +256,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
         supplierPerSource.add(swekSupplier);
         sourcesPerEventType.put(source, supplierPerSource);
         activeEventTypes.put(eventType, sourcesPerEventType);
-
     }
 
     /**
@@ -341,7 +339,6 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
             addToDownloaderMap(eventType, dw.getDownloadStartDate(), dw);
             downloadEventPool.execute(dw);
         }
-
     }
 
     /**
