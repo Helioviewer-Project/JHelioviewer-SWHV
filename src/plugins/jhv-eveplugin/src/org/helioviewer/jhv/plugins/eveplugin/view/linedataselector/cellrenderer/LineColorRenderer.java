@@ -36,7 +36,7 @@ public class LineColorRenderer extends DefaultTableCellRenderer {
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 
-    public class LineColorPanel extends JPanel {
+    private static class LineColorPanel extends JPanel {
         private final Color c;
 
         public LineColorPanel(Color c) {
