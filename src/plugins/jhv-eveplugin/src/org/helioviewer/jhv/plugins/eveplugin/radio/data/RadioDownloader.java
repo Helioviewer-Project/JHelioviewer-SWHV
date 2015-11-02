@@ -328,7 +328,7 @@ public class RadioDownloader {
      * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
      *
      */
-    private class ImageDownloadWorkerResult {
+    private static class ImageDownloadWorkerResult {
         /** the list of downloaded jpx data */
         private final List<DownloadedJPXData> imageInfoViews;
         /** the no data intervals */

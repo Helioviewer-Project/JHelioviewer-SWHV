@@ -73,7 +73,7 @@ public class DownloadedJPXData implements ViewDataHandler {
         view = null;
     }
 
-    private class DownloadedJPXDataWorkerResult {
+    private static class DownloadedJPXDataWorkerResult {
         private final long imageID;
         private final long downloadID;
         private final Rectangle dataSize;
