@@ -554,7 +554,6 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     Item[] detectors = DataSources.getSingletonInstance().getDetectors(obs, ins);
 
                     for (Item detector : detectors) {
-
                         Item[] measurements = DataSources.getSingletonInstance().getMeasurements(obs, ins, detector.getKey());
 
                         ItemPair.PrintMode printMode = ItemPair.PrintMode.BOTH;

@@ -21,8 +21,6 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         }
     }
 
-    private AnnotationMode mode = AnnotationMode.RECTANGLE;
-
     private final AnnotateRectangle aRect = new AnnotateRectangle(camera);
     private final AnnotateCircle aCircle = new AnnotateCircle(camera);
     private final AnnotateCross aCross = new AnnotateCross(camera);
@@ -81,7 +79,6 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
             default:
                 break;
         }
-        mode = newMode;
     }
 
 }

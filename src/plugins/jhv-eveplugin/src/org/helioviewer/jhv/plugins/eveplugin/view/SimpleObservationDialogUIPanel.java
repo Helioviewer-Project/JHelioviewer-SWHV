@@ -41,9 +41,6 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     protected JComboBox comboBoxGroup;
     protected JComboBox comboBoxData;
 
-    private final JPanel timePane;
-    private final JPanel plotPane;
-
     public SimpleObservationDialogUIPanel() {
         ObservationDialogDateModel.getInstance().addListener(this);
 
@@ -52,8 +49,8 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         calendarStartDate = new JHVCalendarDatePicker();
         comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
         comboBoxData = new JComboBox(new DefaultComboBoxModel());
-        timePane = new JPanel();
-        plotPane = new JPanel();
+        JPanel timePane = new JPanel();
+        JPanel plotPane = new JPanel();
 
         // set up time settings
         calendarStartDate.addJHVCalendarListener(this);
