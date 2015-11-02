@@ -104,7 +104,7 @@ public class SWEKTreeModel {
         if (loadingTypes.containsKey(eventType)) {
             Set<Object> objs = loadingTypes.get(eventType);
             objs.remove(obj);
-            if (objs.size() == 0) {
+            if (objs.isEmpty()) {
                 loadingTypes.remove(eventType);
                 fireEventTypeStopLoading(eventType);
             } else {
