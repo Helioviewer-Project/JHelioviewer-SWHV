@@ -18,7 +18,7 @@ public interface RadioDataManagerListener {
 
     public abstract void newGlobalFrequencyInterval(FrequencyInterval interval);
 
-    public abstract void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> ID, Long imageID);
+    public abstract void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> ID, long imageID);
 
     public abstract void clearAllSavedImages();
 
@@ -26,13 +26,13 @@ public interface RadioDataManagerListener {
 
     public abstract void downloadRequestDataVisibilityChanged(DownloadRequestData drd, long ID);
 
-    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, Long downloadID, Long imageID);
+    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, long imageID);
 
-    public abstract void clearAllSavedImagesForID(Long downloadID, Long imageID);
+    public abstract void clearAllSavedImagesForID(long downloadID, long imageID);
 
     public abstract void intervalTooBig(long iD);
 
-    public abstract void noDataInterval(List<Interval<Date>> noDataList, Long downloadID);
+    public abstract void noDataInterval(List<Interval<Date>> noDataList, long downloadID);
 
     /**
      * The maximum frequency interval for the plot with the given plot
@@ -47,4 +47,5 @@ public interface RadioDataManagerListener {
     public abstract void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval);
 
     public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, long imageID);
+
 }

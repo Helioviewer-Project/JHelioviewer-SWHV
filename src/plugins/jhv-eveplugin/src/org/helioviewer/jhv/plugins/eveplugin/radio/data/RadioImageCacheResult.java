@@ -7,6 +7,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.interval.Interval;
 
 public class RadioImageCacheResult {
+
     private List<DownloadedJPXData> availableData;
     private List<Interval<Date>> missingInterval;
     private List<Long> toRemove;
@@ -56,5 +57,6 @@ public class RadioImageCacheResult {
 
     public void setNoDataInterval(List<Interval<Date>> noDataInterval) {
         this.noDataInterval = noDataInterval;
-    }   
+    }
+
 }

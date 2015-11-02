@@ -13,13 +13,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
 public class DownloadedJPXData implements ViewDataHandler {
 
     private JP2CallistoView view;
-    private Long imageID;
+    private long imageID;
     private Date startDate;
     private Date endDate;
     private final RadioDataManager radioDataManager;
-    private final Long downloadID;
+    private final long downloadID;
 
-    public DownloadedJPXData(JP2CallistoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
+    public DownloadedJPXData(JP2CallistoView view, long imageID, Date startDate, Date endDate, long downloadID) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
@@ -39,11 +39,11 @@ public class DownloadedJPXData implements ViewDataHandler {
         this.view = view;
     }
 
-    public Long getImageID() {
+    public long getImageID() {
         return imageID;
     }
 
-    public void setImageID(Long id) {
+    public void setImageID(long id) {
         imageID = id;
     }
 
@@ -79,7 +79,7 @@ public class DownloadedJPXData implements ViewDataHandler {
         private final Rectangle dataSize;
         private final byte[] byteData;
 
-        public DownloadedJPXDataWorkerResult(byte[] data, Long imageID, Long downloadID, Rectangle dataSize) {
+        public DownloadedJPXDataWorkerResult(byte[] data, long imageID, long downloadID, Rectangle dataSize) {
             super();
             this.imageID = imageID;
             this.downloadID = downloadID;
