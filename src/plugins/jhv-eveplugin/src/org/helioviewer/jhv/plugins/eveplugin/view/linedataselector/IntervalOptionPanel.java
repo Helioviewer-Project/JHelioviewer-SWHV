@@ -24,10 +24,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-//Java 6 does not support generics for JComboBox and DefaultComboBoxModel
-//Should be removed if support for Java 6 is not needed anymore
-//Class will not be serialized so we suppress the warnings
-@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+@SuppressWarnings("serial")
 public class IntervalOptionPanel extends JPanel implements ActionListener, LayersListener, TimingListener, LineDataSelectorModelListener {
 
     private final JComboBox zoomComboBox;
@@ -216,7 +213,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
     }
 
-    public Interval<Date> zoomTo(final ZOOM zoom, final int value) {
+    private Interval<Date> zoomTo(final ZOOM zoom, final long value) {
         Interval<Date> newInterval = new Interval<Date>(null, null);
         Interval<Date> selectedInterval = drawController.getSelectedInterval();
         Interval<Date> availableInterval = drawController.getAvailableInterval();
@@ -245,7 +242,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         return drawController.setSelectedInterval(newInterval, true);
     }
 
-    private Interval<Date> computeCarringtonInterval(Interval<Date> interval, int value) {
+    private Interval<Date> computeCarringtonInterval(Interval<Date> interval, long value) {
         return computeZoomForMilliSeconds(interval, value * 2356585920l);
     }
 
@@ -293,14 +290,13 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         drawController.setAvailableInterval(new Interval<Date>(availableS, availableE));
 
         return new Interval<Date>(startDate, endDate);
-
     }
 
-    private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final int difference) {
+    private Interval<Date> computeZoomInterval(final Interval<Date> interval, final int calendarField, final long difference) {
         return computeZoomForMilliSeconds(interval, differenceInMilliseconds(calendarField, difference));
     }
 
-    private Long differenceInMilliseconds(final int calendarField, final int value) {
+    private Long differenceInMilliseconds(final int calendarField, final long value) {
         switch (calendarField) {
         case Calendar.YEAR:
             return value * 365 * 24 * 60 * 60 * 1000l;
