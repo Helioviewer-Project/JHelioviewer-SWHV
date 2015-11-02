@@ -174,8 +174,6 @@ public class EVEDrawableElement implements DrawableElement {
         // Definitions
         // //////////////////////////////////////////////////////////////////////////
 
-        public final int numberOfPoints;
-        public final int numberOfWarnLevels;
         public final ArrayList<ArrayList<Integer>> xPoints;
         public final ArrayList<ArrayList<Integer>> yPoints;
         public final ArrayList<int[]> xPointsArray;
@@ -190,13 +188,13 @@ public class EVEDrawableElement implements DrawableElement {
         // //////////////////////////////////////////////////////////////////////////
 
         public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels, final List<String> warnLabels, double ratioX, double graphWidth) {
-            numberOfPoints = points.size();
-            numberOfWarnLevels = warnLevels.size();
             xPoints = new ArrayList<ArrayList<Integer>>();
             yPoints = new ArrayList<ArrayList<Integer>>();
             xPointsArray = new ArrayList<int[]>();
             yPointsArray = new ArrayList<int[]>();
             this.color = color;
+
+            int numberOfWarnLevels = warnLevels.size();
             this.warnLevels = new int[numberOfWarnLevels];
             this.warnLabels = new String[numberOfWarnLevels];
             int counter = -1;
