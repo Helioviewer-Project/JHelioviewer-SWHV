@@ -81,7 +81,7 @@ public class DownloadController {
             }
 
             if (intervals.size() == 0) {
-                fireDownloadStarted(band, queryInterval);
+                fireDownloadStarted(band);
                 return;
             }
 
@@ -98,7 +98,7 @@ public class DownloadController {
             addFutureJobs(addDownloads(jobs), band);
 
             // inform listeners
-            fireDownloadStarted(band, queryInterval);
+            fireDownloadStarted(band);
         }
     }
 
@@ -150,7 +150,7 @@ public class DownloadController {
             fj.cancel(true);
         }
         futureJobs.remove(band);
-        fireDownloadFinished(band, null, 0);
+        fireDownloadFinished(band);
     }
 
     public boolean isDownloadActive(final Band band) {
@@ -161,11 +161,11 @@ public class DownloadController {
         return list.size() > 0;
     }
 
-    private void fireDownloadStarted(final Band band, final Interval<Date> interval) {
+    private void fireDownloadStarted(final Band band) {
         selectorModel.downloadStarted(band);
     }
 
-    private void fireDownloadFinished(final Band band, final Interval<Date> interval, final int activeBandDownloads) {
+    private void fireDownloadFinished(final Band band) {
         selectorModel.downloadFinished(band);
     }
 
@@ -203,7 +203,7 @@ public class DownloadController {
                         downloadMap.remove(band);
                     }
                 }
-                fireDownloadFinished(band, interval, numberOfDownloads);
+                fireDownloadFinished(band);
             }
         });
     }

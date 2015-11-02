@@ -186,7 +186,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             ndc.setVisible(drd.isVisible());
         }
 
-        fireChangeVisibility(ID, drd.isVisible());
+        fireChangeVisibility(ID);
     }
 
     @Override
@@ -316,7 +316,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         }
     }
 
-    private void fireChangeVisibility(long ID, boolean visible) {
+    private void fireChangeVisibility(long ID) {
         for (RadioPlotModelListener l : listeners) {
             l.changeVisibility(ID);
         }

@@ -136,7 +136,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         }
     }
 
-    private void updateBand(final Band band, boolean keepFullValueRange) {
+    private void updateBand(final Band band) {
         Interval<Date> interval = drawController.getSelectedInterval();
         Rectangle plotArea = drawController.getPlotArea();
         EVEValues data = retrieveData(band, interval, plotArea);
@@ -168,10 +168,10 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         dataMapPerUnitLabel.get(yAxisElement).put(band, data);
     }
 
-    private void updateBands(boolean keepFullValueRange) {
+    private void updateBands() {
         for (YAxisElement yAxisElement : dataMapPerUnitLabel.keySet()) {
             for (final Band band : dataMapPerUnitLabel.get(yAxisElement).keySet()) {
-                updateBand(band, keepFullValueRange);
+                updateBand(band);
             }
         }
     }
@@ -319,7 +319,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                     eveDrawableElementMap.put(otherYAxisElement, new EVEDrawableElement());
                 }
                 resetAvailableRange();
-                updateBand(band, true);
+                updateBand(band);
                 fireRedrawRequest(true);
             }
         }
@@ -368,7 +368,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
             if (selectedIntervalChanged) {
                 selectedIntervalChanged = false;
-                updateBands(keepFullValueRange);
+                updateBands();
                 fireRedrawRequest(keepFullValueRange);
             }
         }
