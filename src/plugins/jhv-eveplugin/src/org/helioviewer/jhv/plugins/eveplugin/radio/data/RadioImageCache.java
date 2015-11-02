@@ -13,7 +13,7 @@ import org.helioviewer.jhv.base.logging.Log;
 
 public class RadioImageCache {
 
-    private final int CACHE_SIZE = 3;
+    private static final int CACHE_SIZE = 3;
     private static RadioImageCache instance;
     private long cacheCounter;
     private final Map<Long, DownloadedJPXData> dataCache;

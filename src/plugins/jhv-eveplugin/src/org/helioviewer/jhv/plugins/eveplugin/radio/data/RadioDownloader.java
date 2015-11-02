@@ -19,6 +19,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class RadioDownloader {
+
     // Make connection with server to request the jpx
     // Make structure indicating the start and stop for every jpx in the file
     // give the data for a certain zoomlevel and timerange
@@ -28,7 +29,7 @@ public class RadioDownloader {
     private final Set<Date> requestDateCache;
     private JHVWorker<ImageDownloadWorkerResult, Void> imageDownloadWorker;
 
-    private final long MAXIMUM_DAYS = 172800000;
+    private static final long MAXIMUM_DAYS = 172800000;
 
     private RadioDownloader() {
         listeners = new ArrayList<RadioDownloaderListener>();

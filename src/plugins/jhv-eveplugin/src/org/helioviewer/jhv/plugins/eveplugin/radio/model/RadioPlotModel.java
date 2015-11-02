@@ -278,11 +278,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private BufferedImage createBufferedImage(int width, int height, int[] data) {
-        int[] useData = new int[0];
+        int[] useData;
         if (width * height == data.length) {
             useData = data;
         } else {
-            Log.error("Data array was to small created white image");
+            Log.error("Data array was too small; white image created");
             useData = new int[width * height];
         }
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -294,11 +294,11 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private BufferedImage createBufferedImage(int width, int height, byte[] data) {
-        byte[] useData = new byte[0];
+        byte[] useData;
         if (width * height == data.length) {
             useData = data;
         } else {
-            Log.error("Data array was to small created white image");
+            Log.error("Data array was too small; white image created");
             useData = new byte[width * height];
         }
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, ColorLookupModel.getInstance().getColorModel());

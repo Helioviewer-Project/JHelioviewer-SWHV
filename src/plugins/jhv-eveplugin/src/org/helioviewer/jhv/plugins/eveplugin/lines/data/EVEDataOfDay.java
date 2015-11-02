@@ -6,7 +6,7 @@ import java.util.GregorianCalendar;
 
 public class EVEDataOfDay {
 
-    private final int MINUTES_PER_DAY = 1440;
+    private static final int MINUTES_PER_DAY = 1440;
 
     private final float[] values = new float[MINUTES_PER_DAY];
     private final long[] dates = new long[MINUTES_PER_DAY];
