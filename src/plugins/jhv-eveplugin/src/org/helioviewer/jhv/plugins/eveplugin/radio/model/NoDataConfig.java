@@ -13,6 +13,7 @@ import org.helioviewer.jhv.base.interval.Interval;
  * @author Bram.Bourgoignie@oma.be
  */
 public class NoDataConfig {
+
     /** The interval for which there is no data. */
     private Interval<Date> dateInterval;
 
@@ -142,9 +143,10 @@ public class NoDataConfig {
             String text = "No data available";
             final int textWidth = (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
             final int textHeight = (int) g.getFontMetrics().getStringBounds(text, g).getHeight();
-            final int x1 = drawableAreaMap.getDestinationX0() + (spaceWidth / 2) - (textWidth / 2);
-            final int y1 = (int) ((spaceHeight / 2) - (0.5 * textHeight));
+            final int x1 = drawableAreaMap.getDestinationX0() + spaceWidth / 2 - textWidth / 2;
+            final int y1 = spaceHeight / 2 - textHeight / 2;
             g.drawString(text, x1, y1);
         }
     }
+
 }
