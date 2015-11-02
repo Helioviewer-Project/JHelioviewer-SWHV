@@ -111,10 +111,10 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     public ArrayList<JHVEvent> getActiveEvents(Date currentDate) {
         ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
         if (data != null) {
-            for (String eventType : data.keySet()) {
-                for (Date sDate : data.get(eventType).keySet()) {
-                    for (Date eDate : data.get(eventType).get(sDate).keySet()) {
-                        for (JHVEvent event : data.get(eventType).get(sDate).get(eDate)) {
+            for (NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> v1 : data.values()) {
+                for (NavigableMap<Date, List<JHVEvent>> v2 : v1.values()) {
+                    for (List<JHVEvent> v3 : v2.values()) {
+                        for (JHVEvent event : v3) {
                             if (event != null && event.getStartDate() != null && event.getEndDate() != null) {
                                 if (event.getStartDate().getTime() <= currentDate.getTime() && event.getEndDate().getTime() >= currentDate.getTime()) {
                                     activeEvents.add(event);
@@ -126,7 +126,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
                         }
                     }
                 }
-
             }
         }
         return activeEvents;
