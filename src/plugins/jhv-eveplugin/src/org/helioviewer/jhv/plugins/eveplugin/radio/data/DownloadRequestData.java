@@ -11,7 +11,7 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 public class DownloadRequestData implements LineDataSelectorElement {
 
     private Map<Long, RadioImage> radioImages;
-    private Long downloadID;
+    private long downloadID;
     private boolean isDownloading;
     private boolean isVisible;
 
@@ -42,11 +42,11 @@ public class DownloadRequestData implements LineDataSelectorElement {
         this.radioImages = radioImages;
     }
 
-    public Long getDownloadID() {
+    public long getDownloadID() {
         return downloadID;
     }
 
-    public void setDownloadID(Long iD) {
+    public void setDownloadID(long iD) {
         downloadID = iD;
     }
 
@@ -59,7 +59,6 @@ public class DownloadRequestData implements LineDataSelectorElement {
     public void setVisibility(boolean visible) {
         isVisible = visible;
         radioDataManager.downloadRequestDataVisibilityChanged(this);
-
     }
 
     @Override

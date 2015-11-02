@@ -14,7 +14,6 @@ import org.helioviewer.jhv.base.logging.Log;
 public class RadioImageCache {
 
     private final int CACHE_SIZE = 3;
-    private final List<RadioImageCacheListener> listeners;
     private static RadioImageCache instance;
     private long cacheCounter;
     private final Map<Long, DownloadedJPXData> dataCache;
@@ -24,21 +23,12 @@ public class RadioImageCache {
     private final Map<Date, Interval<Date>> noDataCache;
 
     private RadioImageCache() {
-        listeners = new ArrayList<RadioImageCacheListener>();
         cacheCounter = 0;
         dataCache = new HashMap<Long, DownloadedJPXData>();
         useCache = new TreeMap<Long, DownloadedJPXData>();
         startDates = new HashMap<Date, DownloadedJPXData>();
         noDataCache = new HashMap<Date, Interval<Date>>();
         reverseUseCache = new HashMap<DownloadedJPXData, Long>();
-    }
-
-    public void addRadioImageCacheListener(RadioImageCacheListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeRadioImageListener(RadioImageCacheListener listener) {
-        listeners.remove(listener);
     }
 
     public static RadioImageCache getInstance() {
@@ -136,4 +126,5 @@ public class RadioImageCache {
         noDataCache.put(interval.getStart(), interval);
         return !added;
     }
+
 }

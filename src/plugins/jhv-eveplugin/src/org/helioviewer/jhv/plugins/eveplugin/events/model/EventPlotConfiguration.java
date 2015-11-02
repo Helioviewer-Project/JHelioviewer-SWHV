@@ -26,9 +26,6 @@ public class EventPlotConfiguration {
     /** the Y position */
     private final int yPosition;
 
-    /** The position of the angle the event area */
-    private Rectangle drawPosition;
-
     /** The click position */
     private Rectangle clickPosition;
 
@@ -83,7 +80,7 @@ public class EventPlotConfiguration {
         JHVEvent highlightedEvent = null;
         int spacePerLine = Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + offset;
-        drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
+        Rectangle drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
         // minimal width is 1
         if (drawPosition.width < 5) {
             drawPosition.x = drawPosition.x - (5 / drawPosition.width);
@@ -105,7 +102,6 @@ public class EventPlotConfiguration {
             drawPosition.height = drawPosition.height + 2;
             shouldRedraw = true;
             spacePerLine = drawPosition.height;
-
         }
         if (mousePosition != null && containsMouse)
             highlightedEvent = event;

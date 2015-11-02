@@ -5,6 +5,7 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.data;
  * 
  */
 public class FrequencyInterval {
+
     private int start;
     private int end;
 
@@ -36,15 +37,25 @@ public class FrequencyInterval {
         this.end = end;
     }
 
-    public boolean equals(FrequencyInterval interval) {
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof FrequencyInterval)) {
+            return false;
+        }
+        FrequencyInterval interval = (FrequencyInterval) o;
         return interval.getStart() == start && interval.getEnd() == end;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
     }
 
     public boolean overlaps(FrequencyInterval otherInterval) {
         return !(this.getStart() > otherInterval.getEnd() || this.getEnd() < otherInterval.getStart());
     }
-    
-    
+
     public int squeeze(int element) {
          if (element >= start && element <= end) {
              return element;
@@ -56,8 +67,9 @@ public class FrequencyInterval {
              }
          }
     }
-    
+
     public boolean containsInclusive(int value) {
         return value >= start || value <= end;
     }
+
 }
