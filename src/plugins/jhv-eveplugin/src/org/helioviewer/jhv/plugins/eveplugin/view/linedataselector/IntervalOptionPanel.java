@@ -115,7 +115,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
     }
 
-    private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarField, final int calendarValue, final ZOOM zoom) {
+    private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarValue, final ZOOM zoom) {
         model.addElement(new ZoomComboboxItem(zoom, calendarValue));
         return true;
     }
@@ -134,16 +134,16 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
 
-        addElementToModel(model, Calendar.YEAR, 1, ZOOM.Year);
-        addElementToModel(model, Calendar.MONTH, 6, ZOOM.Month);
-        addElementToModel(model, Calendar.MONTH, 3, ZOOM.Month);
+        addElementToModel(model, 1, ZOOM.Year);
+        addElementToModel(model, 6, ZOOM.Month);
+        addElementToModel(model, 3, ZOOM.Month);
         addCarringtonRotationToModel(model, 1);
 
-        addElementToModel(model, Calendar.DATE, 7, ZOOM.Day);
+        addElementToModel(model, 7, ZOOM.Day);
 
-        addElementToModel(model, Calendar.HOUR, 12, ZOOM.Hour);
-        addElementToModel(model, Calendar.HOUR, 6, ZOOM.Hour);
-        addElementToModel(model, Calendar.HOUR, 1, ZOOM.Hour);
+        addElementToModel(model, 12, ZOOM.Hour);
+        addElementToModel(model, 6, ZOOM.Hour);
+        addElementToModel(model, 1, ZOOM.Hour);
     }
 
     private static class ZoomComboboxItem {

@@ -181,7 +181,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     public void setAvailableInterval(final Interval<Date> interval) {
         availableInterval = makeCompleteDay(interval);
         // Log.debug("New available interval : " + availableInterval);
-        fireAvailableIntervalChanged(availableInterval);
+        fireAvailableIntervalChanged();
 
         // request data if needed
         final Calendar calendar = new GregorianCalendar();
@@ -404,7 +404,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
     }
 
-    private void fireAvailableIntervalChanged(final Interval<Date> newInterval) {
+    private void fireAvailableIntervalChanged() {
         for (TimingListener listener : tListeners) {
             listener.availableIntervalChanged();
         }

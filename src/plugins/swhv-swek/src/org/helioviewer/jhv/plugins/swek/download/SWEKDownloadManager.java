@@ -311,7 +311,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the source from where the events are coming
      * @return the parameters
      */
-    private List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSource source, SWEKSupplier supplier) {
+    private List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<SWEKParam>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
         Map<SWEKParameter, List<SWEKParam>> paramsPerEventParameter = filterManager.getFilterForEventType(eventType);
@@ -334,7 +334,7 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
      *            the supplier providing the event
      */
     private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
-        List<SWEKParam> params = defineParameters(eventType, swekSource, supplier);
+        List<SWEKParam> params = defineParameters(eventType, supplier);
         for (Interval<Date> intt : Interval.splitInterval(interval, 14)) {
             DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
             dw.addDownloadWorkerListener(this);

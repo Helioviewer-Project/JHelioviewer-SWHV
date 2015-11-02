@@ -90,9 +90,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID) {
         ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
-        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, startFrequency, endFrequency, area, zdc, false);
+        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, startFrequency, endFrequency, area, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, startFrequency, endFrequency, area, zdc, true);
+        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, startFrequency, endFrequency, area, true);
         int destX0 = defineXInDestinationArea(startDate, zdc);
         int destY0 = defineYInDestinationArea(startFrequency, yAxisElement, zdc);
         int destX1 = defineXInDestinationArea(endDate, zdc);
@@ -178,7 +178,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         return zdc.getDisplaySize().x + (int) Math.floor((dateToFind.getTime() - zdc.getMinX().getTime()) / (1.0 * (zdc.getMaxX().getTime() - zdc.getMinX().getTime()) / zdc.getDisplaySize().width));
     }
 
-    private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, ZoomDataConfig zdc, boolean ceil) {
+    private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, boolean ceil) {
         if (!ceil) {
             return (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
         } else {
