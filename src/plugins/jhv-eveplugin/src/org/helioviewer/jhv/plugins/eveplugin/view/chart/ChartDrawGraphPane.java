@@ -613,39 +613,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
     }
 
-    public class GraphPolyline {
-
-        public final int numberOfPoints;
-        public final int numberOfWarnLevels;
-        public final int[] xPoints;
-        public final int[] yPoints;
-        public final int[] warnLevels;
-
-        public final Color color;
-
-        public GraphPolyline(final List<Point> points, final Color color, final List<Integer> warnLevels) {
-            numberOfPoints = points.size();
-            numberOfWarnLevels = warnLevels.size();
-            xPoints = new int[numberOfPoints];
-            yPoints = new int[numberOfPoints];
-            this.color = color;
-            this.warnLevels = new int[numberOfWarnLevels];
-
-            int counter = 0;
-            for (final Point point : points) {
-                xPoints[counter] = point.x;
-                yPoints[counter] = point.y;
-                counter++;
-            }
-
-            counter = 0;
-            for (final Integer warnLevel : warnLevels) {
-                this.warnLevels[counter] = warnLevel;
-                counter++;
-            }
-        }
-    }
-
     @Override
     public void drawRequest() {
         setTwoAxisInformation();
