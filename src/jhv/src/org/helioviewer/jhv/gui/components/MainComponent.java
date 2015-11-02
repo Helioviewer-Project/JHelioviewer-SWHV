@@ -6,6 +6,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
 
@@ -84,6 +85,16 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Displayer.reshapeAll();
     }
 
+    private static void renderBlackCircle(GL2 gl, double[] matrix) {
+        gl.glPushMatrix();
+        gl.glMultMatrixd(matrix, 0);
+        {
+            gl.glColor3f(0, 0, 0);
+            GLHelper.drawCircle(gl, 0, 0, 0.98, 30);
+        }
+        gl.glPopMatrix();
+    }
+
     public static void renderScene(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (GL3DViewport vp : Displayer.getViewports()) {
@@ -92,6 +103,9 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 camera.applyPerspective(gl);
+
+                renderBlackCircle(gl, camera.getRotation().transpose().m);
+
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
                 camera.getAnnotateInteraction().drawInteractionFeedback(gl);
             }

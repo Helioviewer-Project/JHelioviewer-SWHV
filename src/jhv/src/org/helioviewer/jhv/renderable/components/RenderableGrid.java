@@ -52,16 +52,13 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void render(GL2 gl, GL3DViewport vp) {
-        GL3DCamera activeCamera = vp.getCamera();
-
-        renderBlackCircle(gl, activeCamera.getRotation().transpose().m);
-
         if (!isVisible[vp.getIndex()])
             return;
 
         if (showAxes)
             drawAxes(gl);
 
+        GL3DCamera activeCamera = vp.getCamera();
         Mat4d cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:
@@ -76,12 +73,10 @@ public class RenderableGrid extends AbstractRenderable {
             break;
         }
 
-        double[] matrix = cameraMatrix.transpose().m;
-
         GLHelper.lineWidth(gl, 0.25);
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(matrix, 0);
+        gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             if (showLabels) {
                 // cameraWidth changes ever so slightly with distance to Sun
@@ -92,16 +87,6 @@ public class RenderableGrid extends AbstractRenderable {
         }
         gl.glPopMatrix();
         drawEarthCircles(gl);
-    }
-
-    private void renderBlackCircle(GL2 gl, double[] matrix) {
-        gl.glPushMatrix();
-        gl.glMultMatrixd(matrix, 0);
-        {
-            gl.glColor3f(0, 0, 0);
-            GLHelper.drawCircle(gl, 0, 0, 0.98, 30);
-        }
-        gl.glPopMatrix();
     }
 
     private void drawAxes(GL2 gl) {
