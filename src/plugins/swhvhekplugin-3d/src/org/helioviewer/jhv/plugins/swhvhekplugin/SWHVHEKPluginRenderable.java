@@ -160,9 +160,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
         List<Vec3d> points = el.getBoundCC();
-        if (points == null || points.size() == 0) {
+        if (points == null || points.isEmpty()) {
             points = el.getBoundBox();
-            if (points == null || points.size() == 0) {
+            if (points == null || points.isEmpty()) {
                 return;
             }
         }

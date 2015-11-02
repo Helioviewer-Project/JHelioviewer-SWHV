@@ -25,9 +25,10 @@ public class BandTypeAPI extends APIAbstract {
 
     private static BandTypeAPI singletonInstance;
     private BandType[] bandtypes;
-    private Boolean isUpdated = Boolean.FALSE;
     private final HashMap<String, BandGroup> groups = new HashMap<String, BandGroup>();
     private final List<BandGroup> orderedGroups = new ArrayList<BandGroup>();
+
+    private boolean isUpdated = false;
 
     private final Properties defaultProperties = new Properties();
 

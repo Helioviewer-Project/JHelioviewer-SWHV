@@ -10,6 +10,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 
 public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListener, ValueSpaceListener {
+
     private Date minX;
     private Date maxX;
     private Rectangle displaySize;
@@ -104,7 +105,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MinX = ").append(minX).append("\n").append("MaxX = ").append(maxX).append("\n").append("DisplaySize = ").append(displaySize).append("\n");
+        sb.append("MinX = ").append(minX).append("\nMaxX = ").append(maxX).append("\nDisplaySize = ").append(displaySize).append("\n");
         return sb.toString();
     }
 
@@ -116,12 +117,11 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void valueSpaceChanged(Range availableRange, Range selectedRange) {
         requestData();
     }
+
 }

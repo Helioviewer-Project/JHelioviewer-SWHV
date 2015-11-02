@@ -3,8 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 import java.awt.Rectangle;
 import java.util.Date;
 
-import javax.swing.SwingWorker;
-
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
@@ -20,7 +18,6 @@ public class DownloadedJPXData implements ViewDataHandler {
     private Date endDate;
     private final RadioDataManager radioDataManager;
     private final Long downloadID;
-    private SwingWorker<DownloadedJPXDataWorkerResult, Void> worker;
 
     public DownloadedJPXData(JP2CallistoView view, Long imageID, Date startDate, Date endDate, Long downloadID) {
         super();
@@ -68,11 +65,6 @@ public class DownloadedJPXData implements ViewDataHandler {
 
     public void remove() {
         radioDataManager.finishedDownloadingID(imageID, downloadID);
-
-        if (worker != null && !worker.isDone()) {
-            worker.cancel(true);
-        }
-        worker = null;
 
         if (view != null) {
             view.removeDataHandler();
