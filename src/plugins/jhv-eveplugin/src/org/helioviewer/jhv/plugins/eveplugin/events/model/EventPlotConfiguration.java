@@ -81,7 +81,7 @@ public class EventPlotConfiguration {
      */
     public JHVEvent draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
         JHVEvent highlightedEvent = null;
-        int spacePerLine = Math.max(3, Math.min(4, (new Double(Math.floor(1.0 * graphArea.height / totalLines / 2))).intValue()));
+        int spacePerLine = Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + offset;
         drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
         // minimal width is 1
