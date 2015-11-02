@@ -116,7 +116,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     @Override
     public void addTreeModelListener(TreeModelListener l) {
         listeners.add(l);
-
     }
 
     /*
@@ -202,7 +201,6 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
         listeners.remove(l);
-
     }
 
     /*

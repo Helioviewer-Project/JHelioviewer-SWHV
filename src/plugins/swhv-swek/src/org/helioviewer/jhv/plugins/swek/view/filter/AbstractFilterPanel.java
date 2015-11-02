@@ -36,13 +36,13 @@ public abstract class AbstractFilterPanel extends JPanel {
     /** the SWEK the event type */
     protected SWEKEventType eventType;
     /** The minimum value of the filter */
-    protected Double min;
+    protected double min;
     /** The maximum value of the filter */
-    protected Double max;
+    protected double max;
     /** The middle value of the filter */
-    protected Double middleValue;
+    protected double middleValue;
     /** The stepSize */
-    protected Double stepSize;
+    protected double stepSize;
     /** The filter manager instance */
     protected String units;
 

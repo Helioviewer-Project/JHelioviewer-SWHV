@@ -383,7 +383,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
                 }
                 mousePressed = newMousePosition;
             } else {
-                List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
                 Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
                 Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
                 double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
@@ -393,7 +392,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
                     start -= (end - plotAreaSpace.getScaledMaxTime());
                     end = plotAreaSpace.getScaledMaxTime();
                 }
-                pasList.add(plotAreaSpace);
                 minList.put(plotAreaSpace, start);
                 maxList.put(plotAreaSpace, end);
                 if (plotAreaSpace.minMaxTimeIntervalContainsTime(maxList.get(plotAreaSpace))) {
@@ -458,7 +456,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void jumpSelectedInterval(Point point) {
         final double availableIntervalSpace = getWidth() - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + ChartConstants.getRangeSelectionWidth()) - 1.0;
         final double position = (point.getX() - ChartConstants.getGraphLeftSpace()) / availableIntervalSpace;
-        List<PlotAreaSpace> pasList = new ArrayList<PlotAreaSpace>();
         Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
         Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
         double middlePosition = plotAreaSpace.getScaledSelectedMinTime() + plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
@@ -466,7 +463,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             // jump to left
             double start = plotAreaSpace.getScaledSelectedMinTime() - (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             double end = plotAreaSpace.getScaledSelectedMaxTime() - (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            pasList.add(plotAreaSpace);
             if (start < plotAreaSpace.getScaledMinTime()) {
                 end += (plotAreaSpace.getScaledMinTime() - start);
                 start = plotAreaSpace.getScaledMinTime();
@@ -477,7 +473,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             // jump to right
             double start = plotAreaSpace.getScaledSelectedMinTime() + (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
             double end = plotAreaSpace.getScaledSelectedMaxTime() + (plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime());
-            pasList.add(plotAreaSpace);
             if (end > plotAreaSpace.getScaledMaxTime()) {
                 start -= (end - plotAreaSpace.getScaledMaxTime());
                 end = plotAreaSpace.getScaledMaxTime();
@@ -489,7 +484,6 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         if (plotAreaSpace.minMaxTimeIntervalContainsTime(minList.get(plotAreaSpace))) {
             plotAreaSpace.setScaledSelectedTime(minList.get(plotAreaSpace), maxList.get(plotAreaSpace), true);
         }
-
     }
 
     @Override

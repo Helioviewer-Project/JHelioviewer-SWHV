@@ -31,7 +31,7 @@ public class EVECache {
 
         for (int i = 0; i < values.length; i++) {
             calendar.setTimeInMillis(dates[i]);
-            final Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+            int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
 
             EVEDataOfDay cache = cacheMap.get(key);
             if (cache == null) {
@@ -71,9 +71,9 @@ public class EVECache {
         GregorianCalendar calendar = new GregorianCalendar();
 
         calendar.setTimeInMillis(binEnd);
-        Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         calendar.setTimeInMillis(binStart);
-        Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
 
         while (key <= keyEnd) {
             EVEDataOfDay cache = cacheMap.get(key);
@@ -87,7 +87,7 @@ public class EVECache {
             cache.fillResult(result);
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
-            key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+            key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         }
 
         return result;
@@ -96,16 +96,17 @@ public class EVECache {
     public boolean hasDataInInterval(Interval<Date> selectedInterval) {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(selectedInterval.getEnd());
-        Integer keyEnd = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        int keyEnd = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         calendar.setTime(selectedInterval.getStart());
-        Integer key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+        int key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+
         while (key <= keyEnd) {
             EVEDataOfDay cache = cacheMap.get(key);
             if (cache != null && cache.hasData()) {
                 return true;
             }
             calendar.add(Calendar.DAY_OF_YEAR, 1);
-            key = new Integer(calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR));
+            key = calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
         }
         return false;
     }

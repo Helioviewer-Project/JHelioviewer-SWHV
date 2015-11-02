@@ -60,7 +60,7 @@ public class PfssPluginPanel extends JPanel {
         c0.gridx = 0;
         c0.gridy = 0;
         this.qualitySpinner = new JSpinner();
-        this.qualitySpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), new Integer(8), new Integer(1)));
+        this.qualitySpinner.setModel(new SpinnerNumberModel(0, 0, 8, 1));
 
         this.qualitySpinner.addChangeListener(new ChangeListener() {
             @Override
