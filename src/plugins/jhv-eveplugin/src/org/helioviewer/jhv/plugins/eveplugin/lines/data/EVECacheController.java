@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.lines.data;
 
 import java.awt.Rectangle;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +76,6 @@ public class EVECacheController {
         if (band == null || interval == null || interval.getStart() == null || interval.getEnd() == null) {
             return null;
         }
-
         return cache.getValuesInInterval(band, interval, DrawController.getSingletonInstance().getGraphArea());
     }
 
@@ -93,14 +90,6 @@ public class EVECacheController {
             requestCache.put(band, new RequestCache());
         }
         return requestCache.get(band);
-    }
-
-    private Date getDay(final Date date) {
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-
-        GregorianCalendar day = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        return day.getTime();
     }
 
     private void fireDataAdded(final Band band) {
