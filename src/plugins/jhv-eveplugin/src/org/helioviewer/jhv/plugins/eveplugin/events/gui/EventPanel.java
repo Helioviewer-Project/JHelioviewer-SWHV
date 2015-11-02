@@ -23,6 +23,8 @@ import org.helioviewer.jhv.plugins.eveplugin.events.model.EventTypePlotConfigura
 
 public class EventPanel implements DrawableElement {
 
+    private static final float dash1[] = { 10f };
+
     @Override
     public DrawableElementType getDrawableElementType() {
         return DrawableElementType.EVENT;
@@ -35,7 +37,6 @@ public class EventPanel implements DrawableElement {
             Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
             int eventTypeNr = 0;
             int previousLine = 0;
-            float dash1[] = { 10.0f };
             BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
             Stroke normalStroke = g.getStroke();
             JHVEvent highlightedEvent = null;

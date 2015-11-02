@@ -62,9 +62,6 @@ public class RadioDataManager implements RadioDownloaderListener {
     /** Instance of the zoom manager */
     private ZoomManager zoomManager;
 
-    /** Id for identifying the requests for data. */
-    private final long id = 0;
-
     /** Instance of eve state */
     private EVEState eveState;
 
@@ -540,7 +537,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     JP2CallistoView jp2View = jpxData.getView();
                     if (jp2View != null) {
-                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd(), id);
+                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd());
                         jp2View.setViewport(viewport);
 
                         Rectangle roi = ri.getROI();

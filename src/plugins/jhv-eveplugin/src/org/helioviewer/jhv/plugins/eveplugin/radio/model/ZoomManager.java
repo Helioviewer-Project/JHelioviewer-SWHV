@@ -155,11 +155,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
      *             interval or the given start frequency or end frequency fall
      *             outside the minimum and maximum frequency.
      */
-    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq, long downloadId) {
+    public Rectangle getAvailableSpaceForInterval(Date startDate, Date endDate, int startFreq, int endFreq) {
         Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
             int height = displaySize.height;
-            double ratio = 1.0 * displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
+            double ratio = displaySize.getWidth() / (double) (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
             int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
             return new Rectangle(width, height);
         } else {

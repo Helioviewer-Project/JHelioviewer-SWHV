@@ -17,11 +17,12 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 
-//Class will not be serialized so we suppress the warnings
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class LineOptionPanel extends JPanel {
 
     private final Band band;
+
+    private static final String[] options = { "Left", "Right" };
 
     public LineOptionPanel(Band band) {
         this.band = band;
@@ -62,12 +63,10 @@ public class LineOptionPanel extends JPanel {
         c.fill = GridBagConstraints.NONE;
         add(yAxis, c);
 
-        String[] options = { "Left", "Right" };
         JComboBox changeAxis = new JComboBox(options);
         changeAxis.setToolTipText("Switch the axis");
         changeAxis.setSelectedIndex(EVEDrawController.getSingletonInstance().getAxisLocation(band));
         changeAxis.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 EVEDrawController.getSingletonInstance().changeAxis(band);
