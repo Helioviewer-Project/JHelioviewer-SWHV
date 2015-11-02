@@ -16,7 +16,7 @@ import org.helioviewer.jhv.plugins.swek.model.AbstractSWEKTreeModelElement;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
     @Override
@@ -30,7 +30,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    class TreeLabel extends JPanel {
+    private static class TreeLabel extends JPanel {
         ImageIcon imageIcon;
 
         public TreeLabel(ImageIcon icon) {

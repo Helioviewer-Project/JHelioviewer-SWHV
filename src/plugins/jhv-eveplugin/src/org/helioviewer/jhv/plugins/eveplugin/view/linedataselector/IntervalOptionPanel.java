@@ -146,7 +146,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         addElementToModel(model, Calendar.HOUR, 1, ZOOM.Hour);
     }
 
-    private class ZoomComboboxItem {
+    private static class ZoomComboboxItem {
 
         private final ZOOM zoom;
         private final int number;

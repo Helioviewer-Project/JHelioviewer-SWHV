@@ -68,7 +68,7 @@ public class RadioDownloader {
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         if (endDate != null && startDate != null) {
                             // case there were not more than three days
-                            while (startDate.before(endDate) || startDate.equals(endDate)) {
+                            while (startDate.compareTo(endDate) <= 0) {
                                 JP2CallistoView v = (JP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                                 if (v != null) {
                                     long imageID = getNextID();
@@ -170,7 +170,7 @@ public class RadioDownloader {
             Date endDate = interval.getEnd();
             if (endDate != null && startDate != null) {
                 // case there were not more than three days
-                while (startDate.before(endDate) || startDate.equals(endDate)) {
+                while (startDate.compareTo(endDate) <= 0) {
                     boolean inRequestCache = true;
                     if (!requestDateCache.contains(startDate)) {
                         inRequestCache = false;

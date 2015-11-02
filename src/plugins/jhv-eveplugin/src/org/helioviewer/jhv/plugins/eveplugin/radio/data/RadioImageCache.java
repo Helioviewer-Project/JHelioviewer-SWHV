@@ -95,7 +95,7 @@ public class RadioImageCache {
         List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
         List<Long> toRemove = new ArrayList<Long>(dataCache.keySet());
         List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
-        while (localStart.before(end) || localStart.equals(end)) {
+        while (localStart.compareTo(end) <= 0) {
             if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
                 intervalList.add(new Interval<Date>(localStart, new Date(localStart.getTime() + stepsize)));
             } else {
