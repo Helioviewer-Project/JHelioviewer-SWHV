@@ -375,7 +375,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     /**
      * File Chooser Filter which allows JAR files only.
      * */
-    private class JARFilter extends FileFilter {
+    private static class JARFilter extends FileFilter {
 
         private final String[] extensions = { "jar" };
 

@@ -383,13 +383,13 @@ public class ImageDataPanel extends ObservationDialogPanel {
      * */
     private static class CadencePanel extends JPanel implements ActionListener {
 
-        private final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
+        private static final String[] timeStepUnitStrings = { "sec", "min", "hours", "days", "get all" };
 
-        private final static int TIMESTEP_SECONDS = 0;
-        private final static int TIMESTEP_MINUTES = 1;
-        private final static int TIMESTEP_HOURS = 2;
-        private final static int TIMESTEP_DAYS = 3;
-        private final static int TIMESTEP_ALL = 4;
+        private static final int TIMESTEP_SECONDS = 0;
+        private static final int TIMESTEP_MINUTES = 1;
+        private static final int TIMESTEP_HOURS = 2;
+        private static final int TIMESTEP_DAYS = 3;
+        private static final int TIMESTEP_ALL = 4;
 
         private final JSpinner spinnerCadence = new JSpinner();
         private final JComboBox comboUnit = new JComboBox(timeStepUnitStrings);

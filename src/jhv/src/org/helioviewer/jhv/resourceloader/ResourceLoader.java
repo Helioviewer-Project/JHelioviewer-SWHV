@@ -406,7 +406,7 @@ public class ResourceLoader {
      * @author Andre Dau
      * 
      */
-    public class ResourceFile {
+    private static class ResourceFile {
         private URI srcDir;
         private URI destDir;
         private String srcName;
@@ -573,7 +573,7 @@ public class ResourceLoader {
      * @author Andre Dau
      * 
      */
-    public class ResourceConfiguration implements Comparable<ResourceConfiguration> {
+    private static class ResourceConfiguration implements Comparable<ResourceConfiguration> {
         private int priority;
         private List<ResourceRequirement> requirements;
         private List<ResourceFile> files;
@@ -718,7 +718,7 @@ public class ResourceLoader {
      * @author Andre Dau
      * 
      */
-    public class ResourceDefinition extends DefaultHandler {
+    private static class ResourceDefinition extends DefaultHandler {
         private ResourceConfiguration currentConfig;
         private List<ResourceConfiguration> configurations;
         private boolean isValid;
@@ -927,7 +927,7 @@ public class ResourceLoader {
      * @author Andre Dau
      * 
      */
-    public class ResourceRequirement {
+    private static class ResourceRequirement {
         private String name;
         private REQUIREMENT_TYPES type;
         private List<String> values;

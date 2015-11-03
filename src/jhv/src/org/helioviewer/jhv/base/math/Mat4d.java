@@ -447,22 +447,22 @@ public class Mat4d {
     public final String toString() {
         String format = "%01.02f";
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(format, m[0]) + ", ");
-        sb.append(String.format(format, m[4]) + ", ");
-        sb.append(String.format(format, m[8]) + ", ");
-        sb.append(String.format(format, m[12]) + ", \n");
-        sb.append(String.format(format, m[1]) + ", ");
-        sb.append(String.format(format, m[5]) + ", ");
-        sb.append(String.format(format, m[9]) + ", ");
-        sb.append(String.format(format, m[13]) + ", \n");
-        sb.append(String.format(format, m[2]) + ", ");
-        sb.append(String.format(format, m[6]) + ", ");
-        sb.append(String.format(format, m[10]) + ", ");
-        sb.append(String.format(format, m[14]) + ", \n");
-        sb.append(String.format(format, m[3]) + ", ");
-        sb.append(String.format(format, m[7]) + ", ");
-        sb.append(String.format(format, m[11]) + ", ");
-        sb.append(String.format(format, m[15]) + ", \n");
+        sb.append(String.format(format + ", ", m[0]));
+        sb.append(String.format(format + ", ", m[4]));
+        sb.append(String.format(format + ", ", m[8]));
+        sb.append(String.format(format + ", \n", m[12]));
+        sb.append(String.format(format + ", ", m[1]));
+        sb.append(String.format(format + ", ", m[5]));
+        sb.append(String.format(format + ", ", m[9]));
+        sb.append(String.format(format + ", \n", m[13]));
+        sb.append(String.format(format + ", ", m[2]));
+        sb.append(String.format(format + ", ", m[6]));
+        sb.append(String.format(format + ", ", m[10]));
+        sb.append(String.format(format + ", \n", m[14]));
+        sb.append(String.format(format + ", ", m[3]));
+        sb.append(String.format(format + ", ", m[7]));
+        sb.append(String.format(format + ", ", m[11]));
+        sb.append(String.format(format + ", \n", m[15]));
 
         return sb.toString();
     }

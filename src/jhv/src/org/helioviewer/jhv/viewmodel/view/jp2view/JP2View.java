@@ -113,7 +113,7 @@ public class JP2View extends AbstractView {
         return _jp2Image.getDownloadURI();
     }
 
-    private class AbolishThread extends Thread {
+    private static class AbolishThread extends Thread {
         private JP2View view;
 
         public Runnable init(JP2View view) {

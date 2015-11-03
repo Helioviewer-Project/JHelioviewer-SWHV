@@ -217,7 +217,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
         return panel;
     }
 
-    private class DefaultsSelectionPanel extends JPanel {
+    private static class DefaultsSelectionPanel extends JPanel {
 
         private JTable table = null;
 
