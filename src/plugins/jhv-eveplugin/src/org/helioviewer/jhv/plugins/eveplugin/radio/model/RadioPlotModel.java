@@ -184,14 +184,12 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         for (NoDataConfig ndc : noDataConfigList.get(ID)) {
             ndc.setVisible(drd.isVisible());
         }
-
         fireChangeVisibility(ID);
     }
 
     @Override
     public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, long radioImageID) {
         BufferedImage newImage = createBufferedImage(area.width, area.height, data);
-        data = new int[0];
         bufferedImages.put(radioImageID, newImage);
         radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID);
@@ -209,7 +207,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, long radioImageID) {
         BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
-        byteData = new byte[0];
         bufferedImages.put(radioImageID, newImage);
         radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, downloadID);
@@ -287,7 +284,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         }
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         DataBufferInt dataBuffer = new DataBufferInt(useData, width * height);
-        useData = new int[0];
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xFF0000, 0xFF00, 0xFF, 0xFF000000 }, new Point(0, 0));
         newImage.setData(raster);
         return newImage;
@@ -303,7 +299,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         }
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, ColorLookupModel.getInstance().getColorModel());
         DataBufferByte dataBuffer = new DataBufferByte(useData, width * height);
-        useData = new byte[0];
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
         newImage.setData(raster);
         return newImage;
