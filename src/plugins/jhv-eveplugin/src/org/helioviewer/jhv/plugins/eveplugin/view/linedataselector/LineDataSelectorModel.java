@@ -143,7 +143,7 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
 
     @Override
     public String getColumnName(int columnIndex) {
-        return "" + columnIndex;
+        return String.valueOf(columnIndex);
     }
 
     @Override

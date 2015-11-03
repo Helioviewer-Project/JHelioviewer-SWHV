@@ -28,7 +28,7 @@ import org.helioviewer.jhv.plugins.swek.download.FilterManager;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  * 
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public abstract class AbstractFilterPanel extends JPanel {
 
     /** the SWEK parameter for this filter */

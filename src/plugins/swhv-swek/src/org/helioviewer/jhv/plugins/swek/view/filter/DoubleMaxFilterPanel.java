@@ -19,7 +19,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class DoubleMaxFilterPanel extends AbstractFilterPanel {
 
     /** Maximum value spinner */
@@ -32,7 +32,7 @@ public class DoubleMaxFilterPanel extends AbstractFilterPanel {
     @Override
     public void filter(boolean active) {
         if (active) {
-            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(), SWEKOperand.SMALLER_OR_EQUAL);
+            SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), String.valueOf(maximumValueSpinner.getValue()), SWEKOperand.SMALLER_OR_EQUAL);
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMax);
             filterManager.addFilter(eventType, parameter, params);

@@ -39,4 +39,5 @@ public class FilterPanelFactory {
         }
         return panels;
     }
+
 }

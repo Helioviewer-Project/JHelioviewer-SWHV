@@ -25,7 +25,7 @@ import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
  * @author Bram Bourgoignie (Bram.bourgoignie@oma.be)
  * 
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
 
     /** Minimum value spinner */
@@ -50,8 +50,8 @@ public class DoubleMinMaxFilterPanel extends AbstractFilterPanel {
     public void filter(boolean active) {
         if (active) {
             if ((Double) minimumValueSpinner.getValue() <= (Double) maximumValueSpinner.getValue()) {
-                SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(), SWEKOperand.BIGGER_OR_EQUAL);
-                SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), "" + maximumValueSpinner.getValue(), SWEKOperand.SMALLER_OR_EQUAL);
+                SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), String.valueOf(minimumValueSpinner.getValue()), SWEKOperand.BIGGER_OR_EQUAL);
+                SWEKParam paramMax = new SWEKParam(parameter.getParameterName(), String.valueOf(maximumValueSpinner.getValue()), SWEKOperand.SMALLER_OR_EQUAL);
                 ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
                 params.add(paramMin);
                 params.add(paramMax);
