@@ -34,18 +34,26 @@ public class EventPanel implements DrawableElement {
     public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         if (EventModel.getSingletonInstance().isEventsVisible()) {
             EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
-            Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
+            int nrEventTypes = etpc.getNrOfEventTypes();
+            int totalLines = etpc.getTotalNrLines();
             int eventTypeNr = 0;
             int previousLine = 0;
-            BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash1, 0.0f);
+
+            Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
+
+            BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
             Stroke normalStroke = g.getStroke();
             JHVEvent highlightedEvent = null;
-            for (String eventType : epcs.keySet()) {
+
+            for (Map.Entry<String, List<EventPlotConfiguration>> entry : epcs.entrySet()) {
+                String eventType = entry.getKey();
+                int maxLines = etpc.getMaxLinesPerEventType().get(eventType).intValue();
+
                 boolean first = true;
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
-                for (EventPlotConfiguration epc : epcs.get(eventType)) {
-                    JHVEvent rEvent = epc.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
+                for (EventPlotConfiguration epc : entry.getValue()) {
+                    JHVEvent rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
                     if (rEvent != null) {
                         highlightedEvent = rEvent;
                     }
@@ -54,17 +62,17 @@ public class EventPanel implements DrawableElement {
                         shouldRedraw = epc;
                     }
                     if (first) {
-                        spacePerLine = 2 * Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * etpc.getTotalNrLines()))));
-                        int spaceNeeded = spacePerLine * etpc.getMaxLinesPerEventType().get(eventType).intValue();
+                        spacePerLine = 2 * Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
+                        int spaceNeeded = spacePerLine * maxLines;
                         ImageIcon icon = epc.getEvent().getIcon();
                         leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
                     }
                     first = false;
                 }
                 if (shouldRedraw != null) {
-                    shouldRedraw.draw(g, graphArea, etpc.getNrOfEventTypes(), eventTypeNr, etpc.getMaxLinesPerEventType().get(eventType).intValue(), etpc.getTotalNrLines(), previousLine, mousePosition);
+                    shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
                 }
-                previousLine += etpc.getMaxLinesPerEventType().get(eventType).intValue();
+                previousLine += maxLines;
                 if (eventTypeNr != epcs.size() - 1) {
                     g.setStroke(dashed);
                     g.setColor(Color.black);
