@@ -19,7 +19,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class DoubleMinFilterPanel extends AbstractFilterPanel {
 
     /** Minimum value spinner */
@@ -32,7 +32,7 @@ public class DoubleMinFilterPanel extends AbstractFilterPanel {
     @Override
     public void filter(boolean active) {
         if (active) {
-            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), "" + minimumValueSpinner.getValue(), SWEKOperand.BIGGER_OR_EQUAL);
+            SWEKParam paramMin = new SWEKParam(parameter.getParameterName(), String.valueOf(minimumValueSpinner.getValue()), SWEKOperand.BIGGER_OR_EQUAL);
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(paramMin);
             filterManager.addFilter(eventType, parameter, params);

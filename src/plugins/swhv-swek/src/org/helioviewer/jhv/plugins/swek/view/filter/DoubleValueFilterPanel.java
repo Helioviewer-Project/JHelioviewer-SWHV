@@ -19,7 +19,7 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.download.SWEKOperand;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class DoubleValueFilterPanel extends AbstractFilterPanel {
 
     /** The value spinner */
@@ -32,7 +32,7 @@ public class DoubleValueFilterPanel extends AbstractFilterPanel {
     @Override
     public void filter(boolean active) {
         if (active) {
-            SWEKParam param = new SWEKParam(parameter.getParameterName(), "" + spinner.getValue(), SWEKOperand.EQUALS);
+            SWEKParam param = new SWEKParam(parameter.getParameterName(), String.valueOf(spinner.getValue()), SWEKOperand.EQUALS);
             ArrayList<SWEKParam> params = new ArrayList<SWEKParam>();
             params.add(param);
             filterManager.addFilter(eventType, parameter, params);
