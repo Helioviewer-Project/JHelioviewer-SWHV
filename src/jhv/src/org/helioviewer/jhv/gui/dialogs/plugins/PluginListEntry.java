@@ -226,7 +226,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
     }
 
     // Link Label
-    private class LinkLabel extends JLabel {
+    private static class LinkLabel extends JLabel {
 
         public LinkLabel(final String text) {
             initVisualComponents(text);
