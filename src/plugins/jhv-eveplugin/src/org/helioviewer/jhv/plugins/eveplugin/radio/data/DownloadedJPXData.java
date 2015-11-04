@@ -8,18 +8,18 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
 public class DownloadedJPXData implements ViewDataHandler {
 
-    private JP2CallistoView view;
+    private JP2ViewCallisto view;
     private long imageID;
     private Date startDate;
     private Date endDate;
     private final RadioDataManager radioDataManager;
     private final long downloadID;
 
-    public DownloadedJPXData(JP2CallistoView view, long imageID, Date startDate, Date endDate, long downloadID) {
+    public DownloadedJPXData(JP2ViewCallisto view, long imageID, Date startDate, Date endDate, long downloadID) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
@@ -31,11 +31,11 @@ public class DownloadedJPXData implements ViewDataHandler {
         this.downloadID = downloadID;
     }
 
-    public JP2CallistoView getView() {
+    public JP2ViewCallisto getView() {
         return view;
     }
 
-    public void setView(JP2CallistoView view) {
+    public void setView(JP2ViewCallisto view) {
         this.view = view;
     }
 
@@ -120,7 +120,7 @@ public class DownloadedJPXData implements ViewDataHandler {
 
     @Override
     public void handleData(View callistoView, ImageData imageData) {
-        if (callistoView instanceof JP2CallistoView && imageData instanceof SingleChannelByte8ImageData) {
+        if (callistoView instanceof JP2ViewCallisto && imageData instanceof SingleChannelByte8ImageData) {
             if (imageData.getWidth() < 1 || imageData.getHeight() < 1) {
                 Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
                 return;

@@ -15,7 +15,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.io.APIRequestManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 public class RadioDownloader {
@@ -75,7 +75,7 @@ public class RadioDownloader {
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         // case there were not more than three days
                         while (startDate.compareTo(endDate) <= 0) {
-                            JP2CallistoView v = (JP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                            JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                             if (v != null) {
                                 long imageID = getNextID();
                                 DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate, downloadID);
@@ -200,9 +200,9 @@ public class RadioDownloader {
                 List<Interval<Date>> noDataList = new ArrayList<Interval<Date>>();
                 List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                 for (Date date : datesToDownload) {
-                    JP2CallistoView v = null;
+                    JP2ViewCallisto v = null;
                     try {
-                        v = (JP2CallistoView) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                        v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                     }

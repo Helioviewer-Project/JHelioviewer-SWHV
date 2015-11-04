@@ -10,7 +10,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
-public class JP2CallistoView extends JP2View {
+public class JP2ViewCallisto extends JP2View {
 
     private Region region;
     private Rectangle viewport = new Rectangle(86400, 380);
