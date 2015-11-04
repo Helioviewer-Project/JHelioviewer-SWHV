@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -22,19 +23,30 @@ import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
+import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
@@ -72,7 +84,7 @@ public class JP2Image {
     private int[] builtinLUT = null;
 
     /** An object with all the resolution layer information. */
-    private ResolutionSet resolutionSet;
+    protected ResolutionSet resolutionSet;
     private int resolutionSetCompositionLayer = -1;
 
     /**
@@ -101,6 +113,9 @@ public class JP2Image {
 
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
+
+    private boolean hiResImage = false;
+    private static final int hiDpiCutoff = 1024;
 
     /**
      * Constructor
@@ -159,6 +174,10 @@ public class JP2Image {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
         }
+
+        Rectangle fullFrame = resolutionSet.getResolutionLevel(0).getResolutionBounds();
+        if (JHVGlobals.GoForTheBroke && fullFrame.width * fullFrame.height > hiDpiCutoff * hiDpiCutoff)
+            hiResImage = true;
     }
 
     /**
@@ -332,6 +351,71 @@ public class JP2Image {
     protected void signalReader(JP2ImageParameter params) {
         if (reader != null)
             reader.signalReader(params);
+    }
+
+    // Recalculates the image parameters used within the jp2-package
+    // Reader signals only for CURRENTFRAME*
+    protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
+        GL3DCamera camera = Displayer.getViewport().getCamera();
+        MetaData m = metaDataList[frameNumber];
+        Region r = ViewROI.updateROI(camera, masterTime, m);
+
+        double mWidth = m.getPhysicalSize().x;
+        double mHeight = m.getPhysicalSize().y;
+        double rWidth = r.getWidth();
+        double rHeight = r.getHeight();
+
+        double ratio = 2 * camera.getCameraWidth() / Displayer.getViewport().getHeight();
+        int totalHeight = (int) (mHeight / ratio);
+
+        ResolutionLevel res;
+        if (hiResImage && totalHeight > hiDpiCutoff && Layers.isMoviePlaying())
+            res = resolutionSet.getPreviousResolutionLevel(totalHeight, totalHeight);
+        else
+            res = resolutionSet.getNextResolutionLevel(totalHeight, totalHeight);
+
+        int viewportImageWidth = res.getResolutionBounds().width;
+        int viewportImageHeight = res.getResolutionBounds().height;
+
+        double currentMeterPerPixel = mWidth / viewportImageWidth;
+        int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
+        int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
+
+        Vec2d rUpperLeft = r.getUpperLeftCorner();
+        Vec2d mUpperLeft = m.getPhysicalUpperLeft();
+        double displacementX = rUpperLeft.x - mUpperLeft.x;
+        double displacementY = rUpperLeft.y - mUpperLeft.y;
+
+        int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
+        int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
+
+        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
+        JP2ImageParameter newImageViewParams = new JP2ImageParameter(this, masterTime, subImage, res, frameNumber);
+
+        return checkParameter(newImageViewParams, fromReader);
+    }
+
+    private JP2ImageParameter oldImageViewParams;
+
+    protected JP2ImageParameter checkParameter(JP2ImageParameter newImageViewParams, boolean fromReader) {
+        if (!fromReader && imageCacheStatus.getImageStatus(newImageViewParams.compositionLayer) == CacheStatus.COMPLETE &&
+                           newImageViewParams.equals(oldImageViewParams)) {
+            if (!(this instanceof JP2ImageCallisto))
+                Displayer.display();
+            return null;
+        }
+
+        boolean viewChanged = oldImageViewParams == null ||
+                              !(newImageViewParams.subImage.equals(oldImageViewParams.subImage) && 
+                                newImageViewParams.resolution.equals(oldImageViewParams.resolution));
+        // ping reader
+        if (viewChanged) {
+            signalReader(newImageViewParams);
+        }
+
+        oldImageViewParams = newImageViewParams;
+
+        return newImageViewParams;
     }
 
     /**
