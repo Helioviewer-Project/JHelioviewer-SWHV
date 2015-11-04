@@ -21,9 +21,9 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2CallistoView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 
 /**
@@ -535,7 +535,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
                 FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
-                    JP2CallistoView jp2View = jpxData.getView();
+                    JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
                         Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd());
                         jp2View.setViewport(viewport);
@@ -617,7 +617,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download identifier for which the data was downloaded
      */
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, long downloadID, double ratioX, double ratioY) {
-        JP2CallistoView jp2CallistoView = djd.getView();
+        JP2ViewCallisto jp2CallistoView = djd.getView();
         if (jp2CallistoView != null) {
             JP2Image image = jp2CallistoView.getJP2Image();
             image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
