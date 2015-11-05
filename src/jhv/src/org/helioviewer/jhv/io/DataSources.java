@@ -398,6 +398,9 @@ public class DataSources {
 
             @Override
             protected void done() {
+                if (jsonResult == null)
+                    return;
+
                 ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
 
                 idp.setupSources(DataSources.getSingletonInstance());
