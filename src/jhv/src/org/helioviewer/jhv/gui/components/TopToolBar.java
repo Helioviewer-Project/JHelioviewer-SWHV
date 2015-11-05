@@ -22,13 +22,11 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.GL3DAnnotateInteraction.AnnotationMode;
+import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.SetAnnotateInteractionAction;
-import org.helioviewer.jhv.gui.actions.SetPanInteractionAction;
-import org.helioviewer.jhv.gui.actions.SetRotationInteractionAction;
 import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
 import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
@@ -52,13 +50,12 @@ public class TopToolBar extends JToolBar implements MouseListener {
         PAN, ROTATE, ANNOTATE
     };
 
-    private static final InteractionMode defaultInteractionMode = InteractionMode.ROTATE;
+    private static InteractionMode interactionMode;
+    private static DisplayMode displayMode;
 
     private enum DisplayMode {
         ICONANDTEXT, ICONONLY, TEXTONLY
     };
-
-    private DisplayMode displayMode;
 
     private JToggleButton panButton;
     private JToggleButton rotateButton;
@@ -80,21 +77,36 @@ public class TopToolBar extends JToolBar implements MouseListener {
             displayMode = DisplayMode.ICONANDTEXT;
         }
 
-        createNewToolBar(defaultInteractionMode);
+        try {
+            interactionMode = InteractionMode.valueOf(Settings.getSingletonInstance().getProperty("display.interaction").toUpperCase());
+        } catch (Exception e) {
+            Log.error("Error when reading the interaction mode", e);
+            interactionMode = InteractionMode.ROTATE;
+        }
+
+        createNewToolBar();
         addMouseListener(this);
     }
 
     private void setActiveInteractionMode(InteractionMode mode) {
+        interactionMode = mode;
+        Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
+        Settings.getSingletonInstance().save();
+
+        GL3DCamera cam = Displayer.getViewport().getCamera();
         switch (mode) {
-        case PAN:
-            panButton.doClick();
-            break;
-        case ROTATE:
-            rotateButton.doClick();
-            break;
-        case ANNOTATE:
-            annotateButton.doClick();
-            break;
+            case PAN:
+                cam.setCurrentInteraction(cam.getPanInteraction());
+                panButton.setSelected(true);
+                break;
+            case ROTATE:
+                cam.setCurrentInteraction(cam.getRotateInteraction());
+                rotateButton.setSelected(true);
+                break;
+            case ANNOTATE:
+                cam.setCurrentInteraction(cam.getAnnotateInteraction());
+                annotateButton.setSelected(true);
+                break;
         }
     }
 
@@ -145,7 +157,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
      *            Current interaction mode
      * @see #setDisplayMode(DisplayMode)
      */
-    protected void createNewToolBar(InteractionMode interactionMode) {
+    protected void createNewToolBar() {
         removeAll();
 
         // Zoom
@@ -160,29 +172,49 @@ public class TopToolBar extends JToolBar implements MouseListener {
         // Interaction
         ButtonGroup group = new ButtonGroup();
 
-        panButton = new JToggleButton(new SetPanInteractionAction());
+        panButton = new JToggleButton(new AbstractAction("Pan") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setActiveInteractionMode(InteractionMode.PAN);
+            }
+        });
         panButton.setIcon(IconBank.getIcon(JHVIcon.PAN));
         panButton.setSelectedIcon(IconBank.getIcon(JHVIcon.PAN_SELECTED));
         panButton.setToolTipText("Pan");
         group.add(panButton);
         addButton(panButton);
 
-        rotateButton = new JToggleButton(new SetRotationInteractionAction());
+        rotateButton = new JToggleButton(new AbstractAction("Rotate") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setActiveInteractionMode(InteractionMode.ROTATE);
+            }
+        });
         rotateButton.setIcon(IconBank.getIcon(JHVIcon.ROTATE));
         rotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.ROTATE_SELECTED));
         rotateButton.setToolTipText("Rotate");
         group.add(rotateButton);
         addButton(rotateButton);
 
-        annotateButton = new JToggleButton(new SetAnnotateInteractionAction());
+        annotateButton = new JToggleButton(new AbstractAction("Annotate") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setActiveInteractionMode(InteractionMode.ANNOTATE);
+            }
+        });
         annotateButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         annotateButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         annotateButton.setToolTipText("Annotate");
+        group.add(annotateButton);
+        addButton(annotateButton);
+
+        setActiveInteractionMode(interactionMode);
 
         final JPopupMenu annotatePopup = new JPopupMenu();
         ButtonGroup annotateGroup = new ButtonGroup();
 
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem(new AbstractAction("Rectangle") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
             }
@@ -192,6 +224,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         rectangleItem.setSelected(true);
 
         JRadioButtonMenuItem circleItem = new JRadioButtonMenuItem(new AbstractAction("Circle") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
             }
@@ -200,6 +233,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         annotateGroup.add(circleItem);
 
         JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem(new AbstractAction("Cross") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CROSS);
             }
@@ -212,11 +246,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
-
-        group.add(annotateButton);
-        addButton(annotateButton);
-
-        setActiveInteractionMode(interactionMode);
 
         addSeparator();
 
@@ -292,15 +321,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
             Settings.getSingletonInstance().save();
         }
 
-        InteractionMode interactionMode = defaultInteractionMode;
-        if (panButton.isSelected())
-            interactionMode = InteractionMode.PAN;
-        else if (rotateButton.isSelected())
-            interactionMode = InteractionMode.ROTATE;
-        else if (annotateButton.isSelected())
-            interactionMode = InteractionMode.ANNOTATE;
-
-        createNewToolBar(interactionMode);
+        createNewToolBar();
         firePropertyChange("displayMode", oldDisplayMode, displayMode);
         revalidate();
     }
