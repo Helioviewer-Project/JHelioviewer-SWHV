@@ -358,7 +358,7 @@ public class JP2Image {
     protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = metaDataList[frameNumber];
-        Region r = ViewROI.updateROI(camera, masterTime, m);
+        Region r = ViewROI.getInstance().updateROI(camera, masterTime, m);
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;

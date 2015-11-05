@@ -10,25 +10,33 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
 
-    private static final double resolution = 5.;
-    private static final Vec2d[] pointlist = new Vec2d[((int) resolution + 1) * 2 * 2];
+    private static final double extraSize = 0.02;
+    private static final int resolution = 5;
+    private static final Vec2d[] pointlist = new Vec2d[(resolution + 1) * 2 * 2];
 
-    private static final ViewROI instance = new ViewROI();
+    private static ViewROI instance;
 
     private ViewROI() {
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                pointlist[count] = new Vec2d(2. * (i / resolution - 0.5), -2. * (j - 0.5));
+                pointlist[count] = new Vec2d(2. * (i / (double) resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= resolution; j++) {
-                pointlist[count] = new Vec2d(2. * (i - 0.5), -2. * (j / resolution - 0.5));
+                pointlist[count] = new Vec2d(2. * (i - 0.5), -2. * (j / (double) resolution - 0.5));
                 count++;
             }
         }
+    }
+
+    public static ViewROI getInstance() {
+        if (instance == null) {
+            instance = new ViewROI();
+        }
+        return instance;
     }
 
     public static Region updateROI(GL3DCamera camera, JHVDate masterTime, MetaData m) {
@@ -50,8 +58,8 @@ public class ViewROI {
 
         camera.pop();
 
-        double widthxAdd = Math.abs(0.02 * (maxPhysicalX - minPhysicalX));
-        double widthyAdd = Math.abs(0.02 * (maxPhysicalY - minPhysicalY));
+        double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
+        double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
         minPhysicalX = minPhysicalX - widthxAdd;
         maxPhysicalX = maxPhysicalX + widthxAdd;
         minPhysicalY = minPhysicalY - widthyAdd;
