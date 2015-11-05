@@ -27,12 +27,11 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
-import org.helioviewer.jhv.gui.actions.ToggleCoronaVisibilityAction;
-import org.helioviewer.jhv.gui.actions.ToggleSolarRotationAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
 import org.helioviewer.jhv.gui.actions.ZoomOutAction;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 /**
  * Toolbar containing the most common actions.
@@ -249,14 +248,26 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        trackSolarRotationButton = new JToggleButton(new ToggleSolarRotationAction());
+        trackSolarRotationButton = new JToggleButton(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GL3DCamera cam = Displayer.getViewport().getCamera();
+                cam.setTrackingMode(!cam.getTrackingMode());
+            }
+        });
         trackSolarRotationButton.setSelected(false);
         trackSolarRotationButton.setIcon(IconBank.getIcon(JHVIcon.FOCUS));
         trackSolarRotationButton.setSelectedIcon(IconBank.getIcon(JHVIcon.FOCUS_SELECTED));
         trackSolarRotationButton.setToolTipText("Track solar rotation");
         addButton(trackSolarRotationButton);
 
-        coronaVisibilityButton = new JToggleButton(new ToggleCoronaVisibilityAction());
+        coronaVisibilityButton = new JToggleButton(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RenderableImageLayer.toggleCorona();
+                Displayer.display();
+            }
+        });
         coronaVisibilityButton.setSelected(false);
         coronaVisibilityButton.setIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE));
         coronaVisibilityButton.setSelectedIcon(IconBank.getIcon(JHVIcon.LAYER_IMAGE_OFF));
