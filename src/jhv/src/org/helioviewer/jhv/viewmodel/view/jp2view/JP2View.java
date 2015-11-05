@@ -175,7 +175,7 @@ public class JP2View extends AbstractView {
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
         GL3DCamera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
-        Region r = ViewROI.updateROI(camera, masterTime, m);
+        Region r = ViewROI.getInstance().updateROI(camera, masterTime, m);
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
