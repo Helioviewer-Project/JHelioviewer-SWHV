@@ -11,13 +11,6 @@ import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 public class GL3DEarthCamera extends GL3DCamera {
 
-    private final GL3DEarthCameraOptionPanel earthCameraOptionPanel;
-
-    public GL3DEarthCamera() {
-        super();
-        earthCameraOptionPanel = new GL3DEarthCameraOptionPanel(this);
-    }
-
     @Override
     public void reset() {
         super.reset();
@@ -72,9 +65,14 @@ public class GL3DEarthCamera extends GL3DCamera {
         this.updateCameraTransformation();
     }
 
+    private GL3DEarthCameraOptionPanel optionPanel;
+
     @Override
     public GL3DCameraOptionPanel getOptionPanel() {
-        return earthCameraOptionPanel;
+        if (optionPanel == null) {
+            optionPanel = new GL3DEarthCameraOptionPanel(this);
+        }
+        return optionPanel;
     }
 
 }

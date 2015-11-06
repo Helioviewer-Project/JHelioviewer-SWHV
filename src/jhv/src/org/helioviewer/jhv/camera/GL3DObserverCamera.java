@@ -12,13 +12,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class GL3DObserverCamera extends GL3DCamera {
 
-    private final GL3DObserverCameraOptionPanel observerCameraOptionPanel;
-
-    public GL3DObserverCamera() {
-        super();
-        observerCameraOptionPanel = new GL3DObserverCameraOptionPanel(this);
-    }
-
     @Override
     public void reset() {
         super.reset();
@@ -84,9 +77,14 @@ public class GL3DObserverCamera extends GL3DCamera {
         updateCameraTransformation();
     }
 
+    private GL3DObserverCameraOptionPanel optionPanel;
+
     @Override
     public GL3DCameraOptionPanel getOptionPanel() {
-        return observerCameraOptionPanel;
+        if (optionPanel == null) {
+            optionPanel = new GL3DObserverCameraOptionPanel(this);
+        }
+        return optionPanel;
     }
 
 }
