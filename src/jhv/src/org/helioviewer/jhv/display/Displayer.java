@@ -210,7 +210,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void setActiveCamera(GL3DCamera camera) {
         GL3DCamera activeCamera = getViewport().getCamera();
-        activeCamera.deactivate();
         camera.activate(activeCamera);
         for (GL3DViewport vp : getViewports()) {
             vp.setCamera(camera);

@@ -42,10 +42,10 @@ public class GL3DPositionLoading {
     private boolean isLoaded = false;
     private Latitudinal[] position;
     private JHVWorker<Latitudinal[], Void> worker;
-    private final GL3DExpertCamera camera;
+    private final GL3DExpertCameraOptionPanel optionPanel;
 
-    public GL3DPositionLoading(GL3DExpertCamera camera) {
-        this.camera = camera;
+    public GL3DPositionLoading(GL3DExpertCameraOptionPanel _optionPanel) {
+        optionPanel = _optionPanel;
     }
 
     private static class LoadPositionWorker extends JHVWorker<Latitudinal[], Void> {
@@ -224,7 +224,7 @@ public class GL3DPositionLoading {
     }
 
     public void fireLoaded(final String state) {
-        camera.fireNewLoaded(state);
+        optionPanel.fireLoaded(state);
     }
 
     public Date getBeginDate() {
