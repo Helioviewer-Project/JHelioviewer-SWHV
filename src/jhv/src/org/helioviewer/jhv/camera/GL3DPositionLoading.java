@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
-import org.helioviewer.jhv.base.astronomy.Position.Latitudinal;
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -40,15 +40,15 @@ public class GL3DPositionLoading {
     private Date endDatems = new Date();
 
     private boolean isLoaded = false;
-    private Latitudinal[] position;
-    private JHVWorker<Latitudinal[], Void> worker;
+    private Position.Latitudinal[] position;
+    private JHVWorker<Position.Latitudinal[], Void> worker;
     private final GL3DExpertCameraOptionPanel optionPanel;
 
     public GL3DPositionLoading(GL3DExpertCameraOptionPanel _optionPanel) {
         optionPanel = _optionPanel;
     }
 
-    private static class LoadPositionWorker extends JHVWorker<Latitudinal[], Void> {
+    private static class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
         private String report = null;
         private final String beginDate;
         private final String endDate;
@@ -67,8 +67,8 @@ public class GL3DPositionLoading {
         }
 
         @Override
-        protected Latitudinal[] backgroundWork() throws Exception {
-            Latitudinal[] ret = null;
+        protected Position.Latitudinal[] backgroundWork() throws Exception {
+            Position.Latitudinal[] ret = null;
             JSONObject result;
             try {
                 long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
@@ -112,7 +112,7 @@ public class GL3DPositionLoading {
         @Override
         protected void done() {
             if (!this.isCancelled()) {
-                Latitudinal[] newPosition = null;
+                Position.Latitudinal[] newPosition = null;
                 try {
                     newPosition = this.get();
                 } catch (Exception e) {
@@ -148,7 +148,7 @@ public class GL3DPositionLoading {
         JHVGlobals.getExecutorService().execute(worker);
     }
 
-    public void setPosition(Latitudinal[] newPosition) {
+    public void setPosition(Position.Latitudinal[] newPosition) {
         position = newPosition;
     }
 
@@ -159,12 +159,12 @@ public class GL3DPositionLoading {
         }
     }
 
-    private Latitudinal[] parseData(JSONObject jsonResult) {
-        Latitudinal[] positionHelper = new Latitudinal[0];
+    private Position.Latitudinal[] parseData(JSONObject jsonResult) {
+        Position.Latitudinal[] positionHelper = new Position.Latitudinal[0];
         try {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
-            positionHelper = new Latitudinal[resLength];
+            positionHelper = new Position.Latitudinal[resLength];
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
@@ -182,7 +182,7 @@ public class GL3DPositionLoading {
                 lat = -posArray.getDouble(2);
 
                 Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                positionHelper[j] = new Latitudinal(date.getTime(), rad, lon, lat);
+                positionHelper[j] = new Position.Latitudinal(date.getTime(), rad, lon, lat);
             }
         } catch (JSONException e) {
             this.fireLoaded(PARTIALSTATE);
@@ -249,7 +249,7 @@ public class GL3DPositionLoading {
         return -1L;
     }
 
-    public Latitudinal getInterpolatedPosition(long currentCameraTime) {
+    public Position.Latitudinal getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
             long milli;
@@ -284,7 +284,7 @@ public class GL3DPositionLoading {
                 hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
                 hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
-            return new Latitudinal(milli, dist, hgln, hglt);
+            return new Position.Latitudinal(milli, dist, hgln, hglt);
         } else {
             return null;
         }
