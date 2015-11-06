@@ -49,9 +49,9 @@ public abstract class GL3DCamera {
     private GL3DInteraction currentInteraction = rotationInteraction;
 
     public void reset() {
-        this.translation = new Vec2d(0, 0);
-        this.currentDragRotation.clear();
-        this.currentInteraction.reset();
+        translation = new Vec2d(0, 0);
+        currentDragRotation.clear();
+        currentInteraction.reset();
         zoomToFit();
         timeChanged(Layers.getLastUpdatedTimestamp());
     }
@@ -64,11 +64,11 @@ public abstract class GL3DCamera {
      */
     public void activate(GL3DCamera precedingCamera) {
         if (precedingCamera != null) {
-            this.rotation = precedingCamera.rotation.copy();
-            this.translation = precedingCamera.translation.copy();
-            this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
+            rotation = precedingCamera.rotation.copy();
+            translation = precedingCamera.translation.copy();
+            FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
-            this.updateCameraWidthAspect(precedingCamera.previousAspect);
+            updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
             if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
@@ -80,9 +80,9 @@ public abstract class GL3DCamera {
             }
         } else {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
-            this.reset();
+            reset();
         }
-        this.timeChanged(Layers.getLastUpdatedTimestamp());
+        timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
     public GL3DCamera duplicate(JHVDate date) {
@@ -131,17 +131,12 @@ public abstract class GL3DCamera {
 
     public void updateCameraWidthAspect(double aspect) {
         cameraWidth = distance * Math.tan(0.5 * fov);
-        if (cameraWidth == 0.)
-            cameraWidth = 1.;
-
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
-
-        orthoMatrixInverse = Mat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
     public Mat4d getOrthoMatrixInverse() {
-        return orthoMatrixInverse.copy();
+        return Mat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
     public void applyPerspective(GL2 gl) {
@@ -257,18 +252,18 @@ public abstract class GL3DCamera {
      * translation information.
      */
     protected void updateCameraTransformation() {
-        this.rotation = this.currentDragRotation.copy();
-        this.rotation.rotate(this.localRotation);
-        cameraTransformation = this.rotation.toMatrix().translate(translation.x, translation.y, -distance);
+        rotation = currentDragRotation.copy();
+        rotation.rotate(localRotation);
+        cameraTransformation = rotation.toMatrix().translate(translation.x, translation.y, -distance);
     }
 
-    public void setCameraFOV(double fov) {
-        if (fov < MIN_FOV) {
-            this.fov = MIN_FOV;
-        } else if (fov > MAX_FOV) {
-            this.fov = MAX_FOV;
+    public void setCameraFOV(double _fov) {
+        if (_fov < MIN_FOV) {
+            fov = MIN_FOV;
+        } else if (_fov > MAX_FOV) {
+            fov = MAX_FOV;
         } else {
-            this.fov = fov;
+            fov = _fov;
         }
     }
 
@@ -289,27 +284,27 @@ public abstract class GL3DCamera {
     }
 
     public void setFOVangleDegrees(double fovAngle) {
-        this.FOVangleToDraw = fovAngle * Math.PI / 180.;
+        FOVangleToDraw = fovAngle * Math.PI / 180.;
     }
 
-    public void setCurrentInteraction(GL3DInteraction currentInteraction) {
-        this.currentInteraction = currentInteraction;
+    public void setCurrentInteraction(GL3DInteraction _currentInteraction) {
+        currentInteraction = _currentInteraction;
     }
 
     public GL3DInteraction getCurrentInteraction() {
-        return this.currentInteraction;
+        return currentInteraction;
     }
 
     public GL3DInteraction getPanInteraction() {
-        return this.panInteraction;
+        return panInteraction;
     }
 
     public GL3DInteraction getRotateInteraction() {
-        return this.rotationInteraction;
+        return rotationInteraction;
     }
 
     public GL3DAnnotateInteraction getAnnotateInteraction() {
-        return this.annotateInteraction;
+        return annotateInteraction;
     }
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
@@ -327,7 +322,7 @@ public abstract class GL3DCamera {
     }
 
     public Mat4d getRotation() {
-        return this.rotation.toMatrix();
+        return rotation.toMatrix();
     }
 
 }

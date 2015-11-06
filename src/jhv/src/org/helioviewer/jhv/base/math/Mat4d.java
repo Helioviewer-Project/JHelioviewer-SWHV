@@ -417,7 +417,7 @@ public class Mat4d {
     }
 
     public final static Mat4d orthoInverse(double l, double r, double b, double t, double n, double f) {
-        return new Mat4d((r - l) / 2., 0., 0., -(r + l) / 2., 0., (t - b) / 2., 0., (t + b) / 2., 0., 0., (n - f) / 2., -(f + n) / 2., 0., 0., 0., 1.);
+        return new Mat4d((r - l) * 0.5, 0., 0., -(r + l) * 0.5, 0., (t - b) * 0.5, 0., (t + b) * 0.5, 0., 0., (n - f) * 0.5, -(f + n) * 0.5, 0., 0., 0., 1.);
     }
 
     public final static Mat4d perspective(double fov, double aspect, double n, double f) {
