@@ -139,8 +139,8 @@ public class Vec2d {
         return newVec;
     }
 
-    private Vec2d copy() {
-        return new Vec2d(this.x, this.y);
+    public Vec2d copy() {
+        return new Vec2d(this);
     }
 
     public boolean isApproxEqual(Vec2d vec, double tolerance) {

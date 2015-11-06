@@ -28,7 +28,8 @@ public abstract class GL3DCamera {
     private Mat4d cameraTransformation;
 
     private Quatd rotation;
-    protected Vec3d translation;
+    private Vec2d translation;
+    protected double distance;
 
     private Quatd currentDragRotation;
 
@@ -55,7 +56,7 @@ public abstract class GL3DCamera {
         this.rotation = new Quatd();
         this.currentDragRotation = new Quatd();
         this.localRotation = new Quatd();
-        this.translation = new Vec3d();
+        this.translation = new Vec2d();
         this.fov = INITFOV;
         this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
         this.panInteraction = new GL3DPanInteraction(this);
@@ -64,7 +65,7 @@ public abstract class GL3DCamera {
     }
 
     public void reset() {
-        this.translation = new Vec3d(0, 0, this.translation.z);
+        this.translation = new Vec2d(0, 0);
         this.currentDragRotation.clear();
         this.currentInteraction.reset();
         zoomToFit();
@@ -127,21 +128,20 @@ public abstract class GL3DCamera {
         return this.FOVangleToDraw;
     }
 
-    public void setPanning(double x, double y) {
-        translation.x = x;
-        translation.y = y;
+    public void setPanning(Vec2d pan) {
+        translation = pan;
     }
 
-    public double getZTranslation() {
-        return translation.z;
-    }
-
-    public Vec3d getTranslation() {
+    public Vec2d getPanning() {
         return translation;
     }
 
+    public double getDistance() {
+        return distance;
+    }
+
     public Quatd getLocalRotation() {
-        return this.localRotation;
+        return localRotation;
     }
 
     public void rotateCurrentDragRotation(Quatd _currentDragRotation) {
@@ -151,7 +151,7 @@ public abstract class GL3DCamera {
     }
 
     public void updateCameraWidthAspect(double aspect) {
-        cameraWidth = -translation.z * Math.tan(0.5 * fov);
+        cameraWidth = -distance * Math.tan(0.5 * fov);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
 
@@ -280,7 +280,7 @@ public abstract class GL3DCamera {
     protected void updateCameraTransformation() {
         this.rotation = this.currentDragRotation.copy();
         this.rotation.rotate(this.localRotation);
-        cameraTransformation = this.rotation.toMatrix().translate(this.translation);
+        cameraTransformation = this.rotation.toMatrix().translate(translation.x, translation.y, distance);
     }
 
     public void setCameraFOV(double fov) {
@@ -306,7 +306,7 @@ public abstract class GL3DCamera {
     }
 
     public void zoom(int wr) {
-        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), -translation.z));
+        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), -distance));
     }
 
     public void setFOVangleDegrees(double fovAngle) {
@@ -344,7 +344,7 @@ public abstract class GL3DCamera {
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan2(0.5 * size,  -translation.z));
+            setCameraFOV(2. * Math.atan2(0.5 * size, -distance));
     }
 
     public Mat4d getRotation() {
