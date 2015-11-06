@@ -42,16 +42,14 @@ public class GL3DObserverCamera extends GL3DCamera {
             m = view.getMetaData(date);
         }
 
-        double d;
         if (m == null) {
             localRotation = Quatd.ZERO;
-            d = Sun.MeanEarthDistance;
+            distance = Sun.MeanEarthDistance;
         } else {
             localRotation = m.getRotationObs();
-            d = m.getDistanceObs();
+            distance = m.getDistanceObs();
         }
 
-        distance = -d;
         updateCameraTransformation();
     }
 

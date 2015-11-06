@@ -76,12 +76,8 @@ public class GL3DExpertCamera extends GL3DCamera {
         JHVDate ndate = forceTimeChanged(date);
         Position.Latitudinal p = Sun.getEarth(ndate.getTime());
 
-        double b = currentB;
-        double l = -currentL + p.lon;
-        double d = currentDistance;
-
-        localRotation = new Quatd(b, l);
-        distance = -d;
+        localRotation = new Quatd(currentB, -currentL + p.lon);
+        distance = currentDistance;
         updateCameraTransformation();
     }
 
