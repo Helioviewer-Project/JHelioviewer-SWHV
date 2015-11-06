@@ -28,7 +28,7 @@ public abstract class GL3DCamera {
     private Mat4d cameraTransformation;
 
     private Quatd rotation;
-    private Vec3d translation;
+    protected Vec3d translation;
 
     private Quatd currentDragRotation;
 
@@ -132,32 +132,22 @@ public abstract class GL3DCamera {
         translation.y = y;
     }
 
-    protected void setZTranslation(double z) {
-        translation.z = z;
-    }
-
     public double getZTranslation() {
-        return this.translation.z;
+        return translation.z;
     }
 
     public Vec3d getTranslation() {
-        return this.translation;
+        return translation;
     }
 
     public Quatd getLocalRotation() {
         return this.localRotation;
     }
 
-    public void setLocalRotation(Quatd localRotation) {
-        this.localRotation = localRotation;
-        this.rotation.clear();
-        this.updateCameraTransformation();
-    }
-
-    public void rotateCurrentDragRotation(Quatd currentDragRotation) {
-        this.currentDragRotation.rotate(currentDragRotation);
-        this.rotation.clear();
-        this.updateCameraTransformation();
+    public void rotateCurrentDragRotation(Quatd _currentDragRotation) {
+        currentDragRotation.rotate(_currentDragRotation);
+        rotation.clear();
+        updateCameraTransformation();
     }
 
     public void updateCameraWidthAspect(double aspect) {
@@ -287,14 +277,10 @@ public abstract class GL3DCamera {
      * Updates the camera transformation by applying the rotation and
      * translation information.
      */
-    public void updateCameraTransformation() {
+    protected void updateCameraTransformation() {
         this.rotation = this.currentDragRotation.copy();
         this.rotation.rotate(this.localRotation);
         cameraTransformation = this.rotation.toMatrix().translate(this.translation);
-    }
-
-    public double getCameraFOV() {
-        return fov;
     }
 
     public void setCameraFOV(double fov) {
