@@ -661,13 +661,9 @@ public class JP2Image {
     public String getXML(int boxNumber) {
         String xml = null;
         try {
-            if (kduRender != null) {
-                xml = KakaduUtils.getXml(kduRender.getFamilySrc(), boxNumber);
-            } else {
-                KakaduEngine kduTmp = new KakaduEngine(cacheRender, uri, null);
-                xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
-                kduTmp.destroy();
-            }
+            KakaduEngine kduTmp = new KakaduEngine(cacheReader, uri, null);
+            xml = KakaduUtils.getXml(kduTmp.getFamilySrc(), boxNumber);
+            kduTmp.destroy();
         } catch (Exception e) {
             e.printStackTrace();
         }
