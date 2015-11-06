@@ -54,7 +54,7 @@ public class GL3DObserverCamera extends GL3DCamera {
         if (date == null)
             return;
 
-        updateRotation(date, null);
+        updateRotation(date);
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
@@ -64,12 +64,11 @@ public class GL3DObserverCamera extends GL3DCamera {
     }
 
     @Override
-    public void updateRotation(JHVDate date, MetaData m) {
-       if (m == null) {
-            View view = Layers.getActiveView();
-            if (view != null) {
-                m = view.getMetaData(date);
-            }
+    public void updateRotation(JHVDate date) {
+        MetaData m = null;
+        View view = Layers.getActiveView();
+        if (view != null) {
+            m = view.getMetaData(date);
         }
 
         double d;
