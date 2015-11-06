@@ -3,16 +3,9 @@ package org.helioviewer.jhv.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.display.Displayer;
 
-/**
- * Standard panning interaction, moves the camera proportionally to the mouse
- * movement when dragging
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public class GL3DPanInteraction extends GL3DDefaultInteraction {
 
     private Point lastMousePoint;
@@ -33,10 +26,10 @@ public class GL3DPanInteraction extends GL3DDefaultInteraction {
         int y = p.y - lastMousePoint.y;
         double m = 2. * camera.getCameraWidth() / Displayer.getViewport().getHeight();
 
-        Vec3d tran = camera.getTranslation();
-        tran.x += x * m;
-        tran.y -= y * m;
-        camera.setPanning(tran.x, tran.y);
+        Vec2d pan = camera.getPanning();
+        pan.x += x * m;
+        pan.y -= y * m;
+        camera.setPanning(pan);
         camera.updateCameraTransformation();
 
         lastMousePoint = p;

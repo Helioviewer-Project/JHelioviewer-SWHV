@@ -81,7 +81,7 @@ public class GL3DExpertCamera extends GL3DCamera {
         double d = currentDistance;
 
         localRotation = new Quatd(b, l);
-        translation.z = -d;
+        distance = -d;
         updateCameraTransformation();
     }
 

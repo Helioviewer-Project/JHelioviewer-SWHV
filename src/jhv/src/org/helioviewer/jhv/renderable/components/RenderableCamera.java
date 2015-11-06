@@ -39,7 +39,7 @@ public class RenderableCamera extends AbstractRenderable {
             return;
 
         GL3DCamera activeCamera = vp.getCamera();
-        double width = activeCamera.getZTranslation() * Math.tan(activeCamera.getFOVAngleToDraw());
+        double width = activeCamera.getDistance() * Math.tan(activeCamera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
 
