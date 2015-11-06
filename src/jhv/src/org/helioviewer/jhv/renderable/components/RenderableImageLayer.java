@@ -20,7 +20,6 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.threads.JHVWorker;
 
@@ -150,20 +149,18 @@ public class RenderableImageLayer extends AbstractRenderable {
             }
             GLSLShader.filter(gl);
 
-            MetaData m = imageData.getMetaData();
             GL3DCamera camera = vp.getCamera();
+            GL3DCamera localCamera = camera.duplicate(imageData.getMasterTime());
 
-            camera.push(imageData.getMasterTime(), null);
-            Mat4d vpmi = camera.getOrthoMatrixInverse();
-            vpmi.translate(new Vec3d(-camera.getTranslation().x, -camera.getTranslation().y, 0.));
+            Mat4d vpmi = localCamera.getOrthoMatrixInverse();
+            vpmi.translate(new Vec3d(-localCamera.getTranslation().x, -localCamera.getTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(m.getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
             }
-            camera.pop();
 
             enablePositionVBO(gl);
             enableIndexVBO(gl);

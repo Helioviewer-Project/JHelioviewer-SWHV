@@ -45,18 +45,16 @@ public class ViewROI {
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        camera.push(masterTime, m);
+        GL3DCamera localCamera = camera.duplicate(masterTime);
 
-        Quatd camDiff = camera.getCameraDifferenceRotationQuatd(m.getRotationObs());
+        Quatd camDiff = localCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
-            Vec3d hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
+            Vec3d hitPoint = localCamera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
             minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
             maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
             maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
         }
-
-        camera.pop();
 
         double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
         double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));

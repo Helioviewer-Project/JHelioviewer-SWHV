@@ -10,9 +10,7 @@ import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 import com.jogamp.opengl.GL2;
 
@@ -32,7 +30,7 @@ public abstract class GL3DCamera {
     private Quatd rotation;
     private Vec3d translation;
 
-    private final Quatd currentDragRotation;
+    private Quatd currentDragRotation;
 
     protected Quatd localRotation;
 
@@ -40,8 +38,7 @@ public abstract class GL3DCamera {
 
     private Mat4d orthoMatrixInverse = Mat4d.identity();
 
-    private double cameraWidth = 1.;
-    private double previousCameraWidth = -1;
+    private double cameraWidth = 1;
 
     private double cameraWidthTimesAspect;
 
@@ -85,7 +82,7 @@ public abstract class GL3DCamera {
             this.translation = precedingCamera.translation.copy();
             this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
-            this.updateRotation(Layers.getLastUpdatedTimestamp(), null);
+            this.updateRotation(Layers.getLastUpdatedTimestamp());
             this.updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
@@ -108,23 +105,23 @@ public abstract class GL3DCamera {
     private Vec3d saveTranslation;
     private Mat4d saveTransformation;
 
-    public void push(JHVDate date, MetaData m) {
+    public GL3DCamera duplicate(JHVDate date) {
         if (!trackingMode) {
-            saveRotation = rotation.copy();
-            saveLocalRotation = localRotation.copy();
-            saveTranslation = translation.copy();
-            saveTransformation = cameraTransformation.copy();
-            updateRotation(date, m);
-        }
-    }
+            try {
+                GL3DCamera camera = this.getClass().newInstance();
 
-    public void pop() {
-        if (!trackingMode) {
-            rotation = saveRotation;
-            localRotation = saveLocalRotation;
-            translation = saveTranslation;
-            cameraTransformation = saveTransformation;
-        }
+                camera.fov = this.fov;
+                camera.translation = this.translation.copy();
+                camera.currentDragRotation = this.currentDragRotation.copy();
+                camera.updateRotation(date);
+                camera.updateCameraWidthAspect(this.previousAspect);
+
+                return camera;
+            } catch (Exception e) {
+                return this;
+            }
+        } else
+            return this;
     }
 
     public double getFOVAngleToDraw() {
@@ -138,7 +135,6 @@ public abstract class GL3DCamera {
 
     protected void setZTranslation(double z) {
         translation.z = z;
-        updateCameraWidthAspect(previousAspect);
     }
 
     public double getZTranslation() {
@@ -165,30 +161,15 @@ public abstract class GL3DCamera {
         this.updateCameraTransformation();
     }
 
-    // quantization bits per half width camera
-    private static final int quantFactor = 1 << 12;
-
     public void updateCameraWidthAspect(double aspect) {
-        cameraWidth = -translation.z * Math.tan(fov / 2.);
+        cameraWidth = -translation.z * Math.tan(0.5 * fov);
         if (cameraWidth == 0.)
             cameraWidth = 1.;
 
-        cameraWidth = (long) (cameraWidth * quantFactor) / (double) quantFactor;
-        if (cameraWidth == previousCameraWidth && aspect == previousAspect) {
-            return;
-        }
-
-        previousCameraWidth = cameraWidth;
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
 
-        //orthoMatrix = GL3DMat4d.ortho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
         orthoMatrixInverse = Mat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-
-        if (this == Displayer.getViewport().getCamera()) {
-            // Displayer.render();
-            ImageViewerGui.getZoomStatusPanel().updateZoomLevel(cameraWidth);
-        }
     }
 
     public Mat4d getOrthoMatrixInverse() {
@@ -288,10 +269,10 @@ public abstract class GL3DCamera {
         double up1y = computeUpY(viewportCoordinates);
         Vec3d hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 <= Sun.Radius2 / 2.) {
+        if (radius2 <= 0.5 * Sun.Radius2) {
             hitPoint = new Vec3d(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         } else {
-            hitPoint = new Vec3d(up1x, up1y, Sun.Radius2 / (2. * Math.sqrt(radius2)));
+            hitPoint = new Vec3d(up1x, up1y, 0.5 * Sun.Radius2 / Math.sqrt(radius2));
         }
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
@@ -325,7 +306,6 @@ public abstract class GL3DCamera {
         } else {
             this.fov = fov;
         }
-        updateCameraWidthAspect(previousAspect);
     }
 
     @Override
@@ -349,12 +329,11 @@ public abstract class GL3DCamera {
     }
 
     public void zoom(int wr) {
-        double newfov = Math.atan2(cameraWidth * (1 + 0.015 * wr), -translation.z) * 2.;
-        setCameraFOV(newfov);
+        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), -translation.z));
     }
 
     public void setFOVangleDegrees(double fovAngle) {
-        this.FOVangleToDraw = fovAngle * Math.PI / 180.0;
+        this.FOVangleToDraw = fovAngle * Math.PI / 180.;
     }
 
     public void setCurrentInteraction(GL3DInteraction currentInteraction) {
@@ -383,14 +362,14 @@ public abstract class GL3DCamera {
 
     public abstract void timeChanged(JHVDate date);
 
-    public abstract void updateRotation(JHVDate date, MetaData m);
+    public abstract void updateRotation(JHVDate date);
 
     public void zoomToFit() {
         double size = Layers.getLargestPhysicalSize();
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan(-size / 2. / this.getZTranslation()));
+            setCameraFOV(2. * Math.atan2(0.5 * size,  -translation.z));
     }
 
     public Mat4d getRotation() {

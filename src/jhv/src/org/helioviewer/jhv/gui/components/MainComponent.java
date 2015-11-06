@@ -108,6 +108,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
                 camera.getAnnotateInteraction().drawInteractionFeedback(gl);
+
+                if (camera == Displayer.getViewport().getCamera()) {
+                    ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getCameraWidth());
+                }
             }
         }
     }
@@ -139,7 +143,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             GL3DCamera camera = vp.getCamera();
-            camera.updateRotation(Layers.getLastUpdatedTimestamp(), null);
+            camera.updateRotation(Layers.getLastUpdatedTimestamp());
             camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
             gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
             camera.applyPerspective(gl);

@@ -11,7 +11,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
@@ -36,7 +35,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     @Override
     public void reset() {
         super.reset();
-        updateRotation(Layers.getLastUpdatedTimestamp(), null);
+        updateRotation(Layers.getLastUpdatedTimestamp());
     }
 
     @Override
@@ -60,7 +59,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     @Override
     public void timeChanged(JHVDate date) {
         if (!this.getTrackingMode()) {
-            updateRotation(date, null);
+            updateRotation(date);
         } else {
             Displayer.render();
         }
@@ -114,7 +113,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     @Override
-    public void updateRotation(JHVDate date, MetaData m) {
+    public void updateRotation(JHVDate date) {
         JHVDate ndate = forceTimeChanged(date);
         Position.Latitudinal p = Sun.getEarth(ndate.getTime());
 
@@ -129,7 +128,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     public void fireNewLoaded(String state) {
         expertCameraOptionPanel.fireLoaded(state);
-        updateRotation(Layers.getLastUpdatedTimestamp(), null);
+        updateRotation(Layers.getLastUpdatedTimestamp());
         Displayer.render();
     }
 
