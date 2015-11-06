@@ -15,7 +15,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
-    private final GL3DExpertCameraOptionPanel expertCameraOptionPanel;
     private final GL3DPositionLoading positionLoading;
     private double currentL = 0.;
     private double currentB = 0.;
@@ -25,11 +24,8 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
 
     public GL3DExpertCamera() {
         super();
-        expertCameraOptionPanel = new GL3DExpertCameraOptionPanel(this);
         positionLoading = new GL3DPositionLoading(this);
         this.timeChanged(Layers.getLastUpdatedTimestamp());
-        expertCameraOptionPanel.syncWithLayerBeginTime(false);
-        expertCameraOptionPanel.syncWithLayerEndTime(true);
     }
 
     @Override
@@ -127,7 +123,7 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
     }
 
     public void fireNewLoaded(String state) {
-        expertCameraOptionPanel.fireLoaded(state);
+        optionPanel.fireLoaded(state);
         updateRotation(Layers.getLastUpdatedTimestamp());
         Displayer.render();
     }
@@ -167,9 +163,16 @@ public class GL3DExpertCamera extends GL3DCamera implements LayersListener {
         }
     }
 
+    private GL3DExpertCameraOptionPanel optionPanel;
+
     @Override
     public GL3DCameraOptionPanel getOptionPanel() {
-        return expertCameraOptionPanel;
+        if (optionPanel == null) {
+            optionPanel = new GL3DExpertCameraOptionPanel(this);
+            optionPanel.syncWithLayerBeginTime(false);
+            optionPanel.syncWithLayerEndTime(true);
+        }
+        return optionPanel;
     }
 
 }
