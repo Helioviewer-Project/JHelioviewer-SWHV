@@ -23,46 +23,30 @@ public abstract class GL3DCamera {
     private static final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
 
-    private double previousAspect = -1.0;
+    private Mat4d cameraTransformation = Mat4d.identity();
 
-    private Mat4d cameraTransformation;
+    private Quatd rotation = new Quatd();
+    private Quatd currentDragRotation = new Quatd();
+    protected Quatd localRotation = new Quatd();
 
-    private Quatd rotation;
-    private Vec2d translation;
-    protected double distance;
-
-    private Quatd currentDragRotation;
-
-    protected Quatd localRotation;
+    private Vec2d translation = new Vec2d();
+    protected double distance = Sun.MeanEarthDistance;
 
     private boolean trackingMode;
 
     private Mat4d orthoMatrixInverse = Mat4d.identity();
 
     private double cameraWidth = 1;
-
     private double cameraWidthTimesAspect;
+    private double previousAspect = -1.0;
 
     private double FOVangleToDraw;
 
-    private final GL3DTrackballRotationInteraction rotationInteraction;
-    private final GL3DPanInteraction panInteraction;
-    private final GL3DAnnotateInteraction annotateInteraction;
+    private final GL3DTrackballRotationInteraction rotationInteraction = new GL3DTrackballRotationInteraction(this);
+    private final GL3DPanInteraction panInteraction = new GL3DPanInteraction(this);
+    private final GL3DAnnotateInteraction annotateInteraction = new GL3DAnnotateInteraction(this);
 
-    private GL3DInteraction currentInteraction;
-
-    public GL3DCamera() {
-        this.cameraTransformation = Mat4d.identity();
-        this.rotation = new Quatd();
-        this.currentDragRotation = new Quatd();
-        this.localRotation = new Quatd();
-        this.translation = new Vec2d();
-        this.fov = INITFOV;
-        this.rotationInteraction = new GL3DTrackballRotationInteraction(this);
-        this.panInteraction = new GL3DPanInteraction(this);
-        this.annotateInteraction = new GL3DAnnotateInteraction(this);
-        this.currentInteraction = this.rotationInteraction;
-    }
+    private GL3DInteraction currentInteraction = rotationInteraction;
 
     public void reset() {
         this.translation = new Vec2d(0, 0);
@@ -100,11 +84,6 @@ public abstract class GL3DCamera {
         }
         this.timeChanged(Layers.getLastUpdatedTimestamp());
     }
-
-    private Quatd saveRotation;
-    private Quatd saveLocalRotation;
-    private Vec3d saveTranslation;
-    private Mat4d saveTransformation;
 
     public GL3DCamera duplicate(JHVDate date) {
         if (!trackingMode) {
