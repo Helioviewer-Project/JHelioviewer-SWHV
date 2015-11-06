@@ -51,7 +51,7 @@ public class GL3DObserverCamera extends GL3DCamera {
             d = m.getDistanceObs();
         }
 
-        setZTranslation(-d);
+        translation.z = -d;
         updateCameraTransformation();
     }
 
