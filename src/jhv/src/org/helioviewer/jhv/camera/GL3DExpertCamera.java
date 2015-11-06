@@ -19,23 +19,6 @@ public class GL3DExpertCamera extends GL3DCamera {
     private double currentDistance = Sun.MeanEarthDistance;
 
     @Override
-    public void reset() {
-        super.reset();
-        updateRotation(Layers.getLastUpdatedTimestamp());
-    }
-
-    @Override
-    public void activate(GL3DCamera precedingCamera) {
-        super.activate(precedingCamera);
-        this.timeChanged(Layers.getLastUpdatedTimestamp());
-    }
-
-    @Override
-    public String getName() {
-        return "Expert camera";
-    }
-
-    @Override
     public void timeChanged(JHVDate date) {
         if (!this.getTrackingMode()) {
             updateRotation(date);

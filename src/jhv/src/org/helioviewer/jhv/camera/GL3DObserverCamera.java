@@ -13,23 +13,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 public class GL3DObserverCamera extends GL3DCamera {
 
     @Override
-    public void reset() {
-        super.reset();
-        this.forceTimeChanged(Layers.getLastUpdatedTimestamp());
-    }
-
-    @Override
-    public void activate(GL3DCamera precedingCamera) {
-        super.activate(precedingCamera);
-        this.timeChanged(Layers.getLastUpdatedTimestamp());
-    }
-
-    @Override
-    public String getName() {
-        return "View from observer";
-    }
-
-    @Override
     public void timeChanged(JHVDate date) {
         if (!this.getTrackingMode()) {
             forceTimeChanged(date);

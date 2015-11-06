@@ -68,6 +68,7 @@ public abstract class GL3DCamera {
         this.currentDragRotation.clear();
         this.currentInteraction.reset();
         zoomToFit();
+        timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
     /**
@@ -82,7 +83,6 @@ public abstract class GL3DCamera {
             this.translation = precedingCamera.translation.copy();
             this.FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
 
-            this.updateRotation(Layers.getLastUpdatedTimestamp());
             this.updateCameraWidthAspect(precedingCamera.previousAspect);
 
             GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
@@ -97,7 +97,7 @@ public abstract class GL3DCamera {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
             this.reset();
         }
-        Displayer.render();
+        this.timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
     private Quatd saveRotation;
@@ -307,11 +307,6 @@ public abstract class GL3DCamera {
         }
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
     public void setTrackingMode(boolean trackingMode) {
         this.trackingMode = trackingMode;
     }
@@ -351,8 +346,6 @@ public abstract class GL3DCamera {
     public GL3DAnnotateInteraction getAnnotateInteraction() {
         return this.annotateInteraction;
     }
-
-    public abstract String getName();
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
