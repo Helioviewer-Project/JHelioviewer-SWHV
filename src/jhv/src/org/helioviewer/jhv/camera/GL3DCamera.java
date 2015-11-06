@@ -109,7 +109,6 @@ public abstract class GL3DCamera {
         if (!trackingMode) {
             try {
                 GL3DCamera camera = this.getClass().newInstance();
-
                 camera.fov = this.fov;
                 camera.translation = this.translation.copy();
                 camera.currentDragRotation = this.currentDragRotation.copy();
@@ -319,9 +318,6 @@ public abstract class GL3DCamera {
 
     public boolean getTrackingMode() {
         return trackingMode;
-    }
-
-    public void deactivate() {
     }
 
     public double getCameraWidth() {

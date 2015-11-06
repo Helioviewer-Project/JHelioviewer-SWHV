@@ -24,15 +24,17 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.base.TimeTextField;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarDatePicker;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarEvent;
 import org.helioviewer.jhv.gui.components.calendar.JHVCalendarListener;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
+public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implements LayersListener {
 
     private final JLabel loadedLabel;
 
@@ -56,6 +58,8 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     private final JCheckBox exactDateCheckBox;
 
     private boolean firstComboChanged = false;
+
+    private GL3DPositionLoading positionLoading;
 
     public GL3DExpertCameraOptionPanel(final GL3DExpertCamera camera) {
         super();
@@ -107,9 +111,10 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
                     setBeginTime(false);
                     setEndTime(true);
                 }
-                camera.setInterpolation(selected);
             }
         });
+
+        positionLoading = new GL3DPositionLoading(this);
     }
 
     public void addSyncButtons(GridBagConstraints c) {
@@ -152,7 +157,26 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     }
 
     @Override
+    public void activate() {
+        Layers.addLayersListener(this);
+    }
+
+    @Override
     public void deactivate() {
+        Layers.removeLayersListener(this);
+    }
+
+    @Override
+    public void layerAdded(View view) {
+    }
+
+    @Override
+    public void activeLayerChanged(View view) {
+        if (view != null) {
+            positionLoading.setBeginDate(Layers.getStartDate(view).getDate(), false);
+            positionLoading.setEndDate(Layers.getEndDate(view).getDate(), true);
+            Displayer.render();
+        }
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
@@ -170,8 +194,9 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
                 if (event.getStateChange() == ItemEvent.SELECTED && firstComboChanged) {
                     GL3DSpaceObject object = (GL3DSpaceObject) event.getItem();
                     if (object != null) {
-                        camera.setObservingObject(object.getUrlName(), true);
-                        revalidate();
+                        positionLoading.setObserver(object.getUrlName(), true);
+                        // revalidate();
+                        // Displayer.render();
                     }
                 }
                 if (event.getStateChange() == ItemEvent.SELECTED && !firstComboChanged) {
@@ -228,13 +253,15 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
     private void setEndTime(boolean applyChanges) {
         Date dt = endTimePicker.getValue();
         Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
-        camera.setEndDate(end_date, applyChanges);
+        positionLoading.setEndDate(end_date, applyChanges);
+        // Displayer.render();
     }
 
     private void setBeginTime(boolean applyChanges) {
         Date dt = beginTimePicker.getValue();
         Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
-        camera.setBeginDate(begin_date, applyChanges);
+        positionLoading.setBeginDate(begin_date, applyChanges);
+        // Displayer.render();
     }
 
     private void syncWithLayer() {
@@ -338,6 +365,13 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel {
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
         loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
+
+        camera.updateRotation(Layers.getLastUpdatedTimestamp());
+        Displayer.render();
+    }
+
+    public GL3DPositionLoading getPositionLoading() {
+        return positionLoading;
     }
 
 }

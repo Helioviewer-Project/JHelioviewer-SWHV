@@ -25,11 +25,6 @@ public class GL3DObserverCamera extends GL3DCamera {
     }
 
     @Override
-    public void deactivate() {
-        super.deactivate();
-    }
-
-    @Override
     public String getName() {
         return "View from observer";
     }

@@ -24,11 +24,6 @@ public class GL3DEarthCamera extends GL3DCamera {
     }
 
     @Override
-    public void deactivate() {
-        super.deactivate();
-    }
-
-    @Override
     public String getName() {
         return "View from Earth";
     }
