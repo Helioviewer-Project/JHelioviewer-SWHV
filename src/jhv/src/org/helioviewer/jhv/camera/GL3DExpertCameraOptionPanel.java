@@ -48,7 +48,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private JSeparatorComboBox objectCombobox;
 
-    private final GL3DExpertCamera camera;
+    private final GL3DCamera camera;
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
@@ -61,7 +61,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private GL3DPositionLoading positionLoading;
 
-    public GL3DExpertCameraOptionPanel(final GL3DExpertCamera camera) {
+    public GL3DExpertCameraOptionPanel(GL3DCamera camera) {
         super();
         this.camera = camera;
         setLayout(new GridBagLayout());
@@ -115,28 +115,33 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
         });
 
         positionLoading = new GL3DPositionLoading(this);
+        // !
+        syncWithLayerBeginTime(false);
+        syncWithLayerEndTime(true);
     }
 
     public void addSyncButtons(GridBagConstraints c) {
-        this.synchronizeWithLayersButton = new JButton("Sync");
-        this.synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
-        this.synchronizeWithLayersButton.addActionListener(new ActionListener() {
+        synchronizeWithLayersButton = new JButton("Sync");
+        synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
+        synchronizeWithLayersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncWithLayer();
             }
         });
-        this.synchronizeWithNowButton = new JButton("Now");
-        this.synchronizeWithNowButton.setToolTipText("Fill twice current time");
-        this.synchronizeWithNowButton.addActionListener(new ActionListener() {
+
+        synchronizeWithNowButton = new JButton("Now");
+        synchronizeWithNowButton.setToolTipText("Fill twice current time");
+        synchronizeWithNowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncBothLayerNow();
             }
         });
-        this.synchronizeWithCurrentButton = new JButton("Current");
-        this.synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
-        this.synchronizeWithCurrentButton.addActionListener(new ActionListener() {
+
+        synchronizeWithCurrentButton = new JButton("Current");
+        synchronizeWithCurrentButton.setToolTipText("Fill twice selected layer time");
+        synchronizeWithCurrentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 syncWithLayerCurrentTime();
@@ -144,14 +149,13 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
         });
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(0, 3));
-        this.synchronizeWithLayersButton.getMaximumSize().width = 15;
-        buttonPanel.add(this.synchronizeWithLayersButton);
 
-        this.synchronizeWithCurrentButton.getMaximumSize().width = 15;
-        buttonPanel.add(this.synchronizeWithCurrentButton);
-
-        this.synchronizeWithNowButton.getMaximumSize().width = 15;
-        buttonPanel.add(this.synchronizeWithNowButton);
+        synchronizeWithLayersButton.getMaximumSize().width = 15;
+        buttonPanel.add(synchronizeWithLayersButton);
+        synchronizeWithCurrentButton.getMaximumSize().width = 15;
+        buttonPanel.add(synchronizeWithCurrentButton);
+        synchronizeWithNowButton.getMaximumSize().width = 15;
+        buttonPanel.add(synchronizeWithNowButton);
 
         add(buttonPanel, c);
     }

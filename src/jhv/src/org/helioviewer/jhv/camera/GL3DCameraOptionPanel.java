@@ -3,13 +3,12 @@ package org.helioviewer.jhv.camera;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public abstract class GL3DCameraOptionPanel extends JPanel {
+public class GL3DCameraOptionPanel extends JPanel {
 
-    abstract public void activate();
+    public void activate() {}
 
-    abstract public void deactivate();
+    public void deactivate() {}
 
-    public GL3DCameraOptionPanel() {
-    }
+    public GL3DCameraOptionPanel() {}
 
 }

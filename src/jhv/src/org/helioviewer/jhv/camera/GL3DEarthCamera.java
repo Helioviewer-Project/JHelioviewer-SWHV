@@ -16,14 +16,4 @@ public class GL3DEarthCamera extends GL3DCamera {
         updateCameraTransformation();
     }
 
-    private GL3DEarthCameraOptionPanel optionPanel;
-
-    @Override
-    public GL3DCameraOptionPanel getOptionPanel() {
-        if (optionPanel == null) {
-            optionPanel = new GL3DEarthCameraOptionPanel(this);
-        }
-        return optionPanel;
-    }
-
 }
