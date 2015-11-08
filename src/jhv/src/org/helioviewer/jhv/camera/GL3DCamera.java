@@ -10,7 +10,9 @@ import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 import com.jogamp.opengl.GL2;
 
@@ -33,8 +35,6 @@ public abstract class GL3DCamera {
     protected double distance = Sun.MeanEarthDistance;
 
     private boolean trackingMode;
-
-    private Mat4d orthoMatrixInverse = Mat4d.identity();
 
     private double cameraWidth = 1;
     private double cameraWidthTimesAspect;
@@ -80,9 +80,12 @@ public abstract class GL3DCamera {
             }
         } else {
             Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
-            reset();
         }
-        timeChanged(Layers.getLastUpdatedTimestamp());
+        reset();
+
+        if (precedingCamera != null) {
+            setTrackingMode(precedingCamera.getTrackingMode());
+        }
     }
 
     public GL3DCamera duplicate(JHVDate date) {
@@ -267,8 +270,8 @@ public abstract class GL3DCamera {
         }
     }
 
-    public void setTrackingMode(boolean trackingMode) {
-        this.trackingMode = trackingMode;
+    public void setTrackingMode(boolean _trackingMode) {
+        trackingMode = _trackingMode;
     }
 
     public boolean getTrackingMode() {
@@ -309,9 +312,25 @@ public abstract class GL3DCamera {
 
     public abstract GL3DCameraOptionPanel getOptionPanel();
 
-    public abstract void timeChanged(JHVDate date);
-
     public abstract void updateRotation(JHVDate date);
+
+    protected JHVDate cameraTime;
+
+    public void timeChanged(JHVDate date) {
+        cameraTime = date;
+
+        if (!trackingMode) {
+            updateRotation(cameraTime);
+        } else {
+            Displayer.render();
+        }
+
+        RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
+        if (renderableCamera != null) {
+            renderableCamera.setTimeString(cameraTime.toString());
+            ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
+        }
+    }
 
     public void zoomToFit() {
         double size = Layers.getLargestPhysicalSize();
