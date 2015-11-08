@@ -366,7 +366,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
         String htmlend = "</body></html>";
         loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
 
-        camera.updateRotation(Layers.getLastUpdatedTimestamp());
+        camera.timeChanged(Layers.getLastUpdatedTimestamp());
         Displayer.render();
     }
 

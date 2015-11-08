@@ -105,7 +105,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 camera.applyPerspective(gl);
 
                 renderBlackCircle(gl, camera.getRotation().transpose().m);
-
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
                 camera.getAnnotateInteraction().drawInteractionFeedback(gl);
 
