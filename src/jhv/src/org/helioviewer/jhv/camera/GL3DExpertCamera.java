@@ -1,15 +1,10 @@
 package org.helioviewer.jhv.camera;
 
-import java.util.Date;
-
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 public class GL3DExpertCamera extends GL3DCamera {
@@ -18,16 +13,7 @@ public class GL3DExpertCamera extends GL3DCamera {
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
 
-    @Override
-    public void timeChanged(JHVDate date) {
-        if (!this.getTrackingMode()) {
-            updateRotation(date);
-        } else {
-            Displayer.render();
-        }
-    }
-
-    private JHVDate forceTimeChanged(JHVDate date) {
+    private JHVDate interpolate(JHVDate date) {
         GL3DPositionLoading positionLoading = optionPanel.getPositionLoading();
         if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
@@ -63,18 +49,13 @@ public class GL3DExpertCamera extends GL3DCamera {
             currentB = p.lat;
         }
 
-        RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
-        if (renderableCamera != null) {
-            renderableCamera.setTimeString(date.toString());
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
-        }
         return date;
     }
 
     @Override
     public void updateRotation(JHVDate date) {
-        JHVDate ndate = forceTimeChanged(date);
-        Position.Latitudinal p = Sun.getEarth(ndate.getTime());
+        cameraTime = interpolate(date);
+        Position.Latitudinal p = Sun.getEarth(cameraTime.getTime());
 
         localRotation = new Quatd(currentB, -currentL + p.lon);
         distance = currentDistance;

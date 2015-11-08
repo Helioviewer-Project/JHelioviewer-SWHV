@@ -146,11 +146,9 @@ public class GL3DCameraOptionsPanel extends JPanel {
     }
 
     private void changeCamera(GL3DCamera newCamera) {
-        newCamera.setTrackingMode(previousCamera.getTrackingMode());
-        this.switchOptionsPanel(newCamera.getOptionPanel());
+        switchOptionsPanel(newCamera.getOptionPanel());
 
         Displayer.setActiveCamera(newCamera);
-        newCamera.reset();
         previousCamera = newCamera;
     }
 
