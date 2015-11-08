@@ -14,7 +14,7 @@ public class GL3DExpertCamera extends GL3DCamera {
     private double currentDistance = Sun.MeanEarthDistance;
 
     private JHVDate interpolate(JHVDate date) {
-        GL3DPositionLoading positionLoading = optionPanel.getPositionLoading();
+        GL3DPositionLoading positionLoading = expertOptionPanel.getPositionLoading();
         if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             long tLayerStart = 0, tLayerEnd = 0;
@@ -60,18 +60,6 @@ public class GL3DExpertCamera extends GL3DCamera {
         localRotation = new Quatd(currentB, -currentL + p.lon);
         distance = currentDistance;
         updateCameraTransformation();
-    }
-
-    private GL3DExpertCameraOptionPanel optionPanel;
-
-    @Override
-    public GL3DCameraOptionPanel getOptionPanel() {
-        if (optionPanel == null) {
-            optionPanel = new GL3DExpertCameraOptionPanel(this);
-            optionPanel.syncWithLayerBeginTime(false);
-            optionPanel.syncWithLayerEndTime(true);
-        }
-        return optionPanel;
     }
 
 }

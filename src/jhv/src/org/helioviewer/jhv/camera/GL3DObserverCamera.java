@@ -27,14 +27,4 @@ public class GL3DObserverCamera extends GL3DCamera {
         updateCameraTransformation();
     }
 
-    private GL3DObserverCameraOptionPanel optionPanel;
-
-    @Override
-    public GL3DCameraOptionPanel getOptionPanel() {
-        if (optionPanel == null) {
-            optionPanel = new GL3DObserverCameraOptionPanel(this);
-        }
-        return optionPanel;
-    }
-
 }

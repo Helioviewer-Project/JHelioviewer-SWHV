@@ -18,6 +18,12 @@ import com.jogamp.opengl.GL2;
 
 public abstract class GL3DCamera {
 
+    protected static enum CameraMode {
+        OBSERVER, EARTH, EXPERT
+    }
+
+    private CameraMode mode;
+
     private static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.02;
     private static final double MAX_FOV = INITFOV * 30;
@@ -47,6 +53,17 @@ public abstract class GL3DCamera {
     private final GL3DAnnotateInteraction annotateInteraction = new GL3DAnnotateInteraction(this);
 
     private GL3DInteraction currentInteraction = rotationInteraction;
+
+    public GL3DCamera() {
+        if (this instanceof GL3DEarthCamera) {
+            mode = CameraMode.EARTH;
+        } else if (this instanceof GL3DExpertCamera) {
+            mode = CameraMode.EXPERT;
+            expertOptionPanel = new GL3DExpertCameraOptionPanel(this);
+        } else {
+            mode = CameraMode.OBSERVER;
+        }
+    }
 
     public void reset() {
         translation = new Vec2d(0, 0);
@@ -310,7 +327,16 @@ public abstract class GL3DCamera {
         return annotateInteraction;
     }
 
-    public abstract GL3DCameraOptionPanel getOptionPanel();
+    private GL3DCameraOptionPanel optionPanel = new GL3DCameraOptionPanel();
+    protected GL3DExpertCameraOptionPanel expertOptionPanel;
+
+    public GL3DCameraOptionPanel getOptionPanel() {
+        if (mode == CameraMode.EXPERT) {
+            return expertOptionPanel;
+        } else {
+            return optionPanel;
+        }
+    }
 
     public abstract void updateRotation(JHVDate date);
 
