@@ -21,8 +21,8 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.camera.GL3DAnnotateInteraction.AnnotationMode;
 import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;

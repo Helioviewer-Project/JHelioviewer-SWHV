@@ -6,12 +6,12 @@ import java.awt.event.MouseEvent;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.display.Displayer;
 
-public class GL3DPanInteraction extends GL3DDefaultInteraction {
+public class InteractionPan extends InteractionDefault {
 
     private Point lastMousePoint;
 
-    protected GL3DPanInteraction(GL3DCamera camera) {
-        super(camera);
+    protected InteractionPan(GL3DCamera _camera) {
+        super(_camera);
     }
 
     @Override
