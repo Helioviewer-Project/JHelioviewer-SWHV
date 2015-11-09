@@ -58,6 +58,11 @@ public class Camera {
 
     private CameraMode mode = CameraMode.OBSERVER;
 
+    private void refresh() {
+        timeChanged(Layers.getLastUpdatedTimestamp());
+        Displayer.render();
+    }
+
     protected void setMode(CameraMode _mode) {
         mode = _mode;
         switch (mode) {
@@ -70,6 +75,7 @@ public class Camera {
             default:
                 vantagePoint = vantagePointObserver;
         }
+        refresh();
     }
 
     public void reset() {
@@ -77,8 +83,7 @@ public class Camera {
         currentDragRotation.clear();
         currentInteraction.reset();
         zoomToFit();
-        timeChanged(Layers.getLastUpdatedTimestamp());
-        Displayer.render();
+        refresh();
     }
 
     public Camera duplicate(JHVDate date) {
@@ -267,8 +272,7 @@ public class Camera {
 
     public void setTrackingMode(boolean _trackingMode) {
         trackingMode = _trackingMode;
-        timeChanged(Layers.getLastUpdatedTimestamp());
-        Displayer.render();
+        refresh();
     }
 
     public boolean getTrackingMode() {
@@ -312,8 +316,7 @@ public class Camera {
 
     protected void firePositionLoaded(final String state) {
         expertOptionPanel.fireLoaded(state);
-        timeChanged(Layers.getLastUpdatedTimestamp());
-        Displayer.render();
+        refresh();
     }
 
     protected CameraOptionPanel getOptionPanel() {
