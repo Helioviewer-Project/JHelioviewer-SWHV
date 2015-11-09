@@ -5,7 +5,7 @@ import java.awt.Component;
 import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCamera.CameraMode;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
@@ -19,7 +19,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private final GL3DViewport miniview = new GL3DViewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
+    private final Viewport miniview = new Viewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -28,11 +28,11 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
         Mat4d cameraMatrix = vp.getCamera().getOrientation().toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
@@ -93,7 +93,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
             miniview.getCamera().zoomToFit();
     }
 
-    public GL3DViewport getViewport() {
+    public Viewport getViewport() {
         int vpw = Displayer.getGLWidth();
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * optionsPanel.scale * 0.01);

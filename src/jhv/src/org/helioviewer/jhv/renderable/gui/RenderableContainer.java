@@ -6,7 +6,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GLText;
@@ -63,19 +63,19 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
         for (Renderable renderable : renderables) {
             renderable.render(gl, vp);
         }
     }
 
-    public void renderFloat(GL2 gl, GL3DViewport vp) {
+    public void renderFloat(GL2 gl, Viewport vp) {
         for (Renderable renderable : renderables) {
             renderable.renderFloat(gl, vp);
         }
     }
 
-    public void renderMiniview(GL2 gl, GL3DViewport miniview) {
+    public void renderMiniview(GL2 gl, Viewport miniview) {
         RenderableMiniview mv = ImageViewerGui.getRenderableMiniview();
         mv.renderMiniview(gl, miniview);
         for (Renderable renderable : renderables) {
@@ -272,7 +272,7 @@ public class RenderableContainer implements TableModel, Reorderable {
                 }
             }
         }
-        for (GL3DViewport vp : Displayer.getViewports()) {
+        for (Viewport vp : Displayer.getViewports()) {
             vp.computeActive();
         }
         Displayer.reshapeAll();

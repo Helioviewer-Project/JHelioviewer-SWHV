@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
@@ -51,7 +51,7 @@ public class RenderableGrid extends AbstractRenderable {
     private GridChoiceType gridChoice = GridChoiceType.OBSERVER;
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
         if (!isVisible[vp.getIndex()])
             return;
 
@@ -407,7 +407,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
     }
 
     public void setCoordinates(GridChoiceType _gridChoice) {
