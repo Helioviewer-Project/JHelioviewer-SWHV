@@ -406,8 +406,4 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         iconCacheId.clear();
     }
 
-    @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-    }
-
 }

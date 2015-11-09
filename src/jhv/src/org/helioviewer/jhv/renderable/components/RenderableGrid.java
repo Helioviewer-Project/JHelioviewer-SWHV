@@ -406,10 +406,6 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glDeleteBuffers(1, new int[] { colorBufferID }, 0);
     }
 
-    @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-    }
-
     public void setCoordinates(GridChoiceType _gridChoice) {
         gridChoice = _gridChoice;
     }

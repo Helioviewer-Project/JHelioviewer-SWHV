@@ -156,8 +156,4 @@ public class RenderableCamera extends AbstractRenderable {
     public void dispose(GL2 gl) {
     }
 
-    @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-    }
-
 }
