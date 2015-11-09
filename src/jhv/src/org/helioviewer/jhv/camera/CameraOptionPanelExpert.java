@@ -60,7 +60,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private final PositionLoad positionLoad;
 
-    public CameraOptionPanelExpert(PositionLoad _positionLoad) {
+    CameraOptionPanelExpert(PositionLoad _positionLoad) {
         positionLoad = _positionLoad;
 
         setLayout(new GridBagLayout());
@@ -112,13 +112,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
                 }
             }
         });
-
-        // !
-        syncWithLayerBeginTime(false);
-        syncWithLayerEndTime(true);
     }
 
-    public void addSyncButtons(GridBagConstraints c) {
+    private void addSyncButtons(GridBagConstraints c) {
         synchronizeWithLayersButton = new JButton("Sync");
         synchronizeWithLayersButton.setToolTipText("Fill selected layer dates");
         synchronizeWithLayersButton.addActionListener(new ActionListener() {
@@ -159,12 +155,12 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     @Override
-    public void activate() {
+    void activate() {
         Layers.addLayersListener(this);
     }
 
     @Override
-    public void deactivate() {
+    void deactivate() {
         Layers.removeLayersListener(this);
     }
 
@@ -177,7 +173,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         if (view != null) {
             positionLoad.setBeginDate(Layers.getStartDate(view).getDate(), false);
             positionLoad.setEndDate(Layers.getEndDate(view).getDate(), true);
-            Displayer.render();
+            // Displayer.render();
         }
     }
 
@@ -266,12 +262,13 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         // Displayer.render();
     }
 
-    private void syncWithLayer() {
+    @Override
+    void syncWithLayer() {
         syncWithLayerBeginTime(false);
         syncWithLayerEndTime(true);
     }
 
-    void syncWithLayerBeginTime(boolean applyChanges) {
+    private void syncWithLayerBeginTime(boolean applyChanges) {
         View view = Layers.getActiveView();
         if (view == null)
             return;
@@ -310,7 +307,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         setEndTime(true);
     }
 
-    void syncWithLayerEndTime(boolean applyChanges) {
+    private void syncWithLayerEndTime(boolean applyChanges) {
         View view = Layers.getActiveView();
         if (view == null)
             return;
@@ -363,7 +360,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         add(addEndDatePanel, c);
     }
 
-    public void fireLoaded(String state) {
+    void fireLoaded(String state) {
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
         loadedLabel.setText(htmlstart + "Status: " + state + htmlend);

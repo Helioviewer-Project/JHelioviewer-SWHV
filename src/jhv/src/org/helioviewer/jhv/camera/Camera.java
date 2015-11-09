@@ -302,7 +302,6 @@ public class Camera {
         return annotateInteraction;
     }
 
-    private CameraOptionPanel optionPanel = new CameraOptionPanel();
     CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
 
     void firePositionLoaded(final String state) {
@@ -313,9 +312,8 @@ public class Camera {
     CameraOptionPanel getOptionPanel() {
         if (mode == CameraMode.EXPERT) {
             return expertOptionPanel;
-        } else {
-            return optionPanel;
         }
+        return null;
     }
 
     public void timeChanged(JHVDate date) {
