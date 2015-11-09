@@ -155,11 +155,11 @@ public class RenderableImageLayer extends AbstractRenderable {
             Mat4d vpmi = localCamera.getOrthoMatrixInverse();
             vpmi.translate(new Vec3d(-localCamera.getPanning().x, -localCamera.getPanning().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(imageData.getMetaData().getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuatd(prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(prevImageData.getMetaData().getRotationObs()));
             }
 
             enablePositionVBO(gl);

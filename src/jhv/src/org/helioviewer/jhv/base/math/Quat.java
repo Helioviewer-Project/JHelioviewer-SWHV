@@ -1,26 +1,26 @@
 package org.helioviewer.jhv.base.math;
 
-public class Quatd {
+public class Quat {
 
     private static final double EPSILON = 0.000001;
 
-    public static final Quatd ZERO = new Quatd();
+    public static final Quat ZERO = new Quat();
 
     private double a;
     private Vec3d u;
 
-    public static Quatd createRotation(double angle, Vec3d axis) {
+    public static Quat createRotation(double angle, Vec3d axis) {
         if (angle == 0.)
-            return new Quatd();
+            return new Quat();
 
         double halfAngle = angle / 2.0;
         Vec3d axisCopy = axis.copy();
         axisCopy.normalize();
         axisCopy.multiply(Math.sin(halfAngle));
-        return new Quatd(Math.cos(halfAngle), axisCopy);
+        return new Quat(Math.cos(halfAngle), axisCopy);
     }
 
-    public Quatd(double ax, double ay, double az) {
+    public Quat(double ax, double ay, double az) {
         ax /= 2.;
         ay /= 2.;
         az /= 2.;
@@ -35,7 +35,7 @@ public class Quatd {
                  sx * sy * cz - cx * cy * sz);
     }
 
-    public Quatd(double ax, double ay) {
+    public Quat(double ax, double ay) {
         ax /= 2.;
         ay /= 2.;
         double sx = Math.sin(ax), cx = Math.cos(ax);
@@ -48,16 +48,16 @@ public class Quatd {
                  sx * sy);
     }
 
-    private Quatd(double a, double x, double y, double z) {
+    private Quat(double a, double x, double y, double z) {
         this(a, new Vec3d(x, y, z));
     }
 
-    private Quatd(double a, Vec3d u) {
+    private Quat(double a, Vec3d u) {
         this.a = a;
         this.u = u;
     }
 
-    public Quatd() {
+    public Quat() {
         this(1, new Vec3d(0., 0., 0.));
     }
 
@@ -66,7 +66,7 @@ public class Quatd {
         this.u = new Vec3d();
     }
 
-    public Quatd multiply(Quatd q) {
+    public Quat multiply(Quat q) {
         double a1 = this.a;
         double x1 = this.u.x;
         double y1 = this.u.y;
@@ -80,7 +80,7 @@ public class Quatd {
         double x = (a1 * x2 + x1 * a2 + y1 * z2 - z1 * y2);
         double y = (a1 * y2 - x1 * z2 + y1 * a2 + z1 * x2);
         double z = (a1 * z2 + x1 * y2 - y1 * x2 + z1 * a2);
-        return new Quatd(a, x, y, z);
+        return new Quat(a, x, y, z);
     }
 
     public Mat4d toMatrix() {
@@ -109,26 +109,26 @@ public class Quatd {
         return this.u;
     }
 
-    public Quatd add(Quatd q) {
+    public Quat add(Quat q) {
         this.u.add(q.u);
         this.a += q.a;
         return this;
     }
 
-    public Quatd subtract(Quatd q) {
+    public Quat subtract(Quat q) {
         this.u.subtract(q.u);
         this.a -= q.a;
         return this;
     }
 
-    public Quatd scale(double s) {
+    public Quat scale(double s) {
         this.a *= s;
         this.u.multiply(s);
         return this;
     }
 
-    public void rotate(Quatd q2) {
-        Quatd q1 = this.copy();
+    public void rotate(Quat q2) {
+        Quat q1 = this.copy();
 
         this.a = q1.a * q2.a - q1.u.x * q2.u.x - q1.u.y * q2.u.y - q1.u.z * q2.u.z;
         this.u.x = q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y;
@@ -138,8 +138,8 @@ public class Quatd {
         this.normalize();
     }
 
-    public void rotateWithConjugate(Quatd q2) {
-        Quatd q1 = this.copy();
+    public void rotateWithConjugate(Quat q2) {
+        Quat q1 = this.copy();
 
         this.a = q1.a * q2.a + q1.u.x * q2.u.x + q1.u.y * q2.u.y + q1.u.z * q2.u.z;
         this.u.x = -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y;
@@ -149,11 +149,11 @@ public class Quatd {
         this.normalize();
     }
 
-    public Quatd slerp(Quatd r, double t) {
+    public Quat slerp(Quat r, double t) {
         double cosAngle = dot(r);
 
         if (cosAngle > 1 - EPSILON) {
-            Quatd result = r.copy().add(this.copy().subtract(r).scale(t));
+            Quat result = r.copy().add(this.copy().subtract(r).scale(t));
             result.normalize();
             return result;
         }
@@ -165,45 +165,45 @@ public class Quatd {
 
         double theta0 = Math.acos(cosAngle);
         double theta = theta0 * t;
-        Quatd v2 = r.copy().subtract(this.copy().scale(cosAngle));
+        Quat v2 = r.copy().subtract(this.copy().scale(cosAngle));
         v2.normalize();
 
-        Quatd q = this.copy().scale(Math.cos(theta)).add(v2.scale(Math.sin(theta)));
+        Quat q = this.copy().scale(Math.cos(theta)).add(v2.scale(Math.sin(theta)));
         q.normalize();
         return q;
     }
 
-    public Quatd nlerp(Quatd r, double t) {
-        Quatd result = r.copy().add(this.copy().subtract(r).scale(t));
+    public Quat nlerp(Quat r, double t) {
+        Quat result = r.copy().add(this.copy().subtract(r).scale(t));
         result.normalize();
         return result;
     }
 
-    public void set(Quatd q) {
+    public void set(Quat q) {
         this.a = q.a;
         this.u = q.u;
     }
 
-    public Quatd normalize() {
+    public Quat normalize() {
         double l = Math.sqrt(a * a + u.length2());
         a /= l;
         u.divide(l);
         return this;
     }
 
-    public double dot(Quatd q) {
+    public double dot(Quat q) {
         return this.a * q.a + this.u.x * q.u.x + this.u.y * q.u.y + this.u.z * q.u.z;
     }
 
-    public static Quatd calcRotation(Vec3d startPoint, Vec3d endPoint) {
+    public static Quat calcRotation(Vec3d startPoint, Vec3d endPoint) {
         Vec3d rotationAxis = Vec3d.cross(startPoint, endPoint);
         double rotationAngle = Math.atan2(rotationAxis.length(), Vec3d.dot(startPoint, endPoint));
 
-        return Quatd.createRotation(rotationAngle, rotationAxis);
+        return Quat.createRotation(rotationAngle, rotationAxis);
     }
 
-    public Quatd copy() {
-        return new Quatd(this.a, this.u.copy());
+    public Quat copy() {
+        return new Quat(this.a, this.u.copy());
     }
 
     @Override

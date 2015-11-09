@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.io.InputStream;
 
 import org.helioviewer.jhv.base.FileUtils;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 import com.jogamp.opengl.GL2;
@@ -119,11 +119,11 @@ public class GLSLShader {
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
-    public static void bindCameraDifferenceRotationQuat(GL2 gl, Quatd quat) {
+    public static void bindCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
         gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public static void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quatd quat) {
+    public static void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
