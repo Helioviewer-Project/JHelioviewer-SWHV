@@ -29,7 +29,7 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class GL3DCameraOptionsPanel extends JPanel {
 
-    private GL3DCameraOptionPanel currentOptionPanel;
+    private CameraOptionPanel currentOptionPanel;
 
     private static final String[] cameras = new String[] { "Observer Camera", "Earth Camera", "Expert Camera" };
     private static final String explanation = "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n" +
@@ -120,10 +120,15 @@ public class GL3DCameraOptionsPanel extends JPanel {
         add(fovPanel, c);
     }
 
-    private void switchOptionsPanel(GL3DCameraOptionPanel newOptionPanel) {
+    private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {
         if (currentOptionPanel != null) {
+            currentOptionPanel.deactivate();
             remove(currentOptionPanel);
         }
+
+        currentOptionPanel = newOptionPanel;
+        currentOptionPanel.activate();
+
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1;
         c.weighty = 1;
@@ -131,8 +136,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 2;
-        this.add(newOptionPanel, c);
-        currentOptionPanel = newOptionPanel;
+        add(currentOptionPanel, c);
         revalidate();
     }
 

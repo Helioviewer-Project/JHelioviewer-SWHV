@@ -24,7 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class GL3DPositionLoading {
+public class PositionLoad {
 
     private static final String LOADEDSTATE = "Loaded";
     private static final String FAILEDSTATE = "Failed";
@@ -44,21 +44,20 @@ public class GL3DPositionLoading {
     private JHVWorker<Position.Latitudinal[], Void> worker;
     private final VantagePointExpert vantagePoint;
 
-    public GL3DPositionLoading(VantagePointExpert _vantagePoint) {
+    public PositionLoad(VantagePointExpert _vantagePoint) {
         vantagePoint = _vantagePoint;
     }
 
-    private static class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
+    private class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
+
         private String report = null;
         private final String beginDate;
         private final String endDate;
         private final Date beginDatems;
         private final Date endDatems;
         private final String observer;
-        private final GL3DPositionLoading positionLoading;
 
-        public LoadPositionWorker(GL3DPositionLoading _loadObj, String _beginDate, String _endDate, Date _beginDatems, Date _endDatems, String _observer) {
-            positionLoading = _loadObj;
+        public LoadPositionWorker(String _beginDate, String _endDate, Date _beginDatems, Date _endDatems, String _observer) {
             beginDate = _beginDate;
             endDate = _endDate;
             beginDatems = _beginDatems;
@@ -77,13 +76,13 @@ public class GL3DPositionLoading {
                 if (span / deltat > max)
                     deltat = span / max;
 
-                URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + this.beginDate + "&utc_end=" + this.endDate + "&deltat=" + deltat +
+                URL url = new URL(baseUrl + "abcorr=LT%2BS&utc=" + beginDate + "&utc_end=" + endDate + "&deltat=" + deltat +
                                             "&observer=" + observer + "&target=" + target + "&ref=HEEQ&kind=latitudinal");
                 DownloadStream ds = new DownloadStream(url.toURI(), 30000, 30000, true);
                 Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
                 if (!ds.getResponse400()) {
                     result = new JSONObject(new JSONTokener(reader));
-                    ret = positionLoading.parseData(result);
+                    ret = parseData(result);
                 } else {
                     JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
                     if (jsonObject.has("faultstring")) {
@@ -97,9 +96,11 @@ public class GL3DPositionLoading {
             } catch (UnknownHostException e) {
                 Log.debug("Unknown host, network down?", e);
             } catch (IOException e) {
-                report = FAILEDSTATE + ": server problem";
+                report = FAILEDSTATE + ": server error";
             } catch (JSONException e) {
-                report = FAILEDSTATE + ": JSON parse problem";
+                report = FAILEDSTATE + ": JSON parse error";
+            } catch (ParseException e) {
+                report = FAILEDSTATE + ": JSON parse error";
             } catch (URISyntaxException e) {
                 report = FAILEDSTATE + ": wrong URI";
             } finally {
@@ -109,62 +110,10 @@ public class GL3DPositionLoading {
             return ret;
         }
 
-        @Override
-        protected void done() {
-            if (!this.isCancelled()) {
-                Position.Latitudinal[] newPosition = null;
-                try {
-                    newPosition = this.get();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (report == null) {
-                    if (newPosition == null) {
-                        report = "response is void";
-                    } else if (newPosition.length == 0) {
-                        report = "response is zero length array";
-                    } else {
-                        positionLoading.setPosition(newPosition);
-                        positionLoading.setLoaded(true);
-                    }
-                }
-                if (report != null) {
-                    positionLoading.fireLoaded(report);
-                    report = null;
-                }
-            }
-        }
-    }
-
-    private void requestData() {
-        if (worker != null) {
-            worker.cancel(false);
-        }
-        fireLoaded("Loading...");
-
-        worker = new LoadPositionWorker(this, beginDate, endDate, beginDatems, endDatems, observer);
-        worker.setThreadName("MAIN--GL3DPositionLoading");
-        JHVGlobals.getExecutorService().execute(worker);
-    }
-
-    public void setPosition(Position.Latitudinal[] newPosition) {
-        position = newPosition;
-    }
-
-    private void setLoaded(boolean isLoaded) {
-        this.isLoaded = isLoaded;
-        if (isLoaded) {
-            this.fireLoaded(LOADEDSTATE);
-        }
-    }
-
-    private Position.Latitudinal[] parseData(JSONObject jsonResult) {
-        Position.Latitudinal[] positionHelper = new Position.Latitudinal[0];
-        try {
+        private Position.Latitudinal[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
-            positionHelper = new Position.Latitudinal[resLength];
+            Position.Latitudinal[] ret = new Position.Latitudinal[resLength];
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
@@ -182,19 +131,55 @@ public class GL3DPositionLoading {
                 lat = -posArray.getDouble(2);
 
                 Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                positionHelper[j] = new Position.Latitudinal(date.getTime(), rad, lon, lat);
+                ret[j] = new Position.Latitudinal(date.getTime(), rad, lon, lat);
             }
-        } catch (JSONException e) {
-            this.fireLoaded(PARTIALSTATE);
-            Log.warn("JSON response parse failure", e);
-        } catch (ParseException e) {
-            this.fireLoaded(PARTIALSTATE);
-            Log.warn("JSON response parse failure", e);
-        } catch (NumberFormatException e) {
-            this.fireLoaded(PARTIALSTATE);
-            Log.warn("JSON response parse failure", e);
+            return ret;
         }
-        return positionHelper;
+
+        @Override
+        protected void done() {
+            if (!isCancelled()) {
+                Position.Latitudinal[] newPosition = null;
+                try {
+                    newPosition = get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (report == null) {
+                    if (newPosition == null) {
+                        report = "response is void";
+                    } else if (newPosition.length == 0) {
+                        report = "response is zero length array";
+                    } else {
+                        position = newPosition;
+                        setLoaded(true);
+                    }
+                }
+                if (report != null) {
+                    fireLoaded(report);
+                    report = null;
+                }
+            }
+        }
+    }
+
+    private void requestData() {
+        if (worker != null) {
+            worker.cancel(false);
+        }
+        fireLoaded("Loading...");
+
+        worker = new LoadPositionWorker(beginDate, endDate, beginDatems, endDatems, observer);
+        worker.setThreadName("MAIN--GL3DPositionLoading");
+        JHVGlobals.getExecutorService().execute(worker);
+    }
+
+    private void setLoaded(boolean _isLoaded) {
+        isLoaded = _isLoaded;
+        if (isLoaded) {
+            fireLoaded(LOADEDSTATE);
+        }
     }
 
     public boolean isLoaded() {
@@ -207,17 +192,17 @@ public class GL3DPositionLoading {
         requestData();
     }
 
-    public void setBeginDate(Date beginDate, boolean applyChanges) {
-        this.beginDate = TimeUtils.utcFullDateFormat.format(beginDate);
-        this.beginDatems = beginDate;
+    public void setBeginDate(Date _beginDate, boolean applyChanges) {
+        beginDate = TimeUtils.utcFullDateFormat.format(_beginDate);
+        beginDatems = _beginDate;
         if (applyChanges) {
             applyChanges();
         }
     }
 
-    public void setEndDate(Date endDate, boolean applyChanges) {
-        this.endDate = TimeUtils.utcFullDateFormat.format(endDate);
-        this.endDatems = endDate;
+    public void setEndDate(Date _endDate, boolean applyChanges) {
+        endDate = TimeUtils.utcFullDateFormat.format(_endDate);
+        endDatems = _endDate;
         if (applyChanges) {
             applyChanges();
         }

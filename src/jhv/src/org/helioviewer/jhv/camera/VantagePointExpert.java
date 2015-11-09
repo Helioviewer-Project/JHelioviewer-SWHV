@@ -12,10 +12,10 @@ public class VantagePointExpert extends VantagePoint {
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
-    private GL3DPositionLoading positionLoading = new GL3DPositionLoading(this);
+    private PositionLoad positionLoad = new PositionLoad(this);
 
     private JHVDate interpolate(JHVDate date) {
-        if (positionLoading.isLoaded()) {
+        if (positionLoad.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             long tLayerStart = 0, tLayerEnd = 0;
             // Active layer times
@@ -26,8 +26,8 @@ public class VantagePointExpert extends VantagePoint {
             }
 
             // camera times
-            long tPositionStart = positionLoading.getStartTime();
-            long tPositionEnd = positionLoading.getEndTime();
+            long tPositionStart = positionLoad.getStartTime();
+            long tPositionEnd = positionLoad.getEndTime();
 
             if (tLayerEnd != tLayerStart) {
                 currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (dateTime - tLayerStart) / (double) (tLayerEnd - tLayerStart));
@@ -35,7 +35,7 @@ public class VantagePointExpert extends VantagePoint {
                 currentCameraTime = tPositionEnd;
             }
 
-            Position.Latitudinal p = positionLoading.getInterpolatedPosition(currentCameraTime);
+            Position.Latitudinal p = positionLoad.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
                 date = new JHVDate(p.milli);
                 currentDistance = p.rad;
