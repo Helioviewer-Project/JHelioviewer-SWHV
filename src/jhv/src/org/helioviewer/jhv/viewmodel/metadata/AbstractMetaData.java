@@ -2,15 +2,15 @@ package org.helioviewer.jhv.viewmodel.metadata;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
 public abstract class AbstractMetaData implements MetaData {
 
-    private Vec2d lowerLeftCorner;
-    private Vec2d sizeVector;
+    private Vec2 lowerLeftCorner;
+    private Vec2 sizeVector;
 
     protected int pixelWidth;
     protected int pixelHeight;
@@ -44,8 +44,8 @@ public abstract class AbstractMetaData implements MetaData {
      *            Physical height of the corresponding image
      */
     public AbstractMetaData(double newLowerLeftCornerX, double newLowerLeftCornerY, double newWidth, double newHeight) {
-        lowerLeftCorner = new Vec2d(newLowerLeftCornerX, newLowerLeftCornerY);
-        sizeVector = new Vec2d(newWidth, newHeight);
+        lowerLeftCorner = new Vec2(newLowerLeftCornerX, newLowerLeftCornerY);
+        sizeVector = new Vec2(newWidth, newHeight);
     }
 
     /**
@@ -54,7 +54,7 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newImageSize
      *            Physical size of the corresponding image
      */
-    protected void setPhysicalSize(Vec2d newImageSize) {
+    protected void setPhysicalSize(Vec2 newImageSize) {
         sizeVector = newImageSize;
     }
 
@@ -64,22 +64,22 @@ public abstract class AbstractMetaData implements MetaData {
      * @param newlLowerLeftCorner
      *            Physical lower left corner the corresponding image
      */
-    protected void setPhysicalLowerLeftCorner(Vec2d newlLowerLeftCorner) {
+    protected void setPhysicalLowerLeftCorner(Vec2 newlLowerLeftCorner) {
         lowerLeftCorner = newlLowerLeftCorner;
     }
 
     @Override
-    public Vec2d getPhysicalLowerLeft() {
+    public Vec2 getPhysicalLowerLeft() {
         return lowerLeftCorner;
     }
 
     @Override
-    public Vec2d getPhysicalUpperLeft() {
-        return new Vec2d(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    public Vec2 getPhysicalUpperLeft() {
+        return new Vec2(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
     }
 
     @Override
-    public Vec2d getPhysicalSize() {
+    public Vec2 getPhysicalSize() {
         return sizeVector;
     }
 

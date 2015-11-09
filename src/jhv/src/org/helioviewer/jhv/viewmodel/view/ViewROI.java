@@ -2,7 +2,7 @@ package org.helioviewer.jhv.viewmodel.view;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
@@ -12,7 +12,7 @@ public class ViewROI {
 
     private static final double extraSize = 0.02;
     private static final int resolution = 5;
-    private static final Vec2d[] pointlist = new Vec2d[(resolution + 1) * 2 * 2];
+    private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
 
     private static ViewROI instance;
 
@@ -20,13 +20,13 @@ public class ViewROI {
         int count = 0;
         for (int i = 0; i <= resolution; i++) {
             for (int j = 0; j <= 1; j++) {
-                pointlist[count] = new Vec2d(2. * (i / (double) resolution - 0.5), -2. * (j - 0.5));
+                pointlist[count] = new Vec2(2. * (i / (double) resolution - 0.5), -2. * (j - 0.5));
                 count++;
             }
         }
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= resolution; j++) {
-                pointlist[count] = new Vec2d(2. * (i - 0.5), -2. * (j / (double) resolution - 0.5));
+                pointlist[count] = new Vec2(2. * (i - 0.5), -2. * (j / (double) resolution - 0.5));
                 count++;
             }
         }
@@ -63,7 +63,7 @@ public class ViewROI {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        Vec2d metPhysicalSize = m.getPhysicalSize();
+        Vec2 metPhysicalSize = m.getPhysicalSize();
         double metLLX = m.getPhysicalLowerLeft().x;
         double metLLY = m.getPhysicalLowerLeft().y;
         double metURX = metLLX + metPhysicalSize.x;

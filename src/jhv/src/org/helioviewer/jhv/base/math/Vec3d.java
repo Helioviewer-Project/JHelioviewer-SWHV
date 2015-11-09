@@ -24,7 +24,7 @@ public class Vec3d {
         this.z = z;
     }
 
-    public Vec3d(Vec2d vector) {
+    public Vec3d(Vec2 vector) {
         this.x = vector.x;
         this.y = vector.y;
         this.z = 0;
@@ -254,8 +254,8 @@ public class Vec3d {
         return new double[] { x, y, z };
     }
 
-    public final Vec2d toVec2() {
-        return new Vec2d(x, y);
+    public final Vec2 toVec2() {
+        return new Vec2(x, y);
     }
 
     public final Vec3d copy() {

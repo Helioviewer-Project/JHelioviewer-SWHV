@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -19,7 +19,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
-    private Vec2d sunPixelPosition;
+    private Vec2 sunPixelPosition;
 
     public HelioviewerMetaData(MetaDataContainer m) {
         identifyObservation(m);
@@ -205,13 +205,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
             double sunX = m.tryGetDouble("CRPIX1") - 1;
             double sunY = m.tryGetDouble("CRPIX2") - 1;
-            sunPixelPosition = new Vec2d(sunX, pixelHeight - 1 - sunY);
+            sunPixelPosition = new Vec2(sunX, pixelHeight - 1 - sunY);
 
-            setPhysicalLowerLeftCorner(new Vec2d(-unitPerPixel * sunX, -unitPerPixel * sunY));
-            setPhysicalSize(new Vec2d(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
+            setPhysicalLowerLeftCorner(new Vec2(-unitPerPixel * sunX, -unitPerPixel * sunY));
+            setPhysicalSize(new Vec2(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
         } else { // pixel based
-            setPhysicalLowerLeftCorner(new Vec2d(0, 0));
-            setPhysicalSize(new Vec2d(pixelWidth, pixelHeight));
+            setPhysicalLowerLeftCorner(new Vec2(0, 0));
+            setPhysicalSize(new Vec2(pixelWidth, pixelHeight));
         }
     }
 
