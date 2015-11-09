@@ -18,7 +18,7 @@ import com.jogamp.opengl.GL2;
 
 public class Camera {
 
-    protected static enum CameraMode {
+    static enum CameraMode {
         OBSERVER, EARTH, EXPERT
     }
 
@@ -63,7 +63,7 @@ public class Camera {
         Displayer.render();
     }
 
-    protected void setMode(CameraMode _mode) {
+    void setMode(CameraMode _mode) {
         mode = _mode;
         switch (mode) {
             case EXPERT:
@@ -86,24 +86,21 @@ public class Camera {
         refresh();
     }
 
-    public Camera duplicate(JHVDate date) {
+    public void push(JHVDate date) {
         if (!trackingMode) {
-            try {
-                Camera camera = new Camera();
-                camera.setMode(mode);
-                camera.fov = fov;
-                camera.currentTranslation = currentTranslation.copy();
-                camera.currentDragRotation = currentDragRotation.copy();
-                camera.updateCameraWidthAspect(previousAspect);
-                camera.vantagePoint.update(date);
-                camera.updateCameraTransformation();
+            vantagePoint.push();
+            vantagePoint.update(date);
+            updateCameraTransformation();
+            updateCameraWidthAspect(previousAspect);
+        }
+    }
 
-                return camera;
-            } catch (Exception e) {
-                return this;
-            }
-        } else
-            return this;
+    public void pop() {
+        if (!trackingMode) {
+            vantagePoint.pop();
+            updateCameraTransformation();
+            updateCameraWidthAspect(previousAspect);
+        }
     }
 
     public double getFOVAngleToDraw() {
@@ -240,20 +237,16 @@ public class Camera {
         return currentTranslation;
     }
 
-    protected void setCurrentTranslation(Vec2 pan) {
+    void setCurrentTranslation(Vec2 pan) {
         currentTranslation = pan;
         updateCameraTransformation();
     }
 
-    protected void rotateCurrentDragRotation(Quat _currentDragRotation) {
+    void rotateCurrentDragRotation(Quat _currentDragRotation) {
         currentDragRotation.rotate(_currentDragRotation);
         updateCameraTransformation();
     }
 
-    /**
-     * Updates the camera transformation by applying the rotation and
-     * translation information.
-     */
     private void updateCameraTransformation() {
         rotation = currentDragRotation.copy();
         rotation.rotate(vantagePoint.orientation);
@@ -312,14 +305,14 @@ public class Camera {
     }
 
     private CameraOptionPanel optionPanel = new CameraOptionPanel();
-    protected CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
+    CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
 
-    protected void firePositionLoaded(final String state) {
+    void firePositionLoaded(final String state) {
         expertOptionPanel.fireLoaded(state);
         refresh();
     }
 
-    protected CameraOptionPanel getOptionPanel() {
+    CameraOptionPanel getOptionPanel() {
         if (mode == CameraMode.EXPERT) {
             return expertOptionPanel;
         } else {

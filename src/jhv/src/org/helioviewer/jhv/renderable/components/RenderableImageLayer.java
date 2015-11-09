@@ -150,17 +150,19 @@ public class RenderableImageLayer extends AbstractRenderable {
             GLSLShader.filter(gl);
 
             Camera camera = vp.getCamera();
-            Camera localCamera = camera.duplicate(imageData.getMasterTime());
+            camera.push(imageData.getMasterTime());
 
-            Mat4 vpmi = localCamera.getOrthoMatrixInverse();
-            vpmi.translate(new Vec3(-localCamera.getCurrentTranslation().x, -localCamera.getCurrentTranslation().y, 0.));
+            Mat4 vpmi = camera.getOrthoMatrixInverse();
+            vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, localCamera.getCameraDifferenceRotationQuat(prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(prevImageData.getMetaData().getRotationObs()));
             }
+
+            camera.pop();
 
             enablePositionVBO(gl);
             enableIndexVBO(gl);
