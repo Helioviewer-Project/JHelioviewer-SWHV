@@ -26,14 +26,13 @@ public class InteractionPan extends InteractionDefault {
         int y = p.y - lastMousePoint.y;
         double m = 2. * camera.getCameraWidth() / Displayer.getViewport().getHeight();
 
-        Vec2 pan = camera.getPanning();
+        Vec2 pan = camera.getCurrentTranslation();
         pan.x += x * m;
         pan.y -= y * m;
-        camera.setPanning(pan);
-        camera.updateCameraTransformation();
+        camera.setCurrentTranslation(pan);
+        Displayer.render();
 
         lastMousePoint = p;
-        Displayer.render();
     }
 
     @Override

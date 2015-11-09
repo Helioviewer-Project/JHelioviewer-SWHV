@@ -27,7 +27,6 @@ public class InteractionRotate extends InteractionDefault {
         Vec3 currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
         currentDragRotation = Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         camera.rotateCurrentDragRotation(currentDragRotation);
-        camera.updateCameraTransformation();
         Displayer.render();
     }
 
