@@ -101,8 +101,4 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
         PfssPlugin.getPfsscache().destroy(gl);
     }
 
-    @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-    }
-
 }
