@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
@@ -92,18 +92,18 @@ public class TopToolBar extends JToolBar implements MouseListener {
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
         Settings.getSingletonInstance().save();
 
-        GL3DCamera cam = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getViewport().getCamera();
         switch (mode) {
             case PAN:
-                cam.setCurrentInteraction(cam.getPanInteraction());
+                camera.setCurrentInteraction(camera.getPanInteraction());
                 panButton.setSelected(true);
                 break;
             case ROTATE:
-                cam.setCurrentInteraction(cam.getRotateInteraction());
+                camera.setCurrentInteraction(camera.getRotateInteraction());
                 rotateButton.setSelected(true);
                 break;
             case ANNOTATE:
-                cam.setCurrentInteraction(cam.getAnnotateInteraction());
+                camera.setCurrentInteraction(camera.getAnnotateInteraction());
                 annotateButton.setSelected(true);
                 break;
         }
@@ -251,8 +251,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton = new JToggleButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GL3DCamera cam = Displayer.getViewport().getCamera();
-                cam.setTrackingMode(!cam.getTrackingMode());
+                Camera camera = Displayer.getViewport().getCamera();
+                camera.setTrackingMode(!camera.getTrackingMode());
             }
         });
         trackSolarRotationButton.setSelected(false);

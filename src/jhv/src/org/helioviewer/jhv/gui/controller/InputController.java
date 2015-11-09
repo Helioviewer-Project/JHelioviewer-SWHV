@@ -11,7 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
@@ -59,7 +59,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mouseEntered(e);
 
-        GL3DCamera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getViewport().getCamera();
         if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
             component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
         }
@@ -80,7 +80,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mousePressed(e);
 
-        GL3DCamera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
                 component.setCursor(UIGlobals.closedHandCursor);
@@ -96,7 +96,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mouseReleased(e);
 
-        GL3DCamera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getViewport().getCamera();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
                 component.setCursor(UIGlobals.openHandCursor);

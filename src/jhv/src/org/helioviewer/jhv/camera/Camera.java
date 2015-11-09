@@ -16,13 +16,11 @@ import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DCamera {
+public class Camera {
 
-    public static enum CameraMode {
+    protected static enum CameraMode {
         OBSERVER, EARTH, EXPERT
     }
-
-    private CameraMode mode;
 
     private static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.02;
@@ -51,23 +49,24 @@ public class GL3DCamera {
     private final InteractionAnnotate annotateInteraction = new InteractionAnnotate(this);
     private Interaction currentInteraction = rotationInteraction;
 
-    private VantagePoint vantagePoint;
+    private final VantagePointObserver vantagePointObserver = new VantagePointObserver();
+    private final VantagePointEarth vantagePointEarth = new VantagePointEarth();
+    private final VantagePointExpert vantagePointExpert = new VantagePointExpert();
+    private VantagePoint vantagePoint = vantagePointObserver;
 
-    public GL3DCamera(CameraMode _mode) {
-        setMode(_mode);
-    }
+    private CameraMode mode = CameraMode.OBSERVER;
 
     protected void setMode(CameraMode _mode) {
         mode = _mode;
         switch (mode) {
             case EXPERT:
-                vantagePoint = new VantagePointExpert();
+                vantagePoint = vantagePointExpert;
             break;
             case EARTH:
-                vantagePoint = new VantagePointEarth();
+                vantagePoint = vantagePointEarth;
             break;
             default:
-                vantagePoint = new VantagePointObserver();
+                vantagePoint = vantagePointObserver;
         }
     }
 
@@ -79,10 +78,11 @@ public class GL3DCamera {
         timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
-    public GL3DCamera duplicate(JHVDate date) {
+    public Camera duplicate(JHVDate date) {
         if (!trackingMode) {
             try {
-                GL3DCamera camera = new GL3DCamera(mode);
+                Camera camera = new Camera();
+                camera.setMode(mode);
                 camera.fov = fov;
                 camera.currentTranslation = currentTranslation.copy();
                 camera.currentDragRotation = currentDragRotation.copy();

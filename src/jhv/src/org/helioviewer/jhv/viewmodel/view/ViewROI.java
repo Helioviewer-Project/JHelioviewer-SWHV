@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
@@ -39,13 +39,13 @@ public class ViewROI {
         return instance;
     }
 
-    public static Region updateROI(GL3DCamera camera, JHVDate masterTime, MetaData m) {
+    public static Region updateROI(Camera camera, JHVDate masterTime, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        GL3DCamera localCamera = camera.duplicate(masterTime);
+        Camera localCamera = camera.duplicate(masterTime);
 
         Quatd camDiff = localCamera.getCameraDifferenceRotationQuatd(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {

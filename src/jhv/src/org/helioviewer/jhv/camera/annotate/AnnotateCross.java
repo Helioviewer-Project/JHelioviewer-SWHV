@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.math.Vec3d;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 
@@ -15,7 +15,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private final ArrayList<Vec3d> crossPoints = new ArrayList<Vec3d>();
 
-    public AnnotateCross(GL3DCamera _camera) {
+    public AnnotateCross(Camera _camera) {
         super(_camera);
     }
 

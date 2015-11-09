@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
@@ -38,13 +38,13 @@ public class RenderableCamera extends AbstractRenderable {
         if (!isVisible[vp.getIndex()])
             return;
 
-        GL3DCamera activeCamera = vp.getCamera();
-        double width = activeCamera.getDistance() * Math.tan(activeCamera.getFOVAngleToDraw());
+        Camera camera = vp.getCamera();
+        double width = camera.getDistance() * Math.tan(camera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(activeCamera.getOrientation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(camera.getOrientation().toMatrix().transpose().m, 0);
         {
             GLHelper.lineWidth(gl, 1);
 

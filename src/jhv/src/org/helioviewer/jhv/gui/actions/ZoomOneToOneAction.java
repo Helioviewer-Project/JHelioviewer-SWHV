@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -36,11 +36,13 @@ public class ZoomOneToOneAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();
         if (view != null) {
-            GL3DCamera camera = Displayer.getViewport().getCamera();
             MetaData metaData = view.getImageLayer().getImageData().getMetaData();
             double imageFraction = Displayer.getViewport().getHeight() / (double) metaData.getPixelHeight();
+
+            Camera camera = Displayer.getViewport().getCamera();
             double fov = 2. * Math.atan2(0.5 * metaData.getPhysicalSize().y * imageFraction, camera.getDistance());
             camera.setCameraFOV(fov);
+
             Displayer.render();
         }
     }

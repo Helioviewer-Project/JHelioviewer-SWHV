@@ -8,8 +8,7 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DCamera.CameraMode;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
@@ -45,7 +44,7 @@ public class Displayer implements JHVEventHighlightListener {
         return new Dimension(glWidth, glHeight);
     }
 
-    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
+    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, new Camera(), true);
     private static Viewport viewport1 = new Viewport(1, 0, 0, 100, 100, viewport0.getCamera(), false);
     private static Viewport viewport2 = new Viewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
     private static Viewport viewport3 = new Viewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
@@ -160,8 +159,7 @@ public class Displayer implements JHVEventHighlightListener {
         viewports[3].setOffset(w / 2, h / 2);
     }
 
-    public static void setActiveCamera(GL3DCamera camera) {
-        GL3DCamera activeCamera = getViewport().getCamera();
+    public static void setActiveCamera(Camera camera) {
         for (Viewport vp : viewports) {
             vp.setCamera(camera);
         }

@@ -26,7 +26,7 @@ public class InteractionAnnotate extends InteractionDefault {
     private final AnnotateCross aCross = new AnnotateCross(camera);
     private Annotateable activeAnnotatable = aRect;
 
-    protected InteractionAnnotate(GL3DCamera _camera) {
+    protected InteractionAnnotate(Camera _camera) {
         super(_camera);
     }
 
