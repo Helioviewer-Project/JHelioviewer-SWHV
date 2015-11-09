@@ -49,9 +49,11 @@ public class Camera {
     private final InteractionAnnotate annotateInteraction = new InteractionAnnotate(this);
     private Interaction currentInteraction = rotationInteraction;
 
+    private final PositionLoad positionLoad = new PositionLoad(this);
+
     private final VantagePointObserver vantagePointObserver = new VantagePointObserver();
     private final VantagePointEarth vantagePointEarth = new VantagePointEarth();
-    private final VantagePointExpert vantagePointExpert = new VantagePointExpert();
+    private final VantagePointExpert vantagePointExpert = new VantagePointExpert(positionLoad);
     private VantagePoint vantagePoint = vantagePointObserver;
 
     private CameraMode mode = CameraMode.OBSERVER;
@@ -303,9 +305,15 @@ public class Camera {
     }
 
     private CameraOptionPanel optionPanel = new CameraOptionPanel();
-    protected CameraOptionPanelExpert expertOptionPanel;
+    protected CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
 
-    public CameraOptionPanel getOptionPanel() {
+    protected void firePositionLoaded(final String state) {
+        expertOptionPanel.fireLoaded(state);
+        timeChanged(Layers.getLastUpdatedTimestamp());
+        Displayer.render();
+    }
+
+    protected CameraOptionPanel getOptionPanel() {
         if (mode == CameraMode.EXPERT) {
             return expertOptionPanel;
         } else {

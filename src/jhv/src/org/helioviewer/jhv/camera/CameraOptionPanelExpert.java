@@ -48,7 +48,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private JSeparatorComboBox objectCombobox;
 
-    private final Camera camera;
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
@@ -59,10 +58,10 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
 
     private boolean firstComboChanged = false;
 
-    private PositionLoad positionLoad;
+    private final PositionLoad positionLoad;
 
-    public CameraOptionPanelExpert(Camera _camera) {
-        camera = _camera;
+    public CameraOptionPanelExpert(PositionLoad _positionLoad) {
+        positionLoad = _positionLoad;
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -114,7 +113,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             }
         });
 
-        positionLoad = new PositionLoad(new VantagePointExpert());
         // !
         syncWithLayerBeginTime(false);
         syncWithLayerEndTime(true);
@@ -369,13 +367,6 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         String htmlstart = "<html><body style='width: 200px'>";
         String htmlend = "</body></html>";
         loadedLabel.setText(htmlstart + "Status: " + state + htmlend);
-
-        camera.timeChanged(Layers.getLastUpdatedTimestamp());
-        Displayer.render();
-    }
-
-    public PositionLoad getPositionLoad() {
-        return positionLoad;
     }
 
 }
