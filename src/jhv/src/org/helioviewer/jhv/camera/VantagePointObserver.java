@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -15,7 +15,7 @@ public class VantagePointObserver extends VantagePoint {
 
         View view = Layers.getActiveView();
         if (view == null) {
-            orientation = Quatd.ZERO;
+            orientation = Quat.ZERO;
             distance = Sun.MeanEarthDistance;
         } else {
             MetaData m = view.getMetaData(time);

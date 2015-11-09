@@ -5,7 +5,7 @@ import java.awt.Point;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Mat4d;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -31,9 +31,9 @@ public class Camera {
 
     private Mat4d cameraTransformation = Mat4d.identity();
 
-    private Quatd rotation = new Quatd();
+    private Quat rotation = new Quat();
 
-    private Quatd currentDragRotation = new Quatd();
+    private Quat currentDragRotation = new Quat();
     private Vec2d currentTranslation = new Vec2d();
 
     private boolean trackingMode;
@@ -114,11 +114,11 @@ public class Camera {
         return vantagePoint.distance;
     }
 
-    public Quatd getOrientation() {
+    public Quat getOrientation() {
         return vantagePoint.orientation;
     }
 
-    public void rotateCurrentDragRotation(Quatd _currentDragRotation) {
+    public void rotateCurrentDragRotation(Quat _currentDragRotation) {
         currentDragRotation.rotate(_currentDragRotation);
         rotation.clear();
         updateCameraTransformation();
@@ -144,7 +144,7 @@ public class Camera {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public Vec3d getVectorFromSphereOrPlane(Vec2d normalizedScreenpos, Quatd cameraDifferenceRotation) {
+    public Vec3d getVectorFromSphereOrPlane(Vec2d normalizedScreenpos, Quat cameraDifferenceRotation) {
         double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - currentTranslation.x;
         double up1y = normalizedScreenpos.y * cameraWidth - currentTranslation.y;
 
@@ -235,8 +235,8 @@ public class Camera {
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
-    public Quatd getCameraDifferenceRotationQuatd(Quatd rot) {
-        Quatd cameraDifferenceRotation = rotation.copy();
+    public Quat getCameraDifferenceRotationQuat(Quat rot) {
+        Quat cameraDifferenceRotation = rotation.copy();
         cameraDifferenceRotation.rotateWithConjugate(rot);
 
         return cameraDifferenceRotation;

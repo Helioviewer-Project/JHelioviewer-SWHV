@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -54,7 +54,7 @@ public interface MetaData {
 
     public JHVDate getDateObs();
 
-    public Quatd getRotationObs();
+    public Quat getRotationObs();
 
     public double getDistanceObs();
 

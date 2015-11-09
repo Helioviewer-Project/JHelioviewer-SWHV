@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.math.MathUtils;
@@ -181,7 +181,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
         phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
-        rotationObs = new Quatd(theta, phi);
+        rotationObs = new Quat(theta, phi);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {

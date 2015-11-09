@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4d;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.Viewport;
@@ -70,7 +70,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quatd q) {
+    private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
             for (int i = 0; i <= mres; i++) {
@@ -84,7 +84,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };;
+    private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
@@ -99,7 +99,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         int lineResolution = 2;
 
         Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        Quatd q = new Quatd(p.lat, p.lon);
+        Quat q = new Quat(p.lat, p.lon);
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;

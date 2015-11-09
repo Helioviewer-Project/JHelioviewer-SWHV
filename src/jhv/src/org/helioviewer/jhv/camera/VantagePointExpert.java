@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -57,7 +57,7 @@ public class VantagePointExpert extends VantagePoint {
         time = interpolate(date);
 
         Position.Latitudinal p = Sun.getEarth(time.getTime());
-        orientation = new Quatd(currentB, -currentL + p.lon);
+        orientation = new Quat(currentB, -currentL + p.lon);
         distance = currentDistance;
     }
 

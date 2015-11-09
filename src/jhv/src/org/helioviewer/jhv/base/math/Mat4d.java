@@ -328,7 +328,7 @@ public class Mat4d {
         return this;
     }
 
-    public final static Mat4d rotation(Quatd q) {
+    public final static Mat4d rotation(Quat q) {
         return Mat4d.rotation(q.getAngle(), q.getRotationAxis());
     }
 

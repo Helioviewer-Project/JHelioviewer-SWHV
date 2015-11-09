@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4d;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.layers.Layers;
@@ -113,14 +113,14 @@ public class RenderableGrid extends AbstractRenderable {
             Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().getTime());
             {
                 gl.glPushMatrix();
-                Quatd longitudeRotation = new Quatd(0, p.lon + Math.PI / 2);
+                Quat longitudeRotation = new Quat(0, p.lon + Math.PI / 2);
                 longitudeRotation.conjugate();
                 gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                 gl.glPopMatrix();
 
                 gl.glPushMatrix();
-                Quatd latitudeRotation = new Quatd(p.lat + Math.PI / 2, p.lon);
+                Quat latitudeRotation = new Quat(p.lat + Math.PI / 2, p.lon);
                 latitudeRotation.conjugate();
                 gl.glMultMatrixd(latitudeRotation.toMatrix().m, 0);
                 gl.glRotatef((float) (-p.lat), 0, 0, 1);

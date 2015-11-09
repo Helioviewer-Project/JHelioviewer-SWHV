@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quatd;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
@@ -160,10 +160,10 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
                 Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-                Quatd localRotation = new Quatd(p.lat, p.lon);
+                Quat localRotation = new Quat(p.lat, p.lon);
                 hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
 
-                Quatd q = new Quatd(p.lat, p.lon);
+                Quat q = new Quat(p.lat, p.lon);
                 pt = q.rotateInverseVector(new Vec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e);
