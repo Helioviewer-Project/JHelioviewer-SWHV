@@ -5,10 +5,10 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 
-public class VantagePointEarth extends VantagePoint {
+class VantagePointEarth extends VantagePoint {
 
     @Override
-    protected void update(JHVDate date) {
+    void update(JHVDate date) {
         time = date;
 
         Position.Latitudinal p = Sun.getEarth(time.getTime());

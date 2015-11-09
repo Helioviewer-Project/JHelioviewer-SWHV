@@ -7,10 +7,10 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class VantagePointObserver extends VantagePoint {
+class VantagePointObserver extends VantagePoint {
 
     @Override
-    public void update(JHVDate date) {
+    void update(JHVDate date) {
         time = date;
 
         View view = Layers.getActiveView();
