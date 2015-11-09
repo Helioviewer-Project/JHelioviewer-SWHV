@@ -131,7 +131,7 @@ public class RenderableCamera extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return "Vantage Point";
+        return "Viewpoint";
     }
 
     @Override

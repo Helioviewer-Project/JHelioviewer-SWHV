@@ -31,11 +31,11 @@ public class CameraOptionsPanel extends JPanel {
 
     private CameraOptionPanel currentOptionPanel;
 
-    private static final String[] cameras = new String[] { "Observer Camera", "Earth Camera", "Expert Camera" };
-    private static final String explanation = "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n" +
-                                              "Earth camera: view from Earth.\nCamera time defined by timestamps of the active layer.\n\n" +
-                                              "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless " +
-                                              "\"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
+    private static final String[] cameras = new String[] { "Observer View", "Earth View", "Arbitrary View" };
+    private static final String explanation = "Observer: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
+                                              "Earth: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
+                                              "Arbitrary: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
+                                              "\"Use master layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
     public CameraOptionsPanel(final Camera camera) {
         setLayout(new GridBagLayout());
@@ -68,13 +68,13 @@ public class CameraOptionsPanel extends JPanel {
 
         AbstractAction showInfoAction = new AbstractAction() {
             {
-                putValue(SHORT_DESCRIPTION, "Show camera info");
+                putValue(SHORT_DESCRIPTION, "Show viewpoint info");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
             }
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                TextDialog td = new TextDialog("Camera options information", explanation);
+                TextDialog td = new TextDialog("Viewpoint options information", explanation);
                 td.showDialog();
             }
         };

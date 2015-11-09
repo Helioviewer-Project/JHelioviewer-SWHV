@@ -62,8 +62,7 @@ public class PreferencesDialog extends JDialog implements ShowableDialog {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
 
         JPanel paramsSubPanel = new JPanel(new BorderLayout());
         paramsSubPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 0, 3));
