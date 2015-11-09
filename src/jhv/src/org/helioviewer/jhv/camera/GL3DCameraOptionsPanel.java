@@ -37,7 +37,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                                               "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless " +
                                               "\"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
-    public GL3DCameraOptionsPanel(final GL3DCamera camera) {
+    public GL3DCameraOptionsPanel(final Camera camera) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
@@ -54,11 +54,11 @@ public class GL3DCameraOptionsPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String selectedItem = (String) comboBox.getSelectedItem();
                 if (selectedItem.equals(cameras[0]))
-                    changeCamera(camera, GL3DCamera.CameraMode.OBSERVER);
+                    changeCamera(camera, Camera.CameraMode.OBSERVER);
                 else if (selectedItem.equals(cameras[1]))
-                    changeCamera(camera, GL3DCamera.CameraMode.EARTH);
+                    changeCamera(camera, Camera.CameraMode.EARTH);
                 else
-                    changeCamera(camera, GL3DCamera.CameraMode.EXPERT);
+                    changeCamera(camera, Camera.CameraMode.EXPERT);
             }
         });
 
@@ -136,7 +136,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
         revalidate();
     }
 
-    private void changeCamera(GL3DCamera camera, GL3DCamera.CameraMode mode) {
+    private void changeCamera(Camera camera, Camera.CameraMode mode) {
         camera.setMode(mode);
         switchOptionsPanel(camera.getOptionPanel());
         Displayer.setActiveCamera(camera);

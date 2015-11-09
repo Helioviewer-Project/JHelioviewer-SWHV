@@ -13,15 +13,15 @@ public class Viewport {
     private int y;
     private final int idx;
     private boolean isVisible = true;
-    private GL3DCamera camera;
+    private Camera camera;
 
-    public Viewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera) {
+    public Viewport(int _idx, int _x, int _y, int _w, int _h, Camera _camera) {
         this(_idx, _x, _y, _w, _h, _camera, false);
     }
 
     private boolean active;
 
-    public Viewport(int _idx, int _x, int _y, int _w, int _h, GL3DCamera _camera, boolean _active) {
+    public Viewport(int _idx, int _x, int _y, int _w, int _h, Camera _camera, boolean _active) {
         idx = _idx;
         w = _w;
         h = _h;
@@ -31,11 +31,11 @@ public class Viewport {
         active = _active;
     }
 
-    public GL3DCamera getCamera() {
+    public Camera getCamera() {
         return camera;
     }
 
-    public void setCamera(GL3DCamera _camera) {
+    public void setCamera(Camera _camera) {
         camera = _camera;
     }
 

@@ -14,7 +14,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
@@ -173,7 +173,7 @@ public class JP2View extends AbstractView {
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
-        GL3DCamera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getViewport().getCamera();
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region r = ViewROI.getInstance().updateROI(camera, masterTime, m);
 

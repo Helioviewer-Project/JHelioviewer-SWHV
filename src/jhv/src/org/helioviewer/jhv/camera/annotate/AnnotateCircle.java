@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.math.Vec3d;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 
@@ -19,7 +19,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     private Vec3d startPoint;
     private Vec3d endPoint;
 
-    public AnnotateCircle(GL3DCamera _camera) {
+    public AnnotateCircle(Camera _camera) {
         super(_camera);
     }
 

@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Quatd;
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -58,7 +58,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        GL3DCamera activeCamera = vp.getCamera();
+        Camera activeCamera = vp.getCamera();
         Mat4d cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:

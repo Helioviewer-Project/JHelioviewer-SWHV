@@ -10,7 +10,7 @@ public class InteractionPan extends InteractionDefault {
 
     private Point lastMousePoint;
 
-    protected InteractionPan(GL3DCamera _camera) {
+    protected InteractionPan(Camera _camera) {
         super(_camera);
     }
 

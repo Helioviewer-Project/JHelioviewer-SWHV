@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
-import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -99,7 +99,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                GL3DCamera camera = vp.getCamera();
+                Camera camera = vp.getCamera();
                 camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 camera.applyPerspective(gl);
@@ -118,7 +118,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public static void renderFloatScene(GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                GL3DCamera camera = vp.getCamera();
+                Camera camera = vp.getCamera();
                 camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 ImageViewerGui.getRenderableContainer().renderFloat(gl, vp);
@@ -141,7 +141,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
-            GL3DCamera camera = vp.getCamera();
+            Camera camera = vp.getCamera();
             // camera.updateRotation(Layers.getLastUpdatedTimestamp());
             camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
             gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());

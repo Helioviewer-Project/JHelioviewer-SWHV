@@ -9,9 +9,9 @@ import com.jogamp.opengl.GL2;
 
 public abstract class InteractionDefault extends Interaction {
 
-    protected GL3DCamera camera;
+    protected Camera camera;
 
-    protected InteractionDefault(GL3DCamera _camera) {
+    protected InteractionDefault(Camera _camera) {
         camera = _camera;
     }
 

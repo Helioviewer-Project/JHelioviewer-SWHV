@@ -11,7 +11,7 @@ public class InteractionRotate extends InteractionDefault {
     private Vec3d currentRotationStartPoint;
     private Quatd currentDragRotation;
 
-    protected InteractionRotate(GL3DCamera _camera) {
+    protected InteractionRotate(Camera _camera) {
         super(_camera);
     }
 

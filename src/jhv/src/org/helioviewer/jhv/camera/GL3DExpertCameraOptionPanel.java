@@ -48,7 +48,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private JSeparatorComboBox objectCombobox;
 
-    private final GL3DCamera camera;
+    private final Camera camera;
     private JButton synchronizeWithLayersButton;
     private JButton synchronizeWithNowButton;
     private JButton synchronizeWithCurrentButton;
@@ -61,7 +61,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private GL3DPositionLoading positionLoading;
 
-    public GL3DExpertCameraOptionPanel(GL3DCamera camera) {
+    public GL3DExpertCameraOptionPanel(Camera camera) {
         super();
         this.camera = camera;
         setLayout(new GridBagLayout());
