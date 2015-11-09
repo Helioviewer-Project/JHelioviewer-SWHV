@@ -7,14 +7,14 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-class VantagePointExpert extends VantagePoint {
+class ViewpointExpert extends Viewpoint {
 
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
     private final PositionLoad positionLoad;
 
-    VantagePointExpert(PositionLoad _positionLoad) {
+    ViewpointExpert(PositionLoad _positionLoad) {
         super();
         positionLoad = _positionLoad;
     }

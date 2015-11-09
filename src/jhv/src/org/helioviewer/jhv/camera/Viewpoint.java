@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
-abstract class VantagePoint {
+abstract class Viewpoint {
 
     JHVDate time;
     Quat orientation;
@@ -13,7 +13,7 @@ abstract class VantagePoint {
 
     abstract void update(JHVDate date);
 
-    VantagePoint() {
+    Viewpoint() {
         time = TimeUtils.epoch;
         orientation = Quat.ZERO;
         distance = Sun.MeanEarthDistance;
