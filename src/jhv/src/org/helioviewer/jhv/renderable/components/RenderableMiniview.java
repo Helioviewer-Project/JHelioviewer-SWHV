@@ -3,7 +3,8 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Component;
 
 import org.helioviewer.jhv.base.math.Mat4d;
-import org.helioviewer.jhv.camera.GL3DObserverCamera;
+import org.helioviewer.jhv.camera.GL3DCamera;
+import org.helioviewer.jhv.camera.GL3DCamera.CameraMode;
 import org.helioviewer.jhv.camera.GL3DViewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -18,7 +19,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private final GL3DViewport miniview = new GL3DViewport(0, 0, 0, 100, 100, new GL3DObserverCamera(), true);
+    private final GL3DViewport miniview = new GL3DViewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -32,7 +33,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void renderMiniview(GL2 gl, GL3DViewport vp) {
-        Mat4d cameraMatrix = vp.getCamera().getLocalRotation().toMatrix();
+        Mat4d cameraMatrix = vp.getCamera().getOrientation().toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {

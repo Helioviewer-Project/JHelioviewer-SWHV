@@ -62,7 +62,7 @@ public class RenderableGrid extends AbstractRenderable {
         Mat4d cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:
-            cameraMatrix = activeCamera.getLocalRotation().toMatrix();
+            cameraMatrix = activeCamera.getOrientation().toMatrix();
             break;
         case HCI:
             //TBD

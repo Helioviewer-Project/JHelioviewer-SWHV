@@ -114,7 +114,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
             }
         });
 
-        positionLoading = new GL3DPositionLoading(this);
+        positionLoading = new GL3DPositionLoading(new VantagePointExpert());
         // !
         syncWithLayerBeginTime(false);
         syncWithLayerEndTime(true);

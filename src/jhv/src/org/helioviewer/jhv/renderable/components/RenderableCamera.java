@@ -44,7 +44,7 @@ public class RenderableCamera extends AbstractRenderable {
         double scale = 1.;
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(activeCamera.getLocalRotation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(activeCamera.getOrientation().toMatrix().transpose().m, 0);
         {
             GLHelper.lineWidth(gl, 1);
 
