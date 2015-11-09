@@ -34,7 +34,7 @@ import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implements LayersListener {
+public class CameraOptionPanelExpert extends CameraOptionPanel implements LayersListener {
 
     private final JLabel loadedLabel;
 
@@ -59,11 +59,11 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private boolean firstComboChanged = false;
 
-    private GL3DPositionLoading positionLoading;
+    private PositionLoad positionLoad;
 
-    public GL3DExpertCameraOptionPanel(Camera camera) {
-        super();
-        this.camera = camera;
+    public CameraOptionPanelExpert(Camera _camera) {
+        camera = _camera;
+
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
@@ -114,7 +114,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
             }
         });
 
-        positionLoading = new GL3DPositionLoading(new VantagePointExpert());
+        positionLoad = new PositionLoad(new VantagePointExpert());
         // !
         syncWithLayerBeginTime(false);
         syncWithLayerEndTime(true);
@@ -177,8 +177,8 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
-            positionLoading.setBeginDate(Layers.getStartDate(view).getDate(), false);
-            positionLoading.setEndDate(Layers.getEndDate(view).getDate(), true);
+            positionLoad.setBeginDate(Layers.getStartDate(view).getDate(), false);
+            positionLoad.setEndDate(Layers.getEndDate(view).getDate(), true);
             Displayer.render();
         }
     }
@@ -198,7 +198,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
                 if (event.getStateChange() == ItemEvent.SELECTED && firstComboChanged) {
                     SpaceObject object = (SpaceObject) event.getItem();
                     if (object != null) {
-                        positionLoading.setObserver(object.getUrlName(), true);
+                        positionLoad.setObserver(object.getUrlName(), true);
                         // revalidate();
                         // Displayer.render();
                     }
@@ -257,14 +257,14 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
     private void setEndTime(boolean applyChanges) {
         Date dt = endTimePicker.getValue();
         Date end_date = new Date(endDatePicker.getDate().getTime() + dt.getTime());
-        positionLoading.setEndDate(end_date, applyChanges);
+        positionLoad.setEndDate(end_date, applyChanges);
         // Displayer.render();
     }
 
     private void setBeginTime(boolean applyChanges) {
         Date dt = beginTimePicker.getValue();
         Date begin_date = new Date(beginDatePicker.getDate().getTime() + dt.getTime());
-        positionLoading.setBeginDate(begin_date, applyChanges);
+        positionLoad.setBeginDate(begin_date, applyChanges);
         // Displayer.render();
     }
 
@@ -374,8 +374,8 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
         Displayer.render();
     }
 
-    public GL3DPositionLoading getPositionLoading() {
-        return positionLoading;
+    public PositionLoad getPositionLoad() {
+        return positionLoad;
     }
 
 }

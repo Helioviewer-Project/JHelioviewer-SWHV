@@ -302,10 +302,10 @@ public class Camera {
         return annotateInteraction;
     }
 
-    private GL3DCameraOptionPanel optionPanel = new GL3DCameraOptionPanel();
-    protected GL3DExpertCameraOptionPanel expertOptionPanel;
+    private CameraOptionPanel optionPanel = new CameraOptionPanel();
+    protected CameraOptionPanelExpert expertOptionPanel;
 
-    public GL3DCameraOptionPanel getOptionPanel() {
+    public CameraOptionPanel getOptionPanel() {
         if (mode == CameraMode.EXPERT) {
             return expertOptionPanel;
         } else {
