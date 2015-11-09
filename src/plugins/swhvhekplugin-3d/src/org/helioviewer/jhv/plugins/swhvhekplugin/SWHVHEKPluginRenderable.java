@@ -19,7 +19,7 @@ import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Quatd;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -327,7 +327,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
         if (isVisible[vp.getIndex()]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
@@ -346,7 +346,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderFloat(GL2 gl, GL3DViewport vp) {
+    public void renderFloat(GL2 gl, Viewport vp) {
         if (isVisible[vp.getIndex()]) {
             if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
                 drawText(gl, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
@@ -407,7 +407,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
     }
 
 }

@@ -5,7 +5,7 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -34,7 +34,7 @@ public class RenderableCamera extends AbstractRenderable {
     }
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
         if (!isVisible[vp.getIndex()])
             return;
 
@@ -157,7 +157,7 @@ public class RenderableCamera extends AbstractRenderable {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
     }
 
 }

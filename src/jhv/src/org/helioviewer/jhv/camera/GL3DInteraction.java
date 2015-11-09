@@ -12,20 +12,6 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-/**
- * An Interaction is responsible for turning user events into camera behavior.
- * There are 3 main interaction types: Rotation, Panning, Zoom Box. Every
- * {@link GL3DCamera} must supply a {@link GL3DInteraction} for every
- * interaction type. The interaction should manipulate the {@link GL3DCamera}'s
- * translation and rotation. This can either be achieved by direct manipulation
- * or through {@link GL3DCameraAnimation}s that are applied to the
- * {@link GL3DCamera}. Furthermore every interaction can draw Interaction
- * Feedback by overriding the corresponding method, which is called at the end
- * of each renderloop.
- *
- * @author Simon Spoerri (simon.spoerri@fhnw.ch)
- *
- */
 public abstract class GL3DInteraction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
     protected GL3DCamera camera;
@@ -86,9 +72,8 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
     public void setActiveView(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
-        GL3DViewport[] viewports = Displayer.getViewports();
-        for (int i = 0; i < viewports.length; i++) {
-            GL3DViewport vp = viewports[i];
+
+        for (Viewport vp : Displayer.getViewports()) {
             if (vp.isActive()) {
                 if (x >= vp.getOffsetX() && x <= vp.getOffsetX() + vp.getWidth() && y >= vp.getOffsetY() && y <= vp.getOffsetY() + vp.getHeight()) {
                     Displayer.setViewport(vp);
@@ -96,4 +81,5 @@ public abstract class GL3DInteraction implements MouseWheelListener, MouseMotion
             }
         }
     }
+
 }

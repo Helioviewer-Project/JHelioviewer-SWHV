@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.renderable.gui;
 
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -43,7 +43,7 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
-    public void renderFloat(GL2 gl, GL3DViewport vp) {
+    public void renderFloat(GL2 gl, Viewport vp) {
     }
 
 }

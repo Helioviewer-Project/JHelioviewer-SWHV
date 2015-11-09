@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.gui.components;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -97,7 +97,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     public static void renderScene(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        for (GL3DViewport vp : Displayer.getViewports()) {
+        for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
                 GL3DCamera camera = vp.getCamera();
                 camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
@@ -116,7 +116,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     }
 
     public static void renderFloatScene(GL2 gl) {
-        for (GL3DViewport vp : Displayer.getViewports()) {
+        for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
                 GL3DCamera camera = vp.getCamera();
                 camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
@@ -139,7 +139,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         renderScene(gl);
 
-        GL3DViewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
+        Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             GL3DCamera camera = vp.getCamera();
             // camera.updateRotation(Layers.getLastUpdatedTimestamp());

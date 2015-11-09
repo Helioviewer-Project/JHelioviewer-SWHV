@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.math.Mat4d;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.GL3DCamera;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
@@ -123,16 +123,16 @@ public class RenderableImageLayer extends AbstractRenderable {
     }
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
         _render(gl, vp, new double[] { 1., 1., 0., 1. }, false);
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
         _render(gl, vp, new double[] { 0., 0., 0., 0. }, true);
     }
 
-    private void _render(GL2 gl, GL3DViewport vp, double[] depthrange, boolean isMiniview) {
+    private void _render(GL2 gl, Viewport vp, double[] depthrange, boolean isMiniview) {
         if (imageData == null) {
             return;
         }
@@ -186,7 +186,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     }
 
     @Override
-    public void renderFloat(GL2 gl, GL3DViewport vp) {
+    public void renderFloat(GL2 gl, Viewport vp) {
         if (imageData == null) {
             int delta = (int) (vp.getHeight() * 0.01);
             TextRenderer renderer = GLText.getRenderer((int) (vp.getHeight() * vpScale));

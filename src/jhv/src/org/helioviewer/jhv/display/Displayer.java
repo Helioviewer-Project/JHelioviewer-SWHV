@@ -10,7 +10,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.GL3DCamera;
 import org.helioviewer.jhv.camera.GL3DCamera.CameraMode;
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -20,6 +20,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
+
     public static boolean multiview = false;
 
     private static Component displayComponent;
@@ -44,28 +45,28 @@ public class Displayer implements JHVEventHighlightListener {
         return new Dimension(glWidth, glHeight);
     }
 
-    private static GL3DViewport viewport0 = new GL3DViewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
-    private static GL3DViewport viewport1 = new GL3DViewport(1, 0, 0, 100, 100, viewport0.getCamera(), false);
-    private static GL3DViewport viewport2 = new GL3DViewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
-    private static GL3DViewport viewport3 = new GL3DViewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
-    private static GL3DViewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
-    private static GL3DViewport viewport = viewport0;
+    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, new GL3DCamera(CameraMode.OBSERVER), true);
+    private static Viewport viewport1 = new Viewport(1, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static Viewport viewport2 = new Viewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static Viewport viewport3 = new Viewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static Viewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
+    private static Viewport viewport = viewport0;
 
-    public static GL3DViewport[] getViewports() {
+    public static Viewport[] getViewports() {
         return viewports;
     }
 
-    public static GL3DViewport getViewport() {
+    public static Viewport getViewport() {
         return viewport;
     }
 
-    public static void setViewport(GL3DViewport _viewport) {
+    public static void setViewport(Viewport _viewport) {
         viewport = _viewport;
     }
 
     public static int countActiveLayers() {
         int ct = 0;
-        for (GL3DViewport vp : Displayer.getViewports()) {
+        for (Viewport vp : viewports) {
             if (vp.isActive()) {
                 ct++;
             }
@@ -82,23 +83,18 @@ public class Displayer implements JHVEventHighlightListener {
         case 1:
             reshape();
             break;
-
         case 2:
             reshape2();
             break;
-
         case 3:
             reshape4();
             break;
-
         case 4:
             reshape4();
             break;
-
         default:
             reshape();
             break;
-
         }
     }
 
@@ -106,9 +102,8 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
 
-        GL3DViewport[] viewports = Displayer.getViewports();
         boolean first = true;
-        for (GL3DViewport vp : viewports) {
+        for (Viewport vp : viewports) {
             if (first && vp.isActive()) {
                 vp.getCamera().updateCameraWidthAspect(w / (double) h);
                 vp.setSize(w, h);
@@ -126,10 +121,9 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int halfw = w / 2;
         int h = Displayer.getGLHeight();
-        GL3DViewport[] viewports = Displayer.getViewports();
         boolean first = true;
 
-        for (GL3DViewport vp : viewports) {
+        for (Viewport vp : viewports) {
             if (vp.isActive()) {
                 if (first) {
                     vp.getCamera().updateCameraWidthAspect(halfw / (double) h);
@@ -148,27 +142,29 @@ public class Displayer implements JHVEventHighlightListener {
     private static void reshape4() {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
-        GL3DViewport[] viewports = Displayer.getViewports();
-        GL3DViewport vp0 = viewports[0];
-        GL3DViewport vp1 = viewports[1];
-        GL3DViewport vp2 = viewports[2];
-        GL3DViewport vp3 = viewports[3];
 
-        vp0.getCamera().updateCameraWidthAspect(w / (double) h);
-        vp0.setSize(w / 2, h / 2);
-        vp0.setOffset(0, 0);
+        viewports[0].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[0].setSize(w / 2, h / 2);
+        viewports[0].setOffset(0, 0);
 
-        vp1.getCamera().updateCameraWidthAspect(w / (double) h);
-        vp1.setSize(w / 2, h / 2);
-        vp1.setOffset(w / 2, 0);
+        viewports[1].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[1].setSize(w / 2, h / 2);
+        viewports[1].setOffset(w / 2, 0);
 
-        vp2.getCamera().updateCameraWidthAspect(w / (double) h);
-        vp2.setSize(w / 2, h / 2);
-        vp2.setOffset(0, h / 2);
+        viewports[2].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[2].setSize(w / 2, h / 2);
+        viewports[2].setOffset(0, h / 2);
 
-        vp3.getCamera().updateCameraWidthAspect(w / (double) h);
-        vp3.setSize(w / 2, h / 2);
-        vp3.setOffset(w / 2, h / 2);
+        viewports[3].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[3].setSize(w / 2, h / 2);
+        viewports[3].setOffset(w / 2, h / 2);
+    }
+
+    public static void setActiveCamera(GL3DCamera camera) {
+        GL3DCamera activeCamera = getViewport().getCamera();
+        for (Viewport vp : viewports) {
+            vp.setCamera(camera);
+        }
     }
 
     private static boolean torender = false;
@@ -208,24 +204,15 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static void setActiveCamera(GL3DCamera camera) {
-        GL3DCamera activeCamera = getViewport().getCamera();
-        for (GL3DViewport vp : getViewports()) {
-            vp.setCamera(camera);
-        }
-    }
-
     public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
 
     private static class DisplayDataHandler implements ViewDataHandler {
-
         @Override
         public void handleData(View view, ImageData imageData) {
             view.getImageLayer().setImageData(imageData);
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
             display();
         }
-
     }
 
     @Override

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Component;
 
-import org.helioviewer.jhv.camera.GL3DViewport;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -18,11 +18,11 @@ public class RenderableTimeStamp extends AbstractRenderable {
     private static final String name = "Timestamp";
 
     @Override
-    public void render(GL2 gl, GL3DViewport vp) {
+    public void render(GL2 gl, Viewport vp) {
     }
 
     @Override
-    public void renderFloat(GL2 gl, GL3DViewport vp) {
+    public void renderFloat(GL2 gl, Viewport vp) {
         if (!isVisible[vp.getIndex()])
             return;
 
@@ -76,7 +76,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, GL3DViewport vp) {
+    public void renderMiniview(GL2 gl, Viewport vp) {
     }
 
 }
