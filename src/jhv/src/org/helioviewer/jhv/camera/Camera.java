@@ -29,8 +29,6 @@ public class Camera {
     private static final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
 
-    private Mat4 cameraTransformation = Mat4.identity();
-
     private Quat rotation = new Quat();
 
     private Quat currentDragRotation = new Quat();
@@ -130,6 +128,7 @@ public class Camera {
         gl.glLoadIdentity();
         gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
+        Mat4 cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -vantagePoint.distance);
         // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(cameraTransformation.m, 0);
@@ -250,7 +249,6 @@ public class Camera {
     private void updateCameraTransformation() {
         rotation = currentDragRotation.copy();
         rotation.rotate(vantagePoint.orientation);
-        cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -vantagePoint.distance);
     }
 
     public void setCameraFOV(double _fov) {
@@ -323,7 +321,7 @@ public class Camera {
     public void timeChanged(JHVDate date) {
         if (!trackingMode) {
             vantagePoint.update(date);
-            updateCameraTransformation();
+            // updateCameraTransformation();
         }
     }
 
