@@ -26,7 +26,6 @@ public abstract class InteractionDefault extends Interaction {
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             camera.reset();
-            Displayer.render();
         }
         setActiveView(e);
     }
