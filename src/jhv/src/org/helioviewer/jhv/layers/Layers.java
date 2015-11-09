@@ -145,6 +145,7 @@ public class Layers {
         lastTimestamp = dateTime;
 
         Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
+        Displayer.getViewport().getCamera().fireTimeUpdated();
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp);
         }

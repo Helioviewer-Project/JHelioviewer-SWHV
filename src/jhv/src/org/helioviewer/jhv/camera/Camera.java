@@ -328,7 +328,9 @@ public class Camera {
         } else {
             Displayer.render();
         }
+    }
 
+    public void fireTimeUpdated() {
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
             renderableCamera.setTimeString(vantagePoint.time.toString());
