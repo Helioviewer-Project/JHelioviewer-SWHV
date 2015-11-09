@@ -27,7 +27,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
-public class GL3DCameraOptionsPanel extends JPanel {
+public class CameraOptionsPanel extends JPanel {
 
     private CameraOptionPanel currentOptionPanel;
 
@@ -37,7 +37,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
                                               "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless " +
                                               "\"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
-    public GL3DCameraOptionsPanel(final Camera camera) {
+    public CameraOptionsPanel(final Camera camera) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();

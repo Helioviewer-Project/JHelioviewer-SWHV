@@ -101,6 +101,8 @@ public class PositionLoad {
                 report = FAILEDSTATE + ": JSON parse error";
             } catch (ParseException e) {
                 report = FAILEDSTATE + ": JSON parse error";
+            } catch (NumberFormatException e) {
+                report = FAILEDSTATE + ": JSON parse error";
             } catch (URISyntaxException e) {
                 report = FAILEDSTATE + ": wrong URI";
             } finally {

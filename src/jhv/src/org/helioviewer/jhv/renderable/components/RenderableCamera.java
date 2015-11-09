@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.GL3DCameraOptionsPanel;
+import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -30,7 +30,7 @@ public class RenderableCamera extends AbstractRenderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        optionsPanel = new GL3DCameraOptionsPanel(Displayer.getViewport().getCamera());
+        optionsPanel = new CameraOptionsPanel(Displayer.getViewport().getCamera());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class RenderableCamera extends AbstractRenderable {
 
     @Override
     public String getName() {
-        return "Camera";
+        return "Vantage Point";
     }
 
     @Override
