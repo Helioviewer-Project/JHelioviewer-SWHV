@@ -78,6 +78,7 @@ public class Camera {
         currentInteraction.reset();
         zoomToFit();
         timeChanged(Layers.getLastUpdatedTimestamp());
+        Displayer.render();
     }
 
     public Camera duplicate(JHVDate date) {
@@ -266,6 +267,8 @@ public class Camera {
 
     public void setTrackingMode(boolean _trackingMode) {
         trackingMode = _trackingMode;
+        timeChanged(Layers.getLastUpdatedTimestamp());
+        Displayer.render();
     }
 
     public boolean getTrackingMode() {
@@ -325,8 +328,6 @@ public class Camera {
         if (!trackingMode) {
             vantagePoint.update(date);
             updateCameraTransformation();
-        } else {
-            Displayer.render();
         }
     }
 
