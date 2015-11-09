@@ -105,26 +105,12 @@ public class Camera {
         return FOVangleToDraw;
     }
 
-    public void setPanning(Vec2 pan) {
-        currentTranslation = pan;
-    }
-
-    public Vec2 getPanning() {
-        return currentTranslation;
-    }
-
     public double getDistance() {
         return vantagePoint.distance;
     }
 
     public Quat getOrientation() {
         return vantagePoint.orientation;
-    }
-
-    public void rotateCurrentDragRotation(Quat _currentDragRotation) {
-        currentDragRotation.rotate(_currentDragRotation);
-        rotation.clear();
-        updateCameraTransformation();
     }
 
     public void updateCameraWidthAspect(double aspect) {
@@ -245,11 +231,25 @@ public class Camera {
         return cameraDifferenceRotation;
     }
 
+    public Vec2 getCurrentTranslation() {
+        return currentTranslation;
+    }
+
+    protected void setCurrentTranslation(Vec2 pan) {
+        currentTranslation = pan;
+        updateCameraTransformation();
+    }
+
+    protected void rotateCurrentDragRotation(Quat _currentDragRotation) {
+        currentDragRotation.rotate(_currentDragRotation);
+        updateCameraTransformation();
+    }
+
     /**
      * Updates the camera transformation by applying the rotation and
      * translation information.
      */
-    protected void updateCameraTransformation() {
+    private void updateCameraTransformation() {
         rotation = currentDragRotation.copy();
         rotation.rotate(vantagePoint.orientation);
         cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -vantagePoint.distance);
