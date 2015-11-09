@@ -3,7 +3,7 @@ package org.helioviewer.jhv.camera;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.display.Displayer;
 
 public class InteractionPan extends InteractionDefault {
@@ -26,7 +26,7 @@ public class InteractionPan extends InteractionDefault {
         int y = p.y - lastMousePoint.y;
         double m = 2. * camera.getCameraWidth() / Displayer.getViewport().getHeight();
 
-        Vec2d pan = camera.getPanning();
+        Vec2 pan = camera.getPanning();
         pan.x += x * m;
         pan.y -= y * m;
         camera.setPanning(pan);

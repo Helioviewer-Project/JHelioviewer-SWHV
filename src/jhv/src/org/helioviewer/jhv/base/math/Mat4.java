@@ -128,9 +128,11 @@ public class Mat4 {
         return new Vec3d((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
     }
 
-    public final Vec4d multiply(Vec4d v) {
-        return new Vec4d(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
+/*
+    public final Vec4 multiply(Vec4 v) {
+        return new Vec4(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w, m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w, m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w, m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w);
     }
+*/
 
     public final Vec3d translation() {
         return new Vec3d(m[12], m[13], m[14]);

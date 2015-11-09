@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 
@@ -26,7 +26,7 @@ public interface MetaData {
      *
      * @return Physical image size
      */
-    public Vec2d getPhysicalSize();
+    public Vec2 getPhysicalSize();
 
     /**
      * Returns the physical position of the lower left corner of the
@@ -34,9 +34,9 @@ public interface MetaData {
      *
      * @return Physical position of the lower left corner
      */
-    public Vec2d getPhysicalLowerLeft();
+    public Vec2 getPhysicalLowerLeft();
 
-    public Vec2d getPhysicalUpperLeft();
+    public Vec2 getPhysicalUpperLeft();
 
     /**
      * Returns the width of the image in pixels.

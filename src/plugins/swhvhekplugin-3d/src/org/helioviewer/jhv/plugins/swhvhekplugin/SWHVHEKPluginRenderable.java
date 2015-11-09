@@ -17,7 +17,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -272,7 +272,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
 
-        Vec2d bd = new Vec2d(0, 0);
+        Vec2 bd = new Vec2(0, 0);
         int ct = 0;
         for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();

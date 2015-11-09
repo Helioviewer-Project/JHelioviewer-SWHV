@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3d;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
@@ -34,7 +34,7 @@ public class Camera {
     private Quat rotation = new Quat();
 
     private Quat currentDragRotation = new Quat();
-    private Vec2d currentTranslation = new Vec2d();
+    private Vec2 currentTranslation = new Vec2();
 
     private boolean trackingMode;
 
@@ -71,7 +71,7 @@ public class Camera {
     }
 
     public void reset() {
-        currentTranslation = new Vec2d(0, 0);
+        currentTranslation = new Vec2(0, 0);
         currentDragRotation.clear();
         currentInteraction.reset();
         zoomToFit();
@@ -102,11 +102,11 @@ public class Camera {
         return FOVangleToDraw;
     }
 
-    public void setPanning(Vec2d pan) {
+    public void setPanning(Vec2 pan) {
         currentTranslation = pan;
     }
 
-    public Vec2d getPanning() {
+    public Vec2 getPanning() {
         return currentTranslation;
     }
 
@@ -144,7 +144,7 @@ public class Camera {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public Vec3d getVectorFromSphereOrPlane(Vec2d normalizedScreenpos, Quat cameraDifferenceRotation) {
+    public Vec3d getVectorFromSphereOrPlane(Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
         double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - currentTranslation.x;
         double up1y = normalizedScreenpos.y * cameraWidth - currentTranslation.y;
 

@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 
 public class PixelBasedMetaData extends AbstractMetaData {
     /**
@@ -31,8 +31,8 @@ public class PixelBasedMetaData extends AbstractMetaData {
         double unitPerPixelY = region.getHeight() / pixelHeight;
         double newUnitPerPixel = Math.max(unitPerPixelX, unitPerPixelY);
 
-        setPhysicalSize(Vec2d.scale(getPhysicalSize(), newUnitPerPixel / unitPerPixel));
-        setPhysicalLowerLeftCorner(new Vec2d(region.getLowerLeftCorner().x, region.getLowerLeftCorner().y - getPhysicalSize().y + region.getHeight()));
+        setPhysicalSize(Vec2.scale(getPhysicalSize(), newUnitPerPixel / unitPerPixel));
+        setPhysicalLowerLeftCorner(new Vec2(region.getLowerLeftCorner().x, region.getLowerLeftCorner().y - getPhysicalSize().y + region.getHeight()));
         unitPerPixel = newUnitPerPixel;
     }
 

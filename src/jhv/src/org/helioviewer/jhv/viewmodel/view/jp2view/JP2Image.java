@@ -27,7 +27,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.math.Vec2d;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -381,8 +381,8 @@ public class JP2Image {
         int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
         int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
 
-        Vec2d rUpperLeft = r.getUpperLeftCorner();
-        Vec2d mUpperLeft = m.getPhysicalUpperLeft();
+        Vec2 rUpperLeft = r.getUpperLeftCorner();
+        Vec2 mUpperLeft = m.getPhysicalUpperLeft();
         double displacementX = rUpperLeft.x - mUpperLeft.x;
         double displacementY = rUpperLeft.y - mUpperLeft.y;
 
