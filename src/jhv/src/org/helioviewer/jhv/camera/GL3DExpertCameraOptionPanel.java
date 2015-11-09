@@ -185,10 +185,10 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
 
     private void addObjectCombobox(GridBagConstraints c) {
         objectCombobox = new JSeparatorComboBox();
-        GL3DSpaceObject[] objectList = GL3DSpaceObject.getObjectList();
+        SpaceObject[] objectList = SpaceObject.getObjectList();
         for (int i = 0; i < objectList.length; i++) {
             objectCombobox.addItem(objectList[i]);
-            if (i == GL3DSpaceObject.LINESEPSATS || i == GL3DSpaceObject.LINESEPPLANETS) {
+            if (i == SpaceObject.LINESEPSATS || i == SpaceObject.LINESEPPLANETS) {
                 objectCombobox.addItem(new JSeparator());
             }
         }
@@ -196,7 +196,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
             @Override
             public void itemStateChanged(ItemEvent event) {
                 if (event.getStateChange() == ItemEvent.SELECTED && firstComboChanged) {
-                    GL3DSpaceObject object = (GL3DSpaceObject) event.getItem();
+                    SpaceObject object = (SpaceObject) event.getItem();
                     if (object != null) {
                         positionLoading.setObserver(object.getUrlName(), true);
                         // revalidate();
@@ -209,7 +209,7 @@ public class GL3DExpertCameraOptionPanel extends GL3DCameraOptionPanel implement
             }
         });
         add(objectCombobox, c);
-        objectCombobox.setSelectedItem(GL3DSpaceObject.earth);
+        objectCombobox.setSelectedItem(SpaceObject.earth);
     }
 
     private void addBeginDatePanel(GridBagConstraints c) {

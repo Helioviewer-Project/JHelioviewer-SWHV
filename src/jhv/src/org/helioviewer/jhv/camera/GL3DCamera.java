@@ -46,11 +46,10 @@ public class GL3DCamera {
 
     private double FOVangleToDraw;
 
-    private final GL3DTrackballRotationInteraction rotationInteraction = new GL3DTrackballRotationInteraction(this);
-    private final GL3DPanInteraction panInteraction = new GL3DPanInteraction(this);
-    private final GL3DAnnotateInteraction annotateInteraction = new GL3DAnnotateInteraction(this);
-
-    private GL3DInteraction currentInteraction = rotationInteraction;
+    private final InteractionRotate rotationInteraction = new InteractionRotate(this);
+    private final InteractionPan panInteraction = new InteractionPan(this);
+    private final InteractionAnnotate annotateInteraction = new InteractionAnnotate(this);
+    private Interaction currentInteraction = rotationInteraction;
 
     private VantagePoint vantagePoint;
 
@@ -283,23 +282,23 @@ public class GL3DCamera {
         FOVangleToDraw = fovAngle * Math.PI / 180.;
     }
 
-    public void setCurrentInteraction(GL3DInteraction _currentInteraction) {
+    public void setCurrentInteraction(Interaction _currentInteraction) {
         currentInteraction = _currentInteraction;
     }
 
-    public GL3DInteraction getCurrentInteraction() {
+    public Interaction getCurrentInteraction() {
         return currentInteraction;
     }
 
-    public GL3DInteraction getPanInteraction() {
+    public Interaction getPanInteraction() {
         return panInteraction;
     }
 
-    public GL3DInteraction getRotateInteraction() {
+    public Interaction getRotateInteraction() {
         return rotationInteraction;
     }
 
-    public GL3DAnnotateInteraction getAnnotateInteraction() {
+    public InteractionAnnotate getAnnotateInteraction() {
         return annotateInteraction;
     }
 

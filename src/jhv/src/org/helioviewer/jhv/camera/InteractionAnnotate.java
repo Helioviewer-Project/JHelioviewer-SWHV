@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 
 import com.jogamp.opengl.GL2;
 
-public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
+public class InteractionAnnotate extends InteractionDefault {
 
     public static enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
@@ -26,8 +26,8 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
     private final AnnotateCross aCross = new AnnotateCross(camera);
     private Annotateable activeAnnotatable = aRect;
 
-    protected GL3DAnnotateInteraction(GL3DCamera camera) {
-        super(camera);
+    protected InteractionAnnotate(GL3DCamera _camera) {
+        super(_camera);
     }
 
     @Override
@@ -35,6 +35,13 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         aRect.render(gl);
         aCircle.render(gl);
         aCross.render(gl);
+    }
+
+    @Override
+    public void reset() {
+        aRect.reset();
+        aCircle.reset();
+        aCross.reset();
     }
 
     @Override
@@ -57,19 +64,8 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
         activeAnnotatable.keyPressed(e);
     }
 
-    @Override
-    public void reset() {
-        aRect.reset();
-        aCircle.reset();
-        aCross.reset();
-        super.reset();
-    }
-
     public void setMode(AnnotationMode newMode) {
         switch (newMode) {
-            case RECTANGLE:
-                activeAnnotatable = aRect;
-                break;
             case CIRCLE:
                 activeAnnotatable = aCircle;
                 break;
@@ -77,7 +73,7 @@ public class GL3DAnnotateInteraction extends GL3DDefaultInteraction {
                 activeAnnotatable = aCross;
                 break;
             default:
-                break;
+                activeAnnotatable = aRect;
         }
     }
 
