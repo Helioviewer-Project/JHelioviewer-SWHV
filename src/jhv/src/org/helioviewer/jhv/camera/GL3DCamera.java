@@ -16,9 +16,9 @@ import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class GL3DCamera {
+public class GL3DCamera {
 
-    protected static enum CameraMode {
+    public static enum CameraMode {
         OBSERVER, EARTH, EXPERT
     }
 
@@ -34,11 +34,9 @@ public abstract class GL3DCamera {
     private Mat4d cameraTransformation = Mat4d.identity();
 
     private Quatd rotation = new Quatd();
-    private Quatd currentDragRotation = new Quatd();
-    protected Quatd localRotation = new Quatd();
 
-    private Vec2d translation = new Vec2d();
-    protected double distance = Sun.MeanEarthDistance;
+    private Quatd currentDragRotation = new Quatd();
+    private Vec2d currentTranslation = new Vec2d();
 
     private boolean trackingMode;
 
@@ -54,66 +52,44 @@ public abstract class GL3DCamera {
 
     private GL3DInteraction currentInteraction = rotationInteraction;
 
-    public GL3DCamera() {
-        if (this instanceof GL3DEarthCamera) {
-            mode = CameraMode.EARTH;
-        } else if (this instanceof GL3DExpertCamera) {
-            mode = CameraMode.EXPERT;
-            expertOptionPanel = new GL3DExpertCameraOptionPanel(this);
-        } else {
-            mode = CameraMode.OBSERVER;
+    private VantagePoint vantagePoint;
+
+    public GL3DCamera(CameraMode _mode) {
+        setMode(_mode);
+    }
+
+    protected void setMode(CameraMode _mode) {
+        mode = _mode;
+        switch (mode) {
+            case EXPERT:
+                vantagePoint = new VantagePointExpert();
+            break;
+            case EARTH:
+                vantagePoint = new VantagePointEarth();
+            break;
+            default:
+                vantagePoint = new VantagePointObserver();
         }
     }
 
     public void reset() {
-        translation = new Vec2d(0, 0);
+        currentTranslation = new Vec2d(0, 0);
         currentDragRotation.clear();
         currentInteraction.reset();
         zoomToFit();
         timeChanged(Layers.getLastUpdatedTimestamp());
     }
 
-    /**
-     * This method is called when the camera changes and should copy the
-     * required settings of the preceding camera objects.
-     *
-     * @param precedingCamera
-     */
-    public void activate(GL3DCamera precedingCamera) {
-        if (precedingCamera != null) {
-            rotation = precedingCamera.rotation.copy();
-            translation = precedingCamera.translation.copy();
-            FOVangleToDraw = precedingCamera.getFOVAngleToDraw();
-
-            updateCameraWidthAspect(precedingCamera.previousAspect);
-
-            GL3DInteraction precedingInteraction = precedingCamera.getCurrentInteraction();
-            if (precedingInteraction.equals(precedingCamera.getRotateInteraction())) {
-                this.setCurrentInteraction(this.getRotateInteraction());
-            } else if (precedingInteraction.equals(precedingCamera.getPanInteraction())) {
-                this.setCurrentInteraction(this.getPanInteraction());
-            } else if (precedingInteraction.equals(precedingCamera.getAnnotateInteraction())) {
-                this.setCurrentInteraction(this.getAnnotateInteraction());
-            }
-        } else {
-            Log.debug("GL3DCamera: No Preceding Camera, resetting Camera");
-        }
-        reset();
-
-        if (precedingCamera != null) {
-            setTrackingMode(precedingCamera.getTrackingMode());
-        }
-    }
-
     public GL3DCamera duplicate(JHVDate date) {
         if (!trackingMode) {
             try {
-                GL3DCamera camera = this.getClass().newInstance();
-                camera.fov = this.fov;
-                camera.translation = this.translation.copy();
-                camera.currentDragRotation = this.currentDragRotation.copy();
-                camera.updateRotation(date);
-                camera.updateCameraWidthAspect(this.previousAspect);
+                GL3DCamera camera = new GL3DCamera(mode);
+                camera.fov = fov;
+                camera.currentTranslation = currentTranslation.copy();
+                camera.currentDragRotation = currentDragRotation.copy();
+                camera.updateCameraWidthAspect(previousAspect);
+                camera.vantagePoint.update(date);
+                camera.updateCameraTransformation();
 
                 return camera;
             } catch (Exception e) {
@@ -124,23 +100,23 @@ public abstract class GL3DCamera {
     }
 
     public double getFOVAngleToDraw() {
-        return this.FOVangleToDraw;
+        return FOVangleToDraw;
     }
 
     public void setPanning(Vec2d pan) {
-        translation = pan;
+        currentTranslation = pan;
     }
 
     public Vec2d getPanning() {
-        return translation;
+        return currentTranslation;
     }
 
     public double getDistance() {
-        return distance;
+        return vantagePoint.distance;
     }
 
-    public Quatd getLocalRotation() {
-        return localRotation;
+    public Quatd getOrientation() {
+        return vantagePoint.orientation;
     }
 
     public void rotateCurrentDragRotation(Quatd _currentDragRotation) {
@@ -150,7 +126,7 @@ public abstract class GL3DCamera {
     }
 
     public void updateCameraWidthAspect(double aspect) {
-        cameraWidth = distance * Math.tan(0.5 * fov);
+        cameraWidth = vantagePoint.distance * Math.tan(0.5 * fov);
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
     }
@@ -170,8 +146,8 @@ public abstract class GL3DCamera {
     }
 
     public Vec3d getVectorFromSphereOrPlane(Vec2d normalizedScreenpos, Quatd cameraDifferenceRotation) {
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - translation.x;
-        double up1y = normalizedScreenpos.y * cameraWidth - translation.y;
+        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - currentTranslation.x;
+        double up1y = normalizedScreenpos.y * cameraWidth - currentTranslation.y;
 
         Vec3d hitPoint;
         Vec3d rotatedHitPoint;
@@ -199,17 +175,17 @@ public abstract class GL3DCamera {
     }
 
     private double computeUpX(Point viewportCoordinates) {
-        return computeNormalizedX(viewportCoordinates) * cameraWidthTimesAspect - translation.x;
+        return computeNormalizedX(viewportCoordinates) * cameraWidthTimesAspect - currentTranslation.x;
     }
 
     private double computeUpY(Point viewportCoordinates) {
-        return computeNormalizedY(viewportCoordinates) * cameraWidth - translation.y;
+        return computeNormalizedY(viewportCoordinates) * cameraWidth - currentTranslation.y;
     }
 
     public Vec3d getVectorFromSphere(Point viewportCoordinates) {
         Vec3d hitPoint = getVectorFromSphereAlt(viewportCoordinates);
         if (hitPoint != null) {
-            return localRotation.rotateInverseVector(hitPoint);
+            return vantagePoint.orientation.rotateInverseVector(hitPoint);
         }
         return null;
     }
@@ -273,8 +249,8 @@ public abstract class GL3DCamera {
      */
     protected void updateCameraTransformation() {
         rotation = currentDragRotation.copy();
-        rotation.rotate(localRotation);
-        cameraTransformation = rotation.toMatrix().translate(translation.x, translation.y, -distance);
+        rotation.rotate(vantagePoint.orientation);
+        cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -vantagePoint.distance);
     }
 
     public void setCameraFOV(double _fov) {
@@ -300,7 +276,7 @@ public abstract class GL3DCamera {
     }
 
     public void zoom(int wr) {
-        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), distance));
+        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), vantagePoint.distance));
     }
 
     public void setFOVangleDegrees(double fovAngle) {
@@ -338,22 +314,17 @@ public abstract class GL3DCamera {
         }
     }
 
-    public abstract void updateRotation(JHVDate date);
-
-    protected JHVDate cameraTime;
-
     public void timeChanged(JHVDate date) {
-        cameraTime = date;
-
         if (!trackingMode) {
-            updateRotation(cameraTime);
+            vantagePoint.update(date);
+            updateCameraTransformation();
         } else {
             Displayer.render();
         }
 
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
-            renderableCamera.setTimeString(cameraTime.toString());
+            renderableCamera.setTimeString(vantagePoint.time.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
@@ -363,7 +334,7 @@ public abstract class GL3DCamera {
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan2(0.5 * size, distance));
+            setCameraFOV(2. * Math.atan2(0.5 * size, vantagePoint.distance));
     }
 
     public Mat4d getRotation() {

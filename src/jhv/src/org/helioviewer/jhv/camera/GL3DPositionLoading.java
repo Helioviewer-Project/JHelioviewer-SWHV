@@ -42,10 +42,10 @@ public class GL3DPositionLoading {
     private boolean isLoaded = false;
     private Position.Latitudinal[] position;
     private JHVWorker<Position.Latitudinal[], Void> worker;
-    private final GL3DExpertCameraOptionPanel optionPanel;
+    private final VantagePointExpert vantagePoint;
 
-    public GL3DPositionLoading(GL3DExpertCameraOptionPanel _optionPanel) {
-        optionPanel = _optionPanel;
+    public GL3DPositionLoading(VantagePointExpert _vantagePoint) {
+        vantagePoint = _vantagePoint;
     }
 
     private static class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
@@ -198,13 +198,13 @@ public class GL3DPositionLoading {
     }
 
     public boolean isLoaded() {
-        return this.isLoaded;
+        return isLoaded;
     }
 
     private void applyChanges() {
-        this.setLoaded(false);
-        this.position = null;
-        this.requestData();
+        setLoaded(false);
+        position = null;
+        requestData();
     }
 
     public void setBeginDate(Date beginDate, boolean applyChanges) {
@@ -224,15 +224,15 @@ public class GL3DPositionLoading {
     }
 
     public void fireLoaded(final String state) {
-        optionPanel.fireLoaded(state);
+        vantagePoint.fireLoaded(state);
     }
 
     public Date getBeginDate() {
-        return this.beginDatems;
+        return beginDatems;
     }
 
     public Date getEndDate() {
-        return this.endDatems;
+        return endDatems;
     }
 
     public long getStartTime() {
@@ -291,7 +291,7 @@ public class GL3DPositionLoading {
     }
 
     public void setObserver(String object, boolean applyChanges) {
-        this.observer = object;
+        observer = object;
         if (applyChanges) {
             applyChanges();
         }

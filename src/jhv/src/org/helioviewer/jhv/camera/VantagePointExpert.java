@@ -7,14 +7,14 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class GL3DExpertCamera extends GL3DCamera {
+public class VantagePointExpert extends VantagePoint {
 
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
+    private GL3DPositionLoading positionLoading = new GL3DPositionLoading(this);
 
     private JHVDate interpolate(JHVDate date) {
-        GL3DPositionLoading positionLoading = expertOptionPanel.getPositionLoading();
         if (positionLoading.isLoaded()) {
             long currentCameraTime, dateTime = date.getTime();
             long tLayerStart = 0, tLayerEnd = 0;
@@ -25,7 +25,7 @@ public class GL3DExpertCamera extends GL3DCamera {
                 tLayerEnd = Layers.getEndDate(view).getTime();
             }
 
-            //Camera times
+            // camera times
             long tPositionStart = positionLoading.getStartTime();
             long tPositionEnd = positionLoading.getEndTime();
 
@@ -53,13 +53,16 @@ public class GL3DExpertCamera extends GL3DCamera {
     }
 
     @Override
-    public void updateRotation(JHVDate date) {
-        cameraTime = interpolate(date);
-        Position.Latitudinal p = Sun.getEarth(cameraTime.getTime());
+    public void update(JHVDate date) {
+        time = interpolate(date);
 
-        localRotation = new Quatd(currentB, -currentL + p.lon);
+        Position.Latitudinal p = Sun.getEarth(time.getTime());
+        orientation = new Quatd(currentB, -currentL + p.lon);
         distance = currentDistance;
-        updateCameraTransformation();
+    }
+
+    public void fireLoaded(final String state) {
+        // optionPanel.fireLoaded(state);
     }
 
 }

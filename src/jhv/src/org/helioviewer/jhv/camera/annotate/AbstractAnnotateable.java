@@ -27,7 +27,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     }
 
     protected static Vec3d toSpherical(GL3DCamera camera, Vec3d _p) {
-        Vec3d p = camera.getLocalRotation().rotateVector(_p);
+        Vec3d p = camera.getOrientation().rotateVector(_p);
 
         Vec3d pt = new Vec3d();
         pt.x = p.length();
@@ -43,7 +43,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
         pt.x = x * Math.sin(y) * Math.sin(z);
         pt.y = x * Math.cos(y);
 
-        return camera.getLocalRotation().rotateInverseVector(pt);
+        return camera.getOrientation().rotateInverseVector(pt);
     }
 
 }

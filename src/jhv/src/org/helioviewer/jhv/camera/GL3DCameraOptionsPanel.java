@@ -34,21 +34,17 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class GL3DCameraOptionsPanel extends JPanel {
 
-    private GL3DCamera previousCamera;
-    private final JComboBox comboBox;
-
     private GL3DCameraOptionPanel currentOptionPanel;
 
-    private JPanel fovPanel;
-    private JSpinner fovSpinner;
-    private final CameraComboboxModel comboBoxModel;
+    private static final String[] cameras = new String[] { "Observer Camera", "Earth Camera", "Expert Camera" };
+    private static final String explanation = "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n" +
+                                              "Earth camera: view from Earth.\nCamera time defined by timestamps of the active layer.\n\n" +
+                                              "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless " +
+                                              "\"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
-    public GL3DCameraOptionsPanel(GL3DCamera newCamera) {
+    public GL3DCameraOptionsPanel(final GL3DCamera camera) {
         setLayout(new GridBagLayout());
-        comboBoxModel = new CameraComboboxModel();
 
-        Displayer.setActiveCamera(newCamera);
-        addInitialCameraTypes();
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
@@ -57,27 +53,18 @@ public class GL3DCameraOptionsPanel extends JPanel {
         c.gridy = 0;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
-        comboBox = new JComboBox(comboBoxModel);
+
+        final JComboBox comboBox = new JComboBox(cameras);
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = 0;
-                Object selectedItem = comboBox.getSelectedItem();
-                while (selectedItem != comboBoxModel.getComboBoxTitle(i) && i < comboBoxModel.getCurrentCameras()) {
-                    i++;
-                }
-                if (i != comboBoxModel.getCurrentCameras()) {
-                    Class<?> cls = comboBoxModel.getCombolistClass(i);
-                    GL3DCamera camera;
-                    try {
-                        camera = (GL3DCamera) cls.newInstance();
-                        changeCamera(camera);
-                    } catch (InstantiationException e1) {
-                        e1.printStackTrace();
-                    } catch (IllegalAccessException e1) {
-                        e1.printStackTrace();
-                    }
-                }
+                String selectedItem = (String) comboBox.getSelectedItem();
+                if (selectedItem.equals(cameras[0]))
+                    changeCamera(camera, GL3DCamera.CameraMode.OBSERVER);
+                else if (selectedItem.equals(cameras[1]))
+                    changeCamera(camera, GL3DCamera.CameraMode.EARTH);
+                else
+                    changeCamera(camera, GL3DCamera.CameraMode.EXPERT);
             }
         });
 
@@ -93,7 +80,7 @@ public class GL3DCameraOptionsPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                TextDialog td = new TextDialog("Camera options information", comboBoxModel.getExplanation());
+                TextDialog td = new TextDialog("Camera options information", explanation);
                 td.showDialog();
             }
         };
@@ -110,22 +97,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 1;
         createFOV(c);
-        previousCamera = newCamera;
-        changeCamera(newCamera);
-    }
-
-    public void addInitialCameraTypes() {
-        addCameraType("Observer Camera", GL3DObserverCamera.class, "Observer camera: view from observer.\nCamera time defined by timestamps of the active layer.\n\n");
-        addCameraType("Earth Camera", GL3DEarthCamera.class, "Earth camera: view from Earth.\nCamera time defined by timestamps of the active layer.\n\n");
-        addCameraType("Expert Camera", GL3DExpertCamera.class, "Expert camera: view from selected object.\nCamera time defined by timestamps of the active layer, unless \"Use active layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.");
-    }
-
-    public void addCameraType(String comboBoxTitle, Class<?> cls, String explanation) {
-        comboBoxModel.addCameraType(comboBoxTitle, cls, explanation);
-    }
-
-    public void removeCameraType(Class<?> cls) {
-        comboBoxModel.removeCameraType(cls);
     }
 
     private void switchOptionsPanel(GL3DCameraOptionPanel newOptionPanel) {
@@ -145,20 +116,20 @@ public class GL3DCameraOptionsPanel extends JPanel {
         revalidate();
     }
 
-    private void changeCamera(GL3DCamera newCamera) {
-        switchOptionsPanel(newCamera.getOptionPanel());
-
-        Displayer.setActiveCamera(newCamera);
-        previousCamera = newCamera;
+    private void changeCamera(GL3DCamera camera, GL3DCamera.CameraMode mode) {
+        camera.setMode(mode);
+        switchOptionsPanel(camera.getOptionPanel());
+        Displayer.setActiveCamera(camera);
     }
 
     private void createFOV(GridBagConstraints c) {
         double min = 0, max = 180;
 
-        fovPanel = new JPanel();
+        JPanel fovPanel = new JPanel();
         fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
         fovPanel.add(new JLabel("FOV angle"));
-        fovSpinner = new JSpinner();
+
+        final JSpinner fovSpinner = new JSpinner();
         fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(0.8), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
@@ -178,92 +149,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
         fovSpinner.setMaximumSize(new Dimension(6, 22));
         fovPanel.add(Box.createHorizontalGlue());
         add(fovPanel, c);
-    }
-
-    private static class CameraComboboxModel implements ComboBoxModel {
-        private Object selectedItem;
-        private final ArrayList<ListDataListener> listDataListeners = new ArrayList<ListDataListener>();
-        private final ArrayList<String> combolist = new ArrayList<String>();
-        private final ArrayList<Class<?>> combolistClass = new ArrayList<Class<?>>();
-        private final ArrayList<String> explanations = new ArrayList<String>();
-
-        public CameraComboboxModel() {
-
-        }
-
-        public int getCurrentCameras() {
-            return combolist.size();
-        }
-
-        public Class<?> getCombolistClass(int i) {
-            return combolistClass.get(i);
-        }
-
-        public Object getComboBoxTitle(int i) {
-            return combolist.get(i);
-        }
-
-        @Override
-        public int getSize() {
-            return combolist.size();
-        }
-
-        @Override
-        public Object getElementAt(int index) {
-            return combolist.get(index);
-        }
-
-        @Override
-        public void addListDataListener(ListDataListener l) {
-            this.listDataListeners.add(l);
-        }
-
-        @Override
-        public void removeListDataListener(ListDataListener l) {
-            this.listDataListeners.remove(l);
-        }
-
-        @Override
-        public void setSelectedItem(Object anItem) {
-            this.selectedItem = anItem;
-        }
-
-        @Override
-        public Object getSelectedItem() {
-            return this.selectedItem;
-        }
-
-        public void addCameraType(String comboBoxTitle, Class<?> cls, String explanation) {
-            combolist.add(comboBoxTitle);
-            explanations.add(explanation);
-            combolistClass.add(cls);
-            if (this.selectedItem == null) {
-                this.selectedItem = combolist.get(0);
-            }
-        }
-
-        public void removeCameraType(Class<?> cls) {
-            int idx = combolistClass.indexOf(cls);
-
-            if (idx == -1) {
-                Log.error("Trying to remove unexisting element from camera list");
-            } else {
-                if (this.selectedItem == combolist.get(idx) && combolist.size() > 0) {
-                    this.selectedItem = combolist.get(0);
-                }
-                combolist.remove(idx);
-                explanations.remove(idx);
-                combolistClass.remove(idx);
-            }
-        }
-
-        private String getExplanation() {
-            String full = "";
-            for (String expl : explanations) {
-                full += expl;
-            }
-            return full;
-        }
     }
 
 }

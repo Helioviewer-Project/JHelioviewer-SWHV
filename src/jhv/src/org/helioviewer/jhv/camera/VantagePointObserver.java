@@ -7,24 +7,25 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-public class GL3DObserverCamera extends GL3DCamera {
+public class VantagePointObserver extends VantagePoint {
 
     @Override
-    public void updateRotation(JHVDate date) {
+    public void update(JHVDate date) {
+        time = date;
+
         MetaData m = null;
         View view = Layers.getActiveView();
         if (view != null) {
-            m = view.getMetaData(date);
+            m = view.getMetaData(time);
         }
 
         if (m == null) {
-            localRotation = Quatd.ZERO;
+            orientation = Quatd.ZERO;
             distance = Sun.MeanEarthDistance;
         } else {
-            localRotation = m.getRotationObs();
+            orientation = m.getRotationObs();
             distance = m.getDistanceObs();
         }
-        updateCameraTransformation();
     }
 
 }
