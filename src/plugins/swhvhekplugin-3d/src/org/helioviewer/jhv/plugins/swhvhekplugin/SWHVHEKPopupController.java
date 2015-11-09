@@ -14,7 +14,7 @@ import java.util.Map;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -146,8 +146,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     public void mouseMoved(MouseEvent e) {
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
-        Vec3d pt = null;
-        Vec3d hitpoint = null;
+        Vec3 pt = null;
+        Vec3 hitpoint = null;
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
@@ -164,7 +164,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
 
                 Quat q = new Quat(p.lat, p.lon);
-                pt = q.rotateInverseVector(new Vec3d(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+                pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e);
                 pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
@@ -192,12 +192,12 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         }
     }
 
-    private Vec3d getHitPointPlane(MouseEvent e) {
+    private Vec3 getHitPointPlane(MouseEvent e) {
         return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());
     }
 
-    private Vec3d getHitPoint(MouseEvent e) {
-        Vec3d hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+    private Vec3 getHitPoint(MouseEvent e) {
+        Vec3 hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
         if (hp != null)
             hp.y = -hp.y;
         return hp;

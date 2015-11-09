@@ -3,12 +3,12 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
 
 public class InteractionRotate extends InteractionDefault {
 
-    private Vec3d currentRotationStartPoint;
+    private Vec3 currentRotationStartPoint;
     private Quat currentDragRotation;
 
     protected InteractionRotate(Camera _camera) {
@@ -24,7 +24,7 @@ public class InteractionRotate extends InteractionDefault {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3d currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
+        Vec3 currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
         currentDragRotation = Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
         camera.rotateCurrentDragRotation(currentDragRotation);
         camera.updateCameraTransformation();

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
@@ -110,7 +110,7 @@ public class GLImage {
         MetaData metadata = imageData.getMetaData();
         GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
         if (metadata.getCutOffValue() > 0) {
-            Vec3d cdir = metadata.getCutOffDirection();
+            Vec3 cdir = metadata.getCutOffDirection();
             GLSLShader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0f);
             GLSLShader.setCutOffValue(metadata.getCutOffValue());
         } else {

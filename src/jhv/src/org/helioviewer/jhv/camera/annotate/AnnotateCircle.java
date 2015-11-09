@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -13,27 +13,27 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    private final ArrayList<Vec3d> circleStartPoints = new ArrayList<Vec3d>();
-    private final ArrayList<Vec3d> circleEndPoints = new ArrayList<Vec3d>();
+    private final ArrayList<Vec3> circleStartPoints = new ArrayList<Vec3>();
+    private final ArrayList<Vec3> circleEndPoints = new ArrayList<Vec3>();
 
-    private Vec3d startPoint;
-    private Vec3d endPoint;
+    private Vec3 startPoint;
+    private Vec3 endPoint;
 
     public AnnotateCircle(Camera _camera) {
         super(_camera);
     }
 
-    private void drawCircle(GL2 gl, Vec3d bp, Vec3d ep) {
+    private void drawCircle(GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = bp.dot(ep);
         double r = Math.sqrt(1 - cosf * cosf);
         //P = center + r cos(A) (bp x ep) + r sin(A) ep
 
-        Vec3d center = Vec3d.multiply(bp, cosf);
+        Vec3 center = Vec3.multiply(bp, cosf);
         center.multiply(radius);
 
-        Vec3d u = Vec3d.cross(bp, ep);
+        Vec3 u = Vec3.cross(bp, ep);
         u.normalize();
-        Vec3d v = Vec3d.cross(bp, u);
+        Vec3 v = Vec3.cross(bp, u);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
         int subdivs = 100;
@@ -80,7 +80,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3d pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -128,7 +128,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3d pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }

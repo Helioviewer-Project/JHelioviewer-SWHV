@@ -7,7 +7,7 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
@@ -39,7 +39,7 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         if (position == lastPosition)
             return;
 
-        Vec3d computedposition = Displayer.getViewport().getCamera().getVectorFromSphereAlt(position);
+        Vec3 computedposition = Displayer.getViewport().getCamera().getVectorFromSphereAlt(position);
         double radius = Displayer.getViewport().getCamera().getRadiusFromSphereAlt(position);
 
         if (computedposition == null) {

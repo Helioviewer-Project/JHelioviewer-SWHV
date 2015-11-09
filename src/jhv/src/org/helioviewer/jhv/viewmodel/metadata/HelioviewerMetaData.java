@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
@@ -36,7 +36,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (detector.equalsIgnoreCase("C2")) {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
             cutOffValue = (float) (-this.getPhysicalUpperLeft().x);
-            cutOffDirection = new Vec3d(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
+            cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }
     }
 

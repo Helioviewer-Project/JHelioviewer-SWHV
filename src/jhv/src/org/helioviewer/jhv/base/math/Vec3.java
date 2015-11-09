@@ -1,13 +1,13 @@
 package org.helioviewer.jhv.base.math;
 
-public class Vec3d {
+public class Vec3 {
     /**
      * Predefined Vectors
      */
-    public static final Vec3d ZERO = new Vec3d(0, 0, 0);
-    public static final Vec3d XAxis = new Vec3d(1, 0, 0);
-    public static final Vec3d YAxis = new Vec3d(0, 1, 0);
-    public static final Vec3d ZAxis = new Vec3d(0, 0, 1);
+    public static final Vec3 ZERO = new Vec3(0, 0, 0);
+    public static final Vec3 XAxis = new Vec3(1, 0, 0);
+    public static final Vec3 YAxis = new Vec3(0, 1, 0);
+    public static final Vec3 ZAxis = new Vec3(0, 0, 1);
 
     /**
      * Coordinates
@@ -18,29 +18,29 @@ public class Vec3d {
 
     // Constructors
 
-    public Vec3d(double x, double y, double z) {
+    public Vec3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public Vec3d(Vec2 vector) {
+    public Vec3(Vec2 vector) {
         this.x = vector.x;
         this.y = vector.y;
         this.z = 0;
     }
 
-    public Vec3d(Vec3d vector) {
+    public Vec3(Vec3 vector) {
         this.x = vector.x;
         this.y = vector.y;
         this.z = vector.z;
     }
 
-    public Vec3d() {
-        this(Vec3d.ZERO);
+    public Vec3() {
+        this(Vec3.ZERO);
     }
 
-    public Vec3d(double[] coordinates) {
+    public Vec3(double[] coordinates) {
         if (coordinates == null || coordinates.length < 3) {
             throw new IllegalArgumentException("Coordinate Array must contain at least 3 dimensions");
         }
@@ -55,25 +55,25 @@ public class Vec3d {
         this.z = z;
     }
 
-    public final void set(Vec3d vector) {
+    public final void set(Vec3 vector) {
         this.x = vector.x;
         this.y = vector.y;
         this.z = vector.z;
     }
 
-    public final void setMax(Vec3d vector) {
+    public final void setMax(Vec3 vector) {
         this.x = this.x > vector.x ? this.x : vector.x;
         this.y = this.y > vector.y ? this.y : vector.y;
         this.z = this.z > vector.z ? this.z : vector.z;
     }
 
-    public final void setMin(Vec3d vector) {
+    public final void setMin(Vec3 vector) {
         this.x = this.x < vector.x ? this.x : vector.x;
         this.y = this.y < vector.y ? this.y : vector.y;
         this.z = this.z < vector.z ? this.z : vector.z;
     }
 
-    public final void add(Vec3d vec) {
+    public final void add(Vec3 vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
@@ -85,15 +85,15 @@ public class Vec3d {
         this.z += s;
     }
 
-    public final static Vec3d add(Vec3d vec1, Vec3d vec2) {
-        return new Vec3d(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
+    public final static Vec3 add(Vec3 vec1, Vec3 vec2) {
+        return new Vec3(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
     }
 
-    public final static Vec3d add(Vec3d vec1, double s) {
-        return new Vec3d(vec1.x + s, vec1.y + s, vec1.z + s);
+    public final static Vec3 add(Vec3 vec1, double s) {
+        return new Vec3(vec1.x + s, vec1.y + s, vec1.z + s);
     }
 
-    public final Vec3d subtract(Vec3d vec) {
+    public final Vec3 subtract(Vec3 vec) {
         this.x -= vec.x;
         this.y -= vec.y;
         this.z -= vec.z;
@@ -106,15 +106,15 @@ public class Vec3d {
         this.z -= s;
     }
 
-    public final static Vec3d subtract(Vec3d vec1, Vec3d vec2) {
-        return new Vec3d(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
+    public final static Vec3 subtract(Vec3 vec1, Vec3 vec2) {
+        return new Vec3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
-    public final static Vec3d subtract(Vec3d vec1, double s) {
-        return new Vec3d(vec1.x - s, vec1.y - s, vec1.z - s);
+    public final static Vec3 subtract(Vec3 vec1, double s) {
+        return new Vec3(vec1.x - s, vec1.y - s, vec1.z - s);
     }
 
-    public final void divide(Vec3d vec) {
+    public final void divide(Vec3 vec) {
         if (vec.x == 0.0 || vec.y == 0.0 || vec.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
         this.x /= vec.x;
@@ -130,19 +130,19 @@ public class Vec3d {
         this.z /= s;
     }
 
-    public final static Vec3d divide(Vec3d vec1, Vec3d vec2) {
+    public final static Vec3 divide(Vec3 vec1, Vec3 vec2) {
         if (vec2.x == 0.0 || vec2.y == 0.0 || vec2.z == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new Vec3d(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
+        return new Vec3(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
     }
 
-    public final static Vec3d divide(Vec3d vec1, double s) {
+    public final static Vec3 divide(Vec3 vec1, double s) {
         if (s == 0.0)
             throw new IllegalArgumentException("Division by 0 not allowed!");
-        return new Vec3d(vec1.x / s, vec1.y / s, vec1.z / s);
+        return new Vec3(vec1.x / s, vec1.y / s, vec1.z / s);
     }
 
-    public final void multiply(Vec3d vec) {
+    public final void multiply(Vec3 vec) {
         this.x *= vec.x;
         this.y *= vec.y;
         this.z *= vec.z;
@@ -154,28 +154,28 @@ public class Vec3d {
         this.z *= s;
     }
 
-    public final static Vec3d multiply(Vec3d vec1, Vec3d vec2) {
-        return new Vec3d(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
+    public final static Vec3 multiply(Vec3 vec1, Vec3 vec2) {
+        return new Vec3(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
     }
 
-    public final static Vec3d multiply(Vec3d vec1, double s) {
-        return new Vec3d(vec1.x * s, vec1.y * s, vec1.z * s);
+    public final static Vec3 multiply(Vec3 vec1, double s) {
+        return new Vec3(vec1.x * s, vec1.y * s, vec1.z * s);
     }
 
-    public final double dot(Vec3d vec) {
-        return Vec3d.dot(this, vec);
+    public final double dot(Vec3 vec) {
+        return Vec3.dot(this, vec);
     }
 
-    public final static double dot(Vec3d u, Vec3d v) {
+    public final static double dot(Vec3 u, Vec3 v) {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
     }
 
-    public final Vec3d cross(Vec3d vec) {
-        return Vec3d.cross(this, vec);
+    public final Vec3 cross(Vec3 vec) {
+        return Vec3.cross(this, vec);
     }
 
-    public final static Vec3d cross(Vec3d u, Vec3d v) {
-        return new Vec3d(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
+    public final static Vec3 cross(Vec3 u, Vec3 v) {
+        return new Vec3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
     }
 
     public final void negate() {
@@ -184,13 +184,13 @@ public class Vec3d {
         this.z = -this.z;
     }
 
-    public final static Vec3d negate(Vec3d vec) {
-        Vec3d vecCopy = vec.copy();
+    public final static Vec3 negate(Vec3 vec) {
+        Vec3 vecCopy = vec.copy();
         vecCopy.negate();
         return vecCopy;
     }
 
-    public final boolean isApproxEqual(Vec3d vec, double tolerance) {
+    public final boolean isApproxEqual(Vec3 vec, double tolerance) {
         return Math.abs(this.x - vec.x) <= tolerance && Math.abs(this.y - vec.y) <= tolerance && Math.abs(this.z - vec.z) <= tolerance;
     }
 
@@ -258,14 +258,14 @@ public class Vec3d {
         return new Vec2(x, y);
     }
 
-    public final Vec3d copy() {
-        return new Vec3d(this);
+    public final Vec3 copy() {
+        return new Vec3(this);
     }
 
-    public final static double[] toArray(Vec3d[] vecs) {
+    public final static double[] toArray(Vec3[] vecs) {
         double[] arr = new double[vecs.length * 3];
         for (int i = 0; i < vecs.length; i++) {
-            Vec3d v = vecs[i];
+            Vec3 v = vecs[i];
             arr[i * 3 + 0] = v.x;
             arr[i * 3 + 1] = v.y;
             arr[i * 3 + 2] = v.z;
@@ -275,8 +275,8 @@ public class Vec3d {
 
     @Override
     public final boolean equals(Object o) {
-        if (o instanceof Vec3d)
-            return isApproxEqual((Vec3d) o, 0.0);
+        if (o instanceof Vec3)
+            return isApproxEqual((Vec3) o, 0.0);
         return false;
     }
 

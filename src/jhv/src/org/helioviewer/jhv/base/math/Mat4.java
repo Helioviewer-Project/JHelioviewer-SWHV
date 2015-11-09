@@ -118,14 +118,14 @@ public class Mat4 {
         return this;
     }
 
-    public final Vec3d multiply(Vec3d v) {
+    public final Vec3 multiply(Vec3 v) {
         double W = m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15];
-        return new Vec3d((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
+        return new Vec3((m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12]) / W, (m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13]) / W, (m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]) / W);
     }
 
-    public final Vec3d multiplyTranspose(Vec3d v) {
+    public final Vec3 multiplyTranspose(Vec3 v) {
         double W = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
-        return new Vec3d((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
+        return new Vec3((m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]) / W, (m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]) / W, (m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]) / W);
     }
 
 /*
@@ -134,8 +134,8 @@ public class Mat4 {
     }
 */
 
-    public final Vec3d translation() {
-        return new Vec3d(m[12], m[13], m[14]);
+    public final Vec3 translation() {
+        return new Vec3(m[12], m[13], m[14]);
     }
 
     public final void setTranslation(double x, double y, double z) {
@@ -252,7 +252,7 @@ public class Mat4 {
     // return I;
     // }
 
-    public final Mat4 translate(Vec3d t) {
+    public final Mat4 translate(Vec3 t) {
         m[12] += t.x;
         m[13] += t.y;
         m[14] += t.z;
@@ -266,11 +266,11 @@ public class Mat4 {
         return this;
     }
 
-    public final static Mat4 translation(Vec3d t) {
+    public final static Mat4 translation(Vec3 t) {
         return new Mat4(1, 0, 0, t.x, 0, 1, 0, t.y, 0, 0, 1, t.z, 0, 0, 0, 1);
     }
 
-    public final Mat4 scale(Vec3d s) {
+    public final Mat4 scale(Vec3 s) {
         m[0] *= s.x;
         m[5] *= s.y;
         m[10] *= s.z;
@@ -288,7 +288,7 @@ public class Mat4 {
         return new Mat4(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1);
     }
 
-    public final Mat4 rotate(double angle, Vec3d axis) {
+    public final Mat4 rotate(double angle, Vec3 axis) {
         return this.rotate(angle, axis.x, axis.y, axis.z);
     }
 
@@ -334,7 +334,7 @@ public class Mat4 {
         return Mat4.rotation(q.getAngle(), q.getRotationAxis());
     }
 
-    public final static Mat4 rotation(double angle, Vec3d axis) {
+    public final static Mat4 rotation(double angle, Vec3 axis) {
         return Mat4.rotation(angle, axis.x, axis.y, axis.z);
     }
 

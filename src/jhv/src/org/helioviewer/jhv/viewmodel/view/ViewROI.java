@@ -3,7 +3,7 @@ package org.helioviewer.jhv.viewmodel.view;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -49,7 +49,7 @@ public class ViewROI {
 
         Quat camDiff = localCamera.getCameraDifferenceRotationQuat(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
-            Vec3d hitPoint = localCamera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
+            Vec3 hitPoint = localCamera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
             minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
             maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);

@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -144,23 +144,23 @@ public class Camera {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    public Vec3d getVectorFromSphereOrPlane(Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
+    public Vec3 getVectorFromSphereOrPlane(Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
         double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - currentTranslation.x;
         double up1y = normalizedScreenpos.y * cameraWidth - currentTranslation.y;
 
-        Vec3d hitPoint;
-        Vec3d rotatedHitPoint;
+        Vec3 hitPoint;
+        Vec3 rotatedHitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1) {
-            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(1. - radius2));
+            hitPoint = new Vec3(up1x, up1y, Math.sqrt(1. - radius2));
             rotatedHitPoint = cameraDifferenceRotation.rotateInverseVector(hitPoint);
             if (rotatedHitPoint.z > 0.) {
                 return rotatedHitPoint;
             }
         }
-        Vec3d altnormal = cameraDifferenceRotation.rotateVector(Vec3d.ZAxis);
+        Vec3 altnormal = cameraDifferenceRotation.rotateVector(Vec3.ZAxis);
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
-        hitPoint = new Vec3d(up1x, up1y, zvalue);
+        hitPoint = new Vec3(up1x, up1y, zvalue);
 
         return cameraDifferenceRotation.rotateInverseVector(hitPoint);
     }
@@ -181,35 +181,35 @@ public class Camera {
         return computeNormalizedY(viewportCoordinates) * cameraWidth - currentTranslation.y;
     }
 
-    public Vec3d getVectorFromSphere(Point viewportCoordinates) {
-        Vec3d hitPoint = getVectorFromSphereAlt(viewportCoordinates);
+    public Vec3 getVectorFromSphere(Point viewportCoordinates) {
+        Vec3 hitPoint = getVectorFromSphereAlt(viewportCoordinates);
         if (hitPoint != null) {
             return vantagePoint.orientation.rotateInverseVector(hitPoint);
         }
         return null;
     }
 
-    public Vec3d getVectorFromPlane(Point viewportCoordinates) {
+    public Vec3 getVectorFromPlane(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
-        Vec3d altnormal = currentDragRotation.rotateVector(Vec3d.ZAxis);
+        Vec3 altnormal = currentDragRotation.rotateVector(Vec3.ZAxis);
         if (altnormal.z == 0) {
             return null;
         }
         double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
 
-        Vec3d hitPoint = new Vec3d(up1x, up1y, zvalue);
+        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
 
-    public Vec3d getVectorFromSphereAlt(Point viewportCoordinates) {
+    public Vec3 getVectorFromSphereAlt(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
 
-        Vec3d hitPoint;
+        Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 1.) {
-            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(1. - radius2));
+            hitPoint = new Vec3(up1x, up1y, Math.sqrt(1. - radius2));
             return currentDragRotation.rotateInverseVector(hitPoint);
         }
         return null;
@@ -222,15 +222,15 @@ public class Camera {
         return Math.sqrt(up1x * up1x + up1y * up1y);
     }
 
-    public Vec3d getVectorFromSphereTrackball(Point viewportCoordinates) {
+    public Vec3 getVectorFromSphereTrackball(Point viewportCoordinates) {
         double up1x = computeUpX(viewportCoordinates);
         double up1y = computeUpY(viewportCoordinates);
-        Vec3d hitPoint;
+        Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 0.5 * Sun.Radius2) {
-            hitPoint = new Vec3d(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
+            hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
         } else {
-            hitPoint = new Vec3d(up1x, up1y, 0.5 * Sun.Radius2 / Math.sqrt(radius2));
+            hitPoint = new Vec3(up1x, up1y, 0.5 * Sun.Radius2 / Math.sqrt(radius2));
         }
         return currentDragRotation.rotateInverseVector(hitPoint);
     }
