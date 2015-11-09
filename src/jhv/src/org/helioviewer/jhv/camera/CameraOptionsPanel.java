@@ -126,17 +126,20 @@ public class CameraOptionsPanel extends JPanel {
             remove(currentOptionPanel);
         }
 
-        currentOptionPanel = newOptionPanel;
-        currentOptionPanel.activate();
+        if (newOptionPanel != null) {
+            currentOptionPanel = newOptionPanel;
+            currentOptionPanel.activate();
+            currentOptionPanel.syncWithLayer();
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridwidth = 2;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 2;
-        add(currentOptionPanel, c);
+            GridBagConstraints c = new GridBagConstraints();
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridwidth = 2;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.gridx = 0;
+            c.gridy = 2;
+            add(currentOptionPanel, c);
+        }
         revalidate();
     }
 
