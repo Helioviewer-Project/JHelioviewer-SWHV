@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
@@ -29,7 +29,7 @@ public class Camera {
     private static final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
 
-    private Mat4d cameraTransformation = Mat4d.identity();
+    private Mat4 cameraTransformation = Mat4.identity();
 
     private Quat rotation = new Quat();
 
@@ -130,8 +130,8 @@ public class Camera {
         cameraWidthTimesAspect = cameraWidth * aspect;
     }
 
-    public Mat4d getOrthoMatrixInverse() {
-        return Mat4d.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+    public Mat4 getOrthoMatrixInverse() {
+        return Mat4.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
     public void applyPerspective(GL2 gl) {
@@ -336,7 +336,7 @@ public class Camera {
             setCameraFOV(2. * Math.atan2(0.5 * size, vantagePoint.distance));
     }
 
-    public Mat4d getRotation() {
+    public Mat4 getRotation() {
         return rotation.toMatrix();
     }
 

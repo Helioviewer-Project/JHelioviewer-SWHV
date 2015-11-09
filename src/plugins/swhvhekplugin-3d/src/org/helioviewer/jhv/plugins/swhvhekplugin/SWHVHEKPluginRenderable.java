@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2d;
 import org.helioviewer.jhv.base.math.Vec3d;
@@ -84,7 +84,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
     private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
@@ -228,7 +228,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Vec3d axis = sourceDir.cross(targetDir);
         axis.normalize();
-        Mat4d r = Mat4d.rotation(Math.atan2(x, z), Vec3d.YAxis);
+        Mat4 r = Mat4.rotation(Math.atan2(x, z), Vec3d.YAxis);
         r.rotate(-Math.asin(y / targetDir.length()), Vec3d.XAxis);
 
         Vec3d p0 = new Vec3d(-width2, -height2, 0);

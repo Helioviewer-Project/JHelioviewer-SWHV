@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Mat4d;
+import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
@@ -59,17 +59,17 @@ public class RenderableGrid extends AbstractRenderable {
             drawAxes(gl);
 
         Camera activeCamera = vp.getCamera();
-        Mat4d cameraMatrix;
+        Mat4 cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:
             cameraMatrix = activeCamera.getOrientation().toMatrix();
             break;
         case HCI:
             //TBD
-            cameraMatrix = Mat4d.identity();
+            cameraMatrix = Mat4.identity();
             break;
         default:
-            cameraMatrix = Mat4d.identity();
+            cameraMatrix = Mat4.identity();
             break;
         }
 
