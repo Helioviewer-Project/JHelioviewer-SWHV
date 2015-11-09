@@ -5,7 +5,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 
-class VantagePointEarth extends VantagePoint {
+class ViewpointEarth extends Viewpoint {
 
     @Override
     void update(JHVDate date) {

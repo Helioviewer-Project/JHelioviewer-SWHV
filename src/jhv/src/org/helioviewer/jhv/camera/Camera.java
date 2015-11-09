@@ -49,10 +49,10 @@ public class Camera {
 
     private final PositionLoad positionLoad = new PositionLoad(this);
 
-    private final VantagePointObserver vantagePointObserver = new VantagePointObserver();
-    private final VantagePointEarth vantagePointEarth = new VantagePointEarth();
-    private final VantagePointExpert vantagePointExpert = new VantagePointExpert(positionLoad);
-    private VantagePoint vantagePoint = vantagePointObserver;
+    private final ViewpointObserver viewpointObserver = new ViewpointObserver();
+    private final ViewpointEarth viewpointEarth = new ViewpointEarth();
+    private final ViewpointExpert viewpointExpert = new ViewpointExpert(positionLoad);
+    private Viewpoint viewpoint = viewpointObserver;
 
     private CameraMode mode = CameraMode.OBSERVER;
 
@@ -65,13 +65,13 @@ public class Camera {
         mode = _mode;
         switch (mode) {
             case EXPERT:
-                vantagePoint = vantagePointExpert;
+                viewpoint = viewpointExpert;
             break;
             case EARTH:
-                vantagePoint = vantagePointEarth;
+                viewpoint = viewpointEarth;
             break;
             default:
-                vantagePoint = vantagePointObserver;
+                viewpoint = viewpointObserver;
         }
         refresh();
     }
@@ -86,8 +86,8 @@ public class Camera {
 
     public void push(JHVDate date) {
         if (!trackingMode) {
-            vantagePoint.push();
-            vantagePoint.update(date);
+            viewpoint.push();
+            viewpoint.update(date);
             updateCameraTransformation();
             updateCameraWidthAspect(previousAspect);
         }
@@ -95,7 +95,7 @@ public class Camera {
 
     public void pop() {
         if (!trackingMode) {
-            vantagePoint.pop();
+            viewpoint.pop();
             updateCameraTransformation();
             updateCameraWidthAspect(previousAspect);
         }
@@ -106,15 +106,15 @@ public class Camera {
     }
 
     public double getDistance() {
-        return vantagePoint.distance;
+        return viewpoint.distance;
     }
 
     public Quat getOrientation() {
-        return vantagePoint.orientation;
+        return viewpoint.orientation;
     }
 
     public void updateCameraWidthAspect(double aspect) {
-        cameraWidth = vantagePoint.distance * Math.tan(0.5 * fov);
+        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
         previousAspect = aspect;
         cameraWidthTimesAspect = cameraWidth * aspect;
     }
@@ -128,7 +128,7 @@ public class Camera {
         gl.glLoadIdentity();
         gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
-        Mat4 cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -vantagePoint.distance);
+        Mat4 cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -viewpoint.distance);
         // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(cameraTransformation.m, 0);
@@ -174,7 +174,7 @@ public class Camera {
     public Vec3 getVectorFromSphere(Point viewportCoordinates) {
         Vec3 hitPoint = getVectorFromSphereAlt(viewportCoordinates);
         if (hitPoint != null) {
-            return vantagePoint.orientation.rotateInverseVector(hitPoint);
+            return viewpoint.orientation.rotateInverseVector(hitPoint);
         }
         return null;
     }
@@ -248,7 +248,7 @@ public class Camera {
 
     private void updateCameraTransformation() {
         rotation = currentDragRotation.copy();
-        rotation.rotate(vantagePoint.orientation);
+        rotation.rotate(viewpoint.orientation);
     }
 
     public void setCameraFOV(double _fov) {
@@ -275,7 +275,7 @@ public class Camera {
     }
 
     public void zoom(int wr) {
-        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), vantagePoint.distance));
+        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), viewpoint.distance));
     }
 
     public void setFOVangleDegrees(double fovAngle) {
@@ -318,7 +318,7 @@ public class Camera {
 
     public void timeChanged(JHVDate date) {
         if (!trackingMode) {
-            vantagePoint.update(date);
+            viewpoint.update(date);
             // updateCameraTransformation();
         }
     }
@@ -326,7 +326,7 @@ public class Camera {
     public void fireTimeUpdated() {
         RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
         if (renderableCamera != null) {
-            renderableCamera.setTimeString(vantagePoint.time.toString());
+            renderableCamera.setTimeString(viewpoint.time.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
@@ -336,7 +336,7 @@ public class Camera {
         if (size == 0)
             setCameraFOV(INITFOV);
         else
-            setCameraFOV(2. * Math.atan2(0.5 * size, vantagePoint.distance));
+            setCameraFOV(2. * Math.atan2(0.5 * size, viewpoint.distance));
     }
 
     public Mat4 getRotation() {
