@@ -13,16 +13,12 @@ public class VantagePointObserver extends VantagePoint {
     public void update(JHVDate date) {
         time = date;
 
-        MetaData m = null;
         View view = Layers.getActiveView();
-        if (view != null) {
-            m = view.getMetaData(time);
-        }
-
-        if (m == null) {
+        if (view == null) {
             orientation = Quatd.ZERO;
             distance = Sun.MeanEarthDistance;
         } else {
+            MetaData m = view.getMetaData(time);
             orientation = m.getRotationObs();
             distance = m.getDistanceObs();
         }
