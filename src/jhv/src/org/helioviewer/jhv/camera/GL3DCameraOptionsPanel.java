@@ -3,15 +3,12 @@ package org.helioviewer.jhv.camera;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -21,9 +18,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataListener;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -46,7 +41,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
@@ -91,12 +85,39 @@ public class GL3DCameraOptionsPanel extends JPanel {
         infoButton.setFocusPainted(false);
         infoButton.setContentAreaFilled(false);
         add(infoButton, c);
-        c.weightx = 1;
 
+        // fov
+        double min = 0, max = 180;
+
+        JPanel fovPanel = new JPanel();
+        fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
+        fovPanel.add(new JLabel("FOV angle"));
+
+        final JSpinner fovSpinner = new JSpinner();
+        fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(0.8), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
+
+        camera.setFOVangleDegrees((Double) fovSpinner.getValue());
+
+        fovSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                camera.setFOVangleDegrees((Double) fovSpinner.getValue());
+                Displayer.display();
+            }
+        });
+        WheelSupport.installMouseWheelSupport(fovSpinner);
+        fovPanel.add(fovSpinner);
+
+        fovSpinner.setMaximumSize(new Dimension(6, 22));
+        fovPanel.add(Box.createHorizontalGlue());
+
+        c.weightx = 1;
         c.gridwidth = 2;
         c.gridx = 0;
         c.gridy = 1;
-        createFOV(c);
+        add(fovPanel, c);
     }
 
     private void switchOptionsPanel(GL3DCameraOptionPanel newOptionPanel) {
@@ -104,7 +125,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
             remove(currentOptionPanel);
         }
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 0, 0);
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = 2;
@@ -120,35 +140,6 @@ public class GL3DCameraOptionsPanel extends JPanel {
         camera.setMode(mode);
         switchOptionsPanel(camera.getOptionPanel());
         Displayer.setActiveCamera(camera);
-    }
-
-    private void createFOV(GridBagConstraints c) {
-        double min = 0, max = 180;
-
-        JPanel fovPanel = new JPanel();
-        fovPanel.setLayout(new BoxLayout(fovPanel, BoxLayout.LINE_AXIS));
-        fovPanel.add(new JLabel("FOV angle"));
-
-        final JSpinner fovSpinner = new JSpinner();
-        fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(0.8), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
-        JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
-
-        Displayer.getViewport().getCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
-
-        fovSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                Displayer.getViewport().getCamera().setFOVangleDegrees((Double) fovSpinner.getValue());
-                Displayer.display();
-            }
-        });
-        WheelSupport.installMouseWheelSupport(fovSpinner);
-        fovPanel.add(fovSpinner);
-
-        fovSpinner.setMaximumSize(new Dimension(6, 22));
-        fovPanel.add(Box.createHorizontalGlue());
-        add(fovPanel, c);
     }
 
 }
