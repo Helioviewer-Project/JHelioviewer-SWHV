@@ -28,7 +28,6 @@ public class PositionLoad {
 
     private static final String LOADEDSTATE = "Loaded";
     private static final String FAILEDSTATE = "Failed";
-    private static final String PARTIALSTATE = "Partial";
 
     private static final String baseUrl = "http://swhv.oma.be/position?";
     private static final String target = "SUN";
@@ -42,10 +41,11 @@ public class PositionLoad {
     private boolean isLoaded = false;
     private Position.Latitudinal[] position;
     private JHVWorker<Position.Latitudinal[], Void> worker;
-    private final VantagePointExpert vantagePoint;
 
-    public PositionLoad(VantagePointExpert _vantagePoint) {
-        vantagePoint = _vantagePoint;
+    private final Camera camera;
+
+    public PositionLoad(Camera _camera) {
+        camera = _camera;
     }
 
     private class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
@@ -211,7 +211,7 @@ public class PositionLoad {
     }
 
     public void fireLoaded(final String state) {
-        vantagePoint.fireLoaded(state);
+        camera.firePositionLoaded(state);
     }
 
     public Date getBeginDate() {

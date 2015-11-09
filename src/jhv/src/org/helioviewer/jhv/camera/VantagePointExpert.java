@@ -12,7 +12,12 @@ public class VantagePointExpert extends VantagePoint {
     private double currentL = 0.;
     private double currentB = 0.;
     private double currentDistance = Sun.MeanEarthDistance;
-    private PositionLoad positionLoad = new PositionLoad(this);
+    private final PositionLoad positionLoad;
+
+    protected VantagePointExpert(PositionLoad _positionLoad) {
+        super();
+        positionLoad = _positionLoad;
+    }
 
     private JHVDate interpolate(JHVDate date) {
         if (positionLoad.isLoaded()) {
@@ -59,10 +64,6 @@ public class VantagePointExpert extends VantagePoint {
         Position.Latitudinal p = Sun.getEarth(time.getTime());
         orientation = new Quat(currentB, -currentL + p.lon);
         distance = currentDistance;
-    }
-
-    public void fireLoaded(final String state) {
-        // optionPanel.fireLoaded(state);
     }
 
 }
