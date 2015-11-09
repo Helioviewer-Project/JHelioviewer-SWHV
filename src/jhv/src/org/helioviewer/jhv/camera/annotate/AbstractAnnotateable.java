@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
 
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 
 public abstract class AbstractAnnotateable implements Annotateable {
@@ -26,10 +26,10 @@ public abstract class AbstractAnnotateable implements Annotateable {
         camera = _camera;
     }
 
-    protected static Vec3d toSpherical(Camera camera, Vec3d _p) {
-        Vec3d p = camera.getOrientation().rotateVector(_p);
+    protected static Vec3 toSpherical(Camera camera, Vec3 _p) {
+        Vec3 p = camera.getOrientation().rotateVector(_p);
 
-        Vec3d pt = new Vec3d();
+        Vec3 pt = new Vec3();
         pt.x = p.length();
         pt.y = Math.acos(p.y / pt.x);
         pt.z = Math.atan2(p.x, p.z);
@@ -37,8 +37,8 @@ public abstract class AbstractAnnotateable implements Annotateable {
         return pt;
     }
 
-    protected static Vec3d toCart(Camera camera, double x, double y, double z) {
-        Vec3d pt = new Vec3d();
+    protected static Vec3 toCart(Camera camera, double x, double y, double z) {
+        Vec3 pt = new Vec3();
         pt.z = x * Math.sin(y) * Math.cos(z);
         pt.x = x * Math.sin(y) * Math.sin(z);
         pt.y = x * Math.cos(y);

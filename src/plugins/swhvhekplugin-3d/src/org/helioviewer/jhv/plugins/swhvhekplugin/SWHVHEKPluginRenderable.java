@@ -17,8 +17,7 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -77,7 +76,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double alpha = 1. - i / (double) mres;
                 double r = alpha * r_start + (1 - alpha) * (r_end);
                 double theta = alpha * t_start + (1 - alpha) * (t_end);
-                Vec3d res = q.rotateInverseVector(new Vec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3 res = q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
         }
@@ -143,7 +142,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double deltar = sz * (el[0] * 2 - 1);
                 double r = distSun + deltar;
                 double theta = principalAngle + deltatheta;
-                Vec3d res = q.rotateInverseVector(new Vec3d(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3 res = q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glTexCoord2f(el[0], el[1]);
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
@@ -159,7 +158,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-        List<Vec3d> points = el.getBoundCC();
+        List<Vec3> points = el.getBoundCC();
         if (points == null || points.isEmpty()) {
             points = el.getBoundBox();
             if (points == null || points.isEmpty()) {
@@ -176,8 +175,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
-        Vec3d oldBoundaryPoint3d = null;
-        for (Vec3d point : points) {
+        Vec3 oldBoundaryPoint3d = null;
+        for (Vec3 point : points) {
             int divpoints = 10;
 
             gl.glBegin(GL2.GL_LINE_STRIP);
@@ -202,7 +201,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
-                Vec3d pt = el.centralPoint();
+                Vec3 pt = el.centralPoint();
                 String type = evt.getJHVEventType().getEventType();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
@@ -223,18 +222,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double width2 = width / 2.;
         double height2 = height / 2.;
 
-        Vec3d sourceDir = new Vec3d(0, 0, 1);
-        Vec3d targetDir = new Vec3d(x, y, z);
+        Vec3 sourceDir = new Vec3(0, 0, 1);
+        Vec3 targetDir = new Vec3(x, y, z);
 
-        Vec3d axis = sourceDir.cross(targetDir);
+        Vec3 axis = sourceDir.cross(targetDir);
         axis.normalize();
-        Mat4 r = Mat4.rotation(Math.atan2(x, z), Vec3d.YAxis);
-        r.rotate(-Math.asin(y / targetDir.length()), Vec3d.XAxis);
+        Mat4 r = Mat4.rotation(Math.atan2(x, z), Vec3.YAxis);
+        r.rotate(-Math.asin(y / targetDir.length()), Vec3.XAxis);
 
-        Vec3d p0 = new Vec3d(-width2, -height2, 0);
-        Vec3d p1 = new Vec3d(-width2, height2, 0);
-        Vec3d p2 = new Vec3d(width2, height2, 0);
-        Vec3d p3 = new Vec3d(width2, -height2, 0);
+        Vec3 p0 = new Vec3(-width2, -height2, 0);
+        Vec3 p1 = new Vec3(-width2, height2, 0);
+        Vec3 p2 = new Vec3(width2, height2, 0);
+        Vec3 p3 = new Vec3(width2, -height2, 0);
 
         p0 = r.multiply(p0);
         p1 = r.multiply(p1);
@@ -272,20 +271,19 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
 
-        Vec2 bd = new Vec2(0, 0);
+        double boundW = 0;
         int ct = 0;
         for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
             Rectangle2D bound = renderer.getBounds(txt);
-            if (bd.x < bound.getWidth())
-                bd.x = bound.getWidth();
+            if (boundW < bound.getWidth())
+                boundW = bound.getWidth();
             ct++;
         }
-        bd.y = fontSize * 1.1 * ct;
 
         Point textInit = new Point(pt.x, pt.y);
-        float w = (float) (bd.x + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
-        float h = (float) (bd.y + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
+        float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
+        float h = (float) (fontSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
 
         // Correct if out of view
         if (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT > width) {

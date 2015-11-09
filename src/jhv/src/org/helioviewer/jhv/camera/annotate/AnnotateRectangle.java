@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -13,17 +13,17 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private final ArrayList<Vec3d> rectangleStartPoints = new ArrayList<Vec3d>();
-    private final ArrayList<Vec3d> rectangleEndPoints = new ArrayList<Vec3d>();
+    private final ArrayList<Vec3> rectangleStartPoints = new ArrayList<Vec3>();
+    private final ArrayList<Vec3> rectangleEndPoints = new ArrayList<Vec3>();
 
-    private Vec3d startPoint;
-    private Vec3d endPoint;
+    private Vec3 startPoint;
+    private Vec3 endPoint;
 
     public AnnotateRectangle(Camera _camera) {
         super(_camera);
     }
 
-    private void drawRectangle(GL2 gl, Vec3d bp, Vec3d ep) {
+    private void drawRectangle(GL2 gl, Vec3 bp, Vec3 ep) {
         gl.glBegin(GL2.GL_LINE_STRIP);
 
         if (bp.z * ep.z < 0) {
@@ -33,10 +33,10 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 bp.z += 2 * Math.PI;
         }
 
-        Vec3d p1 = bp;
-        Vec3d p2 = new Vec3d(radius, ep.y, bp.z);
-        Vec3d p3 = ep;
-        Vec3d p4 = new Vec3d(radius, bp.y, ep.z);
+        Vec3 p1 = bp;
+        Vec3 p2 = new Vec3(radius, ep.y, bp.z);
+        Vec3 p3 = ep;
+        Vec3 p4 = new Vec3(radius, bp.y, ep.z);
 
         interpolatedDraw(gl, p1, p2);
         interpolatedDraw(gl, p2, p3);
@@ -49,7 +49,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         return endPoint != null && startPoint != null;
     }
 
-    private void interpolatedDraw(GL2 gl, Vec3d p1s, Vec3d p2s) {
+    private void interpolatedDraw(GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
 
@@ -57,7 +57,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            Vec3d pc = toCart(camera, radius, y, z);
+            Vec3 pc = toCart(camera, radius, y, z);
             gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
         }
     }
@@ -88,7 +88,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3d pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -137,7 +137,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3d pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }

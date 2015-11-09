@@ -7,14 +7,14 @@ public class Quat {
     public static final Quat ZERO = new Quat();
 
     private double a;
-    private Vec3d u;
+    private Vec3 u;
 
-    public static Quat createRotation(double angle, Vec3d axis) {
+    public static Quat createRotation(double angle, Vec3 axis) {
         if (angle == 0.)
             return new Quat();
 
         double halfAngle = angle / 2.0;
-        Vec3d axisCopy = axis.copy();
+        Vec3 axisCopy = axis.copy();
         axisCopy.normalize();
         axisCopy.multiply(Math.sin(halfAngle));
         return new Quat(Math.cos(halfAngle), axisCopy);
@@ -29,7 +29,7 @@ public class Quat {
         double sz = Math.sin(az), cz = Math.cos(az);
 
         this.a = cx * cy * cz + sx * sy * sz;
-        this.u = new Vec3d(
+        this.u = new Vec3(
                  sx * cy * cz - cx * sy * sz,
                  cx * sy * cz + sx * cy * sz,
                  sx * sy * cz - cx * cy * sz);
@@ -42,28 +42,28 @@ public class Quat {
         double sy = Math.sin(ay), cy = Math.cos(ay);
 
         this.a = cx * cy;
-        this.u = new Vec3d(
+        this.u = new Vec3(
                  sx * cy,
                  cx * sy,
                  sx * sy);
     }
 
     private Quat(double a, double x, double y, double z) {
-        this(a, new Vec3d(x, y, z));
+        this(a, new Vec3(x, y, z));
     }
 
-    private Quat(double a, Vec3d u) {
+    private Quat(double a, Vec3 u) {
         this.a = a;
         this.u = u;
     }
 
     public Quat() {
-        this(1, new Vec3d(0., 0., 0.));
+        this(1, new Vec3(0., 0., 0.));
     }
 
     public void clear() {
         this.a = 1;
-        this.u = new Vec3d();
+        this.u = new Vec3();
     }
 
     public Quat multiply(Quat q) {
@@ -105,7 +105,7 @@ public class Quat {
         return this.a;
     }
 
-    public Vec3d getRotationAxis() {
+    public Vec3 getRotationAxis() {
         return this.u;
     }
 
@@ -195,9 +195,9 @@ public class Quat {
         return this.a * q.a + this.u.x * q.u.x + this.u.y * q.u.y + this.u.z * q.u.z;
     }
 
-    public static Quat calcRotation(Vec3d startPoint, Vec3d endPoint) {
-        Vec3d rotationAxis = Vec3d.cross(startPoint, endPoint);
-        double rotationAngle = Math.atan2(rotationAxis.length(), Vec3d.dot(startPoint, endPoint));
+    public static Quat calcRotation(Vec3 startPoint, Vec3 endPoint) {
+        Vec3 rotationAxis = Vec3.cross(startPoint, endPoint);
+        double rotationAngle = Math.atan2(rotationAxis.length(), Vec3.dot(startPoint, endPoint));
 
         return Quat.createRotation(rotationAngle, rotationAxis);
     }
@@ -211,7 +211,7 @@ public class Quat {
         return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
     }
 
-    public Vec3d rotateVector(Vec3d vec) {
+    public Vec3 rotateVector(Vec3 vec) {
         //q'vq = vec + 2.0 * cross(q.xyz,cross(  q.xyz, vec ) + q.w * vec)
         double vx = vec.z * u.y - vec.y * u.z + a * vec.x;
         double vy = vec.x * u.z - vec.z * u.x + a * vec.y;
@@ -219,18 +219,18 @@ public class Quat {
         double vvx = (vz * u.y - vy * u.z) * 2. + vec.x;
         double vvy = (vx * u.z - vz * u.x) * 2. + vec.y;
         double vvz = (vy * u.x - vx * u.y) * 2. + vec.z;
-        return new Vec3d(vvx, vvy, vvz);
+        return new Vec3(vvx, vvy, vvz);
         //18 mul + 12 add
     }
 
-    public Vec3d rotateInverseVector(Vec3d vec) {
+    public Vec3 rotateInverseVector(Vec3 vec) {
         double vx = -vec.z * u.y + vec.y * u.z + a * vec.x;
         double vy = -vec.x * u.z + vec.z * u.x + a * vec.y;
         double vz = -vec.y * u.x + vec.x * u.y + a * vec.z;
         double vvx = (-vz * u.y + vy * u.z) * 2. + vec.x;
         double vvy = (-vx * u.z + vz * u.x) * 2. + vec.y;
         double vvz = (-vy * u.x + vx * u.y) * 2. + vec.z;
-        return new Vec3d(vvx, vvy, vvz);
+        return new Vec3(vvx, vvy, vvz);
     }
 
     public void conjugate() {

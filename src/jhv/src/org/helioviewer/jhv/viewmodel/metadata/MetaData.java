@@ -2,7 +2,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 
 /**
@@ -64,6 +64,6 @@ public interface MetaData {
 
     float getCutOffValue();
 
-    Vec3d getCutOffDirection();
+    Vec3 getCutOffDirection();
 
 }

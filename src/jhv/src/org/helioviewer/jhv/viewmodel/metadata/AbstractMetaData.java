@@ -3,7 +3,7 @@ package org.helioviewer.jhv.viewmodel.metadata;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3d;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
@@ -24,7 +24,7 @@ public abstract class AbstractMetaData implements MetaData {
 
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
-    protected Vec3d cutOffDirection;
+    protected Vec3 cutOffDirection;
 
     public AbstractMetaData() {
         lowerLeftCorner = null;
@@ -124,7 +124,7 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public Vec3d getCutOffDirection() {
+    public Vec3 getCutOffDirection() {
         return cutOffDirection;
     }
 
