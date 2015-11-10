@@ -126,7 +126,10 @@ public class RenderableContainer implements TableModel, Reorderable {
             insertRow(toIndex, toMove);
         }
         fireListeners();
-        arrangeMultiView(Displayer.multiview);
+
+        if (Displayer.multiview) {
+            arrangeMultiView(true);
+        }
     }
 
     @Override
@@ -268,7 +271,6 @@ public class RenderableContainer implements TableModel, Reorderable {
                         ctImages++;
                     }
                     im.getGLImage().setOpacity(opacity);
-                    ctImages++;
                 }
             }
         }
