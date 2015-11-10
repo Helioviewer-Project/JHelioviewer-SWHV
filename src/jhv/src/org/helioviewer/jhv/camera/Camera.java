@@ -258,7 +258,6 @@ public class Camera {
         } else {
             fov = _fov;
         }
-        updateCameraWidthAspect(previousAspect);
     }
 
     public void setTrackingMode(boolean _trackingMode) {
@@ -275,7 +274,7 @@ public class Camera {
     }
 
     public void zoom(int wr) {
-        setCameraFOV(2. * Math.atan2(cameraWidth * (1 + 0.015 * wr), viewpoint.distance));
+        setCameraFOV(fov * (1 + 0.015 * wr));
     }
 
     public void setFOVangleDegrees(double fovAngle) {
