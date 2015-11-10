@@ -75,7 +75,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         if (sz - 1 >= 0)
-            drawCircle(gl, (circleStartPoints.get(activeIndex)), (circleEndPoints.get(activeIndex)));
+            drawCircle(gl, circleStartPoints.get(activeIndex), circleEndPoints.get(activeIndex));
     }
 
     @Override
