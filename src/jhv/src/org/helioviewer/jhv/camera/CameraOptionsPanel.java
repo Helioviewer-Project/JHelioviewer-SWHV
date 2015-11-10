@@ -1,19 +1,20 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -31,10 +32,9 @@ public class CameraOptionsPanel extends JPanel {
 
     private CameraOptionPanel currentOptionPanel;
 
-    private static final String[] cameras = new String[] { "Observer View", "Earth View", "Arbitrary View" };
     private static final String explanation = "Observer: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
                                               "Earth: view from Earth.\nCamera time defined by timestamps of the master layer.\n\n" +
-                                              "Arbitrary: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
+                                              "Other: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
                                               "\"Use master layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
     public CameraOptionsPanel(final Camera camera) {
@@ -48,25 +48,46 @@ public class CameraOptionsPanel extends JPanel {
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        final JComboBox comboBox = new JComboBox(cameras);
-        comboBox.addActionListener(new ActionListener() {
+        JPanel radio = new JPanel(new FlowLayout(FlowLayout.LEADING));
+
+        JRadioButton observerItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedItem = (String) comboBox.getSelectedItem();
-                if (selectedItem.equals(cameras[0]))
-                    changeCamera(camera, Camera.CameraMode.OBSERVER);
-                else if (selectedItem.equals(cameras[1]))
-                    changeCamera(camera, Camera.CameraMode.EARTH);
-                else
-                    changeCamera(camera, Camera.CameraMode.EXPERT);
+                changeCamera(camera, Camera.CameraMode.OBSERVER);
             }
         });
+        observerItem.setText("Observer View");
+        observerItem.setSelected(true);
+        radio.add(observerItem);
 
-        add(comboBox, c);
+        JRadioButton earthItem = new JRadioButton(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeCamera(camera, Camera.CameraMode.EARTH);
+            }
+        });
+        earthItem.setText("Earth View");
+        radio.add(earthItem);
+
+        JRadioButton expertItem = new JRadioButton(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeCamera(camera, Camera.CameraMode.EXPERT);
+            }
+        });
+        expertItem.setText("Other View");
+        radio.add(expertItem);
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(observerItem);
+        group.add(earthItem);
+        group.add(expertItem);
+
+        add(radio, c);
         c.gridx = 1;
         c.weightx = 0;
 
-        AbstractAction showInfoAction = new AbstractAction() {
+        JButton infoButton = new JButton(new AbstractAction() {
             {
                 putValue(SHORT_DESCRIPTION, "Show viewpoint info");
                 putValue(SMALL_ICON, IconBank.getIcon(JHVIcon.INFO));
@@ -77,8 +98,7 @@ public class CameraOptionsPanel extends JPanel {
                 TextDialog td = new TextDialog("Viewpoint options information", explanation);
                 td.showDialog();
             }
-        };
-        JButton infoButton = new JButton(showInfoAction);
+        });
         infoButton.setBorder(null);
         infoButton.setText(null);
         infoButton.setBorderPainted(false);
