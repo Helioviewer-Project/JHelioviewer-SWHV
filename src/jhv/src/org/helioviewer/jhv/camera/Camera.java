@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.awt.Point;
 
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
@@ -31,7 +30,7 @@ public class Camera {
 
     private Quat rotation = new Quat();
 
-    private Quat currentDragRotation = new Quat();
+    private final Quat currentDragRotation = new Quat();
     private Vec2 currentTranslation = new Vec2();
 
     private boolean trackingMode;
@@ -259,6 +258,7 @@ public class Camera {
         } else {
             fov = _fov;
         }
+        updateCameraWidthAspect(previousAspect);
     }
 
     public void setTrackingMode(boolean _trackingMode) {
