@@ -83,11 +83,8 @@ public class Camera {
         refresh();
     }
 
-    private double saveFOV;
-
     public void push(JHVDate date) {
         if (!trackingMode) {
-            saveFOV = fov;
             viewpoint.push();
             viewpoint.update(date);
             updateCameraTransformation();
@@ -97,7 +94,6 @@ public class Camera {
 
     public void pop() {
         if (!trackingMode) {
-            fov = saveFOV;
             viewpoint.pop();
             updateCameraTransformation();
             updateCameraWidthAspect(previousAspect);
@@ -262,6 +258,7 @@ public class Camera {
         } else {
             fov = _fov;
         }
+        updateCameraWidthAspect(previousAspect);
     }
 
     public void setTrackingMode(boolean _trackingMode) {
