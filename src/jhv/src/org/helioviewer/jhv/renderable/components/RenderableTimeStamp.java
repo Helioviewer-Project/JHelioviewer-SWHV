@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.renderable.components;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Viewport;
@@ -38,7 +39,10 @@ public class RenderableTimeStamp extends AbstractRenderable {
         TextRenderer renderer = GLText.getRenderer((int) (vp.getHeight() * vpScale));
 
         renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
+        renderer.setColor(Color.BLACK);
         renderer.draw(text, delta, delta);
+        renderer.setColor(Color.WHITE);
+        renderer.draw(text, delta + 1, delta + 1);
         renderer.endRendering();
     }
 

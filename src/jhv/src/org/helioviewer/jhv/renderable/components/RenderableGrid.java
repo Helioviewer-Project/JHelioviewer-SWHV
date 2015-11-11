@@ -94,10 +94,10 @@ public class RenderableGrid extends AbstractRenderable {
 
         gl.glBegin(GL2.GL_LINES);
         {
-            gl.glColor4f(0, 0, 1, 1);
+            gl.glColor3f(0, 0, 1);
             gl.glVertex3f(0, -1.2f, 0);
             gl.glVertex3f(0, -1, 0);
-            gl.glColor4f(1, 0, 0, 1);
+            gl.glColor3f(1, 0, 0);
             gl.glVertex3f(0, 1.2f, 0);
             gl.glVertex3f(0, 1, 0);
         }
@@ -105,7 +105,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawEarthCircles(GL2 gl) {
-        gl.glColor4f(1, 1, 0, 1);
+        gl.glColor3f(1, 1, 0);
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
