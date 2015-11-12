@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -76,6 +77,12 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
         eventTypeTree.addMouseListener(this);
         eventTypeTree.addTreeExpansionListener(eventPanelModel);
         eventTypeTree.setCellRenderer(new SWEKEventTreeRenderer());
+
+        // workaround for Win HiDpi
+        if (System.getProperty("jhv.os").equals("windows")) {
+            eventTypeTree.setRowHeight((new JCheckBox("J")).getPreferredSize().height);
+        }
+
         add(eventTypeTree, BorderLayout.CENTER);
         final FilterDialog filterDialog = new FilterDialog(eventType);
 
