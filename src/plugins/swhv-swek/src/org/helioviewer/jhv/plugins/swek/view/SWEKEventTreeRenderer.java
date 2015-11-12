@@ -1,17 +1,20 @@
 package org.helioviewer.jhv.plugins.swek.view;
 
+import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Component;
+//import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+//import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.plugins.swek.model.AbstractSWEKTreeModelElement;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelSupplier;
@@ -35,7 +38,7 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
 
         public TreeLabel(ImageIcon icon) {
             super();
-            this.imageIcon = icon;
+            imageIcon = icon;
         }
 
         @Override
@@ -60,23 +63,20 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
      * @return The panel to be placed in the tree
      */
     private JPanel createLeaf(String name, Object whatToDisplay) {
-        JCheckBox checkBox = new JCheckBox();
-        checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(checkBox, BorderLayout.LINE_START);
+        ComponentUtils.SmallPanel panel = new ComponentUtils.SmallPanel(new BorderLayout());
+        panel.setOpaque(false);
+
         ImageIcon icon = ((AbstractSWEKTreeModelElement) whatToDisplay).getIcon();
         if (icon != null) {
-            JPanel tempPanel = new JPanel();
-            tempPanel.setLayout(new BorderLayout());
-            tempPanel.add(new TreeLabel(icon), BorderLayout.LINE_START);
-            tempPanel.add(new JLabel(name), BorderLayout.CENTER);
-            tempPanel.setOpaque(false);
-            panel.add(tempPanel);
-        } else {
-            panel.add(new JLabel(name), BorderLayout.CENTER);
+            panel.add(new TreeLabel(icon), BorderLayout.LINE_START);
         }
-        panel.setOpaque(false);
+
+        JCheckBox checkBox = new JCheckBox(name);
+        checkBox.setSelected(((AbstractSWEKTreeModelElement) whatToDisplay).isCheckboxSelected());
+        checkBox.setBackground(Color.WHITE);
+        panel.add(checkBox, BorderLayout.CENTER);
+
+        panel.setSmall();
         return panel;
     }
 
