@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -28,7 +29,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends JPanel {
+public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
 
     private CameraOptionPanel currentOptionPanel;
 
@@ -138,6 +139,8 @@ public class CameraOptionsPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 1;
         add(fovPanel, c);
+
+        setSmall();
     }
 
     private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {

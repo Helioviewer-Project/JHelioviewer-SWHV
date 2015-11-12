@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.renderable.components;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -13,7 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -21,11 +19,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class RenderableGridOptionsPanel extends JPanel {
+public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
 
     enum GridChoiceType {
         OBSERVER("Observer grid"), HCI("HCI grid");
@@ -67,7 +67,6 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox axes = new JCheckBox("Solar axes", true);
         axes.setHorizontalTextPosition(SwingConstants.LEFT);
-        axes.setPreferredSize(new Dimension(axes.getPreferredSize().width, 22));
         axes.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -81,7 +80,6 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         JCheckBox labels = new JCheckBox("Grid labels", true);
         labels.setHorizontalTextPosition(SwingConstants.LEFT);
-        labels.setPreferredSize(new Dimension(labels.getPreferredSize().width, 22));
         labels.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -97,9 +95,6 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         add(new JLabel("Longitude", JLabel.RIGHT), c0);
 
-        gridResolutionXSpinner.setMinimumSize(new Dimension(42, 22));
-        gridResolutionXSpinner.setPreferredSize(new Dimension(62, 22));
-        gridResolutionXSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fx = ((JSpinner.DefaultEditor) gridResolutionXSpinner.getEditor()).getTextField();
         fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
@@ -111,9 +106,6 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.EAST;
         add(new JLabel("Latitude", JLabel.RIGHT), c0);
 
-        gridResolutionYSpinner.setMinimumSize(new Dimension(42, 22));
-        gridResolutionYSpinner.setPreferredSize(new Dimension(62, 22));
-        gridResolutionYSpinner.setMaximumSize(new Dimension(82, 22));
         JFormattedTextField fy = ((JSpinner.DefaultEditor) gridResolutionYSpinner.getEditor()).getTextField();
         fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
 
@@ -130,6 +122,8 @@ public class RenderableGridOptionsPanel extends JPanel {
         c0.anchor = GridBagConstraints.WEST;
         createGridChoiceBox(renderableGrid);
         //add(gridChoiceBox, c0);
+
+        setSmall();
     }
 
     public void createGridChoiceBox(RenderableGrid renderableGrid) {

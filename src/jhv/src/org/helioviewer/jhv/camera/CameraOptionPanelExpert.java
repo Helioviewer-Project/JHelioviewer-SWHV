@@ -112,6 +112,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
                 }
             }
         });
+
+        setSmall();
     }
 
     private void addSyncButtons(GridBagConstraints c) {

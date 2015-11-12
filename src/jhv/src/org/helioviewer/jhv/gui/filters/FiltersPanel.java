@@ -3,13 +3,12 @@ package org.helioviewer.jhv.gui.filters;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.JPanel;
-
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
 
 @SuppressWarnings("serial")
-public class FiltersPanel extends JPanel {
+public class FiltersPanel extends ComponentUtils.SmallPanel {
 
     private final RunningDifferencePanel runningDifferencePanel;
     private final OpacityPanel opacityPanel;
@@ -55,6 +54,8 @@ public class FiltersPanel extends JPanel {
         c.gridy++;
         this.addToGridBag(c, channelMixerPanel);
         c.gridy++;
+
+        setSmall();
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {
