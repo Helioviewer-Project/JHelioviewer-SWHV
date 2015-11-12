@@ -24,7 +24,7 @@ public class LineDataVisibleCellRenderer extends DefaultTableCellRenderer {
 
             label.setText(null);
             label.setHorizontalAlignment(SwingConstants.CENTER);
-            label.setBorder(LineDataSelectorTablePanel.commonLeftBorder);
+            label.setBorder(LineDataSelectorTablePanel.commonBorder);
 
             if (lineDataElement.isVisible()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));

@@ -16,9 +16,15 @@ public class RenderableTimeCellRenderer extends DefaultTableCellRenderer {
         // http://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
         if (value instanceof Renderable) {
             Renderable renderable = (Renderable) value;
-            label.setText(renderable.getTimeString());
             label.setBorder(RenderableContainerPanel.commonBorder);
-            label.setToolTipText("UTC observation time");
+
+            String timeString = renderable.getTimeString();
+            label.setText(timeString);
+
+            if (timeString == null)
+                label.setToolTipText(null);
+            else
+                label.setToolTipText("UTC time");
         }
 
         return label;

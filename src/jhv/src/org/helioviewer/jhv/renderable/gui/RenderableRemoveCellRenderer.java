@@ -23,7 +23,7 @@ public class RenderableRemoveCellRenderer extends DefaultTableCellRenderer {
 
             label.setText(null);
             label.setHorizontalAlignment(SwingConstants.CENTER);
-            label.setBorder(RenderableContainerPanel.commonRightBorder);
+            label.setBorder(RenderableContainerPanel.commonBorder);
 
             if (renderable.isDeletable()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));

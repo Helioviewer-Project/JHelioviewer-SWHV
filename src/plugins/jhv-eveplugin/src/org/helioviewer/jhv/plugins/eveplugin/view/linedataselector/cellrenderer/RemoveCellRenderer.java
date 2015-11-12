@@ -25,7 +25,7 @@ public class RemoveCellRenderer extends DefaultTableCellRenderer {
 
             label.setText(null);
             label.setHorizontalAlignment(SwingConstants.CENTER);
-            label.setBorder(LineDataSelectorTablePanel.commonRightBorder);
+            label.setBorder(LineDataSelectorTablePanel.commonBorder);
 
             if (lineDataElement.isDeletable()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.REMOVE_LAYER));

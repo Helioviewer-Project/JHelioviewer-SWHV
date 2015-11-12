@@ -23,7 +23,7 @@ public class RenderableVisibleCellRenderer extends DefaultTableCellRenderer {
 
             label.setText(null);
             label.setHorizontalAlignment(SwingConstants.CENTER);
-            label.setBorder(RenderableContainerPanel.commonLeftBorder);
+            label.setBorder(RenderableContainerPanel.commonBorder);
 
             if (renderable.isVisible()) {
                 label.setIcon(IconBank.getIcon(JHVIcon.VISIBLE));
