@@ -107,8 +107,8 @@ public class JavaHelioViewer {
                 JHVExecutor.setSwingWorkersExecutorService(10);
 
                 TimeUtils.getSingletonInstance(); // instantiate class
-                UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
+                UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
 
                 Log.info("Start main window");
                 ExitHooks.attach();
