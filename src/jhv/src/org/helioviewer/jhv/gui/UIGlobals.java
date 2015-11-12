@@ -33,7 +33,7 @@ public class UIGlobals {
             int defaultSize = font.getSize();
 
             String defaultFont = "SansSerif";
-            if (System.getProperty("jhv.os").equals("mac")) {
+            if (System.getProperty("jhv.os").equals("mac")) { // scrap enormous Lucida Sans
                 defaultFont = "HelveticaNeue";
                 defaultSize -= 1;
             }
