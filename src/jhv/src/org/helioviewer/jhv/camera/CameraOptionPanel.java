@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.camera;
 
-import javax.swing.JPanel;
+import org.helioviewer.jhv.gui.ComponentUtils;
 
 @SuppressWarnings("serial")
-class CameraOptionPanel extends JPanel {
+class CameraOptionPanel extends ComponentUtils.SmallPanel {
 
     void activate() {}
 

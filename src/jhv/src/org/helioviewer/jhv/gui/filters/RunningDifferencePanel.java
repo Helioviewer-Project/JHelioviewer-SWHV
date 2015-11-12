@@ -119,19 +119,11 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     private void setDifferenceMode(boolean showExtraPanel) {
         if (showExtraPanel) {
-            final GridBagConstraints c = new GridBagConstraints();
-            c.weightx = 1;
-            c.weighty = 1;
-            c.gridwidth = 1;
-            c.anchor = GridBagConstraints.CENTER;
-            c.fill = GridBagConstraints.HORIZONTAL;
-
-            c.gridx = 0;
-            c.gridwidth = 3;
-            topPanel.add(radPanel, c);
+            radPanel.setVisible(true);
             image.setRunDiffNoRot(!diffRot.isSelected());
-        } else
-            topPanel.remove(radPanel);
+        } else {
+            radPanel.setVisible(false);
+        }
     }
 
     private void setDifferenceModetoJP2View(boolean showExtraPanel, boolean differenceMode, boolean baseDifferenceMode) {
@@ -216,6 +208,16 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
         radPanel.add(truncateLabel, gc);
         gc.gridx = 2;
         radPanel.add(truncateSpinner, gc);
+
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        c.gridx = 0;
+        c.gridwidth = 3;
+        topPanel.add(radPanel, c);
     }
 
     @Override

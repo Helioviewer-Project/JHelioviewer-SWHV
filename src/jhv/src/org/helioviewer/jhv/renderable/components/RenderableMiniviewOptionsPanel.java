@@ -1,23 +1,22 @@
 package org.helioviewer.jhv.renderable.components;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
 @SuppressWarnings("serial")
-public class RenderableMiniviewOptionsPanel extends JPanel {
+public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
 
     private JSpinner xSpinner;
     private static final int DEFAULT = 10;
@@ -37,12 +36,11 @@ public class RenderableMiniviewOptionsPanel extends JPanel {
         c0.gridx = 0;
         add(new JLabel("Size", JLabel.RIGHT), c0);
 
-        xSpinner.setMinimumSize(new Dimension(42, 22));
-        xSpinner.setPreferredSize(new Dimension(62, 22));
-        xSpinner.setMaximumSize(new Dimension(82, 22));
         c0.anchor = GridBagConstraints.WEST;
         c0.gridx = 1;
         add(xSpinner, c0);
+
+        setSmall();
     }
 
     public void createXSpinner() {
