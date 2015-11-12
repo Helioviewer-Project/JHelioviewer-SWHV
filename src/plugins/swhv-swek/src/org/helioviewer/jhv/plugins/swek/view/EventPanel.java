@@ -80,7 +80,7 @@ public class EventPanel extends JPanel implements MouseListener, SWEKTreeModelLi
 
         // workaround for Win HiDpi
         if (System.getProperty("jhv.os").equals("windows")) {
-            eventTypeTree.setRowHeight((new JCheckBox("J")).getPreferredSize().height);
+            eventTypeTree.setRowHeight(new JCheckBox("J").getPreferredSize().height);
         }
 
         add(eventTypeTree, BorderLayout.CENTER);

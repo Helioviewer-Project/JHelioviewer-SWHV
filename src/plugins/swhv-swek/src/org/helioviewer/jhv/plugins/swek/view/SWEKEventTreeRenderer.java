@@ -2,12 +2,14 @@ package org.helioviewer.jhv.plugins.swek.view;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -37,6 +39,8 @@ public class SWEKEventTreeRenderer extends DefaultTreeCellRenderer {
         public TreeLabel(ImageIcon icon) {
             super();
             imageIcon = icon;
+            int size = new JLabel("J").getPreferredSize().height;
+            setPreferredSize(new Dimension(size, size));
         }
 
         @Override
