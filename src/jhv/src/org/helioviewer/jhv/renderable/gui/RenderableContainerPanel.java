@@ -45,7 +45,6 @@ public class RenderableContainerPanel extends JPanel {
     static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
     static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
-    private static final int ROW_HEIGHT = 20;
     private static final int ICON_WIDTH = 20;
     private static final int TITLE_WIDTH = 140;
 
@@ -97,7 +96,6 @@ public class RenderableContainerPanel extends JPanel {
 
         JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, ROW_HEIGHT * NUMBEROFVISIBLEROWS + 1));
         jsp.getViewport().setBackground(Color.WHITE);
 
         JButton addLayerButton = new JButton("New Layer", IconBank.getIcon(JHVIcon.ADD));
@@ -138,7 +136,6 @@ public class RenderableContainerPanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.setRowHeight(ROW_HEIGHT);
         grid.setBackground(Color.white);
 
         grid.getColumnModel().getColumn(VISIBLE_COL).setCellRenderer(new RenderableVisibleCellRenderer());
@@ -230,10 +227,21 @@ public class RenderableContainerPanel extends JPanel {
         grid.setDropMode(DropMode.INSERT_ROWS);
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
+        jsp.setPreferredSize(new Dimension(ImageViewerGui.SIDE_PANEL_WIDTH, getGridRowHeight() * NUMBEROFVISIBLEROWS + 1));
+        grid.setRowHeight(getGridRowHeight());
+
         optionsPanelWrapper = new JPanel(new BorderLayout());
 
         gc.gridy = 1;
         add(optionsPanelWrapper, gc);
+    }
+
+    private int rowHeight = -1;
+    public int getGridRowHeight() {
+        if (rowHeight == -1) {
+            rowHeight = grid.getRowHeight() + 4;
+        }
+        return rowHeight;
     }
 
     private void setOptionsPanel(Renderable renderable) {
