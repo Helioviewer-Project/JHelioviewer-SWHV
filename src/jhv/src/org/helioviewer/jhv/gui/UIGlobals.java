@@ -28,36 +28,46 @@ public class UIGlobals {
         if (instance == null) {
             instance = new UIGlobals();
 
+
+            Font font = UIManager.getDefaults().getFont("Label.font");
+            int defaultSize = font.getSize();
+
+            String defaultFont = "SansSerif";
+            if (System.getProperty("jhv.os").equals("mac")) {
+                defaultFont = "HelveticaNeue";
+                defaultSize -= 1;
+            }
+
+            HashMap<TextAttribute, Object> map = new HashMap<TextAttribute, Object>();
+            map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+            map.put(TextAttribute.FAMILY, defaultFont);
+
+            map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
+            map.put(TextAttribute.SIZE, defaultSize);
+
+            font = new Font(map);
+            UIFont = font;
+
+            map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+            map.put(TextAttribute.SIZE, defaultSize);
+            UIFontBold = font.deriveFont(map);
+
+            map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
+            map.put(TextAttribute.SIZE, defaultSize - 2);
+            UIFontSmall = font.deriveFont(map);
+
+            map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+            map.put(TextAttribute.SIZE, defaultSize - 2);
+            UIFontSmallBold = font.deriveFont(map);
+
+            UIFontMono = new Font("Monospaced", Font.PLAIN, defaultSize);
+
             InputStream is = FileUtils.getResourceInputStream("/fonts/RobotoCondensed-Regular.ttf");
             try {
                 UIFontRoboto = Font.createFont(Font.TRUETYPE_FONT, is);
             } catch (Exception e) {
                 Log.warn("Font not loaded correctly, fallback to default");
-                UIFontRoboto = new Font("SansSerif", Font.PLAIN, 20);
-            }
-
-            if (System.getProperty("jhv.os").equals("mac")) {
-                HashMap<TextAttribute, Object> map = new HashMap<TextAttribute, Object>();
-                map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
-                map.put(TextAttribute.FAMILY, "HelveticaNeue");
-
-                map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
-                map.put(TextAttribute.SIZE, 12);
-
-                Font font = new Font(map);
-                UIFont = font;
-
-                map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-                map.put(TextAttribute.SIZE, 12);
-                UIFontBold = font.deriveFont(map);
-
-                map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_REGULAR);
-                map.put(TextAttribute.SIZE, 10);
-                UIFontSmall = font.deriveFont(map);
-
-                map.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-                map.put(TextAttribute.SIZE, 10);
-                UIFontSmallBold = font.deriveFont(map);
+                UIFontRoboto = new Font("SansSerif", Font.PLAIN, defaultSize);
             }
         }
         return instance;
@@ -74,13 +84,13 @@ public class UIGlobals {
         }
     }
 
-    public static Font UIFont = new Font("SansSerif", Font.PLAIN, 12);
-    public static Font UIFontBold = new Font("SansSerif", Font.BOLD, 12);
+    public static Font UIFont;
+    public static Font UIFontBold;
 
-    public static Font UIFontSmall = new Font("SansSerif", Font.PLAIN, 10);
-    public static Font UIFontSmallBold = new Font("SansSerif", Font.BOLD, 10);
+    public static Font UIFontSmall;
+    public static Font UIFontSmallBold;
 
-    public static Font UIFontMono = new Font("Courier", Font.PLAIN, 12);
+    public static Font UIFontMono;
 
     public static Font UIFontRoboto;
 
