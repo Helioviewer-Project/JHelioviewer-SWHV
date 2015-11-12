@@ -42,8 +42,6 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.cellrenderer.
 public class LineDataSelectorTablePanel extends JPanel implements TableModelListener, ListSelectionListener {
 
     public static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
-    public static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
-    public static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     private static final int ICON_WIDTH = 20;
 

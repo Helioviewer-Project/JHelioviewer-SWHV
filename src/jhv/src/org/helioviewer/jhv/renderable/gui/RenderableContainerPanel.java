@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -42,11 +43,8 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 public class RenderableContainerPanel extends JPanel {
 
     static final Border commonBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
-    static final Border commonLeftBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
-    static final Border commonRightBorder = new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY);
 
     private static final int ICON_WIDTH = 20;
-    private static final int TITLE_WIDTH = 140;
 
     private static final int VISIBLE_COL = 0;
     private static final int TITLE_COL = 1;
@@ -143,10 +141,11 @@ public class RenderableContainerPanel extends JPanel {
         grid.getColumnModel().getColumn(VISIBLE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new RenderableCellRenderer());
-        grid.getColumnModel().getColumn(TITLE_COL).setPreferredWidth(TITLE_WIDTH);
-        grid.getColumnModel().getColumn(TITLE_COL).setMaxWidth(TITLE_WIDTH);
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new RenderableTimeCellRenderer());
+        int timeWidth = (new JLabel("2000-01-01T00:00:00")).getPreferredSize().width;
+        grid.getColumnModel().getColumn(TITLE_COL).setPreferredWidth(timeWidth);
+        grid.getColumnModel().getColumn(TITLE_COL).setMaxWidth(timeWidth);
 
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new RenderableRemoveCellRenderer());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
