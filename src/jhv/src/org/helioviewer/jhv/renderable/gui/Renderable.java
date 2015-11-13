@@ -2,17 +2,18 @@ package org.helioviewer.jhv.renderable.gui;
 
 import java.awt.Component;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 
 import com.jogamp.opengl.GL2;
 
 public interface Renderable {
 
-    public void render(GL2 gl, Viewport vp);
+    public void render(Camera camera, Viewport vp, GL2 gl);
 
-    public void renderFloat(GL2 gl, Viewport vp);
+    public void renderFloat(Camera camera, Viewport vp, GL2 gl);
 
-    public void renderMiniview(GL2 gl, Viewport vp);
+    public void renderMiniview(Camera camera, Viewport vp, GL2 gl);
 
     public void prerender(GL2 gl);
 

@@ -25,7 +25,7 @@ public class ResetCameraAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Displayer.getViewport().getCamera().reset();
+        Displayer.getCamera().reset();
     }
 
 }

@@ -30,15 +30,14 @@ public class RenderableCamera extends AbstractRenderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        optionsPanel = new CameraOptionsPanel(Displayer.getViewport().getCamera());
+        optionsPanel = new CameraOptionsPanel(Displayer.getCamera());
     }
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.getIndex()])
             return;
 
-        Camera camera = vp.getCamera();
         double width = camera.getDistance() * Math.tan(camera.getFOVAngleToDraw());
         double height = width;
         double scale = 1.;

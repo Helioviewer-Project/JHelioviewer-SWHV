@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -193,11 +194,11 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     }
 
     private Vec3 getHitPointPlane(MouseEvent e) {
-        return Displayer.getViewport().getCamera().getVectorFromPlane(e.getPoint());
+        return CameraHelper.getVectorFromPlane(Displayer.getCamera(), Displayer.getViewport(), e.getPoint());
     }
 
     private Vec3 getHitPoint(MouseEvent e) {
-        Vec3 hp = Displayer.getViewport().getCamera().getVectorFromSphere(e.getPoint());
+        Vec3 hp = CameraHelper.getVectorFromSphere(Displayer.getCamera(), Displayer.getViewport(), e.getPoint());
         if (hp != null)
             hp.y = -hp.y;
         return hp;

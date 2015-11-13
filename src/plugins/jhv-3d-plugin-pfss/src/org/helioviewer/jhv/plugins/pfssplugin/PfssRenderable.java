@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -32,7 +33,7 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
     }
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.getIndex()]) {
             PfssData pfssData;
             long millis = Layers.getLastUpdatedTimestamp().getTime();

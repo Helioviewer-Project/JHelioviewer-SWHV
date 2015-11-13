@@ -124,16 +124,16 @@ public class RenderableImageLayer extends AbstractRenderable {
     }
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
-        _render(gl, vp, new double[] { 1., 1., 0., 1. }, false);
+    public void render(Camera camera, Viewport vp, GL2 gl) {
+        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. });
     }
 
     @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-        _render(gl, vp, new double[] { 0., 0., 0., 0. }, true);
+    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. });
     }
 
-    private void _render(GL2 gl, Viewport vp, double[] depthrange, boolean isMiniview) {
+    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
         if (imageData == null) {
             return;
         }
@@ -142,7 +142,7 @@ public class RenderableImageLayer extends AbstractRenderable {
 
         GLSLShader.bind(gl);
         {
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, isMiniview);
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
             GLSLShader.setViewport(vp.getWidth(), vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
             if (!RenderableImageLayer.showCorona) {
@@ -150,10 +150,9 @@ public class RenderableImageLayer extends AbstractRenderable {
             }
             GLSLShader.filter(gl);
 
-            Camera camera = vp.getCamera();
             camera.push(imageData.getMasterTime());
 
-            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp.getWidth() / (double) vp.getHeight());
+            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
 
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
@@ -190,7 +189,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     }
 
     @Override
-    public void renderFloat(GL2 gl, Viewport vp) {
+    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             int delta = (int) (vp.getHeight() * 0.01);
             TextRenderer renderer = GLText.getRenderer(Math.min(48, (int) (vp.getHeight() * vpScale)));

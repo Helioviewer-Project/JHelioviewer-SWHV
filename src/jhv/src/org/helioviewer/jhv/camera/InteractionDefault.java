@@ -7,7 +7,7 @@ import org.helioviewer.jhv.display.Displayer;
 
 import com.jogamp.opengl.GL2;
 
-public abstract class InteractionDefault extends Interaction {
+public class InteractionDefault extends Interaction {
 
     protected Camera camera;
 
@@ -23,7 +23,7 @@ public abstract class InteractionDefault extends Interaction {
         if (e.getClickCount() == 2) {
             camera.reset();
         }
-        setActiveView(e);
+        setActiveViewport(e);
     }
 
     @Override
@@ -32,7 +32,7 @@ public abstract class InteractionDefault extends Interaction {
         Displayer.render();
     }
 
-    public void setActiveView(MouseEvent e) {
+    private void setActiveViewport(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
 
@@ -40,6 +40,7 @@ public abstract class InteractionDefault extends Interaction {
             if (vp.isActive()) {
                 if (x >= vp.getOffsetX() && x <= vp.getOffsetX() + vp.getWidth() && y >= vp.getOffsetY() && y <= vp.getOffsetY() + vp.getHeight()) {
                     Displayer.setViewport(vp);
+                    break;
                 }
             }
         }

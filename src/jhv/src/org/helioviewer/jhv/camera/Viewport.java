@@ -13,30 +13,20 @@ public class Viewport {
     private int y;
     private final int idx;
     private boolean isVisible = true;
-    private Camera camera;
 
-    public Viewport(int _idx, int _x, int _y, int _w, int _h, Camera _camera) {
-        this(_idx, _x, _y, _w, _h, _camera, false);
+    public Viewport(int _idx, int _x, int _y, int _w, int _h) {
+        this(_idx, _x, _y, _w, _h, false);
     }
 
     private boolean active;
 
-    public Viewport(int _idx, int _x, int _y, int _w, int _h, Camera _camera, boolean _active) {
+    public Viewport(int _idx, int _x, int _y, int _w, int _h, boolean _active) {
         idx = _idx;
         w = _w;
         h = _h;
         x = _x;
         y = _y;
-        camera = _camera;
         active = _active;
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera _camera) {
-        camera = _camera;
     }
 
     public int getWidth() {
@@ -86,7 +76,7 @@ public class Viewport {
 
     @Override
     public String toString() {
-        return "Offset: " + this.getOffsetX() + "," + this.getOffsetY() + " Size: " + this.getWidth() + "," + this.getHeight();
+        return "Offset: " + getOffsetX() + "," + getOffsetY() + " Size: " + getWidth() + "," + getHeight();
     }
 
     public int getIndex() {

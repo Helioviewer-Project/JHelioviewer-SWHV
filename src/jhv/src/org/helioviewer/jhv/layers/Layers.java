@@ -144,8 +144,8 @@ public class Layers {
     private static void syncTime(JHVDate dateTime) {
         lastTimestamp = dateTime;
 
-        Displayer.getViewport().getCamera().timeChanged(lastTimestamp);
-        Displayer.getViewport().getCamera().fireTimeUpdated();
+        Displayer.getCamera().timeChanged(lastTimestamp);
+        Displayer.getCamera().fireTimeUpdated();
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp);
         }

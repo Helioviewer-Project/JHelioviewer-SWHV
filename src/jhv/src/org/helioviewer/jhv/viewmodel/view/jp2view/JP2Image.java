@@ -30,6 +30,7 @@ import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -356,16 +357,18 @@ public class JP2Image {
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
     protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
-        Camera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getCamera();
+        Viewport vp = Displayer.getViewport();
+
         MetaData m = metaDataList[frameNumber];
-        Region r = ViewROI.getInstance().updateROI(camera, masterTime, m);
+        Region r = ViewROI.updateROI(camera,vp, masterTime, m);
 
         double mWidth = m.getPhysicalSize().x;
         double mHeight = m.getPhysicalSize().y;
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = 2 * camera.getWidth() / Displayer.getViewport().getHeight();
+        double ratio = 2 * camera.getWidth() / vp.getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;

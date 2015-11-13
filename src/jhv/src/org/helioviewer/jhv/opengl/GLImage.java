@@ -59,7 +59,7 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, boolean isMiniView) {
+    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         applyRegion(imageData, prevImageData, baseImageData);
         applyRunningDifference(gl);
 

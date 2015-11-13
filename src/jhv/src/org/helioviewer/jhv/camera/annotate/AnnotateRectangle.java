@@ -95,7 +95,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = vectorFromSphere(camera, e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -137,7 +137,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = vectorFromSphere(camera, e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }
