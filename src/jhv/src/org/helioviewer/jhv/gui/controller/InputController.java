@@ -33,13 +33,13 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         component.addKeyListener(this);
     }
 
-    private MouseEvent mouseSynthesizer(MouseEvent e) {
+    private MouseEvent synthesizeMouse(MouseEvent e) {
         return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiers(),
                               e.getX() * GLInfo.pixelScale[0], e.getY() * GLInfo.pixelScale[1],
                               e.getClickCount(), e.isPopupTrigger(), e.getButton());
     }
 
-    private MouseWheelEvent mouseWheelSynthesizer(MouseWheelEvent e) {
+    private MouseWheelEvent synthesizeMouseWheel(MouseWheelEvent e) {
         return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiers(),
                                    e.getX() * GLInfo.pixelScale[0], e.getY() * GLInfo.pixelScale[1],
                                    e.getClickCount(),  e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
@@ -47,7 +47,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseClicked(e);
 
@@ -56,7 +56,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseEntered(e);
 
@@ -67,7 +67,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseExited(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseExited(e);
 
@@ -76,7 +76,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseListener listener : mouseListeners)
             listener.mousePressed(e);
 
@@ -91,7 +91,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseListener listener : mouseListeners)
             listener.mouseReleased(e);
 
@@ -106,7 +106,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseMotionListener listener : mouseMotionListeners)
             listener.mouseDragged(e);
 
@@ -119,7 +119,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        e = mouseSynthesizer(e);
+        e = synthesizeMouse(e);
         for (MouseMotionListener listener : mouseMotionListeners)
             listener.mouseMoved(e);
 
@@ -129,7 +129,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        e = mouseWheelSynthesizer(e);
+        e = synthesizeMouseWheel(e);
         for (MouseWheelListener listener : mouseWheelListeners)
             listener.mouseWheelMoved(e);
 
