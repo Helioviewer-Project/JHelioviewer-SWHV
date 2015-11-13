@@ -100,9 +100,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
                 Camera camera = vp.getCamera();
-                camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
+
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                camera.applyPerspective(gl);
+                camera.applyPerspective(gl, vp.getWidth() / (double) vp.getHeight());
 
                 renderBlackCircle(gl, camera.getRotation().transpose().m);
                 ImageViewerGui.getRenderableContainer().render(gl, vp);
@@ -118,8 +119,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public static void renderFloatScene(GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                Camera camera = vp.getCamera();
-                camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+                // Camera camera = vp.getCamera();
+                // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 ImageViewerGui.getRenderableContainer().renderFloat(gl, vp);
             }
@@ -142,10 +143,11 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
         if (vp.isVisible()) {
             Camera camera = vp.getCamera();
+            // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
             camera.timeChanged(Layers.getLastUpdatedTimestamp());
-            camera.updateCameraWidthAspect(vp.getWidth() / (double) vp.getHeight());
+
             gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-            camera.applyPerspective(gl);
+            camera.applyPerspective(gl, vp.getWidth() / (double) vp.getHeight());
             ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
         }
         renderFloatScene(gl);

@@ -35,9 +35,7 @@ public class Camera {
 
     private boolean trackingMode;
 
-    private double previousAspect = 1;
     private double cameraWidth = 1;
-    private double cameraWidthTimesAspect;
 
     private double FOVangleToDraw;
 
@@ -86,16 +84,16 @@ public class Camera {
         if (!trackingMode) {
             viewpoint.push();
             viewpoint.update(date);
-            updateCameraTransformation();
-            updateCameraWidthAspect(previousAspect);
+            updateTransformation();
+            updateWidth();
         }
     }
 
     public void pop() {
         if (!trackingMode) {
             viewpoint.pop();
-            updateCameraTransformation();
-            updateCameraWidthAspect(previousAspect);
+            updateTransformation();
+            updateWidth();
         }
     }
 
@@ -111,20 +109,24 @@ public class Camera {
         return viewpoint.orientation;
     }
 
-    public void updateCameraWidthAspect(double aspect) {
-        previousAspect = aspect;
+    private double cameraAspect = 1; // tbd
+
+    public void setAspect(double aspect) {
+        cameraAspect = aspect;
+    }
+
+    public void updateWidth() {
         cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
-        cameraWidthTimesAspect = cameraWidth * aspect;
     }
 
-    public Mat4 getOrthoMatrixInverse() {
-        return Mat4.orthoInverse(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+    public Mat4 getOrthoMatrixInverse(double aspect) {
+        return Mat4.orthoInverse(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, clipNear, clipFar);
     }
 
-    public void applyPerspective(GL2 gl) {
+    public void applyPerspective(GL2 gl, double aspect) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrtho(-cameraWidthTimesAspect, cameraWidthTimesAspect, -cameraWidth, cameraWidth, clipNear, clipFar);
+        gl.glOrtho(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, clipNear, clipFar);
 
         Mat4 cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -viewpoint.distance);
         // applyCamera
@@ -133,7 +135,7 @@ public class Camera {
     }
 
     public Vec3 getVectorFromSphereOrPlane(Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
-        double up1x = normalizedScreenpos.x * cameraWidthTimesAspect - currentTranslation.x;
+        double up1x = normalizedScreenpos.x * cameraWidth * cameraAspect - currentTranslation.x;
         double up1y = normalizedScreenpos.y * cameraWidth - currentTranslation.y;
 
         Vec3 hitPoint;
@@ -162,7 +164,7 @@ public class Camera {
     }
 
     private double computeUpX(Point viewportCoordinates) {
-        return computeNormalizedX(viewportCoordinates) * cameraWidthTimesAspect - currentTranslation.x;
+        return computeNormalizedX(viewportCoordinates) * cameraWidth * cameraAspect - currentTranslation.x;
     }
 
     private double computeUpY(Point viewportCoordinates) {
@@ -236,15 +238,15 @@ public class Camera {
 
     void setCurrentTranslation(Vec2 pan) {
         currentTranslation = pan;
-        updateCameraTransformation();
+        updateTransformation();
     }
 
     void rotateCurrentDragRotation(Quat _currentDragRotation) {
         currentDragRotation.rotate(_currentDragRotation);
-        updateCameraTransformation();
+        updateTransformation();
     }
 
-    private void updateCameraTransformation() {
+    private void updateTransformation() {
         rotation = currentDragRotation.copy();
         rotation.rotate(viewpoint.orientation);
     }
@@ -257,7 +259,7 @@ public class Camera {
         } else {
             fov = _fov;
         }
-        updateCameraWidthAspect(previousAspect);
+        updateWidth();
     }
 
     public void setTrackingMode(boolean _trackingMode) {
@@ -318,7 +320,8 @@ public class Camera {
     public void timeChanged(JHVDate date) {
         if (!trackingMode) {
             viewpoint.update(date);
-            // updateCameraTransformation();
+            updateTransformation();
+            updateWidth();
         }
     }
 

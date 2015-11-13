@@ -104,12 +104,12 @@ public class Displayer implements JHVEventHighlightListener {
         boolean first = true;
         for (Viewport vp : viewports) {
             if (first && vp.isActive()) {
-                vp.getCamera().updateCameraWidthAspect(w / (double) h);
+                vp.getCamera().setAspect(w / (double) h);
                 vp.setSize(w, h);
                 vp.setOffset(0, 0);
                 first = false;
             } else {
-                vp.getCamera().updateCameraWidthAspect(w / (double) h);
+                vp.getCamera().setAspect(w / (double) h);
                 vp.setSize(w, h);
                 vp.setOffset(0, 0);
             }
@@ -125,12 +125,12 @@ public class Displayer implements JHVEventHighlightListener {
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
                 if (first) {
-                    vp.getCamera().updateCameraWidthAspect(halfw / (double) h);
+                    vp.getCamera().setAspect(halfw / (double) h);
                     vp.setSize(halfw, h);
                     vp.setOffset(0, 0);
                     first = false;
                 } else {
-                    vp.getCamera().updateCameraWidthAspect(halfw / (double) h);
+                    vp.getCamera().setAspect(halfw / (double) h);
                     vp.setSize(halfw, h);
                     vp.setOffset(halfw, 0);
                 }
@@ -142,19 +142,19 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
 
-        viewports[0].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[0].getCamera().setAspect(w / (double) h);
         viewports[0].setSize(w / 2, h / 2);
         viewports[0].setOffset(0, 0);
 
-        viewports[1].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[1].getCamera().setAspect(w / (double) h);
         viewports[1].setSize(w / 2, h / 2);
         viewports[1].setOffset(w / 2, 0);
 
-        viewports[2].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[2].getCamera().setAspect(w / (double) h);
         viewports[2].setSize(w / 2, h / 2);
         viewports[2].setOffset(0, h / 2);
 
-        viewports[3].getCamera().updateCameraWidthAspect(w / (double) h);
+        viewports[3].getCamera().setAspect(w / (double) h);
         viewports[3].setSize(w / 2, h / 2);
         viewports[3].setOffset(w / 2, h / 2);
     }
