@@ -21,15 +21,11 @@ public class Camera {
     private double fov = INITFOV;
 
     private Quat rotation = new Quat();
-
-    private final Quat currentDragRotation = new Quat();
     private Vec2 currentTranslation = new Vec2();
-
-    private boolean trackingMode;
-
+    private final Quat currentDragRotation = new Quat();
     private double cameraWidth = 1;
 
-    private double FOVangleToDraw;
+    private boolean trackingMode;
 
     private final InteractionRotate rotationInteraction = new InteractionRotate(this);
     private final InteractionPan panInteraction = new InteractionPan(this);
@@ -87,10 +83,6 @@ public class Camera {
             updateTransformation();
             updateWidth();
         }
-    }
-
-    public double getFOVAngleToDraw() {
-        return FOVangleToDraw;
     }
 
     public double getDistance() {
@@ -161,10 +153,6 @@ public class Camera {
 
     public void zoom(int wr) {
         setCameraFOV(fov * (1 + 0.015 * wr));
-    }
-
-    public void setFOVangleDegrees(double fovAngle) {
-        FOVangleToDraw = fovAngle * Math.PI / 180.;
     }
 
     public void setCurrentInteraction(Interaction _currentInteraction) {
