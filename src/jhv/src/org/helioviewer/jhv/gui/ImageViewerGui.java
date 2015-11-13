@@ -116,7 +116,7 @@ public class ImageViewerGui {
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
         leftScrollPane.setBorder(null);
-        leftScrollPane.getVerticalScrollBar().setUnitIncrement(20); // size of renderable row height
+        leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
         mainComponent = new MainComponent();
         inputController = new InputController(mainComponent);

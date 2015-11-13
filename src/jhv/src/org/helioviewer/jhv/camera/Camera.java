@@ -22,7 +22,7 @@ public class Camera {
     }
 
     private static final double INITFOV = (48. / 60.) * Math.PI / 180.;
-    private static final double MIN_FOV = INITFOV * 0.02;
+    private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
     private static final double clipNear = Sun.Radius * 3;
     private static final double clipFar = Sun.Radius * 10000;
