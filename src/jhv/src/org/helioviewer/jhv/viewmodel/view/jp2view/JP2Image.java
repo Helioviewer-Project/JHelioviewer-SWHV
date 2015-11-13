@@ -365,7 +365,7 @@ public class JP2Image {
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
-        double ratio = 2 * camera.getCameraWidth() / Displayer.getViewport().getHeight();
+        double ratio = 2 * camera.getWidth() / Displayer.getViewport().getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
         ResolutionLevel res;

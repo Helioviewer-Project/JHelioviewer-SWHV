@@ -58,11 +58,11 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        Camera activeCamera = vp.getCamera();
+        Camera camera = vp.getCamera();
         Mat4 cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:
-            cameraMatrix = activeCamera.getOrientation().toMatrix();
+            cameraMatrix = camera.getOrientation().toMatrix();
             break;
         case HCI:
             //TBD
@@ -80,7 +80,7 @@ public class RenderableGrid extends AbstractRenderable {
         {
             if (showLabels) {
                 // cameraWidth changes ever so slightly with distance to Sun
-                int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * activeCamera.getCameraWidth()));
+                int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * camera.getWidth()));
                 drawText(gl, pixelsPerSolarRadius);
             }
             drawCircles(gl);
