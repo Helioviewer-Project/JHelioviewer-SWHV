@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -34,7 +35,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
-    private Component component;
+    private static Component component;
+    private static Camera camera;
 
     protected static JHVEvent mouseOverJHVEvent = null;
     protected static Point mouseOverPosition = null;
@@ -45,6 +47,11 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     @Override
     public void setComponent(Component _component) {
         component = _component;
+    }
+
+    @Override
+    public void setCamera(Camera _camera) {
+        camera = _camera;
     }
 
     @Override
@@ -194,11 +201,11 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     }
 
     private Vec3 getHitPointPlane(MouseEvent e) {
-        return CameraHelper.getVectorFromPlane(Displayer.getCamera(), Displayer.getViewport(), e.getPoint());
+        return CameraHelper.getVectorFromPlane(camera, Displayer.getViewport(), e.getPoint());
     }
 
     private Vec3 getHitPoint(MouseEvent e) {
-        Vec3 hp = CameraHelper.getVectorFromSphere(Displayer.getCamera(), Displayer.getViewport(), e.getPoint());
+        Vec3 hp = CameraHelper.getVectorFromSphere(camera, Displayer.getViewport(), e.getPoint());
         if (hp != null)
             hp.y = -hp.y;
         return hp;
