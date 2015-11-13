@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainComponent;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
@@ -119,7 +120,7 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
         mainComponent = new MainComponent();
-        inputController = new InputController(mainComponent);
+        inputController = new InputController(Displayer.getCamera(), mainComponent);
         mainContentPanel = new MainContentPanel(mainComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);
