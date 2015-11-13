@@ -15,10 +15,6 @@ public class InteractionRotate extends InteractionDefault {
     }
 
     @Override
-    public void reset() {
-    }
-
-    @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
         camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));

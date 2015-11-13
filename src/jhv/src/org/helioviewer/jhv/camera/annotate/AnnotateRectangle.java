@@ -87,6 +87,13 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
+    public void clear() {
+        rectangleStartPoints.clear();
+        rectangleEndPoints.clear();
+        activeIndex = -1;
+    }
+
+    @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
@@ -126,13 +133,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 Displayer.display();
             }
         }
-    }
-
-    @Override
-    public void reset() {
-        rectangleStartPoints.clear();
-        rectangleEndPoints.clear();
-        activeIndex = -1;
     }
 
     @Override

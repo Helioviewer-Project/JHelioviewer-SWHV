@@ -8,9 +8,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-public abstract class Interaction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
-
-    abstract public void reset();
+public class Interaction implements MouseWheelListener, MouseMotionListener, MouseListener, KeyListener {
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {

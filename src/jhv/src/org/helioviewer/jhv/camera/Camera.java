@@ -35,9 +35,9 @@ public class Camera {
 
     private boolean trackingMode;
 
+    private double previousAspect = 1;
     private double cameraWidth = 1;
     private double cameraWidthTimesAspect;
-    private double previousAspect = -1.0;
 
     private double FOVangleToDraw;
 
@@ -78,7 +78,6 @@ public class Camera {
     public void reset() {
         currentTranslation = new Vec2(0, 0);
         currentDragRotation.clear();
-        currentInteraction.reset();
         zoomToFit();
         refresh();
     }
@@ -113,8 +112,8 @@ public class Camera {
     }
 
     public void updateCameraWidthAspect(double aspect) {
-        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
         previousAspect = aspect;
+        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
         cameraWidthTimesAspect = cameraWidth * aspect;
     }
 
@@ -258,6 +257,7 @@ public class Camera {
         } else {
             fov = _fov;
         }
+        updateCameraWidthAspect(previousAspect);
     }
 
     public void setTrackingMode(boolean _trackingMode) {

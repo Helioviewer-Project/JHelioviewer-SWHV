@@ -79,6 +79,13 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
+    public void clear() {
+        circleStartPoints.clear();
+        circleEndPoints.clear();
+        activeIndex = -1;
+    }
+
+    @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 pt = camera.getVectorFromSphere(e.getPoint());
         if (pt != null) {
@@ -117,13 +124,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
                 Displayer.display();
             }
         }
-    }
-
-    @Override
-    public void reset() {
-        circleStartPoints.clear();
-        circleEndPoints.clear();
-        activeIndex = -1;
     }
 
     @Override

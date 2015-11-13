@@ -19,10 +19,6 @@ public abstract class InteractionDefault extends Interaction {
     }
 
     @Override
-    public void reset() {
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             camera.reset();
