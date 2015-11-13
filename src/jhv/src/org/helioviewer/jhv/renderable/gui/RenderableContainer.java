@@ -230,6 +230,9 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public boolean isViewportActive(int idx) {
+        if (idx == 0)
+            return true;
+
         for (Renderable renderable : renderables) {
             if (renderable instanceof RenderableImageLayer && renderable.isVisible(idx))
                 return true;

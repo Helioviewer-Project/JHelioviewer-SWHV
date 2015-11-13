@@ -69,7 +69,7 @@ public class Displayer implements JHVEventHighlightListener {
         viewport = _viewport;
     }
 
-    public static int countActiveLayers() {
+    private static int countActiveLayers() {
         int ct = 0;
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
@@ -107,13 +107,8 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
 
-        boolean first = true;
         for (Viewport vp : viewports) {
-            if (first && vp.isActive()) {
-                vp.setSize(w, h);
-                vp.setOffset(0, 0);
-                first = false;
-            } else {
+            if (vp.isActive()) {
                 vp.setSize(w, h);
                 vp.setOffset(0, 0);
             }

@@ -118,8 +118,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public static void renderFloatScene(Camera camera, GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                // Camera camera = vp.getCamera();
-                // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
                 ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
             }
