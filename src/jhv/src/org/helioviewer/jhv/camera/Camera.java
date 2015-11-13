@@ -115,7 +115,7 @@ public class Camera {
         cameraAspect = aspect;
     }
 
-    public void updateWidth() {
+    private void updateWidth() {
         cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
     }
 

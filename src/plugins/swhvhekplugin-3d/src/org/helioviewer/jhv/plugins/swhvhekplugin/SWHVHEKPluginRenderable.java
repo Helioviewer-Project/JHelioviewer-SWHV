@@ -23,7 +23,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -262,9 +261,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final double vpScale = 0.019;
 
-    public void drawText(GL2 gl, JHVEvent evt, Point pt) {
-        int height = Displayer.getGLHeight();
-        int width = Displayer.getGLWidth();
+    private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
+        int width = vp.getWidth();
+        int height = vp.getHeight();
 
         TextRenderer renderer = GLText.getRenderer((int) (height * vpScale));
         float fontSize = renderer.getFont().getSize2D();
@@ -347,7 +346,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     public void renderFloat(GL2 gl, Viewport vp) {
         if (isVisible[vp.getIndex()]) {
             if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
-                drawText(gl, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
+                drawText(gl, vp, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
             }
         }
     }
