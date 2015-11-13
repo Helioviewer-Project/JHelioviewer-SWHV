@@ -53,17 +53,6 @@ import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
 
-/**
- * Panel containing the movie controls.
- *
- * <p>
- * This panel provides the capability to start and stop an movie, step to
- * certain frames and switch the movie speed as well as the movie mode.
- *
- * @author Markus Langenberg
- * @author Malte Nuhn
- *
- */
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements ActionListener, ChangeListener, MouseListener, MouseWheelListener {
 
@@ -192,10 +181,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static JSpinner speedSpinner;
     private static JComboBox speedUnitComboBox;
     private static JComboBox animationModeComboBox;
-    private static JPanel recordPanel;
 
-    private static JPanel modePanel;
-    private static JPanel speedPanel;
+    private static ComponentUtils.SmallPanel speedPanel;
+    private static ComponentUtils.SmallPanel modePanel;
+    private static ComponentUtils.SmallPanel recordPanel;
 
     // Icons
     private static final Icon playIcon = IconBank.getIcon(JHVIcon.PLAY);
@@ -287,7 +276,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         // It is not included in the main Panel to save space if it is not shown
 
         // Speed
-        speedPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        speedPanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
         speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
@@ -312,7 +301,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         mainPanel.add(speedPanel);
 
         // Animation mode
-        modePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        modePanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         modePanel.add(new JLabel("Animation mode", JLabel.RIGHT));
 
         AnimationMode[] modi = { AnimationMode.LOOP, AnimationMode.STOP, AnimationMode.SWING };
@@ -323,7 +312,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         mainPanel.add(modePanel);
 
-        recordPanel = new JPanel(new GridBagLayout());
+        recordPanel = new ComponentUtils.SmallPanel(new GridBagLayout());
         recordPanel.setBorder(BorderFactory.createTitledBorder(" Recording "));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -383,6 +372,10 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         recordPanel.add(recordSizeCombo, c);
 
         mainPanel.add(recordPanel);
+
+        speedPanel.setSmall();
+        modePanel.setSmall();
+        recordPanel.setSmall();
 
         setEnabledState(false);
         setAdvanced(isAdvanced);
