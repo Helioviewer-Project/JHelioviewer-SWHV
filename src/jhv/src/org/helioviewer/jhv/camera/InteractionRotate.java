@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Displayer;
 public class InteractionRotate extends InteractionDefault {
 
     private Vec3 currentRotationStartPoint;
-    private Quat currentDragRotation;
 
     protected InteractionRotate(Camera _camera) {
         super(_camera);
@@ -17,16 +16,12 @@ public class InteractionRotate extends InteractionDefault {
 
     @Override
     public void reset() {
-        if (currentDragRotation != null) {
-            currentDragRotation.clear();
-        }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 currentRotationEndPoint = camera.getVectorFromSphereTrackball(e.getPoint());
-        currentDragRotation = Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint);
-        camera.rotateCurrentDragRotation(currentDragRotation);
+        camera.rotateCurrentDragRotation(Quat.calcRotation(currentRotationStartPoint, currentRotationEndPoint));
         Displayer.render();
     }
 
