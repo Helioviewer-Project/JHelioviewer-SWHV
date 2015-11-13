@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.display.Displayer;
 
-public class InteractionRotate extends InteractionDefault {
+public class InteractionRotate extends Interaction {
 
     private Vec3 currentRotationStartPoint;
 
@@ -22,12 +22,8 @@ public class InteractionRotate extends InteractionDefault {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        currentRotationStartPoint = null;
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
+        super.mousePressed(e);
         currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Displayer.getViewport(), e.getPoint());
     }
 

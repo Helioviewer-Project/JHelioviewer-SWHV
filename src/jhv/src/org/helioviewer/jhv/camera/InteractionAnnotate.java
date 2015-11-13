@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 
 import com.jogamp.opengl.GL2;
 
-public class InteractionAnnotate extends InteractionDefault {
+public class InteractionAnnotate extends Interaction {
 
     public static enum AnnotationMode {
         RECTANGLE, CIRCLE, CROSS;
@@ -39,6 +39,7 @@ public class InteractionAnnotate extends InteractionDefault {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        super.mousePressed(e);
         activeAnnotatable.mousePressed(e);
     }
 
