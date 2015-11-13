@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import javax.swing.JLabel;
+import org.helioviewer.jhv.gui.components.StatusPanel;
 
-@SuppressWarnings({"serial"})
-public class FramerateStatusPanel extends JLabel {
+@SuppressWarnings("serial")
+public class FramerateStatusPanel extends StatusPanel.StatusPlugin {
 
     public FramerateStatusPanel() {
         updateFramerate(0);
