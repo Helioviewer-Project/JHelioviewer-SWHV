@@ -21,26 +21,17 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
     private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
     private static String emptyPos = "(\u03B8, \u03C6) : (--\u00B0, --\u00B0)";
 
+    private static Camera camera;
+
     public PositionStatusPanel() {
         setText(emptyPos + String.format(rhoFormat, 0.));
     }
 
-    /**
-     * Updates the displayed position.
-     *
-     * If the physical dimensions are available, translates the screen
-     * coordinates to physical coordinates.
-     *
-     * @param position
-     *            Position on the screen.
-     */
     private void updatePosition(Point position) {
         if (position == lastPosition)
             return;
 
-        Camera camera = Displayer.getCamera();
         Viewport vp = Displayer.getViewport();
-
         Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
         double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
@@ -55,24 +46,20 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         lastPosition = position;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public void setCamera(Camera _camera) {
+        camera = _camera;
+    }
+
     @Override
     public void setComponent(Component _component) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseDragged(MouseEvent e) {
         updatePosition(e.getPoint());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseMoved(MouseEvent e) {
         updatePosition(e.getPoint());
