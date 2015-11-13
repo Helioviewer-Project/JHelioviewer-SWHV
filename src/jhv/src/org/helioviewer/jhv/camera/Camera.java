@@ -13,8 +13,6 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
-import com.jogamp.opengl.GL2;
-
 public class Camera {
 
     static enum CameraMode {
@@ -24,8 +22,6 @@ public class Camera {
     private static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
-    private static final double clipNear = Sun.Radius * 3;
-    private static final double clipFar = Sun.Radius * 10000;
     private double fov = INITFOV;
 
     private Quat rotation = new Quat();
@@ -113,25 +109,6 @@ public class Camera {
 
     public void setAspect(double aspect) {
         cameraAspect = aspect;
-    }
-
-    private void updateWidth() {
-        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
-    }
-
-    public Mat4 getOrthoMatrixInverse(double aspect) {
-        return Mat4.orthoInverse(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-    }
-
-    public void applyPerspective(GL2 gl, double aspect) {
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-        gl.glOrtho(-cameraWidth * aspect, cameraWidth * aspect, -cameraWidth, cameraWidth, clipNear, clipFar);
-
-        Mat4 cameraTransformation = rotation.toMatrix().translate(currentTranslation.x, currentTranslation.y, -viewpoint.distance);
-        // applyCamera
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
     public Vec3 getVectorFromSphereOrPlane(Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
@@ -251,6 +228,10 @@ public class Camera {
         rotation.rotate(viewpoint.orientation);
     }
 
+    private void updateWidth() {
+        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
+    }
+
     public void setCameraFOV(double _fov) {
         if (_fov < MIN_FOV) {
             fov = MIN_FOV;
@@ -271,7 +252,7 @@ public class Camera {
         return trackingMode;
     }
 
-    public double getCameraWidth() {
+    public double getWidth() {
         return cameraWidth;
     }
 

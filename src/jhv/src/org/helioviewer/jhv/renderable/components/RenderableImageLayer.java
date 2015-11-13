@@ -10,6 +10,7 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -152,8 +153,9 @@ public class RenderableImageLayer extends AbstractRenderable {
             Camera camera = vp.getCamera();
             camera.push(imageData.getMasterTime());
 
-            Mat4 vpmi = camera.getOrthoMatrixInverse(vp.getWidth() / (double) vp.getHeight());
+            Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp.getWidth() / (double) vp.getHeight());
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
+
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
