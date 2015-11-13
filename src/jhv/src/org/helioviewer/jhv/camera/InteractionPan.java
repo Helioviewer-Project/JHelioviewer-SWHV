@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.display.Displayer;
 
-public class InteractionPan extends InteractionDefault {
+public class InteractionPan extends Interaction {
 
     private Point lastMousePoint;
 
@@ -16,6 +16,7 @@ public class InteractionPan extends InteractionDefault {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        super.mousePressed(e);
         lastMousePoint = e.getPoint();
     }
 
@@ -33,11 +34,6 @@ public class InteractionPan extends InteractionDefault {
         Displayer.render();
 
         lastMousePoint = p;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        Displayer.render();
     }
 
 }
