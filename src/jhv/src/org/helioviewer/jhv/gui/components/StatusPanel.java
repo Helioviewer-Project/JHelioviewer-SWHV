@@ -9,6 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.gui.UIGlobals;
+
 /**
  * Class used for displaying information and statuses in a panel at the very
  * bottom of JHV.
@@ -26,10 +28,16 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class StatusPanel extends JPanel {
 
+    public static class StatusPlugin extends JLabel {
+
+        public StatusPlugin() {
+            setFont(UIGlobals.UIFontSmall);
+        }
+
+    }
+
     private final JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private final JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-    private static JLabel statusInfoLabel = new JLabel();
 
     public enum Alignment {
         LEFT, RIGHT
@@ -52,13 +60,14 @@ public class StatusPanel extends JPanel {
         add(rightPanel, BorderLayout.EAST);
 
         if (leftMargin != 0) {
-            statusInfoLabel.setPreferredSize(new Dimension(leftMargin, 1));
-            leftPanel.add(statusInfoLabel);
+            JPanel spacer = new JPanel();
+            spacer.setPreferredSize(new Dimension(leftMargin, 0));
+            leftPanel.add(spacer);
         }
 
         if (rightMargin != 0) {
             JPanel spacer = new JPanel();
-            spacer.setPreferredSize(new Dimension(rightMargin, 1));
+            spacer.setPreferredSize(new Dimension(rightMargin, 0));
             rightPanel.add(spacer);
         }
     }
@@ -71,12 +80,12 @@ public class StatusPanel extends JPanel {
      * @param alignment
      *            Alignment of the new plugin, can be either LEFT or RIGHT
      */
-    public void addPlugin(JLabel newPlugin, Alignment alignment) {
+    public void addPlugin(StatusPlugin newPlugin, Alignment alignment) {
         if (alignment == Alignment.LEFT) {
             leftPanel.add(newPlugin);
 
             JPanel spacer = new JPanel();
-            spacer.setPreferredSize(new Dimension(10, 1));
+            spacer.setPreferredSize(new Dimension(10, 0));
             leftPanel.add(spacer);
         } else {
             rightPanel.add(newPlugin, 0);
@@ -89,7 +98,7 @@ public class StatusPanel extends JPanel {
      * @param oldPlugin
      *            Plugin to remove
      */
-    public void removePlugin(JLabel oldPlugin) {
+    public void removePlugin(StatusPlugin oldPlugin) {
         leftPanel.remove(oldPlugin);
         rightPanel.remove(oldPlugin);
     }

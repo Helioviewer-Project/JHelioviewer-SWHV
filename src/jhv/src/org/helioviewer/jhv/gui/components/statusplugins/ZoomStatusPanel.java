@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.gui.components.statusplugins;
 
-import javax.swing.JLabel;
+import org.helioviewer.jhv.gui.components.StatusPanel;
 
-@SuppressWarnings({"serial"})
-public class ZoomStatusPanel extends JLabel {
+@SuppressWarnings("serial")
+public class ZoomStatusPanel extends StatusPanel.StatusPlugin {
 
     public ZoomStatusPanel() {
-        setText("Zoom:");
+        updateZoomLevel(1);
     }
 
     public void updateZoomLevel(double cameraWidth) {

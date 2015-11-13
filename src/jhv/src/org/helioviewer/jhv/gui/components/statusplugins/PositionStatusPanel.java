@@ -5,21 +5,17 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JLabel;
-
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
-/**
- * Status panel for displaying the current mouse position.
- */
-@SuppressWarnings({ "serial" })
-public class PositionStatusPanel extends JLabel implements MouseMotionListener, InputControllerPlugin {
+@SuppressWarnings("serial")
+public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
 
     private Point lastPosition;
     private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
