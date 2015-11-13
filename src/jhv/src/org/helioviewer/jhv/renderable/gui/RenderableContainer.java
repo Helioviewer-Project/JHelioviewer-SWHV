@@ -278,7 +278,6 @@ public class RenderableContainer implements TableModel, Reorderable {
             vp.computeActive();
         }
         Displayer.reshapeAll();
-        Displayer.getViewport().getCamera().updateCameraWidthAspect(Displayer.getGLWidth() / (double) Displayer.getGLHeight());
         Displayer.render();
     }
 

@@ -152,7 +152,7 @@ public class RenderableImageLayer extends AbstractRenderable {
             Camera camera = vp.getCamera();
             camera.push(imageData.getMasterTime());
 
-            Mat4 vpmi = camera.getOrthoMatrixInverse();
+            Mat4 vpmi = camera.getOrthoMatrixInverse(vp.getWidth() / (double) vp.getHeight());
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
             GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
