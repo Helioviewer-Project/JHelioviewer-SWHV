@@ -4,10 +4,6 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 
-/**
- * 
- * @author Stephan Pagel
- * */
 public interface MainContentPanelPlugin {
 
     public String getTabName();
