@@ -38,13 +38,6 @@ public class InteractionAnnotate extends InteractionDefault {
     }
 
     @Override
-    public void reset() {
-        aRect.reset();
-        aCircle.reset();
-        aCross.reset();
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         activeAnnotatable.mousePressed(e);
     }
@@ -75,6 +68,12 @@ public class InteractionAnnotate extends InteractionDefault {
             default:
                 activeAnnotatable = aRect;
         }
+    }
+
+    public void clear() {
+        aRect.clear();
+        aCircle.clear();
+        aCross.clear();
     }
 
 }

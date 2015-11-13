@@ -67,6 +67,12 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
+    public void clear() {
+        crossPoints.clear();
+        activeIndex = -1;
+    }
+
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
@@ -91,12 +97,6 @@ public class AnnotateCross extends AbstractAnnotateable {
                 Displayer.display();
             }
         }
-    }
-
-    @Override
-    public void reset() {
-        crossPoints.clear();
-        activeIndex = -1;
     }
 
     @Override

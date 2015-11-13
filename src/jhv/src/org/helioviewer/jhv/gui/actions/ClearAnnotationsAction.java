@@ -22,7 +22,7 @@ public class ClearAnnotationsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Displayer.getViewport().getCamera().getAnnotateInteraction().reset();
+        Displayer.getViewport().getCamera().getAnnotateInteraction().clear();
         Displayer.display();
     }
 
