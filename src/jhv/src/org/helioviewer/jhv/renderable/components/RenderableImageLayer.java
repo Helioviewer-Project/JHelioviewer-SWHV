@@ -39,7 +39,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     private JHVWorker<?, ?> worker;
     private View view;
 
-    private static final double vpScale = 0.04;
+    private static final double vpScale = 0.035;
     private static final String loading = "Loading...";
 
     public RenderableImageLayer(JHVWorker<?, ?> _worker) {
@@ -191,7 +191,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     public void renderFloat(GL2 gl, Viewport vp) {
         if (imageData == null) {
             int delta = (int) (vp.getHeight() * 0.01);
-            TextRenderer renderer = GLText.getRenderer((int) (vp.getHeight() * vpScale));
+            TextRenderer renderer = GLText.getRenderer(Math.min(48, (int) (vp.getHeight() * vpScale)));
             Rectangle2D rect = renderer.getBounds(loading);
 
             renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
