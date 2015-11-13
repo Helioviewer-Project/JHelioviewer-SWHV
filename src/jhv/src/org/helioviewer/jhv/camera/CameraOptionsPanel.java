@@ -169,7 +169,6 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
     private void changeCamera(Camera camera, Camera.CameraMode mode) {
         camera.setMode(mode);
         switchOptionsPanel(camera.getOptionPanel());
-        Displayer.setActiveCamera(camera);
     }
 
 }

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.components;
 
+import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
@@ -96,33 +97,44 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glPopMatrix();
     }
 
-    public static void renderScene(GL2 gl) {
+    public static void renderScene(Camera camera, GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+        Mat4 inverse = camera.getRotation().transpose();
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
-                Camera camera = vp.getCamera();
-                // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
-
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                CameraHelper.applyPerspective(gl, camera, vp.getWidth() / (double) vp.getHeight());
+                CameraHelper.applyPerspective(camera, vp, gl);
 
-                renderBlackCircle(gl, camera.getRotation().transpose().m);
-                ImageViewerGui.getRenderableContainer().render(gl, vp);
+                renderBlackCircle(gl, inverse.m);
+                ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
                 camera.getAnnotateInteraction().drawInteractionFeedback(gl);
             }
         }
 
-        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(Displayer.getViewport().getCamera().getWidth());
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getWidth());
     }
 
-    public static void renderFloatScene(GL2 gl) {
+    public static void renderFloatScene(Camera camera, GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isVisible() && vp.isActive()) {
                 // Camera camera = vp.getCamera();
                 // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
                 gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-                ImageViewerGui.getRenderableContainer().renderFloat(gl, vp);
+                ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
             }
+        }
+    }
+
+    private static void renderMiniview(GL2 gl) {
+        Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
+        if (vp.isVisible()) {
+            Camera cameraMini = ImageViewerGui.getRenderableMiniview().getCamera();
+            cameraMini.timeChanged(Layers.getLastUpdatedTimestamp());
+
+            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
+            CameraHelper.applyPerspective(cameraMini, vp, gl);
+            ImageViewerGui.getRenderableContainer().renderMiniview(cameraMini, vp, gl);
         }
     }
 
@@ -137,19 +149,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             exporter.handleMovieExport(gl);
         }
 
-        renderScene(gl);
-
-        Viewport vp = ImageViewerGui.getRenderableMiniview().getViewport();
-        if (vp.isVisible()) {
-            Camera camera = vp.getCamera();
-            // camera.setAspect(vp.getWidth() / (double) vp.getHeight());
-            camera.timeChanged(Layers.getLastUpdatedTimestamp());
-
-            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.getWidth(), vp.getHeight());
-            CameraHelper.applyPerspective(gl, camera, vp.getWidth() / (double) vp.getHeight());
-            ImageViewerGui.getRenderableContainer().renderMiniview(gl, vp);
-        }
-        renderFloatScene(gl);
+        Camera camera = Displayer.getCamera();
+        renderScene(camera, gl);
+        renderMiniview(gl);
+        renderFloatScene(camera, gl);
     }
 
 }

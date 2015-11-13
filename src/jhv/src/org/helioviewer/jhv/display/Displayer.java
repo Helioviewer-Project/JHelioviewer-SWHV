@@ -44,10 +44,16 @@ public class Displayer implements JHVEventHighlightListener {
         return new Dimension(glWidth, glHeight);
     }
 
-    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, new Camera(), true);
-    private static Viewport viewport1 = new Viewport(1, 0, 0, 100, 100, viewport0.getCamera(), false);
-    private static Viewport viewport2 = new Viewport(2, 0, 0, 100, 100, viewport0.getCamera(), false);
-    private static Viewport viewport3 = new Viewport(3, 0, 0, 100, 100, viewport0.getCamera(), false);
+    private static Camera camera = new Camera();
+
+    public static Camera getCamera() {
+        return camera;
+    }
+
+    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, true);
+    private static Viewport viewport1 = new Viewport(1, 0, 0, 100, 100, false);
+    private static Viewport viewport2 = new Viewport(2, 0, 0, 100, 100, false);
+    private static Viewport viewport3 = new Viewport(3, 0, 0, 100, 100, false);
     private static Viewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
     private static Viewport viewport = viewport0;
 
@@ -104,12 +110,10 @@ public class Displayer implements JHVEventHighlightListener {
         boolean first = true;
         for (Viewport vp : viewports) {
             if (first && vp.isActive()) {
-                vp.getCamera().setAspect(w / (double) h);
                 vp.setSize(w, h);
                 vp.setOffset(0, 0);
                 first = false;
             } else {
-                vp.getCamera().setAspect(w / (double) h);
                 vp.setSize(w, h);
                 vp.setOffset(0, 0);
             }
@@ -125,12 +129,10 @@ public class Displayer implements JHVEventHighlightListener {
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
                 if (first) {
-                    vp.getCamera().setAspect(halfw / (double) h);
                     vp.setSize(halfw, h);
                     vp.setOffset(0, 0);
                     first = false;
                 } else {
-                    vp.getCamera().setAspect(halfw / (double) h);
                     vp.setSize(halfw, h);
                     vp.setOffset(halfw, 0);
                 }
@@ -142,27 +144,17 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
 
-        viewports[0].getCamera().setAspect(w / (double) h);
         viewports[0].setSize(w / 2, h / 2);
         viewports[0].setOffset(0, 0);
 
-        viewports[1].getCamera().setAspect(w / (double) h);
         viewports[1].setSize(w / 2, h / 2);
         viewports[1].setOffset(w / 2, 0);
 
-        viewports[2].getCamera().setAspect(w / (double) h);
         viewports[2].setSize(w / 2, h / 2);
         viewports[2].setOffset(0, h / 2);
 
-        viewports[3].getCamera().setAspect(w / (double) h);
         viewports[3].setSize(w / 2, h / 2);
         viewports[3].setOffset(w / 2, h / 2);
-    }
-
-    public static void setActiveCamera(Camera camera) {
-        for (Viewport vp : viewports) {
-            vp.setCamera(camera);
-        }
     }
 
     private static boolean torender = false;

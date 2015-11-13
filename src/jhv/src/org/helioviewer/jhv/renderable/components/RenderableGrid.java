@@ -51,14 +51,13 @@ public class RenderableGrid extends AbstractRenderable {
     private GridChoiceType gridChoice = GridChoiceType.OBSERVER;
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.getIndex()])
             return;
 
         if (showAxes)
             drawAxes(gl);
 
-        Camera camera = vp.getCamera();
         Mat4 cameraMatrix;
         switch (gridChoice) {
         case OBSERVER:

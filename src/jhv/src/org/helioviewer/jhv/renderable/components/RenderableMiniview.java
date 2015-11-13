@@ -18,7 +18,8 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private final Viewport miniview = new Viewport(0, 0, 0, 100, 100, new Camera(), true);
+    private final Camera cameraMini = new Camera();
+    private final Viewport miniview = new Viewport(0, 0, 0, 100, 100, true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -27,12 +28,12 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
     }
 
     @Override
-    public void renderMiniview(GL2 gl, Viewport vp) {
-        Mat4 cameraMatrix = vp.getCamera().getOrientation().toMatrix();
+    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+        Mat4 cameraMatrix = camera.getOrientation().toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {
@@ -89,7 +90,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     @Override
     public void activeLayerChanged(View view) {
         if (view != null)
-            miniview.getCamera().zoomToFit();
+            cameraMini.zoomToFit();
     }
 
     public Viewport getViewport() {
@@ -99,6 +100,10 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         miniview.setSize(offset, offset, size, size);
 
         return miniview;
+    }
+
+    public Camera getCamera() {
+        return cameraMini;
     }
 
     @Override

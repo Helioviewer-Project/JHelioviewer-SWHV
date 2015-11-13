@@ -9,6 +9,9 @@ import javax.swing.JLabel;
 
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 
@@ -39,8 +42,11 @@ public class PositionStatusPanel extends JLabel implements MouseMotionListener, 
         if (position == lastPosition)
             return;
 
-        Vec3 computedposition = Displayer.getViewport().getCamera().getVectorFromSphereAlt(position);
-        double radius = Displayer.getViewport().getCamera().getRadiusFromSphereAlt(position);
+        Camera camera = Displayer.getCamera();
+        Viewport vp = Displayer.getViewport();
+
+        Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
+        double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
         if (computedposition == null) {
             setText(emptyPos + String.format(rhoFormat, radius));

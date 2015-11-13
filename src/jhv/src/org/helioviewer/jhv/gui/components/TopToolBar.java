@@ -92,7 +92,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
         Settings.getSingletonInstance().save();
 
-        Camera camera = Displayer.getViewport().getCamera();
+        Camera camera = Displayer.getCamera();
         switch (mode) {
             case PAN:
                 camera.setCurrentInteraction(camera.getPanInteraction());
@@ -215,7 +215,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem(new AbstractAction("Rectangle") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
+                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
             }
         });
         annotatePopup.add(rectangleItem);
@@ -225,7 +225,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem circleItem = new JRadioButtonMenuItem(new AbstractAction("Circle") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
+                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
             }
         });
         annotatePopup.add(circleItem);
@@ -234,7 +234,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem(new AbstractAction("Cross") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getViewport().getCamera().getAnnotateInteraction().setMode(AnnotationMode.CROSS);
+                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.CROSS);
             }
         });
         annotatePopup.add(crossItem);
@@ -251,7 +251,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton = new JToggleButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Camera camera = Displayer.getViewport().getCamera();
+                Camera camera = Displayer.getCamera();
                 camera.setTrackingMode(!camera.getTrackingMode());
             }
         });

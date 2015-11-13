@@ -120,7 +120,7 @@ public class RenderableContainerPanel extends JPanel {
         });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
-        // addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
+        addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);

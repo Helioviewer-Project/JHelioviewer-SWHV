@@ -6,6 +6,8 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
@@ -14,7 +16,7 @@ public class ViewROI {
     private static final int resolution = 5;
     private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
 
-    private static ViewROI instance;
+    private static final ViewROI instance = new ViewROI();
 
     private ViewROI() {
         int count = 0;
@@ -32,14 +34,7 @@ public class ViewROI {
         }
     }
 
-    public static ViewROI getInstance() {
-        if (instance == null) {
-            instance = new ViewROI();
-        }
-        return instance;
-    }
-
-    public static Region updateROI(Camera camera, JHVDate masterTime, MetaData m) {
+    public static Region updateROI(Camera camera, Viewport vp, JHVDate masterTime, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
@@ -49,7 +44,7 @@ public class ViewROI {
 
         Quat camDiff = camera.getCameraDifferenceRotationQuat(m.getRotationObs());
         for (int i = 0; i < pointlist.length; i++) {
-            Vec3 hitPoint = camera.getVectorFromSphereOrPlane(pointlist[i], camDiff);
+            Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
             minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
             maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);

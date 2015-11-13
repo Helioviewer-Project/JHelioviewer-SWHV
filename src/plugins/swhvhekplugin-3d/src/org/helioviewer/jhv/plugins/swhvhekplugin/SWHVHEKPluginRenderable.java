@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -324,7 +325,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void render(GL2 gl, Viewport vp) {
+    public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.getIndex()]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
@@ -343,7 +344,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderFloat(GL2 gl, Viewport vp) {
+    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.getIndex()]) {
             if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
                 drawText(gl, vp, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);

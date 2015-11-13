@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainComponent;
 
@@ -48,8 +49,9 @@ public class GLGrab {
         Displayer.reshapeAll();
         {
             fbo.bind(gl);
-            MainComponent.renderScene(gl);
-            MainComponent.renderFloatScene(gl);
+            Camera camera = Displayer.getCamera();
+            MainComponent.renderScene(camera, gl);
+            MainComponent.renderFloatScene(camera, gl);
             fbo.unbind(gl);
 
             fbo.use(gl, fboTex);

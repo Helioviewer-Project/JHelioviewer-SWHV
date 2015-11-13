@@ -101,7 +101,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = camera.getVectorFromSphere(e.getPoint());
+        Vec3 pt = vectorFromSphere(camera, e.getPoint());
         if (pt != null) {
             crossPoints.add(pt);
             activeIndex = crossPoints.size() - 1;
