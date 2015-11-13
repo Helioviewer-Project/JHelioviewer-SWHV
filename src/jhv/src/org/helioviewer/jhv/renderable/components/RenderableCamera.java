@@ -14,7 +14,7 @@ import com.jogamp.opengl.GL2;
 
 public class RenderableCamera extends AbstractRenderable {
 
-    private final Component optionsPanel;
+    private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;
 
     private static final Color firstcolor = Color.BLUE;
@@ -38,7 +38,7 @@ public class RenderableCamera extends AbstractRenderable {
         if (!isVisible[vp.getIndex()])
             return;
 
-        double width = camera.getDistance() * Math.tan(camera.getFOVAngleToDraw());
+        double width = camera.getDistance() * Math.tan(optionsPanel.getFOVAngle());
         double height = width;
         double scale = 1.;
 

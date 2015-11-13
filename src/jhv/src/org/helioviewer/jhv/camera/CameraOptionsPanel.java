@@ -31,6 +31,9 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
 
+    private static final double FOVAngleDefault = 0.8;
+    private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
+
     private CameraOptionPanel currentOptionPanel;
 
     private static final String explanation = "Observer: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -115,16 +118,14 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         fovPanel.add(new JLabel("FOV angle"));
 
         final JSpinner fovSpinner = new JSpinner();
-        fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(0.8), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
+        fovSpinner.setModel(new SpinnerNumberModel(Double.valueOf(FOVAngleDefault), Double.valueOf(min), Double.valueOf(max), Double.valueOf(0.01)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) fovSpinner.getEditor()).getTextField();
         f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u00B0", min, max));
-
-        camera.setFOVangleDegrees((Double) fovSpinner.getValue());
 
         fovSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                camera.setFOVangleDegrees((Double) fovSpinner.getValue());
+                FOVAngle = (Double) fovSpinner.getValue() * Math.PI / 180.;
                 Displayer.display();
             }
         });
@@ -141,6 +142,10 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         add(fovPanel, c);
 
         setSmall();
+    }
+
+    public double getFOVAngle() {
+        return FOVAngle;
     }
 
     private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {
