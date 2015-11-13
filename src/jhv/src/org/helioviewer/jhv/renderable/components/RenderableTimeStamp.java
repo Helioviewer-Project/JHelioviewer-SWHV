@@ -32,12 +32,12 @@ public class RenderableTimeStamp extends AbstractRenderable {
         if (Displayer.multiview) {
             RenderableImageLayer im = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(vp.getIndex());
             if (im != null) {
-                text = im.getTimeString();
+                text = im.getTimeString() + " " + im.getName();
             }
         }
 
         int delta = (int) (vp.getHeight() * 0.01);
-        TextRenderer renderer = GLText.getRenderer(Math.min(48, (int) (vp.getHeight() * vpScale)));
+        TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.getHeight() * vpScale)));
 
         renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
         renderer.setColor(Color.BLACK);

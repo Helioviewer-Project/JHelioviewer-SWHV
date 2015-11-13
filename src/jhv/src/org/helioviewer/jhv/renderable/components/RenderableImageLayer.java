@@ -192,7 +192,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             int delta = (int) (vp.getHeight() * 0.01);
-            TextRenderer renderer = GLText.getRenderer(Math.min(48, (int) (vp.getHeight() * vpScale)));
+            TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.getHeight() * vpScale)));
             Rectangle2D rect = renderer.getBounds(loading);
 
             renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
