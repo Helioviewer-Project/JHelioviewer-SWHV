@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.layers.Layers;
 
 import com.jogamp.opengl.GL2;
 
@@ -136,6 +137,13 @@ public class CameraHelper {
         hitPoint = new Vec3(up1x, up1y, zvalue);
 
         return cameraDifferenceRotation.rotateInverseVector(hitPoint);
+    }
+
+    public static void zoomToFit(Camera camera) {
+        double newFOV = Camera.INITFOV, size = Layers.getLargestPhysicalSize();
+        if (size != 0)
+            newFOV = 2. * Math.atan2(0.5 * size, camera.getDistance());
+        camera.setCameraFOV(newFOV);
     }
 
 }
