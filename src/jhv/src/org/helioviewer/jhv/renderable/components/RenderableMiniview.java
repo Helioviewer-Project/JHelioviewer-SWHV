@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -89,8 +90,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void activeLayerChanged(View view) {
-        if (view != null)
-            cameraMini.zoomToFit();
+        CameraHelper.zoomToFit(cameraMini);
     }
 
     public Viewport getViewport() {

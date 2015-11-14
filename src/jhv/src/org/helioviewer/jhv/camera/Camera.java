@@ -15,7 +15,7 @@ public class Camera {
         OBSERVER, EARTH, EXPERT
     }
 
-    private static final double INITFOV = (48. / 60.) * Math.PI / 180.;
+    static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
     private double fov = INITFOV;
@@ -64,7 +64,7 @@ public class Camera {
     public void reset() {
         currentTranslation = new Vec2(0, 0);
         currentDragRotation.clear();
-        zoomToFit();
+        CameraHelper.zoomToFit(this);
         refresh();
     }
 
@@ -203,14 +203,6 @@ public class Camera {
             renderableCamera.setTimeString(viewpoint.time.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
-    }
-
-    public void zoomToFit() {
-        double size = Layers.getLargestPhysicalSize();
-        if (size == 0)
-            setCameraFOV(INITFOV);
-        else
-            setCameraFOV(2. * Math.atan2(0.5 * size, viewpoint.distance));
     }
 
     public Mat4 getRotation() {
