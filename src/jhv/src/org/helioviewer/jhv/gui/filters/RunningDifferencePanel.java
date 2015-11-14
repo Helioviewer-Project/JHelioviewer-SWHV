@@ -8,10 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -19,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -32,22 +27,14 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
-import org.helioviewer.jhv.io.FileDownloader;
+import org.helioviewer.jhv.io.DownloadView;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 
-/**
- * Panel to control running differences
- *
- * @author Helge Dietert
- *
- */
 @SuppressWarnings("serial")
 public class RunningDifferencePanel extends AbstractFilterPanel implements ChangeListener {
-    /**
-     * Controlled filter by this panel
-     */
+
     private final JSpinner truncateSpinner;
     private final JLabel truncateLabel;
     private final JPanel diffPanel = new JPanel();
@@ -71,7 +58,7 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                downloadLayer((JP2View) view);
+                DownloadView.downloadLayer((JP2View) view);
             }
         });
         downloadLayerButton.setBorder(null);
@@ -252,62 +239,6 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
 
     public Component getPanel() {
         return diffPanel;
-    }
-
-    /**
-     * Trigger downloading the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
-    private static void downloadLayer(JP2View view) {
-        Thread downloadThread = new Thread(new Runnable() {
-            private JP2View theView;
-
-            @Override
-            public void run() {
-                downloadFromJPIP(theView);
-            }
-
-            public Runnable init(JP2View theView) {
-                this.theView = theView;
-                return this;
-            }
-        }.init(view), "DownloadFromJPIPThread");
-        downloadThread.start();
-    }
-
-    /**
-     * Downloads the complete image from the JPIP server.
-     *
-     * Changes the source of the View afterwards, since a local file is always
-     * faster.
-     */
-    private static void downloadFromJPIP(JP2View v) {
-        FileDownloader fileDownloader = new FileDownloader();
-        URI downloadUri = v.getDownloadURI();
-        URI uri = v.getUri();
-
-        // the http server to download the file from is unknown
-        if (downloadUri.equals(uri) && !downloadUri.toString().contains("delphi.nascom.nasa.gov")) {
-            String inputValue = JOptionPane.showInputDialog("To download this file, please specify a concurrent HTTP server address to the JPIP server: ", uri);
-            if (inputValue != null) {
-                try {
-                    downloadUri = new URI(inputValue);
-                } catch (URISyntaxException e) {
-                }
-            }
-        }
-
-        File downloadDestination = fileDownloader.getDefaultDownloadLocation(uri);
-        try {
-            if (!fileDownloader.get(downloadUri, downloadDestination, "Downloading " + v.getName())) {
-                return;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
     }
 
 }
