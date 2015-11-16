@@ -41,8 +41,14 @@ public class Camera {
 
     private CameraMode mode = CameraMode.OBSERVER;
 
+    private void updateCamera(JHVDate date) {
+        viewpoint.update(date);
+        updateTransformation();
+        updateWidth();
+    }
+
     private void refresh() {
-        timeChanged(Layers.getLastUpdatedTimestamp());
+        updateCamera(Layers.getLastUpdatedTimestamp());
         Displayer.render();
     }
 
@@ -71,9 +77,7 @@ public class Camera {
     public void push(JHVDate date) {
         if (!trackingMode) {
             viewpoint.push();
-            viewpoint.update(date);
-            updateTransformation();
-            updateWidth();
+            updateCamera(date);
         }
     }
 
@@ -191,9 +195,7 @@ public class Camera {
 
     public void timeChanged(JHVDate date) {
         if (!trackingMode) {
-            viewpoint.update(date);
-            updateTransformation();
-            updateWidth();
+            updateCamera(date);
         }
     }
 
