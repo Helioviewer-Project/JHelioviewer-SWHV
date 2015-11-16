@@ -25,25 +25,14 @@ public class SubImage {
         this.height = h;
     }
 
-    /** Overridden equals method. */
     @Override
-    public boolean equals(Object _obj) {
-        if (_obj == null)
+    public boolean equals(Object o) {
+        if (!(o instanceof SubImage))
             return false;
-        else if (!(_obj instanceof SubImage))
-            return false;
-        else {
-            SubImage roi = SubImage.class.cast(_obj);
-            return x == roi.x && y == roi.y && width == roi.width && height == roi.height;
-        }
+        SubImage roi = (SubImage) o;
+        return x == roi.x && y == roi.y && width == roi.width && height == roi.height;
     }
 
-    /** Returns the number of pixels in the ROI */
-    public int getNumPixels() {
-        return width * height;
-    }
-
-    /** Overridden toString method */
     @Override
     public String toString() {
         String ret = "x=" + x + "   ";
