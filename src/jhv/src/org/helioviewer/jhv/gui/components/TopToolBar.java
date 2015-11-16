@@ -26,6 +26,7 @@ import org.helioviewer.jhv.camera.InteractionAnnotate.AnnotationMode;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
@@ -92,18 +93,17 @@ public class TopToolBar extends JToolBar implements MouseListener {
         Settings.getSingletonInstance().setProperty("display.interaction", mode.toString().toLowerCase());
         Settings.getSingletonInstance().save();
 
-        Camera camera = Displayer.getCamera();
         switch (mode) {
             case PAN:
-                camera.setCurrentInteraction(camera.getPanInteraction());
+                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getPanInteraction());
                 panButton.setSelected(true);
                 break;
             case ROTATE:
-                camera.setCurrentInteraction(camera.getRotateInteraction());
+                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getRotateInteraction());
                 rotateButton.setSelected(true);
                 break;
             case ANNOTATE:
-                camera.setCurrentInteraction(camera.getAnnotateInteraction());
+                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getAnnotateInteraction());
                 annotateButton.setSelected(true);
                 break;
         }
@@ -215,7 +215,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem(new AbstractAction("Rectangle") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
+                ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.RECTANGLE);
             }
         });
         annotatePopup.add(rectangleItem);
@@ -225,7 +225,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem circleItem = new JRadioButtonMenuItem(new AbstractAction("Circle") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
+                ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CIRCLE);
             }
         });
         annotatePopup.add(circleItem);
@@ -234,7 +234,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         JRadioButtonMenuItem crossItem = new JRadioButtonMenuItem(new AbstractAction("Cross") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Displayer.getCamera().getAnnotateInteraction().setMode(AnnotationMode.CROSS);
+                ImageViewerGui.getAnnotateInteraction().setMode(AnnotationMode.CROSS);
             }
         });
         annotatePopup.add(crossItem);

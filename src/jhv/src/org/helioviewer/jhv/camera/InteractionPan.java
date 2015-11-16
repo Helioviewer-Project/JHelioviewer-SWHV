@@ -10,7 +10,7 @@ public class InteractionPan extends Interaction {
 
     private Point lastMousePoint;
 
-    protected InteractionPan(Camera _camera) {
+    public InteractionPan(Camera _camera) {
         super(_camera);
     }
 

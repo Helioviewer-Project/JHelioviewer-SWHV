@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 
 /**
  * Action that resets the view transformation of the current camera
@@ -22,7 +23,7 @@ public class ClearAnnotationsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Displayer.getCamera().getAnnotateInteraction().clear();
+        ImageViewerGui.getAnnotateInteraction().clear();
         Displayer.display();
     }
 

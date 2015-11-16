@@ -18,6 +18,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.Interaction;
+import org.helioviewer.jhv.camera.InteractionAnnotate;
+import org.helioviewer.jhv.camera.InteractionPan;
+import org.helioviewer.jhv.camera.InteractionRotate;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.actions.ExitProgramAction;
 import org.helioviewer.jhv.gui.components.MainComponent;
@@ -42,17 +47,6 @@ import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 
-/**
- * A class that sets up the graphical user interface.
- *
- * @author caplins
- * @author Benjamin Wamsler
- * @author Alen Agheksanterian
- * @author Stephan Pagel
- * @author Markus Langenberg
- * @author Andre Dau
- *
- */
 public class ImageViewerGui {
 
     public static final int SIDE_PANEL_WIDTH = 320;
@@ -77,6 +71,11 @@ public class ImageViewerGui {
     private static RenderableCamera renderableCamera;
     private static RenderableMiniview renderableMiniview;
 
+    private static InteractionRotate rotationInteraction;
+    private static InteractionPan panInteraction;
+    private static InteractionAnnotate annotateInteraction;
+    private static Interaction currentInteraction;
+
     public static void prepareGui() {
         mainFrame = createMainFrame();
 
@@ -91,6 +90,12 @@ public class ImageViewerGui {
         midSplitPane.setOneTouchExpandable(false);
         midSplitPane.setDividerSize(6);
         contentPanel.add(midSplitPane, BorderLayout.CENTER);
+
+        Camera camera = Displayer.getCamera();
+        rotationInteraction = new InteractionRotate(camera);
+        panInteraction = new InteractionPan(camera);
+        annotateInteraction = new InteractionAnnotate(camera);
+        currentInteraction = rotationInteraction;
 
         // STATUS PANEL
         zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
@@ -120,7 +125,7 @@ public class ImageViewerGui {
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(renderableContainerPanel.getGridRowHeight());
 
         mainComponent = new MainComponent();
-        inputController = new InputController(Displayer.getCamera(), mainComponent);
+        inputController = new InputController(camera, mainComponent);
         mainContentPanel = new MainContentPanel(mainComponent);
 
         midSplitPane.setLeftComponent(leftScrollPane);
@@ -295,6 +300,26 @@ public class ImageViewerGui {
 
     public static RenderableContainer getRenderableContainer() {
         return renderableContainer;
+    }
+
+    public static void setCurrentInteraction(Interaction _currentInteraction) {
+        currentInteraction = _currentInteraction;
+    }
+
+    public static Interaction getCurrentInteraction() {
+        return currentInteraction;
+    }
+
+    public static Interaction getPanInteraction() {
+        return panInteraction;
+    }
+
+    public static Interaction getRotateInteraction() {
+        return rotationInteraction;
+    }
+
+    public static InteractionAnnotate getAnnotateInteraction() {
+        return annotateInteraction;
     }
 
 }

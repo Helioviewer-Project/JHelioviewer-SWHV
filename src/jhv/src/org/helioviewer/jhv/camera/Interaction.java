@@ -16,7 +16,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
 
     protected Camera camera;
 
-    protected Interaction(Camera _camera) {
+    public Interaction(Camera _camera) {
         camera = _camera;
     }
 

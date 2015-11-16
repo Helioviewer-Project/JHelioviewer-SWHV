@@ -27,11 +27,6 @@ public class Camera {
 
     private boolean trackingMode;
 
-    private final InteractionRotate rotationInteraction = new InteractionRotate(this);
-    private final InteractionPan panInteraction = new InteractionPan(this);
-    private final InteractionAnnotate annotateInteraction = new InteractionAnnotate(this);
-    private Interaction currentInteraction = rotationInteraction;
-
     private final PositionLoad positionLoad = new PositionLoad(this);
 
     private final ViewpointObserver viewpointObserver = new ViewpointObserver();
@@ -157,26 +152,6 @@ public class Camera {
 
     public void zoom(int wr) {
         setCameraFOV(fov * (1 + 0.015 * wr));
-    }
-
-    public void setCurrentInteraction(Interaction _currentInteraction) {
-        currentInteraction = _currentInteraction;
-    }
-
-    public Interaction getCurrentInteraction() {
-        return currentInteraction;
-    }
-
-    public Interaction getPanInteraction() {
-        return panInteraction;
-    }
-
-    public Interaction getRotateInteraction() {
-        return rotationInteraction;
-    }
-
-    public InteractionAnnotate getAnnotateInteraction() {
-        return annotateInteraction;
     }
 
     CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);

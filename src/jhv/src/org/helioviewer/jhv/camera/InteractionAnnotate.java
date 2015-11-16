@@ -26,7 +26,7 @@ public class InteractionAnnotate extends Interaction {
     private final AnnotateCross aCross = new AnnotateCross(camera);
     private Annotateable activeAnnotatable = aRect;
 
-    protected InteractionAnnotate(Camera _camera) {
+    public InteractionAnnotate(Camera _camera) {
         super(_camera);
     }
 
