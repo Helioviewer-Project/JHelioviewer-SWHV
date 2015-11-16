@@ -12,6 +12,7 @@ import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -51,7 +52,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mouseClicked(e);
 
-        camera.getCurrentInteraction().mouseClicked(e);
+        ImageViewerGui.getCurrentInteraction().mouseClicked(e);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseListener listener : mouseListeners)
             listener.mouseEntered(e);
 
-        if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
+        if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
             component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
         }
     }
@@ -81,12 +82,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             listener.mousePressed(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
+            if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
                 component.setCursor(UIGlobals.closedHandCursor);
             }
             buttonDown = true;
         }
-        camera.getCurrentInteraction().mousePressed(e);
+        ImageViewerGui.getCurrentInteraction().mousePressed(e);
     }
 
     @Override
@@ -96,12 +97,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             listener.mouseReleased(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (camera.getCurrentInteraction() != camera.getAnnotateInteraction()) {
+            if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
                 component.setCursor(UIGlobals.openHandCursor);
             }
             buttonDown = false;
         }
-        camera.getCurrentInteraction().mouseReleased(e);
+        ImageViewerGui.getCurrentInteraction().mouseReleased(e);
     }
 
     @Override
@@ -113,7 +114,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         long currentTime = System.currentTimeMillis();
         if (buttonDown && currentTime - lastTime > 30) {
             lastTime = currentTime;
-            camera.getCurrentInteraction().mouseDragged(e);
+            ImageViewerGui.getCurrentInteraction().mouseDragged(e);
         }
     }
 
@@ -123,9 +124,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseMotionListener listener : mouseMotionListeners)
             listener.mouseMoved(e);
 
-        camera.getCurrentInteraction().mouseMoved(e);
+        ImageViewerGui.getCurrentInteraction().mouseMoved(e);
     }
-
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
@@ -133,7 +133,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (MouseWheelListener listener : mouseWheelListeners)
             listener.mouseWheelMoved(e);
 
-        camera.getCurrentInteraction().mouseWheelMoved(e);
+        ImageViewerGui.getCurrentInteraction().mouseWheelMoved(e);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (KeyListener listener : keyListeners)
             listener.keyTyped(e);
 
-        camera.getCurrentInteraction().keyTyped(e);
+        ImageViewerGui.getCurrentInteraction().keyTyped(e);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (KeyListener listener : keyListeners)
             listener.keyPressed(e);
 
-        camera.getCurrentInteraction().keyPressed(e);
+        ImageViewerGui.getCurrentInteraction().keyPressed(e);
     }
 
     @Override
@@ -157,7 +157,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         for (KeyListener listener : keyListeners)
             listener.keyReleased(e);
 
-        camera.getCurrentInteraction().keyReleased(e);
+        ImageViewerGui.getCurrentInteraction().keyReleased(e);
     }
 
     private final HashSet<MouseListener> mouseListeners = new HashSet<MouseListener>();

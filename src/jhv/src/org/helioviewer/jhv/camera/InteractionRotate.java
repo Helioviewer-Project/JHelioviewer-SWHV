@@ -10,7 +10,7 @@ public class InteractionRotate extends Interaction {
 
     private Vec3 currentRotationStartPoint;
 
-    protected InteractionRotate(Camera _camera) {
+    public InteractionRotate(Camera _camera) {
         super(_camera);
     }
 
