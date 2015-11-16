@@ -142,10 +142,7 @@ public class ResolutionSet {
         }
 
         /** Returns the zoom in percent */
-        // public float getZoomPercent() {return 1f/(1<<discardLayers);}
         public float getZoomPercent() {
-            // System.out.println("Zoom value :"+ 1f/(1<<discardLayers));
-            // System.out.println("discardLayers :"+ discardLayers);
             return 1f / (1 << discardLayers);
         }
 
@@ -162,12 +159,10 @@ public class ResolutionSet {
          */
 
         @Override
-        public boolean equals(Object _obj) {
-            if (_obj == null)
+        public boolean equals(Object o) {
+            if (!(o instanceof ResolutionLevel))
                 return false;
-            else if (!(_obj instanceof ResolutionLevel))
-                return false;
-            ResolutionLevel res = ResolutionLevel.class.cast(_obj);
+            ResolutionLevel res = (ResolutionLevel) o;
             return discardLayers == res.discardLayers && dims.equals(res.dims);
         }
 
@@ -186,6 +181,7 @@ public class ResolutionSet {
         public String toString() {
             return "[[ZoomPercent=" + getZoomPercent() + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + dims.toString() + "]]";
         }
+
     }
 
 }
