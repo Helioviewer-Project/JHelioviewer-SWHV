@@ -17,7 +17,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
@@ -49,7 +48,6 @@ class J2KRender implements Runnable {
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
-
         int numLayer = currParams.compositionLayer;
 
         // compositor.Refresh();
@@ -67,17 +65,17 @@ class J2KRender implements Runnable {
 
         parentImageRef.updateResolutionSet(compositor, numLayer);
 
-        compositor.Set_scale(false, false, false, currParams.resolution.getZoomPercent());
+        compositor.Set_scale(false, false, false, currParams.resolution.getZoomPercent(), 1);
+        Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(currParams.subImage);
+        compositor.Set_buffer_surface(requestedRegion);
 
-        SubImage roi = currParams.subImage;
-        Kdu_dims requestedBufferedRegion = KakaduUtils.roiToKdu_dims(roi);
-        compositor.Set_buffer_surface(requestedBufferedRegion);
+        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims());
+        Kdu_dims actualRenderedRegion = compositorBuf.Get_rendering_region();
 
-        Kdu_dims actualBufferedRegion = new Kdu_dims();
-        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(actualBufferedRegion);
-
-        Kdu_coords actualOffset = new Kdu_coords();
-        actualOffset.Assign(actualBufferedRegion.Access_pos());
+        // avoid gc
+        Kdu_coords actualOffset = new Kdu_coords(actualRenderedRegion.Access_pos().Get_x(), actualRenderedRegion.Access_pos().Get_y());
+        Kdu_coords actualSize = actualRenderedRegion.Access_size();
+        int aWidth = actualSize.Get_x(), aHeight = actualSize.Get_y();
 
         Kdu_dims newRegion = new Kdu_dims();
 
@@ -85,9 +83,9 @@ class J2KRender implements Runnable {
         byte[] byteBuffer = null;
 
         if (numComponents < 3) {
-            byteBuffer = new byte[roi.getNumPixels()];
+            byteBuffer = new byte[aWidth * aHeight];
         } else {
-            intBuffer = new int[roi.getNumPixels()];
+            intBuffer = new int[aWidth * aHeight];
         }
 
         int[] localIntBuffer = bufferLocal.get();
@@ -109,16 +107,16 @@ class J2KRender implements Runnable {
             compositorBuf.Get_region(newRegion, localIntBuffer);
 
             int srcIdx = 0;
-            int destIdx = newOffset.Get_x() + newOffset.Get_y() * roi.width;
+            int destIdx = newOffset.Get_x() + newOffset.Get_y() * aWidth;
 
             if (numComponents < 3) {
-                for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                for (int row = 0; row < newHeight; row++, destIdx += aWidth, srcIdx += newWidth) {
                     for (int col = 0; col < newWidth; ++col) {
                         byteBuffer[destIdx + col] = (byte) (localIntBuffer[srcIdx + col] & 0xFF);
                     }
                 }
             } else {
-                for (int row = 0; row < newHeight; row++, destIdx += roi.width, srcIdx += newWidth) {
+                for (int row = 0; row < newHeight; row++, destIdx += aWidth, srcIdx += newWidth) {
                     System.arraycopy(localIntBuffer, srcIdx, intBuffer, destIdx, newWidth);
                 }
             }
@@ -130,9 +128,9 @@ class J2KRender implements Runnable {
 
         ImageData imdata = null;
         if (numComponents < 3) {
-            imdata = new SingleChannelByte8ImageData(roi.width, roi.height, ByteBuffer.wrap(byteBuffer));
+            imdata = new SingleChannelByte8ImageData(aWidth, aHeight, ByteBuffer.wrap(byteBuffer));
         } else {
-            imdata = new ARGBInt32ImageData(false, roi.width, roi.height, IntBuffer.wrap(intBuffer));
+            imdata = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
         setImageData(imdata, currParams);
     }

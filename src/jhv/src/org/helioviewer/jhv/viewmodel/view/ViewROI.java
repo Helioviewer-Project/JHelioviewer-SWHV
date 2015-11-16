@@ -81,8 +81,8 @@ public class ViewROI {
         if (regionWidth > 0 && regionHeight > 0) {
             newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            newRegion = r;
-            System.out.println(">> something is messed");
+            newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
+            System.out.println(">> empty ROI");
         }
 
         return newRegion;
