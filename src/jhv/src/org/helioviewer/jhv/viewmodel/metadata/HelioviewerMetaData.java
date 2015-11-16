@@ -5,7 +5,6 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -20,7 +19,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String fullName = "";
 
     private double unitPerPixel;
-    private Vec2 sunPixelPosition;
+    private double sunPositionX = Double.NaN;
+    private double sunPositionY = Double.NaN;
 
     public HelioviewerMetaData(MetaDataContainer m) {
         identifyObservation(m);
@@ -206,7 +206,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
             double sunX = m.tryGetDouble("CRPIX1") - 1;
             double sunY = m.tryGetDouble("CRPIX2") - 1;
-            sunPixelPosition = new Vec2(sunX, pixelHeight - 1 - sunY);
+
+            sunPositionX = unitPerPixel * sunX;
+            sunPositionY = unitPerPixel * (pixelHeight - 1 - sunY);
 
             region = new Region(-unitPerPixel * sunX, -unitPerPixel * sunY, pixelWidth * unitPerPixel, pixelHeight * unitPerPixel);
         } else { // pixel based
@@ -215,8 +217,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     }
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
-        return new Region((roi.x / zoompercent - sunPixelPosition.x) * unitPerPixel, (roi.y / zoompercent - sunPixelPosition.y) * unitPerPixel,
-                          roi.width * unitPerPixel / zoompercent, roi.height * unitPerPixel / zoompercent);
+        return new Region(roi.x * unitPerPixel / zoompercent - sunPositionX,
+                          roi.y * unitPerPixel / zoompercent - sunPositionY,
+                          roi.width * unitPerPixel / zoompercent,
+                          roi.height * unitPerPixel / zoompercent);
     }
 
     @Override
