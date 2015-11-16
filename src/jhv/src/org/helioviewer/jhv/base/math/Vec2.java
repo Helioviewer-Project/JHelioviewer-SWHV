@@ -34,10 +34,15 @@ public class Vec2 {
 
     public Vec2(double[] coordinates) {
         if (coordinates == null || coordinates.length < 2) {
-            throw new IllegalArgumentException("Coordinate Array must contain at least 3 dimensions");
+            throw new IllegalArgumentException("Coordinate array must contain at least 2 dimensions");
         }
         this.x = coordinates[0];
         this.y = coordinates[1];
+    }
+
+    public void clear() {
+        this.x = 0;
+        this.y = 0;
     }
 
     public void add(Vec2 vec) {
