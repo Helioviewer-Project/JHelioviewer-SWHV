@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
-import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -114,7 +113,6 @@ public class JP2Image {
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
-    private boolean hiResImage = false;
     private static final int hiDpiCutoff = 1024;
 
     /**
@@ -174,10 +172,6 @@ public class JP2Image {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
         }
-
-        Rectangle fullFrame = resolutionSet.getResolutionLevel(0).getResolutionBounds();
-        if (JHVGlobals.GoForTheBroke && fullFrame.width * fullFrame.height > hiDpiCutoff * hiDpiCutoff)
-            hiResImage = true;
     }
 
     /**
@@ -371,12 +365,7 @@ public class JP2Image {
         double ratio = 2 * camera.getWidth() / vp.getHeight();
         int totalHeight = (int) (mHeight / ratio);
 
-        ResolutionLevel res;
-        if (hiResImage && totalHeight > hiDpiCutoff && Layers.isMoviePlaying())
-            res = resolutionSet.getPreviousResolutionLevel(totalHeight, totalHeight);
-        else
-            res = resolutionSet.getNextResolutionLevel(totalHeight, totalHeight);
-
+        ResolutionLevel res = resolutionSet.getNextResolutionLevel(totalHeight, totalHeight);
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
@@ -391,7 +380,14 @@ public class JP2Image {
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
-        JP2ImageParameter newImageViewParams = new JP2ImageParameter(this, masterTime, subImage, res, frameNumber);
+
+        float scaleAdj = 1;
+        int maxDim = Math.max(imageWidth, imageHeight);
+        if (JHVGlobals.GoForTheBroke && maxDim > hiDpiCutoff && Layers.isMoviePlaying()) {
+            scaleAdj = hiDpiCutoff / (float) maxDim;
+        }
+
+        JP2ImageParameter newImageViewParams = new JP2ImageParameter(this, masterTime, subImage, res, scaleAdj, frameNumber);
 
         return checkParameter(newImageViewParams, fromReader);
     }
