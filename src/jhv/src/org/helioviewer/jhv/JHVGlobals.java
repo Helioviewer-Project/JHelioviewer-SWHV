@@ -31,6 +31,7 @@ public class JHVGlobals {
     private JHVGlobals() {}
 
     public static final boolean GoForTheBroke = true;
+    public static final int hiDpiCutoff = 1024;
 
     private static ExecutorService executorService;
 

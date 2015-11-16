@@ -113,8 +113,6 @@ public class JP2Image {
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
-    private static final int hiDpiCutoff = 1024;
-
     /**
      * Constructor
      *
@@ -383,8 +381,8 @@ public class JP2Image {
 
         float scaleAdj = 1;
         int maxDim = Math.max(imageWidth, imageHeight);
-        if (JHVGlobals.GoForTheBroke && maxDim > hiDpiCutoff && Layers.isMoviePlaying()) {
-            scaleAdj = hiDpiCutoff / (float) maxDim;
+        if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
+            scaleAdj = JHVGlobals.hiDpiCutoff / (float) maxDim;
         }
 
         JP2ImageParameter newImageViewParams = new JP2ImageParameter(this, masterTime, subImage, res, scaleAdj, frameNumber);
@@ -403,7 +401,7 @@ public class JP2Image {
         }
 
         boolean viewChanged = oldImageViewParams == null ||
-                              !(newImageViewParams.subImage.equals(oldImageViewParams.subImage) && 
+                              !(newImageViewParams.subImage.equals(oldImageViewParams.subImage) &&
                                 newImageViewParams.resolution.equals(oldImageViewParams.resolution));
         // ping reader
         if (viewChanged) {
