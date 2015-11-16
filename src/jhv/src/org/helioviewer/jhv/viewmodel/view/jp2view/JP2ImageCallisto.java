@@ -42,7 +42,7 @@ public class JP2ImageCallisto extends JP2Image {
         SubImage subImage = new SubImage((int) (region.getLLX() / maxWidth * rect.width), (int) (region.getLLY() / maxHeight * rect.height),
                                          (int) Math.ceil(rWidth / maxWidth * rect.width), (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 
-        return new JP2ImageParameter(this, masterTime, subImage, res, frameNumber);
+        return new JP2ImageParameter(this, masterTime, subImage, res, 1, frameNumber);
     }
 
 }
