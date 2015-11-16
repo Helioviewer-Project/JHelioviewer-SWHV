@@ -21,7 +21,7 @@ public class Camera {
     private double fov = INITFOV;
 
     private Quat rotation = new Quat();
-    private Vec2 currentTranslation = new Vec2();
+    private final Vec2 currentTranslation = new Vec2();
     private final Quat currentDragRotation = new Quat();
     private double cameraWidth = 1;
 
@@ -63,7 +63,7 @@ public class Camera {
     }
 
     public void reset() {
-        currentTranslation = new Vec2(0, 0);
+        currentTranslation.clear();
         currentDragRotation.clear();
         CameraHelper.zoomToFit(this);
         refresh();
@@ -103,8 +103,9 @@ public class Camera {
         return currentTranslation;
     }
 
-    void setCurrentTranslation(Vec2 pan) {
-        currentTranslation = pan;
+    void setCurrentTranslation(double x, double y) {
+        currentTranslation.x = x;
+        currentTranslation.y = y;
         updateTransformation();
     }
 
@@ -156,7 +157,7 @@ public class Camera {
 
     CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
 
-    void firePositionLoaded(final String state) {
+    void firePositionLoaded(String state) {
         expertOptionPanel.fireLoaded(state);
         refresh();
     }
