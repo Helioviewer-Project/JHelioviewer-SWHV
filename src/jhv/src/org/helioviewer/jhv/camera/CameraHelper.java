@@ -146,4 +146,10 @@ public class CameraHelper {
         camera.setCameraFOV(newFOV);
     }
 
+    public static Quat getCameraDifferenceRotation(Camera camera, Quat rot) {
+        Quat q = camera.getRotationQuat();
+        q.rotateWithConjugate(rot);
+        return q;
+    }
+
 }
