@@ -27,8 +27,8 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
         title = new JLabel("Opacity", JLabel.RIGHT);
 
         opacitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        opacitySlider.setMajorTickSpacing(25);
-        opacitySlider.setPaintTicks(true);
+        opacitySlider.setMinorTickSpacing(25);
+        // opacitySlider.setPaintTicks(true);
 
         opacitySlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(opacitySlider);

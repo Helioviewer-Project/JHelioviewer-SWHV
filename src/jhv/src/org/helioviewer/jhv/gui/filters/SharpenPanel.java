@@ -26,8 +26,8 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
         title = new JLabel("Sharpen", JLabel.RIGHT);
 
         sharpeningSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        sharpeningSlider.setMajorTickSpacing(25);
-        sharpeningSlider.setPaintTicks(true);
+        sharpeningSlider.setMinorTickSpacing(25);
+        // sharpeningSlider.setPaintTicks(true);
 
         sharpeningSlider.addChangeListener(this);
         WheelSupport.installMouseWheelSupport(sharpeningSlider);
