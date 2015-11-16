@@ -56,8 +56,6 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
-    private static final int hiDpiCutoff = 1024;
-
     private JHVDate targetMasterTime;
 
     private int targetFrame = 0;
@@ -199,8 +197,8 @@ public class JP2View extends AbstractView {
 
         float scaleAdj = 1;
         int maxDim = Math.max(imageWidth, imageHeight);
-        if (JHVGlobals.GoForTheBroke && maxDim > hiDpiCutoff && Layers.isMoviePlaying()) {
-            scaleAdj = hiDpiCutoff / (float) maxDim;
+        if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
+            scaleAdj = JHVGlobals.hiDpiCutoff / (float) maxDim;
         }
 
         JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, scaleAdj, frameNumber);
