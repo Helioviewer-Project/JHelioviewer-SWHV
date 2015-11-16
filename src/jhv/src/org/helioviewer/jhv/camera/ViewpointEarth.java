@@ -16,4 +16,9 @@ class ViewpointEarth extends Viewpoint {
         distance = p.rad;
     }
 
+    @Override
+    CameraOptionPanel getOptionPanel() {
+        return null;
+    }
+
 }

@@ -12,6 +12,7 @@ abstract class Viewpoint {
     double distance;
 
     abstract void update(JHVDate date);
+    abstract CameraOptionPanel getOptionPanel();
 
     Viewpoint() {
         time = TimeUtils.epoch;

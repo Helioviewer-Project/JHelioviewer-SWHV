@@ -24,4 +24,9 @@ class ViewpointObserver extends Viewpoint {
         }
     }
 
+    @Override
+    CameraOptionPanel getOptionPanel() {
+        return null;
+    }
+
 }

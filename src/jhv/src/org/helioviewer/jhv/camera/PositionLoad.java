@@ -42,10 +42,10 @@ public class PositionLoad {
     private Position.Latitudinal[] position;
     private JHVWorker<Position.Latitudinal[], Void> worker;
 
-    private final Camera camera;
+    private final ViewpointExpert viewpoint;
 
-    public PositionLoad(Camera _camera) {
-        camera = _camera;
+    public PositionLoad(ViewpointExpert _viewpoint) {
+        viewpoint = _viewpoint;
     }
 
     private class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
@@ -210,8 +210,8 @@ public class PositionLoad {
         }
     }
 
-    public void fireLoaded(final String state) {
-        camera.firePositionLoaded(state);
+    public void fireLoaded(String state) {
+        viewpoint.firePositionLoaded(state);
     }
 
     public Date getBeginDate() {

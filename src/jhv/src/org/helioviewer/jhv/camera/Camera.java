@@ -27,11 +27,9 @@ public class Camera {
 
     private boolean trackingMode;
 
-    private final PositionLoad positionLoad = new PositionLoad(this);
-
     private final ViewpointObserver viewpointObserver = new ViewpointObserver();
     private final ViewpointEarth viewpointEarth = new ViewpointEarth();
-    private final ViewpointExpert viewpointExpert = new ViewpointExpert(positionLoad);
+    private final ViewpointExpert viewpointExpert = new ViewpointExpert(this);
     private Viewpoint viewpoint = viewpointObserver;
 
     private CameraMode mode = CameraMode.OBSERVER;
@@ -51,7 +49,7 @@ public class Camera {
         cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
     }
 
-    private void refresh() {
+    void refresh() {
         updateCamera(Layers.getLastUpdatedTimestamp());
         Displayer.render();
     }
@@ -156,18 +154,8 @@ public class Camera {
         setCameraFOV(fov * (1 + 0.015 * wr));
     }
 
-    CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
-
-    void firePositionLoaded(String state) {
-        expertOptionPanel.fireLoaded(state);
-        refresh();
-    }
-
     CameraOptionPanel getOptionPanel() {
-        if (mode == CameraMode.EXPERT) {
-            return expertOptionPanel;
-        }
-        return null;
+        return viewpoint.getOptionPanel();
     }
 
     public void timeChanged(JHVDate date) {
