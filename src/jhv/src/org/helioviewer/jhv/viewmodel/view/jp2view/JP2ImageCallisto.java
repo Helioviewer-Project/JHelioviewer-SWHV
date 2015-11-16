@@ -39,10 +39,8 @@ public class JP2ImageCallisto extends JP2Image {
                                                                    2 * (int) Math.ceil(viewport.height / rHeight * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
-        SubImage subImage = new SubImage((int) (region.getLowerLeftCorner().x / maxWidth * rect.width),
-                (int) (region.getLowerLeftCorner().y / maxHeight * rect.height),
-                (int) Math.ceil(rWidth / maxWidth * rect.width),
-                (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
+        SubImage subImage = new SubImage((int) (region.getLLX() / maxWidth * rect.width), (int) (region.getLLY() / maxHeight * rect.height),
+                                         (int) Math.ceil(rWidth / maxWidth * rect.width), (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 
         return new JP2ImageParameter(this, masterTime, subImage, res, frameNumber);
     }

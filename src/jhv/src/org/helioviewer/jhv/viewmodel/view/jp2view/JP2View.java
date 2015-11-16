@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
@@ -178,10 +177,11 @@ public class JP2View extends AbstractView {
         Viewport vp = Displayer.getViewport();
 
         MetaData m = jp2Image.metaDataList[frameNumber];
+        Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, masterTime, m);
 
-        double mWidth = m.getPhysicalSize().x;
-        double mHeight = m.getPhysicalSize().y;
+        double mWidth = mr.getWidth();
+        double mHeight = mr.getHeight();
         double rWidth = r.getWidth();
         double rHeight = r.getHeight();
 
@@ -201,10 +201,8 @@ public class JP2View extends AbstractView {
         int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
         int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
 
-        Vec2 rUpperLeft = r.getUpperLeftCorner();
-        Vec2 mUpperLeft = m.getPhysicalUpperLeft();
-        double displacementX = rUpperLeft.x - mUpperLeft.x;
-        double displacementY = rUpperLeft.y - mUpperLeft.y;
+        double displacementX = r.getULX() - mr.getULX();
+        double displacementY = r.getULY() - mr.getULY();
 
         int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
         int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);

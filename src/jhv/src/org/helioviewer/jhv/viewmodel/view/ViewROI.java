@@ -60,11 +60,11 @@ public class ViewROI {
         minPhysicalY = minPhysicalY - widthyAdd;
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
-        Vec2 metPhysicalSize = m.getPhysicalSize();
-        double metLLX = m.getPhysicalLowerLeft().x;
-        double metLLY = m.getPhysicalLowerLeft().y;
-        double metURX = metLLX + metPhysicalSize.x;
-        double metURY = metLLY + metPhysicalSize.y;
+        Region r = m.getPhysicalRegion();
+        double metLLX = r.getLLX();
+        double metLLY = r.getLLY();
+        double metURX = r.getURX();
+        double metURY = r.getURY();
 
         if (minPhysicalX < metLLX)
             minPhysicalX = metLLX;
@@ -81,7 +81,8 @@ public class ViewROI {
         if (regionWidth > 0 && regionHeight > 0) {
             newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
         } else {
-            newRegion = new Region(metLLX, metLLY, metURX - metLLX, metURY - metLLY);
+            newRegion = r;
+            System.out.println(">> something is messed");
         }
 
         return newRegion;

@@ -489,7 +489,7 @@ public class Layers {
             else
                 m = d.getMetaData();
 
-            newSize = m.getPhysicalSize().y;
+            newSize = m.getPhysicalRegion().getHeight();
             if (newSize > size) {
                 size = newSize;
             }

@@ -80,8 +80,8 @@ public class GLImage {
     private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         Region region = imageData.getRegion();
 
-        double xOffset = region.getLowerLeftCorner().x;
-        double yOffset = region.getLowerLeftCorner().y;
+        double xOffset = region.getLLX();
+        double yOffset = region.getLLY();
         double xScale = 1. / region.getWidth();
         double yScale = 1. / region.getHeight();
 
@@ -99,8 +99,8 @@ public class GLImage {
         }
 
         if (diffMode) {
-            double diffXOffset = diffRegion.getLowerLeftCorner().x;
-            double diffYOffset = diffRegion.getLowerLeftCorner().y;
+            double diffXOffset = diffRegion.getLLX();
+            double diffYOffset = diffRegion.getLLY();
             double diffXScale = 1. / diffRegion.getWidth();
             double diffYScale = 1. / diffRegion.getHeight();
 

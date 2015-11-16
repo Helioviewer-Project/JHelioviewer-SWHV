@@ -1,58 +1,61 @@
 package org.helioviewer.jhv.base;
 
-import org.helioviewer.jhv.base.math.Vec2;
-
 public class Region {
 
-    private final Vec2 lowerLeftCorner;
-    private final Vec2 sizeVector;
+    private final double width;
+    private final double height;
 
-    public Region(double newLowerLeftX, double newLowerLeftY, double newWidth, double newHeight) {
-        lowerLeftCorner = new Vec2(newLowerLeftX, newLowerLeftY);
-        sizeVector = new Vec2(newWidth, newHeight);
-    }
+    private final double llx;
+    private final double lly;
+    private final double urx;
+    private final double ury;
+    private final double ulx;
+    private final double uly;
 
-    public Region(Vec2 newLowerLeftCorner, double newWidth, double newHeight) {
-        lowerLeftCorner = newLowerLeftCorner;
-        sizeVector = new Vec2(newWidth, newHeight);
-    }
+    public Region(double newLLX, double newLLY, double newWidth, double newHeight) {
+        width = newWidth;
+        height = newHeight;
 
-    public Region(double newLowerLeftX, double newLowerLeftY, Vec2 newSizeVector) {
-        lowerLeftCorner = new Vec2(newLowerLeftX, newLowerLeftY);
-        sizeVector = newSizeVector;
-    }
+        llx = newLLX;
+        lly = newLLY;
 
-    public Region(Vec2 newLowerLeftCorner, Vec2 newSizeVector) {
-        lowerLeftCorner = newLowerLeftCorner;
-        sizeVector = newSizeVector;
-    }
+        urx = llx + width;
+        ury = lly + height;
 
-    public Vec2 getLowerLeftCorner() {
-        return lowerLeftCorner;
-    }
-
-    public Vec2 getSize() {
-        return sizeVector;
-    }
-
-    public double getHeight() {
-        return sizeVector.y;
+        ulx = llx;
+        uly = lly + height;
     }
 
     public double getWidth() {
-        return sizeVector.x;
+        return width;
     }
 
-    public Vec2 getLowerRightCorner() {
-        return new Vec2(lowerLeftCorner.x + sizeVector.x, lowerLeftCorner.y);
+    public double getHeight() {
+        return height;
     }
 
-    public Vec2 getUpperLeftCorner() {
-        return new Vec2(lowerLeftCorner.x, lowerLeftCorner.y + sizeVector.y);
+    public double getLLX() {
+        return llx;
     }
 
-    public Vec2 getUpperRightCorner() {
-        return Vec2.add(lowerLeftCorner, sizeVector);
+    public double getLLY() {
+        return lly;
+    }
+
+    public double getURX() {
+        return urx;
+    }
+
+    public double getURY() {
+        return ury;
+    }
+
+    public double getULX() {
+        return ulx;
+    }
+
+    public double getULY() {
+        return uly;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class Region {
             return false;
         }
         Region r = (Region) o;
-        return r.getSize().equals(sizeVector) && r.getLowerLeftCorner().equals(lowerLeftCorner);
+        return width == r.width && height == r.height && llx == r.llx && lly == r.lly;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class Region {
 
     @Override
     public String toString() {
-        return "[Region: Corner: " + lowerLeftCorner + ", Size: " + sizeVector + "]";
+        return "[Region: Corner: [" + llx + "," + lly + "] Size: [" + width + "," + height + "]";
     }
 
 }
