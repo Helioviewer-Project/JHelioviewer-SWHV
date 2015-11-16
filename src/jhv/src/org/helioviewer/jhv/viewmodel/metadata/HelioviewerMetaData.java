@@ -19,6 +19,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
+    private double unitPerPixel;
     private Vec2 sunPixelPosition;
 
     public HelioviewerMetaData(MetaDataContainer m) {
@@ -35,7 +36,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equalsIgnoreCase("C2")) {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
-            cutOffValue = (float) (-this.getPhysicalUpperLeft().x);
+            cutOffValue = (float) -region.getULX();
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }
     }
@@ -207,11 +208,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double sunY = m.tryGetDouble("CRPIX2") - 1;
             sunPixelPosition = new Vec2(sunX, pixelHeight - 1 - sunY);
 
-            setPhysicalLowerLeftCorner(new Vec2(-unitPerPixel * sunX, -unitPerPixel * sunY));
-            setPhysicalSize(new Vec2(pixelWidth * unitPerPixel, pixelHeight * unitPerPixel));
+            region = new Region(-unitPerPixel * sunX, -unitPerPixel * sunY, pixelWidth * unitPerPixel, pixelHeight * unitPerPixel);
         } else { // pixel based
-            setPhysicalLowerLeftCorner(new Vec2(0, 0));
-            setPhysicalSize(new Vec2(pixelWidth, pixelHeight));
+            region = new Region(0, 0, pixelWidth, pixelHeight);
         }
     }
 

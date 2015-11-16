@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
@@ -48,7 +47,7 @@ public class FITSView extends AbstractView {
         }
         metaDataArray[0] = m;
 
-        imageData.setRegion(new Region(m.getPhysicalLowerLeft(), m.getPhysicalSize()));
+        imageData.setRegion(m.getPhysicalRegion());
         imageData.setMetaData(metaDataArray[0]);
         imageData.setFrameNumber(0);
         imageData.setMasterTime(metaDataArray[0].getDateObs());
