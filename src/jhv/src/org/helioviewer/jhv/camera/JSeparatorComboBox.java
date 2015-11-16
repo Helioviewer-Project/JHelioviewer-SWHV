@@ -19,7 +19,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  * to select the separator with the mouse, the selection will be ignored and the
  * drop down will remain open.
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class JSeparatorComboBox extends JComboBox implements KeyListener {
 
     //  Track key presses and releases
