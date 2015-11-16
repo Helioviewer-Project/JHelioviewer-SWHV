@@ -156,11 +156,11 @@ public class RenderableImageLayer extends AbstractRenderable {
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
 
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(imageData.getMetaData().getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, imageData.getMetaData().getRotationObs()));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, baseImageData.getMetaData().getRotationObs()));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, camera.getCameraDifferenceRotationQuat(prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, prevImageData.getMetaData().getRotationObs()));
             }
 
             camera.pop();

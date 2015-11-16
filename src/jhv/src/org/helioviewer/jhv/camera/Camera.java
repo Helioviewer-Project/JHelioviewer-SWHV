@@ -42,6 +42,15 @@ public class Camera {
         updateWidth();
     }
 
+    private void updateTransformation() {
+        rotation = currentDragRotation.copy();
+        rotation.rotate(viewpoint.orientation);
+    }
+
+    private void updateWidth() {
+        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
+    }
+
     private void refresh() {
         updateCamera(Layers.getLastUpdatedTimestamp());
         Displayer.render();
@@ -92,11 +101,12 @@ public class Camera {
         return viewpoint.orientation;
     }
 
-    public Quat getCameraDifferenceRotationQuat(Quat rot) {
-        Quat cameraDifferenceRotation = rotation.copy();
-        cameraDifferenceRotation.rotateWithConjugate(rot);
+    Quat getRotationQuat() {
+        return rotation.copy();
+    }
 
-        return cameraDifferenceRotation;
+    public Mat4 getRotation() {
+        return rotation.toMatrix();
     }
 
     public Vec2 getCurrentTranslation() {
@@ -116,15 +126,6 @@ public class Camera {
     void rotateCurrentDragRotation(Quat _currentDragRotation) {
         currentDragRotation.rotate(_currentDragRotation);
         updateTransformation();
-    }
-
-    private void updateTransformation() {
-        rotation = currentDragRotation.copy();
-        rotation.rotate(viewpoint.orientation);
-    }
-
-    private void updateWidth() {
-        cameraWidth = viewpoint.distance * Math.tan(0.5 * fov);
     }
 
     public void setCameraFOV(double _fov) {
@@ -181,10 +182,6 @@ public class Camera {
             renderableCamera.setTimeString(viewpoint.time.toString());
             ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
-    }
-
-    public Mat4 getRotation() {
-        return rotation.toMatrix();
     }
 
 }
