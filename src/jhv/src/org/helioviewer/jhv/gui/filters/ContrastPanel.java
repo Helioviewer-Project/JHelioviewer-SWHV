@@ -30,8 +30,8 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
         title = new JLabel("Contrast", JLabel.RIGHT);
 
         contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-        contrastSlider.setMajorTickSpacing(25 * 2); // twice wider
-        contrastSlider.setPaintTicks(true);
+        contrastSlider.setMinorTickSpacing(25 * 2); // twice wider
+        // contrastSlider.setPaintTicks(true);
 
         contrastSlider.addMouseListener(this);
         contrastSlider.addChangeListener(this);
