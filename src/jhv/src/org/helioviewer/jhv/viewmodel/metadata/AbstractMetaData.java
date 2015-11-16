@@ -21,7 +21,7 @@ public abstract class AbstractMetaData implements MetaData {
     protected double outerRadius = Double.MAX_VALUE;
 
     // Serves only for LASCO cutOff edges
-    protected float cutOffValue = -1;
+    protected double cutOffValue = -1;
     protected Vec3 cutOffDirection;
 
     @Override
@@ -65,7 +65,7 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public float getCutOffValue() {
+    public double getCutOffValue() {
         return cutOffValue;
     }
 

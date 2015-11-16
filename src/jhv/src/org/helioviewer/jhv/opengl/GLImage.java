@@ -111,10 +111,10 @@ public class GLImage {
         GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
         if (metadata.getCutOffValue() > 0) {
             Vec3 cdir = metadata.getCutOffDirection();
-            GLSLShader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0f);
-            GLSLShader.setCutOffValue(metadata.getCutOffValue());
+            GLSLShader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0);
+            GLSLShader.setCutOffValue((float) metadata.getCutOffValue());
         } else {
-            GLSLShader.setCutOffValue(-1f);
+            GLSLShader.setCutOffValue(-1);
         }
     }
 

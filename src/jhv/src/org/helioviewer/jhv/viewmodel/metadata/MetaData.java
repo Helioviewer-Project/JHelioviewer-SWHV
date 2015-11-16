@@ -24,8 +24,8 @@ public interface MetaData {
 
     public double getOuterCutOffRadius();
 
-    float getCutOffValue();
+    public double getCutOffValue();
 
-    Vec3 getCutOffDirection();
+    public Vec3 getCutOffDirection();
 
 }
