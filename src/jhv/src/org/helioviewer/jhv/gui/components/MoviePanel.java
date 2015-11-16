@@ -46,6 +46,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -283,6 +284,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedSpinner.addChangeListener(this);
         ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
+        WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);
 
         SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /*
