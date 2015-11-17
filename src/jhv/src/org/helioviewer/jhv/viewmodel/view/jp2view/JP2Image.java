@@ -347,6 +347,7 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
+/*
     protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
         Camera camera = Displayer.getCamera();
         Viewport vp = Displayer.getViewport();
@@ -412,6 +413,7 @@ public class JP2Image {
 
         return newImageViewParams;
     }
+*/
 
     /**
      * Sets the reader mode.

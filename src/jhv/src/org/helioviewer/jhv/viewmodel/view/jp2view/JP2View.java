@@ -195,18 +195,12 @@ public class JP2View extends AbstractView {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        float scaleAdj = 1;
-        int maxDim = Math.max(imageWidth, imageHeight);
-        if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
-            scaleAdj = JHVGlobals.hiDpiCutoff / (float) maxDim;
-        }
-
-        JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, scaleAdj, frameNumber);
-        if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
-            Displayer.display();
-            return null;
-        }
-        oldImageViewParams = newImageViewParams;
+        JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        // if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
+        //    Displayer.display();
+        //    return null;
+        //}
+        //oldImageViewParams = newImageViewParams;
 
         return newImageViewParams;
     }
@@ -333,13 +327,29 @@ public class JP2View extends AbstractView {
             return;
 
         JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame, fromReader);
-        if (imageViewParams == null)
-            return;
+        //if (imageViewParams == null)
+        //    return;
 
+        boolean viewChanged = oldImageViewParams == null ||
+                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
+                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
         // ping reader
-        jp2Image.signalReader(imageViewParams);
+        if (viewChanged) {
+            jp2Image.signalReader(imageViewParams);
+        }
 
-        queueSubmitTask(new J2KRender(this, imageViewParams));
+        oldImageViewParams = imageViewParams;
+
+        if (!(this instanceof JP2ViewCallisto)) {
+            int maxDim = Math.max(imageViewParams.subImage.width, imageViewParams.subImage.height);
+            double adj = 1;
+            if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
+                adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
+            }
+            factor = Math.min(factor, adj);
+        }
+
+        queueSubmitTask(new J2KRender(this, imageViewParams, (float) factor));
     }
 
     @Override
