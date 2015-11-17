@@ -26,7 +26,7 @@ public class JP2ImageCallisto extends JP2Image {
 
     private Region region;
     private Rectangle viewport = new Rectangle(86400, 380);
-
+/*
     @Override
     protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
         double rWidth = region.getWidth();
@@ -44,5 +44,6 @@ public class JP2ImageCallisto extends JP2Image {
 
         return new JP2ImageParameter(this, masterTime, subImage, res, 1, frameNumber);
     }
+*/
 
 }
