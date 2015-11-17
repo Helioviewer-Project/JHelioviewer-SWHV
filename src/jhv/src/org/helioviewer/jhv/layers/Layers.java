@@ -287,7 +287,7 @@ public class Layers {
         view.setDataHandler(Displayer.displayDataHandler);
         Displayer.addRenderListener(view);
 
-        view.render();
+        view.render(1);
         setFrame(0); // force sync
         if (Displayer.multiview) {
             ImageViewerGui.getRenderableContainer().arrangeMultiView(true);

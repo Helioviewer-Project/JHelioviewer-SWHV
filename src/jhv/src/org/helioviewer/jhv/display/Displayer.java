@@ -152,8 +152,8 @@ public class Displayer implements JHVEventHighlightListener {
         viewports[3].setOffset(w / 2, h / 2);
     }
 
-    private static boolean torender = false;
-    private static boolean todisplay = false;
+    private static float renderFactor = -1;
+    private static boolean toDisplay = false;
 
     private static final Timer displayTimer = new Timer(1000 / 30, new DisplayTimerListener());
 
@@ -161,30 +161,34 @@ public class Displayer implements JHVEventHighlightListener {
         displayTimer.start();
     }
 
-    public static void render() {
+    public static void render(float f) {
         if (Layers.getActiveView() == null)
-            todisplay = true;
+            toDisplay = true;
         else
-            torender = true;
+            renderFactor = f;
+    }
+
+    public static void render() {
+        render(1);
     }
 
     public static void display() {
-        todisplay = true;
+        toDisplay = true;
     }
 
     private static class DisplayTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (todisplay == true) {
-                todisplay = false;
+            if (toDisplay == true) {
+                toDisplay = false;
                 displayComponent.repaint();
             }
 
-            if (torender == true) {
-                torender = false;
+            if (renderFactor != -1) {
                 for (final RenderListener renderListener : renderListeners) {
-                    renderListener.render();
+                    renderListener.render(renderFactor);
                 }
+                renderFactor = -1;
             }
         }
     }
