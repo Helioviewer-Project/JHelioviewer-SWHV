@@ -319,7 +319,7 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public void render(float factor) {
+    public void render(double factor) {
         signalRender(_jp2Image, false, factor);
     }
 
@@ -327,7 +327,7 @@ public class JP2View extends AbstractView {
         signalRender(jp2Image, true, 1);
     }
 
-    protected void signalRender(JP2Image jp2Image, boolean fromReader, float factor) {
+    protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;
