@@ -57,7 +57,10 @@ public class JP2ViewCallisto extends JP2View {
         SubImage subImage = new SubImage((int) (region.getLLX() / maxWidth * rect.width), (int) (region.getLLY() / maxHeight * rect.height),
                                          (int) Math.ceil(rWidth / maxWidth * rect.width), (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
 
-        return new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        jp2Image.signalReader(imageViewParams);
+
+        return imageViewParams;
     }
 
 }

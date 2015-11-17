@@ -195,14 +195,24 @@ public class JP2View extends AbstractView {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        JP2ImageParameter newImageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+
+        boolean viewChanged = oldImageViewParams == null ||
+                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
+                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
+        // ping reader
+        if (viewChanged) {
+            jp2Image.signalReader(imageViewParams);
+        }
+
         // if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
         //    Displayer.display();
         //    return null;
         //}
-        //oldImageViewParams = newImageViewParams;
 
-        return newImageViewParams;
+        oldImageViewParams = imageViewParams;
+
+        return imageViewParams;
     }
 
     /**
@@ -329,16 +339,6 @@ public class JP2View extends AbstractView {
         JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame, fromReader);
         //if (imageViewParams == null)
         //    return;
-
-        boolean viewChanged = oldImageViewParams == null ||
-                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
-                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
-        // ping reader
-        if (viewChanged) {
-            jp2Image.signalReader(imageViewParams);
-        }
-
-        oldImageViewParams = imageViewParams;
 
         if (!(this instanceof JP2ViewCallisto)) {
             int maxDim = Math.max(imageViewParams.subImage.width, imageViewParams.subImage.height);
