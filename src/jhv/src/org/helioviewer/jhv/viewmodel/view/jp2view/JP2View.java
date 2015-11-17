@@ -211,13 +211,6 @@ public class JP2View extends AbstractView {
         return newImageViewParams;
     }
 
-    /*
-     * NOTE: The following section is for communications with the two threads,
-     * J2KReader and J2KRender. Thus, the visibility is set to "default" (also
-     * known as "package"). These functions should not be used by any other
-     * class.
-     */
-
     /**
      * Sets the new image data for the given region.
      *
@@ -302,7 +295,7 @@ public class JP2View extends AbstractView {
             targetMasterTime = masterTime;
 
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
-                render();
+                render(1);
             }
         }
     }
@@ -326,15 +319,15 @@ public class JP2View extends AbstractView {
     }
 
     @Override
-    public void render() {
-        signalRender(_jp2Image, false);
+    public void render(float factor) {
+        signalRender(_jp2Image, false, factor);
     }
 
     void signalRenderFromReader(JP2Image jp2Image) {
-        signalRender(jp2Image, true);
+        signalRender(jp2Image, true, 1);
     }
 
-    protected void signalRender(JP2Image jp2Image, boolean fromReader) {
+    protected void signalRender(JP2Image jp2Image, boolean fromReader, float factor) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null)
             return;

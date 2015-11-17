@@ -25,12 +25,12 @@ public class JP2ViewCallisto extends JP2View {
 
     public boolean setRegion(Region r) {
         region = r;
-        signalRender(_jp2Image, false);
+        signalRender(_jp2Image, false, 1);
         return true;
     }
 
     @Override
-    public void render() {
+    public void render(float factor) {
         // should be called only during setJP2Image
     }
 
