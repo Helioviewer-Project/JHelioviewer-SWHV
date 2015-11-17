@@ -20,7 +20,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void render(float factor) {
+    public void render(double factor) {
         if (dataHandler != null) {
             dataHandler.handleData(this, imageData);
         }

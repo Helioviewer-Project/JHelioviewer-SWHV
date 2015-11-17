@@ -30,7 +30,7 @@ public class JP2ViewCallisto extends JP2View {
     }
 
     @Override
-    public void render(float factor) {
+    public void render(double factor) {
         // should be called only during setJP2Image
     }
 

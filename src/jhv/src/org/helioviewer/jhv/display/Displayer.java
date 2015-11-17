@@ -152,7 +152,7 @@ public class Displayer implements JHVEventHighlightListener {
         viewports[3].setOffset(w / 2, h / 2);
     }
 
-    private static float renderFactor = -1;
+    private static double renderFactor = -1;
     private static boolean toDisplay = false;
 
     private static final Timer displayTimer = new Timer(1000 / 30, new DisplayTimerListener());
@@ -161,7 +161,7 @@ public class Displayer implements JHVEventHighlightListener {
         displayTimer.start();
     }
 
-    public static void render(float f) {
+    public static void render(double f) {
         if (Layers.getActiveView() == null)
             toDisplay = true;
         else
