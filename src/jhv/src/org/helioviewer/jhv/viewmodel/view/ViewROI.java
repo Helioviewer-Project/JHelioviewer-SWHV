@@ -61,19 +61,14 @@ public class ViewROI {
         maxPhysicalY = maxPhysicalY + widthyAdd;
 
         Region r = m.getPhysicalRegion();
-        double metLLX = r.getLLX();
-        double metLLY = r.getLLY();
-        double metURX = r.getURX();
-        double metURY = r.getURY();
-
-        if (minPhysicalX < metLLX)
-            minPhysicalX = metLLX;
-        if (minPhysicalY < metLLY)
-            minPhysicalY = metLLY;
-        if (maxPhysicalX > metURX)
-            maxPhysicalX = metURX;
-        if (maxPhysicalY > metURY)
-            maxPhysicalY = metURY;
+        if (minPhysicalX < r.llx)
+            minPhysicalX = r.llx;
+        if (minPhysicalY < r.lly)
+            minPhysicalY = r.lly;
+        if (maxPhysicalX > r.urx)
+            maxPhysicalX = r.urx;
+        if (maxPhysicalY > r.ury)
+            maxPhysicalY = r.ury;
 
         double regionWidth = maxPhysicalX - minPhysicalX;
         double regionHeight = maxPhysicalY - minPhysicalY;

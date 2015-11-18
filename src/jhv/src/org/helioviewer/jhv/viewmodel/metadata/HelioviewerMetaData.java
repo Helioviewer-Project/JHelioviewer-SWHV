@@ -36,7 +36,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equalsIgnoreCase("C2")) {
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
-            cutOffValue = -region.getULX();
+            cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
         }
     }

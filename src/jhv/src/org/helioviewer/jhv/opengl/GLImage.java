@@ -78,14 +78,8 @@ public class GLImage {
     }
 
     private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-        Region region = imageData.getRegion();
-
-        double xOffset = region.getLLX();
-        double yOffset = region.getLLY();
-        double xScale = 1. / region.getWidth();
-        double yScale = 1. / region.getHeight();
-
-        GLSLShader.changeRect(xOffset, yOffset, xScale, yScale);
+        Region r = imageData.getRegion();
+        GLSLShader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
 
         boolean diffMode = false;
         Region diffRegion = null;
@@ -99,12 +93,7 @@ public class GLImage {
         }
 
         if (diffMode) {
-            double diffXOffset = diffRegion.getLLX();
-            double diffYOffset = diffRegion.getLLY();
-            double diffXScale = 1. / diffRegion.getWidth();
-            double diffYScale = 1. / diffRegion.getHeight();
-
-            GLSLShader.setDifferenceRect(diffXOffset, diffYOffset, diffXScale, diffYScale);
+            GLSLShader.setDifferenceRect(diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
         }
 
         MetaData metadata = imageData.getMetaData();

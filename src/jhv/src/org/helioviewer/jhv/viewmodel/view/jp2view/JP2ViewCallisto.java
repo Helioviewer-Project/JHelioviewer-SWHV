@@ -43,19 +43,16 @@ public class JP2ViewCallisto extends JP2View {
 
     @Override
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
-        double rWidth = region.getWidth();
-        double rHeight = region.getHeight();
-
         ResolutionSet set = jp2Image.getResolutionSet();
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
 
-        ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.width / rWidth * maxWidth),
-                                                         2 * (int) Math.ceil(viewport.height / rHeight * maxHeight));
+        ResolutionLevel res = set.getPreviousResolutionLevel((int) Math.ceil(viewport.width / region.width * maxWidth),
+                                                         2 * (int) Math.ceil(viewport.height / region.height * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
-        SubImage subImage = new SubImage((int) (region.getLLX() / maxWidth * rect.width), (int) (region.getLLY() / maxHeight * rect.height),
-                                         (int) Math.ceil(rWidth / maxWidth * rect.width), (int) Math.ceil(rHeight / maxHeight * rect.height), rect);
+        SubImage subImage = new SubImage((int) (region.llx / maxWidth * rect.width), (int) (region.lly / maxHeight * rect.height),
+                                         (int) Math.ceil(region.width / maxWidth * rect.width), (int) Math.ceil(region.height / maxHeight * rect.height), rect);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
         jp2Image.signalReader(imageViewParams);
