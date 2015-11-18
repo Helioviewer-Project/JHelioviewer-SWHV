@@ -23,7 +23,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     private static Component component;
 
     private boolean buttonDown = false;
-    private long lastTime = System.currentTimeMillis();
 
     public InputController(Camera _camera, Component _component) {
         camera = _camera;
@@ -49,37 +48,37 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseClicked(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseClicked(e);
 
         ImageViewerGui.getCurrentInteraction().mouseClicked(e);
+        for (MouseListener listener : mouseListeners)
+            listener.mouseClicked(e);
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseEntered(e);
 
         if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
             component.setCursor(buttonDown ? UIGlobals.closedHandCursor : UIGlobals.openHandCursor);
         }
+
+        for (MouseListener listener : mouseListeners)
+            listener.mouseEntered(e);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseExited(e);
 
         component.setCursor(Cursor.getDefaultCursor());
+
+        for (MouseListener listener : mouseListeners)
+            listener.mouseExited(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mousePressed(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
@@ -87,14 +86,15 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             }
             buttonDown = true;
         }
+
         ImageViewerGui.getCurrentInteraction().mousePressed(e);
+        for (MouseListener listener : mouseListeners)
+            listener.mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseListener listener : mouseListeners)
-            listener.mouseReleased(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (ImageViewerGui.getCurrentInteraction() != ImageViewerGui.getAnnotateInteraction()) {
@@ -102,62 +102,58 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
             }
             buttonDown = false;
         }
+
         ImageViewerGui.getCurrentInteraction().mouseReleased(e);
+        for (MouseListener listener : mouseListeners)
+            listener.mouseReleased(e);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         e = synthesizeMouse(e);
+
+        ImageViewerGui.getCurrentInteraction().mouseDragged(e);
         for (MouseMotionListener listener : mouseMotionListeners)
             listener.mouseDragged(e);
-
-        long currentTime = System.currentTimeMillis();
-        if (buttonDown && currentTime - lastTime > 30) {
-            lastTime = currentTime;
-            ImageViewerGui.getCurrentInteraction().mouseDragged(e);
-        }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         e = synthesizeMouse(e);
-        for (MouseMotionListener listener : mouseMotionListeners)
-            listener.mouseMoved(e);
 
         ImageViewerGui.getCurrentInteraction().mouseMoved(e);
+        for (MouseMotionListener listener : mouseMotionListeners)
+            listener.mouseMoved(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         e = synthesizeMouseWheel(e);
-        for (MouseWheelListener listener : mouseWheelListeners)
-            listener.mouseWheelMoved(e);
 
         ImageViewerGui.getCurrentInteraction().mouseWheelMoved(e);
+        for (MouseWheelListener listener : mouseWheelListeners)
+            listener.mouseWheelMoved(e);
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
+        ImageViewerGui.getCurrentInteraction().keyTyped(e);
         for (KeyListener listener : keyListeners)
             listener.keyTyped(e);
-
-        ImageViewerGui.getCurrentInteraction().keyTyped(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        ImageViewerGui.getCurrentInteraction().keyPressed(e);
         for (KeyListener listener : keyListeners)
             listener.keyPressed(e);
-
-        ImageViewerGui.getCurrentInteraction().keyPressed(e);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        ImageViewerGui.getCurrentInteraction().keyReleased(e);
         for (KeyListener listener : keyListeners)
             listener.keyReleased(e);
-
-        ImageViewerGui.getCurrentInteraction().keyReleased(e);
     }
 
     private final HashSet<MouseListener> mouseListeners = new HashSet<MouseListener>();
