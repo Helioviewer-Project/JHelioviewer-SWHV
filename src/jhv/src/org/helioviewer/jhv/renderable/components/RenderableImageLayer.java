@@ -22,13 +22,14 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.View;
+import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableImageLayer extends AbstractRenderable {
+public class RenderableImageLayer extends AbstractRenderable implements ViewDataHandler {
 
     private static boolean showCorona = true;
 
@@ -68,6 +69,7 @@ public class RenderableImageLayer extends AbstractRenderable {
         glImage.setLUT(view.getDefaultLUT(), false);
 
         view.setImageLayer(this);
+        view.setDataHandler(this);
         Layers.addLayer(view);
         ImageViewerGui.getRenderableContainer().fireListeners();
     }
@@ -400,7 +402,7 @@ public class RenderableImageLayer extends AbstractRenderable {
     private ImageData prevImageData;
     private ImageData baseImageData;
 
-    public void setImageData(ImageData newImageData) {
+    private void setImageData(ImageData newImageData) {
         int frame = newImageData.getFrameNumber();
         if (frame == 0) {
             baseImageData = newImageData;
@@ -421,6 +423,13 @@ public class RenderableImageLayer extends AbstractRenderable {
 
     public GLImage getGLImage() {
         return glImage;
+    }
+
+    @Override
+    public void handleData(ImageData imageData) {
+        setImageData(imageData);
+        ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
+        Displayer.display();
     }
 
 }

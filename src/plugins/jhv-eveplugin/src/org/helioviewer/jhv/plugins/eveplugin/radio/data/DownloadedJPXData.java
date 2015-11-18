@@ -119,8 +119,8 @@ public class DownloadedJPXData implements ViewDataHandler {
     }
 
     @Override
-    public void handleData(View callistoView, ImageData imageData) {
-        if (callistoView instanceof JP2ViewCallisto && imageData instanceof SingleChannelByte8ImageData) {
+    public void handleData(ImageData imageData) {
+        if (imageData instanceof SingleChannelByte8ImageData) {
             if (imageData.getWidth() < 1 || imageData.getHeight() < 1) {
                 Log.error("width: " + imageData.getWidth() + " height: " + imageData.getHeight());
                 return;

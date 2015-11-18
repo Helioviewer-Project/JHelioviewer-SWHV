@@ -239,7 +239,7 @@ public class JP2View extends AbstractView {
         }
 
         if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData);
+            dataHandler.handleData(newImageData);
         }
     }
 

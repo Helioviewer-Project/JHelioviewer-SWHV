@@ -12,11 +12,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -190,17 +186,6 @@ public class Displayer implements JHVEventHighlightListener {
                 }
                 renderFactor = -1;
             }
-        }
-    }
-
-    public static final DisplayDataHandler displayDataHandler = new DisplayDataHandler();
-
-    private static class DisplayDataHandler implements ViewDataHandler {
-        @Override
-        public void handleData(View view, ImageData imageData) {
-            view.getImageLayer().setImageData(imageData);
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(view.getImageLayer());
-            display();
         }
     }
 

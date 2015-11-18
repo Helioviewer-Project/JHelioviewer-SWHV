@@ -284,7 +284,6 @@ public class Layers {
         fireLayerAdded(view);
         setActiveView(view);
 
-        view.setDataHandler(Displayer.displayDataHandler);
         Displayer.addRenderListener(view);
 
         view.render(1);

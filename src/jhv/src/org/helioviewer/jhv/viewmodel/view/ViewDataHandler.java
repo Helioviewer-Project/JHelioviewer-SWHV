@@ -4,6 +4,6 @@ import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 
 public interface ViewDataHandler {
 
-    public abstract void handleData(View view, ImageData imageData);
+    public abstract void handleData(ImageData imageData);
 
 }
