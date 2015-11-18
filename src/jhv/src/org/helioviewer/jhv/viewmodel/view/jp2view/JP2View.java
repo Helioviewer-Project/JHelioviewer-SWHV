@@ -171,27 +171,19 @@ public class JP2View extends AbstractView {
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, masterTime, m);
 
-        double mWidth = mr.getWidth();
-        double mHeight = mr.getHeight();
-        double rWidth = r.getWidth();
-        double rHeight = r.getHeight();
-
         double ratio = 2 * camera.getWidth() / vp.getHeight();
-        int totalHeight = (int) (mHeight / ratio);
+        int totalHeight = (int) (mr.height / ratio);
 
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
-        double currentMeterPerPixel = mWidth / viewportImageWidth;
-        int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
-        int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
+        double currentMeterPerPixel = mr.width / viewportImageWidth;
+        int imageWidth = (int) Math.round(r.width / currentMeterPerPixel);
+        int imageHeight = (int) Math.round(r.height / currentMeterPerPixel);
 
-        double displacementX = r.getULX() - mr.getULX();
-        double displacementY = r.getULY() - mr.getULY();
-
-        int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
-        int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
+        int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * viewportImageWidth);
+        int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * viewportImageHeight);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
