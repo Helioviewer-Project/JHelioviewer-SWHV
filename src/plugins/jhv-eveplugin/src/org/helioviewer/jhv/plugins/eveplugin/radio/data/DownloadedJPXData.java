@@ -5,12 +5,12 @@ import java.util.Date;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
-public class DownloadedJPXData implements ViewDataHandler {
+public class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
     private long imageID;
