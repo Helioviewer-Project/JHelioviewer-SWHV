@@ -149,15 +149,17 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
     }
 
     private void switchOptionsPanel(CameraOptionPanel newOptionPanel) {
+        if (currentOptionPanel == newOptionPanel)
+            return;
+
         if (currentOptionPanel != null) {
             currentOptionPanel.deactivate();
             remove(currentOptionPanel);
         }
 
         if (newOptionPanel != null) {
-            currentOptionPanel = newOptionPanel;
-            currentOptionPanel.activate();
-            currentOptionPanel.syncWithLayer();
+            newOptionPanel.activate();
+            newOptionPanel.syncWithLayer();
 
             GridBagConstraints c = new GridBagConstraints();
             c.weightx = 1;
@@ -166,8 +168,9 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
             c.fill = GridBagConstraints.HORIZONTAL;
             c.gridx = 0;
             c.gridy = 2;
-            add(currentOptionPanel, c);
+            add(newOptionPanel, c);
         }
+        currentOptionPanel = newOptionPanel;
         revalidate();
     }
 
