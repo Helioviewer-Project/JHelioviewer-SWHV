@@ -21,15 +21,15 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.viewmodel.view.ViewDataHandler;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-public class RenderableImageLayer extends AbstractRenderable implements ViewDataHandler {
+public class RenderableImageLayer extends AbstractRenderable implements ImageDataHandler {
 
     private static boolean showCorona = true;
 

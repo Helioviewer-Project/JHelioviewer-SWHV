@@ -6,6 +6,7 @@ import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public abstract class AbstractView implements View {
@@ -93,10 +94,10 @@ public abstract class AbstractView implements View {
         return imageLayer;
     }
 
-    protected ViewDataHandler dataHandler;
+    protected ImageDataHandler dataHandler;
 
     @Override
-    public void setDataHandler(ViewDataHandler _dataHandler) {
+    public void setDataHandler(ImageDataHandler _dataHandler) {
         dataHandler = _dataHandler;
     }
 

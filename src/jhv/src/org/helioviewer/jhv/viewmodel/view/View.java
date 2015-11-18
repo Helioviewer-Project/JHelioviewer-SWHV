@@ -7,6 +7,7 @@ import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 /**
@@ -99,7 +100,7 @@ public interface View extends RenderListener {
 
     public RenderableImageLayer getImageLayer();
 
-    public void setDataHandler(ViewDataHandler dataHandler);
+    public void setDataHandler(ImageDataHandler dataHandler);
 
     public void removeDataHandler();
 
