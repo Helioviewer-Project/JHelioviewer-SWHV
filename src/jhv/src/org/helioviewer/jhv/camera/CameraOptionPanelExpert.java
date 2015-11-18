@@ -276,7 +276,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate startDate = Layers.getStartDate(view);
-        beginDatePicker.setDate(new Date(startDate.getTime() - startDate.getTime() % (60 * 60 * 24 * 1000)));
+        beginDatePicker.setDate(new Date(startDate.milli - startDate.milli % (60 * 60 * 24 * 1000)));
         beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate.getDate()));
         setBeginTime(applyChanges);
     }
@@ -315,7 +315,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
             return;
 
         JHVDate endDate = Layers.getEndDate(view);
-        endDatePicker.setDate(new Date(endDate.getTime() - endDate.getTime() % (60 * 60 * 24 * 1000)));
+        endDatePicker.setDate(new Date(endDate.milli - endDate.milli % (60 * 60 * 24 * 1000)));
         endTimePicker.setText(TimeUtils.timeDateFormat.format(endDate.getDate()));
         setEndTime(applyChanges);
     }

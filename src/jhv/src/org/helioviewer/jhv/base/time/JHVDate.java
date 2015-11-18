@@ -6,7 +6,7 @@ import java.util.Date;
 public class JHVDate implements Comparable<JHVDate> {
 
     private final String string;
-    private final long milli;
+    public final long milli;
 
     /**
      * No arguments may be negative or an exception will be thrown.
@@ -37,10 +37,6 @@ public class JHVDate implements Comparable<JHVDate> {
         Date date = c.getTime();
         string = TimeUtils.utcDateFormat.format(date);
         milli = date.getTime();
-    }
-
-    public long getTime() {
-        return milli;
     }
 
     public Date getDate() {

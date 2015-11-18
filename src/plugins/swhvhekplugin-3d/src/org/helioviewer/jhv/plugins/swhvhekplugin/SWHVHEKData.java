@@ -53,14 +53,14 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         JHVDate last = Layers.getEndDate();
 
         if (first != null) {
-            if (beginDate == null || first.getTime() < beginDate.getTime()) {
+            if (beginDate == null || first.milli < beginDate.getTime()) {
                 beginDate = first.getDate();
                 request = true;
             }
         }
 
         if (last != null) {
-            if (endDate == null || last.getTime() > endDate.getTime()) {
+            if (endDate == null || last.milli > endDate.getTime()) {
                 endDate = last.getDate();
                 request = true;
             }

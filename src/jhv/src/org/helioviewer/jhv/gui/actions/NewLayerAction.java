@@ -40,7 +40,7 @@ public class NewLayerAction extends AbstractAction {
                 Date obsEndDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getEndTime());
                 // only updates if it's really necessary with a tolerance of an hour
                 final int tolerance = 60 * 60 * 1000;
-                if (Math.abs(start.getTime() - obsStartDate.getTime()) > tolerance || Math.abs(end.getTime() - obsEndDate.getTime()) > tolerance) {
+                if (Math.abs(start.milli - obsStartDate.getTime()) > tolerance || Math.abs(end.milli - obsEndDate.getTime()) > tolerance) {
                     if (ObservationDialogDateModel.getInstance().getStartDate() == null || !ObservationDialogDateModel.getInstance().isStartDateSetByUser()) {
                         ObservationDialogDateModel.getInstance().setStartDate(start.getDate(), false);
                     }
