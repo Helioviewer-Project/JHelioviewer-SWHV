@@ -36,8 +36,7 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.getIndex()]) {
             PfssData pfssData;
-            long millis = Layers.getLastUpdatedTimestamp().getTime();
-            if ((pfssData = PfssPlugin.getPfsscache().getData(millis)) != null) {
+            if ((pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli)) != null) {
                 if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
                     previousPfssData.clear(gl);
                 }

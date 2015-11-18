@@ -360,8 +360,8 @@ public class SWEKDownloadManager implements DownloadWorkerListener, IncomingRequ
 
         @Override
         public int compare(T l1, T l2) {
-            long d1 = l1.getDownloadEndDate().getTime() - Layers.getStartDate().getTime();
-            long d2 = l2.getDownloadEndDate().getTime() - Layers.getStartDate().getTime();
+            long d1 = l1.getDownloadEndDate().getTime() - Layers.getStartDate().milli;
+            long d2 = l2.getDownloadEndDate().getTime() - Layers.getStartDate().milli;
             return d1 < d2 ? 1 : -1;
         }
     }

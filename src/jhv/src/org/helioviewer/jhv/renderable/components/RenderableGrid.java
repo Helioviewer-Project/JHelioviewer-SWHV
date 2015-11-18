@@ -109,7 +109,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
         {
-            Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().getTime());
+            Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
             {
                 gl.glPushMatrix();
                 Quat longitudeRotation = new Quat(0, p.lon + Math.PI / 2);

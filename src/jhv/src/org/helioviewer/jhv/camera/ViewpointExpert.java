@@ -23,13 +23,13 @@ class ViewpointExpert extends Viewpoint {
 
     private JHVDate interpolate(JHVDate date) {
         if (positionLoad.isLoaded()) {
-            long currentCameraTime, dateTime = date.getTime();
+            long currentCameraTime;
             long tLayerStart = 0, tLayerEnd = 0;
             // Active layer times
             View view = Layers.getActiveView();
             if (view != null) {
-                tLayerStart = Layers.getStartDate(view).getTime();
-                tLayerEnd = Layers.getEndDate(view).getTime();
+                tLayerStart = Layers.getStartDate(view).milli;
+                tLayerEnd = Layers.getEndDate(view).milli;
             }
 
             // camera times
@@ -37,7 +37,7 @@ class ViewpointExpert extends Viewpoint {
             long tPositionEnd = positionLoad.getEndTime();
 
             if (tLayerEnd != tLayerStart) {
-                currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (dateTime - tLayerStart) / (double) (tLayerEnd - tLayerStart));
+                currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (date.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
             } else {
                 currentCameraTime = tPositionEnd;
             }
@@ -50,7 +50,7 @@ class ViewpointExpert extends Viewpoint {
                 currentB = p.lat;
             }
         } else {
-            Position.Latitudinal p = Sun.getEarth(date.getTime());
+            Position.Latitudinal p = Sun.getEarth(date.milli);
             currentDistance = p.rad;
             currentL = 0;
             currentB = p.lat;
@@ -68,7 +68,7 @@ class ViewpointExpert extends Viewpoint {
     void update(JHVDate date) {
         time = interpolate(date);
 
-        Position.Latitudinal p = Sun.getEarth(time.getTime());
+        Position.Latitudinal p = Sun.getEarth(time.milli);
         orientation = new Quat(currentB, -currentL + p.lon);
         distance = currentDistance;
     }

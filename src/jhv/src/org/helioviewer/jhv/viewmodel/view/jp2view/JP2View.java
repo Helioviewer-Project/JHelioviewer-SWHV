@@ -300,11 +300,10 @@ public class JP2View extends AbstractView {
     @Override
     public int getFrame(JHVDate time) {
         int frame = -1;
-        long milli = time.getTime();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = metaDataArray[++frame].getDateObs().getTime() - milli;
+            currentDiff = metaDataArray[++frame].getDateObs().milli - time.milli;
         } while (currentDiff < 0 && frame < _jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {

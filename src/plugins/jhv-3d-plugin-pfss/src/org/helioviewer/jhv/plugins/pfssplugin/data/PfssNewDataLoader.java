@@ -38,12 +38,12 @@ public class PfssNewDataLoader implements Runnable {
 
     @Override
     public void run() {
-        if (start != null && end != null && start.getTime() <= end.getTime()) {
+        if (start != null && end != null && start.milli <= end.milli) {
             final Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(start.getDate());
 
             final Calendar endCal = GregorianCalendar.getInstance();
-            endCal.setTime(new Date(end.getTime() + 31 * 24 * 60 * 60 * 1000));
+            endCal.setTime(new Date(end.milli + 31 * 24 * 60 * 60 * 1000));
 
             int startYear = startCal.get(Calendar.YEAR);
             int startMonth = startCal.get(Calendar.MONTH);
@@ -89,7 +89,7 @@ public class PfssNewDataLoader implements Runnable {
                 for (Pair<String, Long> pair : urls) {
                     Long dd = pair.b;
                     String url = pair.a;
-                    if (dd > start.getTime() - 24 * 60 * 60 * 1000 && dd < end.getTime() + 24 * 60 * 60 * 1000) {
+                    if (dd > start.milli - 24 * 60 * 60 * 1000 && dd < end.milli + 24 * 60 * 60 * 1000) {
                         FutureTask<Void> dataLoaderTask = new FutureTask<Void>(new PfssDataLoader(url, dd), null);
                         PfssPlugin.pfssDataPool.submit(dataLoaderTask);
                         PfssPlugin.pfssReaperPool.schedule(new CancelTask(dataLoaderTask), TIMEOUT_DOWNLOAD_SECONDS, TimeUnit.SECONDS);
