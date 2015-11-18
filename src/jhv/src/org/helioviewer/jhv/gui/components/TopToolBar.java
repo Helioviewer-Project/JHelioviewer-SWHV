@@ -248,7 +248,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
 
         addSeparator();
 
-        trackSolarRotationButton = new JToggleButton(new AbstractAction() {
+        trackSolarRotationButton = new JToggleButton(new AbstractAction("Track") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Camera camera = Displayer.getCamera();
@@ -261,7 +261,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         trackSolarRotationButton.setToolTipText("Track solar rotation");
         addButton(trackSolarRotationButton);
 
-        coronaVisibilityButton = new JToggleButton(new AbstractAction() {
+        coronaVisibilityButton = new JToggleButton(new AbstractAction("Off-disk Corona") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 RenderableImageLayer.toggleCorona();
