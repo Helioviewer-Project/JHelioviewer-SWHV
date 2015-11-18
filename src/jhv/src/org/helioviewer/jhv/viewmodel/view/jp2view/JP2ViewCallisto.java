@@ -37,7 +37,7 @@ public class JP2ViewCallisto extends JP2View {
     @Override
     void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
         if (dataHandler != null) {
-            dataHandler.handleData(this, newImageData);
+            dataHandler.handleData(newImageData);
         }
     }
 
