@@ -14,10 +14,19 @@ public class Quat {
             return new Quat();
 
         double halfAngle = angle / 2.0;
-        Vec3 axisCopy = axis.copy();
-        axisCopy.normalize();
-        axisCopy.multiply(Math.sin(halfAngle));
-        return new Quat(Math.cos(halfAngle), axisCopy);
+
+        Vec3 v = axis.copy();
+        double l = v.x * v.x + v.y * v.y + v.z * v.z;
+        double m = 0;
+        if (l > 0) {
+            m = Math.sin(halfAngle) / Math.sqrt(l);
+        }
+
+        v.x *= m;
+        v.y *= m;
+        v.z *= m;
+
+        return new Quat(Math.cos(halfAngle), v);
     }
 
     public Quat(double ax, double ay, double az) {
