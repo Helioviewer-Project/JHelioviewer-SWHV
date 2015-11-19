@@ -9,24 +9,18 @@ public class Quat {
     private double a;
     private Vec3 u;
 
-    public static Quat createRotation(double angle, Vec3 axis) {
+    public static Quat createRotation(double angle, Vec3 v) {
         if (angle == 0.)
             return new Quat();
 
-        double halfAngle = angle / 2.0;
-
-        Vec3 v = axis.copy();
+        double halfAngle = angle / 2.;
         double l = v.x * v.x + v.y * v.y + v.z * v.z;
         double m = 0;
         if (l > 0) {
             m = Math.sin(halfAngle) / Math.sqrt(l);
         }
 
-        v.x *= m;
-        v.y *= m;
-        v.z *= m;
-
-        return new Quat(Math.cos(halfAngle), v);
+        return new Quat(Math.cos(halfAngle), v.x * m, v.y * m, v.z * m);
     }
 
     public Quat(double ax, double ay, double az) {

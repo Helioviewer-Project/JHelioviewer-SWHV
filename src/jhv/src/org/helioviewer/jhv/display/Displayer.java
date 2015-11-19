@@ -151,7 +151,7 @@ public class Displayer implements JHVEventHighlightListener {
     private static double renderFactor = -1;
     private static boolean toDisplay = false;
 
-    private static final Timer displayTimer = new Timer(1000 / 30, new DisplayTimerListener());
+    private static final Timer displayTimer = new Timer(1000 / 60, new DisplayTimerListener());
 
     private Displayer() {
         displayTimer.start();
