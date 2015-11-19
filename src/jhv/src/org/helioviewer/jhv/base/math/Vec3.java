@@ -211,40 +211,29 @@ public class Vec3 {
     }
 
     public final void normalize() {
-        double len, len2;
-
-        len2 = this.x * this.x + this.y * this.y + this.z * this.z;
-        if (len2 == 0.0)
+        double len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (len == 0.0)
             return;
 
-        len = Math.sqrt(len2);
         this.x /= len;
         this.y /= len;
         this.z /= len;
 
-        // take shortcut, reasonably close to 1
-        len2 = this.x * this.x + this.y * this.y + this.z * this.z;
-        if (len2 <= 1.0)
+        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (len <= 1.0)
             return;
 
         // errors up to 2ulp found in testing
-        double next = Math.sqrt(Math.nextAfter(len2, len2 + 1.0));
-        this.x /= next;
-        this.y /= next;
-        this.z /= next;
+        len = Math.nextAfter(len, len + 1.0);
+        this.x /= len;
+        this.y /= len;
+        this.z /= len;
 
-        // take shortcut, reasonably close to 1
-        len2 = this.x * this.x + this.y * this.y + this.z * this.z;
-        if (len2 <= 1.0)
+        len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (len <= 1.0)
             return;
 
         // can't happen / something is really messed up
-        /*
-         * System.out.println(len); System.out.println(this);
-         * Log.error("The length of the vector is bigger than 1");
-         */
-        // System.exit(1);
-
         this.x = Double.NaN;
         this.y = Double.NaN;
         this.z = Double.NaN;
