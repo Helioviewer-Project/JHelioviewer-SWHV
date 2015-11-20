@@ -64,7 +64,7 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     }
 
     private boolean isURLColumn(JTable table, int col, int row) {
-        return col >= 0 && isValueURL(table.getValueAt(row, col));
+        return isValueURL(table.getValueAt(row, col));
     }
 
     @Override
@@ -98,6 +98,9 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
 
     @Override
     public void mouseExited(MouseEvent e) {
+        if (row < 0 || col < 0)
+            return;
+
         JTable table = (JTable) e.getComponent();
         if (isURLColumn(table, col, row)) {
             table.repaint(table.getCellRect(row, col, false));
