@@ -34,21 +34,22 @@ public class PfssRenderable extends AbstractRenderable implements LayersListener
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (isVisible[vp.getIndex()]) {
-            PfssData pfssData;
-            if ((pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli)) != null) {
-                if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
-                    previousPfssData.clear(gl);
-                }
-                if (!pfssData.isInit())
-                    pfssData.init(gl);
-                if (pfssData.isInit()) {
-                    pfssData.display(gl);
-                    datetime = pfssData.getDateString();
-                    ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
-                }
-                previousPfssData = pfssData;
+        if (!isVisible[vp.index])
+            return;
+
+        PfssData pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli);
+        if (pfssData != null) {
+            if (previousPfssData != null && previousPfssData != pfssData && previousPfssData.isInit()) {
+                previousPfssData.clear(gl);
             }
+            if (!pfssData.isInit())
+                pfssData.init(gl);
+            if (pfssData.isInit()) {
+                pfssData.display(gl);
+                datetime = pfssData.getDateString();
+                ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
+            }
+            previousPfssData = pfssData;
         }
     }
 
