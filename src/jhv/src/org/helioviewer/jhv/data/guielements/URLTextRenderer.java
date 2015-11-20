@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class URLTextRenderer extends DefaultTableCellRenderer implements MouseListener, MouseMotionListener {
+
     private int row = -1;
     private int col = -1;
     private boolean isRollover;
@@ -69,16 +70,19 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     @Override
     public void mouseMoved(MouseEvent e) {
         JTable table = (JTable) e.getComponent();
-        Point pt = e.getPoint();
         int prevRow = row;
         int prevCol = col;
         boolean prevRollover = isRollover;
+
+        Point pt = e.getPoint();
         row = table.rowAtPoint(pt);
         col = table.columnAtPoint(pt);
-        isRollover = isURLColumn(table, col, row);
-        if (row == prevRow && col == prevCol && isRollover == prevRollover || !isRollover && !prevRollover) {
+        if (row < 0 || col < 0)
             return;
-        }
+
+        isRollover = isURLColumn(table, col, row);
+        if (row == prevRow && col == prevCol && isRollover == prevRollover || !isRollover && !prevRollover)
+            return;
 
         Rectangle repaintRect;
         if (isRollover) {
@@ -107,9 +111,13 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     @Override
     public void mouseClicked(MouseEvent e) {
         JTable table = (JTable) e.getComponent();
+
         Point pt = e.getPoint();
         int ccol = table.columnAtPoint(pt);
         int crow = table.rowAtPoint(pt);
+        if (ccol < 0 || crow < 0)
+            return;
+
         if (isURLColumn(table, ccol, crow)) {
             String value = (String) table.getValueAt(crow, ccol);
             try {
@@ -126,19 +134,19 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) { /* not needed */
+    public void mouseDragged(MouseEvent e) {
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) { /* not needed */
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) { /* not needed */
+    public void mousePressed(MouseEvent e) {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) { /* not needed */
+    public void mouseReleased(MouseEvent e) {
     }
 
 }
