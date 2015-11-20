@@ -7,9 +7,9 @@
             "provider_name"         : "HEK",
             "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader", 
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser",
-            "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/heksource.jar",
-	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/heksource.jar",
-	        "jar_location" : "jar:///sources/heksource.jar",
+            "jar_location_url"      : "http://swhv.oma.be/config/swek_config/jars/heksource.jar",
+            "jar_location_file"     : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/heksource.jar",
+            "jar_location"          : "jar:///sources/heksource.jar",
             "base_url"              : "http://www.lmsal.com/hek/her",
             "general_parameters"    : [
                 {
@@ -215,7 +215,7 @@
             "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader", 
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser",
             "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/comesepsource.jar",
-	        "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
+            "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
             "jar_location" : "jar:///sources/comesepsource.jar",
             "base_url"              : "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php",
             "general_parameters"    : [
@@ -691,7 +691,7 @@
         {
             "event_name"    : "Emerging Flux",
             "suppliers"     : [
-                {   
+                {
                     "supplier_name" : "Emerging flux region module",
                     "supplier_display_name" : "EFRM",
                     "source"        : "HEK"
@@ -710,23 +710,6 @@
             },
             "icon" : "iconbank://EmergingFlux",
             "color" : "colorcode://0x68C3FC"
-        },
-        {
-            "event_name"                    : "Plage",
-            "suppliers"                     : [],
-            "parameter_list"                : [],
-            "request_interval_extension"    : 0,
-            "standard_selected"             : true,
-            "group_on"                      : null,
-            "coordinate_system"             : "helioprojective",
-            "spatial_region"                : {
-                "x1" : -1200,
-                "y1" : -1200,
-                "x2" : 1200,
-                "y2" : 1200
-            },
-            "icon" : "iconbank://Plage",
-            "color" : "colorcode://0xB468FC"
         },
         {
             "event_name"    : "Eruption",
@@ -750,7 +733,8 @@
             },
             "icon" : "iconbank://Eruption",
             "color" : "colorcode://0xB4FC68"
-        },{
+        },
+        {
             "event_name"    : "COMESEP",
             "suppliers"     : [
                 {
