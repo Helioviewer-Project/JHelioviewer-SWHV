@@ -103,40 +103,30 @@ public class Displayer implements JHVEventHighlightListener {
         int w = glWidth;
         int h = glHeight;
 
-        for (Viewport vp : viewports) {
-            if (vp.isActive()) {
-                vp.setSize(0, 0, w, h);
-            }
-        }
+        viewports[0] = new Viewport(viewports[0], 0, 0, w, h);
+        viewports[1] = new Viewport(viewports[1], 0, 0, 0, 0);
+        viewports[2] = new Viewport(viewports[2], 0, 0, 0, 0);
+        viewports[3] = new Viewport(viewports[3], 0, 0, 0, 0);
     }
 
     private static void reshape2() {
         int w = glWidth;
         int h = glHeight;
 
-        int halfw = w / 2;
-        boolean first = true;
-
-        for (Viewport vp : viewports) {
-            if (vp.isActive()) {
-                if (first) {
-                    vp.setSize(0, 0, halfw, h);
-                    first = false;
-                } else {
-                    vp.setSize(halfw, 0, halfw, h);
-                }
-            }
-        }
+        viewports[0] = new Viewport(viewports[0], 0, 0, w / 2, h);
+        viewports[1] = new Viewport(viewports[1], w / 2, 0, w / 2, h);
+        viewports[2] = new Viewport(viewports[2], 0, 0, 0, 0);
+        viewports[3] = new Viewport(viewports[3], 0, 0, 0, 0);
     }
 
     private static void reshape4() {
         int w = glWidth;
         int h = glHeight;
 
-        viewports[0].setSize(0, 0, w / 2, h / 2);
-        viewports[1].setSize(w / 2, 0, w / 2, h / 2);
-        viewports[2].setSize(0, h / 2, w / 2, h / 2);
-        viewports[3].setSize(w / 2, h / 2, w / 2, h / 2);
+        viewports[0] = new Viewport(viewports[0], 0, 0, w / 2, h / 2);
+        viewports[1] = new Viewport(viewports[1], w / 2, 0, w / 2, h / 2);
+        viewports[2] = new Viewport(viewports[2], 0, h / 2, w / 2, h / 2);
+        viewports[3] = new Viewport(viewports[3], w / 2, h / 2, w / 2, h / 2);
     }
 
     private static double renderFactor = -1;
