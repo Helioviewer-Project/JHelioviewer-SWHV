@@ -24,7 +24,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 
 public class EVEDrawableElement implements DrawableElement {
 
-    private final List<GraphPolyline> graphPolylines = new LinkedList<EVEDrawableElement.GraphPolyline>();
+    private final List<GraphPolyline> graphPolylines = new ArrayList<EVEDrawableElement.GraphPolyline>();
     private boolean intervalAvailable = false;
     private Band[] bands = new Band[0];
     // private EVEValues[] values = null;
@@ -99,8 +99,6 @@ public class EVEDrawableElement implements DrawableElement {
                             warnLevels.add(dY - computeY(pairs.getValue(), ratioY, minValue));
                         }
                         warnLabels.add(pairs.getKey());
-                        // it.remove(); // avoids a
-                        // ConcurrentModificationException
                     }
 
                     int counter = 0;
@@ -148,9 +146,7 @@ public class EVEDrawableElement implements DrawableElement {
     }
 
     private void drawGraphs(final Graphics2D g, Rectangle graphArea) {
-        Iterator<GraphPolyline> i = graphPolylines.iterator();
-        while (i.hasNext()) {
-            GraphPolyline line = i.next();
+        for (GraphPolyline line : graphPolylines) {
             g.setColor(line.color);
             for (int k = 0; k < line.xPoints.size(); k++) {
                 g.drawPolyline(line.xPointsArray.get(k), line.yPointsArray.get(k), line.yPoints.get(k).size());
