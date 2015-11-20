@@ -46,12 +46,12 @@ public class Displayer implements JHVEventHighlightListener {
         return camera;
     }
 
-    private static Viewport viewport0 = new Viewport(0, 0, 0, 100, 100, true);
-    private static Viewport viewport1 = new Viewport(1, 0, 0, 100, 100, false);
-    private static Viewport viewport2 = new Viewport(2, 0, 0, 100, 100, false);
-    private static Viewport viewport3 = new Viewport(3, 0, 0, 100, 100, false);
-    private static Viewport[] viewports = { viewport0, viewport1, viewport2, viewport3 };
-    private static Viewport viewport = viewport0;
+    private static Viewport[] viewports = {
+        new Viewport(0, 0, 0, 100, 100, true),
+        new Viewport(1, 0, 0, 100, 100, false),
+        new Viewport(2, 0, 0, 100, 100, false),
+        new Viewport(3, 0, 0, 100, 100, false) };
+    private static Viewport viewport = viewports[0];
 
     public static Viewport[] getViewports() {
         return viewports;
@@ -105,8 +105,7 @@ public class Displayer implements JHVEventHighlightListener {
 
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
-                vp.setSize(w, h);
-                vp.setOffset(0, 0);
+                vp.setSize(0, 0, w, h);
             }
         }
     }
@@ -120,12 +119,10 @@ public class Displayer implements JHVEventHighlightListener {
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
                 if (first) {
-                    vp.setSize(halfw, h);
-                    vp.setOffset(0, 0);
+                    vp.setSize(0, 0, halfw, h);
                     first = false;
                 } else {
-                    vp.setSize(halfw, h);
-                    vp.setOffset(halfw, 0);
+                    vp.setSize(halfw, 0, halfw, h);
                 }
             }
         }
@@ -135,17 +132,10 @@ public class Displayer implements JHVEventHighlightListener {
         int w = Displayer.getGLWidth();
         int h = Displayer.getGLHeight();
 
-        viewports[0].setSize(w / 2, h / 2);
-        viewports[0].setOffset(0, 0);
-
-        viewports[1].setSize(w / 2, h / 2);
-        viewports[1].setOffset(w / 2, 0);
-
-        viewports[2].setSize(w / 2, h / 2);
-        viewports[2].setOffset(0, h / 2);
-
-        viewports[3].setSize(w / 2, h / 2);
-        viewports[3].setOffset(w / 2, h / 2);
+        viewports[0].setSize(0, 0, w / 2, h / 2);
+        viewports[1].setSize(w / 2, 0, w / 2, h / 2);
+        viewports[2].setSize(0, h / 2, w / 2, h / 2);
+        viewports[3].setSize(w / 2, h / 2, w / 2, h / 2);
     }
 
     private static double renderFactor = -1;
