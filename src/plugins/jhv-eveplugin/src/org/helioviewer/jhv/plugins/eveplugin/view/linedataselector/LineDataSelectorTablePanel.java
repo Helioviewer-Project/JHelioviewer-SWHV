@@ -173,8 +173,12 @@ public class LineDataSelectorTablePanel extends JPanel implements TableModelList
              */
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = grid.rowAtPoint(new Point(e.getX(), e.getY()));
-                int col = grid.columnAtPoint(new Point(e.getX(), e.getY()));
+                Point pt = e.getPoint();
+                int row = grid.rowAtPoint(pt);
+                int col = grid.columnAtPoint(pt);
+                if (row < 0 || col < 0)
+                    return;
+
                 LineDataSelectorModel model = (LineDataSelectorModel) grid.getModel();
 
                 if (col == VISIBLE_COL) {
