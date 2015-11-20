@@ -45,16 +45,6 @@ public class Viewport {
         y = _y;
     }
 
-    public void setSize(int _w, int _h) {
-        w = _w;
-        h = _h;
-    }
-
-    public void setOffset(int offsetX, int offsetY) {
-        x = offsetX;
-        y = offsetY;
-    }
-
     public boolean isInside(int px, int py) {
         if (px >= x && px < x + w && py >= getOffsetY() && py < getOffsetY() + h) {
             return true;
