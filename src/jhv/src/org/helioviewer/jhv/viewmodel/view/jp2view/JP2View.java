@@ -171,7 +171,7 @@ public class JP2View extends AbstractView {
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, masterTime, m);
 
-        double ratio = 2 * camera.getWidth() / vp.getHeight();
+        double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio);
 
         ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);

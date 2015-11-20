@@ -18,7 +18,7 @@ public class CameraHelper {
 
     public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
         double width = camera.getWidth();
-        double aspect = vp.getWidth() / (double) vp.getHeight();
+        double aspect = vp.width / (double) vp.height;
         return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, clipNear, clipFar);
     }
 
@@ -27,7 +27,7 @@ public class CameraHelper {
         gl.glLoadIdentity();
 
         double width = camera.getWidth();
-        double aspect = vp.getWidth() / (double) vp.getHeight();
+        double aspect = vp.width / (double) vp.height;
         gl.glOrtho(-width * aspect, width * aspect, -width, width, clipNear, clipFar);
 
         Vec2 translation = camera.getCurrentTranslation();
@@ -38,16 +38,16 @@ public class CameraHelper {
     }
 
     private static double computeNormalizedX(Viewport vp, Point viewportCoordinates) {
-        return +2. * ((viewportCoordinates.getX() - vp.getOffsetX()) / vp.getWidth() - 0.5);
+        return +2. * ((viewportCoordinates.getX() - vp.getOffsetX()) / vp.width - 0.5);
     }
 
     private static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
-        return -2. * ((viewportCoordinates.getY() - vp.getOffsetY()) / vp.getHeight() - 0.5);
+        return -2. * ((viewportCoordinates.getY() - vp.getOffsetY()) / vp.height - 0.5);
     }
 
     private static double computeUpX(Camera camera, Viewport vp, Point viewportCoordinates) {
         double width = camera.getWidth();
-        double aspect = vp.getWidth() / (double) vp.getHeight();
+        double aspect = vp.width / (double) vp.height;
         Vec2 translation = camera.getCurrentTranslation();
         return computeNormalizedX(vp, viewportCoordinates) * width * aspect - translation.x;
     }
@@ -116,7 +116,7 @@ public class CameraHelper {
 
     public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
         double width = camera.getWidth();
-        double aspect = vp.getWidth() / (double) vp.getHeight();
+        double aspect = vp.width / (double) vp.height;
         Vec2 translation = camera.getCurrentTranslation();
 
         double up1x = normalizedScreenpos.x * width * aspect - translation.x;

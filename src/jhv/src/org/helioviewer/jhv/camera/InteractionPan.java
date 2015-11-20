@@ -25,7 +25,7 @@ public class InteractionPan extends Interaction {
         Point p = e.getPoint();
         int x = p.x - lastMousePoint.x;
         int y = p.y - lastMousePoint.y;
-        double m = 2. * camera.getWidth() / Displayer.getViewport().getHeight();
+        double m = 2. * camera.getWidth() / Displayer.getViewport().height;
         lastMousePoint = p;
 
         Vec2 pan = camera.getCurrentTranslation();

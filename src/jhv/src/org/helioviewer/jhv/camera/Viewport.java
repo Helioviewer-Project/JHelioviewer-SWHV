@@ -5,8 +5,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class Viewport {
 
-    private final int w;
-    private final int h;
+    public final int width;
+    public final int height;
     private final int x;
     private final int y;
     public final int index;
@@ -15,8 +15,8 @@ public class Viewport {
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h, boolean _active) {
         index = _idx;
-        w = _w;
-        h = _h;
+        width = _w;
+        height = _h;
         x = _x;
         y = _y;
         active = _active;
@@ -26,24 +26,16 @@ public class Viewport {
         this(vp.index, _x, _y, _w, _h, vp.active);
     }
 
-    public int getWidth() {
-        return w;
-    }
-
-    public int getHeight() {
-        return h;
-    }
-
     public int getOffsetX() {
         return x;
     }
 
     public int getOffsetY() {
-        return Displayer.getGLHeight() - h - y;
+        return Displayer.getGLHeight() - height - y;
     }
 
     public boolean isInside(int px, int py) {
-        if (px >= x && px < x + w && py >= getOffsetY() && py < getOffsetY() + h) {
+        if (px >= x && px < x + width && py >= getOffsetY() && py < getOffsetY() + height) {
             return true;
         }
         return false;
@@ -51,7 +43,7 @@ public class Viewport {
 
     @Override
     public String toString() {
-        return "Offset: " + getOffsetX() + "," + getOffsetY() + " Size: " + getWidth() + "," + getHeight();
+        return "Offset: " + getOffsetX() + "," + getOffsetY() + " Size: " + width + "," + height;
     }
 
     public boolean isActive() {

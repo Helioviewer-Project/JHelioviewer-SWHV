@@ -146,7 +146,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         {
             glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
 
-            GLSLShader.setViewport(vp.getWidth(), vp.getHeight(), vp.getOffsetX(), vp.getOffsetY());
+            GLSLShader.setViewport(vp.width, vp.height, vp.getOffsetX(), vp.getOffsetY());
             if (!RenderableImageLayer.showCorona) {
                 GLSLShader.setOuterCutOffRadius(1.);
             }
@@ -193,12 +193,12 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
-            int delta = (int) (vp.getHeight() * 0.01);
-            TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.getHeight() * vpScale)));
+            int delta = (int) (vp.height * 0.01);
+            TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.height * vpScale)));
             Rectangle2D rect = renderer.getBounds(loading);
 
-            renderer.beginRendering(vp.getWidth(), vp.getHeight(), true);
-            renderer.draw(loading, (int) (vp.getWidth() - rect.getWidth() - delta), (int) (vp.getHeight() - rect.getHeight() - delta));
+            renderer.beginRendering(vp.width, vp.height, true);
+            renderer.draw(loading, (int) (vp.width - rect.getWidth() - delta), (int) (vp.height - rect.getHeight() - delta));
             renderer.endRendering();
         }
     }
