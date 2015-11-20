@@ -222,11 +222,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double width2 = width / 2.;
         double height2 = height / 2.;
 
-        Vec3 sourceDir = new Vec3(0, 0, 1);
         Vec3 targetDir = new Vec3(x, y, z);
 
-        Vec3 axis = sourceDir.cross(targetDir);
-        axis.normalize();
         Mat4 r = Mat4.rotation(Math.atan2(x, z), Vec3.YAxis);
         r.rotate(-Math.asin(y / targetDir.length()), Vec3.XAxis);
 
