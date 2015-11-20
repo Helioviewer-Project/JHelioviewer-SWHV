@@ -38,11 +38,11 @@ public class CameraHelper {
     }
 
     private static double computeNormalizedX(Viewport vp, Point viewportCoordinates) {
-        return +2. * ((viewportCoordinates.getX() - vp.getOffsetX()) / vp.width - 0.5);
+        return +2. * ((viewportCoordinates.x - vp.getOffsetX()) / (double) vp.width - 0.5);
     }
 
     private static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
-        return -2. * ((viewportCoordinates.getY() - vp.getOffsetY()) / vp.height - 0.5);
+        return -2. * ((viewportCoordinates.y - vp.getOffsetY()) / (double) vp.height - 0.5);
     }
 
     private static double computeUpX(Camera camera, Viewport vp, Point viewportCoordinates) {
