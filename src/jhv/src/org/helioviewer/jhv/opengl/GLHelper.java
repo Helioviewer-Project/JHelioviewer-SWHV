@@ -57,16 +57,12 @@ public class GLHelper {
         gl.glLineWidth((float) (w * (unitScale ? 1 : GLInfo.pixelScaleFloat[0])));
     }
 
-    public static Point GL2AWTPoint(Point p) {
-        return new Point((int) (p.x / GLInfo.pixelScaleFloat[0]), (int) (p.y / GLInfo.pixelScaleFloat[1]));
+    public static Point GL2AWTPoint(int x, int y) {
+        return new Point((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Dimension GL2AWTDimension(Dimension d) {
-        return new Dimension((int) (d.width / GLInfo.pixelScaleFloat[0]), (int) (d.height / GLInfo.pixelScaleFloat[1]));
-    }
-
-    public static Dimension AWT2GLDimension(Dimension d) {
-        return new Dimension((int) (d.width * GLInfo.pixelScaleFloat[0]), (int) (d.height * GLInfo.pixelScaleFloat[1]));
+    public static Dimension GL2AWTDimension(int x, int y) {
+        return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
 }
