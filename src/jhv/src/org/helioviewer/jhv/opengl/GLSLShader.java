@@ -324,11 +324,11 @@ public class GLSLShader {
         truncationValueFloat[0] = truncationValue;
     }
 
-    public static void setViewport(float width, float height, float offsetX, float offsetY) {
-        viewport[0] = width;
-        viewport[1] = height;
+    public static void setViewport(float offsetX, float offsetY, float width, float height) {
         viewportOffset[0] = offsetX;
         viewportOffset[1] = offsetY;
+        viewport[0] = width;
+        viewport[1] = height;
     }
 
     public static void setCutOffValue(float val) {
