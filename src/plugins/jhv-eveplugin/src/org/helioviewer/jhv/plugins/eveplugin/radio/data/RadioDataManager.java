@@ -541,7 +541,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         jp2View.setViewport(viewport);
 
                         Rectangle roi = ri.getROI();
-                        if (!jp2View.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()))) {
+                        if (!jp2View.setRegion(new Region(roi.x, roi.y, roi.width, roi.height))) {
                             if (ri.getLastDataSize() != null) {
                                 fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
                             }
@@ -663,7 +663,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         Rectangle roi = tempRs.getROI();
-                        jp2CallistoView.setRegion(new Region(roi.getX(), roi.getY(), roi.getWidth(), roi.getHeight()));
+                        jp2CallistoView.setRegion(new Region(roi.x, roi.y, roi.width, roi.height));
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
