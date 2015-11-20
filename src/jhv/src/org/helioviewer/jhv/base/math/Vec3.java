@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.base.math;
 
+import org.helioviewer.jhv.base.logging.Log;
+
 public class Vec3 {
     /**
      * Predefined Vectors
@@ -230,13 +232,12 @@ public class Vec3 {
         this.z /= len;
 
         len = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-        if (len <= 1.0)
-            return;
-
-        // can't happen / something is really messed up
-        this.x = Double.NaN;
-        this.y = Double.NaN;
-        this.z = Double.NaN;
+        if (len > 1 || Double.isNaN(len)) {
+            Log.error("Normalized to bigger than 1: please report. Computed length: " + len);
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+        }
     }
 
     public final double[] toArray() {
