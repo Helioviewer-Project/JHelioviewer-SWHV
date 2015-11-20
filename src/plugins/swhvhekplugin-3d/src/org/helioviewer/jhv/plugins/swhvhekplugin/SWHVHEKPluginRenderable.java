@@ -326,7 +326,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (isVisible[vp.getIndex()]) {
+        if (isVisible[vp.index]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
@@ -345,7 +345,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (isVisible[vp.getIndex()]) {
+        if (isVisible[vp.index]) {
             if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
                 drawText(gl, vp, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
             }

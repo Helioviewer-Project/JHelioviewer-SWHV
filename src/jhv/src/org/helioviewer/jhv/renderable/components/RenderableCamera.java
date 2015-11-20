@@ -35,7 +35,7 @@ public class RenderableCamera extends AbstractRenderable {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.getIndex()])
+        if (!isVisible[vp.index])
             return;
 
         double width = camera.getDistance() * Math.tan(optionsPanel.getFOVAngle());

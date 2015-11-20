@@ -25,12 +25,12 @@ public class RenderableTimeStamp extends AbstractRenderable {
 
     @Override
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.getIndex()])
+        if (!isVisible[vp.index])
             return;
 
         String text = Layers.getLastUpdatedTimestamp().toString();
         if (Displayer.multiview) {
-            RenderableImageLayer im = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(vp.getIndex());
+            RenderableImageLayer im = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(vp.index);
             if (im != null) {
                 text = im.getTimeString() + " " + im.getName();
             }
