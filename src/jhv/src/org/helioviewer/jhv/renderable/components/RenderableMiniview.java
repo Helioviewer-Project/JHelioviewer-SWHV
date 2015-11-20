@@ -6,7 +6,6 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -20,7 +19,6 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
     private final Camera cameraMini = new Camera();
-    private final Viewport miniview = new Viewport(0, 0, 0, 100, 100, true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -93,12 +91,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     public Viewport getViewport() {
-        int vpw = Displayer.getGLWidth();
-        int offset = (int) (vpw * 0.01);
-        int size = (int) (vpw * optionsPanel.scale * 0.01);
-        miniview.setSize(offset, offset, size, size);
-
-        return miniview;
+        return optionsPanel.miniview;
     }
 
     public Camera getCamera() {

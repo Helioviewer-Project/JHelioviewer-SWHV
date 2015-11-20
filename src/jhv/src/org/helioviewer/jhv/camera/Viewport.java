@@ -5,10 +5,10 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class Viewport {
 
-    private int w;
-    private int h;
-    private int x;
-    private int y;
+    private final int w;
+    private final int h;
+    private final int x;
+    private final int y;
     public final int index;
 
     private boolean active;
@@ -40,13 +40,6 @@ public class Viewport {
 
     public int getOffsetY() {
         return Displayer.getGLHeight() - h - y;
-    }
-
-    public void setSize(int _x, int _y, int _w, int _h) {
-        w = _w;
-        h = _h;
-        x = _x;
-        y = _y;
     }
 
     public boolean isInside(int px, int py) {
