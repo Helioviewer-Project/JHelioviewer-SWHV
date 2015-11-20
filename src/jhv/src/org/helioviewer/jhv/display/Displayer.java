@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.display;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -34,10 +33,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static int getGLHeight() {
         return glHeight;
-    }
-
-    public static Dimension getGLSize() {
-        return new Dimension(glWidth, glHeight);
     }
 
     private static Camera camera = new Camera();
@@ -100,8 +95,8 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static void reshape() {
-        int w = Displayer.getGLWidth();
-        int h = Displayer.getGLHeight();
+        int w = glWidth;
+        int h = glHeight;
 
         for (Viewport vp : viewports) {
             if (vp.isActive()) {
@@ -111,9 +106,10 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static void reshape2() {
-        int w = Displayer.getGLWidth();
+        int w = glWidth;
+        int h = glHeight;
+
         int halfw = w / 2;
-        int h = Displayer.getGLHeight();
         boolean first = true;
 
         for (Viewport vp : viewports) {
@@ -129,8 +125,8 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static void reshape4() {
-        int w = Displayer.getGLWidth();
-        int h = Displayer.getGLHeight();
+        int w = glWidth;
+        int h = glHeight;
 
         viewports[0].setSize(0, 0, w / 2, h / 2);
         viewports[1].setSize(w / 2, 0, w / 2, h / 2);
