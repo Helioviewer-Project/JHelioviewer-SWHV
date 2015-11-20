@@ -46,18 +46,23 @@ public class Displayer implements JHVEventHighlightListener {
         new Viewport(1, 0, 0, 100, 100, false),
         new Viewport(2, 0, 0, 100, 100, false),
         new Viewport(3, 0, 0, 100, 100, false) };
-    private static Viewport viewport = viewports[0];
+    private static int idxViewport = 0;
+
+    public static void setActiveViewport(int x, int y) {
+        for (int i = 0; i < viewports.length; ++i) {
+            if (viewports[i].isActive() && viewports[i].isInside(x, y)) {
+                idxViewport = i;
+                break;
+            }
+        }
+    }
 
     public static Viewport[] getViewports() {
         return viewports;
     }
 
     public static Viewport getViewport() {
-        return viewport;
-    }
-
-    public static void setViewport(Viewport _viewport) {
-        viewport = _viewport;
+        return viewports[idxViewport];
     }
 
     private static int countActiveLayers() {

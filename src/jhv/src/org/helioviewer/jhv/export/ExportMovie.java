@@ -171,7 +171,6 @@ public class ExportMovie implements FrameListener {
                 Layers.removeFrameListener(instance);
             if (mode != RecordMode.FREE)
                 MoviePanel.clickRecordButton();
-            Displayer.setViewport(Displayer.getViewports()[0]);
             Displayer.display(); // force detach
         }
     }

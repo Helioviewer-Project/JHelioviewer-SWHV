@@ -22,6 +22,10 @@ public class Viewport {
         active = _active;
     }
 
+    public Viewport(Viewport vp, int _x, int _y, int _w, int _h) {
+        this(vp.index, _x, _y, _w, _h, vp.active);
+    }
+
     public int getWidth() {
         return w;
     }
