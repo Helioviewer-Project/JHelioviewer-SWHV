@@ -11,7 +11,6 @@ public class Viewport {
     private int y;
     public final int index;
 
-    private boolean isVisible = true;
     private boolean active;
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h, boolean _active) {
@@ -61,14 +60,6 @@ public class Viewport {
             return true;
         }
         return false;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    public void setVisible(boolean _isVisible) {
-        isVisible = _isVisible;
     }
 
     @Override

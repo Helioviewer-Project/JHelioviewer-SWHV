@@ -106,23 +106,4 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         return cameraMini;
     }
 
-    @Override
-    public boolean isVisible(int i) {
-        return false;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return miniview.isVisible();
-    }
-
-    @Override
-    public void setVisible(boolean _isVisible) {
-        miniview.setVisible(_isVisible);
-    }
-
-    @Override
-    public void setVisible(int j) {
-    }
-
 }
