@@ -74,15 +74,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
     }
 
     private void setActiveViewport(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        for (Viewport vp : Displayer.getViewports()) {
-            if (vp.isActive() && vp.isInside(x, y)) {
-                Displayer.setViewport(vp);
-                break;
-            }
-        }
+        Displayer.setActiveViewport(e.getX(), e.getY());
     }
 
 }
