@@ -260,10 +260,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final double vpScale = 0.019;
 
     private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
-        int width = vp.getWidth();
-        int height = vp.getHeight();
-
-        TextRenderer renderer = GLText.getRenderer((int) (height * vpScale));
+        TextRenderer renderer = GLText.getRenderer((int) (vp.height * vpScale));
         float fontSize = renderer.getFont().getSize2D();
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
@@ -283,16 +280,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         float h = (float) (fontSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
 
         // Correct if out of view
-        if (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT > width) {
-            textInit.x -= (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT - width);
+        if (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT > vp.width) {
+            textInit.x -= (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT - vp.width);
         }
-        if (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT > height) {
-            textInit.y -= (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT - height);
+        if (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT > vp.height) {
+            textInit.y -= (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT - vp.height);
         }
         float left = textInit.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT;
         float bottom = textInit.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT;
 
-        renderer.beginRendering(width, height, true);
+        renderer.beginRendering(vp.width, vp.height, true);
 
         gl.glColor4f(0.33f, 0.33f, 0.33f, 0.9f);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -300,10 +297,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glLoadIdentity();
         {
             gl.glBegin(GL2.GL_QUADS);
-            gl.glVertex2f(left, height - bottom);
-            gl.glVertex2f(left, height - bottom - h);
-            gl.glVertex2f(left + w, height - bottom - h);
-            gl.glVertex2f(left + w, height - bottom);
+            gl.glVertex2f(left, vp.height - bottom);
+            gl.glVertex2f(left, vp.height - bottom - h);
+            gl.glVertex2f(left + w, vp.height - bottom - h);
+            gl.glVertex2f(left + w, vp.height - bottom);
             gl.glEnd();
 
         }
@@ -314,7 +311,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         int deltaY = MOUSE_OFFSET_Y;
         for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            renderer.draw(txt, textInit.x + MOUSE_OFFSET_X, height - textInit.y - deltaY);
+            renderer.draw(txt, textInit.x + MOUSE_OFFSET_X, vp.height - textInit.y - deltaY);
             deltaY += fontSize * 1.1;
         }
         renderer.endRendering();

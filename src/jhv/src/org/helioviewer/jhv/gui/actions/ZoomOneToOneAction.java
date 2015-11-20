@@ -37,7 +37,7 @@ public class ZoomOneToOneAction extends AbstractAction {
         View view = Layers.getActiveView();
         if (view != null) {
             MetaData metaData = view.getImageLayer().getImageData().getMetaData();
-            double imageFraction = Displayer.getViewport().getHeight() / (double) metaData.getPixelHeight();
+            double imageFraction = Displayer.getViewport().height / (double) metaData.getPixelHeight();
 
             Camera camera = Displayer.getCamera();
             double fov = 2. * Math.atan2(0.5 * metaData.getPhysicalRegion().height * imageFraction, camera.getDistance());

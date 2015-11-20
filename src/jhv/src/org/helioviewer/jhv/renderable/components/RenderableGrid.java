@@ -79,7 +79,7 @@ public class RenderableGrid extends AbstractRenderable {
         {
             if (showLabels) {
                 // cameraWidth changes ever so slightly with distance to Sun
-                int pixelsPerSolarRadius = (int) (textScale * vp.getHeight() / (2 * camera.getWidth()));
+                int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
                 drawText(gl, pixelsPerSolarRadius);
             }
             drawCircles(gl);
