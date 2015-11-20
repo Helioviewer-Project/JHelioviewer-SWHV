@@ -50,7 +50,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void setActiveViewport(int x, int y) {
         for (int i = 0; i < viewports.length; ++i) {
-            if (viewports[i].isActive() && viewports[i].isInside(x, y)) {
+            if (viewports[i].isActive() && viewports[i].contains(x, y)) {
                 idxViewport = i;
                 break;
             }

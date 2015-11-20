@@ -103,7 +103,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Mat4 inverse = camera.getRotation().transpose();
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isActive()) {
-                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.width, vp.height);
+                gl.glViewport(vp.getX(), vp.getY(), vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
 
                 renderBlackCircle(gl, inverse.m);
@@ -118,7 +118,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public static void renderFloatScene(Camera camera, GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
             if (vp.isActive()) {
-                gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.width, vp.height);
+                gl.glViewport(vp.getX(), vp.getY(), vp.width, vp.height);
                 ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
             }
         }
@@ -130,7 +130,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             Camera cameraMini = ImageViewerGui.getRenderableMiniview().getCamera();
             cameraMini.timeChanged(Layers.getLastUpdatedTimestamp());
 
-            gl.glViewport(vp.getOffsetX(), vp.getOffsetY(), vp.width, vp.height);
+            gl.glViewport(vp.getX(), vp.getY(), vp.width, vp.height);
             CameraHelper.applyPerspective(cameraMini, vp, gl);
             ImageViewerGui.getRenderableContainer().renderMiniview(cameraMini, vp, gl);
         }

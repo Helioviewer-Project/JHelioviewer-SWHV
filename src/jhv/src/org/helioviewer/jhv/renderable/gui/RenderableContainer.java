@@ -22,10 +22,6 @@ public class RenderableContainer implements TableModel, Reorderable {
     private final ArrayList<Renderable> removedRenderables = new ArrayList<Renderable>();
     private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
 
-    public RenderableContainer() {
-        super();
-    }
-
     public void addBeforeRenderable(Renderable renderable) {
         int lastImagelayerIndex = -1;
         int size = renderables.size();
@@ -157,10 +153,6 @@ public class RenderableContainer implements TableModel, Reorderable {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return renderables.get(rowIndex);
-    }
-
-    public Renderable getTypedValueAt(int rowIndex, int columnIndex) {
         return renderables.get(rowIndex);
     }
 

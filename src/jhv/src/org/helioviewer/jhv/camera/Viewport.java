@@ -26,16 +26,16 @@ public class Viewport {
         this(vp.index, _x, _y, _w, _h, vp.active);
     }
 
-    public int getOffsetX() {
+    public int getX() {
         return x;
     }
 
-    public int getOffsetY() {
+    public int getY() {
         return Displayer.getGLHeight() - height - y;
     }
 
-    public boolean isInside(int px, int py) {
-        if (px >= x && px < x + width && py >= getOffsetY() && py < getOffsetY() + height) {
+    public boolean contains(int px, int py) {
+        if (px >= x && px < x + width && py >= getY() && py < getY() + height) {
             return true;
         }
         return false;
@@ -43,7 +43,7 @@ public class Viewport {
 
     @Override
     public String toString() {
-        return "Offset: " + getOffsetX() + "," + getOffsetY() + " Size: " + width + "," + height;
+        return "Offset: " + getX() + "," + getY() + " Size: " + width + "," + height;
     }
 
     public boolean isActive() {
