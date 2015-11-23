@@ -76,6 +76,8 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void reshapeAll() {
+        idxViewport = 0;
+
         int ct = countActiveLayers();
         switch (ct) {
         case 0:
