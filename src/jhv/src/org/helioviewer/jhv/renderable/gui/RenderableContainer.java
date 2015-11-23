@@ -232,8 +232,7 @@ public class RenderableContainer implements TableModel, Reorderable {
     public RenderableImageLayer getViewportRenderableImageLayer(int idx) {
         for (Renderable r : renderables) {
             if (r instanceof RenderableImageLayer && r.isVisible(idx)) {
-                RenderableImageLayer im = (RenderableImageLayer) r;
-                return im;
+                return (RenderableImageLayer) r;
             }
         }
         return null;

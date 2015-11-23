@@ -171,7 +171,6 @@ public class JHVGlobals {
                     jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
                     "-message", "\"" + msg + "\"",
                     "-execute", "open " + "\"" + openURL + "\"",
-                    "-sender", "org.helioviewer.jhv",
                     "-title", "JHelioviewer"
                 };
                 Log.info(">> displayNotification " + Arrays.toString(cmd));
