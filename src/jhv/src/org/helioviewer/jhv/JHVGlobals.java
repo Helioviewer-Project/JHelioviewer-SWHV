@@ -3,6 +3,8 @@ package org.helioviewer.jhv;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
@@ -155,8 +157,28 @@ public class JHVGlobals {
     public static void openURL(String url) {
         try {
             Desktop.getDesktop().browse(new URI(url));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void displayNotification(String msg, String openURL) {
+        if (System.getProperty("jhv.os").equals("mac")) {
+            try {
+                File jarPath = new File(JHVGlobals.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                String[] cmd = new String[] {
+                    jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
+                    "-message", "\"" + msg + "\"",
+                    "-sender", "org.helioviewer.jhv",
+                    "-open", "\"" + openURL + "\"",
+                    "-title", "JHelioviewer"
+                };
+                Runtime.getRuntime().exec(cmd);
+            } catch (Exception e) {
+                StringWriter errors = new StringWriter();
+                e.printStackTrace(new PrintWriter(errors));
+                Log.error(">> displayNotification " + errors.toString());
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir "$TEMP/JHelioviewer.app/Contents/Helpers"
+cp -r "$RESOURCES/terminal-notifier.app" "$TEMP/JHelioviewer.app/Contents/Helpers"
 # Sign app, comment next line if you don't know the password
 #codesign -f -s "SWHV" --keychain "$RESOURCES/swhv.keychain" "$TEMP/JHelioviewer.app"
 codesign -f -s "Developer ID Application" "$TEMP/JHelioviewer.app"
