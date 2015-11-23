@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -229,6 +230,9 @@ public class ExportMovie implements FrameListener {
             try {
                 if (movieExporter != null) {
                     movieExporter.close();
+
+                    File path = new File(moviePath);
+                    JHVGlobals.displayNotification("Export of " + moviePath + " finished.", path.toURI().toString());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
