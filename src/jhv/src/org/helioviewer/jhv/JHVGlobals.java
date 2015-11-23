@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -169,10 +170,11 @@ public class JHVGlobals {
                 String[] cmd = new String[] {
                     jarPath.getCanonicalFile().getParentFile().getParent() + "/Helpers/terminal-notifier.app/Contents/MacOS/terminal-notifier",
                     "-message", "\"" + msg + "\"",
+                    "-execute", "open " + "\"" + openURL + "\"",
                     "-sender", "org.helioviewer.jhv",
-                    "-open", "\"" + openURL + "\"",
                     "-title", "JHelioviewer"
                 };
+                Log.info(">> displayNotification " + Arrays.toString(cmd));
                 Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();
