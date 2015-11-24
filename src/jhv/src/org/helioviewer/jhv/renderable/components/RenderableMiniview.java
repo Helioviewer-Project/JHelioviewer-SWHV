@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewport;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -18,12 +19,21 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
-    private final Camera cameraMini = new Camera();
+    private final Camera miniCamera = new Camera();
+    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100, true);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
         optionsPanel = new RenderableMiniviewOptionsPanel();
         setVisible(true);
+    }
+
+    public void createMiniViewport() {
+        int vpw = Displayer.getGLWidth();
+        int offset = (int) (vpw * 0.01);
+        int size = (int) (vpw * 0.01 * optionsPanel.scale);
+
+        miniViewport = new Viewport(0, offset, offset, size, size, true);
     }
 
     @Override
@@ -87,15 +97,15 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
 
     @Override
     public void activeLayerChanged(View view) {
-        CameraHelper.zoomToFit(cameraMini);
+        CameraHelper.zoomToFit(miniCamera);
     }
 
     public Viewport getViewport() {
-        return optionsPanel.miniview;
+        return miniViewport;
     }
 
     public Camera getCamera() {
-        return cameraMini;
+        return miniCamera;
     }
 
 }
