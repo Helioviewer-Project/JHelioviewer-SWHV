@@ -10,9 +10,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 
@@ -21,16 +21,7 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
 
     private JSpinner xSpinner;
     private static final int DEFAULT = 10;
-
-    protected Viewport miniview;
-
-    private Viewport createMiniview(int scale) {
-        int vpw = Displayer.getGLWidth();
-        int offset = (int) (vpw * 0.01);
-        int size = (int) (vpw * 0.01 * scale);
-
-        return new Viewport(0, offset, offset, size, size, true);
-    }
+    protected int scale = DEFAULT;
 
     public RenderableMiniviewOptionsPanel() {
         createXSpinner();
@@ -51,8 +42,6 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
         add(xSpinner, c0);
 
         setSmall();
-
-        miniview = createMiniview(DEFAULT);
     }
 
     public void createXSpinner() {
@@ -66,7 +55,8 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                miniview = createMiniview(((Double) xSpinner.getValue()).intValue());
+                scale = ((Double) xSpinner.getValue()).intValue();
+                ImageViewerGui.getRenderableMiniview().createMiniViewport();
                 Displayer.display();
             }
         });

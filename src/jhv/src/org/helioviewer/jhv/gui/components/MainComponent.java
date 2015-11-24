@@ -85,6 +85,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         Displayer.setGLSize(width, height);
         Displayer.reshapeAll();
+        ImageViewerGui.getRenderableMiniview().createMiniViewport();
     }
 
     private static void renderBlackCircle(GL2 gl, double[] matrix) {
