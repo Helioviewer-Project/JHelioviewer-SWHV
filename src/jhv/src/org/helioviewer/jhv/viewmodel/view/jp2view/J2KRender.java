@@ -123,9 +123,7 @@ class J2KRender implements Runnable {
             }
         }
 
-        if (compositorBuf != null) {
-            compositorBuf.Native_destroy();
-        }
+        compositorBuf.Native_destroy();
 
         ImageData imdata = null;
         if (numComponents < 3) {

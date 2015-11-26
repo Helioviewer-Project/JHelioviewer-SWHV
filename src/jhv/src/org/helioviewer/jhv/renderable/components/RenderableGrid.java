@@ -157,13 +157,11 @@ public class RenderableGrid extends AbstractRenderable {
             {
                 float rotation = 0;
                 rotation -= lonstepDegrees;
-
                 gl.glRotatef(-lonstepDegrees, 0, 1, 0);
 
                 while (rotation >= -180) {
                     gl.glDrawArrays(GL2.GL_LINE_STRIP, SUBDIVISIONS / 4, SUBDIVISIONS / 2 + 1);
                     gl.glRotatef(-lonstepDegrees, 0, 1, 0);
-
                     rotation -= lonstepDegrees;
                 }
             }
@@ -171,7 +169,7 @@ public class RenderableGrid extends AbstractRenderable {
 
             gl.glPushMatrix();
             {
-                float rotation = 0;
+                float scale, rotation = 0;
                 gl.glRotatef(90, 1, 0, 0);
 
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
@@ -179,7 +177,7 @@ public class RenderableGrid extends AbstractRenderable {
                     gl.glPushMatrix();
                     {
                         gl.glTranslatef(0, 0, (float) Math.sin(Math.PI / 180. * rotation));
-                        float scale = (float) Math.cos(Math.PI / 180. * rotation);
+                        scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     }
@@ -192,7 +190,7 @@ public class RenderableGrid extends AbstractRenderable {
                     gl.glPushMatrix();
                     {
                         gl.glTranslatef(0, 0, -(float) Math.sin(Math.PI / 180. * rotation));
-                        float scale = (float) Math.cos(Math.PI / 180. * rotation);
+                        scale = (float) Math.cos(Math.PI / 180. * rotation);
                         gl.glScalef(scale, scale, scale);
                         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                     }
