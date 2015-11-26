@@ -32,8 +32,6 @@ public class Camera {
     private final ViewpointExpert viewpointExpert = new ViewpointExpert(this);
     private Viewpoint viewpoint = viewpointObserver;
 
-    private CameraMode mode = CameraMode.OBSERVER;
-
     private void updateCamera(JHVDate date) {
         viewpoint.update(date);
         updateTransformation();
@@ -54,8 +52,7 @@ public class Camera {
         Displayer.render();
     }
 
-    void setMode(CameraMode _mode) {
-        mode = _mode;
+    void setMode(CameraMode mode) {
         switch (mode) {
             case EXPERT:
                 viewpoint = viewpointExpert;

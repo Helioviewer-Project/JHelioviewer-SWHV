@@ -177,7 +177,9 @@ public class FITSImage implements MetaDataContainer {
             }
             imageData = new SingleChannelShortImageData(width, height, 16, ShortBuffer.wrap(data));
         }
-        image = imageData.getBufferedImage();
+
+        if (imageData != null)
+            image = imageData.getBufferedImage();
     }
 
     /**
