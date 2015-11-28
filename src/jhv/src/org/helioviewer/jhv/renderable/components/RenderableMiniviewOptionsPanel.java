@@ -56,7 +56,7 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 scale = ((Double) xSpinner.getValue()).intValue();
-                ImageViewerGui.getRenderableMiniview().createMiniViewport();
+                ImageViewerGui.getRenderableMiniview().reshapeViewport();
                 Displayer.display();
             }
         });
