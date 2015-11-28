@@ -7,8 +7,8 @@ public class Viewport {
 
     public final int width;
     public final int height;
-    private final int x;
-    private final int y;
+    public final int x;
+    public final int y;
     public final int index;
 
     private boolean active;
@@ -18,7 +18,7 @@ public class Viewport {
         width = _w;
         height = _h;
         x = _x;
-        y = _y;
+        y = Displayer.getGLHeight() - height - _y;
         active = _active;
     }
 
@@ -26,16 +26,8 @@ public class Viewport {
         this(vp.index, _x, _y, _w, _h, vp.active);
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return Displayer.getGLHeight() - height - y;
-    }
-
     public boolean contains(int px, int py) {
-        if (px >= x && px < x + width && py >= getY() && py < getY() + height) {
+        if (px >= x && px < x + width && py >= y && py < y + height) {
             return true;
         }
         return false;
@@ -43,7 +35,7 @@ public class Viewport {
 
     @Override
     public String toString() {
-        return "Offset: " + getX() + "," + getY() + " Size: " + width + "," + height;
+        return "Offset: " + x + "," + y + " Size: " + width + "," + height;
     }
 
     public boolean isActive() {
