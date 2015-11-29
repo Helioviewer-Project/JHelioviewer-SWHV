@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
@@ -38,12 +39,12 @@ public class RenderableCamera extends AbstractRenderable {
         if (!isVisible[vp.index])
             return;
 
-        double width = camera.getDistance() * Math.tan(optionsPanel.getFOVAngle());
+        double width = camera.getViewpoint().distance * Math.tan(optionsPanel.getFOVAngle());
         double height = width;
         double scale = 1.;
 
         gl.glPushMatrix();
-        gl.glMultMatrixd(camera.getOrientation().toMatrix().transpose().m, 0);
+        gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
             GLHelper.lineWidth(gl, 1);
 
@@ -138,8 +139,9 @@ public class RenderableCamera extends AbstractRenderable {
         return timeString;
     }
 
-    public void setTimeString(String _timeString) {
-        timeString = _timeString;
+    public void fireTimeUpdated() {
+        timeString = Displayer.getCamera().getViewpoint().time.toString();
+        ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
     }
 
     @Override

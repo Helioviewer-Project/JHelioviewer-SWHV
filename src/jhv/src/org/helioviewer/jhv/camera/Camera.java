@@ -5,9 +5,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.renderable.components.RenderableCamera;
 
 public class Camera {
 
@@ -88,12 +86,8 @@ public class Camera {
         }
     }
 
-    public double getDistance() {
-        return viewpoint.distance;
-    }
-
-    public Quat getOrientation() {
-        return viewpoint.orientation;
+    public Viewpoint getViewpoint() {
+        return viewpoint;
     }
 
     Quat getRotationQuat() {
@@ -158,14 +152,6 @@ public class Camera {
     public void timeChanged(JHVDate date) {
         if (!trackingMode) {
             updateCamera(date);
-        }
-    }
-
-    public void fireTimeUpdated() {
-        RenderableCamera renderableCamera = ImageViewerGui.getRenderableCamera();
-        if (renderableCamera != null) {
-            renderableCamera.setTimeString(viewpoint.time.toString());
-            ImageViewerGui.getRenderableContainer().fireTimeUpdated(renderableCamera);
         }
     }
 

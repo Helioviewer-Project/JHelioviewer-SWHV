@@ -41,7 +41,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     public void renderBackground(Camera camera, Viewport vp, GL2 gl) {
-        Mat4 cameraMatrix = camera.getOrientation().toMatrix();
+        Mat4 cameraMatrix = camera.getViewpoint().orientation.toMatrix();
         gl.glDepthRange(0, 0);
         gl.glPushMatrix();
         {

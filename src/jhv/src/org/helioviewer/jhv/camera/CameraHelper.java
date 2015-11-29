@@ -29,7 +29,7 @@ public class CameraHelper {
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 cameraTransformation = camera.getRotation().translate(translation.x, translation.y, -camera.getDistance());
+        Mat4 cameraTransformation = camera.getRotation().translate(translation.x, translation.y, -camera.getViewpoint().distance);
         // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(cameraTransformation.m, 0);
@@ -58,7 +58,7 @@ public class CameraHelper {
     public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, Point viewportCoordinates) {
         Vec3 hitPoint = getVectorFromSphereAlt(camera, vp, viewportCoordinates);
         if (hitPoint != null) {
-            return camera.getOrientation().rotateInverseVector(hitPoint);
+            return camera.getViewpoint().orientation.rotateInverseVector(hitPoint);
         }
         return null;
     }
@@ -138,7 +138,7 @@ public class CameraHelper {
     public static void zoomToFit(Camera camera) {
         double newFOV = Camera.INITFOV, size = Layers.getLargestPhysicalSize();
         if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, camera.getDistance());
+            newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);
     }
 
