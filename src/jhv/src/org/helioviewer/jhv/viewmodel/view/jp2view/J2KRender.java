@@ -16,6 +16,8 @@ import kdu_jni.Kdu_thread_env;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
@@ -134,22 +136,33 @@ class J2KRender implements Runnable {
         setImageData(imdata, currParams);
     }
 
-    private void setImageData(ImageData newImdata, JP2ImageParameter newParams) {
+    private void setImageData(ImageData newImageData, JP2ImageParameter newParams) {
+        int newFrame = newParams.compositionLayer;
+        MetaData metaData = newParams.jp2Image.metaDataList[newFrame];
+
+        newImageData.setFrameNumber(newFrame);
+        newImageData.setMetaData(metaData);
+        newImageData.setMasterTime(newParams.masterTime);
+
+        if (metaData instanceof HelioviewerMetaData) {
+            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(newParams.subImage, newParams.resolution.getZoomPercent()));
+        }
+
         EventQueue.invokeLater(new Runnable() {
-            private ImageData theImdata;
-            private JP2ImageParameter theParams;
+            private ImageData theImageData;
+            private int theFrame;
 
             @Override
             public void run() {
-                parentViewRef.setSubimageData(theImdata, theParams);
+                parentViewRef.setImageData(theImageData, theFrame);
             }
 
-            public Runnable init(ImageData imdata, JP2ImageParameter params) {
-                theImdata = imdata;
-                theParams = params;
+            public Runnable init(ImageData imagedata, int frame) {
+                theImageData = imagedata;
+                theFrame = frame;
                 return this;
             }
-        }.init(newImdata, newParams));
+        }.init(newImageData, newFrame));
     }
 
     @Override

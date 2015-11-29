@@ -20,7 +20,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
@@ -212,27 +211,8 @@ public class JP2View extends AbstractView {
      *
      * This function is used as a callback function which is called by
      * {@link J2KRender} when it has finished decoding an image.
-     *
-     * @param newImageData
-     *            New image data
-     * @param params
-     *            New JP2Image parameters
-     * @param prevParams
-     * @param prevData
      */
-
-    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
-        int frame = params.compositionLayer;
-        MetaData metaData = params.jp2Image.metaDataList[frame];
-
-        newImageData.setFrameNumber(frame);
-        newImageData.setMetaData(metaData);
-        newImageData.setMasterTime(params.masterTime);
-
-        if (metaData instanceof HelioviewerMetaData) {
-            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.getZoomPercent()));
-        }
-
+    void setImageData(ImageData newImageData, int frame) {
         if (frame != trueFrame) {
             trueFrame = frame;
             ++frameCount;
