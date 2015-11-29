@@ -30,7 +30,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     }
 
     protected static Vec3 toSpherical(Camera _camera, Vec3 _p) {
-        Vec3 p = _camera.getOrientation().rotateVector(_p);
+        Vec3 p = _camera.getViewpoint().orientation.rotateVector(_p);
 
         Vec3 pt = new Vec3();
         pt.x = p.length();
@@ -46,7 +46,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
         pt.x = x * Math.sin(y) * Math.sin(z);
         pt.y = x * Math.cos(y);
 
-        return _camera.getOrientation().rotateInverseVector(pt);
+        return _camera.getViewpoint().orientation.rotateInverseVector(pt);
     }
 
     protected static Vec3 vectorFromSphere(Camera _camera, Point p) {

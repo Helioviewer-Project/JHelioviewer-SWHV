@@ -58,7 +58,7 @@ public class JP2View extends AbstractView {
     private JHVDate targetMasterTime;
 
     private int targetFrame = 0;
-    private int trueFrame;
+    private int trueFrame = -1;
 
     private int frameCount = 0;
     private long frameCountStart;

@@ -5,11 +5,11 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 
-abstract class Viewpoint {
+public abstract class Viewpoint {
 
-    JHVDate time;
-    Quat orientation;
-    double distance;
+    public JHVDate time;
+    public Quat orientation;
+    public double distance;
 
     abstract void update(JHVDate date);
     abstract CameraOptionPanel getOptionPanel();
@@ -18,6 +18,12 @@ abstract class Viewpoint {
         time = TimeUtils.epoch;
         orientation = Quat.ZERO;
         distance = Sun.MeanEarthDistance;
+    }
+
+    Viewpoint(Viewpoint v) {
+        time = v.time;
+        orientation = v.orientation.copy();
+        distance = v.distance;
     }
 
     private JHVDate timeSave;
