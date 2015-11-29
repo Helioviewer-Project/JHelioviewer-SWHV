@@ -27,19 +27,16 @@ public class SubImage {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof SubImage))
-            return false;
-        SubImage roi = (SubImage) o;
-        return x == roi.x && y == roi.y && width == roi.width && height == roi.height;
+        if (o instanceof SubImage) {
+            SubImage s = (SubImage) o;
+            return x == s.x && y == s.y && width == s.width && height == s.height;
+        }
+        return false;
     }
 
     @Override
     public String toString() {
-        String ret = "x=" + x + "   ";
-        ret += "y=" + y + "   ";
-        ret += "width=" + width + "   ";
-        ret += "height=" + height + "   ";
-        return ret;
+        return "[x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + "]";
     }
 
 }

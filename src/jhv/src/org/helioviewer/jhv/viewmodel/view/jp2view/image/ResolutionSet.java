@@ -160,10 +160,11 @@ public class ResolutionSet {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof ResolutionLevel))
-                return false;
-            ResolutionLevel res = (ResolutionLevel) o;
-            return discardLayers == res.discardLayers && dims.equals(res.dims);
+            if (o instanceof ResolutionLevel) {
+                ResolutionLevel r = (ResolutionLevel) o;
+                return discardLayers == r.discardLayers && dims.equals(r.dims);
+            }
+            return false;
         }
 
         /**

@@ -205,15 +205,6 @@ public class Quat {
         return Quat.createRotation(rotationAngle, rotationAxis);
     }
 
-    public Quat copy() {
-        return new Quat(this.a, this.u.copy());
-    }
-
-    @Override
-    public String toString() {
-        return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
-    }
-
     public Vec3 rotateVector(Vec3 vec) {
         //q'vq = vec + 2.0 * cross(q.xyz,cross(  q.xyz, vec ) + q.w * vec)
         double vx = vec.z * u.y - vec.y * u.z + a * vec.x;
@@ -244,6 +235,30 @@ public class Quat {
 
     public float[] getFloatArray() {
         return new float[] { (float) u.x, (float) u.y, (float) u.z, (float) a };
+    }
+
+    public Quat copy() {
+        return new Quat(this.a, this.u.copy());
+    }
+
+    @Override
+    public String toString() {
+        return "[" + a + ", " + u.x + ", " + u.y + ", " + u.z + "]";
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o instanceof Quat) {
+            Quat q = (Quat) o;
+            return a == q.a && u.equals(q.u);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
     }
 
 }

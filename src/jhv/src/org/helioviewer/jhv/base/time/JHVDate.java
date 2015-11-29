@@ -51,11 +51,11 @@ public class JHVDate implements Comparable<JHVDate> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof JHVDate)) {
-            return false;
+        if (o instanceof JHVDate) {
+            JHVDate d = (JHVDate) o;
+            return milli == d.milli;
         }
-        JHVDate dt = (JHVDate) o;
-        return milli == dt.milli;
+        return false;
     }
 
     @Override
