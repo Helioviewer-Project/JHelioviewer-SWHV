@@ -5,6 +5,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class Viewport {
 
+    public final double aspect;
     public final int width;
     public final int height;
     public final int x;
@@ -17,6 +18,7 @@ public class Viewport {
         index = _idx;
         width = _w;
         height = _h;
+        aspect = _w / (double) _h;
         x = _x;
         y = Displayer.getGLHeight() - height - _y;
         active = _active;
