@@ -18,8 +18,7 @@ public class CameraHelper {
 
     public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
         double width = camera.getWidth();
-        double aspect = vp.width / (double) vp.height;
-        return Mat4.orthoInverse(-width * aspect, width * aspect, -width, width, clipNear, clipFar);
+        return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
     }
 
     public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {
@@ -27,8 +26,7 @@ public class CameraHelper {
         gl.glLoadIdentity();
 
         double width = camera.getWidth();
-        double aspect = vp.width / (double) vp.height;
-        gl.glOrtho(-width * aspect, width * aspect, -width, width, clipNear, clipFar);
+        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
 
         Vec2 translation = camera.getCurrentTranslation();
         Mat4 cameraTransformation = camera.getRotation().translate(translation.x, translation.y, -camera.getDistance());
@@ -47,9 +45,8 @@ public class CameraHelper {
 
     private static double computeUpX(Camera camera, Viewport vp, Point viewportCoordinates) {
         double width = camera.getWidth();
-        double aspect = vp.width / (double) vp.height;
         Vec2 translation = camera.getCurrentTranslation();
-        return computeNormalizedX(vp, viewportCoordinates) * width * aspect - translation.x;
+        return computeNormalizedX(vp, viewportCoordinates) * width * vp.aspect - translation.x;
     }
 
     private static double computeUpY(Camera camera, Viewport vp, Point viewportCoordinates) {
@@ -97,13 +94,13 @@ public class CameraHelper {
     public static double getRadiusFromSphereAlt(Camera camera, Viewport vp, Point viewportCoordinates) {
         double up1x = computeUpX(camera, vp, viewportCoordinates);
         double up1y = computeUpY(camera, vp, viewportCoordinates);
-
         return Math.sqrt(up1x * up1x + up1y * up1y);
     }
 
     public static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, Point viewportCoordinates) {
         double up1x = computeUpX(camera, vp, viewportCoordinates);
         double up1y = computeUpY(camera, vp, viewportCoordinates);
+
         Vec3 hitPoint;
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 <= 0.5 * Sun.Radius2) {
@@ -116,10 +113,9 @@ public class CameraHelper {
 
     public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, Vec2 normalizedScreenpos, Quat cameraDifferenceRotation) {
         double width = camera.getWidth();
-        double aspect = vp.width / (double) vp.height;
         Vec2 translation = camera.getCurrentTranslation();
 
-        double up1x = normalizedScreenpos.x * width * aspect - translation.x;
+        double up1x = normalizedScreenpos.x * width * vp.aspect - translation.x;
         double up1y = normalizedScreenpos.y * width - translation.y;
 
         Vec3 hitPoint;
