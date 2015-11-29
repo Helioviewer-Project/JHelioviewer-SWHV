@@ -28,11 +28,11 @@ public class Region {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Region)) {
-            return false;
+        if (o instanceof Region) {
+            Region r = (Region) o;
+            return width == r.width && height == r.height && llx == r.llx && lly == r.lly;
         }
-        Region r = (Region) o;
-        return width == r.width && height == r.height && llx == r.llx && lly == r.lly;
+        return false;
     }
 
     @Override

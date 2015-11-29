@@ -26,6 +26,26 @@ public abstract class Viewpoint {
         distance = v.distance;
     }
 
+    @Override
+    public final String toString() {
+        return "[time" + time + ", orientation=" + orientation + ", distance=" + distance + "]";
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o instanceof Viewpoint) {
+            Viewpoint v = (Viewpoint) o;
+            return time.equals(v.time) && orientation.equals(v.orientation) && distance == v.distance;
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        assert false : "hashCode not designed";
+        return 42;
+    }
+
     private JHVDate timeSave;
     private Quat orientationSave;
     private double distanceSave;

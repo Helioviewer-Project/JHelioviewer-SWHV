@@ -45,13 +45,13 @@ public class JP2ImageParameter {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof JP2ImageParameter)) {
-            return false;
+        if (o instanceof JP2ImageParameter) {
+            JP2ImageParameter p = (JP2ImageParameter) o;
+            return jp2Image.equals(p.jp2Image) && masterTime.equals(p.masterTime) &&
+                   subImage.equals(p.subImage) && resolution.equals(p.resolution) &&
+                   compositionLayer == p.compositionLayer;
         }
-        JP2ImageParameter p = (JP2ImageParameter) o;
-        return jp2Image.equals(p.jp2Image) && masterTime.equals(p.masterTime) &&
-               subImage.equals(p.subImage) && resolution.equals(p.resolution) &&
-               compositionLayer == p.compositionLayer;
+        return false;
     }
 
 }
