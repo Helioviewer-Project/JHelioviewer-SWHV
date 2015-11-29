@@ -4,7 +4,6 @@ import java.awt.Rectangle;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -32,13 +31,6 @@ public class JP2ViewCallisto extends JP2View {
     @Override
     public void render(double factor) {
         // should be called only during setJP2Image
-    }
-
-    @Override
-    void setSubimageData(ImageData newImageData, JP2ImageParameter params) {
-        if (dataHandler != null) {
-            dataHandler.handleData(newImageData);
-        }
     }
 
     @Override
