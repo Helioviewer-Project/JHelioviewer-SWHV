@@ -248,7 +248,7 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null)
+        if (stopRender == true || jp2Image == null || /* tbd */ targetFrame < 0)
             return;
 
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(Displayer.getCamera(), Displayer.getViewport(), viewpoint, targetFrame, fromReader);
