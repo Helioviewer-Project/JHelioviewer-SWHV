@@ -49,39 +49,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         setVisible(true);
     }
 
-    public void setView(View _view) {
-        if (view != null)
-            return;
-        view = _view;
-        worker = null; // drop reference
-
-        float opacity = 1;
-        if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
-            int count = 0;
-            for (int i = 0; i < Layers.getNumLayers(); i++) {
-                String name = Layers.getLayer(i).getName();
-                if (!name.contains("LASCO") && !name.contains("COR"))
-                    count++;
-            }
-            opacity = (float) (1. / (1 + count));
-        }
-        glImage.setOpacity(opacity);
-        glImage.setLUT(view.getDefaultLUT(), false);
-
-        view.setImageLayer(this);
-        view.setDataHandler(this);
-        Layers.addLayer(view);
-        ImageViewerGui.getRenderableContainer().fireListeners();
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        super.setVisible(isVisible);
-        if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
-        }
-    }
-
     @Override
     public void init(GL2 gl) {
         glImage.init(gl);
@@ -104,11 +71,58 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     }
 
     @Override
+    public void setVisible(boolean isVisible) {
+        super.setVisible(isVisible);
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
+    }
+
+    public void setView(View _view) {
+        if (view != null)
+            return;
+
+        view = _view;
+        worker = null; // drop reference
+
+        float opacity = 1;
+        if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
+            int count = 0;
+            for (int i = 0; i < Layers.getNumLayers(); i++) {
+                String name = Layers.getLayer(i).getName();
+                if (!name.contains("LASCO") && !name.contains("COR"))
+                    count++;
+            }
+            opacity = (float) (1. / (1 + count));
+        }
+        glImage.setOpacity(opacity);
+        glImage.setLUT(view.getDefaultLUT(), false);
+
+        view.setImageLayer(this);
+        view.setDataHandler(this);
+        Displayer.addRenderListener(view);
+
+        Layers.addLayer(view);
+        ImageViewerGui.getRenderableContainer().fireListeners();
+
+        if (Displayer.multiview) {
+            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+        }
+    }
+
+    @Override
     public void remove(GL2 gl) {
         if (view != null) {
+            Displayer.removeRenderListener(view);
+            view.setDataHandler(null);
+
             view.setImageLayer(null);
             Layers.removeLayer(view);
             view = null;
+
+            if (Displayer.multiview) {
+                ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
+            }
         }
         if (worker != null)
             worker.cancel(true);

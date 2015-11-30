@@ -102,9 +102,4 @@ public abstract class AbstractView implements View {
         dataHandler = _dataHandler;
     }
 
-    @Override
-    public void removeDataHandler() {
-        dataHandler = null;
-    }
-
 }
