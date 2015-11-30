@@ -20,10 +20,16 @@ public abstract class Viewpoint {
         distance = Sun.MeanEarthDistance;
     }
 
-    Viewpoint(Viewpoint v) {
-        time = v.time;
-        orientation = v.orientation.copy();
-        distance = v.distance;
+    public final Viewpoint copy() {
+        try {
+            Viewpoint v = this.getClass().newInstance();
+            v.time = time;
+            v.orientation = orientation.copy();
+            v.distance = distance;
+            return v;
+        } catch (Exception e) {
+            return this;
+        }
     }
 
     @Override
@@ -44,22 +50,6 @@ public abstract class Viewpoint {
     public final int hashCode() {
         assert false : "hashCode not designed";
         return 42;
-    }
-
-    private JHVDate timeSave;
-    private Quat orientationSave;
-    private double distanceSave;
-
-    void push() {
-        timeSave = time;
-        orientationSave = orientation;
-        distanceSave = distance;
-    }
-
-    void pop() {
-        time = timeSave;
-        orientation = orientationSave;
-        distance = distanceSave;
     }
 
 }

@@ -152,7 +152,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             }
             GLSLShader.filter(gl);
 
-            camera.push(imageData.getMasterTime());
+            camera.push(imageData.getViewpoint());
 
             Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));

@@ -13,6 +13,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -55,9 +56,9 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
-    private JHVDate targetMasterTime;
+    private Viewpoint viewpoint;
 
-    private int targetFrame = 0;
+    private int targetFrame = -1;
     private int trueFrame = -1;
 
     private int frameCount = 0;
@@ -78,7 +79,6 @@ public class JP2View extends AbstractView {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
-        targetMasterTime = metaDataArray[0].getDateObs();
 
         _jp2Image.startReader(this);
         frameCountStart = System.currentTimeMillis();
@@ -162,13 +162,13 @@ public class JP2View extends AbstractView {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Viewpoint v, int frameNumber, boolean fromReader) {
         Camera camera = Displayer.getCamera();
         Viewport vp = Displayer.getViewport();
 
         MetaData m = jp2Image.metaDataList[frameNumber];
         Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, masterTime, m);
+        Region r = ViewROI.updateROI(camera, vp, v, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio);
@@ -186,7 +186,7 @@ public class JP2View extends AbstractView {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, v, subImage, res, frameNumber);
 
         boolean viewChanged = oldImageViewParams == null ||
                               !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
@@ -259,16 +259,16 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame, JHVDate masterTime) {
+    public void setFrame(int frame, Viewpoint v) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-                _jp2Image.signalReader(calculateParameter(_jp2Image, masterTime, frame, false)); // wake up reader
+                _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
                 return;
             }
 
             targetFrame = frame;
-            targetMasterTime = masterTime;
+            viewpoint = v;
 
             if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
                 render(1);
@@ -304,10 +304,10 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null)
+        if (stopRender == true || jp2Image == null || viewpoint == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, targetMasterTime, targetFrame, fromReader);
+        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, viewpoint, targetFrame, fromReader);
         //if (imageViewParams == null)
         //    return;
 

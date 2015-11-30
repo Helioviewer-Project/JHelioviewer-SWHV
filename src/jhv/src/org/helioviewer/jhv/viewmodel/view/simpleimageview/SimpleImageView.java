@@ -44,7 +44,6 @@ public class SimpleImageView extends AbstractView {
         imageData.setRegion(metaDataArray[0].getPhysicalRegion());
         imageData.setMetaData(metaDataArray[0]);
         imageData.setFrameNumber(0);
-        imageData.setMasterTime(metaDataArray[0].getDateObs());
     }
 
     /**
