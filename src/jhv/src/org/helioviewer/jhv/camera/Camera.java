@@ -71,16 +71,21 @@ public class Camera {
         refresh();
     }
 
-    public void push(JHVDate date) {
+    private Viewpoint saveViewpoint;
+
+    public void push(Viewpoint v) {
         if (!trackingMode) {
-            viewpoint.push();
-            updateCamera(date);
+            saveViewpoint = viewpoint;
+            viewpoint = v;
+            updateTransformation();
+            updateWidth();
         }
     }
 
     public void pop() {
         if (!trackingMode) {
-            viewpoint.pop();
+            viewpoint = saveViewpoint;
+            saveViewpoint = null;
             updateTransformation();
             updateWidth();
         }

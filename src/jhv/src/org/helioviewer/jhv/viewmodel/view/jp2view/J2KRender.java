@@ -142,7 +142,7 @@ class J2KRender implements Runnable {
 
         newImageData.setFrameNumber(newFrame);
         newImageData.setMetaData(metaData);
-        newImageData.setMasterTime(newParams.masterTime);
+        newImageData.setViewpoint(newParams.viewpoint);
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(newParams.subImage, newParams.resolution.getZoomPercent()));

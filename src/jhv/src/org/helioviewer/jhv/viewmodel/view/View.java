@@ -3,6 +3,7 @@ package org.helioviewer.jhv.viewmodel.view;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.RenderListener;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
@@ -107,7 +108,7 @@ public interface View extends RenderListener {
     public JHVDate getFrameDateTime(int frame);
 
     // <!- only for Layers
-    public void setFrame(int frame, JHVDate masterTime);
+    public void setFrame(int frame, Viewpoint v);
     public int getFrame(JHVDate time);
     public MetaData getMetaData(JHVDate time);
     // -->

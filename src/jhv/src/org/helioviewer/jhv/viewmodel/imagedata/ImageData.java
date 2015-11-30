@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -47,9 +47,9 @@ public interface ImageData {
 
     public MetaData getMetaData();
 
-    public void setMasterTime(JHVDate masterTime);
+    public void setViewpoint(Viewpoint v);
 
-    public JHVDate getMasterTime();
+    public Viewpoint getViewpoint();
 
     public boolean getUploaded();
 

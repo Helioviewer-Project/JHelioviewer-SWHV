@@ -3,7 +3,7 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.awt.Rectangle;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -34,7 +34,7 @@ public class JP2ViewCallisto extends JP2View {
     }
 
     @Override
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, JHVDate masterTime, int frameNumber, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Viewpoint v, int frameNumber, boolean fromReader) {
         ResolutionSet set = jp2Image.getResolutionSet();
         int maxHeight = set.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = set.getResolutionLevel(0).getResolutionBounds().width;
@@ -46,7 +46,7 @@ public class JP2ViewCallisto extends JP2View {
         SubImage subImage = new SubImage((int) (region.llx / maxWidth * rect.width), (int) (region.lly / maxHeight * rect.height),
                                          (int) Math.ceil(region.width / maxWidth * rect.width), (int) Math.ceil(region.height / maxHeight * rect.height), rect);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, masterTime, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, v, subImage, res, frameNumber);
         jp2Image.signalReader(imageViewParams);
 
         return imageViewParams;

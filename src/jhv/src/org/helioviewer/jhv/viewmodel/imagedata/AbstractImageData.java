@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 /**
@@ -26,7 +26,7 @@ public abstract class AbstractImageData implements ImageData {
     private int frameNumber;
     private Region region;
     private MetaData metaData;
-    private JHVDate masterTime;
+    private Viewpoint viewpoint;
     private boolean uploaded = false;
 
     /**
@@ -122,13 +122,13 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
-    public void setMasterTime(JHVDate _masterTime) {
-        masterTime = _masterTime;
+    public void setViewpoint(Viewpoint v) {
+        viewpoint = v;
     }
 
     @Override
-    public JHVDate getMasterTime() {
-        return masterTime;
+    public Viewpoint getViewpoint() {
+        return viewpoint;
     }
 
     @Override
