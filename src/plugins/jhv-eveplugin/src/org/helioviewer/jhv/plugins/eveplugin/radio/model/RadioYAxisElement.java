@@ -1,9 +1,6 @@
-/**
- *
- */
 package org.helioviewer.jhv.plugins.eveplugin.radio.model;
 
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 
 /**
@@ -16,12 +13,6 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
  */
 public class RadioYAxisElement extends YAxisElement {
 
-    /** Instance of the y-value model manager. */
-
-    /**
-     * Default constructor.
-     *
-     */
     public RadioYAxisElement() {
         super();
     }
@@ -70,4 +61,5 @@ public class RadioYAxisElement extends YAxisElement {
         scaledSelectedRange = new Range(newScaledSelectedRange);
         fireSelectedRangeChanged();
     }
+
 }

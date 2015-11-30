@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 

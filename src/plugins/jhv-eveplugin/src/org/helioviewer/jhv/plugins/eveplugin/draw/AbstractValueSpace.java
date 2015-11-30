@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.eveplugin.draw;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.base.Range;
 
 public abstract class AbstractValueSpace implements ValueSpace {
 
@@ -22,4 +22,5 @@ public abstract class AbstractValueSpace implements ValueSpace {
     public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {
         listeners.add(valueSpaceListener);
     }
+
 }
