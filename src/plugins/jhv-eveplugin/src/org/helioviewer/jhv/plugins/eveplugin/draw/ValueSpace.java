@@ -1,8 +1,9 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.base.Range;
 
 public interface ValueSpace {
+
     public abstract Range getScaledSelectedRange();
 
     public abstract Range getScaledAvailableRange();

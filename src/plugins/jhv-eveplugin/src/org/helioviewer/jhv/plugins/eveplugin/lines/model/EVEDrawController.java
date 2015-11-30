@@ -13,9 +13,9 @@ import java.util.Set;
 
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
@@ -32,14 +32,7 @@ import org.helioviewer.jhv.plugins.eveplugin.lines.gui.EVEDrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandType;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 
-/**
- * @author Stephan Pagel
- * */
 public class EVEDrawController implements TimingListener, EVECacheControllerListener, PlotAreaSpaceListener, ValueSpaceListener {
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Definitions
-    // //////////////////////////////////////////////////////////////////////////////
 
     private final Map<YAxisElement, Map<Band, EVEValues>> dataMapPerUnitLabel = new HashMap<YAxisElement, Map<Band, EVEValues>>();
     private final DrawController drawController;
@@ -53,10 +46,6 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private boolean selectedIntervalChanged;
     private boolean keepFullValueRange;
     private final LineDataSelectorModel selectorModel;
-
-    // //////////////////////////////////////////////////////////////////////////////
-    // Methods
-    // //////////////////////////////////////////////////////////////////////////////
 
     private EVEDrawController() {
 
@@ -221,9 +210,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         return EVECacheController.getSingletonInstance().downloadData(band, interval, plotArea);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Zoom Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
+
     @Override
     public void availableIntervalChanged() {
     }
@@ -235,9 +223,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // Band Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     public void bandAdded(final BandType bandType) {
         if (!bandTypes.contains(bandType)) {
@@ -265,9 +251,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
         removeFromMap(band);
     }
 
-    // //////////////////////////////////////////////////////////////////////////////
     // EVE Cache Controller Listener
-    // //////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void dataAdded(final Band band) {

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.draw;
 
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
+import org.helioviewer.jhv.base.Range;
 
 /**
  * This class describes an Y-axis.
@@ -9,6 +9,7 @@ import org.helioviewer.jhv.plugins.eveplugin.base.Range;
  */
 
 public class YAxisElement extends AbstractValueSpace {
+
     public enum YAxisLocation {
         LEFT, RIGHT;
     }
@@ -300,4 +301,5 @@ public class YAxisElement extends AbstractValueSpace {
         scaledAvailableRange = new Range(0, 1);
         scaledSelectedRange = new Range(0, 1);
     }
+
 }

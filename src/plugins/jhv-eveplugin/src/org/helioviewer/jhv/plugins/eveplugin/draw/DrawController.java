@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -20,7 +21,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
-import org.helioviewer.jhv.plugins.eveplugin.base.Range;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
@@ -551,4 +551,5 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         return null;
     }
+
 }
