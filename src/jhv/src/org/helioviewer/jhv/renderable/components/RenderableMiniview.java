@@ -20,7 +20,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     private final RenderableMiniviewOptionsPanel optionsPanel;
 
     private final Camera miniCamera = new Camera();
-    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100, true);
+    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
 
     public RenderableMiniview() {
         Layers.addLayersListener(this);
@@ -33,7 +33,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * optionsPanel.scale);
 
-        miniViewport = new Viewport(0, offset, offset, size, size, true);
+        miniViewport = new Viewport(0, offset, offset, size, size);
     }
 
     @Override

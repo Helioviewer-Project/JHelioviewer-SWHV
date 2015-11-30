@@ -101,7 +101,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         Mat4 inverse = camera.getRotation().transpose();
         for (Viewport vp : Displayer.getViewports()) {
-            if (vp.isActive()) {
+            if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
 
@@ -116,7 +116,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     public static void renderFloatScene(Camera camera, GL2 gl) {
         for (Viewport vp : Displayer.getViewports()) {
-            if (vp.isActive()) {
+            if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 ImageViewerGui.getRenderableContainer().renderFloat(camera, vp, gl);
             }
