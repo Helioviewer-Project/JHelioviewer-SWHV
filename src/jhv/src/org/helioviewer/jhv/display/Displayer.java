@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -11,13 +10,12 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 
 public class Displayer implements JHVEventHighlightListener {
 
     public static boolean multiview = false;
-
-    private static Component displayComponent;
 
     private static int glWidth = 1;
     private static int glHeight = 1;
@@ -160,7 +158,7 @@ public class Displayer implements JHVEventHighlightListener {
         public void actionPerformed(ActionEvent e) {
             if (toDisplay == true) {
                 toDisplay = false;
-                displayComponent.repaint();
+                ImageViewerGui.getMainComponent().repaint();
             }
 
             if (renderFactor != -1) {
@@ -175,10 +173,6 @@ public class Displayer implements JHVEventHighlightListener {
     @Override
     public void eventHightChanged(JHVEvent event) {
         display();
-    }
-
-    public static void setDisplayComponent(Component component) {
-        displayComponent = component;
     }
 
     private static final HashSet<RenderListener> renderListeners = new HashSet<RenderListener>();
