@@ -27,6 +27,10 @@ public class JP2ImageCallisto extends JP2Image {
 
     @Override
     protected JP2ImageParameter calculateParameter(Viewpoint v, int frameNumber, boolean fromReader) {
+        return calculateParameter();
+    }
+
+    private JP2ImageParameter calculateParameter() {
         int maxHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
         int maxWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
 
@@ -37,7 +41,7 @@ public class JP2ImageCallisto extends JP2Image {
         SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * rect.width), (int) (region.y / (double) maxHeight * rect.height),
                                          (int) Math.ceil(region.width / (double) maxWidth * rect.width), (int) Math.ceil(region.height / (double) maxHeight * rect.height), rect);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, v, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, 0);
         signalReader(imageViewParams);
 
         return imageViewParams;

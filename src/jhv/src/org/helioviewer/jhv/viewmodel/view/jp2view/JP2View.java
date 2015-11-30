@@ -49,7 +49,7 @@ public class JP2View extends AbstractView {
 
     private Viewpoint viewpoint;
 
-    private int targetFrame = 0;
+    private int targetFrame = -1;
     private int trueFrame = -1;
 
     private int frameCount = 0;
