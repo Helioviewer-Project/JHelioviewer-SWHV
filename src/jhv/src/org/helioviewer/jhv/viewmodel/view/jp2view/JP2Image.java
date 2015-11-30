@@ -28,7 +28,6 @@ import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.camera.Viewport;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
@@ -346,13 +345,7 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(Viewpoint v, int frameNumber, boolean fromReader) {
-        if (v == null)
-            return null;
-
-        Camera camera = Displayer.getCamera();
-        Viewport vp = Displayer.getViewport();
-
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frameNumber, boolean fromReader) {
         MetaData m = metaDataList[frameNumber];
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, v, m);
