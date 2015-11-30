@@ -25,12 +25,10 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public MainComponent() {
         GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(getGLProfile()).createDummyAutoDrawable(null, true, getRequestedGLCapabilities(), null);
         sharedDrawable.display();
-
         // GUI events can lead to context destruction and invalidation of GL objects and state
         setSharedAutoDrawable(sharedDrawable);
 
         addGLEventListener(this);
-        Displayer.setDisplayComponent(this);
     }
 
     @Override
