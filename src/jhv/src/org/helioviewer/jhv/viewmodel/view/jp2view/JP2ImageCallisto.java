@@ -23,7 +23,7 @@ public class JP2ImageCallisto extends JP2Image {
     }
 
     private Rectangle region;
-    private Rectangle viewport = new Rectangle(86400, 380);
+    private Rectangle viewport;
 
     @Override
     protected JP2ImageParameter calculateParameter(Viewpoint v, int frameNumber, boolean fromReader) {
