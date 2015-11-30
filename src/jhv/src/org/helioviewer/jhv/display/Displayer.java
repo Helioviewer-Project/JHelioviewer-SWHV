@@ -39,16 +39,12 @@ public class Displayer implements JHVEventHighlightListener {
         return camera;
     }
 
-    private static Viewport[] viewports = {
-        new Viewport(0, 0, 0, 100, 100, true),
-        new Viewport(1, 0, 0, 100, 100, false),
-        new Viewport(2, 0, 0, 100, 100, false),
-        new Viewport(3, 0, 0, 100, 100, false) };
+    private static Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
     private static int idxViewport = 0;
 
     public static void setActiveViewport(int x, int y) {
         for (int i = 0; i < viewports.length; ++i) {
-            if (viewports[i].isActive() && viewports[i].contains(x, y)) {
+            if (viewports[i] != null && viewports[i].contains(x, y)) {
                 idxViewport = i;
                 break;
             }
@@ -65,10 +61,9 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static int countActiveLayers() {
         int ct = 0;
-        for (Viewport vp : viewports) {
-            if (vp.isActive()) {
+        for (int i = 0; i < viewports.length; ++i) {
+            if (ImageViewerGui.getRenderableContainer().isViewportActive(i))
                 ct++;
-            }
         }
         return ct;
     }
@@ -88,7 +83,7 @@ public class Displayer implements JHVEventHighlightListener {
             reshape2();
             break;
         case 3:
-            reshape4();
+            reshape3();
             break;
         case 4:
             reshape4();
@@ -103,30 +98,40 @@ public class Displayer implements JHVEventHighlightListener {
         int w = glWidth;
         int h = glHeight;
 
-        viewports[0] = new Viewport(viewports[0], 0, 0, w, h);
-        viewports[1] = new Viewport(viewports[1], 0, 0, 0, 0);
-        viewports[2] = new Viewport(viewports[2], 0, 0, 0, 0);
-        viewports[3] = new Viewport(viewports[3], 0, 0, 0, 0);
+        viewports[0] = new Viewport(0, 0, 0, w, h);
+        viewports[1] = null;
+        viewports[2] = null;
+        viewports[3] = null;
     }
 
     private static void reshape2() {
         int w = glWidth;
         int h = glHeight;
 
-        viewports[0] = new Viewport(viewports[0], 0, 0, w / 2, h);
-        viewports[1] = new Viewport(viewports[1], w / 2, 0, w / 2, h);
-        viewports[2] = new Viewport(viewports[2], 0, 0, 0, 0);
-        viewports[3] = new Viewport(viewports[3], 0, 0, 0, 0);
+        viewports[0] = new Viewport(0, 0, 0, w / 2, h);
+        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h);
+        viewports[2] = null;
+        viewports[3] = null;
+    }
+
+    private static void reshape3() {
+        int w = glWidth;
+        int h = glHeight;
+
+        viewports[0] = new Viewport(0, 0, 0, w / 2, h / 2);
+        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h / 2);
+        viewports[2] = new Viewport(2, 0, h / 2, w / 2, h / 2);
+        viewports[3] = null;
     }
 
     private static void reshape4() {
         int w = glWidth;
         int h = glHeight;
 
-        viewports[0] = new Viewport(viewports[0], 0, 0, w / 2, h / 2);
-        viewports[1] = new Viewport(viewports[1], w / 2, 0, w / 2, h / 2);
-        viewports[2] = new Viewport(viewports[2], 0, h / 2, w / 2, h / 2);
-        viewports[3] = new Viewport(viewports[3], w / 2, h / 2, w / 2, h / 2);
+        viewports[0] = new Viewport(0, 0, 0, w / 2, h / 2);
+        viewports[1] = new Viewport(1, w / 2, 0, w / 2, h / 2);
+        viewports[2] = new Viewport(2, 0, h / 2, w / 2, h / 2);
+        viewports[3] = new Viewport(3, w / 2, h / 2, w / 2, h / 2);
     }
 
     private static double renderFactor = -1;
