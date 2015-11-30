@@ -3,7 +3,9 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.awt.Rectangle;
 import java.net.URI;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
+import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
@@ -26,7 +28,7 @@ public class JP2ImageCallisto extends JP2Image {
     private Rectangle viewport;
 
     @Override
-    protected JP2ImageParameter calculateParameter(Viewpoint v, int frameNumber, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frameNumber, boolean fromReader) {
         return calculateParameter();
     }
 

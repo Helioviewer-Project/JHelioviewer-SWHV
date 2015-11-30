@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Viewpoint;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -250,7 +251,7 @@ public class JP2View extends AbstractView {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(viewpoint, targetFrame, fromReader);
+        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(Displayer.getCamera(), Displayer.getViewport(), viewpoint, targetFrame, fromReader);
         if (imageViewParams == null)
             return;
 
