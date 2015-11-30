@@ -52,7 +52,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         radioDataManager.finishedDownloadingID(imageID, downloadID);
 
         if (view != null) {
-            view.removeDataHandler();
+            view.setDataHandler(null);
             view.abolish();
             view = null;
         }

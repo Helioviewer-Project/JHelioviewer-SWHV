@@ -103,8 +103,6 @@ public interface View extends RenderListener {
 
     public void setDataHandler(ImageDataHandler dataHandler);
 
-    public void removeDataHandler();
-
     public JHVDate getFrameDateTime(int frame);
 
     // <!- only for Layers

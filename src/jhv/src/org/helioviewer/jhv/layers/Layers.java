@@ -266,32 +266,18 @@ public class Layers {
     public static void removeLayer(View view) {
         int index = layers.indexOf(view);
 
-        Displayer.removeRenderListener(view);
-        view.removeDataHandler();
-
         layers.remove(view);
-
         if (view == activeView) {
             setActiveView(getLayer(determineNewActiveLayer(index)));
         }
-
         view.abolish();
-        if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
-        }
     }
 
     public static void addLayer(View view) {
         layers.add(view);
         fireLayerAdded(view);
         setActiveView(view);
-
-        Displayer.addRenderListener(view);
-
-        setFrame(0); // force sync
-        if (Displayer.multiview) {
-            ImageViewerGui.getRenderableContainer().arrangeMultiView(true);
-        }
+        // setFrame(0); // force sync
     }
 
     private static void fireLayerAdded(View view) {
