@@ -131,23 +131,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
-    public void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> downloadIDList, long radioImageID) {
-        for (long ID : downloadIDList) {
-            BufferedImage newImage = bufferedImages.get(radioImageID);
-            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area, ID);
-            PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.get(ID).isVisible(), ID, radioImageID);
-            if (plotConfigList.containsKey(ID)) {
-                plotConfigList.get(ID).put(radioImageID, pc);
-            } else {
-                Map<Long, PlotConfig> tempList = new HashMap<Long, PlotConfig>();
-                tempList.put(radioImageID, pc);
-                plotConfigList.put(ID, tempList);
-            }
-        }
-        fireDrawNewBufferedImage();
-    }
-
-    @Override
     public void newGlobalFrequencyInterval(FrequencyInterval interval) {
     }
 

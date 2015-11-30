@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -21,7 +20,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
@@ -537,15 +536,14 @@ public class RadioDataManager implements RadioDownloaderListener {
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
-                        Rectangle viewport = zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd());
-                        jp2View.setViewport(viewport);
+                        JP2ImageCallisto image = jp2View.getJP2Image();
 
-                        Rectangle roi = ri.getROI();
-                        if (!jp2View.setRegion(new Region(roi.x, roi.y, roi.width, roi.height))) {
-                            if (ri.getLastDataSize() != null) {
-                                fireDataNotChanged(ri.getVisibleImageTimeInterval(), ri.getVisibleImageFreqInterval(), ri.getLastDataSize(), drd.getDownloadID(), ri.getRadioImageID());
-                            }
-                        }
+                        image.setViewport(zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(),
+                                                                                   visibleDateInterval.getEnd(),
+                                                                                   visibleFrequencyInterval.getStart(),
+                                                                                   visibleFrequencyInterval.getEnd()));
+                        image.setRegion(ri.getROI());
+                        jp2View.render(1);
                     }
                 }
             }
@@ -566,29 +564,6 @@ public class RadioDataManager implements RadioDownloaderListener {
             for (RadioDataManagerListener l : listeners) {
                 l.clearAllSavedImagesForID(downloadID, imageID);
             }
-        }
-    }
-
-    /**
-     * Instructs the radio data managers about data that was not changed.
-     *
-     * @param timeInterval
-     *            The visible interval over which the data did not change
-     * @param freqInterval
-     *            The visible frequency interval over which the data did not
-     *            change
-     * @param rectangle
-     *            The area available for the image
-     * @param downloadID
-     *            The download identifier for which the data did not change
-     * @param imageID
-     *            The image identifier for which the data did not change
-     */
-    private void fireDataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle rectangle, long downloadID, long imageID) {
-        List<Long> tempList = new ArrayList<Long>();
-        tempList.add(downloadID);
-        for (RadioDataManagerListener l : listeners) {
-            l.dataNotChanged(timeInterval, freqInterval, rectangle, tempList, imageID);
         }
     }
 
@@ -617,9 +592,9 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download identifier for which the data was downloaded
      */
     private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, long downloadID, double ratioX, double ratioY) {
-        JP2ViewCallisto jp2CallistoView = djd.getView();
-        if (jp2CallistoView != null) {
-            JP2Image image = jp2CallistoView.getJP2Image();
+        JP2ViewCallisto jp2View = djd.getView();
+        if (jp2View != null) {
+            JP2ImageCallisto image = jp2View.getJP2Image();
             image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             ResolutionSet rs = image.getResolutionSet();
             int maximumFrameNumber = image.getMaximumFrameNumber();
@@ -659,11 +634,12 @@ public class RadioDataManager implements RadioDownloaderListener {
                         } else {
                             lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
                         }
-                        jp2CallistoView.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
+                        image.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
-                        Rectangle roi = tempRs.getROI();
-                        jp2CallistoView.setRegion(new Region(roi.x, roi.y, roi.width, roi.height));
+                        image.setRegion(tempRs.getROI());
+                        jp2View.render(1);
+
                         drd.addRadioImage(tempRs);
                     } else {
                         Log.error("Start and/or stop is null");
