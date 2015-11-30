@@ -24,6 +24,7 @@ import org.helioviewer.jhv.base.message.Message;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.fitsview.FITSView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.simpleimageview.SimpleImageView;
@@ -323,7 +324,11 @@ public class APIRequestManager {
             } else if (downloadURI.toString().toLowerCase().endsWith(".png") || downloadURI.toString().toLowerCase().endsWith(".jpg") || downloadURI.toString().toLowerCase().endsWith(".jpeg")) {
                  return new SimpleImageView(uri);
             } else {
-                JP2Image jp2Image = new JP2Image(uri, downloadURI);
+                JP2Image jp2Image;
+                if (downloadURI.toString().toLowerCase().contains("callisto"))
+                    jp2Image = new JP2ImageCallisto(uri, downloadURI);
+                else
+                    jp2Image = new JP2Image(uri, downloadURI);
                 return EventDispatchQueue.invokeAndWait(new AllocateJP2View(jp2Image));
             }
         } catch (InterruptedException e) {
@@ -346,7 +351,7 @@ public class APIRequestManager {
         public JP2View call() {
             JP2View view;
             JP2Image jp2Image = refJP2Image.get();
-            if (jp2Image.getDownloadURI().toString().toLowerCase().contains("callisto")) {
+            if (jp2Image instanceof JP2ImageCallisto) {
                 view = new JP2ViewCallisto();
             } else {
                 view = new JP2View();

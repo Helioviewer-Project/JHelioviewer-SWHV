@@ -3,31 +3,22 @@ package org.helioviewer.jhv.viewmodel.view.jp2view;
 import java.awt.EventQueue;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
-import org.helioviewer.jhv.camera.Viewport;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
-import org.helioviewer.jhv.viewmodel.view.ViewROI;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 /**
  * Implementation of View for JPG2000 images.
@@ -44,7 +35,7 @@ public class JP2View extends AbstractView {
         }
     }
 
-    private final BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
+    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
     private final RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
     private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
 
@@ -158,57 +149,6 @@ public class JP2View extends AbstractView {
         }
     }
 
-    private JP2ImageParameter oldImageViewParams;
-
-    // Recalculates the image parameters used within the jp2-package
-    // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Viewpoint v, int frameNumber, boolean fromReader) {
-        if (v == null)
-            return null;
-
-        Camera camera = Displayer.getCamera();
-        Viewport vp = Displayer.getViewport();
-
-        MetaData m = jp2Image.metaDataList[frameNumber];
-        Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, v, m);
-
-        double ratio = 2 * camera.getWidth() / vp.height;
-        int totalHeight = (int) (mr.height / ratio);
-
-        ResolutionLevel res = jp2Image.getResolutionSet().getNextResolutionLevel(totalHeight, totalHeight);
-        int viewportImageWidth = res.getResolutionBounds().width;
-        int viewportImageHeight = res.getResolutionBounds().height;
-
-        double currentMeterPerPixel = mr.width / viewportImageWidth;
-        int imageWidth = (int) Math.round(r.width / currentMeterPerPixel);
-        int imageHeight = (int) Math.round(r.height / currentMeterPerPixel);
-
-        int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * viewportImageWidth);
-        int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * viewportImageHeight);
-
-        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
-
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(jp2Image, v, subImage, res, frameNumber);
-
-        boolean viewChanged = oldImageViewParams == null ||
-                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
-                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
-        // ping reader
-        if (viewChanged) {
-            jp2Image.signalReader(imageViewParams);
-        }
-
-        // if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
-        //    Displayer.display();
-        //    return null;
-        //}
-
-        oldImageViewParams = imageViewParams;
-
-        return imageViewParams;
-    }
-
     /**
      * Sets the new image data for the given region.
      *
@@ -310,7 +250,7 @@ public class JP2View extends AbstractView {
         if (stopRender == true || jp2Image == null)
             return;
 
-        JP2ImageParameter imageViewParams = calculateParameter(jp2Image, viewpoint, targetFrame, fromReader);
+        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(viewpoint, targetFrame, fromReader);
         if (imageViewParams == null)
             return;
 
