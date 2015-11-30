@@ -14,8 +14,6 @@ public interface RadioDataManagerListener {
 
     public abstract void downloadFinished(long ID);
 
-    public abstract void dataNotChanged(Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> IDList, long imageID);
-
     public abstract void newGlobalFrequencyInterval(FrequencyInterval interval);
 
     public abstract void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> ID, long imageID);
