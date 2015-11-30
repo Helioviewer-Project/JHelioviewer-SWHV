@@ -58,7 +58,7 @@ public class JP2View extends AbstractView {
 
     private Viewpoint viewpoint;
 
-    private int targetFrame = -1;
+    private int targetFrame = 0;
     private int trueFrame = -1;
 
     private int frameCount = 0;
@@ -163,6 +163,9 @@ public class JP2View extends AbstractView {
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
     protected JP2ImageParameter calculateParameter(JP2Image jp2Image, Viewpoint v, int frameNumber, boolean fromReader) {
+        if (v == null)
+            return null;
+
         Camera camera = Displayer.getCamera();
         Viewport vp = Displayer.getViewport();
 
@@ -261,11 +264,11 @@ public class JP2View extends AbstractView {
     @Override
     public void setFrame(int frame, Viewpoint v) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
-            CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
-            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-                _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
-                return;
-            }
+            //CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
+            //if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
+            //    _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
+            //    return;
+            //}
 
             targetFrame = frame;
             viewpoint = v;
@@ -304,12 +307,12 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null || viewpoint == null)
+        if (stopRender == true || jp2Image == null)
             return;
 
         JP2ImageParameter imageViewParams = calculateParameter(jp2Image, viewpoint, targetFrame, fromReader);
-        //if (imageViewParams == null)
-        //    return;
+        if (imageViewParams == null)
+            return;
 
         if (!(this instanceof JP2ViewCallisto)) {
             int maxDim = Math.max(imageViewParams.subImage.width, imageViewParams.subImage.height);

@@ -13,54 +13,39 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 public class DownloadedJPXData implements ImageDataHandler {
 
     private JP2ViewCallisto view;
-    private long imageID;
-    private Date startDate;
-    private Date endDate;
+    private final long imageID;
+    private final Date startDate;
+    private final Date endDate;
     private final RadioDataManager radioDataManager;
     private final long downloadID;
 
-    public DownloadedJPXData(JP2ViewCallisto view, long imageID, Date startDate, Date endDate, long downloadID) {
+    public DownloadedJPXData(JP2ViewCallisto _view, long _imageID, Date _startDate, Date _endDate, long _downloadID) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
-        this.view = view;
-        this.view.setDataHandler(this);
-        this.imageID = imageID;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.downloadID = downloadID;
+        view = _view;
+        view.setDataHandler(this);
+
+        imageID = _imageID;
+        startDate = _startDate;
+        endDate = _endDate;
+        downloadID = _downloadID;
     }
 
     public JP2ViewCallisto getView() {
         return view;
     }
 
-    public void setView(JP2ViewCallisto view) {
-        this.view = view;
-    }
-
     public long getImageID() {
         return imageID;
-    }
-
-    public void setImageID(long id) {
-        imageID = id;
     }
 
     public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
     public Date getEndDate() {
         return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
     public void remove() {
@@ -69,52 +54,7 @@ public class DownloadedJPXData implements ImageDataHandler {
         if (view != null) {
             view.removeDataHandler();
             view.abolish();
-        }
-        view = null;
-    }
-
-    private static class DownloadedJPXDataWorkerResult {
-        private final long imageID;
-        private final long downloadID;
-        private final Rectangle dataSize;
-        private final byte[] byteData;
-
-        public DownloadedJPXDataWorkerResult(byte[] data, long imageID, long downloadID, Rectangle dataSize) {
-            super();
-            this.imageID = imageID;
-            this.downloadID = downloadID;
-            this.dataSize = dataSize;
-            byteData = data;
-        }
-
-        /**
-         * @return the imageID
-         */
-        public long getImageID() {
-            return imageID;
-        }
-
-        /**
-         * @return the downloadID
-         */
-        public long getDownloadID() {
-            return downloadID;
-        }
-
-        /**
-         * @return the dataSize
-         */
-        public Rectangle getDataSize() {
-            return dataSize;
-        }
-
-        /**
-         * Gets the byte data.
-         *
-         * @return The byte data.
-         */
-        public byte[] getByteData() {
-            return byteData;
+            view = null;
         }
     }
 
@@ -126,9 +66,7 @@ public class DownloadedJPXData implements ImageDataHandler {
                 return;
             }
             byte[] data = (byte[]) imageData.getBuffer().array();
-            DownloadedJPXDataWorkerResult result = new DownloadedJPXDataWorkerResult(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-
-            radioDataManager.dataForIDReceived(result.getByteData(), result.getImageID(), result.getDownloadID(), result.getDataSize());
+            radioDataManager.dataForIDReceived(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
             radioDataManager.finishedDownloadingID(imageID, downloadID);
         }
     }
