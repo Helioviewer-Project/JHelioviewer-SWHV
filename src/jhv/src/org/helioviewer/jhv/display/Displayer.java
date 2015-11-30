@@ -61,9 +61,12 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static int countActiveLayers() {
         int ct = 0;
-        for (int i = 0; i < viewports.length; ++i) {
-            if (ImageViewerGui.getRenderableContainer().isViewportActive(i))
-                ct++;
+
+        if (multiview) {
+            for (int i = 0; i < viewports.length; ++i) {
+                if (ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(i) != null)
+                    ct++;
+            }
         }
         return ct;
     }

@@ -218,17 +218,6 @@ public class RenderableContainer implements TableModel, Reorderable {
         GLText.dispose(gl);
     }
 
-    public boolean isViewportActive(int idx) {
-        if (idx == 0)
-            return true;
-
-        for (Renderable renderable : renderables) {
-            if (renderable instanceof RenderableImageLayer && renderable.isVisible(idx))
-                return true;
-        }
-        return false;
-    }
-
     public RenderableImageLayer getViewportRenderableImageLayer(int idx) {
         for (Renderable r : renderables) {
             if (r instanceof RenderableImageLayer && r.isVisible(idx)) {
