@@ -22,20 +22,17 @@ import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.MathUtils;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.LocalImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
@@ -345,75 +342,56 @@ public class JP2Image {
             reader.signalReader(params);
     }
 
+    private JP2ImageParameter oldImageViewParams;
+
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-/*
-    protected JP2ImageParameter calculateParameter(JHVDate masterTime, int frameNumber, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(Viewpoint v, int frameNumber, boolean fromReader) {
+        if (v == null)
+            return null;
+
         Camera camera = Displayer.getCamera();
         Viewport vp = Displayer.getViewport();
 
         MetaData m = metaDataList[frameNumber];
         Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, masterTime, m);
+        Region r = ViewROI.updateROI(camera, vp, v, m);
 
-        double mWidth = mr.getWidth();
-        double mHeight = mr.getHeight();
-        double rWidth = r.getWidth();
-        double rHeight = r.getHeight();
-
-        double ratio = 2 * camera.getWidth() / vp.getHeight();
-        int totalHeight = (int) (mHeight / ratio);
+        double ratio = 2 * camera.getWidth() / vp.height;
+        int totalHeight = (int) (mr.height / ratio);
 
         ResolutionLevel res = resolutionSet.getNextResolutionLevel(totalHeight, totalHeight);
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
-        double currentMeterPerPixel = mWidth / viewportImageWidth;
-        int imageWidth = (int) Math.round(rWidth / currentMeterPerPixel);
-        int imageHeight = (int) Math.round(rHeight / currentMeterPerPixel);
+        double currentMeterPerPixel = mr.width / viewportImageWidth;
+        int imageWidth = (int) Math.round(r.width / currentMeterPerPixel);
+        int imageHeight = (int) Math.round(r.height / currentMeterPerPixel);
 
-        double displacementX = r.getULX() - mr.getULX();
-        double displacementY = r.getULY() - mr.getULY();
-
-        int imagePositionX = (int) Math.round(displacementX / mWidth * viewportImageWidth);
-        int imagePositionY = -(int) Math.round(displacementY / mHeight * viewportImageHeight);
+        int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * viewportImageWidth);
+        int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * viewportImageHeight);
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        float scaleAdj = 1;
-        int maxDim = Math.max(imageWidth, imageHeight);
-        if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
-            scaleAdj = JHVGlobals.hiDpiCutoff / (float) maxDim;
-        }
-
-        JP2ImageParameter newImageViewParams = new JP2ImageParameter(this, masterTime, subImage, res, scaleAdj, frameNumber);
-
-        return checkParameter(newImageViewParams, fromReader);
-    }
-
-    private JP2ImageParameter oldImageViewParams;
-
-    protected JP2ImageParameter checkParameter(JP2ImageParameter newImageViewParams, boolean fromReader) {
-        if (!fromReader && imageCacheStatus.getImageStatus(newImageViewParams.compositionLayer) == CacheStatus.COMPLETE &&
-                           newImageViewParams.equals(oldImageViewParams)) {
-            if (!(this instanceof JP2ImageCallisto))
-                Displayer.display();
-            return null;
-        }
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, v, subImage, res, frameNumber);
 
         boolean viewChanged = oldImageViewParams == null ||
-                              !(newImageViewParams.subImage.equals(oldImageViewParams.subImage) &&
-                                newImageViewParams.resolution.equals(oldImageViewParams.resolution));
+                              !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
+                                imageViewParams.resolution.equals(oldImageViewParams.resolution));
         // ping reader
         if (viewChanged) {
-            signalReader(newImageViewParams);
+            signalReader(imageViewParams);
         }
 
-        oldImageViewParams = newImageViewParams;
+        // if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
+        //    Displayer.display();
+        //    return null;
+        //}
 
-        return newImageViewParams;
+        oldImageViewParams = imageViewParams;
+
+        return imageViewParams;
     }
-*/
 
     /**
      * Sets the reader mode.
