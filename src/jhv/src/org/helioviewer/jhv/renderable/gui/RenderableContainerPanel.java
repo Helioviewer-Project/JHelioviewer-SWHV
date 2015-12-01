@@ -116,6 +116,7 @@ public class RenderableContainerPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.multiview = multiview.isSelected();
                 ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
+                ImageViewerGui.getFiltersPanel().refresh();
             }
         });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());

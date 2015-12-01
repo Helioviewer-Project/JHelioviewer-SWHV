@@ -18,7 +18,6 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
 /**
@@ -213,10 +212,6 @@ public class JP2View extends AbstractView {
 
             targetFrame = frame;
             viewpoint = v;
-
-            if (_jp2Image.getReaderMode() != ReaderMode.ONLYFIREONCOMPLETE) {
-                render(1);
-            }
         }
     }
 
