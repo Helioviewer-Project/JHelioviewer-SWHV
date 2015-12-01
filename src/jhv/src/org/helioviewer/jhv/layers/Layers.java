@@ -9,6 +9,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -145,17 +146,19 @@ public class Layers {
     private static void syncTime(JHVDate dateTime) {
         lastTimestamp = dateTime;
 
-        Displayer.getCamera().timeChanged(lastTimestamp);
-        ImageViewerGui.getRenderableCamera().fireTimeUpdated();
-        for (TimeListener listener : timeListeners) {
-            listener.timeChanged(lastTimestamp);
-        }
-
-        Viewpoint v = Displayer.getCamera().getViewpoint().copy();
+        Camera camera = Displayer.getCamera();
+        camera.timeChanged(lastTimestamp);
+        Viewpoint v = camera.getViewpoint().copy();
         for (View view : layers) {
             if (view == activeView || view.getImageLayer().isVisible()) {
                 view.setFrame(view.getFrame(dateTime), v);
             }
+        }
+        Displayer.render();
+
+        ImageViewerGui.getRenderableCamera().fireTimeUpdated();
+        for (TimeListener listener : timeListeners) {
+            listener.timeChanged(lastTimestamp);
         }
 
         int activeFrame = activeView.getCurrentFrameNumber();

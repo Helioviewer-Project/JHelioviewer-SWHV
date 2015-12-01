@@ -413,7 +413,7 @@ public class JP2Image {
      * @return Current reader mode.
      * @see #setReaderMode(ReaderMode)
      */
-    protected ReaderMode getReaderMode() {
+    ReaderMode getReaderMode() {
         return readerMode;
     }
 

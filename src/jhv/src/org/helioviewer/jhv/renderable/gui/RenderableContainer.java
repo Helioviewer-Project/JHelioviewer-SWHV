@@ -255,7 +255,6 @@ public class RenderableContainer implements TableModel, Reorderable {
                 }
             }
         }
-        ImageViewerGui.getFiltersPanel().refresh();
         Displayer.reshapeAll();
         Displayer.render();
     }
