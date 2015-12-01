@@ -10,8 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
-import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
@@ -232,8 +233,13 @@ public class JP2View extends AbstractView {
         }
     }
 
+    private Camera camera;
+    private Viewport vp;
+
     @Override
-    public void render(double factor) {
+    public void render(Camera _camera, Viewport _vp, double factor) {
+        camera = _camera;
+        vp = _vp;
         signalRender(_jp2Image, false, factor);
     }
 
@@ -243,10 +249,10 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null || /* tbd */ targetFrame < 0)
+        if (stopRender == true || jp2Image == null) //|| /* tbd */ targetFrame < 0)
             return;
 
-        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(Displayer.getCamera(), Displayer.getViewport(), viewpoint, targetFrame, fromReader);
+        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, fromReader);
         if (imageViewParams == null)
             return;
 

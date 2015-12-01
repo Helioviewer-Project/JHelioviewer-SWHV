@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.viewmodel.view;
 
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
@@ -22,7 +24,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void render(double factor) {
+    public void render(Camera camera, Viewport vp, double factor) {
         if (dataHandler != null) {
             dataHandler.handleData(imageData);
         }
