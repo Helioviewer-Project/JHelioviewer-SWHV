@@ -3,20 +3,16 @@ package org.helioviewer.jhv.viewmodel.view;
 import java.net.URI;
 
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
-import org.helioviewer.jhv.display.RenderListener;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
-/**
- * View to manage an image data source.
- *
- * @author Ludwig Schmidt
- */
-public interface View extends RenderListener {
+public interface View {
 
     public enum AnimationMode {
         LOOP {
@@ -40,6 +36,8 @@ public interface View extends RenderListener {
     }
 
     public void abolish();
+
+    public void render(Camera camera, Viewport vp, double factor);
 
     /**
      * Returns the URI representing the location of the image.

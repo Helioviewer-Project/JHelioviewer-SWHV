@@ -11,6 +11,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -150,6 +151,27 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         renderScene(camera, gl);
         renderMiniview(gl);
         renderFloatScene(camera, gl);
+
+        setRender(camera);
+    }
+
+    private static void setRender(Camera camera) {
+        if (renderFactor != -1) {
+            Viewport[] vps = Displayer.getViewports();
+            for (int i = 0; i < vps.length; ++i) {
+                RenderableImageLayer r = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(i);
+                if (r != null)
+                    r.setRender(camera, vps[i], renderFactor);
+            }
+            renderFactor = -1;
+        }
+    }
+
+    private static double renderFactor = -1;
+
+    public void setRender(double _renderFactor) {
+        renderFactor = _renderFactor;
+        repaint();
     }
 
 }
