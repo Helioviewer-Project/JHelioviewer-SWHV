@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -37,11 +38,11 @@ public class CameraHelper {
     }
 
     private static double computeNormalizedX(Viewport vp, Point viewportCoordinates) {
-        return +2. * ((viewportCoordinates.x - vp.x) / (double) vp.width - 0.5);
+        return 2. * ((viewportCoordinates.x - vp.x) / (double) vp.width - 0.5);
     }
 
     private static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
-        return -2. * ((viewportCoordinates.y - vp.y) / (double) vp.height - 0.5);
+        return 2. * ((Displayer.getGLHeight() - viewportCoordinates.y - vp.y) / (double) vp.height - 0.5);
     }
 
     private static double computeUpX(Camera camera, Viewport vp, Point viewportCoordinates) {
