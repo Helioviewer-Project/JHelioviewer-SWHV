@@ -12,7 +12,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
+import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
