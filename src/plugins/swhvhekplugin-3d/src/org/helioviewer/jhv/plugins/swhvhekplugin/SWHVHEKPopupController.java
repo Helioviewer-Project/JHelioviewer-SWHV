@@ -25,7 +25,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
+import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 
@@ -94,9 +94,6 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         return new Point(xCoord, yCoord);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
         if (mouseOverJHVEvent != null) {
@@ -109,16 +106,10 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseExited(MouseEvent e) {
         mouseOverPosition = null;
@@ -126,30 +117,18 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         JHVEventContainer.highlight(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mousePressed(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseDragged(MouseEvent e) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseMoved(MouseEvent e) {
         mouseOverJHVEvent = null;
@@ -168,10 +147,9 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
                 Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-                Quat localRotation = new Quat(p.lat, p.lon);
-                hitpoint = localRotation.rotateInverseVector(getHitPointPlane(e));
-
                 Quat q = new Quat(p.lat, p.lon);
+
+                hitpoint = q.rotateInverseVector(getHitPointPlane(e));
                 pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e);

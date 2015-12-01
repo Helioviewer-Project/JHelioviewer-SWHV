@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui.interfaces;
+package org.helioviewer.jhv.gui.controller;
 
 import java.awt.Component;
 

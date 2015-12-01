@@ -14,7 +14,6 @@ import java.util.HashSet;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.interfaces.InputControllerPlugin;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
