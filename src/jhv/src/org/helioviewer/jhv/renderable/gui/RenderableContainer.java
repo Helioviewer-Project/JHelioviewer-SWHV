@@ -7,8 +7,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;

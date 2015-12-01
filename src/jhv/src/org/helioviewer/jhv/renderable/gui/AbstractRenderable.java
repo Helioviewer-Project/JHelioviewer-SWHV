@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.renderable.gui;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewport;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 

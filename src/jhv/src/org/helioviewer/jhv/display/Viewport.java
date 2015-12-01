@@ -1,6 +1,4 @@
-package org.helioviewer.jhv.camera;
-
-import org.helioviewer.jhv.display.Displayer;
+package org.helioviewer.jhv.display;
 
 public class Viewport {
 

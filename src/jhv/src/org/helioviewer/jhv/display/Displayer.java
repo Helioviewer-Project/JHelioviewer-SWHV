@@ -7,7 +7,6 @@ import java.util.HashSet;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;

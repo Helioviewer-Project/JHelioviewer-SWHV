@@ -5,8 +5,8 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
-import org.helioviewer.jhv.camera.Viewport;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
