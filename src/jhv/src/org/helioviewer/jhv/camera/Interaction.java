@@ -58,7 +58,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
 
     @Override
     public void mousePressed(MouseEvent e) {
-        setActiveViewport(e);
+        Displayer.setActiveViewport(e.getX(), e.getY());
     }
 
     @Override
@@ -71,10 +71,6 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
 
     @Override
     public void keyReleased(KeyEvent e) {
-    }
-
-    private void setActiveViewport(MouseEvent e) {
-        Displayer.setActiveViewport(e.getX(), e.getY());
     }
 
 }
