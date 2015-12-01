@@ -543,7 +543,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                                                                                    visibleFrequencyInterval.getStart(),
                                                                                    visibleFrequencyInterval.getEnd()));
                         image.setRegion(ri.getROI());
-                        jp2View.render(1);
+                        jp2View.render(null, null, 1);
                     }
                 }
             }
@@ -638,7 +638,7 @@ public class RadioDataManager implements RadioDownloaderListener {
 
                         tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                         image.setRegion(tempRs.getROI());
-                        jp2View.render(1);
+                        jp2View.render(null, null, 1);
 
                         drd.addRadioImage(tempRs);
                     } else {

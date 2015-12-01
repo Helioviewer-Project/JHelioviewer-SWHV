@@ -171,7 +171,7 @@ public class Displayer implements JHVEventHighlightListener {
 
             if (renderFactor != -1) {
                 for (final RenderListener renderListener : renderListeners) {
-                    renderListener.render(renderFactor);
+                    renderListener.render(getCamera(), getViewport(), renderFactor);
                 }
                 renderFactor = -1;
             }
