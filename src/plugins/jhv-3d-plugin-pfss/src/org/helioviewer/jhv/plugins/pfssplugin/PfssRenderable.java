@@ -17,24 +17,18 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 import com.jogamp.opengl.GL2;
 
-/**
- * @author Stefan Meier (stefan.meier@fhnw.ch)
- * */
 public class PfssRenderable extends AbstractRenderable implements LayersListener {
 
     private final PfssPluginPanel optionsPanel;
     private PfssData previousPfssData = null;
 
-    /**
-     * Default constructor.
-     */
     public PfssRenderable() {
         optionsPanel = new PfssPluginPanel();
     }
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.index])
+        if (!isVisible[vp.idx])
             return;
 
         PfssData pfssData = PfssPlugin.getPfsscache().getData(Layers.getLastUpdatedTimestamp().milli);

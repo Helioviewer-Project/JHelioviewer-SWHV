@@ -52,7 +52,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.index])
+        if (!isVisible[vp.idx])
             return;
 
         if (showAxes)

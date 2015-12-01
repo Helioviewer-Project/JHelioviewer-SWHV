@@ -153,7 +153,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         if (imageData == null) {
             return;
         }
-        if (!isVisible[vp.index])
+        if (!isVisible[vp.idx])
             return;
 
         GLSLShader.bind(gl);

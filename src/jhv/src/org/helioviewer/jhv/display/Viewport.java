@@ -7,10 +7,10 @@ public class Viewport {
     public final int height;
     public final int x;
     public final int y;
-    public final int index;
+    public final int idx;
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h) {
-        index = _idx;
+        idx = _idx;
         width = _w;
         height = _h;
         aspect = _w / (double) _h;
