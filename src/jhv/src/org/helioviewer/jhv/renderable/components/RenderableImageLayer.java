@@ -100,8 +100,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
         view.setImageLayer(this);
         view.setDataHandler(this);
-        Displayer.addRenderListener(view);
-
         Layers.addLayer(view);
         ImageViewerGui.getRenderableContainer().fireListeners();
 
@@ -113,11 +111,9 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     @Override
     public void remove(GL2 gl) {
         if (view != null) {
-            Displayer.removeRenderListener(view);
-            view.setDataHandler(null);
-
-            view.setImageLayer(null);
             Layers.removeLayer(view);
+            view.setDataHandler(null);
+            view.setImageLayer(null);
             view = null;
 
             if (Displayer.multiview) {
@@ -129,6 +125,11 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
         imageData = prevImageData = baseImageData = null;
         dispose(gl);
+    }
+
+    public void setRender(Camera camera, Viewport vp, double factor) {
+        if (view != null)
+            view.render(camera, vp, factor);
     }
 
     @Override
