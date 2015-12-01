@@ -10,7 +10,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewport;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;

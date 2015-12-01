@@ -5,7 +5,7 @@ import java.net.URI;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
-import org.helioviewer.jhv.camera.Viewport;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;

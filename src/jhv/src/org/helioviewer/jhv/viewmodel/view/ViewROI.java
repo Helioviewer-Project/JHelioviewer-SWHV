@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Viewpoint;
-import org.helioviewer.jhv.camera.Viewport;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class ViewROI {
