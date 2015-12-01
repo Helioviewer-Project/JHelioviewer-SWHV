@@ -100,7 +100,7 @@ public class Layers {
     public static void pauseMovie() {
         frameTimer.stop();
         MoviePanel.setPlayState(false);
-        Displayer.render(); /* ! force update for on the fly resolution change */
+        Displayer.render(1); /* ! force update for on the fly resolution change */
     }
 
     public static void toggleMovie() {
@@ -154,7 +154,7 @@ public class Layers {
                 view.setFrame(view.getFrame(dateTime), v);
             }
         }
-        Displayer.render();
+        Displayer.render(1);
 
         ImageViewerGui.getRenderableCamera().fireTimeUpdated();
         for (TimeListener listener : timeListeners) {

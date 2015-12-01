@@ -32,7 +32,7 @@ public class ZoomFitAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         CameraHelper.zoomToFit(Displayer.getCamera());
-        Displayer.render();
+        Displayer.render(1);
     }
 
 }

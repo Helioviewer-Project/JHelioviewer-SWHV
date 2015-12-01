@@ -47,7 +47,7 @@ public class Camera {
 
     void refresh() {
         updateCamera(Layers.getLastUpdatedTimestamp());
-        Displayer.render();
+        Displayer.render(1);
     }
 
     void setMode(CameraMode mode) {

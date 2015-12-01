@@ -256,7 +256,7 @@ public class RenderableContainer implements TableModel, Reorderable {
             }
         }
         Displayer.reshapeAll();
-        Displayer.render();
+        Displayer.render(1);
     }
 
 }
