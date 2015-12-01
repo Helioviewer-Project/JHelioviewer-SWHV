@@ -10,4 +10,8 @@ public abstract class AbstractFilterPanel {
         image = _image;
     }
 
+    protected void refresh() {
+        setGLImage(image);
+    }
+
 }

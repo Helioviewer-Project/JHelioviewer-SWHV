@@ -91,6 +91,10 @@ public class FiltersPanel extends ComponentUtils.SmallPanel {
         sharpenPanel.setGLImage(image);
     }
 
+    public void refresh() {
+        opacityPanel.refresh();
+    }
+
     public void setView(View view) {
         runningDifferencePanel.setView(view);
     }
