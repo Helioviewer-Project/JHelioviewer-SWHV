@@ -157,19 +157,14 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     private static void setRender(Camera camera) {
         if (renderFactor != -1) {
-            Viewport[] vps = Displayer.getViewports();
-            for (int i = 0; i < vps.length; ++i) {
-                RenderableImageLayer r = ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(i);
-                if (r != null)
-                    r.setRender(camera, vps[i], renderFactor);
-            }
+            ImageViewerGui.getRenderableContainer().setRender(camera, renderFactor);
             renderFactor = -1;
         }
     }
 
     private static double renderFactor = -1;
 
-    public void setRender(double _renderFactor) {
+    public void render(double _renderFactor) {
         renderFactor = _renderFactor;
         repaint();
     }

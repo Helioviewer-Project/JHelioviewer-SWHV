@@ -41,11 +41,13 @@ public class Displayer implements JHVEventHighlightListener {
     private static int idxViewport = 0;
 
     public static void setActiveViewport(int x, int y) {
-        for (int i = 0; i < viewports.length; ++i) {
-            Viewport vp = viewports[i];
-            if (vp != null && vp.contains(x, y)) {
-                idxViewport = vp.idx;
-                break;
+        if (multiview) {
+            for (int i = 0; i < viewports.length; ++i) {
+                Viewport vp = viewports[i];
+                if (vp != null && vp.contains(x, y)) {
+                    idxViewport = vp.idx;
+                    break;
+                }
             }
         }
     }
@@ -158,7 +160,7 @@ public class Displayer implements JHVEventHighlightListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (toDisplay == true) {
-                ImageViewerGui.getMainComponent().setRender(renderFactor);
+                ImageViewerGui.getMainComponent().render(renderFactor);
                 toDisplay = false;
                 renderFactor = -1;
             }

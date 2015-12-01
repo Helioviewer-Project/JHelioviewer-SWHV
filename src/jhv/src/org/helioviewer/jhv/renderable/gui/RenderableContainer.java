@@ -227,6 +227,16 @@ public class RenderableContainer implements TableModel, Reorderable {
         return null;
     }
 
+    public void setRender(Camera camera, double factor) {
+        for (Renderable r : renderables) {
+            int i;
+            if (r instanceof RenderableImageLayer && (i = r.isVisibleIdx()) != -1) {
+                RenderableImageLayer im = (RenderableImageLayer) r;
+                im.setRender(camera, Displayer.getViewports()[i], factor);
+            }
+        }
+    }
+
     public void arrangeMultiView(boolean multiview) {
         int ctImages = 0;
 
