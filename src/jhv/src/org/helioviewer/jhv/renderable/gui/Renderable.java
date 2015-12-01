@@ -27,6 +27,8 @@ public interface Renderable {
 
     public boolean isVisible();
 
+    public int isVisibleIdx();
+
     public void setVisible(boolean b);
 
     public String getTimeString();

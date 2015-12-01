@@ -24,6 +24,15 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
+    public int isVisibleIdx() {
+        for (int i = 0; i < this.isVisible.length; i++) {
+            if (this.isVisible[i])
+                return i;
+        }
+        return -1;
+    }
+
+    @Override
     public void setVisible(boolean isVisible) {
         for (int i = 0; i < this.isVisible.length; i++) {
             this.isVisible[i] = isVisible;
