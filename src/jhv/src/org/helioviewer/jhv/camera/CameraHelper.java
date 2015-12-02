@@ -42,7 +42,7 @@ public class CameraHelper {
     }
 
     private static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
-        return 2. * ((vp.height + vp.yAWT - viewportCoordinates.y) / (double) vp.height - 0.5);
+        return -2. * ((viewportCoordinates.y - vp.yAWT) / (double) vp.height - 0.5);
     }
 
     private static double computeUpX(Camera camera, Viewport vp, Point viewportCoordinates) {
