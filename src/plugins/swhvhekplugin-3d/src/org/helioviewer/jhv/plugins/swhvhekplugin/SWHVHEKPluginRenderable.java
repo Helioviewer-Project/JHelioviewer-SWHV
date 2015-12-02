@@ -286,10 +286,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
-    }
-
-    @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (SWHVHEKPopupController.mouseOverJHVEvent != null) {
             drawText(gl, vp, SWHVHEKPopupController.mouseOverJHVEvent, SWHVHEKPopupController.mouseOverPosition);
