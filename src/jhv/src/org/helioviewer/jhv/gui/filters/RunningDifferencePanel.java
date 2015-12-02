@@ -217,15 +217,17 @@ public class RunningDifferencePanel extends AbstractFilterPanel implements Chang
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        boolean differenceMode = image.getDifferenceMode();
-        if (differenceMode) {
-            boolean baseDifferenceMode = image.getBaseDifferenceMode();
-            setDifferenceModetoChangeCombobox(differenceMode, baseDifferenceMode);
-        } else {
-            setDifferenceModetoChangeCombobox(false, false);
-        }
 
-        truncateSpinner.setValue(1.f - image.getTruncation());
+        if (image != null) {
+            boolean differenceMode = image.getDifferenceMode();
+            if (differenceMode) {
+                boolean baseDifferenceMode = image.getBaseDifferenceMode();
+                setDifferenceModetoChangeCombobox(differenceMode, baseDifferenceMode);
+            } else {
+                setDifferenceModetoChangeCombobox(false, false);
+            }
+            truncateSpinner.setValue(1.f - image.getTruncation());
+        }
     }
 
     public void setView(View _view) {

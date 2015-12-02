@@ -103,7 +103,9 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getLUT(), image.getInvertLUT());
+        if (image != null) {
+            setValue(image.getLUT(), image.getInvertLUT());
+        }
     }
 
     @Override

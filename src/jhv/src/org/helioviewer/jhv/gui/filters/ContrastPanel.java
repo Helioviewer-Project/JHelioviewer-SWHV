@@ -78,7 +78,9 @@ public class ContrastPanel extends AbstractFilterPanel implements ChangeListener
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getContrast());
+        if (image != null) {
+            setValue(image.getContrast());
+        }
     }
 
     @Override

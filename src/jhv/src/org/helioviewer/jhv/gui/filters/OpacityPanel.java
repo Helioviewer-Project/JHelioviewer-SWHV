@@ -62,7 +62,9 @@ public class OpacityPanel extends AbstractFilterPanel implements ChangeListener,
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getOpacity());
+        if (image != null) {
+            setValue(image.getOpacity());
+        }
     }
 
     @Override

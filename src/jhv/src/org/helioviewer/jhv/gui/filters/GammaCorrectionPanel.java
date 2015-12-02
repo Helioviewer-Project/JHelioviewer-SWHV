@@ -120,7 +120,9 @@ public class GammaCorrectionPanel extends AbstractFilterPanel implements ChangeL
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getGamma());
+        if (image != null) {
+            setValue(image.getGamma());
+        }
     }
 
     @Override

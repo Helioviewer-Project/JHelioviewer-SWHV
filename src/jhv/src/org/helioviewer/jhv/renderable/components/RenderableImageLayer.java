@@ -114,6 +114,10 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void remove(GL2 gl) {
+        FiltersPanel fp = ImageViewerGui.getFiltersPanel();
+        fp.setActiveImage(null);
+        fp.setView(null);
+
         if (view != null) {
             Layers.removeLayer(view);
             view.setDataHandler(null);
