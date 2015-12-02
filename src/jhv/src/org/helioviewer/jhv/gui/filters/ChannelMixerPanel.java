@@ -75,7 +75,9 @@ public class ChannelMixerPanel extends AbstractFilterPanel implements ItemListen
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getColorMask());
+        if (image != null) {
+            setValue(image.getColorMask());
+        }
     }
 
     @Override

@@ -61,7 +61,9 @@ public class SharpenPanel extends AbstractFilterPanel implements ChangeListener,
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
-        setValue(image.getSharpen());
+        if (image != null) {
+            setValue(image.getSharpen());
+        }
     }
 
     @Override
