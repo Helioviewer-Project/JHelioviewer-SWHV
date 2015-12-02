@@ -86,15 +86,19 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         worker = null; // drop reference
 
         float opacity = 1;
-        if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
-            int count = 0;
-            for (int i = 0; i < Layers.getNumLayers(); i++) {
-                String name = Layers.getLayer(i).getName();
-                if (!name.contains("LASCO") && !name.contains("COR"))
-                    count++;
+
+        if (!Displayer.multiview) {
+            if (!view.getName().contains("LASCO") && !view.getName().contains("COR")) {
+                int count = 0;
+                for (int i = 0; i < Layers.getNumLayers(); i++) {
+                    String name = Layers.getLayer(i).getName();
+                    if (!name.contains("LASCO") && !name.contains("COR"))
+                        count++;
+                }
+                opacity = (float) (1. / (1 + count));
             }
-            opacity = (float) (1. / (1 + count));
         }
+
         glImage.setOpacity(opacity);
         glImage.setLUT(view.getDefaultLUT(), false);
 
