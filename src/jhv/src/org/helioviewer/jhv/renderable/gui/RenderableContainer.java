@@ -71,6 +71,12 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+        for (Renderable renderable : renderables) {
+            renderable.renderFullFloat(camera, vp, gl);
+        }
+    }
+
     public void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
         ImageViewerGui.getRenderableMiniview().renderBackground(camera, miniview, gl);
         for (Renderable renderable : renderables) {

@@ -13,6 +13,8 @@ public interface Renderable {
 
     public void renderFloat(Camera camera, Viewport vp, GL2 gl);
 
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl);
+
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl);
 
     public void prerender(GL2 gl);

@@ -20,10 +20,10 @@ import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
+import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.view.View;
-import org.helioviewer.jhv.threads.JHVWorker;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
@@ -206,7 +206,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             int delta = (int) (vp.height * 0.01);
             TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.height * vpScale)));

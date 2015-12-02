@@ -60,4 +60,8 @@ public abstract class AbstractRenderable implements Renderable {
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
     }
 
+    @Override
+    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    }
+
 }

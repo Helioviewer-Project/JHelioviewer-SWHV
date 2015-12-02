@@ -9,7 +9,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.layers.Layers;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -21,6 +20,7 @@ public class Displayer implements JHVEventHighlightListener {
     public static void setGLSize(int w, int h) {
         glWidth = w;
         glHeight = h;
+        fullViewport = new Viewport(-1, 0, 0, glWidth, glHeight);
     }
 
     public static int getGLWidth() {
@@ -39,6 +39,11 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
     private static int idxViewport = 0;
+    private static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
+
+    public static Viewport getFullViewport() {
+        return fullViewport;
+    }
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {
@@ -76,6 +81,7 @@ public class Displayer implements JHVEventHighlightListener {
         idxViewport = 0;
 
         int ct = countActiveLayers();
+
         switch (ct) {
         case 0:
             reshape();
