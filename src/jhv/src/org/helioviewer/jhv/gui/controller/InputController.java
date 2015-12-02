@@ -12,6 +12,7 @@ import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.GLInfo;
@@ -120,6 +121,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     public void mouseMoved(MouseEvent e) {
         e = synthesizeMouse(e);
 
+        Displayer.setActiveViewport(e.getX(), e.getY());
         ImageViewerGui.getCurrentInteraction().mouseMoved(e);
         for (MouseMotionListener listener : mouseMotionListeners)
             listener.mouseMoved(e);
