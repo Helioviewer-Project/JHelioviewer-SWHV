@@ -132,19 +132,19 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
+        if (eventsToDraw.size() == 0)
+            return;
+
+        Viewport vp = Displayer.getActiveViewport(e.getX(), e.getY());
+        if (vp == null)
+            return;
+
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
         Vec3 pt = null;
         Vec3 hitpoint = null;
-        ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
-        Viewport[] viewports = Displayer.getViewports();
-        Viewport vp = null;
-        for (Viewport _vp : viewports) {
-            if (_vp != null && _vp.contains(e.getX(), e.getY()))
-                vp = _vp;
-        }
-        if (vp == null)
-            return;
+
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 

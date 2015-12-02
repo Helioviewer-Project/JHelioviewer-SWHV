@@ -41,11 +41,13 @@ public class GLGrab {
     public BufferedImage renderFrame(GL2 gl) {
         BufferedImage screenshot;
 
+        int _x = Displayer.fullViewport.x;
+        int _y = Displayer.fullViewport.y;
         int _w = Displayer.fullViewport.width;
         int _h = Displayer.fullViewport.height;
 
         GLHelper.unitScale = true;
-        Displayer.setGLSize(fbo.getWidth(), fbo.getHeight());
+        Displayer.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
         Displayer.reshapeAll();
         {
             fbo.bind(gl);
@@ -67,7 +69,7 @@ public class GLGrab {
 
             fbo.unuse(gl);
         }
-        Displayer.setGLSize(_w, _h);
+        Displayer.setGLSize(_x, _y, _w, _h);
         Displayer.reshapeAll();
         GLHelper.unitScale = false;
 
