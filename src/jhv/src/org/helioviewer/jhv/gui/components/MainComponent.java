@@ -16,7 +16,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.awt.GLCanvas;
 
 @SuppressWarnings("serial")
@@ -32,7 +31,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     }
 
     @Override
-    public void init(GLAutoDrawable drawable) throws GLException {
+    public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2(); // try to force an exception
 
         GLInfo.update(gl);

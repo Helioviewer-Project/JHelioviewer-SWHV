@@ -14,7 +14,7 @@ public class GLInfo {
     public static int[] pixelScale = new int[] { 1, 1 };
     public static float[] pixelScaleFloat = new float[] { 1f, 1f };
 
-    public static void update(GL2 gl) throws GLException {
+    public static void update(GL2 gl) {
         String version = gl.glGetString(GL2.GL_VERSION);
         Log.debug(">> GLInfo > Version string: " + version);
         String extensionStr = gl.glGetString(GL2.GL_EXTENSIONS);

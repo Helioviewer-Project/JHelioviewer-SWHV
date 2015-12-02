@@ -120,7 +120,7 @@ public class ResolutionSet {
      * @author caplins
      *
      */
-    public class ResolutionLevel {
+    public static class ResolutionLevel {
 
         /** The zoom level of the Resolution */
         private final int discardLayers;
