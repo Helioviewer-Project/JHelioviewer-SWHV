@@ -14,21 +14,13 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static boolean multiview = false;
 
-    private static int glWidth = 1;
-    private static int glHeight = 1;
+    static int glWidth = 1;
+    static int glHeight = 1;
 
-    public static void setGLSize(int w, int h) {
+    public static void setGLSize(int x, int y, int w, int h) {
         glWidth = w;
         glHeight = h;
-        fullViewport = new Viewport(-1, 0, 0, glWidth, glHeight);
-    }
-
-    public static int getGLWidth() {
-        return glWidth;
-    }
-
-    public static int getGLHeight() {
-        return glHeight;
+        fullViewport = new Viewport(-1, x, y, w, h);
     }
 
     private static Camera camera = new Camera();
@@ -39,11 +31,8 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
     private static int idxViewport = 0;
-    private static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
 
-    public static Viewport getFullViewport() {
-        return fullViewport;
-    }
+    public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {
@@ -67,7 +56,6 @@ public class Displayer implements JHVEventHighlightListener {
 
     private static int countActiveLayers() {
         int ct = 0;
-
         if (multiview) {
             for (int i = 0; i < viewports.length; ++i) {
                 if (ImageViewerGui.getRenderableContainer().getViewportRenderableImageLayer(i) != null)
@@ -81,7 +69,6 @@ public class Displayer implements JHVEventHighlightListener {
         idxViewport = 0;
 
         int ct = countActiveLayers();
-
         switch (ct) {
         case 0:
             reshape();

@@ -29,7 +29,7 @@ public class RenderableMiniview extends AbstractRenderable implements LayersList
     }
 
     public void reshapeViewport() {
-        int vpw = Displayer.getGLWidth();
+        int vpw = Displayer.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * optionsPanel.scale);
 

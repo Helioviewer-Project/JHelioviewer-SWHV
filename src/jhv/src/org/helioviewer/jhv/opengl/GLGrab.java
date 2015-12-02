@@ -41,8 +41,8 @@ public class GLGrab {
     public BufferedImage renderFrame(GL2 gl) {
         BufferedImage screenshot;
 
-        int _w = Displayer.getGLWidth();
-        int _h = Displayer.getGLHeight();
+        int _w = Displayer.fullViewport.width;
+        int _h = Displayer.fullViewport.height;
 
         GLHelper.unitScale = true;
         Displayer.setGLSize(fbo.getWidth(), fbo.getHeight());

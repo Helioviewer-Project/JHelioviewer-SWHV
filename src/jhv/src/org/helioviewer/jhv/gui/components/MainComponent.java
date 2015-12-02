@@ -81,7 +81,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        Displayer.setGLSize(width, height);
+        Displayer.setGLSize(x, y, width, height);
         Displayer.reshapeAll();
         ImageViewerGui.getRenderableMiniview().reshapeViewport();
     }
@@ -124,7 +124,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     }
 
     public static void renderFullFloatScene(Camera camera, GL2 gl) {
-        Viewport vp = Displayer.getFullViewport();
+        Viewport vp = Displayer.fullViewport;
         gl.glViewport(vp.x, vp.y, vp.width, vp.height);
         ImageViewerGui.getRenderableContainer().renderFullFloat(camera, vp, gl);
     }
