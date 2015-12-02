@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
@@ -46,12 +44,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private final static double ICON_SIZE = 0.1;
     private final static double ICON_SIZE_HIGHLIGHTED = 0.16;
-    private final static int LEFT_MARGIN_TEXT = 10;
-    private final static int RIGHT_MARGIN_TEXT = 10;
-    private final static int TOP_MARGIN_TEXT = 5;
-    private final static int BOTTOM_MARGIN_TEXT = 5;
-    private final static int MOUSE_OFFSET_X = 25;
-    private final static int MOUSE_OFFSET_Y = 25;
 
     private void bindTexture(GL2 gl, String key, ImageIcon icon) {
         GLTexture tex = iconCacheId.get(key);
@@ -257,65 +249,21 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private static final double vpScale = 0.019;
+    private final static int MOUSE_OFFSET_X = 25;
+    private final static int MOUSE_OFFSET_Y = 25;
 
     private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
-        TextRenderer renderer = GLText.getRenderer((int) (vp.height * vpScale));
-        float fontSize = renderer.getFont().getSize2D();
 
         Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
 
-        double boundW = 0;
-        int ct = 0;
+        String[] txts = new String[params.entrySet().size()];
+        int i = 0;
         for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
             String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            Rectangle2D bound = renderer.getBounds(txt);
-            if (boundW < bound.getWidth())
-                boundW = bound.getWidth();
-            ct++;
+            txts[i] = txt;
+            i++;
         }
-
-        Point textInit = new Point(pt.x, pt.y);
-        float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
-        float h = (float) (fontSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
-
-        // Correct if out of view
-        if (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT > vp.width) {
-            textInit.x -= (w + pt.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT - vp.width);
-        }
-        if (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT > vp.height) {
-            textInit.y -= (h + pt.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT - vp.height);
-        }
-        float left = textInit.x + MOUSE_OFFSET_X - LEFT_MARGIN_TEXT;
-        float bottom = textInit.y + MOUSE_OFFSET_Y - fontSize - TOP_MARGIN_TEXT;
-
-        renderer.beginRendering(vp.width, vp.height, true);
-
-        gl.glColor4f(0.33f, 0.33f, 0.33f, 0.9f);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
-        {
-            gl.glBegin(GL2.GL_QUADS);
-            gl.glVertex2f(left, vp.height - bottom);
-            gl.glVertex2f(left, vp.height - bottom - h);
-            gl.glVertex2f(left + w, vp.height - bottom - h);
-            gl.glVertex2f(left + w, vp.height - bottom);
-            gl.glEnd();
-
-        }
-        gl.glPopMatrix();
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-
-        gl.glColor3f(1, 1, 1);
-        int deltaY = MOUSE_OFFSET_Y;
-        for (Map.Entry<String, JHVEventParameter> entry : params.entrySet()) {
-            String txt = entry.getValue().getParameterDisplayName() + " : " + entry.getValue().getParameterValue();
-            renderer.draw(txt, textInit.x + MOUSE_OFFSET_X, vp.height - textInit.y - deltaY);
-            deltaY += fontSize * 1.1;
-        }
-        renderer.endRendering();
-        gl.glDisable(GL2.GL_TEXTURE_2D);
+        GLText.drawText(gl, vp, txts, pt.x + MOUSE_OFFSET_X, pt.y + MOUSE_OFFSET_Y);
     }
 
     @Override
