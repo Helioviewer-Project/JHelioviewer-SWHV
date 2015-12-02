@@ -189,7 +189,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     }
 
     private Vec3 getHitPointPlane(MouseEvent e, Viewport vp) {
-        return CameraHelper.getVectorFromPlane(camera, Displayer.getViewport(), e.getPoint());
+        return CameraHelper.getVectorFromPlane(camera, vp, e.getPoint());
     }
 
     private Vec3 getHitPoint(MouseEvent e, Viewport vp) {
