@@ -239,19 +239,13 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     public Date getLastDateWithData() {
         Date lastDate = null;
-        Date tempLastDate = null;
         for (Set<DrawableElement> des : drawableElements.values()) {
             for (DrawableElement de : des) {
                 if (de.getLastDateWithData() != null) {
-                    if (tempLastDate == null || de.getLastDateWithData().before(tempLastDate)) {
-                        tempLastDate = de.getLastDateWithData();
+                    if (lastDate == null || de.getLastDateWithData().before(lastDate)) {
+                        lastDate = de.getLastDateWithData();
                     }
                 }
-            }
-        }
-        if (tempLastDate != null) {
-            if (lastDate == null || lastDate.before(tempLastDate)) {
-                lastDate = tempLastDate;
             }
         }
         return lastDate;
