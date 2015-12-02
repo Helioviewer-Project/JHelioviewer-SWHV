@@ -16,7 +16,6 @@ public class InteractionRotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        super.mousePressed(e);
         currentRotationStartPoint = CameraHelper.getVectorFromSphereTrackball(camera, Displayer.getActiveViewport(), e.getPoint());
     }
 

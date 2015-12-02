@@ -16,7 +16,6 @@ public class InteractionPan extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        super.mousePressed(e);
         lastMousePoint = e.getPoint();
     }
 

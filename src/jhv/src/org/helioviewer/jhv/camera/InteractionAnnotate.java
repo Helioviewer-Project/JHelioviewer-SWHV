@@ -39,7 +39,6 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        super.mousePressed(e);
         activeAnnotatable.mousePressed(e);
     }
 

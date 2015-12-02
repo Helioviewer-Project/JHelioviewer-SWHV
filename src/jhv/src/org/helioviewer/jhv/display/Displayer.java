@@ -46,18 +46,6 @@ public class Displayer implements JHVEventHighlightListener {
         }
     }
 
-    public static Viewport getActiveViewport(int x, int y) {
-        if (multiview) {
-            for (int i = 0; i < viewports.length; ++i) {
-                Viewport vp = viewports[i];
-                if (vp != null && vp.contains(x, y)) {
-                    return vp;
-                }
-            }
-        }
-        return viewports[idxViewport];
-    }
-
     public static Viewport getActiveViewport() {
         return viewports[idxViewport];
     }

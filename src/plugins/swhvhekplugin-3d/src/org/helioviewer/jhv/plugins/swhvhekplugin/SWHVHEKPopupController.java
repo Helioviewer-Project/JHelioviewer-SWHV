@@ -136,15 +136,12 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         if (eventsToDraw.size() == 0)
             return;
 
-        Viewport vp = Displayer.getActiveViewport(e.getX(), e.getY());
-        if (vp == null)
-            return;
-
         mouseOverJHVEvent = null;
         mouseOverPosition = null;
         Vec3 pt = null;
         Vec3 hitpoint = null;
 
+        Viewport vp = Displayer.getActiveViewport();
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
@@ -175,8 +172,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                     break;
                 }
             }
-
         }
+
         JHVEventContainer.highlight(mouseOverJHVEvent);
         if (helpCursor != component.getCursor())
             lastCursor = component.getCursor();
