@@ -9,7 +9,7 @@ public class Viewport {
     public final int y;
     public final int idx;
 
-    private final int yAwt;
+    public final int yAWT; // AWT direction
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h) {
         idx = _idx;
@@ -18,11 +18,11 @@ public class Viewport {
         aspect = _w / (double) _h;
         x = _x;
         y = Displayer.getGLHeight() - height - _y;
-        yAwt = _y;
+        yAWT = _y;
     }
 
     public boolean contains(int px, int py) {
-        if (px >= x && px < x + width && py >= yAwt && py < yAwt + height) {
+        if (px >= x && px < x + width && py >= yAWT && py < yAWT + height) {
             return true;
         }
         return false;
