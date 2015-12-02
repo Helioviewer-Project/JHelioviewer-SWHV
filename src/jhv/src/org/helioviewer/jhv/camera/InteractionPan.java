@@ -30,7 +30,7 @@ public class InteractionPan extends Interaction {
 
         Vec2 pan = camera.getCurrentTranslation();
         camera.setCurrentTranslation(pan.x + x * m, pan.y - y * m);
-        Displayer.render(0.25);
+        Displayer.render(0.5);
     }
 
     @Override
