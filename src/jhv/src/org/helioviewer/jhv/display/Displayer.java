@@ -30,7 +30,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     private static Viewport[] viewports = { new Viewport(0, 0, 0, 100, 100), null, null, null };
-    private static int idxViewport = 0;
+    private static int activeViewport = 0;
 
     public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
 
@@ -39,7 +39,7 @@ public class Displayer implements JHVEventHighlightListener {
             for (int i = 0; i < viewports.length; ++i) {
                 Viewport vp = viewports[i];
                 if (vp != null && vp.contains(x, y)) {
-                    idxViewport = vp.idx;
+                    activeViewport = i;
                     break;
                 }
             }
@@ -47,7 +47,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static Viewport getActiveViewport() {
-        return viewports[idxViewport];
+        return viewports[activeViewport];
     }
 
     public static Viewport[] getViewports() {
@@ -66,16 +66,10 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void reshapeAll() {
-        idxViewport = 0;
+        activeViewport = 0;
 
         int ct = countActiveLayers();
         switch (ct) {
-        case 0:
-            reshape();
-            break;
-        case 1:
-            reshape();
-            break;
         case 2:
             reshape2();
             break;
