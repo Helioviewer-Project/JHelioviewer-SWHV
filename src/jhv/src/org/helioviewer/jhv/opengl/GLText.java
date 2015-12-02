@@ -2,7 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.Rectangle2D;
 
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 import com.jogamp.opengl.GL2;
@@ -43,6 +45,68 @@ public class GLText {
                 renderer[i] = null;
             }
         }
+    }
+
+    private static final double vpScale = 0.019;
+    private final static int LEFT_MARGIN_TEXT = 10;
+    private final static int RIGHT_MARGIN_TEXT = 10;
+    private final static int TOP_MARGIN_TEXT = 5;
+    private final static int BOTTOM_MARGIN_TEXT = 5;
+
+    public static void drawText(GL2 gl, Viewport vp, String[] txts, int pt_x, int pt_y) {
+        TextRenderer renderer = GLText.getRenderer((int) (vp.height * vpScale));
+        float fontSize = renderer.getFont().getSize2D();
+
+        double boundW = 0;
+        int ct = 0;
+        for (String txt : txts) {
+            Rectangle2D bound = renderer.getBounds(txt);
+            if (boundW < bound.getWidth())
+                boundW = bound.getWidth();
+            ct++;
+        }
+
+        float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
+        float h = (float) (fontSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
+        int textInit_x = pt_x;
+        int textInit_y = pt_y;
+
+        // Correct if out of view
+        if (w + pt_x - LEFT_MARGIN_TEXT > vp.width) {
+            textInit_x -= (w + pt_x - LEFT_MARGIN_TEXT - vp.width);
+        }
+        if (h + pt_y - fontSize - TOP_MARGIN_TEXT > vp.height) {
+            textInit_y -= (h + pt_y - fontSize - TOP_MARGIN_TEXT - vp.height);
+        }
+        float left = textInit_x - LEFT_MARGIN_TEXT;
+        float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
+
+        renderer.beginRendering(vp.width, vp.height, true);
+
+        gl.glColor4f(0.33f, 0.33f, 0.33f, 0.9f);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
+        {
+            gl.glBegin(GL2.GL_QUADS);
+            gl.glVertex2f(left, vp.height - bottom);
+            gl.glVertex2f(left, vp.height - bottom - h);
+            gl.glVertex2f(left + w, vp.height - bottom - h);
+            gl.glVertex2f(left + w, vp.height - bottom);
+            gl.glEnd();
+
+        }
+        gl.glPopMatrix();
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+
+        gl.glColor3f(1, 1, 1);
+        int deltaY = 0;
+        for (String txt : txts) {
+            renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
+            deltaY += fontSize * 1.1;
+        }
+        renderer.endRendering();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
 }
