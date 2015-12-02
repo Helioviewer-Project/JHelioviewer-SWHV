@@ -50,7 +50,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     }
 
     protected static Vec3 vectorFromSphere(Camera _camera, Point p) {
-        return CameraHelper.getVectorFromSphere(_camera, Displayer.getViewport(), p);
+        return CameraHelper.getVectorFromSphere(_camera, Displayer.getActiveViewport(), p);
     }
 
 }

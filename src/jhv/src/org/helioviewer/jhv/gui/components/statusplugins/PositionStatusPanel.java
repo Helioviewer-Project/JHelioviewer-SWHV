@@ -31,7 +31,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         if (position == lastPosition)
             return;
 
-        Viewport vp = Displayer.getViewport();
+        Viewport vp = Displayer.getActiveViewport();
         Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
         double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
