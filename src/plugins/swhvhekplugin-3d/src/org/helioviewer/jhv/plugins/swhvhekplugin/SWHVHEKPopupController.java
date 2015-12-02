@@ -25,6 +25,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -136,6 +137,14 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         Vec3 pt = null;
         Vec3 hitpoint = null;
         ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
+        Viewport[] viewports = Displayer.getViewports();
+        Viewport vp = null;
+        for (Viewport _vp : viewports) {
+            if (_vp != null && _vp.contains(e.getX(), e.getY()))
+                vp = _vp;
+        }
+        if (vp == null)
+            return;
         for (JHVEvent evt : eventsToDraw) {
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
 
@@ -149,10 +158,10 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
                 Quat q = new Quat(p.lat, p.lon);
 
-                hitpoint = q.rotateInverseVector(getHitPointPlane(e));
+                hitpoint = q.rotateInverseVector(getHitPointPlane(e, vp));
                 pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-                hitpoint = getHitPoint(e);
+                hitpoint = getHitPoint(e, vp);
                 pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
             }
 
@@ -166,6 +175,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                     break;
                 }
             }
+
         }
         JHVEventContainer.highlight(mouseOverJHVEvent);
         if (helpCursor != component.getCursor())
@@ -178,12 +188,12 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         }
     }
 
-    private Vec3 getHitPointPlane(MouseEvent e) {
+    private Vec3 getHitPointPlane(MouseEvent e, Viewport vp) {
         return CameraHelper.getVectorFromPlane(camera, Displayer.getViewport(), e.getPoint());
     }
 
-    private Vec3 getHitPoint(MouseEvent e) {
-        Vec3 hp = CameraHelper.getVectorFromSphere(camera, Displayer.getViewport(), e.getPoint());
+    private Vec3 getHitPoint(MouseEvent e, Viewport vp) {
+        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, e.getPoint());
         if (hp != null)
             hp.y = -hp.y;
         return hp;
