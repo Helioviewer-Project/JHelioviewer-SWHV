@@ -2,7 +2,6 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.regex.Matcher;
 
 import org.helioviewer.jhv.base.Regex;
 
@@ -128,18 +127,10 @@ public class JHVEventParameter {
     }
 
     private boolean isDouble(String value) {
-        if (value != null) {
-            Matcher m = Regex.FloatingPointPattern.matcher(value);
-            return m.matches();
-        }
-        return false;
+        return value != null && Regex.FloatingPointPattern.matcher(value).matches();
     }
 
     private boolean isInteger(String value) {
-        if (value != null) {
-            Matcher m = Regex.IntegerPointPattern.matcher(value);
-            return m.matches();
-        }
-        return false;
+        return value != null && Regex.IntegerPattern.matcher(value).matches();
     }
 }
