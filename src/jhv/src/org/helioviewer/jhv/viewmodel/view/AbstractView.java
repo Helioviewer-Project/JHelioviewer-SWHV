@@ -7,7 +7,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
-import org.helioviewer.jhv.viewmodel.imagecache.LocalImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
@@ -15,7 +15,7 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 public abstract class AbstractView implements View {
 
     private RenderableImageLayer imageLayer;
-    private LocalImageCacheStatus cacheStatus;
+    private ImageCacheStatusLocal cacheStatus;
     protected ImageData imageData = null;
     protected MetaData[] metaDataArray = new MetaData[1];
 
@@ -33,7 +33,7 @@ public abstract class AbstractView implements View {
     @Override
     public CacheStatus getImageCacheStatus(int frame) {
         if (cacheStatus == null) {
-            cacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
+            cacheStatus = new ImageCacheStatusLocal(getMaximumFrameNumber());
         }
         return cacheStatus.getImageStatus(frame);
     }
