@@ -79,8 +79,7 @@ public class JP2Image {
     private int[] builtinLUT = null;
 
     /** An object with all the resolution layer information. */
-    protected ResolutionSet resolutionSet;
-    private int resolutionSetCompositionLayer = -1;
+    ResolutionSet[] resolutionSet;
 
     private JPIPSocket socket;
 
@@ -248,43 +247,67 @@ public class JP2Image {
 
         // A layer must be added to determine the image parameters
         compositor.Add_ilayer(0, ref1, ref2);
-        {
-            // Retrieve the number of composition layers
-            {
-                int[] tempVar = new int[1];
-                jpxSrc.Count_compositing_layers(tempVar);
-                frameCount = tempVar[0];
-            }
 
+        // Retrieve the number of composition layers
+        int[] tempVar = new int[1];
+        jpxSrc.Count_compositing_layers(tempVar);
+        frameCount = tempVar[0];
+
+        resolutionSet = new ResolutionSet[frameCount];
+        for (int i = 0; i < frameCount; ++i) {
             Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
             if (!stream.Exists()) {
-                throw new KduException(">> stream doesn't exist");
+                throw new KduException(">> stream does not exist " + i);
             }
 
-            // Retrieve the number of components
-            {
-                // Since it gets tricky here I am just grabbing a bunch of values
-                // and taking the max of them. It is acceptable to think that an
-                // image is color when its not monochromatic, but not the other way
-                // around... so this is just playing it safe.
-                Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-                cmap.Configure(stream);
-
-                int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-
-                // numComponents = maxComponents == 1 ? 1 : 3;
-                numComponents = maxComponents; // With new file formats we may have 2 components
-
-                cmap.Clear();
-                cmap.Native_destroy();
-                cmap = null;
+            if (i == 0) {
+                numComponents = getNumComponents(stream);
             }
-            // Cleanup
-            stream = null;
+            resolutionSet[i] = getResolutionSet(compositor, stream, i);
         }
-        updateResolutionSet(compositor, 0);
+
         // Remove the layer that was added
         compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
+    }
+
+    private ResolutionSet getResolutionSet(Kdu_region_compositor compositor, Kdu_codestream stream, int frame) throws KduException {
+        compositor.Set_scale(false, false, false, 1f);
+        Kdu_dims dims = new Kdu_dims();
+        if (!compositor.Get_total_composition_dims(dims)) {
+            throw new KduException(">> cannot determine dimensions for stream " + frame);
+        }
+
+        int maxDWT = stream.Get_min_dwt_levels();
+        ResolutionSet res = new ResolutionSet(maxDWT + 1);
+        res.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
+
+        for (int i = 1; i <= maxDWT; i++) {
+            compositor.Set_scale(false, false, false, 1f / (1 << i));
+            dims = new Kdu_dims();
+            if (!compositor.Get_total_composition_dims(dims))
+                break;
+            res.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
+        }
+
+        return res;
+    }
+
+    private int getNumComponents(Kdu_codestream stream) throws KduException {
+        // Since it gets tricky here I am just grabbing a bunch of values
+        // and taking the max of them. It is acceptable to think that an
+        // image is color when its not monochromatic, but not the other way
+        // around... so this is just playing it safe.
+        Kdu_channel_mapping cmap = new Kdu_channel_mapping();
+        cmap.Configure(stream);
+
+        int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
+        // numComponents = maxComponents == 1 ? 1 : 3;
+        // With new file formats we may have 2 components
+
+        cmap.Clear();
+        cmap.Native_destroy();
+
+        return maxComponents;
     }
 
     private KakaduEngine kduRender;
@@ -327,15 +350,15 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frameNumber, boolean fromReader) {
-        MetaData m = metaDataList[frameNumber];
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frame, boolean fromReader) {
+        MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, v, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio);
 
-        ResolutionLevel res = resolutionSet.getNextResolutionLevel(totalHeight, totalHeight);
+        ResolutionLevel res = resolutionSet[frame].getNextResolutionLevel(totalHeight, totalHeight);
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
@@ -348,7 +371,7 @@ public class JP2Image {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, v, subImage, res, frameNumber);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, v, subImage, res, frame);
 
         boolean viewChanged = oldImageViewParams == null ||
                               !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
@@ -471,8 +494,8 @@ public class JP2Image {
      * Gets the ResolutionSet object that contains the Resolution level
      * information.
      */
-    public ResolutionSet getResolutionSet() {
-        return resolutionSet;
+    public ResolutionSet getResolutionSet(int frame) {
+        return resolutionSet[frame];
     }
 
     private volatile boolean isAbolished = false;
@@ -521,45 +544,6 @@ public class JP2Image {
         } finally {
             cacheRender = null;
             cacheReader = null;
-        }
-    }
-
-    protected void updateResolutionSet(Kdu_region_compositor compositor, int compositionLayerCurrentlyInUse) throws KduException {
-        if (resolutionSetCompositionLayer == compositionLayerCurrentlyInUse)
-            return;
-
-        Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
-        if (!stream.Exists()) {
-            throw new KduException(">> stream doesn't exist " + compositionLayerCurrentlyInUse);
-        }
-
-        resolutionSetCompositionLayer = compositionLayerCurrentlyInUse;
-
-        int maxDWT = stream.Get_min_dwt_levels();
-
-        compositor.Set_scale(false, false, false, 1.0f);
-        Kdu_dims dims = new Kdu_dims();
-        if (!compositor.Get_total_composition_dims(dims))
-            return;
-
-        if (resolutionSet != null) {
-            int pixelWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
-            int pixelHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
-
-            Kdu_coords size = dims.Access_size();
-            if (size.Get_x() == pixelWidth && size.Get_y() == pixelHeight)
-                return;
-        }
-
-        resolutionSet = new ResolutionSet(maxDWT + 1);
-        resolutionSet.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
-
-        for (int i = 1; i <= maxDWT; i++) {
-            compositor.Set_scale(false, false, false, 1.0f / (1 << i));
-            dims = new Kdu_dims();
-            if (!compositor.Get_total_composition_dims(dims))
-                break;
-            resolutionSet.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
         }
     }
 
