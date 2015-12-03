@@ -18,10 +18,6 @@ public class JHVEventParameter {
     /** The parameter display value */
     private String displayParameterValue;
 
-    /**
-     * Default constructor.
-     *
-     */
     public JHVEventParameter() {
         parameterName = "";
         parameterDisplayName = "";
@@ -133,4 +129,5 @@ public class JHVEventParameter {
     private boolean isInteger(String value) {
         return value != null && Regex.IntegerPattern.matcher(value).matches();
     }
+
 }

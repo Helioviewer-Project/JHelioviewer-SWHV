@@ -2,7 +2,7 @@
     "manually_changed":false,
     "config_version" : "v0.2",
     "sources" : [
-        { 
+        {
             "name"                  : "HEK",
             "provider_name"         : "HEK",
             "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader", 
@@ -17,7 +17,7 @@
                     "parameter_name"            : "Event_PeakTime",
                     "parameter_display_name"    : "Event Peak Time",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
@@ -25,7 +25,7 @@
                     "parameter_display_name"    : "Mean Wavelength",
                     "filter"                    : null,
                     "default_visible"           : false
-                },                
+                },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Type",
@@ -168,28 +168,28 @@
                     "parameter_name"            : "atearliest",
                     "parameter_display_name"    : "Event Time at Earliest",
                     "filter"                    : null,
-                    "default_visible"   : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "atstrongest",
                     "parameter_display_name"    : "Event Time at Strongest",
                     "filter"                    : null,
-                    "default_visible"       : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "atlatest",
                     "parameter_display_name"    : "Event Time at Latest",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
                     "parameter_name"            : "emitter",
                     "parameter_display_name"    : "Emitter",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "COMESEP",
@@ -259,7 +259,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
                     "parameter_display_name"    : "NOAA Number",
@@ -271,16 +271,16 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 },
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_McIntoshCls",
                     "parameter_display_name"    : "McIntosh Classification",
@@ -325,7 +325,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -351,14 +351,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -373,7 +373,7 @@
                             "step_size"     : 1,
                             "units"         : "km/s"
                         },
-                    "default_visible"   : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
@@ -438,12 +438,12 @@
                     "filter"                    : null,
                     "default_visible"           : false
                 },{
-		    "source"                    : "HEK",
-                    "parameter_name"            : “cme_angularwidth”,
-                    "parameter_display_name"    : “Angular Width”,
+                    "source"                    : "HEK",
+                    "parameter_name"            : "CME_AngularWidth",
+                    "parameter_display_name"    : "Angular Width",
                     "filter"                    : null,
-                    "default_visible"           : true	
-		}
+                    "default_visible"           : true
+                }
             ],
             "request_interval_extension"    : 43200000,
             "standard_selected" : true,
@@ -473,7 +473,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -499,14 +499,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -539,14 +539,14 @@
         {
             "event_name"    : "Coronal Hole",
             "suppliers"     : [
-                {   
+                {
                     "supplier_name" : "SPoCA",
                     "supplier_display_name" : "SPoCA",
                     "source"        : "HEK"
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -572,16 +572,16 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 }
-		],
+            ],
             "request_interval_extension"    : 86400000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -605,7 +605,7 @@
                 }
             ],
             "parameter_list"        : [
-			    {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -631,16 +631,16 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 }
-		],
+            ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -664,7 +664,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -690,14 +690,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -744,7 +744,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -770,16 +770,16 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 }
-		],
+            ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -796,7 +796,6 @@
         {
             "event_name"    : "Flare",
             "suppliers"     : [
-                
                 {
                     "supplier_name" : "SWPC",
                     "supplier_display_name" : "NOAA SWPC",
@@ -805,11 +804,11 @@
                 {
                     "supplier_name" : "Flare Detective - Trigger Module",
                     "supplier_display_name" : "Flare Detective",
-                    "source"        : "HEK"
+                    "source"                : "HEK"
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NOAANum",
                     "parameter_display_name"    : "NOAA Number",
@@ -849,14 +848,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
@@ -896,7 +895,7 @@
                 }
             ],
             "parameter_list"        : [
-			    {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_NumSpot",
                     "parameter_display_name"    : "Number of Sunspots",
@@ -924,21 +923,21 @@
                     "filter"                    : null,
                     "default_visible"           : false
                 },
-			    {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : false
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : false
+                    "default_visible"           : false
                 }
-		],
+            ],
             "request_interval_extension"    : 432000000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -962,7 +961,7 @@
                 }
             ],
             "parameter_list"                : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -988,16 +987,16 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       	: true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"		: true
+                    "default_visible"           : true
                 }
-		],
+            ],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -1021,7 +1020,7 @@
                 }
             ],
             "parameter_list"        : [
-		        {
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "OBS_ChannelID",
                     "parameter_display_name"    : "Channel ID",
@@ -1047,14 +1046,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"       : true
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible" : true
+                    "default_visible"           : true
                 }],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
@@ -1130,7 +1129,7 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum" 
+                    "parameter_with" : "ar_noaanum"
                 }
             ]
         },{
@@ -1139,7 +1138,7 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum" 
+                    "parameter_with" : "ar_noaanum"
                 }
             ]
         }
