@@ -270,11 +270,7 @@ public class JP2View extends AbstractView {
 
     @Override
     public LUT getDefaultLUT() {
-        int[] builtIn = _jp2Image.getBuiltinLUT();
-        if (builtIn != null) {
-            return new LUT("built-in", builtIn/* , builtIn */);
-        }
-        return _jp2Image.getAssociatedLUT();
+        return _jp2Image.getDefaultLUT();
     }
 
 }

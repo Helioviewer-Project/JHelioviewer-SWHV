@@ -7,24 +7,13 @@ import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import kdu_jni.Jp2_palette;
-import kdu_jni.Jp2_family_src;
-import kdu_jni.Jpx_codestream_source;
-import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
-import kdu_jni.Kdu_channel_mapping;
-import kdu_jni.Kdu_codestream;
-import kdu_jni.Kdu_coords;
-import kdu_jni.Kdu_dims;
-import kdu_jni.Kdu_ilayer_ref;
-import kdu_jni.Kdu_istream_ref;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Viewport;
@@ -47,6 +36,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_Kdu_cache;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduEngine;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduUtils;
 
 /**
@@ -75,7 +65,6 @@ public class JP2Image {
     /** The number of composition layers for the image. */
     private int frameCount;
 
-    private int numLUTs = 0;
     private int[] builtinLUT = null;
 
     /** An object with all the resolution layer information. */
@@ -146,8 +135,20 @@ public class JP2Image {
 
             KakaduEngine kdu = new KakaduEngine(cacheReader, uri, null);
 
-            createKakaduMachinery(kdu.getJpxSource(), kdu.getCompositor());
-            configureLUT(kdu.getJpxSource());
+            // Retrieve the number of composition layers
+            int[] tempVar = new int[1];
+            kdu.getJpxSource().Count_compositing_layers(tempVar);
+            frameCount = tempVar[0];
+
+            builtinLUT = KakaduHelper.getLUT(kdu.getJpxSource());
+
+            numComponents = KakaduHelper.getNumComponents(kdu.getCompositor(), 0);
+
+            resolutionSet = new ResolutionSet[frameCount];
+            ResolutionSet set = KakaduHelper.getResolutionSet(kdu.getCompositor(), 0);
+            for (int i = 0; i < frameCount; ++i) {
+                resolutionSet[i] = set;
+            }
 
             metaDataList = new MetaData[frameCount];
             KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
@@ -212,102 +213,6 @@ public class JP2Image {
                 }
             }, 5000);
         }
-    }
-
-    private void configureLUT(Jpx_source jpxSrc) throws KduException {
-        Jpx_codestream_source stream = jpxSrc.Access_codestream(0);
-        if (!stream.Exists()) {
-            throw new KduException(">> stream doesn't exist");
-        }
-
-        Jp2_palette palette = stream.Access_palette();
-
-        numLUTs = palette.Get_num_luts();
-        if (numLUTs == 0)
-            return;
-
-        int[] lut = new int[palette.Get_num_entries()];
-        float[] red = new float[lut.length];
-        float[] green = new float[lut.length];
-        float[] blue = new float[lut.length];
-
-        palette.Get_lut(0, red);
-        palette.Get_lut(1, green);
-        palette.Get_lut(2, blue);
-
-        for (int i = 0; i < lut.length; i++) {
-            lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
-        }
-        builtinLUT = lut;
-    }
-
-    private void createKakaduMachinery(Jpx_source jpxSrc, Kdu_region_compositor compositor) throws KduException {
-        // I create references here so the GC doesn't try to collect the Kdu_dims obj
-        Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
-
-        // A layer must be added to determine the image parameters
-        compositor.Add_ilayer(0, ref1, ref2);
-
-        // Retrieve the number of composition layers
-        int[] tempVar = new int[1];
-        jpxSrc.Count_compositing_layers(tempVar);
-        frameCount = tempVar[0];
-
-        resolutionSet = new ResolutionSet[frameCount];
-        for (int i = 0; i < frameCount; ++i) {
-            Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
-            if (!stream.Exists()) {
-                throw new KduException(">> stream does not exist " + i);
-            }
-
-            if (i == 0) {
-                numComponents = getNumComponents(stream);
-            }
-            resolutionSet[i] = getResolutionSet(compositor, stream, i);
-        }
-
-        // Remove the layer that was added
-        compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
-    }
-
-    private ResolutionSet getResolutionSet(Kdu_region_compositor compositor, Kdu_codestream stream, int frame) throws KduException {
-        compositor.Set_scale(false, false, false, 1f);
-        Kdu_dims dims = new Kdu_dims();
-        if (!compositor.Get_total_composition_dims(dims)) {
-            throw new KduException(">> cannot determine dimensions for stream " + frame);
-        }
-
-        int maxDWT = stream.Get_min_dwt_levels();
-        ResolutionSet res = new ResolutionSet(maxDWT + 1);
-        res.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
-
-        for (int i = 1; i <= maxDWT; i++) {
-            compositor.Set_scale(false, false, false, 1f / (1 << i));
-            dims = new Kdu_dims();
-            if (!compositor.Get_total_composition_dims(dims))
-                break;
-            res.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
-        }
-
-        return res;
-    }
-
-    private int getNumComponents(Kdu_codestream stream) throws KduException {
-        // Since it gets tricky here I am just grabbing a bunch of values
-        // and taking the max of them. It is acceptable to think that an
-        // image is color when its not monochromatic, but not the other way
-        // around... so this is just playing it safe.
-        Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-        cmap.Configure(stream);
-
-        int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-        // numComponents = maxComponents == 1 ? 1 : 3;
-        // With new file formats we may have 2 components
-
-        cmap.Clear();
-        cmap.Native_destroy();
-
-        return maxComponents;
     }
 
     private KakaduEngine kduRender;
@@ -547,23 +452,6 @@ public class JP2Image {
         }
     }
 
-    /**
-     * Deactivates the internal color lookup table for the given composition
-     * layer.
-     *
-     * It is not allowed to call this function for a layer which is not loaded
-     * yet.
-     *
-     * @param numLayer
-     *            composition layer to deactivate internal color lookup for
-     */
-    /*
-     * in preservation - not needed void deactivateColorLookupTable(int
-     * numLayer) throws KduException { for (int i = 0; i < numLUTs; i++) {
-     * jpxSrc.Access_layer(numLayer).Access_channels().Set_colour_mapping(i, 0,
-     * -1, numLayer); } }
-     */
-
     // Returns the cache reference
     protected JHV_Kdu_cache getCacheRef() {
         return cacheReader;
@@ -573,12 +461,14 @@ public class JP2Image {
         return imageCacheStatus;
     }
 
-    // Returns the built-in color lookup table.
-    protected int[] getBuiltinLUT() {
-        return builtinLUT;
+    LUT getDefaultLUT() {
+        if (builtinLUT != null) {
+            return new LUT("built-in", builtinLUT/* , builtinLUT */);
+        }
+        return getAssociatedLUT();
     }
 
-    protected LUT getAssociatedLUT() {
+    private LUT getAssociatedLUT() {
         MetaData metaData = metaDataList[0];
         if (metaData instanceof HelioviewerMetaData) {
             String colorKey = DefaultTable.getSingletonInstance().getColorTable((HelioviewerMetaData) metaData);
