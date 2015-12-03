@@ -25,9 +25,8 @@ public class YAxisElement extends AbstractValueSpace {
     /** The scaled available range */
     protected Range scaledAvailableRange;
 
-    private boolean isLogScale;
-
     private YAxisLocation location;
+    private YAxisElementScale scale;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
@@ -52,7 +51,7 @@ public class YAxisElement extends AbstractValueSpace {
         scaledSelectedRange = new Range(0, 1);
         scaledAvailableRange = new Range(0, 1);
         this.label = label;
-        this.isLogScale = isLogScale;
+        setIsLogScale(isLogScale);
     }
 
     /**
@@ -65,7 +64,7 @@ public class YAxisElement extends AbstractValueSpace {
         selectedRange = new Range();
         availableRange = new Range();
         label = "";
-        isLogScale = true;
+        setIsLogScale(true);
         scaledSelectedRange = new Range(0, 1);
         scaledAvailableRange = new Range(0, 1);
     }
@@ -91,16 +90,10 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private void adaptScaledSelectedRange() {
-        double availableMax = availableRange.max;
-        double availableMin = availableRange.min;
-        double selectedMax = selectedRange.max;
-        double selectedMin = selectedRange.min;
-        if (isLogScale) {
-            availableMax = Math.log10(availableMax);
-            availableMin = Math.log10(availableMin);
-            selectedMax = Math.log10(selectedMax);
-            selectedMin = Math.log10(selectedMin);
-        }
+        double availableMax = scale(availableRange.max);
+        double availableMin = scale(availableRange.min);
+        double selectedMax = scale(selectedRange.max);
+        double selectedMin = scale(selectedRange.min);
         double diffAvailable = availableMax - availableMin;
         double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
 
@@ -155,16 +148,10 @@ public class YAxisElement extends AbstractValueSpace {
 
     private void adaptScaledAvailableRange() {
 
-        double selectedMax = selectedRange.max;
-        double selectedMin = selectedRange.min;
-        double availableMax = availableRange.max;
-        double availableMin = availableRange.min;
-        if (isLogScale) {
-            selectedMax = Math.log10(selectedMax);
-            selectedMin = Math.log10(selectedMin);
-            availableMin = Math.log10(availableMin);
-            availableMax = Math.log10(availableMax);
-        }
+        double selectedMax = scale(selectedRange.max);
+        double selectedMin = scale(selectedRange.min);
+        double availableMax = scale(availableRange.max);
+        double availableMin = scale(availableRange.min);
 
         double diffSelectedRange = selectedMax - selectedMin;
         double diffScaledSelectedRange = scaledSelectedRange.max - scaledSelectedRange.min;
@@ -187,8 +174,7 @@ public class YAxisElement extends AbstractValueSpace {
      */
 
     public String getLabel() {
-        String localLabel = label.replace("^2", "\u00B2");
-        return localLabel;
+        return scale.getLabel();
     }
 
     public String getOriginalLabel() {
@@ -214,6 +200,14 @@ public class YAxisElement extends AbstractValueSpace {
         return selectedRange.min;
     }
 
+    public double getScaledMinValue() {
+        return scale(selectedRange.min);
+    }
+
+    public double getScaledMaxValue() {
+        return scale(selectedRange.max);
+    }
+
     /**
      * Gets the maximum value.
      *
@@ -232,16 +226,15 @@ public class YAxisElement extends AbstractValueSpace {
      */
     public void set(String label, boolean isLogScale) {
         this.label = label;
-        this.isLogScale = isLogScale;
-    }
-
-    public boolean isLogScale() {
-        return isLogScale;
+        setIsLogScale(isLogScale);
     }
 
     public void setIsLogScale(boolean isLogScale) {
-        this.isLogScale = isLogScale;
-
+        if (isLogScale) {
+            scale = new YAxisElementLogScale(label);
+        } else {
+            scale = new YAxisElementIdentityScale(label);
+        }
     }
 
     public YAxisLocation getLocation() {
@@ -264,12 +257,9 @@ public class YAxisElement extends AbstractValueSpace {
 
     @Override
     public void setScaledSelectedRange(Range newScaledSelectedRange) {
-        double minAvailable = availableRange.min;
-        double maxAvailable = availableRange.max;
-        if (isLogScale) {
-            minAvailable = Math.log10(minAvailable);
-            maxAvailable = Math.log10(maxAvailable);
-        }
+        double minAvailable = scale(availableRange.min);
+        double maxAvailable = scale(availableRange.max);
+
         double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
         double diffAvail = maxAvailable - minAvailable;
 
@@ -280,11 +270,7 @@ public class YAxisElement extends AbstractValueSpace {
 
         double selectedStart = minAvailable + diffScSelStartScAvaiStart * ratio;
         double selectedEnd = minAvailable + diffscSelEndScAvailStart * ratio;
-        if (isLogScale) {
-            selectedRange = new Range(Math.pow(10, selectedStart), Math.pow(10, selectedEnd));
-        } else {
-            selectedRange = new Range(selectedStart, selectedEnd);
-        }
+        selectedRange = new Range(scale.invScale(selectedStart), scale.invScale(selectedEnd));
         scaledSelectedRange = new Range(newScaledSelectedRange);
         fireSelectedRangeChanged();
     }
@@ -302,4 +288,63 @@ public class YAxisElement extends AbstractValueSpace {
         scaledSelectedRange = new Range(0, 1);
     }
 
+    public double scale(double maxValue) {
+        return scale.scale(maxValue);
+    }
+
+    private static interface YAxisElementScale {
+        public abstract double scale(double val);
+
+        public abstract double invScale(double val);
+
+        public abstract String getLabel();
+    }
+
+    private static class YAxisElementLogScale implements YAxisElementScale {
+        private final String label;
+
+        public YAxisElementLogScale(String _label) {
+            label = "log(" + _label.replace("^2", "\u00B2") + ")";
+        }
+
+        @Override
+        public double scale(double val) {
+
+            return Math.log10(val);
+        }
+
+        @Override
+        public double invScale(double val) {
+            return Math.pow(10, val);
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
+    }
+
+    private static class YAxisElementIdentityScale implements YAxisElementScale {
+        private final String label;
+
+        public YAxisElementIdentityScale(String _label) {
+            label = _label.replace("^2", "\u00B2");
+        }
+
+        @Override
+        public double scale(double val) {
+            return val;
+        }
+
+        @Override
+        public double invScale(double val) {
+            return val;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
+
+    }
 }

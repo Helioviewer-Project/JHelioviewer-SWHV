@@ -317,22 +317,13 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         String verticalLabel = yAxisElement.getLabel();
 
-        if (yAxisElement.isLogScale()) {
-            verticalLabel = "log(" + verticalLabel + ")";
-        }
         final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
         g.drawString(verticalLabel, (int) (ChartConstants.getGraphLeftSpace() + Math.max((-1 * ChartConstants.getGraphLeftSpace() + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - ChartConstants.getTwoAxisGraphRight())))), (int) verticalLabelBounds.getHeight());
 
-        double minValue = 0.0;
-        double maxValue = 0.0;
-        if (yAxisElement.isLogScale()) {
-            minValue = Math.log10(yAxisElement.getMinValue());
-            maxValue = Math.log10(yAxisElement.getMaxValue());
-        } else {
-            minValue = yAxisElement.getMinValue();
-            maxValue = yAxisElement.getMaxValue();
-        }
+        double minValue = yAxisElement.scale(yAxisElement.getMinValue());
+        double maxValue = yAxisElement.scale(yAxisElement.getMaxValue());
+
         double signFactor = 1;
         double useMax = 0;
         if (maxValue < minValue) {
@@ -400,19 +391,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         ratioX = !drawController.getIntervalAvailable() ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
-            double logMinValue;
-            double logMaxValue;
-            if (!yAxisElement.isLogScale() || (yAxisElement.isLogScale() && yAxisElement.getMinValue() > 10e-50 && yAxisElement.getMaxValue() > 10e-50)) {
-                if (yAxisElement.isLogScale()) {
-                    logMinValue = Math.log10(yAxisElement.getMinValue());
-                    logMaxValue = Math.log10(yAxisElement.getMaxValue());
-                } else {
-                    logMinValue = yAxisElement.getMinValue();
-                    logMaxValue = yAxisElement.getMaxValue();
-                }
-                double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height / (logMaxValue - logMinValue);
-                yRatios.put(yAxisElement, ratioY);
-            }
+            double logMinValue = yAxisElement.scale(yAxisElement.getMinValue());
+            double logMaxValue = yAxisElement.scale(yAxisElement.getMaxValue());
+
+            double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height / (logMaxValue - logMinValue);
+            yRatios.put(yAxisElement, ratioY);
         }
     }
 
