@@ -2,14 +2,11 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 
 import java.awt.Rectangle;
 
-import org.helioviewer.jhv.base.interval.Interval;
-
 /**
  * A class describing the available resolution levels for a given image. It
  * supplies several simple methods to aid in selecting appropriate zoom levels.
  *
  * @author caplins
- *
  */
 public class ResolutionSet {
 
@@ -20,12 +17,6 @@ public class ResolutionSet {
     private final ResolutionLevel[] resolutions;
 
     /**
-     * An interval covering the available resolutions. Should range from zero on
-     * up.
-     */
-    public final Interval<Integer> resolutionRange;
-
-    /**
      * Constructor. Takes the number of resolution levels in the associated
      * image.
      *
@@ -33,7 +24,6 @@ public class ResolutionSet {
      */
     public ResolutionSet(int _numResolutions) {
         resolutions = new ResolutionLevel[_numResolutions];
-        resolutionRange = new Interval<Integer>(0, resolutions.length - 1);
     }
 
     /**
@@ -52,19 +42,6 @@ public class ResolutionSet {
         resolutions[_discardLayer] = new ResolutionLevel(_discardLayer, _dims);
     }
 
-    /**
-     * Returns a resolution level zoomed by _delta levels. Useful for zooming in
-     * and out operations. Also can be used for zoom min/max by using
-     * Integer.MAX_VALUE and INTEGER.MIN_VALUE.
-     *
-     * @param _currRes
-     * @param _delta
-     * @return Requested resolution level
-     */
-    public ResolutionLevel getResolutionLevel(ResolutionLevel _currRes, int _delta) {
-        return resolutions[resolutionRange.squeeze(_currRes.discardLayers + _delta)];
-    }
-
     public ResolutionLevel getResolutionLevel(int _index) {
         return resolutions[_index];
     }
@@ -79,18 +56,6 @@ public class ResolutionSet {
         return resolutions[idx];
     }
 
-/*
-    public ResolutionLevel getClosestResolutionLevel(double _source, double _target) {
-        int idx = 0;
-        for (int i = resolutions.length - 1; i >= 0; i--) {
-            idx = i;
-            if (_source * Math.pow(2, resolutions[i].getZoomLevel()) <= _target)
-                break;
-        }
-        return resolutions[idx];
-    }
-*/
-
     public ResolutionLevel getNextResolutionLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
             if (resolutions[i].dims.width < w || resolutions[i].dims.height < h)
@@ -99,16 +64,8 @@ public class ResolutionSet {
         return resolutions[resolutions.length - 1];
     }
 
-    public ResolutionLevel getNextResolutionLevelAlt(double ratio, double mHeight) {
-        for (int i = 1; i < resolutions.length; ++i) {
-            if (mHeight / (resolutions[i].dims.width) >= ratio)
-                return resolutions[i - 1];
-        }
-        return resolutions[resolutions.length - 1];
-    }
-
     public int getMaxResolutionLevels() {
-        return resolutionRange.getEnd();
+        return resolutions.length - 1;
     }
 
     /**
