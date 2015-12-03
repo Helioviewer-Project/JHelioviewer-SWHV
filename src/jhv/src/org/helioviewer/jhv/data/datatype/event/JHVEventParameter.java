@@ -112,7 +112,7 @@ public class JHVEventParameter {
     }
 
     private String beautifyParameterValue(String parameterValue) {
-        if (isDouble(parameterValue)) {
+        if (isDouble(parameterValue) && !isInteger(parameterValue)) {
             NumberFormat formatter = new DecimalFormat("0.###E0");
             String result = formatter.format(Double.parseDouble(parameterValue));
             if (result.contains("E0")) {
@@ -152,7 +152,7 @@ public class JHVEventParameter {
                 "(((" + Digits + "(\\.)?(" + Digits + "?)(" + Exp + ")?)|" +
 
         // . Digits ExponentPart_opt FloatTypeSuffix_opt
-                "(\\.(" + Digits + ")(" + Exp + ")?)|" +
+        "(\\.(" + Digits + ")(" + Exp + ")?)|" +
 
                 // Hexadecimal strings
                 "((" +
@@ -168,5 +168,9 @@ public class JHVEventParameter {
         // "whitespace"
 
         return value != null && Pattern.matches(fpRegex, value);
+    }
+
+    private boolean isInteger(String value) {
+        return value.matches("\\d+");
     }
 }
