@@ -321,8 +321,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         g.setColor(ChartConstants.LABEL_TEXT_COLOR);
         g.drawString(verticalLabel, (int) (ChartConstants.getGraphLeftSpace() + Math.max((-1 * ChartConstants.getGraphLeftSpace() + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - ChartConstants.getTwoAxisGraphRight())))), (int) verticalLabelBounds.getHeight());
 
-        double minValue = yAxisElement.scale(yAxisElement.getMinValue());
-        double maxValue = yAxisElement.scale(yAxisElement.getMaxValue());
+        double minValue = yAxisElement.getScaledMinValue();
+        double maxValue = yAxisElement.getScaledMaxValue();
 
         double signFactor = 1;
         double useMax = 0;
@@ -391,10 +391,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         ratioX = !drawController.getIntervalAvailable() ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
         yRatios = new HashMap<YAxisElement, Double>();
         for (YAxisElement yAxisElement : drawController.getYAxisElements()) {
-            double logMinValue = yAxisElement.scale(yAxisElement.getMinValue());
-            double logMaxValue = yAxisElement.scale(yAxisElement.getMaxValue());
+            double minValue = yAxisElement.getScaledMinValue();
+            double maxValue = yAxisElement.getScaledMaxValue();
 
-            double ratioY = logMaxValue < logMinValue ? graphArea.height / (logMinValue - logMaxValue) : graphArea.height / (logMaxValue - logMinValue);
+            double ratioY = maxValue < minValue ? graphArea.height / (minValue - maxValue) : graphArea.height / (maxValue - minValue);
             yRatios.put(yAxisElement, ratioY);
         }
     }
@@ -672,7 +672,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                     }
 
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
-                    ) {
+                            ) {
                         vs.setScaledSelectedRange(new Range(startValue, endValue));
                     }
                 }
