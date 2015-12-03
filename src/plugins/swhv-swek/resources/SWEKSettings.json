@@ -5,7 +5,7 @@
         {
             "name"                  : "HEK",
             "provider_name"         : "HEK",
-            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader", 
+            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKDownloader",
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.hek.HEKParser",
             "jar_location_url"      : "http://swhv.oma.be/config/swek_config/jars/heksource.jar",
             "jar_location_file"     : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/heksource.jar",
@@ -151,16 +151,30 @@
                     "parameter_display_name"    : "Bound Box",
                     "filter"                    : null,
                     "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_ImageURL",
+                    "parameter_display_name"    : "Context Image",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_ThumbURL",
+                    "parameter_display_name"    : "Context Thumbnail",
+                    "filter"                    : null,
+                    "default_visible"           : false
                 }
             ]
-        },{ 
+        },{
             "name"                  : "COMESEP",
             "provider_name"         : "COMESEP",
-            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader", 
+            "downloader"            : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepDownloader",
             "event_parser"          : "org.helioviewer.jhv.plugins.swek.sources.comesep.ComesepParser",
-            "jar_location_url"     : "http://swhv.oma.be/config/swek_config/jars/comesepsource.jar",
-            "jar_location_file"          : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
-            "jar_location" : "jar:///sources/comesepsource.jar",
+            "jar_location_url"      : "http://swhv.oma.be/config/swek_config/jars/comesepsource.jar",
+            "jar_location_file"     : "file:///Users/user/JHelioviewer/PluginResources/swek_plugin/sources/comesepsource.jar",
+            "jar_location"          : "jar:///sources/comesepsource.jar",
             "base_url"              : "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php",
             "general_parameters"    : [
                 {

@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
@@ -254,15 +256,17 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
         Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
-        String[] txts = new String[params.values().size()];
+        ArrayList<String> txts = new ArrayList<String>();
 
-        int i = 0;
         for (JHVEventParameter p : params.values()) {
-            String txt = p.getParameterDisplayName() + " : " + p.getDisplayParameterValue();
-            txts[i] = txt;
-            i++;
+            String value = p.getDisplayParameterValue();
+            if (!Regex.HTTPpattern.matcher(value).matches()) {
+                String txt = p.getParameterDisplayName() + " : " + value;
+                txts.add(txt);
+            }
         }
-        GLText.drawText(gl, vp, txts, pt.x + MOUSE_OFFSET_X, pt.y + MOUSE_OFFSET_Y);
+        if (txts.size() != 0)
+            GLText.drawText(gl, vp, txts, pt.x + MOUSE_OFFSET_X, pt.y + MOUSE_OFFSET_Y);
     }
 
     @Override
