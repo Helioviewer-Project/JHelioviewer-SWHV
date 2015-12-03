@@ -28,22 +28,22 @@ public class JP2ImageCallisto extends JP2Image {
     private Rectangle viewport;
 
     @Override
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frameNumber, boolean fromReader) {
-        return calculateParameter();
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frame, boolean fromReader) {
+        return calculateParameter(0);
     }
 
-    private JP2ImageParameter calculateParameter() {
-        int maxHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
-        int maxWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
+    private JP2ImageParameter calculateParameter(int frame) {
+        int maxHeight = resolutionSet[frame].getResolutionLevel(0).getResolutionBounds().height;
+        int maxWidth = resolutionSet[frame].getResolutionLevel(0).getResolutionBounds().width;
 
-        ResolutionLevel res = resolutionSet.getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
-                                                                   2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
+        ResolutionLevel res = resolutionSet[frame].getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
+                                                                          2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
         SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * rect.width), (int) (region.y / (double) maxHeight * rect.height),
                                          (int) Math.ceil(region.width / (double) maxWidth * rect.width), (int) Math.ceil(region.height / (double) maxHeight * rect.height), rect);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, 0);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame);
         signalReader(imageViewParams);
 
         return imageViewParams;

@@ -596,7 +596,7 @@ public class RadioDataManager implements RadioDownloaderListener {
         if (jp2View != null) {
             JP2ImageCallisto image = jp2View.getJP2Image();
             image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
-            ResolutionSet rs = image.getResolutionSet();
+            ResolutionSet rs = image.getResolutionSet(0);
             int maximumFrameNumber = image.getMaximumFrameNumber();
             LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
 
@@ -604,8 +604,8 @@ public class RadioDataManager implements RadioDownloaderListener {
             for (int i = 0; i <= maximumFrameNumber; i++) {
                 try {
                     hvMetaData.parseXML(image.getXML(i));
-                    Double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
-                    Double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
+                    double freqStart = hvMetaData.tryGetDouble("STARTFRQ");
+                    double freqEnd = hvMetaData.tryGetDouble("END-FREQ");
                     Date start = JHVDate.parseDateTime(hvMetaData.get("DATE-OBS")).getDate();
                     Date end = JHVDate.parseDateTime(hvMetaData.get("DATE-END")).getDate();
                     hvMetaData.destroyXML();
@@ -616,7 +616,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                     if (start != null && end != null) {
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionSetting tempResSet = new ResolutionSetting((1.0 * (end.getTime() - start.getTime()) / rs.getResolutionLevel(j).getResolutionBounds().width), ((freqEnd - freqStart) / rs.getResolutionLevel(j).getResolutionBounds().height), j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height, rs.getResolutionLevel(j).getZoomLevel());
+                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) rs.getResolutionLevel(j).getResolutionBounds().width,
+                                                                                 (freqEnd - freqStart) / (double) rs.getResolutionLevel(j).getResolutionBounds().height,
+                                                                                 j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height,
+                                                                                 rs.getResolutionLevel(j).getZoomLevel());
                             resolutionSettings.add(tempResSet);
                         }
 
