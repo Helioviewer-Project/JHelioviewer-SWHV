@@ -82,14 +82,6 @@ public class JP2Image {
     protected ResolutionSet resolutionSet;
     private int resolutionSetCompositionLayer = -1;
 
-    /**
-     * This is a little tricky variable to specify that the file contains
-     * multiple frames
-     */
-    private boolean isJpx = false;
-
-    protected MetaData[] metaDataList;
-
     private JPIPSocket socket;
 
     /**
@@ -108,6 +100,8 @@ public class JP2Image {
 
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
+
+    MetaData[] metaDataList;
 
     /**
      * Constructor
@@ -137,8 +131,6 @@ public class JP2Image {
                 supported = true;
         if (!supported)
             throw new JHV_KduException("File extension not supported");
-
-        isJpx = name.endsWith(".JPX");
 
         try {
             String scheme = uri.getScheme().toUpperCase();
@@ -250,14 +242,8 @@ public class JP2Image {
         builtinLUT = lut;
     }
 
-    /**
-     * Creates the Kakadu objects and sets all the data-members in this object.
-     *
-     * @throws JHV_KduException
-     */
     private void createKakaduMachinery(Jpx_source jpxSrc, Kdu_region_compositor compositor) throws KduException {
-        // I create references here so the GC doesn't try to collect the
-        // Kdu_dims obj
+        // I create references here so the GC doesn't try to collect the Kdu_dims obj
         Kdu_dims ref1 = new Kdu_dims(), ref2 = new Kdu_dims();
 
         // A layer must be added to determine the image parameters
@@ -277,12 +263,9 @@ public class JP2Image {
 
             // Retrieve the number of components
             {
-                // Since it gets tricky here I am just grabbing a bunch of
-                // values
-                // and taking the max of them. It is acceptable to think
-                // that an
-                // image is color when its not monochromatic, but not the
-                // other way
+                // Since it gets tricky here I am just grabbing a bunch of values
+                // and taking the max of them. It is acceptable to think that an
+                // image is color when its not monochromatic, but not the other way
                 // around... so this is just playing it safe.
                 Kdu_channel_mapping cmap = new Kdu_channel_mapping();
                 cmap.Configure(stream);
@@ -290,8 +273,7 @@ public class JP2Image {
                 int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
 
                 // numComponents = maxComponents == 1 ? 1 : 3;
-                numComponents = maxComponents; // With new file formats we
-                // may have 2 components
+                numComponents = maxComponents; // With new file formats we may have 2 components
 
                 cmap.Clear();
                 cmap.Native_destroy();
@@ -422,10 +404,10 @@ public class JP2Image {
      *
      * A image consisting of multiple frames is also called a 'movie'.
      *
-     * @return True, if the image contains multiple frames, false otherwise
+     * @return True if the image contains multiple frames, false otherwise
      */
     protected boolean isMultiFrame() {
-        return isJpx && frameCount > 1;
+        return frameCount > 1;
     }
 
     /**
@@ -542,9 +524,9 @@ public class JP2Image {
         }
     }
 
-    protected boolean updateResolutionSet(Kdu_region_compositor compositor, int compositionLayerCurrentlyInUse) throws KduException {
+    protected void updateResolutionSet(Kdu_region_compositor compositor, int compositionLayerCurrentlyInUse) throws KduException {
         if (resolutionSetCompositionLayer == compositionLayerCurrentlyInUse)
-            return false;
+            return;
 
         Kdu_codestream stream = compositor.Access_codestream(compositor.Get_next_istream(new Kdu_istream_ref(), false, true));
         if (!stream.Exists()) {
@@ -558,7 +540,7 @@ public class JP2Image {
         compositor.Set_scale(false, false, false, 1.0f);
         Kdu_dims dims = new Kdu_dims();
         if (!compositor.Get_total_composition_dims(dims))
-            return false;
+            return;
 
         if (resolutionSet != null) {
             int pixelWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
@@ -566,7 +548,7 @@ public class JP2Image {
 
             Kdu_coords size = dims.Access_size();
             if (size.Get_x() == pixelWidth && size.Get_y() == pixelHeight)
-                return false;
+                return;
         }
 
         resolutionSet = new ResolutionSet(maxDWT + 1);
@@ -579,8 +561,6 @@ public class JP2Image {
                 break;
             resolutionSet.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
         }
-
-        return false;
     }
 
     /**
