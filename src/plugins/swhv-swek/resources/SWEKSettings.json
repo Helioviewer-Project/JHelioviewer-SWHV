@@ -14,27 +14,6 @@
             "general_parameters"    : [
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "Event_Probability",
-                    "parameter_display_name"    : "Event Probability",
-                    "filter"                    : null,
-                    "default_visible"   : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "Event_EndTime",
-                    "parameter_display_name"    : "Event End Time",
-                    "filter"                    : null,
-                    "default_visible"       : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "Event_StartTime",
-                    "parameter_display_name"    : "Event Start Time",
-                    "filter"                    : null,
-                    "default_visible" : true
-                },
-                {
-                    "source"                    : "HEK",
                     "parameter_name"            : "Event_PeakTime",
                     "parameter_display_name"    : "Event Peak Time",
                     "filter"                    : null,
@@ -45,7 +24,7 @@
                     "parameter_name"            : "OBS_Observatory",
                     "parameter_display_name"    : "Observatory",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -315,13 +294,21 @@
                 }
             ],
             "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : true
+                },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "AR_SpotAreaRepr",
-                    "parameter_display_name"    : "Sunspot Area",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"           : true
-                },{
+                    "default_visible" : true
+                },
+		{
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_McIntoshCls",
                     "parameter_display_name"    : "McIntosh Classification",
@@ -337,17 +324,10 @@
                 },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "AR_ZurichCls",
-                    "parameter_display_name"    : "Zurich Classification",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
                     "parameter_name"            : "AR_CompactnessCls",
                     "parameter_display_name"    : "Compactness Classification",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 }
             ],
             "request_interval_extension"    : 86400000,
@@ -373,6 +353,20 @@
                 }
             ],
             "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVel",
@@ -393,7 +387,7 @@
                     "parameter_name"            : "CME_RadialLinVelUncert",
                     "parameter_display_name"    : "Radial Linear Velocity Uncertainty",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -407,7 +401,7 @@
                             "step_size"     : 1,
                             "units"         : "km/s"
                         },
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -421,35 +415,35 @@
                             "step_size"     : 1,
                             "units"         : "km/s"
                         },
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_RadialLinVelStddev",
                     "parameter_display_name"    : "Radial Linear Velocity Standard Deviation",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_Accel",
                     "parameter_display_name"    : "Acceleration",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_AccelUncert",
                     "parameter_display_name"    : "Acceleration Uncertainty",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_Mass",
                     "parameter_display_name"    : "Mass",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 }
             ],
             "request_interval_extension"    : 43200000,
@@ -480,6 +474,20 @@
                 }
             ],
             "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "CD_Area",
@@ -517,7 +525,22 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"        : [],
+            "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                }
+		],
             "request_interval_extension"    : 86400000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -540,7 +563,22 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"        : [],
+            "parameter_list"        : [
+			{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                }
+		],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -564,6 +602,20 @@
                 }
             ],
             "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FI_Length",
@@ -608,7 +660,22 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"        : [],
+            "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                }
+		],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -637,6 +704,20 @@
                 }
             ],
             "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : true
+                },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "FL_GOESCLs",
@@ -674,7 +755,22 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"        : [],
+            "parameter_list"        : [
+			{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : false
+                }
+		],
             "request_interval_extension"    : 432000000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -697,7 +793,22 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"                : [],
+            "parameter_list"                : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       	: true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible"		: true
+                }
+		],
             "request_interval_extension"    : 3000,
             "standard_selected"             : true,
             "group_on"                      : null,
@@ -720,7 +831,21 @@
                     "source"        : "HEK"
                 }
             ],
-            "parameter_list"        : [],
+            "parameter_list"        : [
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_EndTime",
+                    "parameter_display_name"    : "Event End Time",
+                    "filter"                    : null,
+                    "default_visible"       : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_StartTime",
+                    "parameter_display_name"    : "Event Start Time",
+                    "filter"                    : null,
+                    "default_visible" : true
+                }],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
             "group_on"                      : null,
