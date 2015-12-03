@@ -164,7 +164,6 @@ public class YAxisElement extends AbstractValueSpace {
         Double scaledAvailableStart = scaledSelectedRange.min - diffSelStartAvailStart * ratio;
         Double scaledAvailableEnd = scaledSelectedRange.max + diffSelEndAvailEnd * ratio;
         scaledAvailableRange = new Range(scaledAvailableStart, scaledAvailableEnd);
-
     }
 
     /**
@@ -301,6 +300,7 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private static class YAxisElementLogScale implements YAxisElementScale {
+
         private final String label;
 
         public YAxisElementLogScale(String _label) {
@@ -309,7 +309,6 @@ public class YAxisElement extends AbstractValueSpace {
 
         @Override
         public double scale(double val) {
-
             return Math.log10(val);
         }
 
@@ -325,6 +324,7 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private static class YAxisElementIdentityScale implements YAxisElementScale {
+
         private final String label;
 
         public YAxisElementIdentityScale(String _label) {
@@ -347,4 +347,5 @@ public class YAxisElement extends AbstractValueSpace {
         }
 
     }
+
 }
