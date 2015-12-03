@@ -260,7 +260,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         for (JHVEventParameter p : params.values()) {
             String value = p.getDisplayParameterValue();
-            if (!Regex.HTTPpattern.matcher(value).matches()) {
+            if (!Regex.WEB_URL.matcher(value).matches()) {
                 String txt = p.getParameterDisplayName() + " : " + value;
                 txts.add(txt);
             }
