@@ -258,7 +258,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         int i = 0;
         for (JHVEventParameter p : params.values()) {
-            String txt = p.getParameterDisplayName() + " : " + p.getParameterValue();
+            String txt = p.getParameterDisplayName() + " : " + p.getDisplayParameterValue();
             txts[i] = txt;
             i++;
         }
