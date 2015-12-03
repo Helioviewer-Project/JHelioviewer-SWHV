@@ -291,6 +291,10 @@ public class YAxisElement extends AbstractValueSpace {
         return scale.scale(maxValue);
     }
 
+    public double invScale(double maxValue) {
+        return scale.invScale(maxValue);
+    }
+
     private static interface YAxisElementScale {
         public abstract double scale(double val);
 
