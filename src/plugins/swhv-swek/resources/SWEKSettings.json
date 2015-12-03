@@ -21,46 +21,11 @@
                 },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory",
-                    "filter"                    : null,
-                    "default_visible"           : false
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "OBS_ChannelID",
-                    "parameter_display_name"    : "Channel ID",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "OBS_Instrument",
-                    "parameter_display_name"    : "Instrument",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
                     "parameter_name"            : "OBS_MeanWavel",
                     "parameter_display_name"    : "Mean Wavelength",
                     "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "AR_NOAANum",
-                    "parameter_display_name"    : "NOAA Number",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
-                {
-                    "source"                    : "HEK",
-                    "parameter_name"            : "AR_NumSpot",
-                    "parameter_display_name"    : "Number of Sunspots",
-                    "filter"                    : null,
-                    "default_visible"           : true
-                },
+                    "default_visible"           : false
+                },                
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_Type",
@@ -294,7 +259,14 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -308,7 +280,7 @@
                     "filter"                    : null,
                     "default_visible" : true
                 },
-		{
+		        {
                     "source"                    : "HEK",
                     "parameter_name"            : "AR_McIntoshCls",
                     "parameter_display_name"    : "McIntosh Classification",
@@ -353,7 +325,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -474,7 +467,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -526,7 +540,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -564,7 +599,28 @@
                 }
             ],
             "parameter_list"        : [
-			{
+			    {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -602,7 +658,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -661,7 +738,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -692,6 +790,7 @@
         {
             "event_name"    : "Flare",
             "suppliers"     : [
+                
                 {
                     "supplier_name" : "SWPC",
                     "supplier_display_name" : "NOAA SWPC",
@@ -704,7 +803,42 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NOAANum",
+                    "parameter_display_name"    : "NOAA Number",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -756,7 +890,35 @@
                 }
             ],
             "parameter_list"        : [
-			{
+			    {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "AR_NumSpot",
+                    "parameter_display_name"    : "Number of Sunspots",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+			    {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -794,7 +956,28 @@
                 }
             ],
             "parameter_list"                : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
@@ -832,7 +1015,28 @@
                 }
             ],
             "parameter_list"        : [
-		{
+		        {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_ChannelID",
+                    "parameter_display_name"    : "Channel ID",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Instrument",
+                    "parameter_display_name"    : "Instrument",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "OBS_Observatory",
+                    "parameter_display_name"    : "Observatory",
+                    "filter"                    : null,
+                    "default_visible"           : false
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
