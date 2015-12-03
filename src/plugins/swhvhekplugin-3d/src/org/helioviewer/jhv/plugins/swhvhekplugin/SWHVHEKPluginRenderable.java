@@ -253,7 +253,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_Y = 25;
 
     private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
-        Map<String, JHVEventParameter> params = evt.getVisibleEventParameters();
+        Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
         String[] txts = new String[params.values().size()];
 
         int i = 0;
