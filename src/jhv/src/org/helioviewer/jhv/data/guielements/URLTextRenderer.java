@@ -11,23 +11,17 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import org.helioviewer.jhv.base.Regex;
 
 public class URLTextRenderer extends DefaultTableCellRenderer implements MouseListener, MouseMotionListener {
 
     private int row = -1;
     private int col = -1;
     private boolean isRollover;
-    private final Pattern pattern;
-
-    public URLTextRenderer() {
-        String patternString = "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
-        pattern = Pattern.compile(patternString);
-    }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -52,8 +46,7 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
             String strValue = (String) value;
             strValue = strValue.trim();
             strValue = strValue.toLowerCase();
-            Matcher matcher = pattern.matcher(strValue);
-            return matcher.matches();
+            return Regex.HTTPpattern.matcher(strValue).matches();
         } else {
             return false;
         }
