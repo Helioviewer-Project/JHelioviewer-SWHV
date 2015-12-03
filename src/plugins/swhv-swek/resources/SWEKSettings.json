@@ -437,7 +437,13 @@
                     "parameter_display_name"    : "Mass",
                     "filter"                    : null,
                     "default_visible"           : false
-                }
+                },{
+		    "source"                    : "HEK",
+                    "parameter_name"            : “cme_angularwidth”,
+                    "parameter_display_name"    : “Angular Width”,
+                    "filter"                    : null,
+                    "default_visible"           : true	
+		}
             ],
             "request_interval_extension"    : 43200000,
             "standard_selected" : true,
