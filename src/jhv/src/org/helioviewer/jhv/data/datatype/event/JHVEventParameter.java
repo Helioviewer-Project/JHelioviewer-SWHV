@@ -128,12 +128,18 @@ public class JHVEventParameter {
     }
 
     private boolean isDouble(String value) {
-        Matcher m = Regex.FloatingPointPattern.matcher(value);
-        return value != null && m.matches();
+        if (value != null) {
+            Matcher m = Regex.FloatingPointPattern.matcher(value);
+            return m.matches();
+        }
+        return false;
     }
 
     private boolean isInteger(String value) {
-        Matcher m = Regex.IntegerPointPattern.matcher(value);
-        return m.matches();
+        if (value != null) {
+            Matcher m = Regex.IntegerPointPattern.matcher(value);
+            return m.matches();
+        }
+        return false;
     }
 }
