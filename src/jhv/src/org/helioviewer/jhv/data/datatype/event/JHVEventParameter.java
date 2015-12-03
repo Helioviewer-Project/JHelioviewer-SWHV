@@ -123,11 +123,11 @@ public class JHVEventParameter {
     }
 
     private boolean isDouble(String value) {
-        return value != null && Regex.FloatingPointPattern.matcher(value).matches();
+        return value != null && Regex.FloatingPoint.matcher(value).matches();
     }
 
     private boolean isInteger(String value) {
-        return value != null && Regex.IntegerPattern.matcher(value).matches();
+        return value != null && Regex.Integer.matcher(value).matches();
     }
 
 }

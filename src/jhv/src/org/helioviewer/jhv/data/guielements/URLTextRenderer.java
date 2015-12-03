@@ -46,7 +46,7 @@ public class URLTextRenderer extends DefaultTableCellRenderer implements MouseLi
             String strValue = (String) value;
             strValue = strValue.trim();
             strValue = strValue.toLowerCase();
-            return Regex.HTTPpattern.matcher(strValue).matches();
+            return Regex.WEB_URL.matcher(strValue).matches();
         } else {
             return false;
         }
