@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -53,7 +54,7 @@ public class GLText {
     private final static int TOP_MARGIN_TEXT = 5;
     private final static int BOTTOM_MARGIN_TEXT = 5;
 
-    public static void drawText(GL2 gl, Viewport vp, String[] txts, int pt_x, int pt_y) {
+    public static void drawText(GL2 gl, Viewport vp, List<String> txts, int pt_x, int pt_y) {
         TextRenderer renderer = GLText.getRenderer((int) (vp.height * vpScale));
         float fontSize = renderer.getFont().getSize2D();
 
