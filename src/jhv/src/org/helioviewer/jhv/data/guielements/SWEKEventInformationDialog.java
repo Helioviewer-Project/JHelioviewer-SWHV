@@ -50,7 +50,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     private DataCollapsiblePanel allParameters;
     private DataCollapsiblePanel precedingEventsPanel;
     private DataCollapsiblePanel followingEventsPanel;
-    private DataCollapsiblePanel otherRelatedEvents;
+    private DataCollapsiblePanel otherRelatedEventsPanel;
 
     private int expandedPanels;
 
@@ -179,7 +179,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
         Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
         if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
-            otherRelatedEvents = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
+            otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
         }
     }
 
@@ -223,8 +223,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
         int gridYPosition = 3;
 
-        Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
-        if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
+        if (precedingEventsPanel != null) {
             gc.gridy = gridYPosition;
             if (precedingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -235,8 +234,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
             gridYPosition++;
         }
 
-        Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
-        if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
+        if (followingEventsPanel != null) {
             gc.gridy = gridYPosition;
             if (followingEventsPanel.isExpanded()) {
                 gc.weighty = 1;
@@ -247,15 +245,14 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
             gridYPosition++;
         }
 
-        Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
-        if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
+        if (otherRelatedEventsPanel != null) {
             gc.gridy = gridYPosition;
-            if (otherRelatedEvents.isExpanded()) {
+            if (otherRelatedEventsPanel.isExpanded()) {
                 gc.weighty = 1;
             } else {
                 gc.weighty = 0;
             }
-            allTablePanel.add(otherRelatedEvents, gc);
+            allTablePanel.add(otherRelatedEventsPanel, gc);
             gridYPosition++;
         }
     }
@@ -352,7 +349,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         if ((precedingEventsPanel != null && precedingEventsPanel.isExpanded())) {
             newExpandedPanels++;
         }
-        if ((otherRelatedEvents != null && otherRelatedEvents.isExpanded())) {
+        if ((otherRelatedEventsPanel != null && otherRelatedEventsPanel.isExpanded())) {
             newExpandedPanels++;
         }
         return newExpandedPanels;
