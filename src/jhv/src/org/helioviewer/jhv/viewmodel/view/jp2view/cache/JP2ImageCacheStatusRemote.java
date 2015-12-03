@@ -1,29 +1,25 @@
-package org.helioviewer.jhv.viewmodel.imagecache;
+package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-public class RemoteImageCacheStatus implements ImageCacheStatus {
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+
+public class JP2ImageCacheStatusRemote implements ImageCacheStatus {
 
     private final int maxFrameNumber;
     // accessed from J2KReader, read also from EDT by MoviePanel, for the latter not very important if values are consistent
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
-    public RemoteImageCacheStatus(int _maxFrameNumber) {
+    public JP2ImageCacheStatusRemote(int _maxFrameNumber) {
         maxFrameNumber = _maxFrameNumber;
         imageStatus = new CacheStatus[maxFrameNumber + 1];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     // not threadsafe
     @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
         imageStatus[compositionLayer] = newStatus;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     // not threadsafe
     @Override
     public void downgradeImageStatus(int compositionLayer) {
@@ -33,18 +29,12 @@ public class RemoteImageCacheStatus implements ImageCacheStatus {
         imageStatus[compositionLayer] = CacheStatus.PARTIAL;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     // not threadsafe
     @Override
     public CacheStatus getImageStatus(int compositionLayer) {
         return imageStatus[compositionLayer];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getImageCachedPartiallyUntil() {
         int i = Math.max(0, imagePartialUntil);

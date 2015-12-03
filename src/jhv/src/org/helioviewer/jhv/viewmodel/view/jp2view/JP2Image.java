@@ -21,12 +21,12 @@ import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.imagecache.LocalImageCacheStatus;
-import org.helioviewer.jhv.viewmodel.imagecache.RemoteImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -234,7 +234,7 @@ public class JP2Image {
 
     protected void startReader(JP2View view) {
         if (cacheReader != null) { // remote
-            imageCacheStatus = new RemoteImageCacheStatus(getMaximumFrameNumber());
+            imageCacheStatus = new JP2ImageCacheStatusRemote(getMaximumFrameNumber());
             try {
                 reader = new J2KReader(view, this);
                 reader.start();
@@ -242,7 +242,7 @@ public class JP2Image {
                 e.printStackTrace();
             }
         } else {
-            imageCacheStatus = new LocalImageCacheStatus(getMaximumFrameNumber());
+            imageCacheStatus = new JP2ImageCacheStatusLocal(getMaximumFrameNumber());
         }
     }
 
