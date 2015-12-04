@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
@@ -33,11 +34,12 @@ public class JP2ImageCallisto extends JP2Image {
     }
 
     private JP2ImageParameter calculateParameter(int frame) {
-        int maxHeight = resolutionSet[frame].getResolutionLevel(0).getResolutionBounds().height;
-        int maxWidth = resolutionSet[frame].getResolutionLevel(0).getResolutionBounds().width;
+        ResolutionSet resolutionSet = getResolutionSet(frame);
+        int maxHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
+        int maxWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
 
-        ResolutionLevel res = resolutionSet[frame].getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
-                                                                          2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
+        ResolutionLevel res = resolutionSet.getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
+                                                                   2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
         Rectangle rect = res.getResolutionBounds();
 
         SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * rect.width), (int) (region.y / (double) maxHeight * rect.height),

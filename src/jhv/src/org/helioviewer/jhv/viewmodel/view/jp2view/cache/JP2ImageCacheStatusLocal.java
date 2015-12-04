@@ -1,31 +1,31 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import kdu_jni.KduException;
+import kdu_jni.Kdu_region_compositor;
 
-public class JP2ImageCacheStatusLocal implements ImageCacheStatus {
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusLocal;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
+
+public class JP2ImageCacheStatusLocal extends ImageCacheStatusLocal implements JP2ImageCacheStatus {
 
     private final int maxFrameNumber;
+    private final ResolutionSet[] resolutionSet;
 
-    public JP2ImageCacheStatusLocal(int _maxFrameNumber) {
+    public JP2ImageCacheStatusLocal(Kdu_region_compositor compositor, int _maxFrameNumber) throws KduException {
+        super(_maxFrameNumber);
         maxFrameNumber = _maxFrameNumber;
+
+        resolutionSet = new ResolutionSet[maxFrameNumber + 1];
+        for (int i = 0; i <= maxFrameNumber; ++i) {
+            resolutionSet[i] = KakaduHelper.getResolutionSet(compositor, i);
+        }
     }
 
     @Override
-    public CacheStatus getImageStatus(int compositionLayer) {
-        return CacheStatus.COMPLETE;
-    }
-
-    @Override
-    public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
-    }
-
-    @Override
-    public void downgradeImageStatus(int compositionLayer) {
-    }
-
-    @Override
-    public int getImageCachedPartiallyUntil() {
-        return maxFrameNumber;
+    public ResolutionSet getResolutionSet(int compositionLayer) {
+        return resolutionSet[compositionLayer];
     }
 
 }

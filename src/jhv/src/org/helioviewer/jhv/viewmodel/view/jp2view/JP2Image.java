@@ -25,6 +25,7 @@ import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.view.ViewROI;
+import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemote;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
@@ -67,9 +68,6 @@ public class JP2Image {
 
     private int[] builtinLUT = null;
 
-    /** An object with all the resolution layer information. */
-    ResolutionSet[] resolutionSet;
-
     private JPIPSocket socket;
 
     /**
@@ -79,7 +77,7 @@ public class JP2Image {
      */
     private int numComponents;
 
-    private ImageCacheStatus imageCacheStatus;
+    private JP2ImageCacheStatus imageCacheStatus;
 
     // Reader
     public enum ReaderMode {
@@ -144,14 +142,14 @@ public class JP2Image {
 
             numComponents = KakaduHelper.getNumComponents(kdu.getCompositor(), 0);
 
-            resolutionSet = new ResolutionSet[frameCount];
-            ResolutionSet set = KakaduHelper.getResolutionSet(kdu.getCompositor(), 0);
-            for (int i = 0; i < frameCount; ++i) {
-                resolutionSet[i] = set;
-            }
-
             metaDataList = new MetaData[frameCount];
             KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
+
+            if (cacheReader != null) { // remote
+                imageCacheStatus = new JP2ImageCacheStatusRemote(kdu.getCompositor(), getMaximumFrameNumber());
+            } else {
+                imageCacheStatus = new JP2ImageCacheStatusLocal(kdu.getCompositor(), getMaximumFrameNumber());
+            }
 
             kdu.destroy();
         } catch (KduException ex) {
@@ -233,17 +231,13 @@ public class JP2Image {
     }
 
     protected void startReader(JP2View view) {
-        if (cacheReader != null) { // remote
-            imageCacheStatus = new JP2ImageCacheStatusRemote(getMaximumFrameNumber());
+        if (cacheReader != null) // remote
             try {
                 reader = new J2KReader(view, this);
                 reader.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            imageCacheStatus = new JP2ImageCacheStatusLocal(getMaximumFrameNumber());
-        }
     }
 
     protected void signalReader(JP2ImageParameter params) {
@@ -263,7 +257,7 @@ public class JP2Image {
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio);
 
-        ResolutionLevel res = resolutionSet[frame].getNextResolutionLevel(totalHeight, totalHeight);
+        ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
         int viewportImageWidth = res.getResolutionBounds().width;
         int viewportImageHeight = res.getResolutionBounds().height;
 
@@ -400,7 +394,7 @@ public class JP2Image {
      * information.
      */
     public ResolutionSet getResolutionSet(int frame) {
-        return resolutionSet[frame];
+        return imageCacheStatus.getResolutionSet(frame);
     }
 
     private volatile boolean isAbolished = false;
