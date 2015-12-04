@@ -80,7 +80,7 @@ public class ChartConstants {
         return RANGE_SELECTION_WIDTH;
     }
 
-    public static Font font = UIGlobals.UIFontSmall;
+    public static final Font font = UIGlobals.UIFontSmall;
 
     public static final String absentText = "No band / diode / line selected";
 
