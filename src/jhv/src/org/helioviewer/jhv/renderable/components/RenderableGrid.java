@@ -59,6 +59,8 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
+        Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
+
         Mat4 cameraMatrix;
         switch (gridChoice) {
         case VIEWPOINT:
@@ -68,7 +70,6 @@ public class RenderableGrid extends AbstractRenderable {
             cameraMatrix = Mat4.identity();
             break;
         case STONYHURST:
-            Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
             Quat orientation = new Quat(0, p.lon);
             cameraMatrix = orientation.toMatrix();
             break;
@@ -94,7 +95,7 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl);
+        drawEarthCircles(gl, p);
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
@@ -115,9 +116,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private void drawEarthCircles(GL2 gl) {
-        Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
-
+    private void drawEarthCircles(GL2 gl, Position.Latitudinal p) {
         GLHelper.lineWidth(gl, 0.25);
         gl.glColor3f(1, 1, 0);
 
@@ -297,21 +296,23 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void makeRadialLabels() {
         double size = Sun.Radius;
+        double horizontalAdjustment = textScale / 2.;
+        double verticalAdjustment = textScale / 3.;
 
         radialLabels.clear();
 
         for (double phi = 0; phi < 360; phi += STEP_DEGREES) {
-            double angle = phi * Math.PI / 180.;
+            double angle = -phi * Math.PI / 180.;
             String txt = formatStrip(phi);
-            radialLabels.add(new GridLabel(txt, (float) (Math.sin(-angle) * size), (float) (Math.cos(-angle) * size), 0));
+            radialLabels.add(new GridLabel(txt, (float) (Math.sin(angle) * size - horizontalAdjustment), (float) (Math.cos(angle) * size - verticalAdjustment), 0));
         }
     }
 
     private void makeLatLabels() {
         double size = Sun.Radius * 1.1;
         // adjust for font size in horizontal and vertical direction (centering the text approximately)
-        float horizontalAdjustment = textScale / 2f;
-        float verticalAdjustment = textScale / 3f;
+        double horizontalAdjustment = textScale / 2.;
+        double verticalAdjustment = textScale / 3.;
 
         latLabels.clear();
 
