@@ -1,17 +1,30 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import kdu_jni.KduException;
+import kdu_jni.Kdu_region_compositor;
 
-public class JP2ImageCacheStatusRemote implements ImageCacheStatus {
+import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
+
+public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     private final int maxFrameNumber;
+    private final ResolutionSet[] resolutionSet;
+
     // accessed from J2KReader, read also from EDT by MoviePanel, for the latter not very important if values are consistent
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
-    public JP2ImageCacheStatusRemote(int _maxFrameNumber) {
+    public JP2ImageCacheStatusRemote(Kdu_region_compositor compositor, int _maxFrameNumber) throws KduException {
         maxFrameNumber = _maxFrameNumber;
         imageStatus = new CacheStatus[maxFrameNumber + 1];
+
+        resolutionSet = new ResolutionSet[maxFrameNumber + 1];
+        resolutionSet[0] = KakaduHelper.getResolutionSet(compositor, 0);
+        for (int i = 1; i <= maxFrameNumber; ++i) {
+            resolutionSet[i] = resolutionSet[0];
+        }
     }
 
     // not threadsafe
@@ -46,6 +59,11 @@ public class JP2ImageCacheStatusRemote implements ImageCacheStatus {
         imagePartialUntil = i - 1;
 
         return imagePartialUntil;
+    }
+
+    @Override
+    public ResolutionSet getResolutionSet(int compositionLayer) {
+        return resolutionSet[compositionLayer];
     }
 
 }
