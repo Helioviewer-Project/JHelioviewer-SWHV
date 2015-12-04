@@ -150,9 +150,7 @@ public class Layers {
         camera.timeChanged(lastTimestamp);
         Viewpoint v = camera.getViewpoint().copy();
         for (View view : layers) {
-            if (view == activeView || view.getImageLayer().isVisible()) {
-                view.setFrame(view.getFrame(dateTime), v);
-            }
+            view.setFrame(view.getFrame(dateTime), v);
         }
         Displayer.render(1);
 
