@@ -43,7 +43,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  */
 public class ResourceLoader {
-    public static ResourceLoader instance = new ResourceLoader();
+
+    public static final ResourceLoader instance = new ResourceLoader();
 
     private ResourceLoader() {
     }
