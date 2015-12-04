@@ -77,20 +77,27 @@ public class RenderableGrid extends AbstractRenderable {
             break;
         }
 
-        GLHelper.lineWidth(gl, 0.25);
+        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
+        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
 
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
-            int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+            drawGrid(gl);
+            drawRadialGrid(gl);
             if (showLabels) {
                 // cameraWidth changes ever so slightly with distance to Sun
-                drawText(gl, pixelsPerSolarRadius);
+                int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+                drawGridText(gl, pixelsPerSolarRadius);
+                drawRadialGridText(gl, pixelsPerSolarRadius);
             }
-            drawCircles(gl, pixelsPerSolarRadius);
         }
         gl.glPopMatrix();
         drawEarthCircles(gl);
+
+        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
     }
 
     private void drawAxes(GL2 gl) {
@@ -109,44 +116,36 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawEarthCircles(GL2 gl) {
-        gl.glColor3f(1, 1, 0);
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
-        {
-            Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
-            {
-                gl.glPushMatrix();
-                Quat longitudeRotation = new Quat(0, p.lon + Math.PI / 2);
-                longitudeRotation.conjugate();
-                gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                gl.glPopMatrix();
+        Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
 
-                gl.glPushMatrix();
-                Quat latitudeRotation = new Quat(p.lat + Math.PI / 2, p.lon);
-                latitudeRotation.conjugate();
-                gl.glMultMatrixd(latitudeRotation.toMatrix().m, 0);
-                gl.glRotatef((float) (-p.lat), 0, 0, 1);
-                gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-                gl.glPopMatrix();
-            }
-        }
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        GLHelper.lineWidth(gl, 0.25);
+        gl.glColor3f(1, 1, 0);
+
+        gl.glPushMatrix();
+        Quat longitudeRotation = new Quat(0, p.lon + Math.PI / 2);
+        longitudeRotation.conjugate();
+        gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
+        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+        gl.glPopMatrix();
+
+        gl.glPushMatrix();
+        Quat latitudeRotation = new Quat(p.lat + Math.PI / 2, p.lon);
+        latitudeRotation.conjugate();
+        gl.glMultMatrixd(latitudeRotation.toMatrix().m, 0);
+        gl.glRotatef((float) (-p.lat), 0, 0, 1);
+        gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
+        gl.glPopMatrix();
     }
 
     private static final float END_RADIUS = 30;
     private static final float START_RADIUS = 2;
-    private static final float[] R_LABEL_POS = { 2, 7, 12, 22 };
+    private static final float[] R_LABEL_POS = { 2, 8, 24 };
+    private static final float STEP_DEGREES = 15;
 
-    private static float STEP_DEGREES = 15;
-
-    private void drawRadialGrid(GL2 gl, int size) {
-
-        gl.glColor3f(1, 1, 1);
+    private void drawRadialGrid(GL2 gl) {
         gl.glPushMatrix();
         {
+            gl.glColor3f(1, 1, 1);
             gl.glRotatef(90, 0, 0, 1);
             {
                 gl.glPushMatrix();
@@ -166,7 +165,6 @@ public class RenderableGrid extends AbstractRenderable {
             GLHelper.lineWidth(gl, 0.25);
             {
                 gl.glPushMatrix();
-
                 for (float i = 0; i < 360; i += STEP_DEGREES) {
                     gl.glBegin(GL2.GL_LINES);
                     gl.glVertex3f(START_RADIUS, 0, 0);
@@ -178,37 +176,34 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        if (this.showLabels) {
-            drawRadialGridText(gl, size);
-        }
-
     }
 
     private void drawRadialGridText(GL2 gl, int size) {
         gl.glDisable(GL2.GL_CULL_FACE);
+
+        float fuzz = 0.75f;
         for (float rsize : R_LABEL_POS) {
-            TextRenderer renderer = GLText.getRenderer((int) (rsize * size));
+            TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             float textScaleFactor = textScale / renderer.getFont().getSize2D();
             renderer.begin3DRendering();
             for (int i = 0; i < radialLabels.size(); ++i) {
                 GridLabel label = radialLabels.get(i);
-                renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, 0, rsize * textScaleFactor);
+                renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, 0, fuzz * rsize * textScaleFactor);
             }
             renderer.end3DRendering();
         }
-        gl.glEnable(GL2.GL_CULL_FACE);
 
+        gl.glEnable(GL2.GL_CULL_FACE);
     }
 
-    private void drawCircles(GL2 gl, int size) {
-        gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
-        gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+    private void drawGrid(GL2 gl) {
+        gl.glPushMatrix();
         {
-            drawRadialGrid(gl, size);
+            GLHelper.lineWidth(gl, 0.25);
             gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
             gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);
+
             gl.glRotatef(90, 0, 1, 0);
 
             gl.glPushMatrix();
@@ -269,11 +264,9 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
             }
             gl.glPopMatrix();
-
             gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
         }
-        gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        gl.glPopMatrix();
     }
 
     private static String formatStrip(double v) {
@@ -304,6 +297,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private void makeRadialLabels() {
         double size = Sun.Radius;
+
         radialLabels.clear();
 
         for (double phi = 0; phi < 360; phi += STEP_DEGREES) {
@@ -358,7 +352,7 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private void drawText(GL2 gl, int size) {
+    private void drawGridText(GL2 gl, int size) {
         TextRenderer renderer = GLText.getRenderer(size);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D();
