@@ -19,7 +19,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.helioviewer.jhv.display.Displayer;
-
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
@@ -28,7 +27,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
 
     enum GridChoiceType {
-        OBSERVER("Observer grid"), HCI("HCI grid");
+        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), HCI("HCI grid");
 
         private final String display;
 
@@ -117,11 +116,11 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         c0.gridy = 2;
         c0.gridx = 0;
         c0.anchor = GridBagConstraints.EAST;
-        //add(new JLabel("Grid type", JLabel.RIGHT), c0);
+        add(new JLabel("Grid type", JLabel.RIGHT), c0);
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.WEST;
         createGridChoiceBox(renderableGrid);
-        //add(gridChoiceBox, c0);
+        add(gridChoiceBox, c0);
 
         setSmall();
     }
@@ -130,21 +129,12 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         gridChoiceBox = new JComboBox();
         gridChoiceBox.setModel(new DefaultComboBoxModel(GridChoiceType.values()));
         gridChoiceBox.setToolTipText("Choose grid options");
-        gridChoiceBox.setSelectedItem(GridChoiceType.OBSERVER);
+        gridChoiceBox.setSelectedItem(GridChoiceType.VIEWPOINT);
         gridChoiceBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 GridChoiceType t = (GridChoiceType) gridChoiceBox.getSelectedItem();
-                switch (t) {
-                case OBSERVER:
-                    grid.setCoordinates(t);
-                    break;
-                case HCI:
-                    grid.setCoordinates(t);
-                    break;
-                default:
-                    break;
-                }
+                grid.setCoordinates(t);
                 Displayer.display();
             }
         });
