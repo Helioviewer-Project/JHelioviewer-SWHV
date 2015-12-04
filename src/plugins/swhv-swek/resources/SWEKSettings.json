@@ -24,7 +24,7 @@
                     "parameter_name"            : "OBS_MeanWavel",
                     "parameter_display_name"    : "Mean Wavelength",
                     "filter"                    : null,
-                    "default_visible"           : false
+                    "default_visible"           : true
                 },
                 {
                     "source"                    : "HEK",
@@ -451,10 +451,18 @@
                     "parameter_display_name"    : "Mass",
                     "filter"                    : null,
                     "default_visible"           : false
-                },{
+                },
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "CME_AngularWidth",
                     "parameter_display_name"    : "Angular Width",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "Event_Coord1",
+                    "parameter_display_name"    : "Principal Angle",
                     "filter"                    : null,
                     "default_visible"           : true
                 }
