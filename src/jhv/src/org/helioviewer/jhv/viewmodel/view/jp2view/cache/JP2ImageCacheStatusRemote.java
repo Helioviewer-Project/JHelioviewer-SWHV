@@ -11,25 +11,31 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     private final int maxFrameNumber;
     private final ResolutionSet[] resolutionSet;
+    private final Kdu_region_compositor compositor;
 
     // accessed from J2KReader, read also from EDT by MoviePanel, for the latter not very important if values are consistent
     private final CacheStatus[] imageStatus;
     private int imagePartialUntil = -1;
 
-    public JP2ImageCacheStatusRemote(Kdu_region_compositor compositor, int _maxFrameNumber) throws KduException {
+    public JP2ImageCacheStatusRemote(Kdu_region_compositor _compositor, int _maxFrameNumber) throws KduException {
         maxFrameNumber = _maxFrameNumber;
         imageStatus = new CacheStatus[maxFrameNumber + 1];
 
+        compositor = _compositor;
         resolutionSet = new ResolutionSet[maxFrameNumber + 1];
         resolutionSet[0] = KakaduHelper.getResolutionSet(compositor, 0);
-        for (int i = 1; i <= maxFrameNumber; ++i) {
-            resolutionSet[i] = resolutionSet[0];
-        }
     }
 
     // not threadsafe
     @Override
     public void setImageStatus(int compositionLayer, CacheStatus newStatus) {
+        if (resolutionSet[compositionLayer] == null && newStatus == CacheStatus.PARTIAL) {
+            try {
+                resolutionSet[compositionLayer] = KakaduHelper.getResolutionSet(compositor, compositionLayer);
+            } catch (KduException e) {
+                e.printStackTrace();
+            }
+        }
         imageStatus[compositionLayer] = newStatus;
     }
 
@@ -63,6 +69,8 @@ public class JP2ImageCacheStatusRemote implements JP2ImageCacheStatus {
 
     @Override
     public ResolutionSet getResolutionSet(int compositionLayer) {
+        if (resolutionSet[compositionLayer] == null) // temporary
+            return resolutionSet[0];
         return resolutionSet[compositionLayer];
     }
 

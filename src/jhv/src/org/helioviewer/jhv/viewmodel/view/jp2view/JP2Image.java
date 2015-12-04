@@ -63,10 +63,11 @@ public class JP2Image {
     private JHV_Kdu_cache cacheReader;
     private Kdu_cache cacheRender;
 
-    /** The number of composition layers for the image. */
-    private int frameCount;
+    private KakaduEngine kduReader;
 
-    private int[] builtinLUT = null;
+    /** The number of composition layers for the image. */
+    private final int frameCount;
+    private final int[] builtinLUT;
 
     private JPIPSocket socket;
 
@@ -75,9 +76,9 @@ public class JP2Image {
      * channels). Currently only value of 1 and 3 are supported (corresponding
      * to grayscale and RGB images).
      */
-    private int numComponents;
+    private final int numComponents;
 
-    private JP2ImageCacheStatus imageCacheStatus;
+    private final JP2ImageCacheStatus imageCacheStatus;
 
     // Reader
     public enum ReaderMode {
@@ -87,7 +88,7 @@ public class JP2Image {
     private J2KReader reader;
     private ReaderMode readerMode = ReaderMode.ALWAYSFIREONNEWDATA;
 
-    MetaData[] metaDataList;
+    final MetaData[] metaDataList;
 
     /**
      * Constructor
@@ -131,27 +132,25 @@ public class JP2Image {
             } else
                 throw new JHV_KduException(scheme + " scheme not supported!");
 
-            KakaduEngine kdu = new KakaduEngine(cacheReader, uri, null);
+            kduReader = new KakaduEngine(cacheReader, uri, null);
 
             // Retrieve the number of composition layers
             int[] tempVar = new int[1];
-            kdu.getJpxSource().Count_compositing_layers(tempVar);
+            kduReader.getJpxSource().Count_compositing_layers(tempVar);
             frameCount = tempVar[0];
 
-            builtinLUT = KakaduHelper.getLUT(kdu.getJpxSource());
+            builtinLUT = KakaduHelper.getLUT(kduReader.getJpxSource());
 
-            numComponents = KakaduHelper.getNumComponents(kdu.getCompositor(), 0);
+            numComponents = KakaduHelper.getNumComponents(kduReader.getCompositor(), 0);
 
             metaDataList = new MetaData[frameCount];
-            KakaduUtils.cacheMetaData(kdu.getFamilySrc(), metaDataList);
+            KakaduUtils.cacheMetaData(kduReader.getFamilySrc(), metaDataList);
 
             if (cacheReader != null) { // remote
-                imageCacheStatus = new JP2ImageCacheStatusRemote(kdu.getCompositor(), getMaximumFrameNumber());
+                imageCacheStatus = new JP2ImageCacheStatusRemote(kduReader.getCompositor(), getMaximumFrameNumber());
             } else {
-                imageCacheStatus = new JP2ImageCacheStatusLocal(kdu.getCompositor(), getMaximumFrameNumber());
+                imageCacheStatus = new JP2ImageCacheStatusLocal(kduReader.getCompositor(), getMaximumFrameNumber());
             }
-
-            kdu.destroy();
         } catch (KduException ex) {
             ex.printStackTrace();
             throw new JHV_KduException("Failed to create Kakadu machinery: " + ex.getMessage(), ex);
@@ -430,6 +429,10 @@ public class JP2Image {
         try {
             destroyEngine();
 
+            if (kduReader != null) {
+                kduReader.destroy();
+                kduReader = null;
+            }
             if (cacheRender != null) {
                 cacheRender.Close();
                 cacheRender.Native_destroy();
