@@ -15,9 +15,9 @@ public abstract class Viewpoint {
     abstract CameraOptionPanel getOptionPanel();
 
     Viewpoint() {
-        time = TimeUtils.epoch;
-        orientation = Quat.ZERO;
-        distance = Sun.MeanEarthDistance;
+        time = TimeUtils.Epoch;
+        orientation = Sun.EpochEarth.q.copy();
+        distance = Sun.EpochEarth.rad;
     }
 
     public final Viewpoint copy() {

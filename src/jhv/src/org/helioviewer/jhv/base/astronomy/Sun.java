@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.base.astronomy;
 
 import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JulianDay;
+import org.helioviewer.jhv.base.time.TimeUtils;
 
 public class Sun {
 
@@ -17,6 +19,13 @@ public class Sun {
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
 
+    public static final Position.Quaternional EpochEarth;
+
+    static {
+        prevEarth = new Position.Latitudinal(0, 0, 0, 0);
+        EpochEarth = getEarthQuat(TimeUtils.Epoch.milli);
+    }
+
     private static double milli2mjd(long milli) {
         return JulianDay.UNIX_EPOCH_MJD + milli / (86400 * 1000.);
     }
@@ -25,7 +34,7 @@ public class Sun {
         return (JulianDay.DJM0 - epoch + mjd) / 36525.;
     }
 
-    private static Position.Latitudinal prevEarth = new Position.Latitudinal(0, 0, 0, 0);
+    private static Position.Latitudinal prevEarth;
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
     public static Position.Latitudinal getEarth(long milli) {
@@ -77,6 +86,11 @@ public class Sun {
         return Earth;
     }
 
+    public static Position.Quaternional getEarthQuat(long milli) {
+        Position.Latitudinal p = getEarth(milli);
+        return new Position.Quaternional(milli, p.rad, new Quat(p.lat, p.lon));
+    }
+
     // better precison, to be recovered later
     private static double getL0Degree(long milli) {
         double mjd = milli2mjd(milli);
@@ -126,6 +140,15 @@ public class Sun {
         sin2l = sin2l * sin2l;
         double sin4l = sin2l * sin2l;
         return 1.0e-6 * deltaTsec * (2.894 - 0.428 * sin2l - 0.37 * sin4l);
+    }
+
+    private static final Sun instance = new Sun();
+
+    public static Sun getSingletonInstance() {
+        return instance;
+    }
+
+    private Sun() {
     }
 
 }

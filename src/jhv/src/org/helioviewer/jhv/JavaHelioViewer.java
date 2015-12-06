@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.base.FileUtils;
+import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
 import org.helioviewer.jhv.base.message.Message;
@@ -107,6 +108,8 @@ public class JavaHelioViewer {
                 JHVExecutor.setSwingWorkersExecutorService(10);
 
                 TimeUtils.getSingletonInstance(); // instantiate class
+                Sun.getSingletonInstance();
+
                 Settings.getSingletonInstance().setLookAndFeelEverywhere(null, null); // for Windows and testing
                 UIGlobals.getSingletonInstance().setUIFont(UIGlobals.UIFont);
 

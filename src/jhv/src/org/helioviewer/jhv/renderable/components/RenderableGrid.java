@@ -67,7 +67,7 @@ public class RenderableGrid extends AbstractRenderable {
             cameraMatrix = camera.getViewpoint().orientation.toMatrix();
             break;
         case HCI:
-            cameraMatrix = Mat4.identity();
+            cameraMatrix = Sun.EpochEarth.q.toMatrix();
             break;
         case STONYHURST:
             Quat orientation = new Quat(0, p.lon);
