@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -15,8 +16,9 @@ class ViewpointObserver extends Viewpoint {
 
         View view = Layers.getActiveView();
         if (view == null) {
-            orientation = Quat.ZERO;
-            distance = Sun.MeanEarthDistance;
+            Position.Quaternional p = Sun.getEarthQuat(time.milli);
+            orientation = p.q;
+            distance = p.rad;
         } else {
             MetaData m = view.getMetaData(time);
             orientation = m.getRotationObs();

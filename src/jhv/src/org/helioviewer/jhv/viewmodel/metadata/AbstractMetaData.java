@@ -14,9 +14,9 @@ public abstract class AbstractMetaData implements MetaData {
     protected int pixelWidth;
     protected int pixelHeight;
 
-    protected JHVDate dateObs = TimeUtils.epoch;
-    protected Quat rotationObs = Quat.ZERO;
-    protected double distanceObs = Sun.MeanEarthDistance;
+    protected JHVDate dateObs = TimeUtils.Epoch;
+    protected Quat rotationObs = Sun.EpochEarth.q.copy();
+    protected double distanceObs = Sun.EpochEarth.rad;
     protected double innerRadius = 0;
     protected double outerRadius = Double.MAX_VALUE;
 

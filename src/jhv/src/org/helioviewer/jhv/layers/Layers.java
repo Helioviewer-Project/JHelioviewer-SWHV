@@ -137,7 +137,7 @@ public class Layers {
         }
     }
 
-    private static JHVDate lastTimestamp = TimeUtils.epoch;
+    private static JHVDate lastTimestamp = TimeUtils.Epoch;
 
     public static JHVDate getLastUpdatedTimestamp() {
         return lastTimestamp;
