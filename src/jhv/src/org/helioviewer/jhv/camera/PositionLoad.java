@@ -39,8 +39,8 @@ public class PositionLoad {
     private Date endDatems = new Date();
 
     private boolean isLoaded = false;
-    private Position.Latitudinal[] position;
-    private JHVWorker<Position.Latitudinal[], Void> worker;
+    private Position.L[] position;
+    private JHVWorker<Position.L[], Void> worker;
 
     private final ViewpointExpert viewpoint;
 
@@ -48,7 +48,7 @@ public class PositionLoad {
         viewpoint = _viewpoint;
     }
 
-    private class LoadPositionWorker extends JHVWorker<Position.Latitudinal[], Void> {
+    private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
 
         private String report = null;
         private final String beginDate;
@@ -66,8 +66,8 @@ public class PositionLoad {
         }
 
         @Override
-        protected Position.Latitudinal[] backgroundWork() throws Exception {
-            Position.Latitudinal[] ret = null;
+        protected Position.L[] backgroundWork() throws Exception {
+            Position.L[] ret = null;
             JSONObject result;
             try {
                 long deltat = 60, span = (endDatems.getTime() - beginDatems.getTime()) / 1000;
@@ -112,10 +112,10 @@ public class PositionLoad {
             return ret;
         }
 
-        private Position.Latitudinal[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
+        private Position.L[] parseData(JSONObject jsonResult) throws JSONException, ParseException {
             JSONArray resArray = jsonResult.getJSONArray("result");
             int resLength = resArray.length();
-            Position.Latitudinal[] ret = new Position.Latitudinal[resLength];
+            Position.L[] ret = new Position.L[resLength];
 
             for (int j = 0; j < resLength; j++) {
                 JSONObject posObject = resArray.getJSONObject(j);
@@ -133,7 +133,7 @@ public class PositionLoad {
                 lat = -posArray.getDouble(2);
 
                 Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                ret[j] = new Position.Latitudinal(date.getTime(), rad, lon, lat);
+                ret[j] = new Position.L(date.getTime(), rad, lon, lat);
             }
             return ret;
         }
@@ -141,7 +141,7 @@ public class PositionLoad {
         @Override
         protected void done() {
             if (!isCancelled()) {
-                Position.Latitudinal[] newPosition = null;
+                Position.L[] newPosition = null;
                 try {
                     newPosition = get();
                 } catch (Exception e) {
@@ -236,7 +236,7 @@ public class PositionLoad {
         return -1L;
     }
 
-    public Position.Latitudinal getInterpolatedPosition(long currentCameraTime) {
+    public Position.L getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
             long milli;
@@ -271,7 +271,7 @@ public class PositionLoad {
                 hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
                 hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
-            return new Position.Latitudinal(milli, dist, hgln, hglt);
+            return new Position.L(milli, dist, hgln, hglt);
         } else {
             return null;
         }

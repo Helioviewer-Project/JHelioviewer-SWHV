@@ -16,7 +16,7 @@ class ViewpointObserver extends Viewpoint {
 
         View view = Layers.getActiveView();
         if (view == null) {
-            Position.Quaternional p = Sun.getEarthQuat(time.milli);
+            Position.Q p = Sun.getEarthQuat(time.milli);
             orientation = p.q;
             distance = p.rad;
         } else {

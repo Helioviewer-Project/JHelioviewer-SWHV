@@ -42,7 +42,7 @@ class ViewpointExpert extends Viewpoint {
                 currentCameraTime = tPositionEnd;
             }
 
-            Position.Latitudinal p = positionLoad.getInterpolatedPosition(currentCameraTime);
+            Position.L p = positionLoad.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
                 date = new JHVDate(p.milli);
                 currentDistance = p.rad;
@@ -50,7 +50,7 @@ class ViewpointExpert extends Viewpoint {
                 currentB = p.lat;
             }
         } else {
-            Position.Latitudinal p = Sun.getEarth(date.milli);
+            Position.L p = Sun.getEarth(date.milli);
             currentDistance = p.rad;
             currentL = 0;
             currentB = p.lat;
@@ -68,7 +68,7 @@ class ViewpointExpert extends Viewpoint {
     void update(JHVDate date) {
         time = interpolate(date);
 
-        Position.Latitudinal p = Sun.getEarth(time.milli);
+        Position.L p = Sun.getEarth(time.milli);
         orientation = new Quat(currentB, -currentL + p.lon);
         distance = currentDistance;
     }
