@@ -31,7 +31,7 @@ public class RenderableCamera extends AbstractRenderable {
     private String timeString = null;
 
     public RenderableCamera() {
-        optionsPanel = new CameraOptionsPanel(Displayer.getCamera());
+        optionsPanel = new CameraOptionsPanel();
     }
 
     @Override

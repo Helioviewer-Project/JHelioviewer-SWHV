@@ -8,15 +8,14 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 class UpdateViewpointExpert extends UpdateViewpoint {
 
-    private final Camera camera;
-    private final PositionLoad positionLoad = new PositionLoad(this);
-    private final CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
+    private final PositionLoad positionLoad;
 
-    UpdateViewpointExpert(Camera _camera) {
-        camera = _camera;
+    UpdateViewpointExpert(PositionLoad _positionLoad) {
+        positionLoad = _positionLoad;
     }
 
-    private Position.Q interpolate(JHVDate time) {
+    @Override
+    Position.Q update(JHVDate time) {
         if (positionLoad.isLoaded()) {
             long currentCameraTime;
             long tLayerStart = 0, tLayerEnd = 0;
@@ -36,26 +35,9 @@ class UpdateViewpointExpert extends UpdateViewpoint {
             } else {
                 currentCameraTime = tPositionEnd;
             }
-
             return positionLoad.getInterpolatedPosition(currentCameraTime);
         }
-
         return Sun.getEarthQuat(time);
-    }
-
-    void firePositionLoaded(String state) {
-        expertOptionPanel.fireLoaded(state);
-        camera.refresh();
-    }
-
-    @Override
-    Position.Q update(JHVDate date) {
-        return interpolate(date);
-    }
-
-    @Override
-    CameraOptionPanel getOptionPanel() {
-        return expertOptionPanel;
     }
 
 }

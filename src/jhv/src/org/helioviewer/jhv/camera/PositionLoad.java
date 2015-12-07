@@ -44,10 +44,10 @@ public class PositionLoad {
     private Position.L[] position;
     private JHVWorker<Position.L[], Void> worker;
 
-    private final UpdateViewpointExpert updateViewpoint;
+    private final PositionLoadFire receiver;
 
-    public PositionLoad(UpdateViewpointExpert _updateViewpoint) {
-        updateViewpoint = _updateViewpoint;
+    public PositionLoad(PositionLoadFire _receiver) {
+        receiver = _receiver;
     }
 
     private class LoadPositionWorker extends JHVWorker<Position.L[], Void> {
@@ -215,7 +215,7 @@ public class PositionLoad {
     }
 
     public void fireLoaded(String state) {
-        updateViewpoint.firePositionLoaded(state);
+        receiver.firePositionLoaded(state);
     }
 
     public Date getBeginDate() {

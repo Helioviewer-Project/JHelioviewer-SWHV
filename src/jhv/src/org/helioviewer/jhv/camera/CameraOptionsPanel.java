@@ -29,7 +29,7 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 @SuppressWarnings("serial")
-public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
+public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements PositionLoadFire {
 
     private static enum CameraMode {
         OBSERVER, EARTH, EXPERT
@@ -38,6 +38,8 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
     private static final double FOVAngleDefault = 0.8;
     private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
 
+    private final PositionLoad positionLoad;
+    private final CameraOptionPanelExpert expertOptionPanel;
     private CameraOptionPanel currentOptionPanel;
 
     private static final String explanation = "Observer: view from observer.\nCamera time defined by timestamps of the master layer.\n\n" +
@@ -45,7 +47,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
                                               "Other: view from selected object.\nCamera time defined by timestamps of the master layer, unless " +
                                               "\"Use master layer timestamps\" is off. In that case, camera time is interpolated in the configured time interval.";
 
-    public CameraOptionsPanel(final Camera camera) {
+    public CameraOptionsPanel() {
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
@@ -61,7 +63,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton observerItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, CameraMode.OBSERVER);
+                changeCamera(CameraMode.OBSERVER);
             }
         });
         observerItem.setText("Observer View");
@@ -71,7 +73,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton earthItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, CameraMode.EARTH);
+                changeCamera(CameraMode.EARTH);
             }
         });
         earthItem.setText("Earth View");
@@ -80,7 +82,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton expertItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, CameraMode.EXPERT);
+                changeCamera(CameraMode.EXPERT);
             }
         });
         expertItem.setText("Other View");
@@ -146,6 +148,9 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         add(fovPanel, c);
 
         setSmall();
+
+        positionLoad = new PositionLoad(this);
+        expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
     }
 
     public double getFOVAngle() {
@@ -178,12 +183,14 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         revalidate();
     }
 
-    private void changeCamera(Camera camera, CameraMode mode) {
+    private void changeCamera(CameraMode mode) {
         UpdateViewpoint update;
+        CameraOptionPanel panel = null;
 
         switch (mode) {
             case EXPERT:
-                update = new UpdateViewpointExpert(camera);
+                update = new UpdateViewpointExpert(positionLoad);
+                panel = expertOptionPanel;
             break;
             case EARTH:
                 update = new UpdateViewpointEarth();
@@ -191,8 +198,14 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
             default:
                 update = new UpdateViewpointObserver();
         }
-        camera.setUpdate(update);
-        switchOptionsPanel(update.getOptionPanel());
+        Displayer.getCamera().setUpdate(update);
+        switchOptionsPanel(panel);
+    }
+
+    @Override
+    public void firePositionLoaded(String state) {
+        expertOptionPanel.fireLoaded(state);
+        Displayer.getCamera().refresh();
     }
 
 }
