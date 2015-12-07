@@ -59,9 +59,11 @@ public class Layers {
     }
 
     public static void setActiveView(View view) {
-        activeView = view;
-        setMasterMovie(view);
-        fireActiveLayerChanged(view);
+        if (view != activeView) {
+            activeView = view;
+            setMasterMovie(view);
+            fireActiveLayerChanged(view);
+        }
     }
 
     private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
