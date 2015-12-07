@@ -847,7 +847,7 @@ public class HEKParser implements SWEKParser {
     public Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
         double theta = el.y / MathUtils.radeg;
 
-        Position.Latitudinal p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
+        Position.L p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
         double phi = el.x / MathUtils.radeg - p.lon;
 
         double x = Math.cos(theta) * Math.sin(phi);

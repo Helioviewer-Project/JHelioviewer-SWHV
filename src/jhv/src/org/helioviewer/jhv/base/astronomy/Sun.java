@@ -19,10 +19,10 @@ public class Sun {
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
 
-    public static final Position.Quaternional EpochEarth;
+    public static final Position.Q EpochEarth;
 
     static {
-        prevEarth = new Position.Latitudinal(0, 0, 0, 0);
+        prevEarth = new Position.L(0, 0, 0, 0);
         EpochEarth = getEarthQuat(TimeUtils.Epoch.milli);
     }
 
@@ -34,10 +34,10 @@ public class Sun {
         return (JulianDay.DJM0 - epoch + mjd) / 36525.;
     }
 
-    private static Position.Latitudinal prevEarth;
+    private static Position.L prevEarth;
 
     // derived from http://hesperia.gsfc.nasa.gov/ssw/gen/idl/solar/get_sun.pro
-    public static Position.Latitudinal getEarth(long milli) {
+    public static Position.L getEarth(long milli) {
         if (milli == prevEarth.milli) {
             return prevEarth;
         }
@@ -80,15 +80,15 @@ public class Sun {
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
-        Position.Latitudinal Earth = new Position.Latitudinal(milli, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
+        Position.L Earth = new Position.L(milli, dist * Sun.MeanEarthDistance, -he_lon, he_lat);
         prevEarth = Earth;
 
         return Earth;
     }
 
-    public static Position.Quaternional getEarthQuat(long milli) {
-        Position.Latitudinal p = getEarth(milli);
-        return new Position.Quaternional(milli, p.rad, new Quat(p.lat, p.lon));
+    public static Position.Q getEarthQuat(long milli) {
+        Position.L p = getEarth(milli);
+        return new Position.Q(milli, p.rad, new Quat(p.lat, p.lon));
     }
 
     // better precison, to be recovered later

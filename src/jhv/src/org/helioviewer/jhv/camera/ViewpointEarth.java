@@ -11,7 +11,7 @@ class ViewpointEarth extends Viewpoint {
     void update(JHVDate date) {
         time = date;
 
-        Position.Latitudinal p = Sun.getEarth(time.milli);
+        Position.L p = Sun.getEarth(time.milli);
         orientation = new Quat(p.lat, p.lon);
         distance = p.rad;
     }

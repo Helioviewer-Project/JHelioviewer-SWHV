@@ -116,7 +116,7 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             dateString = date.substring(11, 30);
 
-            Position.Latitudinal p = Sun.getEarth(TimeUtils.utcDateFormat.parse(dateString).getTime());
+            Position.L p = Sun.getEarth(TimeUtils.utcDateFormat.parse(dateString).getTime());
             double phi = p.lon;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);

@@ -59,7 +59,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        Position.Latitudinal p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
+        Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
 
         Mat4 cameraMatrix;
         switch (gridChoice) {
@@ -116,7 +116,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glEnd();
     }
 
-    private void drawEarthCircles(GL2 gl, Position.Latitudinal p) {
+    private void drawEarthCircles(GL2 gl, Position.L p) {
         GLHelper.lineWidth(gl, 0.25);
         gl.glColor3f(1, 1, 0);
 
