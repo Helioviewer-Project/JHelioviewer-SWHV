@@ -18,9 +18,4 @@ class UpdateViewpointObserver extends UpdateViewpoint {
         }
     }
 
-    @Override
-    CameraOptionPanel getOptionPanel() {
-        return null;
-    }
-
 }

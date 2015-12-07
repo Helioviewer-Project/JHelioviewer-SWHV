@@ -11,9 +11,4 @@ class UpdateViewpointEarth extends UpdateViewpoint {
         return Sun.getEarthQuat(time);
     }
 
-    @Override
-    CameraOptionPanel getOptionPanel() {
-        return null;
-    }
-
 }
