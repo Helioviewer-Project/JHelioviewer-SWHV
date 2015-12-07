@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-class ViewpointExpert extends Viewpoint {
+class UpdateViewpointExpert extends UpdateViewpoint {
 
     private double currentL = 0.;
     private double currentB = 0.;
@@ -17,7 +17,7 @@ class ViewpointExpert extends Viewpoint {
     private final PositionLoad positionLoad = new PositionLoad(this);
     private final CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
 
-    ViewpointExpert(Camera _camera) {
+    UpdateViewpointExpert(Camera _camera) {
         camera = _camera;
     }
 
@@ -65,12 +65,14 @@ class ViewpointExpert extends Viewpoint {
     }
 
     @Override
-    void update(JHVDate date) {
-        time = interpolate(date);
+    Position.Q update(JHVDate date) {
+        JHVDate time = interpolate(date);
 
         Position.L p = Sun.getEarth(time);
-        orientation = new Quat(currentB, -currentL + p.lon);
-        distance = currentDistance;
+        // orientation = new Quat(currentB, -currentL + p.lon);
+        // distance = currentDistance;
+
+        return new Position.Q(time, currentDistance, new Quat(currentB, -currentL + p.lon));
     }
 
     @Override

@@ -3,8 +3,8 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.viewmodel.imageformat.ImageFormat;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -47,9 +47,9 @@ public interface ImageData {
 
     public MetaData getMetaData();
 
-    public void setViewpoint(Viewpoint v);
+    public void setViewpoint(Position.Q p);
 
-    public Viewpoint getViewpoint();
+    public Position.Q getViewpoint();
 
     public boolean getUploaded();
 

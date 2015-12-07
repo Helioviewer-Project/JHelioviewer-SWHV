@@ -3,18 +3,10 @@ package org.helioviewer.jhv.viewmodel.imagedata;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
-/**
- * Abstract ImageData object to provide some common functionalities.
- *
- * The object manages all format-independent informations, such as the image
- * dimensions and the color mask.
- *
- * @author Markus Langenberg
- */
 public abstract class AbstractImageData implements ImageData {
 
     protected final int width, height;
@@ -26,7 +18,7 @@ public abstract class AbstractImageData implements ImageData {
     private int frameNumber;
     private Region region;
     private MetaData metaData;
-    private Viewpoint viewpoint;
+    private Position.Q viewpoint;
     private boolean uploaded = false;
 
     /**
@@ -122,12 +114,12 @@ public abstract class AbstractImageData implements ImageData {
     }
 
     @Override
-    public void setViewpoint(Viewpoint v) {
-        viewpoint = v;
+    public void setViewpoint(Position.Q p) {
+        viewpoint = p;
     }
 
     @Override
-    public Viewpoint getViewpoint() {
+    public Position.Q getViewpoint() {
         return viewpoint;
     }
 

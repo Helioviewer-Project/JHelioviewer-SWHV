@@ -7,10 +7,10 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -148,9 +148,9 @@ public class Layers {
 
         Camera camera = Displayer.getCamera();
         camera.timeChanged(lastTimestamp);
-        Viewpoint v = camera.getViewpoint().copy();
+        Position.Q p = camera.getViewpoint();
         for (View view : layers) {
-            view.setFrame(view.getFrame(dateTime), v);
+            view.setFrame(view.getFrame(dateTime), p);
         }
         Displayer.render(1);
 

@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
@@ -25,13 +27,15 @@ public class Camera {
 
     private boolean trackingMode;
 
-    private final ViewpointObserver viewpointObserver = new ViewpointObserver();
-    private final ViewpointEarth viewpointEarth = new ViewpointEarth();
-    private final ViewpointExpert viewpointExpert = new ViewpointExpert(this);
-    private Viewpoint viewpoint = viewpointObserver;
+    private Position.Q viewpoint = Sun.EpochEarth;
+
+    private final UpdateViewpointObserver updateViewpointObserver = new UpdateViewpointObserver();
+    private final UpdateViewpointEarth updateViewpointEarth = new UpdateViewpointEarth();
+    private final UpdateViewpointExpert updateViewpointExpert = new UpdateViewpointExpert(this);
+    private UpdateViewpoint updateViewpoint = updateViewpointObserver;
 
     private void updateCamera(JHVDate date) {
-        viewpoint.update(date);
+        viewpoint = updateViewpoint.update(date);
         updateTransformation();
         updateWidth();
     }
@@ -53,13 +57,13 @@ public class Camera {
     void setMode(CameraMode mode) {
         switch (mode) {
             case EXPERT:
-                viewpoint = viewpointExpert;
+                updateViewpoint = updateViewpointExpert;
             break;
             case EARTH:
-                viewpoint = viewpointEarth;
+                updateViewpoint = updateViewpointEarth;
             break;
             default:
-                viewpoint = viewpointObserver;
+                updateViewpoint = updateViewpointObserver;
         }
         refresh();
     }
@@ -71,9 +75,9 @@ public class Camera {
         refresh();
     }
 
-    private Viewpoint saveViewpoint;
+    private Position.Q saveViewpoint;
 
-    public void push(Viewpoint v) {
+    public void push(Position.Q v) {
         if (!trackingMode) {
             saveViewpoint = viewpoint;
             viewpoint = v;
@@ -91,7 +95,7 @@ public class Camera {
         }
     }
 
-    public Viewpoint getViewpoint() {
+    public Position.Q getViewpoint() {
         return viewpoint;
     }
 
@@ -151,7 +155,7 @@ public class Camera {
     }
 
     CameraOptionPanel getOptionPanel() {
-        return viewpoint.getOptionPanel();
+        return updateViewpoint.getOptionPanel();
     }
 
     public void timeChanged(JHVDate date) {

@@ -9,9 +9,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.layers.Layers;
@@ -48,7 +48,7 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
-    private Viewpoint viewpoint;
+    private Position.Q viewpoint;
 
     private int targetFrame = -1;
     private int trueFrame = -1;
@@ -203,7 +203,7 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame, Viewpoint v) {
+    public void setFrame(int frame, Position.Q p) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             //CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             //if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
@@ -212,7 +212,7 @@ public class JP2View extends AbstractView {
             //}
 
             targetFrame = frame;
-            viewpoint = v;
+            viewpoint = p;
         }
     }
 
