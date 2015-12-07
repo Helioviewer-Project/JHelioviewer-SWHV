@@ -180,14 +180,7 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     }
 
     private void addObjectCombobox(GridBagConstraints c) {
-        objectCombobox = new JSeparatorComboBox();
-        SpaceObject[] objectList = SpaceObject.getObjectList();
-        for (int i = 0; i < objectList.length; i++) {
-            objectCombobox.addItem(objectList[i]);
-            if (i == SpaceObject.LINESEPSATS || i == SpaceObject.LINESEPPLANETS) {
-                objectCombobox.addItem(new JSeparator());
-            }
-        }
+        objectCombobox = new JSeparatorComboBox(SpaceObject.getObjectList().toArray());
         objectCombobox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
