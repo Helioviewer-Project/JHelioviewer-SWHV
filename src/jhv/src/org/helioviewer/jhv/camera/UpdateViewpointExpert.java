@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -38,11 +37,7 @@ class UpdateViewpointExpert extends UpdateViewpoint {
                 currentCameraTime = tPositionEnd;
             }
 
-            Position.L p = positionLoad.getInterpolatedPosition(currentCameraTime);
-            if (p != null) {
-                Position.L e = Sun.getEarth(p.time);
-                return new Position.Q(p.time, p.rad, new Quat(p.lat, -p.lon + e.lon));
-            }
+            return positionLoad.getInterpolatedPosition(currentCameraTime);
         }
 
         return Sun.getEarthQuat(time);

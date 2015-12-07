@@ -17,6 +17,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -133,8 +134,10 @@ public class PositionLoad {
                 lon = jlon + (jlon > 0 ? -Math.PI : Math.PI);
                 lat = -posArray.getDouble(2);
 
-                Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                ret[j] = new Position.L(new JHVDate(date.getTime()), rad, lon, lat);
+                JHVDate time = new JHVDate(TimeUtils.utcFullDateFormat.parse(dateString).getTime());
+                Position.L p = Sun.getEarth(time);
+
+                ret[j] = new Position.L(time, rad, -lon + p.lon, lat);
             }
             return ret;
         }
@@ -237,7 +240,7 @@ public class PositionLoad {
         return -1L;
     }
 
-    public Position.L getInterpolatedPosition(long currentCameraTime) {
+    public Position.Q getInterpolatedPosition(long currentCameraTime) {
         if (isLoaded && position.length > 0) {
             double dist, hgln, hglt;
             long milli;
@@ -272,7 +275,7 @@ public class PositionLoad {
                 hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
                 hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
-            return new Position.L(new JHVDate(milli), dist, hgln, hglt);
+            return new Position.Q(new JHVDate(milli), dist, new Quat(hglt, hgln));
         } else {
             return null;
         }
