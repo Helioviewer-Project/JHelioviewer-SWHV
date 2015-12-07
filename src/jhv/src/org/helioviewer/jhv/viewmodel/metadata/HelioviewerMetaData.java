@@ -8,6 +8,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
@@ -24,8 +25,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     public HelioviewerMetaData(MetaDataContainer m) {
         identifyObservation(m);
-        retrieveDateTime(m);
-        retrievePosition(m);
+        retrievePosition(m, retrieveDateTime(m));
         retrievePixelParameters(m);
 
         retrieveOcculterRadii(m);
@@ -132,7 +132,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
     }
 
-    private void retrieveDateTime(MetaDataContainer m) {
+    private JHVDate retrieveDateTime(MetaDataContainer m) {
         String observedDate;
 
         if (instrument.equals("MDI")) {
@@ -146,13 +146,15 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 }
             }
         }
-        // otherwise default epoch
 
         if (observedDate != null)
-            dateObs = JHVDate.parseDateTime(observedDate);
+            return JHVDate.parseDateTime(observedDate);
+        else
+            return TimeUtils.Epoch;
     }
 
-    private void retrievePosition(MetaDataContainer m) {
+    private void retrievePosition(MetaDataContainer m, JHVDate dateObs) {
+        double distanceObs;
         Position.L p = Sun.getEarth(dateObs);
 
         if ((distanceObs = m.tryGetDouble("DSUN_OBS") / Sun.RadiusMeter) == 0) {
@@ -182,7 +184,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
         phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
-        rotationObs = new Quat(theta, phi);
+        viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
@@ -200,7 +202,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan2(Sun.Radius, distanceObs) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(Sun.Radius, viewpoint.rad) * MathUtils.radeg * 3600;
             double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
             unitPerPixel = Sun.Radius / solarPixelRadius;
 

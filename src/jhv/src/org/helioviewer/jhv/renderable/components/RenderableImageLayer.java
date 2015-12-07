@@ -181,11 +181,11 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
 
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, imageData.getMetaData().getRotationObs()));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, imageData.getMetaData().getViewpoint().q));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, baseImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, baseImageData.getMetaData().getViewpoint().q));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, prevImageData.getMetaData().getRotationObs()));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, prevImageData.getMetaData().getViewpoint().q));
             }
 
             camera.pop();
@@ -395,7 +395,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         if (imageData == null) {
             return "N/A";
         }
-        return imageData.getMetaData().getDateObs().toString();
+        return imageData.getMetaData().getViewpoint().time.toString();
     }
 
     @Override

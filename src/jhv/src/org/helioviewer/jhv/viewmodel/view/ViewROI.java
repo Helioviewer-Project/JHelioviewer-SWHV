@@ -42,7 +42,7 @@ public class ViewROI {
 
         camera.push(v);
 
-        Quat camDiff = CameraHelper.getCameraDifferenceRotation(camera, m.getRotationObs());
+        Quat camDiff = CameraHelper.getCameraDifferenceRotation(camera, m.getViewpoint().q);
         for (int i = 0; i < pointlist.length; i++) {
             Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);

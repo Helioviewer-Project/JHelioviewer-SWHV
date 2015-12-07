@@ -76,10 +76,10 @@ public abstract class AbstractView implements View {
     @Override
     public JHVDate getFrameDateTime(int frame) {
         if (frame <= 0)
-            return metaDataArray[0].getDateObs();
+            return metaDataArray[0].getViewpoint().time;
         if (frame >= getMaximumFrameNumber())
-            return metaDataArray[getMaximumFrameNumber()].getDateObs();
-        return metaDataArray[frame].getDateObs();
+            return metaDataArray[getMaximumFrameNumber()].getViewpoint().time;
+        return metaDataArray[frame].getViewpoint().time;
     }
 
     @Override
