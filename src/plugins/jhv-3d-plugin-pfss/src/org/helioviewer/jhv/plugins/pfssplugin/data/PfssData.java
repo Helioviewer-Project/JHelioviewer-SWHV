@@ -11,6 +11,7 @@ import nom.tam.fits.Header;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
@@ -116,7 +117,7 @@ public class PfssData {
             String date = header.findKey("DATE-OBS");
             dateString = date.substring(11, 30);
 
-            Position.L p = Sun.getEarth(TimeUtils.utcDateFormat.parse(dateString).getTime());
+            Position.L p = Sun.getEarth(new JHVDate(TimeUtils.utcDateFormat.parse(dateString).getTime()));
             double phi = p.lon;
 
             double sphi = Math.sin(phi), cphi = Math.cos(phi);

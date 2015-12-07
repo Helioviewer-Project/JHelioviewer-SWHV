@@ -19,6 +19,7 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -91,8 +92,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
 
-        Position.L p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-        Quat q = new Quat(p.lat, p.lon);
+        Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
@@ -105,18 +105,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glColor3f(0f, 0f, 0f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
         int angularResolution = (int) (angularWidthDegree / 4);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.q);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, q);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.q);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, p.q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.q);
 
         String type = evt.getJHVEventType().getEventType();
         bindTexture(gl, type, evt.getIcon());
@@ -136,7 +136,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double deltar = sz * (el[0] * 2 - 1);
                 double r = distSun + deltar;
                 double theta = principalAngle + deltatheta;
-                Vec3 res = q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3 res = p.q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glTexCoord2f(el[0], el[1]);
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }

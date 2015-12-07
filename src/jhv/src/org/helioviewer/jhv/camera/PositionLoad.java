@@ -17,6 +17,7 @@ import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.json.JSONArray;
@@ -133,7 +134,7 @@ public class PositionLoad {
                 lat = -posArray.getDouble(2);
 
                 Date date = TimeUtils.utcFullDateFormat.parse(dateString);
-                ret[j] = new Position.L(date.getTime(), rad, lon, lat);
+                ret[j] = new Position.L(new JHVDate(date.getTime()), rad, lon, lat);
             }
             return ret;
         }
@@ -224,14 +225,14 @@ public class PositionLoad {
 
     public long getStartTime() {
         if (position.length > 0) {
-            return position[0].milli;
+            return position[0].time.milli;
         }
         return -1L;
     }
 
     public long getEndTime() {
         if (position.length > 0) {
-            return position[position.length - 1].milli;
+            return position[position.length - 1].time.milli;
         }
         return -1L;
     }
@@ -244,7 +245,7 @@ public class PositionLoad {
             long tstart = getStartTime();
             long tend = getEndTime();
             if (tstart == tend) {
-                milli = position[0].milli;
+                milli = position[0].time.milli;
                 dist = position[0].rad;
                 hgln = position[0].lon;
                 hglt = position[0].lat;
@@ -257,8 +258,8 @@ public class PositionLoad {
                 }
                 int inext = Math.min(i + 1, position.length - 1);
 
-                tstart = position[i].milli;
-                tend = position[inext].milli;
+                tstart = position[i].time.milli;
+                tend = position[inext].time.milli;
 
                 double alpha;
                 if (tend == tstart)
@@ -266,12 +267,12 @@ public class PositionLoad {
                 else
                     alpha = ((currentCameraTime - tstart) / (double) (tend - tstart)) % 1.;
 
-                milli = (long) ((1. - alpha) * position[i].milli + alpha * position[inext].milli);
+                milli = (long) ((1. - alpha) * position[i].time.milli + alpha * position[inext].time.milli);
                 dist = (1. - alpha) * position[i].rad + alpha * position[inext].rad;
                 hgln = (1. - alpha) * position[i].lon + alpha * position[inext].lon;
                 hglt = (1. - alpha) * position[i].lat + alpha * position[inext].lat;
             }
-            return new Position.L(milli, dist, hgln, hglt);
+            return new Position.L(new JHVDate(milli), dist, hgln, hglt);
         } else {
             return null;
         }
