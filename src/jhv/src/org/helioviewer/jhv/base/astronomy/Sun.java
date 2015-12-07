@@ -29,7 +29,7 @@ public class Sun {
         EpochEarthL = getEarth(TimeUtils.Epoch);
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
 
-        HCI = new Quat(0, EpochEarthL.lon);
+        HCI = new Quat(0, -EpochEarthL.lon);
     }
 
     private static double milli2mjd(long milli) {
