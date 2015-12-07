@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.viewmodel.metadata;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
 
 public abstract class AbstractMetaData implements MetaData {
 
@@ -14,9 +12,7 @@ public abstract class AbstractMetaData implements MetaData {
     protected int pixelWidth;
     protected int pixelHeight;
 
-    protected JHVDate dateObs = TimeUtils.Epoch;
-    protected Quat rotationObs = Sun.EpochEarth.q.copy();
-    protected double distanceObs = Sun.EpochEarth.rad;
+    protected Position.Q viewpoint = Sun.EpochEarth;
     protected double innerRadius = 0;
     protected double outerRadius = Double.MAX_VALUE;
 
@@ -40,18 +36,8 @@ public abstract class AbstractMetaData implements MetaData {
     }
 
     @Override
-    public JHVDate getDateObs() {
-        return dateObs;
-    }
-
-    @Override
-    public Quat getRotationObs() {
-        return rotationObs;
-    }
-
-    @Override
-    public double getDistanceObs() {
-        return distanceObs;
+    public Position.Q getViewpoint() {
+        return viewpoint;
     }
 
     @Override

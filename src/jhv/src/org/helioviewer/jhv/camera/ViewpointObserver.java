@@ -21,8 +21,8 @@ class ViewpointObserver extends Viewpoint {
             distance = p.rad;
         } else {
             MetaData m = view.getMetaData(time);
-            orientation = m.getRotationObs();
-            distance = m.getDistanceObs();
+            orientation = m.getViewpoint().q;
+            distance = m.getViewpoint().rad;
         }
     }
 

@@ -223,7 +223,7 @@ public class JP2View extends AbstractView {
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
-            currentDiff = metaDataArray[++frame].getDateObs().milli - time.milli;
+            currentDiff = metaDataArray[++frame].getViewpoint().time.milli - time.milli;
         } while (currentDiff < 0 && frame < _jp2Image.getMaximumFrameNumber());
 
         if (-lastDiff < currentDiff) {
