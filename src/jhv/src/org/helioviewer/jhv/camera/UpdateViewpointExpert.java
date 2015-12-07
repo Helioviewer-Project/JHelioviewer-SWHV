@@ -9,10 +9,6 @@ import org.helioviewer.jhv.viewmodel.view.View;
 
 class UpdateViewpointExpert extends UpdateViewpoint {
 
-    private double currentL = 0.;
-    private double currentB = 0.;
-    private double currentDistance = Sun.MeanEarthDistance;
-
     private final Camera camera;
     private final PositionLoad positionLoad = new PositionLoad(this);
     private final CameraOptionPanelExpert expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
@@ -21,7 +17,7 @@ class UpdateViewpointExpert extends UpdateViewpoint {
         camera = _camera;
     }
 
-    private JHVDate interpolate(JHVDate date) {
+    private Position.Q interpolate(JHVDate time) {
         if (positionLoad.isLoaded()) {
             long currentCameraTime;
             long tLayerStart = 0, tLayerEnd = 0;
@@ -37,26 +33,19 @@ class UpdateViewpointExpert extends UpdateViewpoint {
             long tPositionEnd = positionLoad.getEndTime();
 
             if (tLayerEnd != tLayerStart) {
-                currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (date.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
+                currentCameraTime = (long) (tPositionStart + (tPositionEnd - tPositionStart) * (time.milli - tLayerStart) / (double) (tLayerEnd - tLayerStart));
             } else {
                 currentCameraTime = tPositionEnd;
             }
 
             Position.L p = positionLoad.getInterpolatedPosition(currentCameraTime);
             if (p != null) {
-                date = p.time;
-                currentDistance = p.rad;
-                currentL = p.lon;
-                currentB = p.lat;
+                Position.L e = Sun.getEarth(p.time);
+                return new Position.Q(p.time, p.rad, new Quat(p.lat, -p.lon + e.lon));
             }
-        } else {
-            Position.L p = Sun.getEarth(date);
-            currentDistance = p.rad;
-            currentL = 0;
-            currentB = p.lat;
         }
 
-        return date;
+        return Sun.getEarthQuat(time);
     }
 
     void firePositionLoaded(String state) {
@@ -66,13 +55,7 @@ class UpdateViewpointExpert extends UpdateViewpoint {
 
     @Override
     Position.Q update(JHVDate date) {
-        JHVDate time = interpolate(date);
-
-        Position.L p = Sun.getEarth(time);
-        // orientation = new Quat(currentB, -currentL + p.lon);
-        // distance = currentDistance;
-
-        return new Position.Q(time, currentDistance, new Quat(currentB, -currentL + p.lon));
+        return interpolate(date);
     }
 
     @Override
