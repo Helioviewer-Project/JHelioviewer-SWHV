@@ -59,7 +59,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp().milli);
+        Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
 
         Mat4 cameraMatrix;
         switch (gridChoice) {

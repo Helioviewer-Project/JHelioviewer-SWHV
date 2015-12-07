@@ -152,11 +152,10 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 double distSun = 2.4;
                 distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
 
-                Position.L p = Sun.getEarth((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2);
-                Quat q = new Quat(p.lat, p.lon);
+                Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
-                hitpoint = q.rotateInverseVector(getHitPointPlane(e, vp));
-                pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+                hitpoint = p.q.rotateInverseVector(getHitPointPlane(e, vp));
+                pt = p.q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
             } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                 hitpoint = getHitPoint(e, vp);
                 pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
