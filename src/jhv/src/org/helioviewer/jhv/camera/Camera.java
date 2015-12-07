@@ -11,10 +11,6 @@ import org.helioviewer.jhv.layers.Layers;
 
 public class Camera {
 
-    static enum CameraMode {
-        OBSERVER, EARTH, EXPERT
-    }
-
     static final double INITFOV = (48. / 60.) * Math.PI / 180.;
     private static final double MIN_FOV = INITFOV * 0.1;
     private static final double MAX_FOV = INITFOV * 30;
@@ -28,11 +24,7 @@ public class Camera {
     private boolean trackingMode;
 
     private Position.Q viewpoint = Sun.EpochEarth;
-
-    private final UpdateViewpointObserver updateViewpointObserver = new UpdateViewpointObserver();
-    private final UpdateViewpointEarth updateViewpointEarth = new UpdateViewpointEarth();
-    private final UpdateViewpointExpert updateViewpointExpert = new UpdateViewpointExpert(this);
-    private UpdateViewpoint updateViewpoint = updateViewpointObserver;
+    private UpdateViewpoint updateViewpoint = new UpdateViewpointObserver();
 
     private void updateCamera(JHVDate date) {
         viewpoint = updateViewpoint.update(date);
@@ -54,17 +46,8 @@ public class Camera {
         Displayer.render(1);
     }
 
-    void setMode(CameraMode mode) {
-        switch (mode) {
-            case EXPERT:
-                updateViewpoint = updateViewpointExpert;
-            break;
-            case EARTH:
-                updateViewpoint = updateViewpointEarth;
-            break;
-            default:
-                updateViewpoint = updateViewpointObserver;
-        }
+    void setUpdate(UpdateViewpoint update) {
+        updateViewpoint = update;
         refresh();
     }
 
@@ -152,10 +135,6 @@ public class Camera {
 
     public void zoom(int wr) {
         setCameraFOV(fov * (1 + 0.015 * wr));
-    }
-
-    CameraOptionPanel getOptionPanel() {
-        return updateViewpoint.getOptionPanel();
     }
 
     public void timeChanged(JHVDate date) {

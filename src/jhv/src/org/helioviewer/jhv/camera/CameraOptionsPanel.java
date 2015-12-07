@@ -31,6 +31,10 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 @SuppressWarnings("serial")
 public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
 
+    private static enum CameraMode {
+        OBSERVER, EARTH, EXPERT
+    }
+
     private static final double FOVAngleDefault = 0.8;
     private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
 
@@ -57,7 +61,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton observerItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, Camera.CameraMode.OBSERVER);
+                changeCamera(camera, CameraMode.OBSERVER);
             }
         });
         observerItem.setText("Observer View");
@@ -67,7 +71,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton earthItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, Camera.CameraMode.EARTH);
+                changeCamera(camera, CameraMode.EARTH);
             }
         });
         earthItem.setText("Earth View");
@@ -76,7 +80,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         JRadioButton expertItem = new JRadioButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeCamera(camera, Camera.CameraMode.EXPERT);
+                changeCamera(camera, CameraMode.EXPERT);
             }
         });
         expertItem.setText("Other View");
@@ -174,9 +178,21 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel {
         revalidate();
     }
 
-    private void changeCamera(Camera camera, Camera.CameraMode mode) {
-        camera.setMode(mode);
-        switchOptionsPanel(camera.getOptionPanel());
+    private void changeCamera(Camera camera, CameraMode mode) {
+        UpdateViewpoint update;
+
+        switch (mode) {
+            case EXPERT:
+                update = new UpdateViewpointExpert(camera);
+            break;
+            case EARTH:
+                update = new UpdateViewpointEarth();
+            break;
+            default:
+                update = new UpdateViewpointObserver();
+        }
+        camera.setUpdate(update);
+        switchOptionsPanel(update.getOptionPanel());
     }
 
 }
