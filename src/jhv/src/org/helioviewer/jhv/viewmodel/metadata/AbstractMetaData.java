@@ -12,7 +12,7 @@ public abstract class AbstractMetaData implements MetaData {
     protected int pixelWidth;
     protected int pixelHeight;
 
-    protected Position.Q viewpoint = Sun.EpochEarth;
+    protected Position.Q viewpoint = Sun.EpochEarthQ;
     protected double innerRadius = 0;
     protected double outerRadius = Double.MAX_VALUE;
 

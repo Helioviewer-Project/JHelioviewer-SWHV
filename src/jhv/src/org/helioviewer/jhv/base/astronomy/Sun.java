@@ -20,11 +20,16 @@ public class Sun {
     public static final double MeanEarthDistanceMeter = 149597870700.;
     public static final double MeanEarthDistance = (MeanEarthDistanceMeter / RadiusMeter);
 
-    public static final Position.Q EpochEarth;
+    public static final Position.L EpochEarthL;
+    public static final Position.Q EpochEarthQ;
+    public static final Quat HCI;
 
     static {
         prevEarth = new Position.L(new JHVDate(0), 0, 0, 0);
-        EpochEarth = getEarthQuat(TimeUtils.Epoch);
+        EpochEarthL = getEarth(TimeUtils.Epoch);
+        EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
+
+        HCI = new Quat(0, EpochEarthL.lon);
     }
 
     private static double milli2mjd(long milli) {

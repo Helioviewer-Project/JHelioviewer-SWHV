@@ -23,7 +23,7 @@ public class Camera {
 
     private boolean trackingMode;
 
-    private Position.Q viewpoint = Sun.EpochEarth;
+    private Position.Q viewpoint = Sun.EpochEarthQ;
     private UpdateViewpoint updateViewpoint = new UpdateViewpointObserver();
 
     private void updateCamera(JHVDate date) {
