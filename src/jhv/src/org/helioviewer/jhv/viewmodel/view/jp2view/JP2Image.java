@@ -12,10 +12,10 @@ import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
@@ -248,10 +248,10 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Viewpoint v, int frame, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, boolean fromReader) {
         MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
-        Region r = ViewROI.updateROI(camera, vp, v, m);
+        Region r = ViewROI.updateROI(camera, vp, p, m);
 
         double ratio = 2 * camera.getWidth() / vp.height;
         int totalHeight = (int) (mr.height / ratio);
@@ -269,7 +269,7 @@ public class JP2Image {
 
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, v, subImage, res, frame);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame);
 
         boolean viewChanged = oldImageViewParams == null ||
                               !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&

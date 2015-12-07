@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 
-import org.helioviewer.jhv.camera.Viewpoint;
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
@@ -16,7 +16,7 @@ public class JP2ImageParameter {
 
     public final JP2Image jp2Image;
 
-    public final Viewpoint viewpoint;
+    public final Position.Q viewpoint;
 
     /** Essentially an immutable Rectangle */
     public final SubImage subImage;
@@ -28,11 +28,11 @@ public class JP2ImageParameter {
     public final int compositionLayer;
 
     /** This constructor assigns all variables... throw NPE if any args are null */
-    public JP2ImageParameter(JP2Image _jp2Image, Viewpoint _viewpoint, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
+    public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
         if (_roi == null || _resolution == null)
             throw new NullPointerException();
         jp2Image = _jp2Image;
-        viewpoint = _viewpoint;
+        viewpoint = _p;
         subImage = _roi;
         resolution = _resolution;
         compositionLayer = _compositionLayer;

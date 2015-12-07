@@ -105,18 +105,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glColor3f(0f, 0f, 0f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
         int angularResolution = (int) (angularWidthDegree / 4);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.q);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
 
-        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.q);
-        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.q);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
+        interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
 
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, p.q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.q);
-        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.q);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, p.orientation);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.orientation);
+        interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
         String type = evt.getJHVEventType().getEventType();
         bindTexture(gl, type, evt.getIcon());
@@ -136,7 +136,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 double deltar = sz * (el[0] * 2 - 1);
                 double r = distSun + deltar;
                 double theta = principalAngle + deltatheta;
-                Vec3 res = p.q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
+                Vec3 res = p.orientation.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
                 gl.glTexCoord2f(el[0], el[1]);
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }

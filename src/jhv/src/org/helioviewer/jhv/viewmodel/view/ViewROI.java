@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.viewmodel.view;
 
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.Viewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -34,15 +34,15 @@ public class ViewROI {
         }
     }
 
-    public static Region updateROI(Camera camera, Viewport vp, Viewpoint v, MetaData m) {
+    public static Region updateROI(Camera camera, Viewport vp, Position.Q p, MetaData m) {
         double minPhysicalX = Double.MAX_VALUE;
         double minPhysicalY = Double.MAX_VALUE;
         double maxPhysicalX = Double.MIN_VALUE;
         double maxPhysicalY = Double.MIN_VALUE;
 
-        camera.push(v);
+        camera.push(p);
 
-        Quat camDiff = CameraHelper.getCameraDifferenceRotation(camera, m.getViewpoint().q);
+        Quat camDiff = CameraHelper.getCameraDifferenceRotation(camera, m.getViewpoint().orientation);
         for (int i = 0; i < pointlist.length; i++) {
             Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
             minPhysicalX = Math.min(minPhysicalX, hitPoint.x);

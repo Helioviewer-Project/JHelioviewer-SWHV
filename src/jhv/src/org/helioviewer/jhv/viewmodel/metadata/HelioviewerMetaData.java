@@ -202,7 +202,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             if (Math.abs(arcsecPerPixelX - arcsecPerPixelY) > arcsecPerPixelX * 0.0001) {
                 Log.warn(">> HelioviewerMetaData.retrievePixelParameters() > CDELT1 and CDELT2 have different values. CDELT1 is used.");
             }
-            double radiusSunInArcsec = Math.atan2(Sun.Radius, viewpoint.rad) * MathUtils.radeg * 3600;
+            double radiusSunInArcsec = Math.atan2(Sun.Radius, viewpoint.distance) * MathUtils.radeg * 3600;
             double solarPixelRadius = radiusSunInArcsec / arcsecPerPixelX;
             unitPerPixel = Sun.Radius / solarPixelRadius;
 

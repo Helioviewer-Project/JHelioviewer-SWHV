@@ -2,27 +2,19 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-class ViewpointObserver extends Viewpoint {
+class UpdateViewpointObserver extends UpdateViewpoint {
 
     @Override
-    void update(JHVDate date) {
-        time = date;
-
+    Position.Q update(JHVDate time) {
         View view = Layers.getActiveView();
         if (view == null) {
-            Position.Q p = Sun.getEarthQuat(time);
-            orientation = p.q;
-            distance = p.rad;
+            return Sun.getEarthQuat(time);
         } else {
-            MetaData m = view.getMetaData(time);
-            orientation = m.getViewpoint().q;
-            distance = m.getViewpoint().rad;
+            return view.getMetaData(time).getViewpoint();
         }
     }
 
