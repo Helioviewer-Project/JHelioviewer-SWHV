@@ -26,21 +26,6 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 @SuppressWarnings("serial")
 public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
 
-    enum GridChoiceType {
-        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), HCI("HCI grid");
-
-        private final String display;
-
-        private GridChoiceType(String s) {
-            display = s;
-        }
-
-        @Override
-        public String toString() {
-            return display;
-        }
-    }
-
     private static final double min = 5, max = 90;
 
     private JSpinner gridResolutionXSpinner;
@@ -126,15 +111,13 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
     }
 
     public void createGridChoiceBox(RenderableGrid renderableGrid) {
-        gridChoiceBox = new JComboBox();
-        gridChoiceBox.setModel(new DefaultComboBoxModel(GridChoiceType.values()));
+        gridChoiceBox = new JComboBox(RenderableGrid.GridChoiceType.values());
         gridChoiceBox.setToolTipText("Choose grid options");
-        gridChoiceBox.setSelectedItem(GridChoiceType.VIEWPOINT);
+        gridChoiceBox.setSelectedItem(RenderableGrid.GridChoiceType.VIEWPOINT);
         gridChoiceBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GridChoiceType t = (GridChoiceType) gridChoiceBox.getSelectedItem();
-                grid.setCoordinates(t);
+                grid.setCoordinates((RenderableGrid.GridChoiceType) gridChoiceBox.getSelectedItem());
                 Displayer.display();
             }
         });
