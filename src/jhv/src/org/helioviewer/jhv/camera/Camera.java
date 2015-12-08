@@ -27,11 +27,11 @@ public class Camera {
 
     private void updateCamera(JHVDate date) {
         viewpoint = updateViewpoint.update(date);
-        updateTransformation();
+        updateRotation();
         updateWidth();
     }
 
-    private void updateTransformation() {
+    private void updateRotation() {
         rotation = Quat.rotate(currentDragRotation, viewpoint.orientation);
     }
 
@@ -62,7 +62,7 @@ public class Camera {
         if (!trackingMode) {
             saveViewpoint = viewpoint;
             viewpoint = v;
-            updateTransformation();
+            updateRotation();
             updateWidth();
         }
     }
@@ -71,7 +71,7 @@ public class Camera {
         if (!trackingMode) {
             viewpoint = saveViewpoint;
             saveViewpoint = null;
-            updateTransformation();
+            updateRotation();
             updateWidth();
         }
     }
@@ -91,7 +91,6 @@ public class Camera {
     void setCurrentTranslation(double x, double y) {
         currentTranslation.x = x;
         currentTranslation.y = y;
-        updateTransformation();
     }
 
     Quat getCurrentDragRotation() {
@@ -100,7 +99,7 @@ public class Camera {
 
     void rotateCurrentDragRotation(Quat _currentDragRotation) {
         currentDragRotation = Quat.rotate(currentDragRotation, _currentDragRotation);
-        updateTransformation();
+        updateRotation();
     }
 
     public void setCameraFOV(double _fov) {
