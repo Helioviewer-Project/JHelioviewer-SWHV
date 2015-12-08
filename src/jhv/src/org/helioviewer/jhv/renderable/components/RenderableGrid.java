@@ -2,19 +2,23 @@ package org.helioviewer.jhv.renderable.components;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
+import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.renderable.components.RenderableGridOptionsPanel.GridChoiceType;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.common.nio.Buffers;
@@ -22,6 +26,21 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid extends AbstractRenderable {
+
+    enum GridChoiceType {
+        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), HCI("HCI grid");
+
+        private final String display;
+
+        private GridChoiceType(String s) {
+            display = s;
+        }
+
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
 
     // height of text in solar radii
     private static final float textScale = 0.08f;
@@ -51,7 +70,24 @@ public class RenderableGrid extends AbstractRenderable {
     private int colorBufferID;
     private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
 
-    public Quat getGridQuat(Camera camera) {
+    public Vec2 gridPoint(Camera camera, Viewport vp, Point point) {
+        Vec3 p = CameraHelper.getVectorFromSphereAlt(camera, vp, point);
+        if (p == null)
+            return null;
+
+        if (gridChoice != GridChoiceType.VIEWPOINT) {
+            Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, getGridQuat(camera));
+            p = q.rotateInverseVector(p);
+        }
+
+        double theta = 90. - Math.acos(p.y) * 180. / Math.PI;
+        double phi = 90. - Math.atan2(p.z, p.x) * 180. / Math.PI;
+        phi = MathUtils.mapToMinus180To180(phi);
+
+        return new Vec2(phi, theta);
+    }
+
+    private Quat getGridQuat(Camera camera) {
         switch (gridChoice) {
         case VIEWPOINT:
             return camera.getViewpoint().orientation;

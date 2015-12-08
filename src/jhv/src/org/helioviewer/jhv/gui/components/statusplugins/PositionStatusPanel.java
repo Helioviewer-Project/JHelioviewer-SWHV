@@ -5,9 +5,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
-import org.helioviewer.jhv.base.math.Quat;
-import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -15,7 +13,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
-import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
@@ -35,23 +32,13 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
             return;
 
         Viewport vp = Displayer.getActiveViewport();
-        Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
-
-        if (computedposition != null) {
-            Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, ImageViewerGui.getRenderableGrid().getGridQuat(camera));
-            Vec3 v = q.rotateInverseVector(computedposition);
-            computedposition = v;
-        }
-
+        Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, position);
         double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
-        if (computedposition == null) {
+        if (coord == null) {
             setText(emptyPos + String.format(rhoFormat, radius));
         } else {
-            double theta = 90. - Math.acos(computedposition.y) * 180. / Math.PI;
-            double phi = 90. - Math.atan2(computedposition.z, computedposition.x) * 180. / Math.PI;
-            phi = MathUtils.mapToMinus180To180(phi);
-            setText(String.format("(\u03B8, \u03C6) : (%.2f\u00B0,%.2f\u00B0)", theta, phi) + String.format(rhoFormat, radius));
+            setText(String.format("(\u03B8, \u03C6) : (%.2f\u00B0,%.2f\u00B0)", coord.y, coord.x) + String.format(rhoFormat, radius));
         }
         lastPosition = position;
     }
