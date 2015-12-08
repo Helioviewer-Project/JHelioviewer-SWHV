@@ -53,6 +53,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     private boolean showAxes = true;
     private boolean showLabels = true;
+    private boolean showRadial = false;
 
     private final Component optionsPanel;
     private static final String name = "Grid";
@@ -119,12 +120,14 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             drawGrid(gl);
-            drawRadialGrid(gl);
+            if (showRadial)
+                drawRadialGrid(gl);
             if (showLabels) {
                 // cameraWidth changes ever so slightly with distance to Sun
                 int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
                 drawGridText(gl, pixelsPerSolarRadius);
-                drawRadialGridText(gl, pixelsPerSolarRadius);
+                if (showRadial)
+                    drawRadialGridText(gl, pixelsPerSolarRadius);
             }
         }
         gl.glPopMatrix();
@@ -494,6 +497,10 @@ public class RenderableGrid extends AbstractRenderable {
 
     public void showAxes(boolean show) {
         showAxes = show;
+    }
+
+    public void showRadial(boolean show) {
+        showRadial = show;
     }
 
     @Override

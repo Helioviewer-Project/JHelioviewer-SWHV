@@ -75,6 +75,29 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
 
         c0.gridy = 1;
 
+        c0.gridx = 1;
+        c0.anchor = GridBagConstraints.EAST;
+        JCheckBox radial = new JCheckBox("Radial grid", false);
+        radial.setHorizontalTextPosition(SwingConstants.LEFT);
+        radial.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                grid.showRadial(e.getStateChange() == ItemEvent.SELECTED);
+                Displayer.display();
+            }
+        });
+        add(radial, c0);
+
+        c0.gridx = 2;
+        c0.anchor = GridBagConstraints.EAST;
+        add(new JLabel("Grid type", JLabel.RIGHT), c0);
+        c0.gridx = 3;
+        c0.anchor = GridBagConstraints.WEST;
+        createGridChoiceBox(renderableGrid);
+        add(gridChoiceBox, c0);
+
+        c0.gridy = 2;
+
         c0.gridx = 0;
         c0.anchor = GridBagConstraints.EAST;
         add(new JLabel("Longitude", JLabel.RIGHT), c0);
@@ -96,16 +119,6 @@ public class RenderableGridOptionsPanel extends ComponentUtils.SmallPanel {
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.WEST;
         add(gridResolutionYSpinner, c0);
-
-        //TBD
-        c0.gridy = 2;
-        c0.gridx = 0;
-        c0.anchor = GridBagConstraints.EAST;
-        add(new JLabel("Grid type", JLabel.RIGHT), c0);
-        c0.gridx = 1;
-        c0.anchor = GridBagConstraints.WEST;
-        createGridChoiceBox(renderableGrid);
-        add(gridChoiceBox, c0);
 
         setSmall();
     }
