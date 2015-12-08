@@ -19,7 +19,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     private Point lastPosition;
     private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
-    private static String emptyPos = "(\u03B8, \u03C6) : (--\u00B0, --\u00B0)";
+    private static String emptyPos = "(\u03C6, \u03B8) : (--\u00B0, --\u00B0)";
 
     private static Camera camera;
 
@@ -38,7 +38,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         if (coord == null) {
             setText(emptyPos + String.format(rhoFormat, radius));
         } else {
-            setText(String.format("(\u03B8, \u03C6) : (%.2f\u00B0,%.2f\u00B0)", coord.y, coord.x) + String.format(rhoFormat, radius));
+            setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
         }
         lastPosition = position;
     }
