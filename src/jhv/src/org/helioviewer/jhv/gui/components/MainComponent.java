@@ -98,7 +98,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public static void renderScene(Camera camera, GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        Mat4 inverse = camera.getRotation().transpose();
+        Mat4 inverse = camera.getRotation().toMatrix().transpose();
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);

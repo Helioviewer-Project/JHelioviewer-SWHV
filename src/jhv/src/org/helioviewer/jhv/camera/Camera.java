@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -18,7 +17,7 @@ public class Camera {
 
     private Quat rotation = new Quat();
     private final Vec2 currentTranslation = new Vec2();
-    private final Quat currentDragRotation = new Quat();
+    private Quat currentDragRotation = new Quat();
     private double cameraWidth = 1;
 
     private boolean trackingMode;
@@ -33,8 +32,7 @@ public class Camera {
     }
 
     private void updateTransformation() {
-        rotation = currentDragRotation.copy();
-        rotation.rotate(viewpoint.orientation);
+        rotation = Quat.rotate(currentDragRotation, viewpoint.orientation);
     }
 
     private void updateWidth() {
@@ -82,12 +80,8 @@ public class Camera {
         return viewpoint;
     }
 
-    Quat getRotationQuat() {
-        return rotation.copy();
-    }
-
-    public Mat4 getRotation() {
-        return rotation.toMatrix();
+    public Quat getRotation() {
+        return rotation;
     }
 
     public Vec2 getCurrentTranslation() {
@@ -105,7 +99,7 @@ public class Camera {
     }
 
     void rotateCurrentDragRotation(Quat _currentDragRotation) {
-        currentDragRotation.rotate(_currentDragRotation);
+        currentDragRotation = Quat.rotate(currentDragRotation, _currentDragRotation);
         updateTransformation();
     }
 

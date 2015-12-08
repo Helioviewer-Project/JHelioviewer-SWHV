@@ -31,7 +31,7 @@ public class CameraHelper {
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
 
         Vec2 translation = camera.getCurrentTranslation();
-        Mat4 cameraTransformation = camera.getRotation().translate(translation.x, translation.y, -camera.getViewpoint().distance);
+        Mat4 cameraTransformation = camera.getRotation().toMatrix().translate(translation.x, translation.y, -camera.getViewpoint().distance);
         // applyCamera
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(cameraTransformation.m, 0);
@@ -143,11 +143,10 @@ public class CameraHelper {
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);
     }
-
+/*
     public static Quat getCameraDifferenceRotation(Camera camera, Quat rot) {
-        Quat q = camera.getRotationQuat();
-        q.rotateWithConjugate(rot);
-        return q;
+        return Quat.rotateWithConjugate(camera.getRotation(), rot);
     }
+*/
 
 }

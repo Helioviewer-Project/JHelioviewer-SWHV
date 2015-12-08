@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -180,12 +181,14 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
             vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
 
+            Quat q = camera.getRotation();
+
             GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, imageData.getMetaData().getViewpoint().orientation));
+            GLSLShader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getViewpoint().orientation));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, baseImageData.getMetaData().getViewpoint().orientation));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getViewpoint().orientation));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, CameraHelper.getCameraDifferenceRotation(camera, prevImageData.getMetaData().getViewpoint().orientation));
+                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
             }
 
             camera.pop();

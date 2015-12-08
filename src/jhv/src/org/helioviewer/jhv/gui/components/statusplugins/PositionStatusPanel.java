@@ -38,8 +38,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
 
         if (computedposition != null) {
-            Quat q = camera.getViewpoint().orientation.copy();
-            q.rotateWithConjugate(ImageViewerGui.getRenderableGrid().getGridQuat(camera));
+            Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, ImageViewerGui.getRenderableGrid().getGridQuat(camera));
             Vec3 v = q.rotateInverseVector(computedposition);
             computedposition = v;
         }
