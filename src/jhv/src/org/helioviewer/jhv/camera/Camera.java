@@ -25,8 +25,8 @@ public class Camera {
     private Position.Q viewpoint = Sun.EpochEarthQ;
     private UpdateViewpoint updateViewpoint = new UpdateViewpointObserver();
 
-    private void updateCamera(JHVDate date) {
-        viewpoint = updateViewpoint.update(date);
+    private void updateCamera(JHVDate time) {
+        viewpoint = updateViewpoint.update(time);
         updateRotation();
         updateWidth();
     }

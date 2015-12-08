@@ -186,9 +186,12 @@ public class Quat {
     }
 
     public Quat normalize() {
-        double l = Math.sqrt(a * a + u.length2());
+        double l = Math.sqrt(a * a + u.x * u.x + u.y * u.y + u.z * u.z);
         a /= l;
-        u.divide(l);
+        u.x /= l;
+        u.y /= l;
+        u.z /= l;
+
         return this;
     }
 
