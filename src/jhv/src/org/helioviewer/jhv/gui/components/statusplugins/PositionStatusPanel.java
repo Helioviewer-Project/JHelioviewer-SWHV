@@ -5,14 +5,17 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
@@ -33,6 +36,14 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
         Viewport vp = Displayer.getActiveViewport();
         Vec3 computedposition = CameraHelper.getVectorFromSphereAlt(camera, vp, position);
+
+        if (computedposition != null) {
+            Quat q = camera.getViewpoint().orientation.copy();
+            q.rotateWithConjugate(ImageViewerGui.getRenderableGrid().getGridQuat(camera));
+            Vec3 v = q.rotateInverseVector(computedposition);
+            computedposition = v;
+        }
+
         double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
 
         if (computedposition == null) {

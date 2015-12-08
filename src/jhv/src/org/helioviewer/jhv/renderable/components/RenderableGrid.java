@@ -51,6 +51,20 @@ public class RenderableGrid extends AbstractRenderable {
     private int colorBufferID;
     private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
 
+    public Quat getGridQuat(Camera camera) {
+        switch (gridChoice) {
+        case VIEWPOINT:
+            return camera.getViewpoint().orientation;
+        case HCI:
+            return Sun.getHCI(Layers.getLastUpdatedTimestamp());
+        case STONYHURST:
+            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            return new Quat(0, p.lon);
+        default:
+            return Quat.ZERO;
+        }
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
@@ -59,24 +73,7 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
-
-        Mat4 cameraMatrix;
-        switch (gridChoice) {
-        case VIEWPOINT:
-            cameraMatrix = camera.getViewpoint().orientation.toMatrix();
-            break;
-        case HCI:
-            cameraMatrix = Sun.getHCI(Layers.getLastUpdatedTimestamp()).toMatrix();
-            break;
-        case STONYHURST:
-            Quat orientation = new Quat(0, p.lon);
-            cameraMatrix = orientation.toMatrix();
-            break;
-        default:
-            cameraMatrix = Mat4.identity();
-            break;
-        }
+        Mat4 cameraMatrix = getGridQuat(camera).toMatrix();
 
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
@@ -95,7 +92,7 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        drawEarthCircles(gl, p);
+        drawEarthCircles(gl, Sun.getEarth(Layers.getLastUpdatedTimestamp()));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);

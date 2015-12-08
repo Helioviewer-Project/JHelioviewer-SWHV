@@ -69,6 +69,7 @@ public class ImageViewerGui {
 
     private static RenderableContainer renderableContainer;
     private static RenderableCamera renderableCamera;
+    private static RenderableGrid renderableGrid;
     private static RenderableMiniview renderableMiniview;
 
     private static InteractionRotate rotationInteraction;
@@ -110,7 +111,8 @@ public class ImageViewerGui {
 
         // Layer control
         renderableContainer = new RenderableContainer();
-        renderableContainer.addRenderable(new RenderableGrid());
+        renderableGrid = new RenderableGrid();
+        renderableContainer.addRenderable(renderableGrid);
         renderableCamera = new RenderableCamera();
         renderableContainer.addRenderable(renderableCamera);
         renderableContainer.addRenderable(new RenderableTimeStamp());
@@ -292,6 +294,10 @@ public class ImageViewerGui {
 
     public static RenderableCamera getRenderableCamera() {
         return renderableCamera;
+    }
+
+    public static RenderableGrid getRenderableGrid() {
+        return renderableGrid;
     }
 
     public static RenderableMiniview getRenderableMiniview() {
