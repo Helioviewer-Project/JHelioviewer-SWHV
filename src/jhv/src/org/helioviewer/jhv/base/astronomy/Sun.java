@@ -22,14 +22,11 @@ public class Sun {
 
     public static final Position.L EpochEarthL;
     public static final Position.Q EpochEarthQ;
-    public static final Quat HCI;
 
     static {
         prevEarth = new Position.L(new JHVDate(0), 0, 0, 0);
         EpochEarthL = getEarth(TimeUtils.Epoch);
         EpochEarthQ = new Position.Q(EpochEarthL.time, EpochEarthL.rad, new Quat(EpochEarthL.lat, EpochEarthL.lon));
-
-        HCI = new Quat(0, -EpochEarthL.lon);
     }
 
     private static double milli2mjd(long milli) {
@@ -77,8 +74,7 @@ public class Sun {
         double x = -Math.cos(diff);
         double eta = Math.atan2(y, x); // rad
 
-        // 1854-01-01.5 / Carrington sidereal period 25.38
-        double theta = ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / 25.38); // rad
+        double theta = sunRot(mjd);
 
         double he_lon = (eta - theta) % (2 * Math.PI);
         if (he_lon < 0)
@@ -90,6 +86,18 @@ public class Sun {
         prevEarth = Earth;
 
         return Earth;
+    }
+
+    private static double sunRot(double mjd) {
+        // 1854-01-01.5 / Carrington sidereal period 25.38
+        return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / 25.38); // rad
+    }
+
+    private static final double theta0 = sunRot(milli2mjd(TimeUtils.Epoch.milli));
+
+    public static Quat getHCI(JHVDate time) {
+        // 1.7381339560109783
+        return new Quat(0, sunRot(milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
     }
 
     public static Position.Q getEarthQuat(JHVDate time) {
