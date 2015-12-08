@@ -143,10 +143,5 @@ public class CameraHelper {
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);
     }
-/*
-    public static Quat getCameraDifferenceRotation(Camera camera, Quat rot) {
-        return Quat.rotateWithConjugate(camera.getRotation(), rot);
-    }
-*/
 
 }
