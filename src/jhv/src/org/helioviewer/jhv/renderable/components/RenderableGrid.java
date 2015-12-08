@@ -110,27 +110,36 @@ public class RenderableGrid extends AbstractRenderable {
         if (showAxes)
             drawAxes(gl);
 
-        Mat4 cameraMatrix = getGridQuat(camera).toMatrix();
-
         gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferID);
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
+
+        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+        Mat4 cameraMatrix = getGridQuat(camera).toMatrix();
 
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
         {
             drawGrid(gl);
-            if (showRadial)
-                drawRadialGrid(gl);
             if (showLabels) {
-                // cameraWidth changes ever so slightly with distance to Sun
-                int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
                 drawGridText(gl, pixelsPerSolarRadius);
-                if (showRadial)
-                    drawRadialGridText(gl, pixelsPerSolarRadius);
             }
         }
         gl.glPopMatrix();
+
+        if (showRadial) {
+            cameraMatrix = camera.getViewpoint().orientation.toMatrix();
+            gl.glPushMatrix();
+            gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
+            {
+                drawRadialGrid(gl);
+                if (showLabels) {
+                    drawRadialGridText(gl, pixelsPerSolarRadius);
+                }
+            }
+            gl.glPopMatrix();
+        }
+
         drawEarthCircles(gl, Sun.getEarth(Layers.getLastUpdatedTimestamp()));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
