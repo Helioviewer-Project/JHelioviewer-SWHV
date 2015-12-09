@@ -93,6 +93,11 @@ public class Sun {
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / 25.38); // rad
     }
 
+    public static double getCarringtonSynodic(JHVDate time) {
+        double mjd = milli2mjd(time.milli);
+        return ((JulianDay.DJM0 - 2398167.) + mjd) / 27.2753 + 1.;
+    }
+
     private static final double theta0 = sunRot(milli2mjd(TimeUtils.Epoch.milli));
 
     public static Quat getHCI(JHVDate time) {
