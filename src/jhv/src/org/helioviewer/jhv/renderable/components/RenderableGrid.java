@@ -98,11 +98,9 @@ public class RenderableGrid extends AbstractRenderable {
         case STONYHURST:
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
             return new Quat(0, p.lon);
-        case CARRINGTON:
-            return Quat.ZERO;
         case HCI:
             return Sun.getHCI(Layers.getLastUpdatedTimestamp());
-        default:
+        default: // CARRINGTON
             return Quat.ZERO;
         }
     }

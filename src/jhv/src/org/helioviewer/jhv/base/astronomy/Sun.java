@@ -99,9 +99,9 @@ public class Sun {
         double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / 27.2753 + 1.;
 
         Position.L p = getEarth(time);
-        double flon = 1 + p.lon / (2 * Math.PI);
+        double flon = 1. + p.lon / (2 * Math.PI);
 
-        return flon + (int) icr;
+        return flon + (int) cr;
     }
 
     private static final double theta0 = sunRot(milli2mjd(TimeUtils.Epoch.milli));
