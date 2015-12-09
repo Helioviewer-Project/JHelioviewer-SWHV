@@ -28,7 +28,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 public class RenderableGrid extends AbstractRenderable {
 
     enum GridChoiceType {
-        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), HCI("HCI grid");
+        VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), CARRINGTON("Carrington grid"), HCI("HCI grid");
 
         private final String display;
 
@@ -85,6 +85,9 @@ public class RenderableGrid extends AbstractRenderable {
         double phi = 90. - Math.atan2(p.z, p.x) * 180. / Math.PI;
         phi = MathUtils.mapToMinus180To180(phi);
 
+        if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
+            phi += 360;
+
         return new Vec2(phi, theta);
     }
 
@@ -92,11 +95,13 @@ public class RenderableGrid extends AbstractRenderable {
         switch (gridChoice) {
         case VIEWPOINT:
             return camera.getViewpoint().orientation;
-        case HCI:
-            return Sun.getHCI(Layers.getLastUpdatedTimestamp());
         case STONYHURST:
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
             return new Quat(0, p.lon);
+        case CARRINGTON:
+            return Sun.getCarrington(Layers.getLastUpdatedTimestamp());
+        case HCI:
+            return Sun.getHCI(Layers.getLastUpdatedTimestamp());
         default:
             return Quat.ZERO;
         }
@@ -382,18 +387,24 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void makeLonLabels() {
+        String txt;
         double size = Sun.Radius * 1.05;
 
         lonLabels.clear();
 
         for (double theta = 0; theta <= 180.; theta += lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            String txt = formatStrip(theta);
+            txt = formatStrip(theta);
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
         for (double theta = -lonstepDegrees; theta > -180.; theta -= lonstepDegrees) {
             double angle = (90 - theta) * Math.PI / 180.;
-            String txt = formatStrip(theta);
+
+            if (gridChoice == GridChoiceType.CARRINGTON) {
+                txt = formatStrip(theta + 360);
+            } else {
+                txt = formatStrip(theta);
+            }
             lonLabels.add(new GridLabel(txt, (float) (Math.cos(angle) * size), (float) (Math.sin(angle) * size), (float) theta));
         }
     }
@@ -530,6 +541,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     public void setCoordinates(GridChoiceType _gridChoice) {
         gridChoice = _gridChoice;
+        makeLonLabels();
     }
 
 }
