@@ -20,7 +20,7 @@ public class CarringtonStatusPanel extends StatusPanel.StatusPlugin implements T
     }
 
     private void updateCarrington(JHVDate time) {
-        setText(String.format("CR: %.2f", Sun.getCarringtonSynodic(time)));
+        setText(String.format("CR: %.2f", Sun.getCarringtonRotation(time)));
     }
 
 }

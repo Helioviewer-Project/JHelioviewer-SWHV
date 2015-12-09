@@ -93,9 +93,15 @@ public class Sun {
         return ((JulianDay.DJM0 - 2398220.) + mjd) * (2 * Math.PI / 25.38); // rad
     }
 
-    public static double getCarringtonSynodic(JHVDate time) {
+    // derived from tim2carr
+    public static double getCarringtonRotation(JHVDate time) {
         double mjd = milli2mjd(time.milli);
-        return ((JulianDay.DJM0 - 2398167.) + mjd) / 27.2753 + 1.;
+        double cr = ((JulianDay.DJM0 - 2398167.) + mjd) / 27.2753 + 1.;
+
+        Position.L p = getEarth(time);
+        double flon = 1 + p.lon / (2 * Math.PI);
+
+        return flon + (int) icr;
     }
 
     private static final double theta0 = sunRot(milli2mjd(TimeUtils.Epoch.milli));
