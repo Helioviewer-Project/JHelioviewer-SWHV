@@ -105,11 +105,6 @@ public class Sun {
         return new Quat(0, sunRot(milli2mjd(time.milli)) + (1.738033457804639 + EpochEarthL.lon - theta0));
     }
 
-    public static Quat getCarrington(JHVDate time) {
-        Position.L p = getEarth(time);
-        return new Quat(0, sunRot(milli2mjd(time.milli)) - p.lon);
-    }
-
     public static Position.Q getEarthQuat(JHVDate time) {
         Position.L p = getEarth(time);
         return new Position.Q(time, p.rad, new Quat(p.lat, p.lon));
