@@ -1,6 +1,18 @@
-diff -ur jogl-v2.3.1/src/jogl/native/macosx/MacOSXWindowSystemInterface.m jogl/src/jogl/native/macosx/MacOSXWindowSystemInterface.m
---- jogl-v2.3.1/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-03-27 15:58:50.000000000 +0100
-+++ jogl/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-10-09 22:03:03.000000000 +0200
+diff -ur jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java jogl-v2.3.2-new/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java
+--- jogl-v2.3.2-orig/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2-new/src/jogl/classes/jogamp/opengl/macosx/cgl/MacOSXCGLContext.java	2015-12-09 16:53:53.000000000 +0100
+@@ -1122,7 +1122,7 @@
+                                   //
+                                   // FIXME: IMHO this synchronization should be implicitly performed via 'CGL.flushBuffer(contextHandle)' above,
+                                   // in case this will be determined a driver bug - use a QUIRK entry in GLRendererQuirks!
+-                                  gl.glFinish();
++                                  // gl.glFinish();
+ 
+                                   // If v-sync is disabled, frames will be drawn as quickly as possible w/o delay,
+                                   // while still synchronizing w/ CALayer.
+diff -ur jogl-v2.3.2-orig/src/jogl/native/macosx/MacOSXWindowSystemInterface.m jogl-v2.3.2-new/src/jogl/native/macosx/MacOSXWindowSystemInterface.m
+--- jogl-v2.3.2-orig/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2-new/src/jogl/native/macosx/MacOSXWindowSystemInterface.m	2015-12-09 16:52:22.000000000 +0100
 @@ -556,8 +556,8 @@
              GLint zeroOpacity = 0;
              [ctx setValues:&zeroOpacity forParameter:NSOpenGLCPSurfaceOpacity];
@@ -11,9 +23,9 @@ diff -ur jogl-v2.3.1/src/jogl/native/macosx/MacOSXWindowSystemInterface.m jogl/s
              [view unlockFocus];        
          }
      }
-diff -ur jogl-v2.3.1/src/nativewindow/native/macosx/OSXmisc.m jogl/src/nativewindow/native/macosx/OSXmisc.m
---- jogl-v2.3.1/src/nativewindow/native/macosx/OSXmisc.m	2015-03-27 15:58:50.000000000 +0100
-+++ jogl/src/nativewindow/native/macosx/OSXmisc.m	2015-10-09 22:03:38.000000000 +0200
+diff -ur jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m jogl-v2.3.2-new/src/nativewindow/native/macosx/OSXmisc.m
+--- jogl-v2.3.2-orig/src/nativewindow/native/macosx/OSXmisc.m	2015-10-10 03:08:14.000000000 +0200
++++ jogl-v2.3.2-new/src/nativewindow/native/macosx/OSXmisc.m	2015-12-09 16:52:22.000000000 +0100
 @@ -342,7 +342,7 @@
      NSWindow* myWindow = [[NSWindow alloc] initWithContentRect: rect
                                             styleMask: NSBorderlessWindowMask
