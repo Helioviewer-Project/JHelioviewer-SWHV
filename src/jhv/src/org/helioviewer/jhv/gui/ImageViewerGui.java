@@ -32,6 +32,7 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.TopToolBar;
+import org.helioviewer.jhv.gui.components.statusplugins.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
@@ -137,8 +138,11 @@ public class ImageViewerGui {
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
 
+        CarringtonStatusPanel carringtonStatus = new CarringtonStatusPanel();
+
         StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA, 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
+        statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
