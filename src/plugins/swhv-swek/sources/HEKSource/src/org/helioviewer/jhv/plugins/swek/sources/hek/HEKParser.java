@@ -16,7 +16,6 @@ import java.util.Scanner;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -877,8 +876,8 @@ public class HEKParser implements SWEKParser {
     }
 
     public Vec3 convertHGSJHV2D(Vec3 el, HEKEvent evt) {
-        double theta = el.y / MathUtils.radeg;
-        double phi = el.x / MathUtils.radeg;
+        double theta = Math.PI / 180 * el.y;
+        double phi = Math.PI / 180 * el.x;
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
@@ -886,10 +885,9 @@ public class HEKParser implements SWEKParser {
     }
 
     public Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
-        double theta = el.y / MathUtils.radeg;
-
         Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-        double phi = el.x / MathUtils.radeg - p.lon;
+        double theta = Math.PI / 180 * el.y;
+        double phi = Math.PI / 180 * el.x - p.lon;
 
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);

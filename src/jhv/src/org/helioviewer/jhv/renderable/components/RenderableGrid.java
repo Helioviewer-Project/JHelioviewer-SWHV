@@ -80,8 +80,8 @@ public class RenderableGrid extends AbstractRenderable {
             p = q.rotateInverseVector(p);
         }
 
-        double theta = 90. - Math.acos(p.y) * 180. / Math.PI;
-        double phi = 90. - Math.atan2(p.z, p.x) * 180. / Math.PI;
+        double theta = 90 - 180 / Math.PI * Math.acos(p.y);
+        double phi = 90 - 180 / Math.PI * Math.atan2(p.z, p.x);
         phi = MathUtils.mapToMinus180To180(phi);
 
         if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)

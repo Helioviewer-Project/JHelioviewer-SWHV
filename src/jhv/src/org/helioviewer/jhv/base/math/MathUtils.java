@@ -10,7 +10,8 @@ import org.helioviewer.jhv.base.interval.Interval;
  */
 public class MathUtils {
 
-    public static final double radeg = 180.0 / Math.PI;
+    public static final double radeg = 180 / Math.PI;
+    public static final double degra = Math.PI / 180;
 
     /**
      * Returns the integer, x, closest on the number line such that
