@@ -259,11 +259,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         ArrayList<String> txts = new ArrayList<String>();
 
         for (JHVEventParameter p : params.values()) {
-            String name = p.getParameterDisplayName();
+            String name = p.getParameterName();
             String value = p.getDisplayParameterValue();
-            if (!Regex.WEB_URL.matcher(value).matches() && !name.equals("Event Description") && !name.equals("Event Title")) {
-                String txt = name + " : " + value;
-                txts.add(txt);
+            if (!Regex.WEB_URL.matcher(value).matches() && !name.equals("event_description") && !name.equals("event_title")) {
+                txts.add(p.getParameterDisplayName() + " : " + value);
             }
         }
         if (txts.size() != 0)
