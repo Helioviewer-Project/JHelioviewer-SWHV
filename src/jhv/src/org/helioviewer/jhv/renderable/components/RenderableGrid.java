@@ -171,10 +171,8 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lon), 0, 1, 0);
         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
-        gl.glPopMatrix();
 
-        gl.glPushMatrix();
-        gl.glRotatef((float) (- 180 / Math.PI * p.lon), 0, 1, 0);
+        gl.glRotatef(-90, 0, 1, 0);
         gl.glRotatef((float) (90 - 180 / Math.PI * p.lat), 1, 0, 0);
         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
         gl.glPopMatrix();
