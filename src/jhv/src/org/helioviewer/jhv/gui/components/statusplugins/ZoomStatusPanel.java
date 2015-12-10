@@ -6,10 +6,10 @@ import org.helioviewer.jhv.gui.components.StatusPanel;
 public class ZoomStatusPanel extends StatusPanel.StatusPlugin {
 
     public ZoomStatusPanel() {
-        updateZoomLevel(1);
+        update(1);
     }
 
-    public void updateZoomLevel(double cameraWidth) {
+    public void update(double cameraWidth) {
         setText(String.format("FOV: %.2f R\u2299", 2 * cameraWidth));
     }
 

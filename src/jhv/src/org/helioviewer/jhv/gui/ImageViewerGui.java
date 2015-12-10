@@ -41,10 +41,10 @@ import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.LoadURIDownloadTask;
 import org.helioviewer.jhv.io.LoadURITask;
-import org.helioviewer.jhv.renderable.components.RenderableCamera;
 import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableMiniview;
 import org.helioviewer.jhv.renderable.components.RenderableTimeStamp;
+import org.helioviewer.jhv.renderable.components.RenderableViewpoint;
 import org.helioviewer.jhv.renderable.gui.RenderableContainer;
 import org.helioviewer.jhv.renderable.gui.RenderableContainerPanel;
 
@@ -66,10 +66,11 @@ public class ImageViewerGui {
     private static MainContentPanel mainContentPanel;
 
     private static ZoomStatusPanel zoomStatus;
+    private static CarringtonStatusPanel carringtonStatus;
     private static FramerateStatusPanel framerateStatus;
 
     private static RenderableContainer renderableContainer;
-    private static RenderableCamera renderableCamera;
+    private static RenderableViewpoint renderableViewpoint;
     private static RenderableGrid renderableGrid;
     private static RenderableMiniview renderableMiniview;
 
@@ -101,6 +102,7 @@ public class ImageViewerGui {
 
         // STATUS PANEL
         zoomStatus = new ZoomStatusPanel(); // zoomStatus has to be initialised before topToolBar
+        carringtonStatus = new CarringtonStatusPanel();
         framerateStatus = new FramerateStatusPanel();
 
         TopToolBar topToolBar = new TopToolBar();
@@ -114,8 +116,8 @@ public class ImageViewerGui {
         renderableContainer = new RenderableContainer();
         renderableGrid = new RenderableGrid();
         renderableContainer.addRenderable(renderableGrid);
-        renderableCamera = new RenderableCamera();
-        renderableContainer.addRenderable(renderableCamera);
+        renderableViewpoint = new RenderableViewpoint();
+        renderableContainer.addRenderable(renderableViewpoint);
         renderableContainer.addRenderable(new RenderableTimeStamp());
         renderableMiniview = new RenderableMiniview();
         renderableContainer.addRenderable(renderableMiniview);
@@ -137,8 +139,6 @@ public class ImageViewerGui {
 
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addPlugin(positionStatus);
-
-        CarringtonStatusPanel carringtonStatus = new CarringtonStatusPanel();
 
         StatusPanel statusPanel = new StatusPanel(leftScrollPane.getPreferredSize().width + SIDE_PANEL_WIDTH_EXTRA, 5);
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.LEFT);
@@ -292,12 +292,16 @@ public class ImageViewerGui {
         return zoomStatus;
     }
 
+    public static CarringtonStatusPanel getCarringtonStatusPanel() {
+        return carringtonStatus;
+    }
+
     public static FramerateStatusPanel getFramerateStatusPanel() {
         return framerateStatus;
     }
 
-    public static RenderableCamera getRenderableCamera() {
-        return renderableCamera;
+    public static RenderableViewpoint getRenderableViewpoint() {
+        return renderableViewpoint;
     }
 
     public static RenderableGrid getRenderableGrid() {

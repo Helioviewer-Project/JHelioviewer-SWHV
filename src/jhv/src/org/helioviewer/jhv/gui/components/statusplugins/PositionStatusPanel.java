@@ -17,7 +17,6 @@ import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 @SuppressWarnings("serial")
 public class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseMotionListener, InputControllerPlugin {
 
-    private Point lastPosition;
     private static String rhoFormat = " | \u03c1 : %.2f R\u2299";
     private static String emptyPos = "(\u03C6, \u03B8) : (--\u00B0, --\u00B0)";
 
@@ -27,10 +26,7 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         setText(emptyPos + String.format(rhoFormat, 0.));
     }
 
-    private void updatePosition(Point position) {
-        if (position == lastPosition)
-            return;
-
+    private void update(Point position) {
         Viewport vp = Displayer.getActiveViewport();
         Vec2 coord = ImageViewerGui.getRenderableGrid().gridPoint(camera, vp, position);
         double radius = CameraHelper.getRadiusFromSphereAlt(camera, vp, position);
@@ -40,7 +36,6 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
         } else {
             setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
         }
-        lastPosition = position;
     }
 
     @Override
@@ -54,12 +49,12 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        updatePosition(e.getPoint());
+        update(e.getPoint());
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        updatePosition(e.getPoint());
+        update(e.getPoint());
     }
 
 }
