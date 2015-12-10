@@ -546,13 +546,13 @@ public class HEKParser implements SWEKParser {
                 String value = ref.getString(keyString);
                 if (keyString.toLowerCase().equals("ref_type")) {
                     if (value.toLowerCase().equals("movie")) {
-                        type = "Movie";
+                        type = "Reference Movie";
                         ok = true;
                     } else if (value.toLowerCase().equals("image")) {
-                        type = "Image";
+                        type = "Reference Image";
                         ok = true;
                     } else if (value.toLowerCase().equals("html")) {
-                        type = "Link";
+                        type = "Reference Link";
                         ok = true;
                     }
                 } else if (keyString.toLowerCase().equals("ref_url")) {
