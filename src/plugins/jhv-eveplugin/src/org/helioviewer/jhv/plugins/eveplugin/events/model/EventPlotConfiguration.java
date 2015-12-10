@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 
 /**
  *
@@ -20,8 +21,6 @@ public class EventPlotConfiguration {
     /** The scaled x position */
     private final double scaledX0;
     private final double scaledX1;
-
-    private static final int offset = 3;
 
     /** the Y position */
     private final int yPosition;
@@ -79,7 +78,7 @@ public class EventPlotConfiguration {
     public JHVEvent draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
         JHVEvent highlightedEvent = null;
         int spacePerLine = Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
-        int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + offset;
+        int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
         Rectangle drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
         // minimal width is 1
         if (drawPosition.width < 5) {
@@ -103,8 +102,9 @@ public class EventPlotConfiguration {
             shouldRedraw = true;
             spacePerLine = drawPosition.height;
         }
-        if (mousePosition != null && containsMouse)
+        if (mousePosition != null && containsMouse) {
             highlightedEvent = event;
+        }
         if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
