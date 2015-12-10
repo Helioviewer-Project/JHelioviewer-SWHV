@@ -48,7 +48,6 @@ import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -209,12 +208,17 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         timeSlider.setMaximum(0);
         timeSlider.setValue(0);
         setEnabledState(false);
+
+        clickRecordButton();
+        recordButton.setEnabled(false);
     }
 
     public static void setMovie(View view) {
         timeSlider.setMaximum(view.getMaximumFrameNumber());
         timeSlider.setValue(view.getCurrentFrameNumber());
         setEnabledState(true);
+
+        recordButton.setEnabled(true);
     }
 
     private MoviePanel() {
@@ -393,7 +397,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         ComponentUtils.enableComponents(recordPanel, enabled);
     }
 
-    private static class RecordButton extends JToggleButton implements ActionListener, LayersListener {
+    private static class RecordButton extends JToggleButton implements ActionListener {
 
         private RecordMode mode = RecordMode.LOOP;
         private RecordSize size = RecordSize.ORIGINAL;
@@ -402,21 +406,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             super("REC", recordIcon);
             setToolTipText("Record movie");
             addActionListener(this);
-            Layers.addLayersListener(this);
-        }
-
-        @Override
-        public void layerAdded(View view) {
-        }
-
-        @Override
-        public void activeLayerChanged(View view) {
-            if (view == null) {
-                if (isSelected())
-                    doClick();
-                setEnabled(false);
-            } else
-                setEnabled(true);
         }
 
         @Override
@@ -463,12 +452,12 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         recordPanel.setVisible(advanced);
     }
 
-    public void setFrameSlider(int frame) {
+    public static void setFrameSlider(int frame) {
         // update just UI, tbd
-        timeSlider.removeChangeListener(this);
+        timeSlider.removeChangeListener(instance);
         timeSlider.setValue(frame);
         frameNumberLabel.setText((frame + 1) + "/" + (timeSlider.getMaximum() + 1));
-        timeSlider.addChangeListener(this);
+        timeSlider.addChangeListener(instance);
     }
 
     /**
@@ -718,8 +707,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      * from the global look and feel.
      */
     private static class TimeSlider extends JSlider {
-
-
         /**
          * Default constructor
          *

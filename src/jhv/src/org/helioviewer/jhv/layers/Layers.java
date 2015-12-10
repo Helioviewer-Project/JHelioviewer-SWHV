@@ -166,7 +166,7 @@ public class Layers {
             listener.frameChanged(activeFrame);
         }
 
-        MoviePanel.getInstance().setFrameSlider(activeFrame);
+        MoviePanel.setFrameSlider(activeFrame);
     }
 
     /**
