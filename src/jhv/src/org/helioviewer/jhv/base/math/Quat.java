@@ -136,7 +136,7 @@ public class Quat {
             q1.a * q2.u.x + q1.u.x * q2.a + q1.u.y * q2.u.z - q1.u.z * q2.u.y,
             q1.a * q2.u.y + q1.u.y * q2.a + q1.u.z * q2.u.x - q1.u.x * q2.u.z,
             q1.a * q2.u.z + q1.u.z * q2.a + q1.u.x * q2.u.y - q1.u.y * q2.u.x);
-        q.normalize();
+        // q.normalize();
         return q;
     }
 
@@ -146,7 +146,7 @@ public class Quat {
            -q1.a * q2.u.x + q1.u.x * q2.a - q1.u.y * q2.u.z + q1.u.z * q2.u.y,
            -q1.a * q2.u.y + q1.u.y * q2.a - q1.u.z * q2.u.x + q1.u.x * q2.u.z,
            -q1.a * q2.u.z + q1.u.z * q2.a - q1.u.x * q2.u.y + q1.u.y * q2.u.x);
-        q.normalize();
+        // q.normalize();
         return q;
     }
 
@@ -188,10 +188,11 @@ public class Quat {
     public Quat normalize() {
         double l = Math.sqrt(a * a + u.x * u.x + u.y * u.y + u.z * u.z);
         if (l != 0) {
-            a /= l;
-            u.x /= l;
-            u.y /= l;
-            u.z /= l;
+            l = 1 / l;
+            a *= l;
+            u.x *= l;
+            u.y *= l;
+            u.z *= l;
         }
         return this;
     }

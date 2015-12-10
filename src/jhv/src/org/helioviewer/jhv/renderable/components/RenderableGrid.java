@@ -169,17 +169,13 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glColor3f(1, 1, 0);
 
         gl.glPushMatrix();
-        Quat longitudeRotation = new Quat(0, p.lon + Math.PI / 2);
-        longitudeRotation.conjugate();
-        gl.glMultMatrixd(longitudeRotation.toMatrix().m, 0);
+        gl.glRotatef((float) (90 - 180 / Math.PI * p.lon), 0, 1, 0);
         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        Quat latitudeRotation = new Quat(p.lat + Math.PI / 2, p.lon);
-        latitudeRotation.conjugate();
-        gl.glMultMatrixd(latitudeRotation.toMatrix().m, 0);
-        gl.glRotatef((float) (-p.lat), 0, 0, 1);
+        gl.glRotatef((float) (- 180 / Math.PI * p.lon), 0, 1, 0);
+        gl.glRotatef((float) (90 - 180 / Math.PI * p.lat), 1, 0, 0);
         gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
         gl.glPopMatrix();
     }
