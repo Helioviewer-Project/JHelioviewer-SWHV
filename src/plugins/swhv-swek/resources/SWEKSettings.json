@@ -306,14 +306,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -891,14 +891,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
@@ -1030,14 +1030,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 }
             ],
             "request_interval_extension"    : 3000,
@@ -1089,14 +1089,14 @@
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 },
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_StartTime",
                     "parameter_display_name"    : "Event Start Time",
                     "filter"                    : null,
-                    "default_visible"           : true
+                    "default_visible"           : false
                 }],
             "request_interval_extension"    : 36000000,
             "standard_selected"             : true,
