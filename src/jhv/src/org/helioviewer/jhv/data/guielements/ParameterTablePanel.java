@@ -76,6 +76,7 @@ public class ParameterTablePanel extends JPanel {
         // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sorter = new TableRowSorter<ParameterTableModel>(parameterModel);
         table.setRowSorter(sorter);
+        sorter.toggleSortOrder(0);
 
         WrappedTextCellRenderer renderer = new WrappedTextCellRenderer();
         table.setDefaultRenderer(String.class, renderer);
