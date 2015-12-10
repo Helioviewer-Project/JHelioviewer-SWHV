@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -25,10 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.RowFilter;
-import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import javax.swing.text.html.HTMLDocument;
 
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -129,6 +126,7 @@ public class ParameterTablePanel extends JPanel {
 
         public WrappedTextCellRenderer() {
             setContentType("text/html");
+            putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         }
 
         @Override
@@ -145,10 +143,6 @@ public class ParameterTablePanel extends JPanel {
             } else {
                 setText(str);
             }
-
-            Font font = UIManager.getFont("Label.font");
-            String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
-            ((HTMLDocument) getDocument()).getStyleSheet().addRule(bodyRule);
 
             setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
             if (table.getRowHeight(row) != getPreferredSize().height) {
