@@ -124,22 +124,16 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
     private void initDescriptionText() {
         textType = new JTextArea(event.getJHVEventType().getEventType());
         textType.setBackground(this.getBackground());
-        textType.setLineWrap(true);
-        textType.setWrapStyleWord(true);
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
 
         textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
         textStartTime.setBackground(this.getBackground());
-        textStartTime.setLineWrap(true);
-        textStartTime.setWrapStyleWord(true);
         textStartTime.setFont(labelIcon.getFont());
         textStartTime.setMargin(new Insets(0, 0, 0, 0));
 
         textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
         textEndTime.setBackground(this.getBackground());
-        textEndTime.setLineWrap(true);
-        textEndTime.setWrapStyleWord(true);
         textEndTime.setFont(labelIcon.getFont());
         textEndTime.setMargin(new Insets(0, 0, 0, 0));
     }
