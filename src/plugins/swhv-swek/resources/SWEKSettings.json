@@ -15,14 +15,14 @@
                 {
                     "source"                    : "HEK",
                     "parameter_name"            : "event_description",
-                    "parameter_display_name"    : "Description",
+                    "parameter_display_name"    : "Event Description",
                     "filter"                    : null,
                     "default_visible" 		: true
                 },
 		{
                     "source"                    : "HEK",
                     "parameter_name"            : "event_title",
-                    "parameter_display_name"    : "Title",
+                    "parameter_display_name"    : "Event Title",
                     "filter"                    : null,
                     "default_visible" 		: true
                 },
