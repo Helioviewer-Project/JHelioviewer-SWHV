@@ -55,18 +55,18 @@ public class Sun {
         // Eccentricity of orbit
         double e = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
         // Sun's equation of center (deg)
-        double c = (1.919460 - 0.004789 * t - 0.000014 * t * t) * Math.sin(mna / MathUtils.radeg) + (0.020094 - 0.000100 * t) * Math.sin(2 * mna / MathUtils.radeg) + 0.000293 * Math.sin(3 * mna / MathUtils.radeg);
+        double c = (1.919460 - 0.004789 * t - 0.000014 * t * t) * Math.sin(mna * MathUtils.degra) + (0.020094 - 0.000100 * t) * Math.sin(2 * mna * MathUtils.degra) + 0.000293 * Math.sin(3 * mna * MathUtils.degra);
         // Sun's true geometric longitude (deg)
         double true_long = mnl + c;
         // Sun's true anomaly (deg):
         double ta = mna + c;
         // Sun's radius vector (AU)
-        double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(ta / MathUtils.radeg));
+        double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(ta * MathUtils.degra));
 
         double lamda = true_long - 0.00569; // deg
         double k = 74.3646 + 1.395833 * t; // deg
-        double diff = (lamda - k) / MathUtils.radeg; // rad
-        double i = 7.25 / MathUtils.radeg; // rad
+        double diff = (lamda - k) * MathUtils.degra; // rad
+        double i = 7.25 * MathUtils.degra; // rad
 
         double he_lat = Math.asin(Math.sin(diff) * Math.sin(i)); // rad
 
@@ -74,11 +74,11 @@ public class Sun {
         double x = -Math.cos(diff);
         double eta = Math.atan2(y, x); // rad
 
-        double theta = sunRot(mjd);
+        double theta = sunRot(mjd); // rad
 
         double he_lon = (eta - theta) % (2 * Math.PI);
         if (he_lon < 0)
-            he_lon += (2 * Math.PI);
+            he_lon += 2 * Math.PI;
 
         // convert distance to solar radii
         // change L0 Carrington longitude sign to increase towards West, like Stonyhurst
