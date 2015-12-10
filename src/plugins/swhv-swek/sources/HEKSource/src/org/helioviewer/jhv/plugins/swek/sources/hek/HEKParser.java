@@ -16,8 +16,8 @@ import java.util.Scanner;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -406,103 +406,116 @@ public class HEKParser implements SWEKParser {
     private void parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
-            String value = result.getString((String) key);
-            if (value.toLowerCase().equals("null")) {
-                value = null;
-            }
-            // Event start time
-            if (keyString.toLowerCase().equals("event_starttime")) {
-                currentEvent.setStartTime(parseDate(value));
-            } else
-            // Event end time
-            if (keyString.toLowerCase().equals("event_endtime")) {
-                currentEvent.setEndTime(parseDate(value));
-            } else
-            // event unique ID
-            if (keyString.toLowerCase().equals("kb_archivid")) {
-                currentEvent.setUniqueID(value);
-            } else
-            // event positions (Standard position)
-            if (keyString.toLowerCase().equals("event_coordsys")) {
-                coordinateSystemString = value;
-            } else if (keyString.toLowerCase().equals("event_coord1")) {
-                if (value != null) {
-                    coordinate1 = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("event_coord2")) {
-                if (value != null) {
-                    coordinate2 = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("event_coord3")) {
-                if (value != null) {
-                    coordinate3 = Double.parseDouble(value);
-                }
-            }
-            // event positions (Not standard)
-            if (keyString.toLowerCase().equals("hgc_bbox")) {
-                hgcBoundedBox = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hgc_boundcc")) {
-                hgcBoundCC = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hgc_coord")) {
-                hgcCentralPoint = parsePoint(value);
-            } else if (keyString.toLowerCase().equals("hgc_x")) {
-                if (value != null) {
-                    hgcX = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hgc_y")) {
-                if (value != null) {
-                    hgcY = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hgs_bbox")) {
-                hgsBoundedBox = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hgs_boundcc")) {
-                hgsBoundCC = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hgs_coord")) {
-                hgsCentralPoint = parsePoint(value);
-            } else if (keyString.toLowerCase().equals("hgs_x")) {
-                if (value != null) {
-                    hgsX = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hgs_y")) {
-                if (value != null) {
-                    hgsY = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hpc_bbox")) {
-                hpcBoundedBox = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hpc_boundcc")) {
-                hpcBoundCC = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hpc_coord")) {
-                hpcCentralPoint = parsePoint(value);
-            } else if (keyString.toLowerCase().equals("hpc_x")) {
-                if (value != null) {
-                    hpcX = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hpc_y")) {
-                if (value != null) {
-                    hpcY = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hrc_bbox")) {
-                hrcBoundedBox = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hrc_boundcc")) {
-                hrcBoundCC = parsePolygon(value);
-            } else if (keyString.toLowerCase().equals("hrc_coord")) {
-                hrcCentralPoint = parsePoint(value);
-            } else if (keyString.toLowerCase().equals("hrc_a")) {
-                if (value != null) {
-                    hrcA = Double.parseDouble(value);
-                }
-            } else if (keyString.toLowerCase().equals("hrc_r")) {
-                if (value != null) {
-                    hrcR = Double.parseDouble(value);
-                }
+            if (keyString.toLowerCase().equals("refs")) {
+                parseRefs(currentEvent, result.getJSONArray((String) key));
             } else {
-                boolean visible = false;
-                boolean configured = false;
-                JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
-                if (!eventType.containsParameter(keyString)) {
-                    if (eventSource.containsParameter(keyString)) {
+                String value = result.getString((String) key);
+                if (value.toLowerCase().equals("null")) {
+                    value = null;
+                }
+                // Event start time
+                if (keyString.toLowerCase().equals("event_starttime")) {
+                    currentEvent.setStartTime(parseDate(value));
+                } else
+                // Event end time
+                if (keyString.toLowerCase().equals("event_endtime")) {
+                    currentEvent.setEndTime(parseDate(value));
+                } else
+                // event unique ID
+                if (keyString.toLowerCase().equals("kb_archivid")) {
+                    currentEvent.setUniqueID(value);
+                } else
+                // event positions (Standard position)
+                if (keyString.toLowerCase().equals("event_coordsys")) {
+                    coordinateSystemString = value;
+                } else if (keyString.toLowerCase().equals("event_coord1")) {
+                    if (value != null) {
+                        coordinate1 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord2")) {
+                    if (value != null) {
+                        coordinate2 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord3")) {
+                    if (value != null) {
+                        coordinate3 = Double.parseDouble(value);
+                    }
+                }
+                // event positions (Not standard)
+                if (keyString.toLowerCase().equals("hgc_bbox")) {
+                    hgcBoundedBox = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hgc_boundcc")) {
+                    hgcBoundCC = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hgc_coord")) {
+                    hgcCentralPoint = parsePoint(value);
+                } else if (keyString.toLowerCase().equals("hgc_x")) {
+                    if (value != null) {
+                        hgcX = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hgc_y")) {
+                    if (value != null) {
+                        hgcY = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hgs_bbox")) {
+                    hgsBoundedBox = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hgs_boundcc")) {
+                    hgsBoundCC = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hgs_coord")) {
+                    hgsCentralPoint = parsePoint(value);
+                } else if (keyString.toLowerCase().equals("hgs_x")) {
+                    if (value != null) {
+                        hgsX = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hgs_y")) {
+                    if (value != null) {
+                        hgsY = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hpc_bbox")) {
+                    hpcBoundedBox = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hpc_boundcc")) {
+                    hpcBoundCC = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hpc_coord")) {
+                    hpcCentralPoint = parsePoint(value);
+                } else if (keyString.toLowerCase().equals("hpc_x")) {
+                    if (value != null) {
+                        hpcX = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hpc_y")) {
+                    if (value != null) {
+                        hpcY = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hrc_bbox")) {
+                    hrcBoundedBox = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hrc_boundcc")) {
+                    hrcBoundCC = parsePolygon(value);
+                } else if (keyString.toLowerCase().equals("hrc_coord")) {
+                    hrcCentralPoint = parsePoint(value);
+                } else if (keyString.toLowerCase().equals("hrc_a")) {
+                    if (value != null) {
+                        hrcA = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("hrc_r")) {
+                    if (value != null) {
+                        hrcR = Double.parseDouble(value);
+                    }
+                } else {
+                    boolean visible = false;
+                    boolean configured = false;
+                    JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
+                    if (!eventType.containsParameter(keyString)) {
+                        if (eventSource.containsParameter(keyString)) {
+                            configured = true;
+                            SWEKParameter p = eventSource.getParameter(keyString);
+                            if (p != null) {
+                                visible = p.isDefaultVisible();
+                                parameter.setParameterDisplayName(p.getParameterDisplayName());
+                            } else {
+                                parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
+                            }
+                        }
+                    } else {
                         configured = true;
-                        SWEKParameter p = eventSource.getParameter(keyString);
+                        SWEKParameter p = eventType.getParameter(keyString);
                         if (p != null) {
                             visible = p.isDefaultVisible();
                             parameter.setParameterDisplayName(p.getParameterDisplayName());
@@ -510,18 +523,45 @@ public class HEKParser implements SWEKParser {
                             parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
                         }
                     }
-                } else {
-                    configured = true;
-                    SWEKParameter p = eventType.getParameter(keyString);
-                    if (p != null) {
-                        visible = p.isDefaultVisible();
-                        parameter.setParameterDisplayName(p.getParameterDisplayName());
-                    } else {
-                        parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                    }
+                    currentEvent.addParameter(parameter, visible, configured);
                 }
-                currentEvent.addParameter(parameter, visible, configured);
             }
+        }
+    }
+
+    private void parseRefs(HEKEvent currentEvent, JSONArray refs) throws JSONException {
+        for (int i = 0; i < refs.length() && !parserStopped; i++) {
+            parseRef(currentEvent, refs.getJSONObject(i));
+        }
+    }
+
+    private void parseRef(HEKEvent currentEvent, JSONObject ref) throws JSONException {
+        Iterator<?> keys = ref.keys();
+        String url = "", type = "";
+        boolean ok = false;
+        while (keys.hasNext()) {
+            Object key = keys.next();
+            if (key instanceof String) {
+                String keyString = (String) key;
+                String value = ref.getString(keyString);
+                if (keyString.toLowerCase().equals("ref_type")) {
+                    if (value.toLowerCase().equals("movie")) {
+                        type = "Movie";
+                        ok = true;
+                    } else if (value.toLowerCase().equals("image")) {
+                        type = "Image";
+                        ok = true;
+                    } else if (value.toLowerCase().equals("html")) {
+                        type = "Link";
+                        ok = true;
+                    }
+                } else if (keyString.toLowerCase().equals("ref_url")) {
+                    url = value;
+                }
+            }
+        }
+        if (ok) {
+            currentEvent.addParameter(new JHVEventParameter(type, type, url), true, true);
         }
     }
 
