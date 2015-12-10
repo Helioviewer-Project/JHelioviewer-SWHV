@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eveplugin.view.chart;
+package org.helioviewer.jhv.plugins.eveplugin;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 /**
  * @author Stephan Pagel
  * */
-public class ChartConstants {
+public class DrawConstants {
 
     private static final int GRAPH_LEFT_SPACE = 50;
     private static final int GRAPH_RIGHT_SPACE = 10;
@@ -47,6 +47,8 @@ public class ChartConstants {
     public static final SimpleDateFormat DAY_MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat MONTH_YEAR_TIME_FORMAT = new SimpleDateFormat("MMM yyyy");
     public static final SimpleDateFormat YEAR_ONLY_TIME_FORMAT = new SimpleDateFormat("yyyy");
+
+    public static final int EVENT_OFFSET = 3;
 
     public static int getGraphLeftSpace() {
         return GRAPH_LEFT_SPACE;

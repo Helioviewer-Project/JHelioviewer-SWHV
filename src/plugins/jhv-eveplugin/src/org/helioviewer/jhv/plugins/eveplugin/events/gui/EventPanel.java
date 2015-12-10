@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -76,14 +77,15 @@ public class EventPanel implements DrawableElement {
                 if (eventTypeNr != epcs.size() - 1) {
                     g.setStroke(dashed);
                     g.setColor(Color.black);
-                    int sepLinePos = previousLine * spacePerLine - spacePerLine / 2;
+                    int sepLinePos = previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
                     g.drawLine(0, sepLinePos, graphArea.width, sepLinePos);
                     g.setStroke(normalStroke);
                 }
                 eventTypeNr++;
             }
-            if (mousePosition != null)
+            if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
+            }
         }
     }
 

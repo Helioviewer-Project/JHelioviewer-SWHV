@@ -21,8 +21,8 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
+import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
-import org.helioviewer.jhv.plugins.eveplugin.view.chart.ChartConstants;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModelListener;
@@ -460,15 +460,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Rectangle getGraphArea() {
-        return new Rectangle(ChartConstants.getGraphLeftSpace(), ChartConstants.getGraphTopSpace(), getGraphWidth(), getGraphHeight());
+        return new Rectangle(DrawConstants.getGraphLeftSpace(), DrawConstants.getGraphTopSpace(), getGraphWidth(), getGraphHeight());
     }
 
     public Rectangle getLeftAxisArea() {
-        return new Rectangle(0, ChartConstants.getGraphTopSpace(), ChartConstants.getGraphLeftSpace(), getGraphHeight() - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace()));
+        return new Rectangle(0, DrawConstants.getGraphTopSpace(), DrawConstants.getGraphLeftSpace(), getGraphHeight() - (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace()));
     }
 
     private int getGraphHeight() {
-        return graphSize.height - (ChartConstants.getGraphTopSpace() + ChartConstants.getGraphBottomSpace());
+        return graphSize.height - (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace());
     }
 
     private int getGraphWidth() {
@@ -476,7 +476,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (getYAxisElements().size() >= 2) {
             twoYAxis = 1;
         }
-        return graphSize.width - (ChartConstants.getGraphLeftSpace() + ChartConstants.getGraphRightSpace() + twoYAxis * ChartConstants.getTwoAxisGraphRight());
+        return graphSize.width - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + twoYAxis * DrawConstants.getTwoAxisGraphRight());
     }
 
     private void createYAxisSet() {
