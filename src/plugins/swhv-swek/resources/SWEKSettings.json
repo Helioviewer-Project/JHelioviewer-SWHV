@@ -14,6 +14,20 @@
             "general_parameters"    : [
                 {
                     "source"                    : "HEK",
+                    "parameter_name"            : "event_description",
+                    "parameter_display_name"    : “Description”,
+                    "filter"                    : null,
+                    "default_visible" 		: true
+                },
+		{
+                    "source"                    : "HEK",
+                    "parameter_name"            : “event_title”,
+                    "parameter_display_name"    : “Title”,
+                    "filter"                    : null,
+                    "default_visible" 		: true
+                },
+{
+                    "source"                    : "HEK",
                     "parameter_name"            : "Event_PeakTime",
                     "parameter_display_name"    : "Event Peak Time",
                     "filter"                    : null,
