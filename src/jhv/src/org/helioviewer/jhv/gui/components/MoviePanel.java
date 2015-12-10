@@ -719,9 +719,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
      */
     private static class TimeSlider extends JSlider {
 
-        private static final Color notCachedColor = Color.LIGHT_GRAY;
-        private static final Color partialCachedColor = new Color(0x8080FF);
-        private static final Color completeCachedColor = new Color(0x4040FF);
 
         /**
          * Default constructor
@@ -747,105 +744,110 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void updateUI() {
         }
 
+    }
+
+    /**
+     * Extension of BasicSliderUI overriding some drawing functions.
+     *
+     * All functions for size calculations stay the same.
+     */
+    private static class TimeSliderUI extends BasicSliderUI {
+
+        private static final Color notCachedColor = Color.LIGHT_GRAY;
+        private static final Color partialCachedColor = new Color(0x8080FF);
+        private static final Color completeCachedColor = new Color(0x4040FF);
+
         /**
-         * Extension of BasicSliderUI overriding some drawing functions.
+         * Default constructor.
          *
-         * All functions for size calculations stay the same.
+         * @param component
+         *            the component where this UI delegate is being
+         *            installed
          */
-        private class TimeSliderUI extends BasicSliderUI {
-
-            /**
-             * Default constructor.
-             *
-             * @param component
-             *            the component where this UI delegate is being
-             *            installed
-             */
-            public TimeSliderUI(JSlider component) {
-                super(component);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            protected TrackListener createTrackListener(JSlider slider) {
-                return new TimeTrackListener();
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            protected void scrollDueToClickInTrack(int dir) {
-                setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void paintThumb(Graphics g) {
-                g.setColor(Color.BLACK);
-                g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
-
-                int x = thumbRect.x + (thumbRect.width - 1) / 2;
-                g.drawLine(x, thumbRect.y, x, thumbRect.y + thumbRect.height - 1);
-            }
-
-            /**
-             * {@inheritDoc}
-             *
-             * Draws the different region (no/partial/complete information
-             * loaded) in different colors.
-             */
-            @Override
-            public void paintTrack(Graphics g) {
-                int height = getSize().height / 4;
-                int offset = (getSize().height - height) / 2;
-
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setStroke(new BasicStroke(4));
-
-                View view = Layers.getActiveView();
-                if (view == null) {
-                    g2d.setColor(notCachedColor);
-                    g2d.drawLine(trackRect.x, offset + getSize().height / 8, trackRect.x + trackRect.width, offset + getSize().height / 8);
-                } else {
-                    int len = view.getMaximumFrameNumber();
-
-                    for (int i = 0; i < len; i++) {
-                        int begin = (int) ((float) i / len * trackRect.width);
-                        int end = (int) ((float) (i + 1) / len * trackRect.width);
-
-                        if (end == begin)
-                            end++;
-
-                        CacheStatus cacheStatus = view.getImageCacheStatus(i);
-
-                        if (cacheStatus == CacheStatus.PARTIAL) {
-                            g2d.setColor(partialCachedColor);
-                        } else if (cacheStatus == CacheStatus.COMPLETE) {
-                            g2d.setColor(completeCachedColor);
-                        } else {
-                            g2d.setColor(notCachedColor);
-                        }
-                        g2d.drawLine(trackRect.x + begin, offset + getSize().height / 8, trackRect.x + end, offset + getSize().height / 8);
-                    }
-                }
-                g2d.setStroke(new BasicStroke(1));
-            }
-
-            /**
-             * Overrides the track listener to access currentX
-             */
-            protected class TimeTrackListener extends TrackListener {
-                public int getCurrentX() {
-                    return currentMouseX;
-                }
-            }
+        public TimeSliderUI(JSlider component) {
+            super(component);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected TrackListener createTrackListener(JSlider slider) {
+            return new TimeTrackListener();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void scrollDueToClickInTrack(int dir) {
+            slider.setValue(this.valueForXPosition(((TimeTrackListener) trackListener).getCurrentX()));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void paintThumb(Graphics g) {
+            g.setColor(Color.BLACK);
+            g.drawRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1);
+
+            int x = thumbRect.x + (thumbRect.width - 1) / 2;
+            g.drawLine(x, thumbRect.y, x, thumbRect.y + thumbRect.height - 1);
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * Draws the different region (no/partial/complete information
+         * loaded) in different colors.
+         */
+        @Override
+        public void paintTrack(Graphics g) {
+            int slider_height = slider.getSize().height;
+            int height = slider_height / 4;
+            int offset = (slider_height - height) / 2;
+
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setStroke(new BasicStroke(4));
+
+            View view = Layers.getActiveView();
+            if (view == null) {
+                g2d.setColor(notCachedColor);
+                g2d.drawLine(trackRect.x, offset + slider_height / 8, trackRect.x + trackRect.width, offset + slider_height / 8);
+            } else {
+                int len = view.getMaximumFrameNumber();
+
+                for (int i = 0; i < len; i++) {
+                    int begin = (int) ((float) i / len * trackRect.width);
+                    int end = (int) ((float) (i + 1) / len * trackRect.width);
+
+                    if (end == begin)
+                        end++;
+
+                    CacheStatus cacheStatus = view.getImageCacheStatus(i);
+
+                    if (cacheStatus == CacheStatus.PARTIAL) {
+                        g2d.setColor(partialCachedColor);
+                    } else if (cacheStatus == CacheStatus.COMPLETE) {
+                        g2d.setColor(completeCachedColor);
+                    } else {
+                        g2d.setColor(notCachedColor);
+                    }
+                    g2d.drawLine(trackRect.x + begin, offset + slider_height / 8, trackRect.x + end, offset + slider_height / 8);
+                }
+            }
+            g2d.setStroke(new BasicStroke(1));
+        }
+
+        /**
+         * Overrides the track listener to access currentX
+         */
+        protected class TimeTrackListener extends TrackListener {
+            public int getCurrentX() {
+                return currentMouseX;
+            }
+        }
     }
 
 }
