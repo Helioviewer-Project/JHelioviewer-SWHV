@@ -17,16 +17,16 @@
                     "parameter_name"            : "event_description",
                     "parameter_display_name"    : "Event Description",
                     "filter"                    : null,
-                    "default_visible" 		: true
+                    "default_visible"           : true
                 },
-		{
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "event_title",
                     "parameter_display_name"    : "Event Title",
                     "filter"                    : null,
-                    "default_visible" 		: true
+                    "default_visible"           : true
                 },
-{
+                {
                     "source"                    : "HEK",
                     "parameter_name"            : "Event_PeakTime",
                     "parameter_display_name"    : "Event Peak Time",
@@ -170,6 +170,13 @@
                     "source"                    : "HEK",
                     "parameter_name"            : "GS_ImageURL",
                     "parameter_display_name"    : "Context Image",
+                    "filter"                    : null,
+                    "default_visible"           : true
+                },
+                {
+                    "source"                    : "HEK",
+                    "parameter_name"            : "GS_MovieURL",
+                    "parameter_display_name"    : "Context Movie",
                     "filter"                    : null,
                     "default_visible"           : true
                 },
