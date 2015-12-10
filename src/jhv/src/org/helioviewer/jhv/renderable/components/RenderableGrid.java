@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -96,10 +95,10 @@ public class RenderableGrid extends AbstractRenderable {
         case VIEWPOINT:
             return camera.getViewpoint().orientation;
         case STONYHURST:
-            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Position.L p = Sun.getEarth(camera.getViewpoint().time);
             return new Quat(0, p.lon);
         case HCI:
-            return Sun.getHCI(Layers.getLastUpdatedTimestamp());
+            return Sun.getHCI(camera.getViewpoint().time);
         default: // CARRINGTON
             return Quat.ZERO;
         }
@@ -143,7 +142,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glPopMatrix();
         }
 
-        drawEarthCircles(gl, Sun.getEarth(Layers.getLastUpdatedTimestamp()));
+        drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
