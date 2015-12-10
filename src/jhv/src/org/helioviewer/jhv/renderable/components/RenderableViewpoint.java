@@ -3,6 +3,7 @@ package org.helioviewer.jhv.renderable.components;
 import java.awt.Color;
 import java.awt.Component;
 
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
@@ -13,7 +14,7 @@ import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
 
-public class RenderableCamera extends AbstractRenderable {
+public class RenderableViewpoint extends AbstractRenderable {
 
     private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;
@@ -30,7 +31,7 @@ public class RenderableCamera extends AbstractRenderable {
 
     private String timeString = null;
 
-    public RenderableCamera() {
+    public RenderableViewpoint() {
         optionsPanel = new CameraOptionsPanel();
     }
 
@@ -140,7 +141,9 @@ public class RenderableCamera extends AbstractRenderable {
     }
 
     public void fireTimeUpdated() {
-        timeString = Displayer.getCamera().getViewpoint().time.toString();
+        JHVDate time = Displayer.getCamera().getViewpoint().time;
+        timeString = time.toString();
+        ImageViewerGui.getCarringtonStatusPanel().update(time);
         ImageViewerGui.getRenderableContainer().fireTimeUpdated(this);
     }
 

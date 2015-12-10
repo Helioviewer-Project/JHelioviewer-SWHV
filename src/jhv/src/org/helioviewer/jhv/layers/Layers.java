@@ -156,7 +156,7 @@ public class Layers {
         }
         Displayer.render(1);
 
-        ImageViewerGui.getRenderableCamera().fireTimeUpdated();
+        ImageViewerGui.getRenderableViewpoint().fireTimeUpdated();
         for (TimeListener listener : timeListeners) {
             listener.timeChanged(lastTimestamp);
         }

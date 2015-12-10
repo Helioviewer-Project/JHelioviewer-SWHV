@@ -619,9 +619,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
             View view = Layers.getActiveView();
             if (view == null)
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(0);
+                ImageViewerGui.getFramerateStatusPanel().update(0);
             else
-                ImageViewerGui.getFramerateStatusPanel().updateFramerate(view.getCurrentFramerate());
+                ImageViewerGui.getFramerateStatusPanel().update(view.getCurrentFramerate());
         }
     }
 

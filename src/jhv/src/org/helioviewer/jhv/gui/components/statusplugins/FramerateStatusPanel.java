@@ -6,10 +6,10 @@ import org.helioviewer.jhv.gui.components.StatusPanel;
 public class FramerateStatusPanel extends StatusPanel.StatusPlugin {
 
     public FramerateStatusPanel() {
-        updateFramerate(0);
+        update(0);
     }
 
-    public void updateFramerate(float fps) {
+    public void update(float fps) {
         setText(String.format("fps: % 2d", Math.round(fps * 100) / 100));
     }
 
