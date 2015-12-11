@@ -20,7 +20,7 @@ public class DrawConstants {
 
     private static final int MIN_VERTICAL_TICK_SPACE = 20;
 
-    private static final int INTERVAL_SELECTION_HEIGHT = 30;
+    private static final int INTERVAL_SELECTION_HEIGHT = 15;
     private static final int RANGE_SELECTION_WIDTH = 15;
 
     public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = new Color(224, 224, 224);
