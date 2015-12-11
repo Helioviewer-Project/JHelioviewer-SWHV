@@ -160,21 +160,22 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     }
 
     private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange) {
+        GLSLShader shader = GLSLShader.ortho;
         if (imageData == null) {
             return;
         }
         if (!isVisible[vp.idx])
             return;
 
-        GLSLShader.bind(gl);
+        shader.bind(gl);
         {
-            glImage.applyFilters(gl, imageData, prevImageData, baseImageData);
+            glImage.applyFilters(gl, imageData, prevImageData, baseImageData, shader);
 
-            GLSLShader.setViewport(vp.x, vp.y, vp.width, vp.height);
+            shader.setViewport(vp.x, vp.y, vp.width, vp.height);
             if (!RenderableImageLayer.showCorona) {
-                GLSLShader.setOuterCutOffRadius(1.);
+                shader.setOuterCutOffRadius(1.);
             }
-            GLSLShader.filter(gl);
+            shader.filter(gl);
 
             camera.push(imageData.getViewpoint());
 
@@ -183,12 +184,12 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
             Quat q = camera.getRotation();
 
-            GLSLShader.bindMatrix(gl, vpmi.getFloatArray());
-            GLSLShader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getViewpoint().orientation));
+            shader.bindMatrix(gl, vpmi.getFloatArray());
+            shader.bindCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, imageData.getMetaData().getViewpoint().orientation));
             if (glImage.getBaseDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getViewpoint().orientation));
+                shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, baseImageData.getMetaData().getViewpoint().orientation));
             } else if (glImage.getDifferenceMode()) {
-                GLSLShader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
+                shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
             }
 
             camera.pop();
@@ -198,11 +199,11 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             {
                 gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
 
-                GLSLShader.bindIsDisc(gl, 1);
+                shader.bindIsDisc(gl, 1);
                 gl.glDepthRange(depthrange[2], depthrange[3]);
                 gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);
 
-                GLSLShader.bindIsDisc(gl, 0);
+                shader.bindIsDisc(gl, 0);
                 gl.glDepthRange(depthrange[0], depthrange[1]);
                 gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_INT, (indexBufferSize - 6) * Buffers.SIZEOF_INT);
 
@@ -213,7 +214,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
             gl.glColorMask(true, true, true, true);
         }
-        GLSLShader.unbind(gl);
+        shader.unbind(gl);
     }
 
     @Override

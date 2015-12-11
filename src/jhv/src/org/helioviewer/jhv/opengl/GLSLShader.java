@@ -8,7 +8,9 @@ import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 
 import com.jogamp.opengl.GL2;
 
-public class GLSLShader {
+public class GLSLShader implements GLSLShaderInterface {
+    public static GLSLShader ortho = new GLSLShader("/data/vertex3d.glsl", "/data/fragment3d.glsl");
+    public static GLSLShader lati = new GLSLShader("/data/vertex3dll.glsl", "/data/fragment3dll.glsl");
 
     public static final int NODIFFERENCE = 0;
     public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
@@ -16,56 +18,70 @@ public class GLSLShader {
     public static final int BASEDIFFERENCE_NO_ROT = 3;
     public static final int BASEDIFFERENCE_ROT = 4;
 
-    private static int vertexID;
-    private static int fragmentID;
-    private static int progID;
+    private int vertexID;
+    private int fragmentID;
+    private int progID;
 
-    public static int truncationValueRef;
-    public static int isDifferenceValueRef;
-    public static int isDiscRef;
+    public int truncationValueRef;
+    public int isDifferenceValueRef;
+    public int isDiscRef;
 
-    public static int pixelSizeWeightingRef;
-    public static int gammaParamRef;
-    public static int contrastParamRef;
-    public static int alphaParamRef;
-    public static int cutOffRadiusRef;
-    public static int outerCutOffRadiusRef;
-    public static int cutOffDirectionRef;
-    public static int cutOffValueRef;
+    public int pixelSizeWeightingRef;
+    public int gammaParamRef;
+    public int contrastParamRef;
+    public int alphaParamRef;
+    public int cutOffRadiusRef;
+    public int outerCutOffRadiusRef;
+    public int cutOffDirectionRef;
+    public int cutOffValueRef;
 
-    public static int rectRef;
-    public static int differenceRectRef;
-    public static int viewportRef;
-    public static int viewportOffsetRef;
+    public int rectRef;
+    public int differenceRectRef;
+    public int viewportRef;
+    public int viewportOffsetRef;
 
-    private static int cameraTransformationInverseRef;
-    private static int cameraDifferenceRotationQuatRef;
-    private static int diffCameraDifferenceRotationQuatRef;
+    private int cameraTransformationInverseRef;
+    private int cameraDifferenceRotationQuatRef;
+    private int diffCameraDifferenceRotationQuatRef;
 
-    public static final int[] isDifferenceValue = new int[1];
-    public static final int[] isDiscValue = new int[1];
+    public final int[] isDifferenceValue = new int[1];
+    public final int[] isDiscValue = new int[1];
 
-    public static final float[] sharpenParamFloat = new float[3];
-    public static final float[] truncationValueFloat = new float[1];
-    public static final float[] gammaParamFloat = new float[1];
-    public static final float[] contrastParamFloat = new float[1];
-    public static final float[] alphaParamFloat = new float[1];
-    public static final float[] cutOffRadiusFloat = new float[1];
-    public static final float[] outerCutOffRadiusFloat = new float[1];
-    public static final float[] cutOffDirectionFloat = new float[3];
-    public static final float[] cutOffValueFloat = new float[3];
+    public final float[] sharpenParamFloat = new float[3];
+    public final float[] truncationValueFloat = new float[1];
+    public final float[] gammaParamFloat = new float[1];
+    public final float[] contrastParamFloat = new float[1];
+    public final float[] alphaParamFloat = new float[1];
+    public final float[] cutOffRadiusFloat = new float[1];
+    public final float[] outerCutOffRadiusFloat = new float[1];
+    public final float[] cutOffDirectionFloat = new float[3];
+    public final float[] cutOffValueFloat = new float[3];
 
-    public static final float[] rectVertex = new float[4];
-    public static final float[] differencerect = new float[4];
-    public static final float[] viewport = new float[2];
-    public static final float[] viewportOffset = new float[2];
+    public final float[] rectVertex = new float[4];
+    public final float[] differencerect = new float[4];
+    public final float[] viewport = new float[2];
 
-    public static ColorMask colorMask = new ColorMask();
+    public final float[] viewportOffset = new float[2];
+
+    private final String vertex;
+    private final String fragment;
+
+    public ColorMask colorMask = new ColorMask();
+
+    public GLSLShader(String vertex, String fragment) {
+        this.vertex = vertex;
+        this.fragment = fragment;
+    }
 
     public static void init(GL2 gl) {
-        InputStream fragmentStream = FileUtils.getResourceInputStream("/data/fragment3d.glsl");
+        ortho._init(gl);
+        lati._init(gl);
+    }
+
+    private void _init(GL2 gl) {
+        InputStream fragmentStream = FileUtils.getResourceInputStream(fragment);
         String fragmentText = FileUtils.convertStreamToString(fragmentStream);
-        InputStream vertexStream = FileUtils.getResourceInputStream("/data/vertex3d.glsl");
+        InputStream vertexStream = FileUtils.getResourceInputStream(vertex);
         String vertexText = FileUtils.convertStreamToString(vertexStream);
 
         attachVertexShader(gl, vertexText);
@@ -106,32 +122,43 @@ public class GLSLShader {
     }
 
     public static void dispose(GL2 gl) {
+        ortho._dispose(gl);
+        lati._dispose(gl);
+    }
+
+    public void _dispose(GL2 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
     }
 
-    public static void bind(GL2 gl) {
+    @Override
+    public void bind(GL2 gl) {
         gl.glUseProgram(progID);
     }
 
-    public static void bindMatrix(GL2 gl, float[] matrix) {
+    @Override
+    public void bindMatrix(GL2 gl, float[] matrix) {
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, matrix, 0);
     }
 
-    public static void bindCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
+    @Override
+    public void bindCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
         gl.glUniform4fv(cameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public static void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
+    @Override
+    public void bindDiffCameraDifferenceRotationQuat(GL2 gl, Quat quat) {
         gl.glUniform4fv(diffCameraDifferenceRotationQuatRef, 1, quat.getFloatArray(), 0);
     }
 
-    public static void unbind(GL2 gl) {
+    @Override
+    public void unbind(GL2 gl) {
         gl.glUseProgram(0);
     }
 
-    public static void setUniform(GL2 gl, int id, float[] val, int count) {
+    @Override
+    public void setUniform(GL2 gl, int id, float[] val, int count) {
         switch (count) {
         case 1:
             gl.glUniform1fv(id, 1, val, 0);
@@ -148,7 +175,8 @@ public class GLSLShader {
         }
     }
 
-    public static void setTextureUnit(GL2 gl, String texname, int texunit) {
+    @Override
+    public void setTextureUnit(GL2 gl, String texname, int texunit) {
         int[] params = new int[] { 0 };
         gl.glGetProgramiv(progID, GL2.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
@@ -162,7 +190,8 @@ public class GLSLShader {
         gl.glUniform1i(id, texunit);
     }
 
-    public static void attachVertexShader(GL2 gl, String vertexText) {
+    @Override
+    public void attachVertexShader(GL2 gl, String vertexText) {
         int iID = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 
         String[] akProgramText = new String[1];
@@ -192,7 +221,8 @@ public class GLSLShader {
         vertexID = iID;
     }
 
-    public static void attachFragmentShader(GL2 gl, String fragmentText) {
+    @Override
+    public void attachFragmentShader(GL2 gl, String fragmentText) {
         int iID = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
 
         String[] akProgramText = new String[1];
@@ -223,7 +253,8 @@ public class GLSLShader {
 
     }
 
-    public static void initializeProgram(GL2 gl, boolean cleanUp) {
+    @Override
+    public void initializeProgram(GL2 gl, boolean cleanUp) {
         progID = gl.glCreateProgram();
         gl.glAttachShader(progID, vertexID);
         gl.glAttachShader(progID, fragmentID);
@@ -252,90 +283,105 @@ public class GLSLShader {
         }
     }
 
-    public static void changeRect(double xOffset, double yOffset, double xScale, double yScale) {
+    @Override
+    public void changeRect(double xOffset, double yOffset, double xScale, double yScale) {
         rectVertex[0] = (float) xOffset;
         rectVertex[1] = (float) yOffset;
         rectVertex[2] = (float) xScale;
         rectVertex[3] = (float) yScale;
     }
 
-    public static void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
+    @Override
+    public void setDifferenceRect(double differenceXOffset, double differenceYOffset, double differenceXScale, double differenceYScale) {
         differencerect[0] = (float) differenceXOffset;
         differencerect[1] = (float) differenceYOffset;
         differencerect[2] = (float) differenceXScale;
         differencerect[3] = (float) differenceYScale;
     }
 
-    public static void filter(GL2 gl) {
+    @Override
+    public void filter(GL2 gl) {
         gl.glColorMask(colorMask.showRed(), colorMask.showGreen(), colorMask.showBlue(), true);
-        gl.glUniform1fv(GLSLShader.contrastParamRef, 1, GLSLShader.contrastParamFloat, 0);
-        gl.glUniform1fv(GLSLShader.truncationValueRef, 1, GLSLShader.truncationValueFloat, 0);
-        gl.glUniform1iv(GLSLShader.isDifferenceValueRef, 1, GLSLShader.isDifferenceValue, 0);
-        gl.glUniform1fv(GLSLShader.gammaParamRef, 1, GLSLShader.gammaParamFloat, 0);
-        gl.glUniform1fv(GLSLShader.alphaParamRef, 1, GLSLShader.alphaParamFloat, 0);
-        gl.glUniform3fv(GLSLShader.pixelSizeWeightingRef, 1, GLSLShader.sharpenParamFloat, 0);
-        gl.glUniform4fv(GLSLShader.rectRef, 1, GLSLShader.rectVertex, 0);
-        gl.glUniform4fv(GLSLShader.differenceRectRef, 1, GLSLShader.differencerect, 0);
-        gl.glUniform1fv(GLSLShader.cutOffRadiusRef, 1, GLSLShader.cutOffRadiusFloat, 0);
-        gl.glUniform1fv(GLSLShader.outerCutOffRadiusRef, 1, GLSLShader.outerCutOffRadiusFloat, 0);
-        gl.glUniform2fv(GLSLShader.viewportRef, 1, GLSLShader.viewport, 0);
-        gl.glUniform2fv(GLSLShader.viewportOffsetRef, 1, GLSLShader.viewportOffset, 0);
-        gl.glUniform3fv(GLSLShader.cutOffDirectionRef, 1, GLSLShader.cutOffDirectionFloat, 0);
-        gl.glUniform1fv(GLSLShader.cutOffValueRef, 1, GLSLShader.cutOffValueFloat, 0);
+        gl.glUniform1fv(contrastParamRef, 1, contrastParamFloat, 0);
+        gl.glUniform1fv(truncationValueRef, 1, truncationValueFloat, 0);
+        gl.glUniform1iv(isDifferenceValueRef, 1, isDifferenceValue, 0);
+        gl.glUniform1fv(gammaParamRef, 1, gammaParamFloat, 0);
+        gl.glUniform1fv(alphaParamRef, 1, alphaParamFloat, 0);
+        gl.glUniform3fv(pixelSizeWeightingRef, 1, sharpenParamFloat, 0);
+        gl.glUniform4fv(rectRef, 1, rectVertex, 0);
+        gl.glUniform4fv(differenceRectRef, 1, differencerect, 0);
+        gl.glUniform1fv(cutOffRadiusRef, 1, cutOffRadiusFloat, 0);
+        gl.glUniform1fv(outerCutOffRadiusRef, 1, outerCutOffRadiusFloat, 0);
+        gl.glUniform2fv(viewportRef, 1, viewport, 0);
+        gl.glUniform2fv(viewportOffsetRef, 1, viewportOffset, 0);
+        gl.glUniform3fv(cutOffDirectionRef, 1, cutOffDirectionFloat, 0);
+        gl.glUniform1fv(cutOffValueRef, 1, cutOffValueFloat, 0);
     }
 
-    public static void bindIsDisc(GL2 gl, int isDisc) {
+    @Override
+    public void bindIsDisc(GL2 gl, int isDisc) {
         isDiscValue[0] = isDisc;
-        gl.glUniform1iv(GLSLShader.isDiscRef, 1, GLSLShader.isDiscValue, 0);
+        gl.glUniform1iv(isDiscRef, 1, isDiscValue, 0);
     }
 
-    public static void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
+    @Override
+    public void setCutOffRadius(double cutOffRadius, double outerCutOffRadius) {
         cutOffRadiusFloat[0] = (float) cutOffRadius;
         outerCutOffRadiusFloat[0] = (float) outerCutOffRadius;
     }
 
-    public static void setOuterCutOffRadius(double cutOffRadius) {
+    @Override
+    public void setOuterCutOffRadius(double cutOffRadius) {
         outerCutOffRadiusFloat[0] = (float) cutOffRadius;
     }
 
-    public static void setAlpha(float alpha) {
+    @Override
+    public void setAlpha(float alpha) {
         alphaParamFloat[0] = alpha;
     }
 
-    public static void setContrast(float contrast) {
+    @Override
+    public void setContrast(float contrast) {
         contrastParamFloat[0] = contrast;
     }
 
-    public static void setGamma(float gamma) {
+    @Override
+    public void setGamma(float gamma) {
         gammaParamFloat[0] = gamma;
     }
 
-    public static void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
+    @Override
+    public void setFactors(float weighting, float pixelWidth, float pixelHeight, float span) {
         sharpenParamFloat[0] = pixelWidth * span;
         sharpenParamFloat[1] = pixelHeight * span;
         sharpenParamFloat[2] = weighting;
     }
 
-    public static void setIsDifference(int isDifference) {
+    @Override
+    public void setIsDifference(int isDifference) {
         isDifferenceValue[0] = isDifference;
     }
 
-    public static void setTruncationValue(float truncationValue) {
+    @Override
+    public void setTruncationValue(float truncationValue) {
         truncationValueFloat[0] = truncationValue;
     }
 
-    public static void setViewport(float offsetX, float offsetY, float width, float height) {
+    @Override
+    public void setViewport(float offsetX, float offsetY, float width, float height) {
         viewportOffset[0] = offsetX;
         viewportOffset[1] = offsetY;
         viewport[0] = width;
         viewport[1] = height;
     }
 
-    public static void setCutOffValue(float val) {
+    @Override
+    public void setCutOffValue(float val) {
         cutOffValueFloat[0] = val;
     }
 
-    public static void setCutOffDirection(float x, float y, float z) {
+    @Override
+    public void setCutOffDirection(float x, float y, float z) {
         cutOffDirectionFloat[0] = x;
         cutOffDirectionFloat[1] = y;
         cutOffDirectionFloat[2] = z;

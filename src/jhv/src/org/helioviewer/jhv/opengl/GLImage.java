@@ -59,27 +59,27 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-        applyRegion(imageData, prevImageData, baseImageData);
-        applyRunningDifference(gl);
+    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLShader shader) {
+        applyRegion(imageData, prevImageData, baseImageData, shader);
+        applyRunningDifference(gl, shader);
 
-        GLSLShader.colorMask = colorMask;
-        GLSLShader.setContrast(contrast);
-        GLSLShader.setGamma(gamma);
-        GLSLShader.setAlpha(opacity);
+        shader.colorMask = colorMask;
+        shader.setContrast(contrast);
+        shader.setGamma(gamma);
+        shader.setAlpha(opacity);
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
-        GLSLShader.setFactors(sharpen, 1f / w, 1f / h, 1f);
+        shader.setFactors(sharpen, 1f / w, 1f / h, 1f);
 
         applyLUT(gl);
 
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLShader shader) {
         Region r = imageData.getRegion();
-        GLSLShader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
+        shader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
 
         boolean diffMode = false;
         Region diffRegion = null;
@@ -93,40 +93,40 @@ public class GLImage {
         }
 
         if (diffMode) {
-            GLSLShader.setDifferenceRect(diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
+            shader.setDifferenceRect(diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
         }
 
         MetaData metadata = imageData.getMetaData();
-        GLSLShader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
+        shader.setCutOffRadius(metadata.getInnerCutOffRadius(), metadata.getOuterCutOffRadius());
         if (metadata.getCutOffValue() > 0) {
             Vec3 cdir = metadata.getCutOffDirection();
-            GLSLShader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0);
-            GLSLShader.setCutOffValue((float) metadata.getCutOffValue());
+            shader.setCutOffDirection((float) cdir.x, (float) cdir.y, 0);
+            shader.setCutOffValue((float) metadata.getCutOffValue());
         } else {
-            GLSLShader.setCutOffValue(-1);
+            shader.setCutOffValue(-1);
         }
     }
 
-    private void applyRunningDifference(GL2 gl) {
+    private void applyRunningDifference(GL2 gl, GLSLShader shader) {
         if (baseDifferenceMode || differenceMode) {
             if (baseDifferenceMode) {
                 if (baseDifferenceNoRot) {
-                    GLSLShader.setIsDifference(GLSLShader.BASEDIFFERENCE_NO_ROT);
+                    shader.setIsDifference(GLSLShader.BASEDIFFERENCE_NO_ROT);
                 } else {
-                    GLSLShader.setIsDifference(GLSLShader.BASEDIFFERENCE_ROT);
+                    shader.setIsDifference(GLSLShader.BASEDIFFERENCE_ROT);
                 }
             } else {
                 if (runningDifferenceNoRot) {
-                    GLSLShader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_NO_ROT);
+                    shader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_NO_ROT);
                 } else {
-                    GLSLShader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_ROT);
+                    shader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_ROT);
                 }
             }
 
-            GLSLShader.setTruncationValue(truncation);
+            shader.setTruncationValue(truncation);
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
         } else {
-            GLSLShader.setIsDifference(GLSLShader.NODIFFERENCE);
+            shader.setIsDifference(GLSLShader.NODIFFERENCE);
         }
     }
 
