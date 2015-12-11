@@ -11,6 +11,10 @@ public interface Renderable {
 
     public void render(Camera camera, Viewport vp, GL2 gl);
 
+    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl);
+
+    public void renderPolar(Camera camera, Viewport vp, GL2 gl);
+
     public void renderFloat(Camera camera, Viewport vp, GL2 gl);
 
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl);

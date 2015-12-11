@@ -103,7 +103,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 CameraHelper.applyPerspective(camera, vp, gl);
-
                 renderBlackCircle(gl, inverse.m);
                 ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
@@ -111,6 +110,34 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
 
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
+    }
+
+    public static void renderSceneLatitudinal(Camera camera, GL2 gl) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+        for (Viewport vp : Displayer.getViewports()) {
+            if (vp != null) {
+                gl.glViewport(vp.x, vp.y, vp.width, vp.height);
+                CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
+                ImageViewerGui.getRenderableContainer().renderLatitudinal(camera, vp, gl);
+            }
+        }
+
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getWidth());
+    }
+
+    public static void renderScenePolar(Camera camera, GL2 gl) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+        for (Viewport vp : Displayer.getViewports()) {
+            if (vp != null) {
+                gl.glViewport(vp.x, vp.y, vp.width, vp.height);
+                CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
+                ImageViewerGui.getRenderableContainer().renderPolar(camera, vp, gl);
+            }
+        }
+
+        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getWidth());
     }
 
     public static void renderFloatScene(Camera camera, GL2 gl) {
@@ -140,8 +167,35 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
     }
 
-    @Override
-    public void display(GLAutoDrawable drawable) {
+    public void renderLatitudinal(GLAutoDrawable drawable) {
+        GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(this);
+        ImageViewerGui.getRenderableContainer().prerender(gl);
+
+        if (exporter != null) {
+            exporter.handleMovieExport(gl);
+        }
+
+        Camera camera = Displayer.getCamera();
+        renderSceneLatitudinal(camera, gl);
+        setRender(camera);
+    }
+
+    public void renderPolar(GLAutoDrawable drawable) {
+        GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(this);
+        ImageViewerGui.getRenderableContainer().prerender(gl);
+
+        if (exporter != null) {
+            exporter.handleMovieExport(gl);
+        }
+
+        Camera camera = Displayer.getCamera();
+        renderScenePolar(camera, gl);
+        setRender(camera);
+    }
+
+    public void renderOrtho(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         GLInfo.updatePixelScale(this);
 
@@ -158,6 +212,20 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         renderFullFloatScene(camera, gl);
 
         setRender(camera);
+    }
+
+    @Override
+    public void display(GLAutoDrawable drawable) {
+        if (Displayer.polar) {
+            renderPolar(drawable);
+        }
+        else if (Displayer.latitudinal) {
+            renderLatitudinal(drawable);
+        }
+        else {
+            renderOrtho(drawable);
+        }
+        //renderOrtho(drawable);
     }
 
     private static void setRender(Camera camera) {

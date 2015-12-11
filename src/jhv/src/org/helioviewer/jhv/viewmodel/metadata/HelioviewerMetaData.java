@@ -4,9 +4,9 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
@@ -74,8 +74,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         if (detector.equalsIgnoreCase("C3"))
             innerRadius *= 1.07;
         if (instrument.equals("MDI") || instrument.equals("HMI") ||
-            observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
-            observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
+                observatory.equals("Kanzelhoehe") || observatory.equals("ROB-USET") ||
+                observatory.equals("NSO-GONG") || observatory.equals("NSO-SOLIS"))
             outerRadius = 1;
     }
 
@@ -185,6 +185,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
         viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
+        viewpointL = p;
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
@@ -220,9 +221,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
 
     public Region roiToRegion(SubImage roi, double zoompercent) {
         return new Region(roi.x * unitPerPixel / zoompercent - sunPositionX,
-                          roi.y * unitPerPixel / zoompercent - sunPositionY,
-                          roi.width * unitPerPixel / zoompercent,
-                          roi.height * unitPerPixel / zoompercent);
+                roi.y * unitPerPixel / zoompercent - sunPositionY,
+                roi.width * unitPerPixel / zoompercent,
+                roi.height * unitPerPixel / zoompercent);
     }
 
     @Override

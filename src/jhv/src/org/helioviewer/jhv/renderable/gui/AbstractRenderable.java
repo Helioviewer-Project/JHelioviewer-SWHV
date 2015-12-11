@@ -49,6 +49,14 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
+    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+    }
+
+    @Override
+    public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
+    }
+
+    @Override
     public void prerender(GL2 gl) {
     }
 
