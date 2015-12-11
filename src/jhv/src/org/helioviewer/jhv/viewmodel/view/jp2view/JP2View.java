@@ -223,6 +223,25 @@ public class JP2View extends AbstractView {
     }
 
     @Override
+    public JHVDate getFrameTime(int frame) {
+        if (frame <= 0)
+            return getFirstTime();
+        if (frame >= getMaximumFrameNumber())
+            return getLastTime();
+        return metaDataArray[frame].getViewpoint().time;
+    }
+
+    @Override
+    public JHVDate getFirstTime() {
+        return metaDataArray[0].getViewpoint().time;
+    }
+
+    @Override
+    public JHVDate getLastTime() {
+        return metaDataArray[getMaximumFrameNumber()].getViewpoint().time;
+    }
+
+    @Override
     public JHVDate getFrameTime(JHVDate time) {
         return metaDataArray[getFrameNumber(time)].getViewpoint().time;
     }

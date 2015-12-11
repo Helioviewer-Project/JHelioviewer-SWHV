@@ -22,8 +22,8 @@ class UpdateViewpointExpert extends UpdateViewpoint {
             // Active layer times
             View view = Layers.getActiveView();
             if (view != null) {
-                tLayerStart = Layers.getStartDate(view).milli;
-                tLayerEnd = Layers.getEndDate(view).milli;
+                tLayerStart = view.getFirstTime().milli;
+                tLayerEnd = view.getLastTime().milli;
             }
 
             // camera times

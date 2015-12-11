@@ -100,7 +100,9 @@ public interface View {
 
     public void setDataHandler(ImageDataHandler dataHandler);
 
-    public JHVDate getFrameDateTime(int frame);
+    public JHVDate getFrameTime(int frame);
+    public JHVDate getFirstTime();
+    public JHVDate getLastTime();
 
     // <!- only for Layers
     public void setFrame(JHVDate time);
