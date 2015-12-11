@@ -17,6 +17,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus.CacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 
@@ -195,7 +196,7 @@ public class JP2View extends AbstractView {
     // to be accessed only from Layers
     @Override
     public void setFrame(JHVDate time) {
-        int frame = getFrame(time);
+        int frame = getFrameNumber(time);
         if (frame != targetFrame) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
@@ -206,9 +207,7 @@ public class JP2View extends AbstractView {
         }
     }
 
-    // to be accessed only from Layers
-    @Override
-    public int getFrame(JHVDate time) {
+    private int getFrameNumber(JHVDate time) {
         int frame = -1, last = _jp2Image.getMaximumFrameNumber();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
@@ -221,6 +220,16 @@ public class JP2View extends AbstractView {
         } else {
             return frame;
         }
+    }
+
+    @Override
+    public JHVDate getFrameTime(JHVDate time) {
+        return metaDataArray[getFrameNumber(time)].getViewpoint().time;
+    }
+
+    @Override
+    public MetaData getMetaData(JHVDate time) {
+        return metaDataArray[getFrameNumber(time)];
     }
 
     private Camera camera;

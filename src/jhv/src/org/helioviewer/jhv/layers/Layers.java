@@ -116,7 +116,7 @@ public class Layers {
         if (activeView == null /*|| !activeView.isMultiFrame()*/)
             return;
 
-        syncTime(activeView.getFrameDateTime(activeView.getFrame(dateTime)));
+        syncTime(activeView.getFrameTime(dateTime));
     }
 
     public static void setFrame(int frame) {
