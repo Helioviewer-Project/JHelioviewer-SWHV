@@ -102,7 +102,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             color = evt.getColor();
         }
 
-        gl.glColor3f(0f, 0f, 0f);
+        gl.glColor3f(0, 0, 0);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
         int angularResolution = (int) (angularWidthDegree / 4);
         interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
