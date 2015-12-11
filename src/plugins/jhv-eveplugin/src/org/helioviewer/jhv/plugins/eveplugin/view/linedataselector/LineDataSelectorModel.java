@@ -25,7 +25,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
         listeners = new ArrayList<LineDataSelectorModelListener>();
         elements = new ArrayList<LineDataSelectorElement>();
         tableListeners = new ArrayList<TableModelListener>();
-
     }
 
     public static LineDataSelectorModel getSingletonInstance() {
@@ -94,8 +93,8 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
     }
 
     private void fireListeners() {
+        TableModelEvent e = new TableModelEvent(this);
         for (TableModelListener listener : tableListeners) {
-            TableModelEvent e = new TableModelEvent(this);
             listener.tableChanged(e);
         }
     }
@@ -104,7 +103,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
         for (LineDataSelectorModelListener listener : listeners) {
             listener.lineDataRemoved(element);
         }
-
     }
 
     private void fireLineDataSelectorElementAdded(LineDataSelectorElement element) {
@@ -188,7 +186,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -198,7 +195,6 @@ public class LineDataSelectorModel implements TableModel, PlotAreaSpaceListener,
 
     @Override
     public void drawMovieLineRequest(Date time) {
-        // TODO Auto-generated method stub
     }
 
 }
