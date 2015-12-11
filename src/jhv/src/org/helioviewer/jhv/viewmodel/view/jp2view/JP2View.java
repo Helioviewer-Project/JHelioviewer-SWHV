@@ -50,7 +50,7 @@ public class JP2View extends AbstractView {
 
     private Position.Q viewpoint;
 
-    private int targetFrame = -1;
+    private int targetFrame = 0;
     private int trueFrame = -1;
 
     private int frameCount = 0;
@@ -205,11 +205,11 @@ public class JP2View extends AbstractView {
     @Override
     public void setFrame(int frame, Position.Q p) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
-            //CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
-            //if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
+            CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
+            if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
             //    _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
-            //    return;
-            //}
+                return;
+            }
 
             targetFrame = frame;
             viewpoint = p;
@@ -249,7 +249,7 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null || /* tbd */ targetFrame < 0)
+        if (stopRender == true || jp2Image == null)
             return;
 
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, fromReader);
