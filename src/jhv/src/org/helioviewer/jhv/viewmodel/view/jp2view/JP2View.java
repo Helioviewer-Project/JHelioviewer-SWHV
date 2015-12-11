@@ -197,6 +197,22 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
+    public JHVDate getNextTime(AnimationMode mode) {
+        int next = targetFrame + 1;
+        switch (mode) {
+            case STOP:
+                if (next > getMaximumFrameNumber())
+                    return null;
+            case SWING:
+                // break; - N/A, needs state
+            default: // LOOP
+                if (next > getMaximumFrameNumber())
+                    return metaDataArray[0].getViewpoint().time;
+        }
+        return metaDataArray[next].getViewpoint().time;
+    }
+
+    @Override
     public void setFrame(JHVDate time) {
         int frame = getFrameNumber(time);
         if (frame != targetFrame) {
@@ -252,6 +268,8 @@ public class JP2View extends AbstractView {
     public MetaData getMetaData(JHVDate time) {
         return metaDataArray[getFrameNumber(time)];
     }
+
+////
 
     private Camera camera;
     private Viewport vp;
