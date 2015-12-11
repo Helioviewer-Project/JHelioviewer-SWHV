@@ -188,7 +188,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
 
     @Override
     public void layerAdded(View view) {
-        Date start = Layers.getStartDate(view).getDate();
+        Date start = view.getFirstTime().getDate();
         calendarStartDate.setDate(start);
         ObservationDialogDateModel.getInstance().setStartDate(start, false);
     }
