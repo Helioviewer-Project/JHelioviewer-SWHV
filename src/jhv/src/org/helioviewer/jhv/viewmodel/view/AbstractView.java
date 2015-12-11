@@ -16,7 +16,7 @@ public abstract class AbstractView implements View {
     private RenderableImageLayer imageLayer;
     private ImageCacheStatusLocal cacheStatus;
     protected ImageData imageData = null;
-    protected MetaData[] metaDataArray = new MetaData[1];
+    protected MetaData _metaData;
 
     @Override
     public void abolish() {
@@ -69,7 +69,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public JHVDate getFirstTime() {
-        return metaDataArray[0].getViewpoint().time;
+        return _metaData.getViewpoint().time;
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaDataArray[0];
+        return _metaData;
     }
 
     @Override

@@ -50,6 +50,8 @@ public class JP2View extends AbstractView {
 
     private boolean stopRender = false;
 
+    private MetaData[] metaDataArray;
+
     /**
      * Sets the JPG2000 image used by this class.
      *
