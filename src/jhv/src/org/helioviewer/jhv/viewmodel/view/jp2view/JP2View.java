@@ -78,7 +78,7 @@ public class JP2View extends AbstractView {
 
     @Override
     public String getName() {
-        return _jp2Image.getName(0);
+        return _jp2Image.getName();
     }
 
     public String getXMLMetaData() {
@@ -156,7 +156,8 @@ public class JP2View extends AbstractView {
      * This function is used as a callback function which is called by
      * {@link J2KRender} when it has finished decoding an image.
      */
-    void setImageData(ImageData newImageData, int frame) {
+    void setImageData(ImageData newImageData) {
+        int frame = newImageData.getFrameNumber();
         if (frame != trueFrame) {
             trueFrame = frame;
             ++frameCount;

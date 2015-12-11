@@ -111,7 +111,7 @@ class J2KReader implements Runnable {
     void start() {
         if (myThread != null)
             stop();
-        myThread = new Thread(this, "Reader " + parentImageRef.getName(0));
+        myThread = new Thread(this, "Reader " + parentImageRef.getName());
         stop = false;
         myThread.start();
     }
