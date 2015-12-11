@@ -56,10 +56,10 @@ public class Camera {
         refresh();
     }
 
-    private Position.Q saveViewpoint;
+    private Position.Q saveViewpoint = null;
 
     public void push(Position.Q v) {
-        if (!trackingMode) {
+        if (!trackingMode && v != null) {
             saveViewpoint = viewpoint;
             viewpoint = v;
             updateRotation();
@@ -68,7 +68,7 @@ public class Camera {
     }
 
     public void pop() {
-        if (!trackingMode) {
+        if (!trackingMode && saveViewpoint != null) {
             viewpoint = saveViewpoint;
             saveViewpoint = null;
             updateRotation();
