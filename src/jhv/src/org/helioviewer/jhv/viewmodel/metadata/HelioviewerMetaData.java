@@ -185,7 +185,7 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
         viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
-        viewpointL = p;
+        viewpointL = new Position.L(dateObs, distanceObs, phi, theta);
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
