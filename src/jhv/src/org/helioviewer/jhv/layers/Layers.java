@@ -7,7 +7,6 @@ import java.util.HashSet;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.camera.Camera;
@@ -150,9 +149,8 @@ public class Layers {
 
         Camera camera = Displayer.getCamera();
         camera.timeChanged(lastTimestamp);
-        Position.Q p = camera.getViewpoint();
         for (View view : layers) {
-            view.setFrame(view.getFrame(dateTime), p);
+            view.setFrame(view.getFrame(dateTime));
         }
         Displayer.render(1);
 
