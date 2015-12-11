@@ -7,7 +7,6 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -21,6 +20,16 @@ public class CameraHelper {
     public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
         double width = camera.getWidth();
         return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
+    }
+
+    public static void applyPerspectiveLL(Camera camera, Viewport vp, GL2 gl) {
+        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glLoadIdentity();
+
+        double width = camera.getWidth();
+        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadMatrixd(new double[] { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, 0);
     }
 
     public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {
