@@ -2,7 +2,6 @@ package org.helioviewer.jhv.viewmodel.view;
 
 import java.net.URI;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -104,7 +103,7 @@ public interface View {
     public JHVDate getFrameDateTime(int frame);
 
     // <!- only for Layers
-    public void setFrame(int frame, Position.Q p);
+    public void setFrame(int frame);
     public int getFrame(JHVDate time);
     public MetaData getMetaData(JHVDate time);
     // -->

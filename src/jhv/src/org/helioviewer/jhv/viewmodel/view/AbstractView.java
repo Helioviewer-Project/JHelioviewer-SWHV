@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -25,6 +24,7 @@ public abstract class AbstractView implements View {
 
     @Override
     public void render(Camera camera, Viewport vp, double factor) {
+        imageData.setViewpoint(camera.getViewpoint());
         if (dataHandler != null) {
             dataHandler.handleData(imageData);
         }
@@ -59,8 +59,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void setFrame(int frame, Position.Q p) {
-        imageData.setViewpoint(p);
+    public void setFrame(int frame) {
     }
 
     @Override

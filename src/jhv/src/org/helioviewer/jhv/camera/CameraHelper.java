@@ -16,6 +16,7 @@ public class CameraHelper {
 
     private static final double clipNear = Sun.Radius * 3;
     private static final double clipFar = Sun.Radius * 10000;
+    private static final double[] identity = Mat4.identity().m;
 
     public static Mat4 getOrthoMatrixInverse(Camera camera, Viewport vp) {
         double width = camera.getWidth();
@@ -29,7 +30,7 @@ public class CameraHelper {
         double width = camera.getWidth();
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadMatrixd(new double[] { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, 0);
+        gl.glLoadMatrixd(identity, 0);
     }
 
     public static void applyPerspective(Camera camera, Viewport vp, GL2 gl) {

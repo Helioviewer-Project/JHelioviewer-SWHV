@@ -48,8 +48,6 @@ public class JP2View extends AbstractView {
     // Member related to JP2
     protected JP2Image _jp2Image;
 
-    private Position.Q viewpoint;
-
     private int targetFrame = 0;
     private int trueFrame = -1;
 
@@ -204,16 +202,14 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame, Position.Q p) {
+    public void setFrame(int frame) {
         if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
             //    _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
                 return;
             }
-
             targetFrame = frame;
-            viewpoint = p;
         }
     }
 
@@ -236,10 +232,12 @@ public class JP2View extends AbstractView {
 
     private Camera camera;
     private Viewport vp;
+    private Position.Q viewpoint;
 
     @Override
     public void render(Camera _camera, Viewport _vp, double factor) {
         camera = _camera;
+        viewpoint = camera.getViewpoint();
         vp = _vp;
         signalRender(_jp2Image, false, factor);
     }
