@@ -59,7 +59,7 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public void setFrame(int frame) {
+    public void setFrame(JHVDate time) {
     }
 
     @Override

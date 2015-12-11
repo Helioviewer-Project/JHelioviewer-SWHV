@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -29,16 +28,9 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
  */
 public class JP2View extends AbstractView {
 
-    static private class RejectExecution implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            System.out.println(Thread.currentThread().getName());
-        }
-    }
-
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
-    private final RejectedExecutionHandler rejectedExecutionHandler = new RejectExecution(); // new ThreadPoolExecutor.CallerRunsPolicy();
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy()/* rejectedExecutionHandler */);
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
+                                                    new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
@@ -202,8 +194,9 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public void setFrame(int frame) {
-        if (frame != targetFrame && frame >= 0 && frame <= _jp2Image.getMaximumFrameNumber()) {
+    public void setFrame(JHVDate time) {
+        int frame = getFrame(time);
+        if (frame != targetFrame) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
             //    _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
