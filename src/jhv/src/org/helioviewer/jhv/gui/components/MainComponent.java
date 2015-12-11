@@ -123,7 +123,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             }
         }
 
-        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getWidth());
+        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
     public static void renderScenePolar(Camera camera, GL2 gl) {
@@ -137,7 +137,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             }
         }
 
-        ImageViewerGui.getZoomStatusPanel().updateZoomLevel(camera.getWidth());
+        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
     public static void renderFloatScene(Camera camera, GL2 gl) {
