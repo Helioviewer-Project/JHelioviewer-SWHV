@@ -78,6 +78,8 @@ class J2KReader implements Runnable {
 
     private final BooleanSignal readerSignal = new BooleanSignal(false);
 
+    private final int num_layers;
+
     /**
      * The constructor. Creates and connects the socket if image is remote.
      *
@@ -89,6 +91,7 @@ class J2KReader implements Runnable {
         parentViewRef = _imageViewRef;
         parentImageRef = _jp2ImageRef;
 
+        num_layers = parentImageRef.getMaximumFrameNumber() + 1;
         cacheRef = parentImageRef.getCacheRef();
         cacheStatusRef = parentImageRef.getImageCacheStatus();
 
@@ -293,8 +296,6 @@ class J2KReader implements Runnable {
                             boolean stopReading = false;
                             int curLayer = currParams.compositionLayer;
 
-                            int num_layers = parentImageRef.getMaximumFrameNumber() + 1;
-
                             lastResponseTime = -1;
 
                             int complete_steps = 0;
@@ -314,7 +315,7 @@ class J2KReader implements Runnable {
                             // - In any other case, choose ALLFRAMESEQUALLY
                             CacheStrategy strategy;
 
-                            if (!parentImageRef.isMultiFrame()) {
+                            if (num_layers <= 1) { // !isMultiFrame()
                                 strategy = CacheStrategy.CURRENTFRAMEONLY;
                             } else if (!Layers.isMoviePlaying() /*! */ && cacheStatusRef.getImageStatus(curLayer) != CacheStatus.COMPLETE) {
                                 strategy = CacheStrategy.CURRENTFRAMEFIRST;

@@ -219,12 +219,12 @@ public class JP2View extends AbstractView {
     // to be accessed only from Layers
     @Override
     public int getFrame(JHVDate time) {
-        int frame = -1;
+        int frame = -1, last = _jp2Image.getMaximumFrameNumber();
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
             currentDiff = metaDataArray[++frame].getViewpoint().time.milli - time.milli;
-        } while (currentDiff < 0 && frame < _jp2Image.getMaximumFrameNumber());
+        } while (currentDiff < 0 && frame < last);
 
         if (-lastDiff < currentDiff) {
             return frame - 1;
