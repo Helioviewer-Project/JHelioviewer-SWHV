@@ -590,7 +590,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
-            movieInterval = new Interval<Date>(Layers.getStartDate(view).getDate(), Layers.getEndDate(view).getDate());
+            movieInterval = new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
             repaint();
         }
     }
