@@ -105,6 +105,7 @@ public interface View {
     public JHVDate getLastTime();
 
     // <!- only for Layers
+    public JHVDate getNextTime(AnimationMode mode);
     public void setFrame(JHVDate time);
     public JHVDate getFrameTime(JHVDate time);
     public MetaData getMetaData(JHVDate time);

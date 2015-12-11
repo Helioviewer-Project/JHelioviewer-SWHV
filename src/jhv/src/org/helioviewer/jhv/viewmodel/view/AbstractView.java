@@ -63,6 +63,11 @@ public abstract class AbstractView implements View {
     }
 
     @Override
+    public JHVDate getNextTime(AnimationMode mode) {
+        return getFirstTime();
+    }
+
+    @Override
     public JHVDate getFrameTime(JHVDate time) {
         return getFirstTime();
     }

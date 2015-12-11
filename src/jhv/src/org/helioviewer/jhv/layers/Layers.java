@@ -65,26 +65,31 @@ public class Layers {
         }
     }
 
-    private static NextFrameCandidateChooser nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
-    private static FrameChooser frameChooser = new RelativeFrameChooser();
-
     private static final Timer frameTimer = new Timer(1000 / 20, new FrameTimerListener());
 
     private static class FrameTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            setFrame(frameChooser.moveToNextFrame(activeView.getCurrentFrameNumber()));
+            if (activeView != null) {
+                JHVDate nextTime = activeView.getNextTime(animationMode);
+                if (nextTime == null)
+                    pauseMovie();
+                else
+                    setTime(nextTime);
+            }
         }
     }
 
     private static void setMasterMovie(View view) {
         if (view == null || !view.isMultiFrame()) {
+            if (view != null && !view.isMultiFrame()) {
+                setTime(view.getFirstTime());
+            }
+
             pauseMovie();
             MoviePanel.unsetMovie();
         } else
             MoviePanel.setMovie(view);
-
-        nextFrameCandidateChooser.setMaxFrame();
     }
 
     public static boolean isMoviePlaying() {
@@ -113,17 +118,15 @@ public class Layers {
     }
 
     public static void setTime(JHVDate dateTime) {
-        if (activeView == null /*|| !activeView.isMultiFrame()*/)
-            return;
-
-        syncTime(activeView.getFrameTime(dateTime));
+        if (activeView != null) {
+            syncTime(activeView.getFrameTime(dateTime));
+        }
     }
 
     public static void setFrame(int frame) {
-        if (activeView == null /*|| !activeView.isMultiFrame()*/)
-            return;
-
-        syncTime(activeView.getFrameTime(frame));
+        if (activeView != null) {
+            syncTime(activeView.getFrameTime(frame));
+        }
     }
 
     public static void nextFrame() {
@@ -301,143 +304,10 @@ public class Layers {
         frameTimer.setDelay(1000 / fps);
     }
 
-    public void setDesiredAbsoluteSpeed(int secondsPerSecond) {
-        /*
-        long[] obsMillis = new long[parentImageRef.getMaximumFrameNumber() + 1];
-        for (int i = 0; i <= parentImageRef.getMaximumFrameNumber(); ++i) {
-            obsMillis[i] = parentImageRef.metaDataList[i].getDateObs().getMillis() / secondsPerSecond;
-        }
-
-        frameChooser = new AbsoluteFrameChooser(obsMillis);
-        ((AbsoluteFrameChooser) frameChooser).resetStartTime(currParams.compositionLayer);
-        */
-    }
+    private static AnimationMode animationMode = AnimationMode.LOOP;
 
     public static void setAnimationMode(AnimationMode mode) {
-        switch (mode) {
-        case LOOP:
-            nextFrameCandidateChooser = new NextFrameCandidateLoopChooser();
-            break;
-        case STOP:
-            nextFrameCandidateChooser = new NextFrameCandidateStopChooser();
-            break;
-        case SWING:
-            nextFrameCandidateChooser = new NextFrameCandidateSwingChooser();
-            break;
-        }
-        nextFrameCandidateChooser.setMaxFrame();
-    }
-
-    private static abstract class NextFrameCandidateChooser {
-        protected int maxFrame;
-
-        protected void setMaxFrame() {
-            if (activeView == null)
-                maxFrame = 0;
-            else
-                maxFrame = activeView.getMaximumFrameNumber();
-        }
-
-        protected void resetStartTime(int frame) {
-            if (frameChooser instanceof AbsoluteFrameChooser) {
-                ((AbsoluteFrameChooser) frameChooser).resetStartTime(frame);
-            }
-        }
-
-        public abstract int getNextCandidate(int lastCandidate);
-    }
-
-    private static class NextFrameCandidateLoopChooser extends NextFrameCandidateChooser {
-        @Override
-        public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > maxFrame) {
-                System.gc();
-                resetStartTime(0);
-                return 0;
-            }
-            return lastCandidate;
-        }
-    }
-
-    private static class NextFrameCandidateStopChooser extends NextFrameCandidateChooser {
-        @Override
-        public int getNextCandidate(int lastCandidate) {
-            if (++lastCandidate > maxFrame) {
-                pauseMovie();
-                resetStartTime(0);
-                return 0;
-            }
-            return lastCandidate;
-        }
-    }
-
-    private static class NextFrameCandidateSwingChooser extends NextFrameCandidateChooser {
-        private int currentDirection = 1;
-
-        @Override
-        public int getNextCandidate(int lastCandidate) {
-            lastCandidate += currentDirection;
-            if (lastCandidate < 0 && currentDirection == -1) {
-                currentDirection = 1;
-                resetStartTime(0);
-                return 1;
-            } else if (lastCandidate > maxFrame && currentDirection == 1) {
-                currentDirection = -1;
-                resetStartTime(maxFrame);
-                return maxFrame - 1;
-            }
-
-            return lastCandidate;
-        }
-    }
-
-    private interface FrameChooser {
-        public int moveToNextFrame(int frameNumber);
-    }
-
-    private static class RelativeFrameChooser implements FrameChooser {
-        @Override
-        public int moveToNextFrame(int frame) {
-            return nextFrameCandidateChooser.getNextCandidate(frame);
-        }
-    }
-
-    private static class AbsoluteFrameChooser implements FrameChooser {
-
-        private final long[] obsMillis;
-        private long absoluteStartTime;
-        private long systemStartTime;
-
-        public AbsoluteFrameChooser(long[] _obsMillis) {
-            obsMillis = _obsMillis;
-        }
-
-        public void resetStartTime(int frame) {
-            absoluteStartTime = obsMillis[frame];
-            systemStartTime = System.currentTimeMillis();
-        }
-
-        @Override
-        public int moveToNextFrame(int frame) {
-            int lastCandidate, nextCandidate = frame;
-            long lastDiff, nextDiff = -Long.MAX_VALUE;
-
-            do {
-                lastCandidate = nextCandidate;
-                nextCandidate = nextFrameCandidateChooser.getNextCandidate(nextCandidate);
-
-                lastDiff = nextDiff;
-                nextDiff = Math.abs(obsMillis[nextCandidate] - absoluteStartTime) - (System.currentTimeMillis() - systemStartTime);
-            } while (nextDiff < 0);
-
-            if (-lastDiff < nextDiff) {
-                return lastCandidate;
-                // return lastDiff;
-            } else {
-                return nextCandidate;
-                // return nextDiff;
-            }
-        }
+        animationMode = mode;
     }
 
     public static double getLargestPhysicalSize() {
