@@ -13,6 +13,8 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 public class Displayer implements JHVEventHighlightListener {
 
     public static boolean multiview = false;
+    public static boolean polar = false;
+    public static boolean latitudinal = false;
 
     static int glWidth = 1;
     static int glHeight = 1;

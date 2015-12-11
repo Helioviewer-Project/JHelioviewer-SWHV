@@ -65,6 +65,18 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
+    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+        for (Renderable renderable : renderables) {
+            renderable.renderLatitudinal(camera, vp, gl);
+        }
+    }
+
+    public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
+        for (Renderable renderable : renderables) {
+            renderable.renderPolar(camera, vp, gl);
+        }
+    }
+
     public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
         for (Renderable renderable : renderables) {
             renderable.renderFloat(camera, vp, gl);

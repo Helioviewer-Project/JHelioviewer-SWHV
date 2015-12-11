@@ -22,7 +22,7 @@ public class CameraHelper {
         return Mat4.orthoInverse(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
     }
 
-    public static void applyPerspectiveLL(Camera camera, Viewport vp, GL2 gl) {
+    public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 

@@ -68,18 +68,18 @@ public class RenderableContainerPanel extends JPanel {
         gc.fill = GridBagConstraints.BOTH;
 
         grid = new JTable(renderableContainer) {
-                    @Override
-                    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                        if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
-                            super.changeSelection(rowIndex, columnIndex, toggle, extend);
-                        // otherwise prevent changing selection
-                    }
+            @Override
+            public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+                if (columnIndex != VISIBLE_COL && columnIndex != REMOVE_COL)
+                    super.changeSelection(rowIndex, columnIndex, toggle, extend);
+                // otherwise prevent changing selection
+            }
 
-                    @Override
-                    public void clearSelection() {
-                        // prevent losing selection
-                    }
-                };
+            @Override
+            public void clearSelection() {
+                // prevent losing selection
+            }
+        };
 
         renderableContainer.addTableModelListener(new TableModelListener() {
             @Override
@@ -119,9 +119,27 @@ public class RenderableContainerPanel extends JPanel {
                 ImageViewerGui.getFiltersPanel().refresh();
             }
         });
+        final JCheckBox polar = new JCheckBox("Polar", Displayer.multiview);
+        polar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Displayer.polar = polar.isSelected();
+                Displayer.display();
+            }
+        });
+        final JCheckBox latitudinal = new JCheckBox("Latitudinal", Displayer.multiview);
+        latitudinal.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Displayer.latitudinal = latitudinal.isSelected();
+                Displayer.display();
+            }
+        });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
         addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
+        //addLayerButtonWrapper.add(polar, BorderLayout.CENTER);
+        //addLayerButtonWrapper.add(latitudinal, BorderLayout.CENTER);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
@@ -241,6 +259,7 @@ public class RenderableContainerPanel extends JPanel {
     }
 
     private int rowHeight = -1;
+
     public int getGridRowHeight() {
         if (rowHeight == -1) {
             rowHeight = grid.getRowHeight() + 4;
