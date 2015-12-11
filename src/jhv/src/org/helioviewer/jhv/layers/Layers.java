@@ -150,7 +150,7 @@ public class Layers {
         Camera camera = Displayer.getCamera();
         camera.timeChanged(lastTimestamp);
         for (View view : layers) {
-            view.setFrame(view.getFrame(dateTime));
+            view.setFrame(dateTime);
         }
         Displayer.render(1);
 
