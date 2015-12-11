@@ -8,6 +8,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
@@ -48,7 +49,7 @@ public class FITSView extends AbstractView {
         metaDataArray[0] = m;
 
         imageData.setRegion(m.getPhysicalRegion());
-        imageData.setMetaData(metaDataArray[0]);
+        imageData.setMetaData(m);
         imageData.setFrameNumber(0);
     }
 
@@ -66,8 +67,9 @@ public class FITSView extends AbstractView {
      * */
     @Override
     public String getName() {
-        if (metaDataArray[0] instanceof ObserverMetaData) {
-            return ((ObserverMetaData) metaDataArray[0]).getFullName();
+        MetaData m = metaDataArray[0];
+        if (m instanceof ObserverMetaData) {
+            return ((ObserverMetaData) m).getFullName();
         } else {
             String name = uri.getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));

@@ -159,19 +159,17 @@ class J2KRender implements Runnable {
 
         EventQueue.invokeLater(new Runnable() {
             private ImageData theImageData;
-            private int theFrame;
 
             @Override
             public void run() {
-                parentViewRef.setImageData(theImageData, theFrame);
+                parentViewRef.setImageData(theImageData);
             }
 
-            public Runnable init(ImageData imagedata, int frame) {
+            public Runnable init(ImageData imagedata) {
                 theImageData = imagedata;
-                theFrame = frame;
                 return this;
             }
-        }.init(newImageData, newFrame));
+        }.init(newImageData));
     }
 
     @Override

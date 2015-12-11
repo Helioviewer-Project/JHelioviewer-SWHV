@@ -216,7 +216,7 @@ public class JP2Image {
 
     Kdu_region_compositor getCompositor(Kdu_thread_env threadEnv) throws KduException, IOException {
         if (kduRender == null) {
-            Thread.currentThread().setName("Render " + getName(0));
+            Thread.currentThread().setName("Render " + getName());
             kduRender = new KakaduEngine(cacheRender, uri, threadEnv);
         }
         return kduRender.getCompositor();
@@ -352,10 +352,10 @@ public class JP2Image {
         return downloadURI;
     }
 
-    protected String getName(int frame) {
-        MetaData metaData = metaDataList[frame];
-        if (metaData instanceof ObserverMetaData) {
-            return ((ObserverMetaData) metaData).getFullName();
+    protected String getName() {
+        MetaData m = metaDataList[0];
+        if (m instanceof ObserverMetaData) {
+            return ((ObserverMetaData) m).getFullName();
         } else {
             String name = getURI().getPath();
             return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));

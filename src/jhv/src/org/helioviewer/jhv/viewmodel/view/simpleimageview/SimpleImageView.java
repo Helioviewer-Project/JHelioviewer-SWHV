@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import org.helioviewer.jhv.viewmodel.imagedata.ARGBInt32ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelShortImageData;
+import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.viewmodel.view.AbstractView;
 
@@ -39,10 +40,12 @@ public class SimpleImageView extends AbstractView {
             imageData = new ARGBInt32ImageData(image);
         }
 
-        metaDataArray[0] = new PixelBasedMetaData(image.getWidth(), image.getHeight());
+        MetaData m = new PixelBasedMetaData(image.getWidth(), image.getHeight());
 
-        imageData.setRegion(metaDataArray[0].getPhysicalRegion());
-        imageData.setMetaData(metaDataArray[0]);
+        metaDataArray[0] = m;
+
+        imageData.setRegion(m.getPhysicalRegion());
+        imageData.setMetaData(m);
         imageData.setFrameNumber(0);
     }
 
