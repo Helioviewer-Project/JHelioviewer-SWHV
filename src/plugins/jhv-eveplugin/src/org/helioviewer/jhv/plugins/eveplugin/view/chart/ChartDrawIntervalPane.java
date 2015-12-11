@@ -83,13 +83,19 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         if (availableInterval != null && selectedInterval != null) {
             computeIntervalBorderPositions(availableInterval, selectedInterval);
-
+            drawIntervalBackground(g);
             drawInterval(g);
             drawMovieInterval(g, availableInterval);
             drawLabels(g, availableInterval, selectedInterval);
             drawBorders(g);
             drawIntervalGraspPoints(g);
+            drawIntervalHBar(g);
         }
+    }
+
+    private void drawIntervalBackground(Graphics2D g) {
+        g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        g.fillRect(leftIntervalBorderPosition - 1, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
     }
 
     private void computeIntervalBorderPositions(Interval<Date> availableInterval, Interval<Date> selectedInterval) {
@@ -111,11 +117,13 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(DrawConstants.getGraphLeftSpace(), 2, availableIntervalSpace, getHeight() - 3);
+
     }
 
     private void drawInterval(Graphics2D g) {
+        final int availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
         g.setColor(Color.black);
-        g.fillRect(leftIntervalBorderPosition, 5, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
+        g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
     }
 
     private void drawMovieInterval(Graphics2D g, Interval<Date> availableInterval) {
@@ -168,8 +176,14 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private void drawIntervalGraspPoints(Graphics2D g) {
         g.setColor(Color.BLACK);
-        g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
-        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, 12, 5, 5));
+        g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
+        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
+    }
+
+    private void drawIntervalHBar(Graphics2D g) {
+        g.setColor(Color.BLACK);
+        g.fill(new RoundRectangle2D.Double(DrawConstants.getGraphLeftSpace(), 0, leftIntervalBorderPosition - DrawConstants.getGraphLeftSpace(), 2, 5, 5));
+        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.getGraphRightSpace(), 2, 5, 5));
     }
 
     private void drawLabels(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
@@ -500,21 +514,16 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseExited(MouseEvent e) {
-        eveState.setMouseTimeIntervalDragging(false);
-        if (mousePressed != null) {
-            if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
-                resizeSelectedInterval(e.getPoint(), true);
-            } else if (mouseOverInterval) {
-                moveSelectedInterval(e.getPoint(), true);
-            }
-        }
-        mousePressed = null;
-        mouseOverInterval = false;
-        mouseOverLeftGraspPoint = false;
-        mouseOverRightGraspPoint = false;
-
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        repaint();
+        /*
+         * eveState.setMouseTimeIntervalDragging(false); if (mousePressed !=
+         * null) { if (mouseOverLeftGraspPoint || mouseOverRightGraspPoint) {
+         * resizeSelectedInterval(e.getPoint(), true); } else if
+         * (mouseOverInterval) { moveSelectedInterval(e.getPoint(), true); } }
+         * mousePressed = null; mouseOverInterval = false;
+         * mouseOverLeftGraspPoint = false; mouseOverRightGraspPoint = false;
+         * 
+         * setCursor(new Cursor(Cursor.DEFAULT_CURSOR)); repaint();
+         */
     }
 
     @Override
