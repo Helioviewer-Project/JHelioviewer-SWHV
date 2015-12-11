@@ -236,9 +236,11 @@ public class JP2View extends AbstractView {
 
     @Override
     public void render(Camera _camera, Viewport _vp, double factor) {
-        camera = _camera;
-        viewpoint = camera.getViewpoint();
         vp = _vp;
+        camera = _camera;
+        if (camera != null) // Callisto
+            viewpoint = camera.getViewpoint();
+
         signalRender(_jp2Image, false, factor);
     }
 
