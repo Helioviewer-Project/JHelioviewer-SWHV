@@ -167,65 +167,45 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
     }
 
-    public void renderLatitudinal(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(this);
-        ImageViewerGui.getRenderableContainer().prerender(gl);
-
-        if (exporter != null) {
-            exporter.handleMovieExport(gl);
-        }
-
-        Camera camera = Displayer.getCamera();
+    public void renderLatitudinal(Camera camera, GL2 gl) {
         renderSceneLatitudinal(camera, gl);
-        setRender(camera);
     }
 
-    public void renderPolar(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(this);
-        ImageViewerGui.getRenderableContainer().prerender(gl);
-
-        if (exporter != null) {
-            exporter.handleMovieExport(gl);
-        }
-
-        Camera camera = Displayer.getCamera();
+    public void renderPolar(Camera camera, GL2 gl) {
         renderScenePolar(camera, gl);
-        setRender(camera);
     }
 
-    public void renderOrtho(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
-        GLInfo.updatePixelScale(this);
-
-        ImageViewerGui.getRenderableContainer().prerender(gl);
-
-        if (exporter != null) {
-            exporter.handleMovieExport(gl);
-        }
-
-        Camera camera = Displayer.getCamera();
+    public void renderOrtho(Camera camera, GL2 gl) {
         renderScene(camera, gl);
         renderMiniview(gl);
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
-
-        setRender(camera);
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
+        GL2 gl = (GL2) drawable.getGL();
+        GLInfo.updatePixelScale(this);
+
+        ImageViewerGui.getRenderableContainer().prerender(gl);
+
+        if (exporter != null) {
+            exporter.handleMovieExport(gl);
+        }
+
+        Camera camera = Displayer.getCamera();
+
         if (Displayer.polar) {
-            renderPolar(drawable);
+            renderPolar(camera, gl);
         }
         else if (Displayer.latitudinal) {
-            renderLatitudinal(drawable);
+            renderLatitudinal(camera, gl);
         }
         else {
-            renderOrtho(drawable);
+            renderOrtho(camera, gl);
         }
-        //renderOrtho(drawable);
+
+        setRender(camera);
     }
 
     private static void setRender(Camera camera) {
