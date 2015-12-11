@@ -173,8 +173,8 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
     @Override
     public void activeLayerChanged(View view) {
         if (view != null) {
-            positionLoad.setBeginDate(Layers.getStartDate(view).getDate(), false);
-            positionLoad.setEndDate(Layers.getEndDate(view).getDate(), true);
+            positionLoad.setBeginDate(view.getFirstTime().getDate(), false);
+            positionLoad.setEndDate(view.getLastTime().getDate(), true);
             // Displayer.render();
         }
     }
@@ -268,9 +268,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         if (view == null)
             return;
 
-        JHVDate startDate = Layers.getStartDate(view);
-        beginDatePicker.setDate(new Date(startDate.milli - startDate.milli % (60 * 60 * 24 * 1000)));
-        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startDate.getDate()));
+        JHVDate startTime = view.getFirstTime();
+        beginDatePicker.setDate(new Date(startTime.milli - startTime.milli % (60 * 60 * 24 * 1000)));
+        beginTimePicker.setText(TimeUtils.timeDateFormat.format(startTime.getDate()));
         setBeginTime(applyChanges);
     }
 
@@ -307,9 +307,9 @@ public class CameraOptionPanelExpert extends CameraOptionPanel implements Layers
         if (view == null)
             return;
 
-        JHVDate endDate = Layers.getEndDate(view);
-        endDatePicker.setDate(new Date(endDate.milli - endDate.milli % (60 * 60 * 24 * 1000)));
-        endTimePicker.setText(TimeUtils.timeDateFormat.format(endDate.getDate()));
+        JHVDate endTime = view.getLastTime();
+        endDatePicker.setDate(new Date(endTime.milli - endTime.milli % (60 * 60 * 24 * 1000)));
+        endTimePicker.setText(TimeUtils.timeDateFormat.format(endTime.getDate()));
         setEndTime(applyChanges);
     }
 

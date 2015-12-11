@@ -31,10 +31,10 @@ public class NewLayerAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         // Check the dates if possible
-        View activeView = Layers.getActiveView();
-        if (activeView != null && activeView.isMultiFrame()) {
-            JHVDate start = Layers.getStartDate(activeView);
-            JHVDate end = Layers.getEndDate(activeView);
+        View view = Layers.getActiveView();
+        if (view != null && view.isMultiFrame()) {
+            JHVDate start = view.getFirstTime();
+            JHVDate end = view.getLastTime();
             try {
                 Date obsStartDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getStartTime());
                 Date obsEndDate = TimeUtils.apiDateFormat.parse(ObservationDialog.getInstance().getObservationImagePane().getEndTime());

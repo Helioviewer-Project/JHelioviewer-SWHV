@@ -123,7 +123,7 @@ public class Layers {
         if (activeView == null /*|| !activeView.isMultiFrame()*/)
             return;
 
-        syncTime(activeView.getFrameDateTime(frame));
+        syncTime(activeView.getFrameTime(frame));
     }
 
     public static void nextFrame() {
@@ -168,30 +168,6 @@ public class Layers {
     }
 
     /**
-     * Return the timestamp of the first available image data of the layer in
-     * question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return timestamp of the first available image data
-     */
-    public static JHVDate getStartDate(View view) {
-        return view.getFrameDateTime(0);
-    }
-
-    /**
-     * Return the timestamp of the last available image data of the layer in
-     * question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     * @return timestamp of the last available image data
-     */
-    public static JHVDate getEndDate(View view) {
-        return view.getFrameDateTime(view.getMaximumFrameNumber());
-    }
-
-    /**
      * Return the timestamp of the first available image data
      *
      * @return timestamp of the first available image data, null if no
@@ -201,7 +177,7 @@ public class Layers {
         JHVDate earliest = null;
 
         for (View view : layers) {
-            JHVDate start = getStartDate(view);
+            JHVDate start = view.getFirstTime();
             if (earliest == null || start.compareTo(earliest) < 0) {
                 earliest = start;
             }
@@ -219,7 +195,7 @@ public class Layers {
         JHVDate latest = null;
 
         for (View view : layers) {
-            JHVDate end = getEndDate(view);
+            JHVDate end = view.getLastTime();
             if (latest == null || end.compareTo(latest) > 0) {
                 latest = end;
             }
@@ -278,7 +254,6 @@ public class Layers {
         layers.add(view);
         fireLayerAdded(view);
         setActiveView(view);
-        // setFrame(0); // force sync
     }
 
     private static void fireLayerAdded(View view) {
