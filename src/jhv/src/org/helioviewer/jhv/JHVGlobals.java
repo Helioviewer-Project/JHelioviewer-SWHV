@@ -138,7 +138,7 @@ public class JHVGlobals {
      *
      * @throws SecurityException
      */
-    public static void createDirs() throws SecurityException {
+    public static void createDirs() {
         JHVDirectory[] dirs = JHVDirectory.values();
         for (JHVDirectory dir : dirs) {
             File f = dir.getFile();

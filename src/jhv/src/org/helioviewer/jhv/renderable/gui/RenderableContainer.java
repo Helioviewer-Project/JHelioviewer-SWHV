@@ -183,15 +183,15 @@ public class RenderableContainer implements TableModel, Reorderable {
     }
 
     public void fireInsert(int idx) {
+        TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
         for (TableModelListener listener : listeners) {
-            TableModelEvent e = new TableModelEvent(this, idx, idx, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
             listener.tableChanged(e);
         }
     }
 
     public void fireListeners() {
+        TableModelEvent e = new TableModelEvent(this);
         for (TableModelListener listener : listeners) {
-            TableModelEvent e = new TableModelEvent(this);
             listener.tableChanged(e);
         }
     }
@@ -200,8 +200,9 @@ public class RenderableContainer implements TableModel, Reorderable {
         int idx = renderables.indexOf(renderable);
         if (idx < 0 || idx >= renderables.size())
             return;
+
+        TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIME_COL, TableModelEvent.UPDATE);
         for (TableModelListener listener : listeners) {
-            TableModelEvent e = new TableModelEvent(this, idx, idx, RenderableContainerPanel.TIME_COL, TableModelEvent.UPDATE);
             listener.tableChanged(e);
         }
     }
