@@ -63,13 +63,13 @@ public abstract class AbstractView implements View {
     }
 
     @Override
-    public int getFrame(JHVDate time) {
-        return 0;
+    public JHVDate getFrameTime(JHVDate time) {
+        return metaDataArray[0].getViewpoint().time;
     }
 
     @Override
     public MetaData getMetaData(JHVDate time) {
-        return metaDataArray[getFrame(time)];
+        return metaDataArray[0];
     }
 
     @Override

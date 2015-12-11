@@ -104,7 +104,7 @@ public interface View {
 
     // <!- only for Layers
     public void setFrame(JHVDate time);
-    public int getFrame(JHVDate time);
+    public JHVDate getFrameTime(JHVDate time);
     public MetaData getMetaData(JHVDate time);
     // -->
 
