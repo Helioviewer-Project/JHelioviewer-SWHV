@@ -65,7 +65,12 @@ public class Layers {
         }
     }
 
-    private static final Timer frameTimer = new Timer(1000 / 20, new FrameTimerListener());
+    private static final Timer frameTimer;
+
+    static {
+        frameTimer = new Timer(1000 / 20, new FrameTimerListener());
+        frameTimer.setCoalesce(true);
+    }
 
     private static class FrameTimerListener implements ActionListener {
         @Override
