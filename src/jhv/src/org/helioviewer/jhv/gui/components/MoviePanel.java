@@ -791,9 +791,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
          */
         @Override
         public void paintTrack(Graphics g) {
-            int slider_height = slider.getSize().height;
-            int height = slider_height / 4;
-            int offset = (slider_height - height) / 2;
+            int y = slider.getSize().height / 2;
 
             Graphics2D g2d = (Graphics2D) g;
             g2d.setStroke(new BasicStroke(4));
@@ -801,10 +799,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             View view = Layers.getActiveView();
             if (view == null) {
                 g2d.setColor(notCachedColor);
-                g2d.drawLine(trackRect.x, offset + slider_height / 8, trackRect.x + trackRect.width, offset + slider_height / 8);
+                g2d.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
                 int len = view.getMaximumFrameNumber();
-
                 for (int i = 0; i < len; i++) {
                     int begin = (int) ((float) i / len * trackRect.width);
                     int end = (int) ((float) (i + 1) / len * trackRect.width);
@@ -813,7 +810,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                         end++;
 
                     CacheStatus cacheStatus = view.getImageCacheStatus(i);
-
                     if (cacheStatus == CacheStatus.PARTIAL) {
                         g2d.setColor(partialCachedColor);
                     } else if (cacheStatus == CacheStatus.COMPLETE) {
@@ -821,7 +817,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
                     } else {
                         g2d.setColor(notCachedColor);
                     }
-                    g2d.drawLine(trackRect.x + begin, offset + slider_height / 8, trackRect.x + end, offset + slider_height / 8);
+                    g2d.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }
             g2d.setStroke(new BasicStroke(1));
