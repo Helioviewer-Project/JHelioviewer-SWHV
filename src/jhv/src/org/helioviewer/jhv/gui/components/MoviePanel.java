@@ -284,7 +284,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
-        speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 99, 1));
+        speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 60, 1));
         speedSpinner.addChangeListener(this);
         ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
@@ -487,13 +487,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
             // Previous frame
         } else if (e.getSource() == previousFrameButton) {
             if (Layers.isMoviePlaying()) {
-                Layers.toggleMovie();
+                Layers.pauseMovie();
             }
             Layers.previousFrame();
             // Next frame
         } else if (e.getSource() == nextFrameButton) {
             if (Layers.isMoviePlaying()) {
-                Layers.toggleMovie();
+                Layers.pauseMovie();
             }
             Layers.nextFrame();
             // Change animation speed
