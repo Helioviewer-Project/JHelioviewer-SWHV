@@ -439,14 +439,14 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     private ImageData baseImageData;
 
     private void setImageData(ImageData newImageData) {
-        int frame = newImageData.getFrameNumber();
+        int frame = newImageData.getMetaData().getFrameNumber();
         if (frame == 0) {
             baseImageData = newImageData;
         }
 
-        if (imageData == null || (prevImageData != null && prevImageData.getFrameNumber() - frame > 2)) {
+        if (imageData == null || (prevImageData != null && prevImageData.getMetaData().getFrameNumber() - frame > 2)) {
             prevImageData = newImageData;
-        } else if (frame != imageData.getFrameNumber()) {
+        } else if (frame != imageData.getMetaData().getFrameNumber()) {
             prevImageData = imageData;
         }
 

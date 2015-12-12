@@ -23,7 +23,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private double sunPositionX = Double.NaN;
     private double sunPositionY = Double.NaN;
 
-    public HelioviewerMetaData(MetaDataContainer m) {
+    public HelioviewerMetaData(MetaDataContainer m, int frame) {
+        frameNumber = frame;
+
         identifyObservation(m);
         retrievePosition(m, retrieveDateTime(m));
         retrievePixelParameters(m);

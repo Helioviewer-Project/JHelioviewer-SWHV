@@ -35,7 +35,7 @@ public class FITSView extends AbstractView {
             throw new IOException("FITS image data cannot be accessed.");
         }
 
-        HelioviewerMetaData m = new HelioviewerMetaData(fits);
+        HelioviewerMetaData m = new HelioviewerMetaData(fits, 0);
 
         BufferedImage bi = fits.getImage(0, 0, m.getPixelHeight(), m.getPixelWidth());
         if (bi.getColorModel().getPixelSize() <= 8) {
@@ -49,7 +49,6 @@ public class FITSView extends AbstractView {
         _metaData = m;
         imageData.setRegion(_metaData.getPhysicalRegion());
         imageData.setMetaData(_metaData);
-        imageData.setFrameNumber(0);
     }
 
     /**

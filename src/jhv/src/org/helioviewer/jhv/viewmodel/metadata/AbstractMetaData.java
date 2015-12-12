@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 
 public abstract class AbstractMetaData implements MetaData {
 
+    protected int frameNumber = 0;
     protected Region region;
 
     protected int pixelWidth;
@@ -20,6 +21,11 @@ public abstract class AbstractMetaData implements MetaData {
     // Serves only for LASCO cutOff edges
     protected double cutOffValue = -1;
     protected Vec3 cutOffDirection;
+
+    @Override
+    public int getFrameNumber() {
+        return frameNumber;
+    }
 
     @Override
     public Region getPhysicalRegion() {

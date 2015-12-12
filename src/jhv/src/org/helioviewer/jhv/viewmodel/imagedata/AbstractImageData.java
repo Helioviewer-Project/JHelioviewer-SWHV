@@ -15,7 +15,6 @@ public abstract class AbstractImageData implements ImageData {
 
     protected BufferedImage image = null;
 
-    private int frameNumber;
     private Region region;
     private MetaData metaData;
     private Position.Q viewpoint;
@@ -35,17 +34,11 @@ public abstract class AbstractImageData implements ImageData {
         bpp = newBpp;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getHeight() {
         return height;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWidth() {
         return width;
@@ -61,9 +54,6 @@ public abstract class AbstractImageData implements ImageData {
         return buffer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public BufferedImage getBufferedImage() {
         if (image == null) {
@@ -82,16 +72,6 @@ public abstract class AbstractImageData implements ImageData {
      * @return the created BufferedImage
      */
     protected abstract BufferedImage createBufferedImageFromImageTransport();
-
-    @Override
-    public void setFrameNumber(int f) {
-        frameNumber = f;
-    }
-
-    @Override
-    public int getFrameNumber() {
-        return frameNumber;
-    }
 
     @Override
     public Region getRegion() {

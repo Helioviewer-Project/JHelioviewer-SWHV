@@ -39,10 +39,9 @@ public class SimpleImageView extends AbstractView {
             imageData = new ARGBInt32ImageData(image);
         }
 
-        _metaData = new PixelBasedMetaData(image.getWidth(), image.getHeight());
+        _metaData = new PixelBasedMetaData(image.getWidth(), image.getHeight(), 0);
         imageData.setRegion(_metaData.getPhysicalRegion());
         imageData.setMetaData(_metaData);
-        imageData.setFrameNumber(0);
     }
 
     /**

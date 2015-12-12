@@ -33,10 +33,6 @@ public interface ImageData {
      */
     public ImageFormat getImageFormat();
 
-    public void setFrameNumber(int framenumber);
-
-    public int getFrameNumber();
-
     public Region getRegion();
 
     public void setRegion(Region r);
