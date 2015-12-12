@@ -51,6 +51,7 @@ public class JP2View extends AbstractView {
     private boolean stopRender = false;
 
     private MetaData[] metaDataArray;
+    private int maximumFrame;
 
     /**
      * Sets the JPG2000 image used by this class.
@@ -64,6 +65,7 @@ public class JP2View extends AbstractView {
         _jp2Image = newJP2Image;
 
         metaDataArray = _jp2Image.metaDataList;
+        maximumFrame = metaDataArray.length - 1;
 
         _jp2Image.startReader(this);
         frameCountStart = System.currentTimeMillis();
@@ -182,12 +184,12 @@ public class JP2View extends AbstractView {
 
     @Override
     public boolean isMultiFrame() {
-        return _jp2Image.isMultiFrame();
+        return maximumFrame > 0;
     }
 
     @Override
     public int getMaximumFrameNumber() {
-        return _jp2Image.getMaximumFrameNumber();
+        return maximumFrame;
     }
 
     @Override
@@ -201,11 +203,11 @@ public class JP2View extends AbstractView {
         int next = targetFrame + 1;
         switch (mode) {
             case STOP:
-                if (next > getMaximumFrameNumber())
+                if (next > maximumFrame)
                     return null;
                 break;
             case SWING:
-                if (targetFrame == getMaximumFrameNumber()) {
+                if (targetFrame == maximumFrame) {
                     Layers.setAnimationMode(AnimationMode.SWINGDOWN);
                     return metaDataArray[targetFrame - 1].getViewpoint().time;
                 }
@@ -217,7 +219,7 @@ public class JP2View extends AbstractView {
                 }
                 return metaDataArray[targetFrame - 1].getViewpoint().time;
             default: // LOOP
-                if (next > getMaximumFrameNumber())
+                if (next > maximumFrame)
                     return metaDataArray[0].getViewpoint().time;
         }
         return metaDataArray[next].getViewpoint().time;
@@ -237,12 +239,12 @@ public class JP2View extends AbstractView {
     }
 
     private int getFrameNumber(JHVDate time) {
-        int frame = -1, last = _jp2Image.getMaximumFrameNumber();
+        int frame = -1;
         long lastDiff, currentDiff = -Long.MAX_VALUE;
         do {
             lastDiff = currentDiff;
             currentDiff = metaDataArray[++frame].getViewpoint().time.milli - time.milli;
-        } while (currentDiff < 0 && frame < last);
+        } while (currentDiff < 0 && frame < maximumFrame);
 
         if (-lastDiff < currentDiff) {
             return frame - 1;
@@ -253,10 +255,6 @@ public class JP2View extends AbstractView {
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        if (frame <= 0)
-            return getFirstTime();
-        if (frame >= getMaximumFrameNumber())
-            return getLastTime();
         return metaDataArray[frame].getViewpoint().time;
     }
 
@@ -267,7 +265,7 @@ public class JP2View extends AbstractView {
 
     @Override
     public JHVDate getLastTime() {
-        return metaDataArray[getMaximumFrameNumber()].getViewpoint().time;
+        return metaDataArray[maximumFrame].getViewpoint().time;
     }
 
     @Override

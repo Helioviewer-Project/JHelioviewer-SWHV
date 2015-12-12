@@ -321,17 +321,6 @@ public class JP2Image {
     }
 
     /**
-     * Returns whether the image contains multiple frames.
-     *
-     * A image consisting of multiple frames is also called a 'movie'.
-     *
-     * @return True if the image contains multiple frames, false otherwise
-     */
-    protected boolean isMultiFrame() {
-        return frameCount > 1;
-    }
-
-    /**
      * Returns the URI representing the location of the image.
      *
      * @return URI representing the location of the image.
