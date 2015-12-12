@@ -146,10 +146,8 @@ class J2KRender implements Runnable {
     }
 
     private void setImageData(ImageData newImageData, JP2ImageParameter newParams) {
-        int newFrame = newParams.compositionLayer;
-        MetaData metaData = newParams.jp2Image.metaDataList[newFrame];
+        MetaData metaData = newParams.jp2Image.metaDataList[newParams.compositionLayer];
 
-        newImageData.setFrameNumber(newFrame);
         newImageData.setMetaData(metaData);
         newImageData.setViewpoint(newParams.viewpoint);
 

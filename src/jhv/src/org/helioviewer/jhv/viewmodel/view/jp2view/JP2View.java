@@ -150,7 +150,7 @@ public class JP2View extends AbstractView {
      * {@link J2KRender} when it has finished decoding an image.
      */
     void setImageData(ImageData newImageData) {
-        int frame = newImageData.getFrameNumber();
+        int frame = newImageData.getMetaData().getFrameNumber();
         if (frame != trueFrame) {
             trueFrame = frame;
             ++frameCount;

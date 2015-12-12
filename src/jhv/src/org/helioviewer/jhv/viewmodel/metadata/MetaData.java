@@ -6,6 +6,8 @@ import org.helioviewer.jhv.base.math.Vec3;
 
 public interface MetaData {
 
+    public int getFrameNumber();
+
     public Region getPhysicalRegion();
 
     public int getPixelWidth();

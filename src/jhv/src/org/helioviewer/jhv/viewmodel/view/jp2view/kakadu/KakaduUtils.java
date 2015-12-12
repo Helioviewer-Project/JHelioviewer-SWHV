@@ -407,7 +407,7 @@ public class KakaduUtils {
                 try {
                     if (myFindBox2(xmlBox, assocBox, Kdu_global.jp2_xml_4cc, 1) == true) {
                         hvMetaData.parseXML(xmlBox2xml(xmlBox));
-                        metaDataList[i] = new HelioviewerMetaData(hvMetaData);
+                        metaDataList[i] = new HelioviewerMetaData(hvMetaData, i);
                         hvMetaData.destroyXML();
                     }
 
@@ -423,7 +423,7 @@ public class KakaduUtils {
             xmlBox = findBoxResult[0];
             if (xmlBox != null) {
                 hvMetaData.parseXML(xmlBox2xml(xmlBox));
-                metaDataList[0] = new HelioviewerMetaData(hvMetaData);
+                metaDataList[0] = new HelioviewerMetaData(hvMetaData, 0);
                 hvMetaData.destroyXML();
             }
         }
