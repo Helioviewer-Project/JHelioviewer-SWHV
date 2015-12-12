@@ -203,8 +203,19 @@ public class JP2View extends AbstractView {
             case STOP:
                 if (next > getMaximumFrameNumber())
                     return null;
+                break;
             case SWING:
-                // break; - N/A, needs state
+                if (targetFrame == getMaximumFrameNumber()) {
+                    Layers.setAnimationMode(AnimationMode.SWINGDOWN);
+                    return metaDataArray[targetFrame - 1].getViewpoint().time;
+                }
+                break;
+            case SWINGDOWN:
+                if (targetFrame == 0) {
+                    Layers.setAnimationMode(AnimationMode.SWING);
+                    return metaDataArray[1].getViewpoint().time;
+                }
+                return metaDataArray[targetFrame - 1].getViewpoint().time;
             default: // LOOP
                 if (next > getMaximumFrameNumber())
                     return metaDataArray[0].getViewpoint().time;
