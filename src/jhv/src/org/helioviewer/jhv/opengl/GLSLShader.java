@@ -87,11 +87,13 @@ public class GLSLShader {
     }
 
     private void _init(GL2 gl) {
+        InputStream fragmentCommonStream = FileUtils.getResourceInputStream("/data/fragmentcommon.glsl");
+        String fragmentCommonText = FileUtils.convertStreamToString(fragmentCommonStream);
         InputStream fragmentStream = FileUtils.getResourceInputStream(fragment);
         String fragmentText = FileUtils.convertStreamToString(fragmentStream);
+        fragmentText = fragmentCommonText + fragmentText;
         InputStream vertexStream = FileUtils.getResourceInputStream(vertex);
         String vertexText = FileUtils.convertStreamToString(vertexStream);
-
         attachVertexShader(gl, vertexText);
         attachFragmentShader(gl, fragmentText);
 
