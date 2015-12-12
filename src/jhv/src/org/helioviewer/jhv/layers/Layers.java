@@ -23,13 +23,6 @@ public class Layers {
     private static View activeView;
     private static final ArrayList<View> layers = new ArrayList<View>();
 
-    /**
-     * Returns the view at a given position within the stack of layers.
-     *
-     * @param index
-     *            Position within the stack of layers
-     * @return View at given position
-     */
     public static View getLayer(int index) {
         try {
             return layers.get(index);
@@ -38,21 +31,10 @@ public class Layers {
         }
     }
 
-    /**
-     * Returns number of layers
-     *
-     * @return Number of layers
-     * @see #getNumberOfVisibleLayer
-     */
     public static int getNumLayers() {
         return layers.size();
     }
 
-    /**
-     * Return the view associated with the active Layer
-     *
-     * @return View associated with the active Layer
-     */
     public static View getActiveView() {
         return activeView;
     }
@@ -175,12 +157,6 @@ public class Layers {
         MoviePanel.setFrameSlider(activeFrame);
     }
 
-    /**
-     * Return the timestamp of the first available image data
-     *
-     * @return timestamp of the first available image data, null if no
-     *         information available
-     */
     public static JHVDate getStartDate() {
         JHVDate earliest = null;
 
@@ -193,12 +169,6 @@ public class Layers {
         return earliest;
     }
 
-    /**
-     * Return the timestamp of the last available image data
-     *
-     * @return timestamp of the last available image data, null if no
-     *         information available
-     */
     public static JHVDate getEndDate() {
         JHVDate latest = null;
 
@@ -211,49 +181,10 @@ public class Layers {
         return latest;
     }
 
-   /**
-     * Check if the given index is valid
-     *
-     * @param idx
-     *            - index of the layer in question
-     * @return true if the index is valid
-     */
-    private static boolean isValidIndex(int idx) {
-        if (idx >= 0 && idx < layers.size()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Calculate a new activeLayer after the old Layer has been deleted
-     *
-     * @param oldActiveLayerIdx
-     *            - index of old active, but deleted, layer
-     * @return the index of the new active layer to choose, or -1 if no suitable
-     *         new layer can be found
-     */
-    private static int determineNewActiveLayer(int oldActiveLayerIdx) {
-        int candidate = oldActiveLayerIdx;
-        if (!isValidIndex(candidate)) {
-            candidate = layers.size() - 1;
-        }
-
-        return candidate;
-    }
-
-    /**
-     * Remove the layer in question
-     *
-     * @param view
-     *            - View that can be associated with the layer in question
-     */
     public static void removeLayer(View view) {
-        int index = layers.indexOf(view);
-
         layers.remove(view);
         if (view == activeView) {
-            setActiveView(getLayer(determineNewActiveLayer(index)));
+            setActiveView(getLayer(layers.size() - 1));
         }
         view.abolish();
     }
