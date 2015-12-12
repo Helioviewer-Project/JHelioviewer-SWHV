@@ -69,10 +69,6 @@ public class Layers {
 
     private static void setMasterMovie(View view) {
         if (view == null || !view.isMultiFrame()) {
-            if (view != null && !view.isMultiFrame()) {
-                setTime(view.getFirstTime());
-            }
-
             pauseMovie();
             MoviePanel.unsetMovie();
         } else
@@ -193,6 +189,7 @@ public class Layers {
         layers.add(view);
         fireLayerAdded(view);
         setActiveView(view);
+        setFrame(0);
     }
 
     private static void fireLayerAdded(View view) {

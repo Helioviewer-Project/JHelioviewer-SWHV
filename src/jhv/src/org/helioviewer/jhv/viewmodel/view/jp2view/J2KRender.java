@@ -59,8 +59,8 @@ class J2KRender implements Runnable {
         int numLayer = currParams.compositionLayer;
 
         CacheStatus status = cacheStatusRef.getImageStatus(numLayer);
-        //if (status != CacheStatus.COMPLETE || status != CacheStatus.PARTIAL)
-        //    return;
+        if (status != CacheStatus.COMPLETE && status != CacheStatus.PARTIAL)
+            return;
 
         // compositor.Refresh();
         // compositor.Remove_ilayer(new Kdu_ilayer_ref(), true);
