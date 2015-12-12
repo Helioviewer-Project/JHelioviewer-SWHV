@@ -255,6 +255,11 @@ public class JP2View extends AbstractView {
 
     @Override
     public JHVDate getFrameTime(int frame) {
+        if (frame < 0)
+            frame = 0;
+        else if (frame > maximumFrame)
+            frame = maximumFrame;
+
         return metaDataArray[frame].getViewpoint().time;
     }
 
