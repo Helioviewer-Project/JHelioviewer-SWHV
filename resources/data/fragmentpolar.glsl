@@ -3,6 +3,12 @@ vec2 get_polar_texcoord(vec4 rect){
     vec4 scrpos =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) +0.5;
     clamp_texcoord(scrpos.xy);
     float theta = -(scrpos.x*TWOPI + PI/2.);
+    if(scrpos.y * polarRadii.y > outerCutOffRadius){
+        discard;
+    }
+    if(scrpos.y * polarRadii.y < cutOffRadius){
+        discard;
+    }
     vec2 texcoord = rect.zw * (-rect.xy + vec2(cos(theta), sin(theta)) * scrpos.y * polarRadii.y);
     clamp_texcoord(texcoord);
     return texcoord;
