@@ -112,8 +112,6 @@ public class RenderableGrid extends AbstractRenderable {
     public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        gl.glPushAttrib(GL2.GL_ENABLE_BIT);
-
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
 
         Mat4 vpmi = Mat4.identity();
@@ -129,14 +127,12 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        gl.glPopAttrib();
     }
 
     @Override
     public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        gl.glPushAttrib(GL2.GL_ENABLE_BIT);
 
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
 
@@ -151,7 +147,6 @@ public class RenderableGrid extends AbstractRenderable {
             }
         }
         gl.glPopMatrix();
-        gl.glPopAttrib();
     }
 
     private void drawGridFlat(GL2 gl, float w, float h) {
@@ -228,7 +223,6 @@ public class RenderableGrid extends AbstractRenderable {
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
-        //gl.glPushAttrib(GL2.GL_ENABLE_BIT);
 
         if (showAxes)
             drawAxes(gl);
@@ -267,7 +261,6 @@ public class RenderableGrid extends AbstractRenderable {
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-        //gl.glPopAttrib();
     }
 
     private void drawAxes(GL2 gl) {
