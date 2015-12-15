@@ -33,6 +33,11 @@ public class PositionStatusPanel extends StatusPanel.StatusPlugin implements Mou
 
         if (coord == null) {
             setText(emptyPos + String.format(rhoFormat, radius));
+        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+            setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y));
+        }
+        else if (Displayer.mode == Displayer.DisplayMode.POLAR) {
+            setText(String.format("\u03B8 : %.2f\u00B0", coord.x) + String.format(rhoFormat, coord.y));
         } else {
             setText(String.format("(\u03C6, \u03B8) : (%.2f\u00B0,%.2f\u00B0)", coord.x, coord.y) + String.format(rhoFormat, radius));
         }

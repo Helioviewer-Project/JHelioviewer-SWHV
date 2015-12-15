@@ -47,11 +47,11 @@ public class CameraHelper {
         gl.glLoadMatrixd(cameraTransformation.m, 0);
     }
 
-    private static double computeNormalizedX(Viewport vp, Point viewportCoordinates) {
+    public static double computeNormalizedX(Viewport vp, Point viewportCoordinates) {
         return 2. * ((viewportCoordinates.x - vp.x) / (double) vp.width - 0.5);
     }
 
-    private static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
+    public static double computeNormalizedY(Viewport vp, Point viewportCoordinates) {
         return -2. * ((viewportCoordinates.y - vp.yAWT) / (double) vp.height - 0.5);
     }
 

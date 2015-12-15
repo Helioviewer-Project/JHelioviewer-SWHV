@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -72,23 +73,36 @@ public class RenderableGrid extends AbstractRenderable {
     private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, Point point) {
-        Vec3 p = CameraHelper.getVectorFromSphereAlt(camera, vp, point);
-        if (p == null)
-            return null;
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+            Vec3 p = CameraHelper.getVectorFromSphereAlt(camera, vp, point);
+            if (p == null)
+                return null;
 
-        if (gridChoice != GridChoiceType.VIEWPOINT) {
-            Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, getGridQuat(camera));
-            p = q.rotateInverseVector(p);
+            if (gridChoice != GridChoiceType.VIEWPOINT) {
+                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, getGridQuat(camera));
+                p = q.rotateInverseVector(p);
+            }
+
+            double theta = 90 - 180 / Math.PI * Math.acos(p.y);
+            double phi = 90 - 180 / Math.PI * Math.atan2(p.z, p.x);
+            phi = MathUtils.mapToMinus180To180(phi);
+
+            if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
+                phi += 360;
+
+            return new Vec2(phi, theta);
         }
-
-        double theta = 90 - 180 / Math.PI * Math.acos(p.y);
-        double phi = 90 - 180 / Math.PI * Math.atan2(p.z, p.x);
-        phi = MathUtils.mapToMinus180To180(phi);
-
-        if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
-            phi += 360;
-
-        return new Vec2(phi, theta);
+        else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+            double x = (CameraHelper.computeNormalizedX(vp, point) + 1) / 2;
+            double y = (CameraHelper.computeNormalizedY(vp, point) + 1) / 2;
+            return new Vec2(x * 360, y * 180);
+        }
+        else {
+            double x = (CameraHelper.computeNormalizedX(vp, point) + 1) / 2;
+            double y = (CameraHelper.computeNormalizedY(vp, point) + 1) / 2;
+            double radius = Layers.getLargestPhysicalSize() / 2;
+            return new Vec2(x * 360, y * radius);
+        }
     }
 
     private Quat getGridQuat(Camera camera) {
