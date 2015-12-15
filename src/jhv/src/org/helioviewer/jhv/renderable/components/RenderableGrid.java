@@ -104,10 +104,112 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
+    private static int POLAR_STEPS_THETA = 24;
+    private static int POLAR_STEPS_RADIAL = 10;
+
+    @Override
+    public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
+        gl.glPushAttrib(GL2.GL_ENABLE_BIT);
+
+        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+
+        Mat4 vpmi = Mat4.identity();
+        vpmi.translate(new Vec3(camera.getCurrentTranslation().x, camera.getCurrentTranslation().y, 0.));
+        gl.glPushMatrix();
+        gl.glMultMatrixd(vpmi.m, 0);
+        {
+            drawGridPolar(gl, (float) (vp.aspect), 1);
+            if (showLabels) {
+                drawGridTextPolar(gl, pixelsPerSolarRadius, (float) (vp.aspect), 1);
+            }
+        }
+        gl.glPopMatrix();
+        gl.glPopAttrib();
+    }
+
+    @Override
+    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+        gl.glPushAttrib(GL2.GL_ENABLE_BIT);
+
+        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
+
+        Mat4 vpmi = Mat4.identity();
+        vpmi.translate(new Vec3(camera.getCurrentTranslation().x, camera.getCurrentTranslation().y, 0.));
+        gl.glPushMatrix();
+        gl.glMultMatrixd(vpmi.m, 0);
+        {
+            drawGridPolar(gl, (float) (vp.aspect), 1);
+            if (showLabels) {
+                drawGridTextPolar(gl, pixelsPerSolarRadius, (float) (vp.aspect), 1);
+            }
+        }
+        gl.glPopMatrix();
+        gl.glPopAttrib();
+    }
+
+    private void drawGridPolar(GL2 gl, float w, float h) {
+
+        gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+        GLHelper.lineWidth(gl, 0.25);
+        {
+            gl.glBegin(GL2.GL_LINES);
+            for (int i = 0; i < (POLAR_STEPS_THETA + 1); i++) {
+                float start = -w / 2 + i * w / POLAR_STEPS_THETA;
+                if (i == POLAR_STEPS_THETA / 2) {
+                    gl.glColor3f(secondColor.getRed() / 255f, secondColor.getGreen() / 255f, secondColor.getBlue() / 255f);
+                }
+                gl.glVertex2f(start, -h / 2);
+                gl.glVertex2f(start, h / 2);
+                if (i == POLAR_STEPS_THETA / 2) {
+                    gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+                }
+            }
+            for (int i = 0; i < (POLAR_STEPS_RADIAL + 1); i++) {
+                float start = -h / 2 + i * h / POLAR_STEPS_RADIAL;
+                if (i == POLAR_STEPS_RADIAL / 2) {
+                    gl.glColor3f(secondColor.getRed() / 255f, secondColor.getGreen() / 255f, secondColor.getBlue() / 255f);
+                }
+                gl.glVertex2f(-w / 2, start);
+                gl.glVertex2f(w / 2, start);
+                if (i == POLAR_STEPS_RADIAL / 2) {
+                    gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+                }
+            }
+            gl.glEnd();
+        }
+    }
+
+    private void drawGridTextPolar(GL2 gl, int size, float w, float h) {
+        TextRenderer renderer = GLText.getRenderer(size);
+        // the scale factor has to be divided by the current font size
+        float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3;
+        renderer.begin3DRendering();
+        gl.glDisable(GL2.GL_CULL_FACE);
+        {
+            for (int i = 0; i < (POLAR_STEPS_THETA + 1); ++i) {
+                if (i == POLAR_STEPS_THETA / 2) {
+                    continue;
+                }
+                float start = -w / 2 + i * w / POLAR_STEPS_THETA;
+                String label = "" + (360 / POLAR_STEPS_THETA) * i;
+                renderer.draw3D(label, start, 0, 0, textScaleFactor);
+            }
+            for (int i = 0; i < (POLAR_STEPS_RADIAL + 1); ++i) {
+                String label = "" + i * 2f / POLAR_STEPS_RADIAL;
+                float start = -h / 2 + i * h / POLAR_STEPS_RADIAL;
+                renderer.draw3D(label, 0, start, 0, textScaleFactor);
+            }
+            renderer.flush();
+        }
+        gl.glEnable(GL2.GL_CULL_FACE);
+        renderer.end3DRendering();
+    }
+
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (!isVisible[vp.idx])
             return;
+        //gl.glPushAttrib(GL2.GL_ENABLE_BIT);
 
         if (showAxes)
             drawAxes(gl);
@@ -146,6 +248,7 @@ public class RenderableGrid extends AbstractRenderable {
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+        //gl.glPopAttrib();
     }
 
     private void drawAxes(GL2 gl) {

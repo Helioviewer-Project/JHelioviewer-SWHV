@@ -189,7 +189,10 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             camera.push(imageData.getViewpoint());
 
             Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
-            vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
+            if (Displayer.polar || Displayer.latitudinal)
+                vpmi.translate(new Vec3(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.));
+            else
+                vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));
 
             Quat q = camera.getRotation();
             shader.bindMatrix(gl, vpmi.getFloatArray());
@@ -200,7 +203,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
-
+            shader.setPolarRadii(gl, 0, Layers.getLargestPhysicalSize() / 2);
             camera.pop();
 
             enablePositionVBO(gl);
