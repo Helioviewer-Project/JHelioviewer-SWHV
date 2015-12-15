@@ -194,13 +194,12 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
 
         Camera camera = Displayer.getCamera();
+
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
             renderPolar(camera, gl);
-        }
-        else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             renderLatitudinal(camera, gl);
-        }
-        else {
+        } else {
             renderOrtho(camera, gl);
         }
 

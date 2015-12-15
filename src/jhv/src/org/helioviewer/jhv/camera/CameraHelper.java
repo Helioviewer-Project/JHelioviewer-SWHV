@@ -27,8 +27,10 @@ public class CameraHelper {
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
+
         double width = camera.getWidth();
         gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -1, 1);
+
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(identity, 0);
     }
@@ -148,17 +150,17 @@ public class CameraHelper {
     }
 
     public static void zoomToFit(Camera camera) {
-
         double newFOV = Camera.INITFOV;
         double size;
+
         if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             size = 1.;
-        }
-        else {
+        } else {
             size = Layers.getLargestPhysicalSize();
         }
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);
     }
+
 }
