@@ -37,12 +37,13 @@ public class ViewROI {
 
     public static Region updateROI(Camera camera, Viewport vp, Position.Q p, MetaData m) {
         Region newRegion;
-        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
 
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             double minPhysicalX = Double.MAX_VALUE;
             double minPhysicalY = Double.MAX_VALUE;
             double maxPhysicalX = Double.MIN_VALUE;
             double maxPhysicalY = Double.MIN_VALUE;
+
             camera.push(p);
 
             Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
@@ -82,8 +83,7 @@ public class ViewROI {
                 newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
                 System.out.println(">> empty ROI");
             }
-        }
-        else {
+        } else {
             newRegion = m.getPhysicalRegion();
         }
         return newRegion;

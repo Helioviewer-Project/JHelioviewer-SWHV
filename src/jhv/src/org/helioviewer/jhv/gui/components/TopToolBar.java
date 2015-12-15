@@ -65,7 +65,6 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton coronaVisibilityButton;
 
     protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
-    private JToggleButton projectionButton;
 
     public TopToolBar() {
         setRollover(true);
@@ -287,11 +286,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 this.add(new JToggleButton(button.getIcon()));
         }
 
-        projectionButton = new JToggleButton(new AbstractAction("Projection") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
+        JButton projectionButton = new JButton();
         projectionButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         projectionButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
         projectionButton.setToolTipText("Projection");
