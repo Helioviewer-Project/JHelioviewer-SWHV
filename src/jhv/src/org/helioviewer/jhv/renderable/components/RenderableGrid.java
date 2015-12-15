@@ -16,6 +16,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -161,7 +162,9 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glVertex2f(start, -h / 2);
                 gl.glVertex2f(start, h / 2);
                 if (i == POLAR_STEPS_THETA / 2) {
+                    GLHelper.lineWidth(gl, 0.5);
                     gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+                    GLHelper.lineWidth(gl, 0.25);
                 }
             }
             for (int i = 0; i < (POLAR_STEPS_RADIAL + 1); i++) {
@@ -172,7 +175,9 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glVertex2f(-w / 2, start);
                 gl.glVertex2f(w / 2, start);
                 if (i == POLAR_STEPS_RADIAL / 2) {
+                    GLHelper.lineWidth(gl, 0.5);
                     gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+                    GLHelper.lineWidth(gl, 0.25);
                 }
             }
             gl.glEnd();
@@ -184,6 +189,7 @@ public class RenderableGrid extends AbstractRenderable {
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3;
         renderer.begin3DRendering();
+        double radius = Layers.getLargestPhysicalSize() / 2;
         gl.glDisable(GL2.GL_CULL_FACE);
         {
             for (int i = 0; i < (POLAR_STEPS_THETA + 1); ++i) {
@@ -191,11 +197,11 @@ public class RenderableGrid extends AbstractRenderable {
                     continue;
                 }
                 float start = -w / 2 + i * w / POLAR_STEPS_THETA;
-                String label = "" + (360 / POLAR_STEPS_THETA) * i;
+                String label = String.format("%d", 360 / POLAR_STEPS_THETA * i);
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (POLAR_STEPS_RADIAL + 1); ++i) {
-                String label = "" + i * 2f / POLAR_STEPS_RADIAL;
+                String label = String.format("%.2f", i * radius / POLAR_STEPS_RADIAL);
                 float start = -h / 2 + i * h / POLAR_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
