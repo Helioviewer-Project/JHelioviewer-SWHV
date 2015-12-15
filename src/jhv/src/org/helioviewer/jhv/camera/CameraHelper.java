@@ -151,7 +151,7 @@ public class CameraHelper {
 
         double newFOV = Camera.INITFOV;
         double size;
-        if (Displayer.polar || Displayer.latitudinal) {
+        if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             size = 1.;
         }
         else {

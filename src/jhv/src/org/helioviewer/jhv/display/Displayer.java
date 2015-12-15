@@ -11,10 +11,34 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class Displayer implements JHVEventHighlightListener {
+    public static enum DisplayMode {
+        ORTHO, POLAR, LATITUDINAL;
+        public String getLabel() {
+            String label;
+            switch (this) {
+            case ORTHO:
+                label = "Orthographic";
+                break;
+            case POLAR:
+                label = "Polar";
+                break;
+            case LATITUDINAL:
+                label = "Latitudinal";
+                break;
+            default:
+                label = "";
+            }
+            return label;
+        }
+    }
 
+    public static DisplayMode mode = DisplayMode.ORTHO;
     public static boolean multiview = false;
-    public static boolean polar = false;
-    public static boolean latitudinal = false;
+
+    public static void setMode(DisplayMode newMode) {
+        mode = newMode;
+        Displayer.getCamera().reset();
+    }
 
     static int glWidth = 1;
     static int glHeight = 1;

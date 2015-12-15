@@ -37,7 +37,7 @@ public class ViewROI {
 
     public static Region updateROI(Camera camera, Viewport vp, Position.Q p, MetaData m) {
         Region newRegion;
-        if (!Displayer.polar && !Displayer.latitudinal) {
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
 
             double minPhysicalX = Double.MAX_VALUE;
             double minPhysicalY = Double.MAX_VALUE;

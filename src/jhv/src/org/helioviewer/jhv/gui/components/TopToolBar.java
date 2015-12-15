@@ -65,6 +65,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
     private JToggleButton coronaVisibilityButton;
 
     protected ArrayList<JToggleButton> pluginList = new ArrayList<JToggleButton>();
+    private JToggleButton projectionButton;
 
     public TopToolBar() {
         setRollover(true);
@@ -94,18 +95,18 @@ public class TopToolBar extends JToolBar implements MouseListener {
         Settings.getSingletonInstance().save();
 
         switch (mode) {
-            case PAN:
-                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getPanInteraction());
-                panButton.setSelected(true);
-                break;
-            case ROTATE:
-                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getRotateInteraction());
-                rotateButton.setSelected(true);
-                break;
-            case ANNOTATE:
-                ImageViewerGui.setCurrentInteraction(ImageViewerGui.getAnnotateInteraction());
-                annotateButton.setSelected(true);
-                break;
+        case PAN:
+            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getPanInteraction());
+            panButton.setSelected(true);
+            break;
+        case ROTATE:
+            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getRotateInteraction());
+            rotateButton.setSelected(true);
+            break;
+        case ANNOTATE:
+            ImageViewerGui.setCurrentInteraction(ImageViewerGui.getAnnotateInteraction());
+            annotateButton.setSelected(true);
+            break;
         }
     }
 
@@ -241,6 +242,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
         annotateGroup.add(crossItem);
 
         annotateButton.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 annotatePopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
@@ -284,6 +286,43 @@ public class TopToolBar extends JToolBar implements MouseListener {
             else
                 this.add(new JToggleButton(button.getIcon()));
         }
+
+        projectionButton = new JToggleButton(new AbstractAction("Projection") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setActiveInteractionMode(InteractionMode.ANNOTATE);
+            }
+        });
+        projectionButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
+        projectionButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
+        projectionButton.setToolTipText("Annotate");
+        group.add(projectionButton);
+        addButton(projectionButton);
+
+        final JPopupMenu projectionPopup = new JPopupMenu();
+        ButtonGroup projectionGroup = new ButtonGroup();
+        for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
+            JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(new AbstractAction(el.getLabel()) {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Displayer.setMode(el);
+                }
+            });
+            projectionPopup.add(projectionItem);
+            projectionGroup.add(projectionItem);
+            if (el == Displayer.DisplayMode.ORTHO) {
+                rectangleItem.setSelected(true);
+            }
+        }
+
+        projectionButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                projectionPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
+            }
+        });
+        addSeparator();
+
     }
 
     /**
