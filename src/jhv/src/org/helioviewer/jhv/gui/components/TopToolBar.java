@@ -290,18 +290,16 @@ public class TopToolBar extends JToolBar implements MouseListener {
         projectionButton = new JToggleButton(new AbstractAction("Projection") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setActiveInteractionMode(InteractionMode.ANNOTATE);
             }
         });
         projectionButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
         projectionButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
-        projectionButton.setToolTipText("Annotate");
-        group.add(projectionButton);
+        projectionButton.setToolTipText("Projection");
         addButton(projectionButton);
 
         final JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
-        for (Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
+        for (final Displayer.DisplayMode el : Displayer.DisplayMode.values()) {
             JRadioButtonMenuItem projectionItem = new JRadioButtonMenuItem(new AbstractAction(el.getLabel()) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -311,7 +309,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
             projectionPopup.add(projectionItem);
             projectionGroup.add(projectionItem);
             if (el == Displayer.DisplayMode.ORTHO) {
-                rectangleItem.setSelected(true);
+                projectionItem.setSelected(true);
             }
         }
 
@@ -321,8 +319,8 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 projectionPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
-        addSeparator();
 
+        addSeparator();
     }
 
     /**
