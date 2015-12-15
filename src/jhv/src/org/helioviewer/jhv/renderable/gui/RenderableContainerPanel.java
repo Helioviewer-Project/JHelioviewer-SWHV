@@ -119,29 +119,10 @@ public class RenderableContainerPanel extends JPanel {
                 ImageViewerGui.getFiltersPanel().refresh();
             }
         });
-        final JCheckBox polar = new JCheckBox("Polar", Displayer.multiview);
-        polar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Displayer.polar = polar.isSelected();
-                Displayer.display();
-                Displayer.getCamera().reset();
-            }
-        });
-        final JCheckBox latitudinal = new JCheckBox("Latitudinal", Displayer.multiview);
-        latitudinal.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Displayer.latitudinal = latitudinal.isSelected();
-                Displayer.display();
-                Displayer.getCamera().reset();
-            }
-        });
+
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(addLayerButton, BorderLayout.EAST);
         addLayerButtonWrapper.add(multiview, BorderLayout.CENTER);
-        //addLayerButtonWrapper.add(polar, BorderLayout.CENTER);
-        //addLayerButtonWrapper.add(latitudinal, BorderLayout.CENTER);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);

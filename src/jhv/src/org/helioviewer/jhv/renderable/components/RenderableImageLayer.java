@@ -189,7 +189,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             camera.push(imageData.getViewpoint());
 
             Mat4 vpmi = CameraHelper.getOrthoMatrixInverse(camera, vp);
-            if (Displayer.polar || Displayer.latitudinal)
+            if (Displayer.mode != Displayer.DisplayMode.ORTHO)
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x / vp.aspect, -camera.getCurrentTranslation().y, 0.));
             else
                 vpmi.translate(new Vec3(-camera.getCurrentTranslation().x, -camera.getCurrentTranslation().y, 0.));

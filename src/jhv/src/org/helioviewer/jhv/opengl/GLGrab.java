@@ -17,8 +17,8 @@ public class GLGrab {
 
     private final FBObject fbo = new FBObject();
     private TextureAttachment fboTex;
-    private int w;
-    private int h;
+    private final int w;
+    private final int h;
 
     public GLGrab(int _w, int _h) {
         w = _w;
@@ -52,8 +52,16 @@ public class GLGrab {
         {
             fbo.bind(gl);
             Camera camera = Displayer.getCamera();
-            MainComponent.renderScene(camera, gl);
-            MainComponent.renderFloatScene(camera, gl);
+            if (Displayer.mode == Displayer.DisplayMode.POLAR) {
+                MainComponent.renderScenePolar(camera, gl);
+            }
+            else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+                MainComponent.renderSceneLatitudinal(camera, gl);
+            }
+            else {
+                MainComponent.renderScene(camera, gl);
+                MainComponent.renderFloatScene(camera, gl);
+            }
             fbo.unbind(gl);
 
             fbo.use(gl, fboTex);
