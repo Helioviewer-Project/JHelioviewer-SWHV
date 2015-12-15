@@ -167,21 +167,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
     }
 
-    public void renderLatitudinal(Camera camera, GL2 gl) {
-        renderSceneLatitudinal(camera, gl);
-    }
-
-    public void renderPolar(Camera camera, GL2 gl) {
-        renderScenePolar(camera, gl);
-    }
-
-    public void renderOrtho(Camera camera, GL2 gl) {
-        renderScene(camera, gl);
-        renderMiniview(gl);
-        renderFloatScene(camera, gl);
-        renderFullFloatScene(camera, gl);
-    }
-
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
@@ -196,12 +181,15 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Camera camera = Displayer.getCamera();
 
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-            renderPolar(camera, gl);
+            renderScenePolar(camera, gl);
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            renderLatitudinal(camera, gl);
+            renderSceneLatitudinal(camera, gl);
         } else {
-            renderOrtho(camera, gl);
+            renderScene(camera, gl);
+            renderMiniview(gl);
         }
+        renderFloatScene(camera, gl);
+        renderFullFloatScene(camera, gl);
 
         setRender(camera);
     }
