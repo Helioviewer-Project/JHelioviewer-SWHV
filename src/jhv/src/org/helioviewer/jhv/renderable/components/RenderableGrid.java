@@ -93,13 +93,17 @@ public class RenderableGrid extends AbstractRenderable {
             return new Vec2(phi, theta);
         }
         else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            double x = (CameraHelper.computeNormalizedX(vp, point) + 1) / 2;
-            double y = (CameraHelper.computeNormalizedY(vp, point) + 1) / 2;
+            double w = camera.getWidth();
+            Vec2 translation = camera.getCurrentTranslation();
+            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
+            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
             return new Vec2(x * 360, y * 180);
         }
         else {
-            double x = (CameraHelper.computeNormalizedX(vp, point) + 1) / 2;
-            double y = (CameraHelper.computeNormalizedY(vp, point) + 1) / 2;
+            double w = camera.getWidth();
+            Vec2 translation = camera.getCurrentTranslation();
+            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
+            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
             double radius = Layers.getLargestPhysicalSize() / 2;
             return new Vec2(x * 360, y * radius);
         }
