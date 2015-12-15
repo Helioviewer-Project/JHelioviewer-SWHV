@@ -286,9 +286,9 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 this.add(new JToggleButton(button.getIcon()));
         }
 
-        JButton projectionButton = new JButton();
-        projectionButton.setIcon(IconBank.getIcon(JHVIcon.SELECT));
-        projectionButton.setSelectedIcon(IconBank.getIcon(JHVIcon.SELECT_SELECTED));
+        JButton projectionButton = new JButton("Projection");
+        projectionButton.setIcon(IconBank.getIcon(JHVIcon.MODE_3D));
+        projectionButton.setSelectedIcon(IconBank.getIcon(JHVIcon.MODE_3D_SELECTED));
         projectionButton.setToolTipText("Projection");
         addButton(projectionButton);
 

@@ -168,7 +168,6 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawGridFlat(GL2 gl, float w, float h) {
-
         gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
         GLHelper.lineWidth(gl, 0.25);
         {
@@ -203,12 +202,14 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
+    /*
     private String formatLabelString(double d) {
         if (d == (long) d)
             return String.format("%d", (long) d);
         else
             return String.format("%.2f", d);
     }
+    */
 
     private void drawGridTextFlat(GL2 gl, int size, float w, float h, double yaxis) {
         TextRenderer renderer = GLText.getRenderer(size);
@@ -222,12 +223,12 @@ public class RenderableGrid extends AbstractRenderable {
                     continue;
                 }
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-                String label = formatLabelString(360 / FLAT_STEPS_THETA * i);
+                String label = formatStrip(360 / FLAT_STEPS_THETA * i);
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
 
-                String label = formatLabelString(i * yaxis / FLAT_STEPS_RADIAL);
+                String label = formatStrip(i * yaxis / FLAT_STEPS_RADIAL);
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
