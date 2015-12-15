@@ -10,9 +10,9 @@ import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import com.jogamp.opengl.GL2;
 
 public class GLSLShader {
-    public static GLSLShader ortho = new GLSLShader("/data/vertexortho.glsl", "/data/fragmentortho.glsl");
-    public static GLSLShader lati = new GLSLShader("/data/vertexlati.glsl", "/data/fragmentlati.glsl");
-    public static GLSLShader polar = new GLSLShader("/data/vertexpolar.glsl", "/data/fragmentpolar.glsl");
+    public static GLSLShader ortho = new GLSLShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
+    public static GLSLShader lati = new GLSLShader("/data/vertex.glsl", "/data/fragmentlati.glsl");
+    public static GLSLShader polar = new GLSLShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
 
     public static final int NODIFFERENCE = 0;
     public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
@@ -39,6 +39,7 @@ public class GLSLShader {
     private int outerCutOffRadiusRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
+    private int polarRadiiRef;
 
     private int rectRef;
     private int differenceRectRef;
@@ -63,6 +64,7 @@ public class GLSLShader {
     private final float[] outerCutOffRadiusFloat = new float[1];
     private final float[] cutOffDirectionFloat = new float[3];
     private final float[] cutOffValueFloat = new float[3];
+    private final float[] polarRadii = new float[2];
 
     private final float[] rectVertex = new float[4];
     private final float[] differencerect = new float[4];
@@ -106,6 +108,7 @@ public class GLSLShader {
         gammaParamRef = gl.glGetUniformLocation(progID, "gamma");
         hgltParamRef = gl.glGetUniformLocation(progID, "hglt");
         hglnParamRef = gl.glGetUniformLocation(progID, "hgln");
+        polarRadiiRef = gl.glGetUniformLocation(progID, "polarRadii");
 
         contrastParamRef = gl.glGetUniformLocation(progID, "contrast");
         alphaParamRef = gl.glGetUniformLocation(progID, "alpha");
@@ -385,5 +388,11 @@ public class GLSLShader {
         hglnParamFloat[0] = (float) ((viewpointL.lon + 2. * Math.PI) % (2. * Math.PI));
         gl.glUniform1fv(hgltParamRef, 1, hgltParamFloat, 0);
         gl.glUniform1fv(hglnParamRef, 1, hglnParamFloat, 0);
+    }
+
+    public void setPolarRadii(GL2 gl, double start, double stop) {
+        polarRadii[0] = (float) start;
+        polarRadii[1] = (float) stop;
+        gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
     }
 }

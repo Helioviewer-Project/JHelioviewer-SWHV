@@ -31,6 +31,7 @@ uniform vec2 viewport;
 uniform vec2 viewportOffset;
 uniform vec3 cutOffDirection;
 uniform float cutOffValue;
+uniform vec2 polarRadii;
 
 vec4 getColor(vec2 texcoord, vec2 difftexcoord) {
     float tmpConvolutionSum = 0.;

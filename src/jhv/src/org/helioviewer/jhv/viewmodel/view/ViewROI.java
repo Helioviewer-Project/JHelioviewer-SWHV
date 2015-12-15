@@ -1,12 +1,13 @@
 package org.helioviewer.jhv.viewmodel.view;
 
-import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
@@ -35,51 +36,56 @@ public class ViewROI {
     }
 
     public static Region updateROI(Camera camera, Viewport vp, Position.Q p, MetaData m) {
-        double minPhysicalX = Double.MAX_VALUE;
-        double minPhysicalY = Double.MAX_VALUE;
-        double maxPhysicalX = Double.MIN_VALUE;
-        double maxPhysicalY = Double.MIN_VALUE;
-
-        camera.push(p);
-
-        Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
-        for (int i = 0; i < pointlist.length; i++) {
-            Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
-            minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
-            minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
-            maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
-            maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
-        }
-
-        camera.pop();
-
-        double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
-        double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
-        minPhysicalX = minPhysicalX - widthxAdd;
-        maxPhysicalX = maxPhysicalX + widthxAdd;
-        minPhysicalY = minPhysicalY - widthyAdd;
-        maxPhysicalY = maxPhysicalY + widthyAdd;
-
-        Region r = m.getPhysicalRegion();
-        if (minPhysicalX < r.llx)
-            minPhysicalX = r.llx;
-        if (minPhysicalY < r.lly)
-            minPhysicalY = r.lly;
-        if (maxPhysicalX > r.urx)
-            maxPhysicalX = r.urx;
-        if (maxPhysicalY > r.ury)
-            maxPhysicalY = r.ury;
-
-        double regionWidth = maxPhysicalX - minPhysicalX;
-        double regionHeight = maxPhysicalY - minPhysicalY;
         Region newRegion;
-        if (regionWidth > 0 && regionHeight > 0) {
-            newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
-        } else {
-            newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
-            System.out.println(">> empty ROI");
-        }
+        if (!Displayer.polar && !Displayer.latitudinal) {
 
+            double minPhysicalX = Double.MAX_VALUE;
+            double minPhysicalY = Double.MAX_VALUE;
+            double maxPhysicalX = Double.MIN_VALUE;
+            double maxPhysicalY = Double.MIN_VALUE;
+            camera.push(p);
+
+            Quat camDiff = Quat.rotateWithConjugate(camera.getRotation(), m.getViewpoint().orientation);
+            for (int i = 0; i < pointlist.length; i++) {
+                Vec3 hitPoint = CameraHelper.getVectorFromSphereOrPlane(camera, vp, pointlist[i], camDiff);
+                minPhysicalX = Math.min(minPhysicalX, hitPoint.x);
+                minPhysicalY = Math.min(minPhysicalY, hitPoint.y);
+                maxPhysicalX = Math.max(maxPhysicalX, hitPoint.x);
+                maxPhysicalY = Math.max(maxPhysicalY, hitPoint.y);
+            }
+
+            camera.pop();
+
+            double widthxAdd = Math.abs(extraSize * (maxPhysicalX - minPhysicalX));
+            double widthyAdd = Math.abs(extraSize * (maxPhysicalY - minPhysicalY));
+            minPhysicalX = minPhysicalX - widthxAdd;
+            maxPhysicalX = maxPhysicalX + widthxAdd;
+            minPhysicalY = minPhysicalY - widthyAdd;
+            maxPhysicalY = maxPhysicalY + widthyAdd;
+
+            Region r = m.getPhysicalRegion();
+            if (minPhysicalX < r.llx)
+                minPhysicalX = r.llx;
+            if (minPhysicalY < r.lly)
+                minPhysicalY = r.lly;
+            if (maxPhysicalX > r.urx)
+                maxPhysicalX = r.urx;
+            if (maxPhysicalY > r.ury)
+                maxPhysicalY = r.ury;
+
+            double regionWidth = maxPhysicalX - minPhysicalX;
+            double regionHeight = maxPhysicalY - minPhysicalY;
+
+            if (regionWidth > 0 && regionHeight > 0) {
+                newRegion = new Region(minPhysicalX, minPhysicalY, regionWidth, regionHeight);
+            } else {
+                newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
+                System.out.println(">> empty ROI");
+            }
+        }
+        else {
+            newRegion = m.getPhysicalRegion();
+        }
         return newRegion;
     }
 

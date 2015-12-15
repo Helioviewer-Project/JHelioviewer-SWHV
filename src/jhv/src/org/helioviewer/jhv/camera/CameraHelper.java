@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -26,9 +27,8 @@ public class CameraHelper {
     public static void applyPerspectiveLatitudinal(Camera camera, Viewport vp, GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-
         double width = camera.getWidth();
-        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, clipNear, clipFar);
+        gl.glOrtho(-width * vp.aspect, width * vp.aspect, -width, width, -1, 1);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadMatrixd(identity, 0);
     }
@@ -148,10 +148,17 @@ public class CameraHelper {
     }
 
     public static void zoomToFit(Camera camera) {
-        double newFOV = Camera.INITFOV, size = Layers.getLargestPhysicalSize();
+
+        double newFOV = Camera.INITFOV;
+        double size;
+        if (Displayer.polar || Displayer.latitudinal) {
+            size = 1.;
+        }
+        else {
+            size = Layers.getLargestPhysicalSize();
+        }
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
         camera.setCameraFOV(newFOV);
     }
-
 }

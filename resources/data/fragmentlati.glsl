@@ -1,19 +1,23 @@
 void main(void)
 {  
-    float tmpConvolutionSum = 0.;
-    vec2 scrpos= (gl_FragCoord.xy)/viewport;
+    vec2 normalizedScreenpos = 2.*(((gl_FragCoord.xy/viewport)-.5)*vec2(viewport.y/viewport.x, 1.));
+    vec4 scrpos =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) +0.5;
+    clamp_texcoord(scrpos.xy);
     float scale = 2.*(rect.y + 1.0/rect.w);
     vec2 texcoord;
     vec3 xcart;
     vec3 xcartrot;
+    float tmpConvolutionSum = 0.;
     float theta = (1.-scrpos.y)*PI;
     float phi = PI + hgln + scrpos.x*TWOPI;
     while(phi>TWOPI){
         phi = phi-TWOPI;
     }
+    /*
     if( phi > PI/32. && phi<TWOPI - PI/32.){
         discard;
     }
+    */
     xcart.x = sin(theta)*cos(phi)/scale;
     xcart.y = sin(theta)*sin(phi)/scale;
     xcart.z = cos(theta)/scale;

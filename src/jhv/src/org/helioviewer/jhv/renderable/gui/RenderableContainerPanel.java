@@ -125,6 +125,7 @@ public class RenderableContainerPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.polar = polar.isSelected();
                 Displayer.display();
+                Displayer.getCamera().reset();
             }
         });
         final JCheckBox latitudinal = new JCheckBox("Latitudinal", Displayer.multiview);
@@ -133,6 +134,7 @@ public class RenderableContainerPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.latitudinal = latitudinal.isSelected();
                 Displayer.display();
+                Displayer.getCamera().reset();
             }
         });
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
