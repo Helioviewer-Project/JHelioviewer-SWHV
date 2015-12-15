@@ -54,14 +54,12 @@ public class GLGrab {
             Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.POLAR) {
                 MainComponent.renderScenePolar(camera, gl);
-            }
-            else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+            } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
                 MainComponent.renderSceneLatitudinal(camera, gl);
-            }
-            else {
+            } else {
                 MainComponent.renderScene(camera, gl);
-                MainComponent.renderFloatScene(camera, gl);
             }
+            MainComponent.renderFloatScene(camera, gl);
             fbo.unbind(gl);
 
             fbo.use(gl, fboTex);
