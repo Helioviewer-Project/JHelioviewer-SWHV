@@ -1,6 +1,6 @@
 void main(void)
 {  
-    vec2 normalizedScreenpos = 2.*(((gl_FragCoord.xy/viewport)-.5)*vec2(viewport.y/viewport.x, 1.));
+    vec2 normalizedScreenpos = 2.*((((gl_FragCoord.xy-viewportOffset)/viewport)-.5)*vec2(viewport.y/viewport.x, 1.));
     vec4 scrpos =  cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.) +0.5;
     clamp_texcoord(scrpos.xy);
     float scale = 2.*(rect.y + 1.0/rect.w);
