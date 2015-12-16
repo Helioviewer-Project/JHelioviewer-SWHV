@@ -6,11 +6,13 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 
@@ -36,11 +38,17 @@ public class ZoomOneToOneAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         View view = Layers.getActiveView();
         if (view != null) {
-            MetaData metaData = view.getImageLayer().getImageData().getMetaData();
-            double imageFraction = Displayer.getActiveViewport().height / (double) metaData.getPixelHeight();
+            MetaData m;
+            ImageData d = view.getImageLayer().getImageData();
+            if (d == null) // not yet decoded
+                m = view.getMetaData(new JHVDate(0));
+            else
+                m = d.getMetaData();
+
+            double imageFraction = Displayer.getActiveViewport().height / (double) m.getPixelHeight();
 
             Camera camera = Displayer.getCamera();
-            double fov = 2. * Math.atan2(0.5 * metaData.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);
+            double fov = 2. * Math.atan2(0.5 * m.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);
             camera.setCameraFOV(fov);
 
             Displayer.render(1);
