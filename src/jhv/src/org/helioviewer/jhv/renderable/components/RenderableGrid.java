@@ -46,8 +46,9 @@ public class RenderableGrid extends AbstractRenderable {
     // height of text in solar radii
     private static final float textScale = 0.08f;
     private static final int SUBDIVISIONS = 90;
-    private static final Color firstColor = Color.RED;
-    private static final Color secondColor = Color.GREEN;
+
+    private static final float[] firstColor = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
+    private static final float[] secondColor = new float[] { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f };
 
     private float lonstepDegrees = 15f;
     private float latstepDegrees = 20f;
@@ -138,7 +139,6 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glMultMatrixd(vpmi.m, 0);
         {
             drawGridFlat(gl, (float) (vp.aspect), 1);
-
             if (showLabels) {
                 double radius = Layers.getLargestPhysicalSize() / 2;
                 drawGridTextFlat(gl, pixelsPerSolarRadius, (float) (vp.aspect), 1, radius);
@@ -168,55 +168,46 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawGridFlat(GL2 gl, float w, float h) {
-        gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
+        gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
         GLHelper.lineWidth(gl, 0.25);
         {
             gl.glBegin(GL2.GL_LINES);
             for (int i = 0; i < (FLAT_STEPS_THETA + 1); i++) {
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
                 if (i == FLAT_STEPS_THETA / 2) {
-                    gl.glColor3f(secondColor.getRed() / 255f, secondColor.getGreen() / 255f, secondColor.getBlue() / 255f);
+                    gl.glColor3f(secondColor[0], secondColor[1], secondColor[2]);
                 }
                 gl.glVertex2f(start, -h / 2);
                 gl.glVertex2f(start, h / 2);
                 if (i == FLAT_STEPS_THETA / 2) {
-                    GLHelper.lineWidth(gl, 0.5);
-                    gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
-                    GLHelper.lineWidth(gl, 0.25);
+                    // GLHelper.lineWidth(gl, 0.5);
+                    gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
+                    // GLHelper.lineWidth(gl, 0.25);
                 }
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); i++) {
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 if (i == FLAT_STEPS_RADIAL / 2) {
-                    gl.glColor3f(secondColor.getRed() / 255f, secondColor.getGreen() / 255f, secondColor.getBlue() / 255f);
+                    gl.glColor3f(secondColor[0], secondColor[1], secondColor[2]);
                 }
                 gl.glVertex2f(-w / 2, start);
                 gl.glVertex2f(w / 2, start);
                 if (i == FLAT_STEPS_RADIAL / 2) {
-                    GLHelper.lineWidth(gl, 0.5);
-                    gl.glColor3f(firstColor.getRed() / 255f, firstColor.getGreen() / 255f, firstColor.getBlue() / 255f);
-                    GLHelper.lineWidth(gl, 0.25);
+                    // GLHelper.lineWidth(gl, 0.5);
+                    gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
+                    // GLHelper.lineWidth(gl, 0.25);
                 }
             }
             gl.glEnd();
         }
     }
 
-    /*
-    private String formatLabelString(double d) {
-        if (d == (long) d)
-            return String.format("%d", (long) d);
-        else
-            return String.format("%.2f", d);
-    }
-    */
-
     private void drawGridTextFlat(GL2 gl, int size, float w, float h, double yaxis) {
         TextRenderer renderer = GLText.getRenderer(size);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3;
+
         renderer.begin3DRendering();
-        gl.glDisable(GL2.GL_CULL_FACE);
         {
             for (int i = 0; i < (FLAT_STEPS_THETA + 1); ++i) {
                 if (i == FLAT_STEPS_THETA / 2) {
@@ -227,14 +218,11 @@ public class RenderableGrid extends AbstractRenderable {
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
-
                 String label = formatStrip(i * yaxis / FLAT_STEPS_RADIAL);
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
-            renderer.flush();
         }
-        gl.glEnable(GL2.GL_CULL_FACE);
         renderer.end3DRendering();
     }
 
@@ -276,7 +264,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glPopMatrix();
         }
 
-        drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
+        //drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
@@ -573,13 +561,9 @@ public class RenderableGrid extends AbstractRenderable {
             positionBuffer.put((float) Math.cos(2 * Math.PI * i / SUBDIVISIONS));
             positionBuffer.put((float) Math.sin(2 * Math.PI * i / SUBDIVISIONS));
             if (i % 2 == 0) {
-                colorBuffer.put(firstColor.getRed() / 255f);
-                colorBuffer.put(firstColor.getGreen() / 255f);
-                colorBuffer.put(firstColor.getBlue() / 255f);
+                colorBuffer.put(firstColor);
             } else {
-                colorBuffer.put(secondColor.getRed() / 255f);
-                colorBuffer.put(secondColor.getGreen() / 255f);
-                colorBuffer.put(secondColor.getBlue() / 255f);
+                colorBuffer.put(secondColor);
             }
         }
 
