@@ -13,12 +13,14 @@ import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
@@ -128,27 +130,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static int FLAT_STEPS_RADIAL = 10;
 
     @Override
-    public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
-        if (!isVisible[vp.idx])
-            return;
-        int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
-
-        Mat4 vpmi = Mat4.identity();
-        vpmi.translate(new Vec3(camera.getCurrentTranslation().x, camera.getCurrentTranslation().y, 0.));
-        gl.glPushMatrix();
-        gl.glMultMatrixd(vpmi.m, 0);
-        {
-            drawGridFlat(gl, (float) (vp.aspect), 1);
-            if (showLabels) {
-                double radius = Layers.getLargestPhysicalSize() / 2;
-                drawGridTextFlat(gl, pixelsPerSolarRadius, (float) (vp.aspect), 1, radius);
-            }
-        }
-        gl.glPopMatrix();
-    }
-
-    @Override
-    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
         if (!isVisible[vp.idx])
             return;
 
@@ -159,15 +141,17 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(vpmi.m, 0);
         {
-            drawGridFlat(gl, (float) (vp.aspect), 1);
+            drawGridFlat(gl, scale, vp);
             if (showLabels) {
-                drawGridTextFlat(gl, pixelsPerSolarRadius, (float) (vp.aspect), 1, 180.);
+                drawGridTextFlat(gl, pixelsPerSolarRadius, scale, vp);
             }
         }
         gl.glPopMatrix();
     }
 
-    private void drawGridFlat(GL2 gl, float w, float h) {
+    private void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
+        float w = (float) vp.aspect;
+        float h = 1;
         gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
         GLHelper.lineWidth(gl, 0.25);
         {
@@ -202,9 +186,10 @@ public class RenderableGrid extends AbstractRenderable {
         }
     }
 
-    private void drawGridTextFlat(GL2 gl, int size, float w, float h, double yaxis) {
+    private void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
+        float w = (float) vp.aspect;
+        float h = 1;
         TextRenderer renderer = GLText.getRenderer(size);
-        // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFont().getSize2D() / 3;
 
         renderer.begin3DRendering();
@@ -214,11 +199,11 @@ public class RenderableGrid extends AbstractRenderable {
                     continue;
                 }
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-                String label = formatStrip(360 / FLAT_STEPS_THETA * i);
+                String label = formatStrip(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
-                String label = formatStrip(i * yaxis / FLAT_STEPS_RADIAL);
+                String label = formatStrip(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }

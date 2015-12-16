@@ -10,6 +10,7 @@ import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -151,25 +152,20 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLShader.ortho);
+        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLShader.ortho, null);
     }
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLShader.ortho);
+        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLShader.ortho, null);
     }
 
     @Override
-    public void renderLatitudinal(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, GLSLShader.lati);
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, shader, scale);
     }
 
-    @Override
-    public void renderPolar(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, GLSLShader.polar);
-    }
-
-    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange, GLSLShader shader) {
+    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange, GLSLShader shader, GridScale scale) {
         if (imageData == null) {
             return;
         }
@@ -203,7 +199,8 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
                 shader.bindDiffCameraDifferenceRotationQuat(gl, Quat.rotateWithConjugate(q, prevImageData.getMetaData().getViewpoint().orientation));
             }
             shader.bindAngles(gl, imageData.getMetaData().getViewpointL());
-            shader.setPolarRadii(gl, 0, Layers.getLargestPhysicalSize() / 2);
+            if (scale != null)
+                shader.setPolarRadii(gl, scale.getYstart(), scale.getYstop());
             camera.pop();
 
             enablePositionVBO(gl);
