@@ -249,7 +249,7 @@ public class RenderableGrid extends AbstractRenderable {
             gl.glPopMatrix();
         }
 
-        //drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
+        drawEarthCircles(gl, Sun.getEarth(camera.getViewpoint().time));
 
         gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);

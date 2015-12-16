@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.scale;
 
 public interface GridScale {
+
     public double scaleX(double val);
 
     public double invScaleX(double val);
