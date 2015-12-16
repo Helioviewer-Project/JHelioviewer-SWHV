@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 
 public class Displayer implements JHVEventHighlightListener {
     public static enum DisplayMode {
-        ORTHO, POLAR, LATITUDINAL;
+        ORTHO, POLAR, LATITUDINAL, LOGPOLAR;
         public String getLabel() {
             String label;
             switch (this) {
@@ -24,6 +24,9 @@ public class Displayer implements JHVEventHighlightListener {
                 break;
             case LATITUDINAL:
                 label = "Latitudinal";
+                break;
+            case LOGPOLAR:
+                label = "LogPolar";
                 break;
             default:
                 label = "";

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.components;
 
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
@@ -112,28 +113,14 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
-    public static void renderSceneLatitudinal(Camera camera, GL2 gl) {
+    public static void renderSceneScale(Camera camera, GL2 gl, GLSLShader shader, GridScale scale) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                ImageViewerGui.getRenderableContainer().renderLatitudinal(camera, vp, gl);
-            }
-        }
-
-        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
-    }
-
-    public static void renderScenePolar(Camera camera, GL2 gl) {
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-        for (Viewport vp : Displayer.getViewports()) {
-            if (vp != null) {
-                gl.glViewport(vp.x, vp.y, vp.width, vp.height);
-                CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
-                ImageViewerGui.getRenderableContainer().renderPolar(camera, vp, gl);
+                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, scale);
             }
         }
 
@@ -179,11 +166,12 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
 
         Camera camera = Displayer.getCamera();
-
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-            renderScenePolar(camera, gl);
+            renderSceneScale(camera, gl, GLSLShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2));
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            renderSceneLatitudinal(camera, gl);
+            renderSceneScale(camera, gl, GLSLShader.lati, new GridScale.GridScaleIdentity(0, 360, 0, 180));
+        } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
+            renderSceneScale(camera, gl, GLSLShader.logpolar, new GridScale.GridScaleLogY(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2));
         } else {
             renderScene(camera, gl);
             renderMiniview(gl);

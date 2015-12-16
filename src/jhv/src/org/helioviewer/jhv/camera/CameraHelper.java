@@ -149,6 +149,14 @@ public class CameraHelper {
         return cameraDifferenceRotation.rotateInverseVector(hitPoint);
     }
 
+    /*public static Vec2 toPolar(Vec3 jhv) {
+        return new Vec2(polar.x * Math.cos(polar.y), polar.x * Math.sin(polar.y), Math.sqrt(1 - polar.x * polar.x));
+    }
+
+    public static Vec3 fromPolar(Vec2 polar) {
+        return new Vec3(polar.x * Math.cos(polar.y), polar.x * Math.sin(polar.y), Math.sqrt(1 - polar.x * polar.x));
+    }*/
+
     public static void zoomToFit(Camera camera) {
         double newFOV = Camera.INITFOV;
         double size;

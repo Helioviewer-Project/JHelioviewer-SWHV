@@ -5,7 +5,7 @@ vec2 get_polar_texcoord(vec4 rect){
     float theta = -(scrpos.x*TWOPI + PI/2.);
     float start = polarRadii.x;
     float end = polarRadii.y;
-    float interpolated = start + scrpos.y * (end-start);
+    float interpolated = exp(start + scrpos.y * (end-start));
     if(interpolated > outerCutOffRadius){
         discard;
     }

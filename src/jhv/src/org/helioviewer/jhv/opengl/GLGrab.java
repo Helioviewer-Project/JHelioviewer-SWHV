@@ -4,9 +4,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.components.MainComponent;
+import org.helioviewer.jhv.layers.Layers;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment.Type;
@@ -53,9 +55,11 @@ public class GLGrab {
             fbo.bind(gl);
             Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-                MainComponent.renderScenePolar(camera, gl);
+                MainComponent.renderSceneScale(camera, gl, GLSLShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, 180));
             } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-                MainComponent.renderSceneLatitudinal(camera, gl);
+                MainComponent.renderSceneScale(camera, gl, GLSLShader.lati, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize()));
+            } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
+                MainComponent.renderSceneScale(camera, gl, GLSLShader.logpolar, new GridScale.GridScaleIdentity(0, 360, Math.log(0.05), Math.log(Layers.getLargestPhysicalSize())));
             } else {
                 MainComponent.renderScene(camera, gl);
             }
@@ -81,5 +85,4 @@ public class GLGrab {
 
         return screenshot;
     }
-
 }

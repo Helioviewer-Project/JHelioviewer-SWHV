@@ -13,6 +13,7 @@ public class GLSLShader {
     public static GLSLShader ortho = new GLSLShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
     public static GLSLShader lati = new GLSLShader("/data/vertex.glsl", "/data/fragmentlati.glsl");
     public static GLSLShader polar = new GLSLShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
+    public static GLSLShader logpolar = new GLSLShader("/data/vertex.glsl", "/data/fragmentlogpolar.glsl");
 
     public static final int NODIFFERENCE = 0;
     public static final int RUNNINGDIFFERENCE_NO_ROT = 1;
@@ -86,6 +87,7 @@ public class GLSLShader {
         ortho._init(gl);
         lati._init(gl);
         polar._init(gl);
+        logpolar._init(gl);
     }
 
     private void _init(GL2 gl) {
@@ -141,7 +143,7 @@ public class GLSLShader {
         ortho._dispose(gl);
         lati._dispose(gl);
         polar._dispose(gl);
-
+        logpolar._dispose(gl);
     }
 
     private void _dispose(GL2 gl) {
