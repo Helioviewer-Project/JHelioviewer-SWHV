@@ -1,30 +1,65 @@
 package org.helioviewer.jhv.base.scale;
 
-public interface GridScale {
+import java.awt.Point;
 
-    public double scaleX(double val);
+import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.Layers;
 
-    public double invScaleX(double val);
+public abstract class GridScale {
+    public static GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
+    public static GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
+    public static GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
+    public static GridScale current = polar;
 
-    public double scaleY(double val);
+    abstract public double scaleX(double val);
 
-    public double invScaleY(double val);
+    abstract public double invScaleX(double val);
 
-    public double getInterpolatedXValue(double v);
+    abstract public double scaleY(double val);
 
-    public double getInterpolatedYValue(double v);
+    abstract public double invScaleY(double val);
 
-    public double getYstart();
+    abstract public double getInterpolatedXValue(double v);
 
-    public double getYstop();
+    abstract public double getInterpolatedYValue(double v);
 
-    public static abstract class GridScaleAbstract implements GridScale {
-        protected final double xStart;
-        protected final double xStop;
-        protected final double yStart;
-        protected final double yStop;
+    abstract public double getInterpolatedXValueInv(double v);
 
-        public GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
+    abstract public double getInterpolatedYValueInv(double v);
+
+    abstract public double getYstart();
+
+    abstract public double getYstop();
+
+    abstract public void set(double _xStart, double _xStop, double _yStart, double _yStop);
+
+    abstract public Vec2 transform(Vec3 pt);
+
+    abstract public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera);
+
+    abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
+
+    public static abstract class GridScaleAbstract extends GridScale {
+        protected double xStart;
+        protected double xStop;
+        protected double yStart;
+        protected double yStop;
+        protected final Transform transform;
+
+        public GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+            xStart = _xStart;
+            xStop = _xStop;
+            yStart = scaleY(_yStart);
+            yStop = scaleY(_yStop);
+            transform = _transform;
+        }
+
+        @Override
+        public void set(double _xStart, double _xStop, double _yStart, double _yStop) {
             xStart = _xStart;
             xStop = _xStop;
             yStart = scaleY(_yStart);
@@ -42,6 +77,16 @@ public interface GridScale {
         }
 
         @Override
+        public double getInterpolatedXValueInv(double v) {
+            return (scaleX(v) - xStart) / (xStop - xStart);
+        }
+
+        @Override
+        public double getInterpolatedYValueInv(double v) {
+            return (scaleY(v) - yStart) / (yStop - yStart);
+        }
+
+        @Override
         public double getYstart() {
             return yStart;
         }
@@ -51,12 +96,34 @@ public interface GridScale {
             return yStop;
         }
 
+        @Override
+        public Vec2 transform(Vec3 pt) {
+            return transform.transform(pt, this);
+        }
+
+        @Override
+        public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera) {
+            double w = camera.getWidth();
+            Vec2 translation = camera.getCurrentTranslation();
+            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
+            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
+            return new Vec2(getInterpolatedXValue(x), getInterpolatedYValue(y));
+        }
+
+        @Override
+        public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera) {
+            double w = camera.getWidth();
+            Vec2 translation = camera.getCurrentTranslation();
+            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect);
+            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y);
+            return new Vec2(x, y);
+        }
     }
 
     public static class GridScaleLogY extends GridScaleAbstract {
 
-        public GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
-            super(_xStart, _xStop, _yStart, _yStop);
+        public GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+            super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
 
         @Override
@@ -83,8 +150,8 @@ public interface GridScale {
 
     public static class GridScaleIdentity extends GridScaleAbstract {
 
-        public GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
-            super(_xStart, _xStop, _yStart, _yStop);
+        public GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop, Transform _transform) {
+            super(_xStart, _xStop, _yStart, _yStop, _transform);
         }
 
         @Override

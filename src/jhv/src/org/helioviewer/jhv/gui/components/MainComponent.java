@@ -167,11 +167,18 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         Camera camera = Displayer.getCamera();
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-            renderSceneScale(camera, gl, GLSLShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2));
+            GridScale gs = GridScale.polar;
+            gs.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
+            GridScale.current = gs;
+            renderSceneScale(camera, gl, GLSLShader.polar, gs);
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            renderSceneScale(camera, gl, GLSLShader.lati, new GridScale.GridScaleIdentity(0, 360, -90, 90));
+            GridScale.current = GridScale.latitudinal;
+            renderSceneScale(camera, gl, GLSLShader.lati, GridScale.latitudinal);
         } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-            renderSceneScale(camera, gl, GLSLShader.logpolar, new GridScale.GridScaleLogY(0, 360, 0.5, Layers.getLargestPhysicalSize() / 2));
+            GridScale gs = GridScale.logpolar;
+            gs.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
+            GridScale.current = gs;
+            renderSceneScale(camera, gl, GLSLShader.logpolar, gs);
         } else {
             renderScene(camera, gl);
             renderMiniview(gl);
