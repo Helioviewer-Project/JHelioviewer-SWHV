@@ -4,9 +4,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
@@ -43,7 +46,17 @@ public class AnnotateCross extends AbstractAnnotateable {
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
             Vec3 pc = toCart(camera, radius, y, z);
-            gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
+            if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
+                Viewport vp = Displayer.getActiveViewport();
+
+                Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(pc.x, -pc.y, pc.z));
+
+                Vec2 tf = GridScale.current.transform(pt);
+                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+            }
+            else {
+                gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
+            }
         }
     }
 

@@ -35,8 +35,8 @@ public interface Transform {
             phi -= (Math.PI + p.lon);
             phi += 6 * Math.PI;
             phi = phi % (2 * Math.PI);
-            double scaledphi = scale.getXValueInv(phi * MathUtils.radeg) - 0.5;
-            double scaledtheta = (scale.getYValueInv(theta * MathUtils.radeg)) - 0.5;
+            double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
+            double scaledtheta = (scale.getYValueInv(theta * MathUtils.radeg));
             return new Vec2(scaledphi, scaledtheta);
         }
     }

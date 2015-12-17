@@ -121,6 +121,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
                 ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, scale);
+                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
             }
         }
 
