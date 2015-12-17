@@ -17,6 +17,7 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
+import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -27,6 +28,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
@@ -248,6 +250,67 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
+    private void drawCactusArcScale(GL2 gl, JHVEvent evt, Date timestamp, GridScale scale, Viewport vp) {
+        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
+        double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
+        double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
+        double speed = SWHVHEKData.readCMESpeed(params);
+        double factor = Sun.RadiusMeter;
+        double distSunBegin = 2.4;
+        double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
+
+        Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+
+        double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
+        double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
+
+        Color color = evt.getEventRelationShip().getRelationshipColor();
+        if (color == null) {
+            color = evt.getColor();
+        }
+
+        gl.glColor3f(0, 0, 0);
+        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
+        gl.glBegin(GL2.GL_LINES);
+        {
+            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
+            if (thetaEnd < thetaStart) {
+                gl.glVertex2f((float) (scale.getXValueInv(360) * vp.aspect), (float) scale.getYValueInv(distSun));
+                gl.glVertex2f((float) (scale.getXValueInv(0) * vp.aspect), (float) scale.getYValueInv(distSun));
+            }
+            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun));
+        }
+        gl.glEnd();
+        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
+        gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+        gl.glBegin(GL2.GL_LINES);
+        {
+            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
+            if (thetaEnd < thetaStart) {
+                gl.glVertex2f((float) (scale.getXValueInv(360) * vp.aspect), (float) scale.getYValueInv(distSun));
+                gl.glVertex2f((float) (scale.getXValueInv(0) * vp.aspect), (float) scale.getYValueInv(distSun));
+            }
+            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun));
+            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
+            gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
+            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
+            gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
+
+            gl.glVertex2f((float) (scale.getXValueInv(principalAngleDegree) * vp.aspect), (float) scale.getYValueInv(distSunBegin));
+            gl.glVertex2f((float) (scale.getXValueInv(principalAngleDegree) * vp.aspect), (float) scale.getYValueInv(distSun + 0.05));
+        }
+        gl.glEnd();
+
+        String type = evt.getJHVEventType().getEventType();
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        bindTexture(gl, type, evt.getIcon());
+        if (evt.isHighlighted()) {
+            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+        } else {
+            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE);
+        }
+    }
+
     private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
@@ -334,8 +397,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (isVisible[vp.idx]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
-                if (evt.getName().equals("Coronal Mass Ejection")) {
-                    //drawCactusArc(gl, evt, controller.currentTime);
+                if (evt.getName().equals("Coronal Mass Ejection") && Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
+                    drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
                 } else {
                     //drawPolygon(gl, evt);
 

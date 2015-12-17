@@ -20,8 +20,8 @@ public interface Transform {
             double theta = Math.atan2(-pt.x, -pt.y);
             theta += 2 * Math.PI;
             theta = theta % (2 * Math.PI);
-            double scaledr = scale.getInterpolatedYValueInv(r) - 0.5;
-            double scaledtheta = (scale.getInterpolatedXValueInv(theta * MathUtils.radeg)) - 0.5;
+            double scaledr = scale.getYValueInv(r);
+            double scaledtheta = (scale.getXValueInv(theta * MathUtils.radeg));
             return new Vec2(scaledtheta, scaledr);
         }
     }
@@ -35,8 +35,8 @@ public interface Transform {
             phi -= (Math.PI + p.lon);
             phi += 6 * Math.PI;
             phi = phi % (2 * Math.PI);
-            double scaledphi = scale.getInterpolatedXValueInv(phi * MathUtils.radeg) - 0.5;
-            double scaledtheta = (scale.getInterpolatedYValueInv(theta * MathUtils.radeg)) - 0.5;
+            double scaledphi = scale.getXValueInv(phi * MathUtils.radeg) - 0.5;
+            double scaledtheta = (scale.getYValueInv(theta * MathUtils.radeg)) - 0.5;
             return new Vec2(scaledphi, scaledtheta);
         }
     }
