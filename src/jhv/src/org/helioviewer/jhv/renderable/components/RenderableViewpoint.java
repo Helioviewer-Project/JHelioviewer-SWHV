@@ -9,7 +9,6 @@ import org.helioviewer.jhv.camera.CameraOptionsPanel;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
 import com.jogamp.opengl.GL2;
@@ -47,7 +46,7 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            GLHelper.lineWidth(gl, 1);
+            gl.glLineWidth(1);
 
             gl.glBegin(GL2.GL_LINE_LOOP);
 

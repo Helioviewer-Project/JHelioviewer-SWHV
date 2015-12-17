@@ -49,7 +49,6 @@ public class GLGrab {
         int _w = Displayer.fullViewport.width;
         int _h = Displayer.fullViewport.height;
 
-        GLHelper.unitScale = true;
         Displayer.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
         Displayer.reshapeAll();
         {
@@ -82,7 +81,6 @@ public class GLGrab {
         }
         Displayer.setGLSize(_x, _y, _w, _h);
         Displayer.reshapeAll();
-        GLHelper.unitScale = false;
 
         return screenshot;
     }
