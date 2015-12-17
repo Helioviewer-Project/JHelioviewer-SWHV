@@ -268,8 +268,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
 
-        Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
-
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
