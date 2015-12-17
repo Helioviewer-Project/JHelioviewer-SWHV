@@ -186,7 +186,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * point.y;
                     double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * point.z;
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
+                    if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
+                        gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
+                    }
+                    else {
+                        Vec3 pt = new Vec3(xnew / r, -ynew / r, znew / r);
+                        pt = Displayer.getCamera().getViewpoint().orientation.rotateVector(new Vec3(pt.x, -pt.y, pt.z));
+
+                        Vec2 tf = GridScale.current.transform(pt);
+                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                    }
                 }
             }
             gl.glEnd();
@@ -400,8 +409,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 if (evt.getName().equals("Coronal Mass Ejection") && Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
                     drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
                 } else {
-                    //drawPolygon(gl, evt);
-
+                    drawPolygon(gl, evt);
                     gl.glDisable(GL2.GL_DEPTH_TEST);
                     drawIconScale(gl, evt, scale, camera, vp);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
