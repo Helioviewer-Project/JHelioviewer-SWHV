@@ -32,7 +32,6 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -44,10 +43,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
 
-    private static final double LINEWIDTH = 0.5;
-    private static final double LINEWIDTH_CACTUS = 1.01;
-
-    private static final double LINEWIDTH_HI = 1;
+    private static final float LINEWIDTH = 0.5f;
+    private static final float LINEWIDTH_HI = 1;
+    private static final float LINEWIDTH_CACTUS = 1.01f;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private final static double ICON_SIZE = 0.1;
@@ -110,13 +108,13 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         gl.glColor3f(0, 0, 0);
-        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
+        gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
 
         interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
         interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
 
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
+        gl.glLineWidth(LINEWIDTH_CACTUS);
 
         interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
         interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
@@ -172,7 +170,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
-        GLHelper.lineWidth(gl, evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
+        gl.glLineWidth(evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
         Vec3 oldBoundaryPoint3d = null;
@@ -279,7 +277,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
 
         gl.glColor3f(0, 0, 0);
-        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
+        gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
         gl.glBegin(GL2.GL_LINES);
         {
             gl.glVertex2f((float) (scale.getXValueInv(thetaStart) * vp.aspect), (float) scale.getYValueInv(distSun));
@@ -290,7 +288,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             gl.glVertex2f((float) (scale.getXValueInv(thetaEnd) * vp.aspect), (float) scale.getYValueInv(distSun));
         }
         gl.glEnd();
-        GLHelper.lineWidth(gl, LINEWIDTH_CACTUS);
+
+        gl.glLineWidth(LINEWIDTH_CACTUS);
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
         gl.glBegin(GL2.GL_LINES);
         {

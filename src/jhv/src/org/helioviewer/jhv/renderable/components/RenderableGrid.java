@@ -18,7 +18,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -140,7 +139,7 @@ public class RenderableGrid extends AbstractRenderable {
         float w = (float) vp.aspect;
         float h = 1;
         gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
-        GLHelper.lineWidth(gl, 0.25);
+        gl.glLineWidth(0.25f);
         {
             gl.glBegin(GL2.GL_LINES);
             for (int i = 0; i < (FLAT_STEPS_THETA + 1); i++) {
@@ -243,7 +242,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawAxes(GL2 gl) {
-        GLHelper.lineWidth(gl, 1);
+        gl.glLineWidth(1);
 
         gl.glBegin(GL2.GL_LINES);
         {
@@ -258,7 +257,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawEarthCircles(GL2 gl, Position.L p) {
-        GLHelper.lineWidth(gl, 0.25);
+        gl.glLineWidth(0.25f);
         gl.glColor3f(1, 1, 0);
 
         gl.glPushMatrix();
@@ -286,17 +285,17 @@ public class RenderableGrid extends AbstractRenderable {
                 gl.glScalef(1, 1, 1);
                 for (float i = START_RADIUS; i <= END_RADIUS; i++) {
                     if (i % 10 == 0) {
-                        GLHelper.lineWidth(gl, 0.5);
+                        gl.glLineWidth(0.5f);
                     }
                     else {
-                        GLHelper.lineWidth(gl, 0.25);
+                        gl.glLineWidth(0.25f);
                     }
                     gl.glScalef(i / (i - 1), i / (i - 1), i / (i - 1));
                     gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, SUBDIVISIONS);
                 }
                 gl.glPopMatrix();
             }
-            GLHelper.lineWidth(gl, 0.25);
+            gl.glLineWidth(0.25f);
             {
                 gl.glPushMatrix();
                 for (float i = 0; i < 360; i += STEP_DEGREES) {
@@ -333,7 +332,7 @@ public class RenderableGrid extends AbstractRenderable {
     private void drawGrid(GL2 gl) {
         gl.glPushMatrix();
         {
-            GLHelper.lineWidth(gl, 0.25);
+            gl.glLineWidth(0.25f);
             gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, colorBufferID);
             gl.glColorPointer(3, GL2.GL_FLOAT, 0, 0);

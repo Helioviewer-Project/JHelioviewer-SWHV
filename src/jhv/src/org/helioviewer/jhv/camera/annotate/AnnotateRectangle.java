@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -63,10 +62,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = toCart(camera, radius, y, z);
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 Viewport vp = Displayer.getActiveViewport();
-
                 Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(pc.x, -pc.y, pc.z));
-
                 Vec2 tf = GridScale.current.transform(pt);
+
                 gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
@@ -79,7 +77,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         if (rectangleStartPoints.size() == 0 && !beingDragged())
             return;
 
-        GLHelper.lineWidth(gl, lineWidth);
+        gl.glLineWidth(lineWidth);
 
         gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
         if (beingDragged()) {

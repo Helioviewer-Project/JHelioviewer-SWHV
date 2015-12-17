@@ -10,7 +10,6 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -48,13 +47,11 @@ public class AnnotateCross extends AbstractAnnotateable {
             Vec3 pc = toCart(camera, radius, y, z);
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 Viewport vp = Displayer.getActiveViewport();
-
                 Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(pc.x, -pc.y, pc.z));
-
                 Vec2 tf = GridScale.current.transform(pt);
+
                 gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
-            }
-            else {
+            } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
@@ -65,7 +62,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         if (crossPoints.size() == 0)
             return;
 
-        GLHelper.lineWidth(gl, lineWidth);
+        gl.glLineWidth(lineWidth);
 
         gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = crossPoints.size();

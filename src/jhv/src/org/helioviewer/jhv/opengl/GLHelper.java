@@ -51,12 +51,6 @@ public class GLHelper {
         gl.glEnd();
     }
 
-    public static boolean unitScale = false;
-
-    public static void lineWidth(GL2 gl, double w) {
-        gl.glLineWidth((float) (w * (unitScale ? 1 : GLInfo.pixelScaleFloat[0])));
-    }
-
     public static Point GL2AWTPoint(int x, int y) {
         return new Point((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }

@@ -13,17 +13,11 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.plugins.pfssplugin.PfssSettings;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-/**
- * Loader of fitsfile & VBO generation & OpenGL visualization
- *
- * @author Stefan Meier (stefan.meier@fhnw.ch)
- * */
 public class PfssData {
 
     private final static Color OPENFIELDCOLOR = Color.RED;
@@ -248,7 +242,7 @@ public class PfssData {
         gl.glColorPointer(4, GL2.GL_FLOAT, 7 * 4, 3 * 4);
         gl.glVertexPointer(3, GL2.GL_FLOAT, 7 * 4, 0);
 
-        GLHelper.lineWidth(gl, PfssSettings.LINE_WIDTH);
+        gl.glLineWidth(PfssSettings.LINE_WIDTH);
         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, vertices.limit() / 7);
 
         gl.glDepthMask(true);
