@@ -15,14 +15,24 @@ import org.helioviewer.jhv.opengl.GLSLShader;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 @SuppressWarnings("serial")
 public class MainComponent extends GLCanvas implements GLEventListener {
 
+    private static GLCapabilities capabilities = new GLCapabilities(GLProfile.getDefault());
+
+    static {
+        capabilities.setSampleBuffers(true);
+        capabilities.setNumSamples(4);
+    }
+
     public MainComponent() {
+        super(capabilities);
         GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(getGLProfile()).createDummyAutoDrawable(null, true, getRequestedGLCapabilities(), null);
         sharedDrawable.display();
         // GUI events can lead to context destruction and invalidation of GL objects and state
@@ -41,9 +51,11 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glDisable(GL2.GL_TEXTURE_1D);
         gl.glDisable(GL2.GL_TEXTURE_2D);
 
-        gl.glEnable(GL2.GL_POINT_SMOOTH);
-        gl.glEnable(GL2.GL_LINE_SMOOTH);
-        gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
+        if (drawable.getChosenGLCapabilities().getNumSamples() == 0) {
+            gl.glEnable(GL2.GL_LINE_SMOOTH);
+            gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST);
+        } else
+            gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);

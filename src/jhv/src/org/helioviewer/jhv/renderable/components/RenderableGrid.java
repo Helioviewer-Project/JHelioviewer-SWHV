@@ -46,7 +46,7 @@ public class RenderableGrid extends AbstractRenderable {
 
     // height of text in solar radii
     private static final float textScale = 0.08f;
-    private static final int SUBDIVISIONS = 90;
+    private static final int SUBDIVISIONS = 360;
 
     private static final float[] firstColor = new float[] { Color.RED.getRed() / 255f, Color.RED.getGreen() / 255f, Color.RED.getBlue() / 255f };
     private static final float[] secondColor = new float[] { Color.GREEN.getRed() / 255f, Color.GREEN.getGreen() / 255f, Color.GREEN.getBlue() / 255f };
