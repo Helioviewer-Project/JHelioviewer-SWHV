@@ -63,6 +63,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
             tex = new GLTexture(gl);
             tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
+
             tex.copyBufferedImage2D(gl, bi);
             iconCacheId.put(key, tex);
         }
@@ -96,6 +97,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double distSunBegin = 2.4;
         double distSun = distSunBegin + speed * (timestamp.getTime() - evt.getStartDate().getTime()) / factor;
         int lineResolution = 2;
+        int angularResolution = (int) (angularWidthDegree / 4);
 
         Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
 
@@ -109,7 +111,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         gl.glColor3f(0, 0, 0);
         GLHelper.lineWidth(gl, LINEWIDTH_CACTUS * 1.2);
-        int angularResolution = (int) (angularWidthDegree / 4);
+
         interPolatedDraw(gl, angularResolution, distSun, distSun, thetaStart, principalAngle, p.orientation);
         interPolatedDraw(gl, angularResolution, distSun, distSun, principalAngle, thetaEnd, p.orientation);
 
@@ -125,7 +127,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         String type = evt.getJHVEventType().getEventType();
         bindTexture(gl, type, evt.getIcon());
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 
         double sz = ICON_SIZE;
         if (evt.isHighlighted()) {
@@ -224,6 +225,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
         double width2 = width / 4.;
         double height2 = height / 4.;
+
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glBegin(GL2.GL_QUADS);
         {
@@ -309,7 +311,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
 
         String type = evt.getJHVEventType().getEventType();
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
         bindTexture(gl, type, evt.getIcon());
         if (evt.isHighlighted()) {
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -321,9 +322,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-
-        gl.glColor3f(1, 1, 1);
         double width2 = width / 2.;
         double height2 = height / 2.;
 
