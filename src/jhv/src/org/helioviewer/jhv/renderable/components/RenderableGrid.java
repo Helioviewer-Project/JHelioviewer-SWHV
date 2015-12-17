@@ -18,7 +18,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
@@ -86,8 +85,8 @@ public class RenderableGrid extends AbstractRenderable {
                 p = q.rotateInverseVector(p);
             }
 
-            double theta = 90 - 180 / Math.PI * Math.acos(p.y);
-            double phi = 90 - 180 / Math.PI * Math.atan2(p.z, p.x);
+            double theta = 90 - MathUtils.radeg * Math.acos(p.y);
+            double phi = 90 - MathUtils.radeg * Math.atan2(p.z, p.x);
             phi = MathUtils.mapToMinus180To180(phi);
 
             if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
@@ -95,20 +94,8 @@ public class RenderableGrid extends AbstractRenderable {
 
             return new Vec2(phi, theta);
         }
-        else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            double w = camera.getWidth();
-            Vec2 translation = camera.getCurrentTranslation();
-            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
-            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
-            return new Vec2(x * 360, y * 180);
-        }
         else {
-            double w = camera.getWidth();
-            Vec2 translation = camera.getCurrentTranslation();
-            double x = (CameraHelper.computeNormalizedX(vp, point) * w - translation.x / vp.aspect) + 0.5;
-            double y = (CameraHelper.computeNormalizedY(vp, point) * w - translation.y) + 0.5;
-            double radius = Layers.getLargestPhysicalSize() / 2;
-            return new Vec2(x * 360, y * radius);
+            return GridScale.current.mouseToGrid(point, vp, camera);
         }
     }
 

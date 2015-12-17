@@ -18,7 +18,9 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
+import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -29,6 +31,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -207,6 +210,44 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
+    private void drawImageScale(GL2 gl, double theta, double r, double width, double height) {
+        double width2 = width / 4.;
+        double height2 = height / 4.;
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            gl.glTexCoord2f(1, 1);
+            gl.glVertex2f((float) (theta + width2), (float) (r - height2));
+            gl.glTexCoord2f(1, 0);
+            gl.glVertex2f((float) (theta + width2), (float) (r + height2));
+            gl.glTexCoord2f(0, 0);
+            gl.glVertex2f((float) (theta - width2), (float) (r + height2));
+            gl.glTexCoord2f(0, 1);
+            gl.glVertex2f((float) (theta - width2), (float) (r - height2));
+        }
+        gl.glEnd();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    private void drawIconScale(GL2 gl, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+        if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
+            if (el.centralPoint() != null) {
+                Vec3 pt = el.centralPoint();
+                pt = camera.getViewpoint().orientation.rotateVector(pt);
+                Vec2 tf = scale.transform(pt);
+                String type = evt.getJHVEventType().getEventType();
+                bindTexture(gl, type, evt.getIcon());
+                if (evt.isHighlighted()) {
+                    drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+                } else {
+                    drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE);
+                }
+            }
+        }
+    }
+
     private void drawImage3d(GL2 gl, double x, double y, double z, double width, double height) {
         y = -y;
 
@@ -281,6 +322,25 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
                     gl.glDisable(GL2.GL_DEPTH_TEST);
                     drawIcon(gl, evt);
+                    gl.glEnable(GL2.GL_DEPTH_TEST);
+                }
+            }
+            SWHVHEKSettings.resetCactusColor();
+        }
+    }
+
+    @Override
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+        if (isVisible[vp.idx]) {
+            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVEvent evt : eventsToDraw) {
+                if (evt.getName().equals("Coronal Mass Ejection")) {
+                    //drawCactusArc(gl, evt, controller.currentTime);
+                } else {
+                    //drawPolygon(gl, evt);
+
+                    gl.glDisable(GL2.GL_DEPTH_TEST);
+                    drawIconScale(gl, evt, scale, camera, vp);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }

@@ -1,0 +1,43 @@
+package org.helioviewer.jhv.base.scale;
+
+import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.layers.Layers;
+
+public interface Transform {
+    public Vec2 transform(Vec3 pt, GridScale scale);
+
+    public static Transform transformpolar = new TransformPolar();
+    public static Transform transformlatitudinal = new TransformLatitudinal();
+
+    public static class TransformPolar implements Transform {
+        @Override
+        public Vec2 transform(Vec3 pt, GridScale scale) {
+            double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+            double theta = Math.atan2(-pt.x, -pt.y);
+            theta += 2 * Math.PI;
+            theta = theta % (2 * Math.PI);
+            double scaledr = scale.getInterpolatedYValueInv(r) - 0.5;
+            double scaledtheta = (scale.getInterpolatedXValueInv(theta * MathUtils.radeg)) - 0.5;
+            return new Vec2(scaledtheta, scaledr);
+        }
+    }
+
+    public static class TransformLatitudinal implements Transform {
+        @Override
+        public Vec2 transform(Vec3 pt, GridScale scale) {
+            double theta = Math.PI / 2 - Math.acos(-pt.y);
+            double phi = Math.atan2(pt.x, pt.z);
+            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            phi -= (Math.PI + p.lon);
+            phi += 6 * Math.PI;
+            phi = phi % (2 * Math.PI);
+            double scaledphi = scale.getInterpolatedXValueInv(phi * MathUtils.radeg) - 0.5;
+            double scaledtheta = (scale.getInterpolatedYValueInv(theta * MathUtils.radeg)) - 0.5;
+            return new Vec2(scaledphi, scaledtheta);
+        }
+    }
+}
