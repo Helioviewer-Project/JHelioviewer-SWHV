@@ -406,7 +406,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         if (isVisible[vp.idx]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
-                if (evt.getName().equals("Coronal Mass Ejection") && Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
+                if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
                     drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
                 } else {
                     drawPolygon(gl, evt);
