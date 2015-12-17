@@ -186,7 +186,6 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                         GridScale scale = GridScale.current;
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
                         mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
-                        System.out.println(tf + " " + mousepos);
                     }
                 } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                     hitpoint = getHitPoint(e, vp);
