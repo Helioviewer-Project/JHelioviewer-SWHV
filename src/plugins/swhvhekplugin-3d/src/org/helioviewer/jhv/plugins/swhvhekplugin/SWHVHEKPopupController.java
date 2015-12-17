@@ -177,6 +177,17 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                 Vec2 tf = null;
                 Vec2 mousepos = null;
                 if (evt.getName().equals("Coronal Mass Ejection")) {
+                    if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR) {
+                        Map<String, JHVEventParameter> params = evt.getAllEventParameters();
+                        double principalAngle = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
+                        double speed = SWHVHEKData.readCMESpeed(params);
+                        double distSun = 2.4;
+                        distSun += speed * (currentTime.getTime() - evt.getStartDate().getTime()) / Sun.RadiusMeter;
+                        GridScale scale = GridScale.current;
+                        tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
+                        mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
+                        System.out.println(tf + " " + mousepos);
+                    }
                 } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
                     hitpoint = getHitPoint(e, vp);
                     pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();

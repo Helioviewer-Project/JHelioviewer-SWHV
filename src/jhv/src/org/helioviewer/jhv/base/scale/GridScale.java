@@ -27,9 +27,9 @@ public abstract class GridScale {
 
     abstract public double getInterpolatedYValue(double v);
 
-    abstract public double getInterpolatedXValueInv(double v);
+    abstract public double getXValueInv(double v);
 
-    abstract public double getInterpolatedYValueInv(double v);
+    abstract public double getYValueInv(double v);
 
     abstract public double getYstart();
 
@@ -77,13 +77,13 @@ public abstract class GridScale {
         }
 
         @Override
-        public double getInterpolatedXValueInv(double v) {
-            return (scaleX(v) - xStart) / (xStop - xStart);
+        public double getXValueInv(double v) {
+            return (scaleX(v) - xStart) / (xStop - xStart) - 0.5;
         }
 
         @Override
-        public double getInterpolatedYValueInv(double v) {
-            return (scaleY(v) - yStart) / (yStop - yStart);
+        public double getYValueInv(double v) {
+            return (scaleY(v) - yStart) / (yStop - yStart) - 0.5;
         }
 
         @Override
