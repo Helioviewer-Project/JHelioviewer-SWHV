@@ -55,11 +55,11 @@ public class GLGrab {
             fbo.bind(gl);
             Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-                MainComponent.renderSceneScale(camera, gl, GLSLShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, 180, Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, 180, Transform.transformpolar));
             } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-                MainComponent.renderSceneScale(camera, gl, GLSLShader.lati, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.lati, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar));
             } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-                MainComponent.renderSceneScale(camera, gl, GLSLShader.logpolar, new GridScale.GridScaleIdentity(0, 360, Math.log(0.05), Math.log(Layers.getLargestPhysicalSize() / 2), Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.logpolar, new GridScale.GridScaleIdentity(0, 360, Math.log(0.05), Math.log(Layers.getLargestPhysicalSize() / 2), Transform.transformpolar));
             } else {
                 MainComponent.renderScene(camera, gl);
             }

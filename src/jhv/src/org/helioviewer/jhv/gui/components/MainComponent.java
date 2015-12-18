@@ -11,7 +11,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLInfo;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -70,7 +70,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         gl.glClearColor(0, 0, 0, 0);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-        GLSLShader.init(gl);
+        GLSLSolarShader.init(gl);
         ImageViewerGui.getRenderableContainer().init(gl);
     }
 
@@ -78,7 +78,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         ImageViewerGui.getRenderableContainer().dispose(gl);
-        GLSLShader.dispose(gl);
+        GLSLSolarShader.dispose(gl);
     }
 
     private ExportMovie exporter;
@@ -125,7 +125,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
-    public static void renderSceneScale(Camera camera, GL2 gl, GLSLShader shader, GridScale scale) {
+    public static void renderSceneScale(Camera camera, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         for (Viewport vp : Displayer.getViewports()) {
@@ -183,15 +183,15 @@ public class MainComponent extends GLCanvas implements GLEventListener {
             GridScale gs = GridScale.polar;
             gs.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
             GridScale.current = gs;
-            renderSceneScale(camera, gl, GLSLShader.polar, gs);
+            renderSceneScale(camera, gl, GLSLSolarShader.polar, gs);
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
             GridScale.current = GridScale.latitudinal;
-            renderSceneScale(camera, gl, GLSLShader.lati, GridScale.latitudinal);
+            renderSceneScale(camera, gl, GLSLSolarShader.lati, GridScale.latitudinal);
         } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             GridScale gs = GridScale.logpolar;
             gs.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
             GridScale.current = gs;
-            renderSceneScale(camera, gl, GLSLShader.logpolar, gs);
+            renderSceneScale(camera, gl, GLSLSolarShader.logpolar, gs);
         } else {
             renderScene(camera, gl);
             renderMiniview(gl);

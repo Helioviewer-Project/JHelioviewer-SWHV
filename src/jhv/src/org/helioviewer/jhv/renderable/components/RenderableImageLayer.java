@@ -19,7 +19,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLImage;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 import org.helioviewer.jhv.threads.JHVWorker;
@@ -152,20 +152,20 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLShader.ortho, null);
+        _render(camera, vp, gl, new double[] { 1., 1., 0., 1. }, GLSLSolarShader.ortho, null);
     }
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
-        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLShader.ortho, null);
+        _render(camera, vp, gl, new double[] { 0., 0., 0., 0. }, GLSLSolarShader.ortho, null);
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         _render(camera, vp, gl, new double[] { 1., 1., 1., 1. }, shader, scale);
     }
 
-    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange, GLSLShader shader, GridScale scale) {
+    private void _render(Camera camera, Viewport vp, GL2 gl, double[] depthrange, GLSLSolarShader shader, GridScale scale) {
         if (imageData == null) {
             return;
         }
@@ -207,7 +207,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
             enableIndexVBO(gl);
             {
                 gl.glVertexPointer(3, GL2.GL_FLOAT, 3 * Buffers.SIZEOF_FLOAT, 0);
-                if (shader == GLSLShader.ortho) {
+                if (shader == GLSLSolarShader.ortho) {
                     shader.bindIsDisc(gl, 1);
                     gl.glDepthRange(depthrange[2], depthrange[3]);
                     gl.glDrawElements(GL2.GL_TRIANGLES, indexBufferSize - 6, GL2.GL_UNSIGNED_INT, 0);

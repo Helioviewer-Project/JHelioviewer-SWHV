@@ -3,7 +3,7 @@ package org.helioviewer.jhv.renderable.gui;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 import com.jogamp.opengl.GL2;
 
@@ -51,7 +51,7 @@ public abstract class AbstractRenderable implements Renderable {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
     };
 
     @Override
