@@ -18,6 +18,8 @@ public class RenderableViewpoint extends AbstractRenderable {
     private final CameraOptionsPanel optionsPanel;
     private static final double epsilon = 0.01;
 
+    private static final float lineWidth = 2;
+
     private static final Color firstcolor = Color.BLUE;
     private static final float oneRed = firstcolor.getRed() / 255f;
     private static final float oneGreen = firstcolor.getGreen() / 255f;
@@ -46,7 +48,7 @@ public class RenderableViewpoint extends AbstractRenderable {
         gl.glPushMatrix();
         gl.glMultMatrixd(camera.getViewpoint().orientation.toMatrix().transpose().m, 0);
         {
-            gl.glLineWidth(1);
+            gl.glLineWidth(lineWidth);
 
             gl.glBegin(GL2.GL_LINE_LOOP);
 

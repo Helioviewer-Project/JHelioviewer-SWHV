@@ -11,7 +11,7 @@ public class PfssSettings {
 
     public static final float LINE_ALPHA = 1;
 
-    public static final float LINE_WIDTH = 0.5f;
+    public static final float LINE_WIDTH = 2;
 
     public static final int POINTS_PER_LINE = 40;
 
