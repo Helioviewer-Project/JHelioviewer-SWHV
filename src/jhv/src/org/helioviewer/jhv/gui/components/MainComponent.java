@@ -127,13 +127,15 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
     public static void renderSceneScale(Camera camera, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
                 gl.glViewport(vp.x, vp.y, vp.width, vp.height);
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
+                gl.glPushMatrix();
+                gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
                 ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, scale);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
+                gl.glPopMatrix();
             }
         }
 
