@@ -19,9 +19,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
     private String observatory = " ";
     private String fullName = "";
 
-    private double unitPerPixel;
-    private double sunPositionX = Double.NaN;
-    private double sunPositionY = Double.NaN;
+    private double unitPerPixel = 1;
+    private double sunPositionX = 0;
+    private double sunPositionY = 0;
 
     public HelioviewerMetaData(MetaDataContainer m, int frame) {
         frameNumber = frame;
