@@ -18,7 +18,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
     protected static final float[] dragColor = new float[] { colorDrag.getRed() / 255f, colorDrag.getGreen() / 255f, colorDrag.getBlue() / 255f };
     protected static final float[] baseColor = new float[] { colorBase.getRed() / 255f, colorBase.getGreen() / 255f, colorBase.getBlue() / 255f };
 
-    protected static final float lineWidth = 1;
+    protected static final float lineWidth = 2;
     protected static final double radius = 1.01;
 
     protected final Camera camera;
