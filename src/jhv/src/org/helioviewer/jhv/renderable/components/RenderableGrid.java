@@ -15,7 +15,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
 
@@ -92,7 +92,7 @@ public class RenderableGrid extends AbstractRenderable {
     private static int FLAT_STEPS_RADIAL = 10;
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (!isVisible[vp.idx])
             return;
 

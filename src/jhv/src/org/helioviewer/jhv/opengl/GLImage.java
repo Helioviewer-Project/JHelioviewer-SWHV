@@ -59,7 +59,7 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLShader shader) {
+    public void applyFilters(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         applyRegion(imageData, prevImageData, baseImageData, shader);
         applyRunningDifference(gl, shader);
 
@@ -77,7 +77,7 @@ public class GLImage {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
-    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLShader shader) {
+    private void applyRegion(ImageData imageData, ImageData prevImageData, ImageData baseImageData, GLSLSolarShader shader) {
         Region r = imageData.getRegion();
         shader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
 
@@ -107,26 +107,26 @@ public class GLImage {
         }
     }
 
-    private void applyRunningDifference(GL2 gl, GLSLShader shader) {
+    private void applyRunningDifference(GL2 gl, GLSLSolarShader shader) {
         if (baseDifferenceMode || differenceMode) {
             if (baseDifferenceMode) {
                 if (baseDifferenceNoRot) {
-                    shader.setIsDifference(GLSLShader.BASEDIFFERENCE_NO_ROT);
+                    shader.setIsDifference(GLSLSolarShader.BASEDIFFERENCE_NO_ROT);
                 } else {
-                    shader.setIsDifference(GLSLShader.BASEDIFFERENCE_ROT);
+                    shader.setIsDifference(GLSLSolarShader.BASEDIFFERENCE_ROT);
                 }
             } else {
                 if (runningDifferenceNoRot) {
-                    shader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_NO_ROT);
+                    shader.setIsDifference(GLSLSolarShader.RUNNINGDIFFERENCE_NO_ROT);
                 } else {
-                    shader.setIsDifference(GLSLShader.RUNNINGDIFFERENCE_ROT);
+                    shader.setIsDifference(GLSLSolarShader.RUNNINGDIFFERENCE_ROT);
                 }
             }
 
             shader.setTruncationValue(truncation);
             diffTex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE2);
         } else {
-            shader.setIsDifference(GLSLShader.NODIFFERENCE);
+            shader.setIsDifference(GLSLSolarShader.NODIFFERENCE);
         }
     }
 

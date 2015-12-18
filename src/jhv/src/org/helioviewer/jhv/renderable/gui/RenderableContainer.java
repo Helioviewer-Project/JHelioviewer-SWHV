@@ -11,7 +11,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.renderable.components.RenderableImageLayer;
 
@@ -67,7 +67,7 @@ public class RenderableContainer implements TableModel, Reorderable {
         }
     }
 
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         for (Renderable renderable : renderables) {
             renderable.renderScale(camera, vp, gl, shader, scale);
         }

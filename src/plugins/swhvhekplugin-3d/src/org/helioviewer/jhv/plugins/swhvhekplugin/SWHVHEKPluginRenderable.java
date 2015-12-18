@@ -32,7 +32,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLSLShader;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.renderable.gui.AbstractRenderable;
@@ -397,7 +397,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLShader shader, GridScale scale) {
+    public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (isVisible[vp.idx]) {
             List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
             for (JHVEvent evt : eventsToDraw) {
