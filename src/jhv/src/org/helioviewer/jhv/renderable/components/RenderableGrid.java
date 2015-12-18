@@ -9,14 +9,11 @@ import java.util.ArrayList;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
-import org.helioviewer.jhv.base.math.MathUtils;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLSLShader;
 import org.helioviewer.jhv.opengl.GLText;
@@ -28,7 +25,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderableGrid extends AbstractRenderable {
 
-    enum GridChoiceType {
+    public enum GridChoiceType {
         VIEWPOINT("Viewpoint grid"), STONYHURST("Stonyhurst grid"), CARRINGTON("Carrington grid"), HCI("HCI grid");
 
         private final String display;
@@ -74,31 +71,10 @@ public class RenderableGrid extends AbstractRenderable {
     private GridChoiceType gridChoice = GridChoiceType.VIEWPOINT;
 
     public Vec2 gridPoint(Camera camera, Viewport vp, Point point) {
-        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
-            Vec3 p = CameraHelper.getVectorFromSphereAlt(camera, vp, point);
-            if (p == null)
-                return null;
-
-            if (gridChoice != GridChoiceType.VIEWPOINT) {
-                Quat q = Quat.rotateWithConjugate(camera.getViewpoint().orientation, getGridQuat(camera));
-                p = q.rotateInverseVector(p);
-            }
-
-            double theta = 90 - MathUtils.radeg * Math.acos(p.y);
-            double phi = 90 - MathUtils.radeg * Math.atan2(p.z, p.x);
-            phi = MathUtils.mapToMinus180To180(phi);
-
-            if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
-                phi += 360;
-
-            return new Vec2(phi, theta);
-        }
-        else {
-            return GridScale.current.mouseToGrid(point, vp, camera);
-        }
+        return GridScale.current.mouseToGrid(point, vp, camera, gridChoice);
     }
 
-    private Quat getGridQuat(Camera camera) {
+    public static Quat getGridQuat(Camera camera, GridChoiceType gridChoice) {
         switch (gridChoice) {
         case VIEWPOINT:
             return camera.getViewpoint().orientation;
@@ -210,7 +186,7 @@ public class RenderableGrid extends AbstractRenderable {
         gl.glVertexPointer(2, GL2.GL_FLOAT, 0, 0);
 
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
-        Mat4 cameraMatrix = getGridQuat(camera).toMatrix();
+        Mat4 cameraMatrix = getGridQuat(camera, gridChoice).toMatrix();
 
         gl.glPushMatrix();
         gl.glMultMatrixd(cameraMatrix.transpose().m, 0);
