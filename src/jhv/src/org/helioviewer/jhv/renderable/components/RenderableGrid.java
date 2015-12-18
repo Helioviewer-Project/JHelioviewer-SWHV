@@ -11,7 +11,6 @@ import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Mat4;
 import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
-import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -95,25 +94,20 @@ public class RenderableGrid extends AbstractRenderable {
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (!isVisible[vp.idx])
             return;
-
         int pixelsPerSolarRadius = (int) (textScale * vp.height / (2 * camera.getWidth()));
-
-        Mat4 vpmi = Mat4.identity();
-        vpmi.translate(new Vec3(camera.getCurrentTranslation().x, camera.getCurrentTranslation().y, 0.));
-        gl.glPushMatrix();
-        gl.glMultMatrixd(vpmi.m, 0);
         {
             drawGridFlat(gl, scale, vp);
             if (showLabels) {
                 drawGridTextFlat(gl, pixelsPerSolarRadius, scale, vp);
             }
         }
-        gl.glPopMatrix();
     }
 
     private void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glEnable(GL2.GL_MULTISAMPLE);
         gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
         gl.glLineWidth(0.25f);
         {
@@ -146,6 +140,8 @@ public class RenderableGrid extends AbstractRenderable {
             }
             gl.glEnd();
         }
+        gl.glEnable(GL2.GL_BLEND);
+
     }
 
     private void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
