@@ -106,8 +106,7 @@ public class RenderableGrid extends AbstractRenderable {
     private void drawGridFlat(GL2 gl, GridScale scale, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
-        gl.glDisable(GL2.GL_BLEND);
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+
         gl.glColor3f(firstColor[0], firstColor[1], firstColor[2]);
         gl.glLineWidth(0.25f);
         {
@@ -140,8 +139,6 @@ public class RenderableGrid extends AbstractRenderable {
             }
             gl.glEnd();
         }
-        gl.glEnable(GL2.GL_BLEND);
-
     }
 
     private void drawGridTextFlat(GL2 gl, int size, GridScale scale, Viewport vp) {
