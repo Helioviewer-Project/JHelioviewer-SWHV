@@ -23,6 +23,8 @@ public class GLText {
     }
 
     public static TextRenderer getRenderer(int size) {
+        size *= GLInfo.pixelScale[1];
+
         int idx = (size - MIN) / STEP;
         if (idx < 0)
             idx = 0;
@@ -48,14 +50,16 @@ public class GLText {
         }
     }
 
-    private static final double vpScale = 0.019;
+    public static final int TEXT_SIZE_NORMAL = 12;
+    public static final int TEXT_SIZE_LARGE = 16;
+
     private final static int LEFT_MARGIN_TEXT = 10;
     private final static int RIGHT_MARGIN_TEXT = 10;
     private final static int TOP_MARGIN_TEXT = 5;
     private final static int BOTTOM_MARGIN_TEXT = 5;
 
     public static void drawText(GL2 gl, Viewport vp, List<String> txts, int pt_x, int pt_y) {
-        TextRenderer renderer = GLText.getRenderer((int) (vp.height * vpScale));
+        TextRenderer renderer = GLText.getRenderer(TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFont().getSize2D();
 
         double boundW = 0;

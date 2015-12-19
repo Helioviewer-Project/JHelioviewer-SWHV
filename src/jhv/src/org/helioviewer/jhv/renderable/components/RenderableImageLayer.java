@@ -230,7 +230,7 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
     public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
         if (imageData == null) {
             int delta = (int) (vp.height * 0.01);
-            TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.height * vpScale)));
+            TextRenderer renderer = GLText.getRenderer(GLText.TEXT_SIZE_LARGE);
             Rectangle2D rect = renderer.getBounds(loading);
 
             renderer.beginRendering(vp.width, vp.height, true);

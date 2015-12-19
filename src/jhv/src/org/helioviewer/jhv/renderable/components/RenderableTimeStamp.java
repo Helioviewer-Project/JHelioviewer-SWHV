@@ -37,7 +37,7 @@ public class RenderableTimeStamp extends AbstractRenderable {
         }
 
         int delta = (int) (vp.height * 0.01);
-        TextRenderer renderer = GLText.getRenderer(Math.min(36, (int) (vp.height * vpScale)));
+        TextRenderer renderer = GLText.getRenderer(GLText.TEXT_SIZE_LARGE);
 
         renderer.beginRendering(vp.width, vp.height, true);
         renderer.setColor(Color.BLACK);
