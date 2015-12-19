@@ -200,22 +200,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
-
-        setRender(camera);
-    }
-
-    private static void setRender(Camera camera) {
-        if (renderFactor != -1) {
-            ImageViewerGui.getRenderableContainer().setRender(camera, renderFactor);
-            renderFactor = -1;
-        }
-    }
-
-    private static double renderFactor = -1;
-
-    public void render(double _renderFactor) {
-        renderFactor = _renderFactor;
-        repaint();
     }
 
 }

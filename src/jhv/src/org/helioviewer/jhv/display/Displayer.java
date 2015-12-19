@@ -9,8 +9,10 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.layers.Layers;
 
 public class Displayer implements JHVEventHighlightListener {
+
     public static enum DisplayMode {
         ORTHO, POLAR, LATITUDINAL, LOGPOLAR;
         public String getLabel() {
@@ -165,8 +167,10 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     public static void render(double f) {
-        toDisplay = true;
-        renderFactor = f;
+        if (Layers.getActiveView() == null)
+            toDisplay = true;
+        else
+            renderFactor = f;
     }
 
     public static void display() {
@@ -177,8 +181,11 @@ public class Displayer implements JHVEventHighlightListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (toDisplay == true) {
-                ImageViewerGui.getMainComponent().render(renderFactor);
+                ImageViewerGui.getMainComponent().repaint();
                 toDisplay = false;
+            }
+            if (renderFactor != -1) {
+                ImageViewerGui.getRenderableContainer().setRender(camera, renderFactor);
                 renderFactor = -1;
             }
         }
