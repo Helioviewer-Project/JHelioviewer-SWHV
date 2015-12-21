@@ -23,7 +23,7 @@ public class Camera {
     private boolean trackingMode;
 
     private Position.Q viewpoint = Sun.EpochEarthQ;
-    private UpdateViewpoint updateViewpoint = new UpdateViewpointObserver();
+    private UpdateViewpoint updateViewpoint = UpdateViewpoint.updateObserver;
 
     private void updateCamera(JHVDate time) {
         viewpoint = updateViewpoint.update(time);

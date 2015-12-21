@@ -38,7 +38,6 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements Pos
     private static final double FOVAngleDefault = 0.8;
     private double FOVAngle = FOVAngleDefault * Math.PI / 180.;
 
-    private final PositionLoad positionLoad;
     private final CameraOptionPanelExpert expertOptionPanel;
     private CameraOptionPanel currentOptionPanel;
 
@@ -149,7 +148,8 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements Pos
 
         setSmall();
 
-        positionLoad = new PositionLoad(this);
+        PositionLoad positionLoad = new PositionLoad(this);
+        ((UpdateViewpoint.UpdateViewpointExpert) UpdateViewpoint.updateExpert).setPositionLoad(positionLoad);
         expertOptionPanel = new CameraOptionPanelExpert(positionLoad);
     }
 
@@ -189,14 +189,14 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements Pos
 
         switch (mode) {
             case EXPERT:
-                update = new UpdateViewpointExpert(positionLoad);
+                update = UpdateViewpoint.updateExpert;
                 panel = expertOptionPanel;
             break;
             case EARTH:
-                update = new UpdateViewpointEarth();
+                update = UpdateViewpoint.updateEarth;
             break;
             default:
-                update = new UpdateViewpointObserver();
+                update = UpdateViewpoint.updateObserver;
         }
         Displayer.getCamera().setUpdate(update);
         switchOptionsPanel(panel);
