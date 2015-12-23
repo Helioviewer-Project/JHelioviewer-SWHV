@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.viewmodel.imagedata;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
@@ -16,7 +15,6 @@ public abstract class AbstractImageData implements ImageData {
 
     protected BufferedImage image = null;
 
-    private Rectangle roi;
     private Region region;
     private MetaData metaData;
     private Position.Q viewpoint;
@@ -34,7 +32,6 @@ public abstract class AbstractImageData implements ImageData {
         width = newWidth;
         height = newHeight;
         bpp = newBpp;
-        roi = new Rectangle(0, 0, newWidth, newHeight);
     }
 
     @Override
@@ -45,16 +42,6 @@ public abstract class AbstractImageData implements ImageData {
     @Override
     public int getWidth() {
         return width;
-    }
-
-    @Override
-    public Rectangle getROI() {
-        return roi;
-    }
-
-    @Override
-    public void setROI(final Rectangle r) {
-        roi = r;
     }
 
     @Override
