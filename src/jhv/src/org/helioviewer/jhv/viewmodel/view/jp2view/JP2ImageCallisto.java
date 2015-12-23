@@ -43,7 +43,8 @@ public class JP2ImageCallisto extends JP2Image {
         Rectangle rect = res.getResolutionBounds();
 
         SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * rect.width), (int) (region.y / (double) maxHeight * rect.height),
-                                         (int) Math.ceil(region.width / (double) maxWidth * rect.width), (int) Math.ceil(region.height / (double) maxHeight * rect.height), rect);
+                                         (int) Math.ceil(region.width / (double) maxWidth * rect.width), (int) Math.ceil(region.height / (double) maxHeight * rect.height),
+                                         rect.width, rect.height);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame);
         signalReader(imageViewParams);
