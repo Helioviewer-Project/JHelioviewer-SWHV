@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
-import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -196,8 +195,7 @@ class J2KReader implements Runnable {
         JPIPQuery query = new JPIPQuery();
         query.setField(JPIPRequestField.CONTEXT.toString(), "jpxl<" + iniLayer + "-" + endLayer + ">");
 
-        Rectangle resDims = currParams.resolution.getResolutionBounds();
-        query.setField(JPIPRequestField.FSIZ.toString(), String.valueOf(resDims.width) + "," + String.valueOf(resDims.height) + "," + "closest");
+        query.setField(JPIPRequestField.FSIZ.toString(), String.valueOf(currParams.resolution.width) + "," + String.valueOf(currParams.resolution.height) + "," + "closest");
         query.setField(JPIPRequestField.ROFF.toString(), String.valueOf(currParams.subImage.x) + "," + String.valueOf(currParams.subImage.y));
         query.setField(JPIPRequestField.RSIZ.toString(), String.valueOf(currParams.subImage.width) + "," + String.valueOf(currParams.subImage.height));
 

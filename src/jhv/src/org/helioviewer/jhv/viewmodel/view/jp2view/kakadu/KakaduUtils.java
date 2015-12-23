@@ -41,11 +41,11 @@ public class KakaduUtils {
      * @return Rectangle equivalent to the given Kdu_dims
      */
     public static Rectangle kdu_dimsToRect(Kdu_dims dims) {
-        Rectangle rect = new Rectangle();
+        Rectangle rect = null;
         try {
             Kdu_coords pos = dims.Access_pos();
             Kdu_coords siz = dims.Access_size();
-            rect.setBounds(pos.Get_x(), pos.Get_y(), siz.Get_x(), siz.Get_y());
+            rect = new Rectangle(pos.Get_x(), pos.Get_y(), siz.Get_x(), siz.Get_y());
         } catch (KduException ex) {
             ex.printStackTrace();
         }

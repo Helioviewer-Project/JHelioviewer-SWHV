@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.kakadu;
 
+import java.awt.Rectangle;
+
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jpx_codestream_source;
 import kdu_jni.Jpx_source;
@@ -31,16 +33,21 @@ public class KakaduHelper {
             throw new KduException(">> cannot determine dimensions for stream " + frame);
         }
 
+        Rectangle rect;
         int maxDWT = stream.Get_min_dwt_levels();
         ResolutionSet res = new ResolutionSet(maxDWT + 1);
-        res.addResolutionLevel(0, KakaduUtils.kdu_dimsToRect(dims));
+
+        rect = KakaduUtils.kdu_dimsToRect(dims);
+        res.addResolutionLevel(0, rect.width, rect.height);
 
         for (int i = 1; i <= maxDWT; i++) {
             compositor.Set_scale(false, false, false, 1f / (1 << i));
             dims = new Kdu_dims();
             if (!compositor.Get_total_composition_dims(dims))
                 break;
-            res.addResolutionLevel(i, KakaduUtils.kdu_dimsToRect(dims));
+
+            rect = KakaduUtils.kdu_dimsToRect(dims);
+            res.addResolutionLevel(i, rect.width, rect.height);
         }
 
         compositor.Remove_ilayer(ilayer, false);

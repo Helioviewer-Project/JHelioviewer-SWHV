@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.image;
 
-import java.awt.Rectangle;
-
 /**
  * A class describing the available resolution levels for a given image. It
  * supplies several simple methods to aid in selecting appropriate zoom levels.
@@ -22,8 +20,8 @@ public class ResolutionSet {
      *
      * @param _numResolutions
      */
-    public ResolutionSet(int _numResolutions) {
-        resolutions = new ResolutionLevel[_numResolutions];
+    public ResolutionSet(int numResolutions) {
+        resolutions = new ResolutionLevel[numResolutions];
     }
 
     /**
@@ -38,19 +36,19 @@ public class ResolutionSet {
      * @param _discardLayer
      * @param _dims
      */
-    public void addResolutionLevel(int _discardLayer, Rectangle _dims) {
-        resolutions[_discardLayer] = new ResolutionLevel(_discardLayer, _dims);
+    public void addResolutionLevel(int discardLayer, int width, int height) {
+        resolutions[discardLayer] = new ResolutionLevel(discardLayer, width, height);
     }
 
-    public ResolutionLevel getResolutionLevel(int _index) {
-        return resolutions[_index];
+    public ResolutionLevel getResolutionLevel(int index) {
+        return resolutions[index];
     }
 
     public ResolutionLevel getPreviousResolutionLevel(int w, int h) {
         int idx = 0;
         for (int i = 0; i < resolutions.length; i++) {
             idx = i;
-            if (resolutions[i].dims.width <= w && resolutions[i].dims.height <= h)
+            if (resolutions[i].width <= w && resolutions[i].height <= h)
                 break;
         }
         return resolutions[idx];
@@ -58,7 +56,7 @@ public class ResolutionSet {
 
     public ResolutionLevel getNextResolutionLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
-            if (resolutions[i].dims.width < w || resolutions[i].dims.height < h)
+            if (resolutions[i].width < w || resolutions[i].height < h)
                 return resolutions[i - 1];
         }
         return resolutions[resolutions.length - 1];
@@ -80,32 +78,21 @@ public class ResolutionSet {
     public static class ResolutionLevel {
 
         /** The zoom level of the Resolution */
-        private final int discardLayers;
+        public final int discardLayers;
 
-        /** The bounds of the Resolution as a Rectangle */
-        private final Rectangle dims;
+        public final int width;
+        public final int height;
 
         /** Private constructor. */
-        private ResolutionLevel(int _discardLayers, Rectangle _dims) {
-            if (_dims == null)
-                throw new NullPointerException();
+        private ResolutionLevel(int _discardLayers, int _width, int _height) {
             discardLayers = _discardLayers;
-            dims = (Rectangle) _dims.clone();
-        }
-
-        /** Returns the number of discardLayers */
-        public int getZoomLevel() {
-            return discardLayers;
+            width = _width;
+            height = _height;
         }
 
         /** Returns the zoom in percent */
         public float getZoomPercent() {
             return 1f / (1 << discardLayers);
-        }
-
-        /** Returns bounds of the resolution as a rectangle. */
-        public Rectangle getResolutionBounds() {
-            return (Rectangle) dims.clone();
         }
 
         /**
@@ -119,7 +106,7 @@ public class ResolutionSet {
         public boolean equals(Object o) {
             if (o instanceof ResolutionLevel) {
                 ResolutionLevel r = (ResolutionLevel) o;
-                return discardLayers == r.discardLayers && dims.equals(r.dims);
+                return discardLayers == r.discardLayers && width == r.width && height == r.height;
             }
             return false;
         }
@@ -137,7 +124,7 @@ public class ResolutionSet {
 
         @Override
         public String toString() {
-            return "[[ZoomPercent=" + getZoomPercent() + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + dims.toString() + "]]";
+            return "[[ZoomPercent=" + getZoomPercent() + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + width + "," + height + "]]";
         }
 
     }
