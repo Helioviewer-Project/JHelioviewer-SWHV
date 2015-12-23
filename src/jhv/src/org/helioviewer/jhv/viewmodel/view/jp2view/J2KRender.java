@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -150,6 +151,7 @@ class J2KRender implements Runnable {
 
         newImageData.setMetaData(metaData);
         newImageData.setViewpoint(newParams.viewpoint);
+        newImageData.setROI(new Rectangle(newParams.subImage.x, newParams.subImage.y, newParams.subImage.width, newParams.subImage.height));
 
         if (metaData instanceof HelioviewerMetaData) {
             newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(newParams.subImage, newParams.resolution.getZoomPercent()));

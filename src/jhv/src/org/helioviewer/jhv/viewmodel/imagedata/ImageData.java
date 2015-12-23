@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.viewmodel.imagedata;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 
@@ -21,6 +22,10 @@ public interface ImageData {
      * @return height of the image
      */
     public int getHeight();
+
+    public Rectangle getROI();
+
+    public void setROI(final Rectangle r);
 
     public int getBitsPerPixel();
 
