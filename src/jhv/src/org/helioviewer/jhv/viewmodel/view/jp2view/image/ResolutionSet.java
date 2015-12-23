@@ -67,10 +67,10 @@ public class ResolutionSet {
     }
 
     /**
-     * A simple class describing a Resolution level for a given image. Note
-     * though this class is public it's constructor is private. The
+     * Immutable class describing a Resolution level for a given image. Note
+     * that while this class is public, its constructor is private. The
      * ResolutionSet object can be considered to be the ResolutionLevel
-     * 'factory'. The ResolutionLevel object is also immutable.
+     * 'factory'.
      *
      * @author caplins
      *
@@ -84,47 +84,37 @@ public class ResolutionSet {
         public final int width;
         public final int height;
 
-        public final double scaleX;
-        public final double scaleY;
+        public final double factorX;
+        public final double factorY;
 
-        /** Private constructor. */
-        private ResolutionLevel(int _discardLayers, int _width, int _height, double _scaleX, double _scaleY) {
+        /** Private constructor */
+        private ResolutionLevel(int _discardLayers, int _width, int _height, double _factorX, double _factorY) {
             discardLayers = _discardLayers;
             scaleLevel = 1f / (1 << discardLayers);
             width = _width;
             height = _height;
-            scaleX = _scaleX;
-            scaleY = _scaleY;
+            factorX = _factorX;
+            factorY = _factorY;
         }
 
         /**
          * The equals method. Since these objects are immutable, can only be
          * instantiated in this class, and are not cloneable you can almost
          * certain do reference comparisons using the ==, but since I am
-         * paranoid I overridden the equals method.
+         * paranoid I have overridden the equals method.
          */
         @Override
         public boolean equals(Object o) {
             if (o instanceof ResolutionLevel) {
                 ResolutionLevel r = (ResolutionLevel) o;
-                return discardLayers == r.discardLayers && width == r.width && height == r.height && scaleX == r.scaleX && scaleY == r.scaleY;
+                return discardLayers == r.discardLayers && width == r.width && height == r.height && factorX == r.factorX && factorY == r.factorY;
             }
             return false;
         }
 
-        /**
-         * Clone is NOT supported.
-         *
-         * @throws CloneNotSupportedException
-         */
-        @Override
-        public Object clone() throws CloneNotSupportedException {
-            throw new CloneNotSupportedException();
-        }
-
         @Override
         public String toString() {
-            return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][Scale=" + scaleX + "," + scaleY + "][ZoomDims=" + width + "," + height + "]]";
+            return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][ScaleFactor=" + factorX + "," + factorY + "][ZoomDims=" + width + "," + height + "]]";
         }
 
     }
