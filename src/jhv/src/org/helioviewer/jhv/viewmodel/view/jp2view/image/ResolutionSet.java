@@ -77,8 +77,9 @@ public class ResolutionSet {
      */
     public static class ResolutionLevel {
 
-        /** The zoom level of the Resolution */
         public final int discardLayers;
+
+        public final float scaleLevel;
 
         public final int width;
         public final int height;
@@ -89,15 +90,11 @@ public class ResolutionSet {
         /** Private constructor. */
         private ResolutionLevel(int _discardLayers, int _width, int _height, double _scaleX, double _scaleY) {
             discardLayers = _discardLayers;
+            scaleLevel = 1f / (1 << discardLayers);
             width = _width;
             height = _height;
             scaleX = _scaleX;
             scaleY = _scaleY;
-        }
-
-        /** Returns the zoom in percent */
-        public float getZoomPercent() {
-            return 1f / (1 << discardLayers);
         }
 
         /**
@@ -106,7 +103,6 @@ public class ResolutionSet {
          * certain do reference comparisons using the ==, but since I am
          * paranoid I overridden the equals method.
          */
-
         @Override
         public boolean equals(Object o) {
             if (o instanceof ResolutionLevel) {
@@ -121,7 +117,6 @@ public class ResolutionSet {
          *
          * @throws CloneNotSupportedException
          */
-
         @Override
         public Object clone() throws CloneNotSupportedException {
             throw new CloneNotSupportedException();
@@ -129,7 +124,7 @@ public class ResolutionSet {
 
         @Override
         public String toString() {
-            return "[[ZoomPercent=" + getZoomPercent() + "][Scale=" + scaleX + "," + scaleY + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + width + "," + height + "]]";
+            return "[[Discard=" + discardLayers + "][ScaleLevel=" + scaleLevel + "][Scale=" + scaleX + "," + scaleY + "][ZoomDims=" + width + "," + height + "]]";
         }
 
     }

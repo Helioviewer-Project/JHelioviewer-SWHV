@@ -76,7 +76,7 @@ class J2KRender implements Runnable {
             ilayer = compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
-        compositor.Set_scale(false, false, false, params.resolution.getZoomPercent(), scaleFactor);
+        compositor.Set_scale(false, false, false, params.resolution.scaleLevel, scaleFactor);
         Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(params.subImage);
         compositor.Set_buffer_surface(requestedRegion);
 
