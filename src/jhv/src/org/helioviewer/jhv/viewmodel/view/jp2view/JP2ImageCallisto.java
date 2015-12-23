@@ -35,16 +35,15 @@ public class JP2ImageCallisto extends JP2Image {
 
     private JP2ImageParameter calculateParameter(int frame) {
         ResolutionSet resolutionSet = getResolutionSet(frame);
-        int maxHeight = resolutionSet.getResolutionLevel(0).getResolutionBounds().height;
-        int maxWidth = resolutionSet.getResolutionLevel(0).getResolutionBounds().width;
+        int maxHeight = resolutionSet.getResolutionLevel(0).height;
+        int maxWidth = resolutionSet.getResolutionLevel(0).width;
 
         ResolutionLevel res = resolutionSet.getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
                                                                    2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
-        Rectangle rect = res.getResolutionBounds();
 
-        SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * rect.width), (int) (region.y / (double) maxHeight * rect.height),
-                                         (int) Math.ceil(region.width / (double) maxWidth * rect.width), (int) Math.ceil(region.height / (double) maxHeight * rect.height),
-                                         rect.width, rect.height);
+        SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * res.width), (int) (region.y / (double) maxHeight * res.height),
+                                         (int) Math.ceil(region.width / (double) maxWidth * res.width), (int) Math.ceil(region.height / (double) maxHeight * res.height),
+                                         res.width, res.height);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame);
         signalReader(imageViewParams);

@@ -245,8 +245,8 @@ public class RadioImage {
      */
     public Rectangle getROI() {
         if (visibleImageFreqInterval != null && visibleImageTimeInterval != null) {
-            int maxImageWidth = resolutioSet.getResolutionLevel(0).getResolutionBounds().width;
-            int maxImageHeight = resolutioSet.getResolutionLevel(0).getResolutionBounds().height;
+            int maxImageWidth = resolutioSet.getResolutionLevel(0).width;
+            int maxImageHeight = resolutioSet.getResolutionLevel(0).height;
             long imageTimesize = imageTimeInterval.getEnd().getTime() - imageTimeInterval.getStart().getTime();
             int imageFrequencySize = imageFreqInterval.getEnd() - imageFreqInterval.getStart();
             double timePerPix = 1.0 * imageTimesize / maxImageWidth;

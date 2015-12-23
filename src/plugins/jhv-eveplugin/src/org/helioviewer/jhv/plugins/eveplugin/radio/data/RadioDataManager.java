@@ -616,10 +616,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                     if (start != null && end != null) {
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) rs.getResolutionLevel(j).getResolutionBounds().width,
-                                                                                 (freqEnd - freqStart) / (double) rs.getResolutionLevel(j).getResolutionBounds().height,
-                                                                                 j, rs.getResolutionLevel(j).getResolutionBounds().width, rs.getResolutionLevel(j).getResolutionBounds().height,
-                                                                                 rs.getResolutionLevel(j).getZoomLevel());
+                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) rs.getResolutionLevel(j).width,
+                                                                                 (freqEnd - freqStart) / (double) rs.getResolutionLevel(j).height,
+                                                                                 j, rs.getResolutionLevel(j).width, rs.getResolutionLevel(j).height,
+                                                                                 rs.getResolutionLevel(j).discardLayers);
                             resolutionSettings.add(tempResSet);
                         }
 

@@ -257,8 +257,8 @@ public class JP2Image {
         int totalHeight = (int) (mr.height / ratio);
 
         ResolutionLevel res = imageCacheStatus.getResolutionSet(frame).getNextResolutionLevel(totalHeight, totalHeight);
-        int viewportImageWidth = res.getResolutionBounds().width;
-        int viewportImageHeight = res.getResolutionBounds().height;
+        int viewportImageWidth = res.width;
+        int viewportImageHeight = res.height;
 
         double currentMeterPerPixel = mr.width / viewportImageWidth;
         int imageWidth = (int) Math.round(r.width / currentMeterPerPixel);
