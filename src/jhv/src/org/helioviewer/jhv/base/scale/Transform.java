@@ -8,6 +8,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.layers.Layers;
 
 public interface Transform {
+
     public Vec2 transform(Vec3 pt, GridScale scale);
 
     public static Transform transformpolar = new TransformPolar();
@@ -19,9 +20,9 @@ public interface Transform {
             double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
             double theta = Math.atan2(-pt.x, -pt.y);
             theta += 2 * Math.PI;
-            theta = theta % (2 * Math.PI);
+            theta %= 2 * Math.PI;
             double scaledr = scale.getYValueInv(r);
-            double scaledtheta = (scale.getXValueInv(theta * MathUtils.radeg));
+            double scaledtheta = scale.getXValueInv(theta * MathUtils.radeg);
             return new Vec2(scaledtheta, scaledr);
         }
     }
@@ -32,12 +33,13 @@ public interface Transform {
             double theta = Math.PI / 2 - Math.acos(-pt.y);
             double phi = Math.atan2(pt.x, pt.z);
             Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
-            phi -= (Math.PI + p.lon);
+            phi -= Math.PI + p.lon;
             phi += 6 * Math.PI;
-            phi = phi % (2 * Math.PI);
+            phi %= 2 * Math.PI;
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
-            double scaledtheta = (scale.getYValueInv(theta * MathUtils.radeg));
+            double scaledtheta = scale.getYValueInv(theta * MathUtils.radeg);
             return new Vec2(scaledphi, scaledtheta);
         }
     }
+
 }
