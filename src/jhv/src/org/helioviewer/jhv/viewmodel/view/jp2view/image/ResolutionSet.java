@@ -36,8 +36,8 @@ public class ResolutionSet {
      * @param _discardLayer
      * @param _dims
      */
-    public void addResolutionLevel(int discardLayer, int width, int height) {
-        resolutions[discardLayer] = new ResolutionLevel(discardLayer, width, height);
+    public void addResolutionLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {
+        resolutions[discardLayer] = new ResolutionLevel(discardLayer, width, height, scaleX, scaleY);
     }
 
     public ResolutionLevel getResolutionLevel(int index) {
@@ -83,11 +83,16 @@ public class ResolutionSet {
         public final int width;
         public final int height;
 
+        public final double scaleX;
+        public final double scaleY;
+
         /** Private constructor. */
-        private ResolutionLevel(int _discardLayers, int _width, int _height) {
+        private ResolutionLevel(int _discardLayers, int _width, int _height, double _scaleX, double _scaleY) {
             discardLayers = _discardLayers;
             width = _width;
             height = _height;
+            scaleX = _scaleX;
+            scaleY = _scaleY;
         }
 
         /** Returns the zoom in percent */
@@ -106,7 +111,7 @@ public class ResolutionSet {
         public boolean equals(Object o) {
             if (o instanceof ResolutionLevel) {
                 ResolutionLevel r = (ResolutionLevel) o;
-                return discardLayers == r.discardLayers && width == r.width && height == r.height;
+                return discardLayers == r.discardLayers && width == r.width && height == r.height && scaleX == r.scaleX && scaleY == r.scaleY;
             }
             return false;
         }
@@ -124,7 +129,7 @@ public class ResolutionSet {
 
         @Override
         public String toString() {
-            return "[[ZoomPercent=" + getZoomPercent() + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + width + "," + height + "]]";
+            return "[[ZoomPercent=" + getZoomPercent() + "][Scale=" + scaleX + "," + scaleY + "][ZoomLevel=" + discardLayers + "][ZoomDims=" + width + "," + height + "]]";
         }
 
     }

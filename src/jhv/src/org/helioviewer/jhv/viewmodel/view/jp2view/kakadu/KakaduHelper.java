@@ -38,8 +38,9 @@ public class KakaduHelper {
         ResolutionSet res = new ResolutionSet(maxDWT + 1);
 
         rect = KakaduUtils.kdu_dimsToRect(dims);
-        res.addResolutionLevel(0, rect.width, rect.height);
+        res.addResolutionLevel(0, rect.width, rect.height, 1, 1);
 
+        int width0 = rect.width, height0 = rect.height;
         for (int i = 1; i <= maxDWT; i++) {
             compositor.Set_scale(false, false, false, 1f / (1 << i));
             dims = new Kdu_dims();
@@ -47,7 +48,7 @@ public class KakaduHelper {
                 break;
 
             rect = KakaduUtils.kdu_dimsToRect(dims);
-            res.addResolutionLevel(i, rect.width, rect.height);
+            res.addResolutionLevel(i, rect.width, rect.height, width0 / (double) rect.width, height0 / (double) rect.height);
         }
 
         compositor.Remove_ilayer(ilayer, false);

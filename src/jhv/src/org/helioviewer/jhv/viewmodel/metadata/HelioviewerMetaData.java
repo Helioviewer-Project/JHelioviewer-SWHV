@@ -221,11 +221,9 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         }
     }
 
-    public Region roiToRegion(SubImage roi, double zoompercent) {
-        return new Region(roi.x * unitPerPixel / zoompercent - sunPositionX,
-                roi.y * unitPerPixel / zoompercent - sunPositionY,
-                roi.width * unitPerPixel / zoompercent,
-                roi.height * unitPerPixel / zoompercent);
+    public Region roiToRegion(SubImage roi, double scaleX, double scaleY) {
+        return new Region(roi.x * scaleX * unitPerPixel - sunPositionX, roi.y * scaleY * unitPerPixel - sunPositionY,
+                          roi.width * scaleX * unitPerPixel, roi.height * scaleY * unitPerPixel);
     }
 
     @Override
