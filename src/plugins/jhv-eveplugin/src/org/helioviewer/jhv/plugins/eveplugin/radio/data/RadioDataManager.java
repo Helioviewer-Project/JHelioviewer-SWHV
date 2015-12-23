@@ -24,6 +24,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 /**
  * The radio data manager manages all the downloaded data for radio
@@ -616,10 +617,10 @@ public class RadioDataManager implements RadioDownloaderListener {
                     if (start != null && end != null) {
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) rs.getResolutionLevel(j).width,
-                                                                                 (freqEnd - freqStart) / (double) rs.getResolutionLevel(j).height,
-                                                                                 j, rs.getResolutionLevel(j).width, rs.getResolutionLevel(j).height,
-                                                                                 rs.getResolutionLevel(j).discardLayers);
+                            ResolutionLevel res = rs.getResolutionLevel(j);
+                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width,
+                                                                                 (freqEnd - freqStart) / (double) res.height, j,
+                                                                                 res.width, res.height, res.discardLayers);
                             resolutionSettings.add(tempResSet);
                         }
 
