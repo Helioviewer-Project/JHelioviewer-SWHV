@@ -44,20 +44,20 @@ class J2KRender implements Runnable {
     /** A reference to the JP2View this object is owned by. */
     private final JP2View parentViewRef;
 
-    private final JP2ImageParameter currParams;
+    private final JP2ImageParameter params;
 
     private final float scaleFactor;
 
     J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams, float _scaleFactor) {
         parentViewRef = _parentViewRef;
-        currParams = _currParams;
-        parentImageRef = currParams.jp2Image;
+        params = _currParams;
+        parentImageRef = params.jp2Image;
         cacheStatusRef = parentImageRef.getImageCacheStatus();
         scaleFactor = _scaleFactor;
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
-        int numLayer = currParams.compositionLayer;
+        int numLayer = params.compositionLayer;
 
         CacheStatus status = cacheStatusRef.getImageStatus(numLayer);
         if (status != CacheStatus.COMPLETE && status != CacheStatus.PARTIAL)
@@ -77,8 +77,8 @@ class J2KRender implements Runnable {
             ilayer = compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
-        compositor.Set_scale(false, false, false, currParams.resolution.getZoomPercent(), scaleFactor);
-        Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(currParams.subImage);
+        compositor.Set_scale(false, false, false, params.resolution.getZoomPercent(), scaleFactor);
+        Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(params.subImage);
         compositor.Set_buffer_surface(requestedRegion);
 
         Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(new Kdu_dims());
@@ -143,18 +143,18 @@ class J2KRender implements Runnable {
         } else {
             imdata = new ARGBInt32ImageData(false, aWidth, aHeight, IntBuffer.wrap(intBuffer));
         }
-        setImageData(imdata, currParams);
+        setImageData(imdata);
     }
 
-    private void setImageData(ImageData newImageData, JP2ImageParameter newParams) {
-        MetaData metaData = newParams.jp2Image.metaDataList[newParams.compositionLayer];
+    private void setImageData(ImageData newImageData) {
+        MetaData metaData = params.jp2Image.metaDataList[params.compositionLayer];
 
         newImageData.setMetaData(metaData);
-        newImageData.setViewpoint(newParams.viewpoint);
-        newImageData.setROI(new Rectangle(newParams.subImage.x, newParams.subImage.y, newParams.subImage.width, newParams.subImage.height));
+        newImageData.setViewpoint(params.viewpoint);
+        newImageData.setROI(new Rectangle(params.subImage.x, params.subImage.y, params.subImage.width, params.subImage.height));
 
         if (metaData instanceof HelioviewerMetaData) {
-            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(newParams.subImage, newParams.resolution.getZoomPercent()));
+            newImageData.setRegion(((HelioviewerMetaData) metaData).roiToRegion(params.subImage, params.resolution.scaleX, params.resolution.scaleY));
         }
 
         EventQueue.invokeLater(new Runnable() {
