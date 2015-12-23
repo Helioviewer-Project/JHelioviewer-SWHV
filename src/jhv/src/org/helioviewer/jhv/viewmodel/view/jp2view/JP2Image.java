@@ -267,7 +267,7 @@ public class JP2Image {
         int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * viewportImageWidth);
         int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * viewportImageHeight);
 
-        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.getResolutionBounds());
+        SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, viewportImageWidth, viewportImageHeight);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame);
 

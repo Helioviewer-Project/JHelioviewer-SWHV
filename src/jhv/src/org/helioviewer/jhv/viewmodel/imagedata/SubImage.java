@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.viewmodel.imagedata;
 
-import java.awt.Rectangle;
-
 public class SubImage {
 
     public final int x;
@@ -9,15 +7,15 @@ public class SubImage {
     public final int width;
     public final int height;
 
-    // minimum 1 pixel, fit into rectangle
-    public SubImage(int x, int y, int w, int h, Rectangle r) {
-        w = Math.min(Math.max(w, 1), r.width);
-        h = Math.min(Math.max(h, 1), r.height);
-        x = Math.min(Math.max(x, 0), r.width - 1);
-        y = Math.min(Math.max(y, 0), r.height - 1);
+    // minimum 1 pixel, clip to full image size
+    public SubImage(int x, int y, int w, int h, int fwidth, int fheight) {
+        x = Math.min(Math.max(x, 0), fwidth - 1);
+        y = Math.min(Math.max(y, 0), fheight - 1);
+        w = Math.min(Math.max(w, 1), fwidth);
+        h = Math.min(Math.max(h, 1), fheight);
 
-        w = Math.min(w, r.width - x);
-        h = Math.min(h, r.height - y);
+        w = Math.min(w, fwidth - x);
+        h = Math.min(h, fheight - y);
 
         this.x = x;
         this.y = y;
