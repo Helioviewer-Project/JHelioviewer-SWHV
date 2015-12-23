@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.viewmodel.view.jp2view.image;
+package org.helioviewer.jhv.viewmodel.imagedata;
 
 import java.awt.Rectangle;
 

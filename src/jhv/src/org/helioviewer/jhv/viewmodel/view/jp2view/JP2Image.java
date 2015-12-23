@@ -21,6 +21,7 @@ import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.ObserverMetaData;
@@ -31,7 +32,6 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.cache.JP2ImageCacheStatusRemot
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPResponse;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPSocket;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.JHV_KduException;

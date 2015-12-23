@@ -6,10 +6,10 @@ import java.net.URI;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 
 public class JP2ImageCallisto extends JP2Image {
 

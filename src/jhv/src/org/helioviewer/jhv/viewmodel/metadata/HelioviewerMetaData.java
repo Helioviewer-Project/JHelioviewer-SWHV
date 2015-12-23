@@ -9,7 +9,7 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 
 public class HelioviewerMetaData extends AbstractMetaData implements ObserverMetaData {
 

@@ -13,10 +13,10 @@ import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
 
+import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.image.SubImage;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPConstants;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPDatabinClass;
 import org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip.JPIPQuery;
