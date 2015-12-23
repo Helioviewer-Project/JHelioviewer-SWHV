@@ -81,18 +81,14 @@ public class GLImage {
         Region r = imageData.getRegion();
         shader.changeRect(r.llx, r.lly, 1. / r.width, 1. / r.height);
 
-        boolean diffMode = false;
         Region diffRegion = null;
-
         if (!baseDifferenceMode && prevImageData != null) {
-            diffMode = true;
             diffRegion = prevImageData.getRegion();
         } else if (baseDifferenceMode && baseImageData != null) {
-            diffMode = true;
             diffRegion = baseImageData.getRegion();
         }
 
-        if (diffMode) {
+        if (diffRegion != null) {
             shader.setDifferenceRect(diffRegion.llx, diffRegion.lly, 1. / diffRegion.width, 1. / diffRegion.height);
         }
 

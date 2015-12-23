@@ -14,6 +14,7 @@ import org.helioviewer.jhv.renderable.components.RenderableGrid;
 import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 
 public abstract class GridScale {
+
     public static GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
     public static GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
     public static GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
@@ -50,6 +51,7 @@ public abstract class GridScale {
     abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
 
     public static abstract class GridScaleAbstract extends GridScale {
+
         protected double xStart;
         protected double xStop;
         protected double yStart;
@@ -207,4 +209,5 @@ public abstract class GridScale {
             return new Vec2(phi, theta);
         }
     }
+
 }
