@@ -16,7 +16,7 @@ public abstract class AbstractValueSpace implements ValueSpace {
     @Override
     public void resetScaledSelectedRange() {
         Range availableRange = getScaledAvailableRange();
-        setScaledSelectedRange(new Range(availableRange));
+        setSelectedRange(new Range(availableRange));
     }
 
     public void addValueSpaceListener(ValueSpaceListener valueSpaceListener) {

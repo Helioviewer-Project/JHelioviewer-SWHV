@@ -8,8 +8,16 @@ public interface ValueSpace {
 
     public abstract Range getScaledAvailableRange();
 
-    public abstract void setScaledSelectedRange(Range newScaledSelectedRange);
-
     public abstract void resetScaledSelectedRange();
+
+    public abstract Range getSelectedRange();
+
+    public abstract Range getAvailableRange();
+
+    public abstract void setSelectedRange(Range range);
+
+    public abstract double scale(double min);
+
+    public abstract double invScale(double endValue);
 
 }

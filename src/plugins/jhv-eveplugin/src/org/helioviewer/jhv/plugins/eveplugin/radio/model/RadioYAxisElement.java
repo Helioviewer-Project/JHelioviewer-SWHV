@@ -44,7 +44,7 @@ public class RadioYAxisElement extends YAxisElement {
     }
 
     @Override
-    public void setScaledSelectedRange(Range newScaledSelectedRange) {
+    public void setSelectedRange(Range newScaledSelectedRange) {
         double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
         double diffAvail = availableRange.max - availableRange.min;
 

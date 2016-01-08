@@ -74,6 +74,7 @@ public class YAxisElement extends AbstractValueSpace {
      *
      * @return The selected range
      */
+    @Override
     public Range getSelectedRange() {
         return selectedRange;
     }
@@ -84,27 +85,10 @@ public class YAxisElement extends AbstractValueSpace {
      * @param selectedRange
      *            The selected range
      */
+    @Override
     public void setSelectedRange(Range selectedRange) {
         this.selectedRange = selectedRange;
-        adaptScaledSelectedRange();
-    }
-
-    private void adaptScaledSelectedRange() {
-        double availableMax = scale(availableRange.max);
-        double availableMin = scale(availableRange.min);
-        double selectedMax = scale(selectedRange.max);
-        double selectedMin = scale(selectedRange.min);
-        double diffAvailable = availableMax - availableMin;
-        double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
-
-        double ratio = diffScaledAvailable / diffAvailable;
-
-        double diffSelStartAvaiStart = selectedMin - availableMin;
-        double diffSelEndAvailStart = selectedMax - availableMin;
-
-        double scaledSelectedStart = scaledAvailableRange.min + ratio * diffSelStartAvaiStart;
-        double scaledSelectedEnd = scaledAvailableRange.min + ratio * diffSelEndAvailStart;
-        scaledSelectedRange = new Range(scaledSelectedStart, scaledSelectedEnd);
+        fireSelectedRangeChanged();
     }
 
     /**
@@ -112,6 +96,7 @@ public class YAxisElement extends AbstractValueSpace {
      *
      * @return The available range
      */
+    @Override
     public Range getAvailableRange() {
         return availableRange;
     }
@@ -147,7 +132,6 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     private void adaptScaledAvailableRange() {
-
         double selectedMax = scale(selectedRange.max);
         double selectedMin = scale(selectedRange.min);
         double availableMax = scale(availableRange.max);
@@ -254,26 +238,6 @@ public class YAxisElement extends AbstractValueSpace {
         return scaledAvailableRange;
     }
 
-    @Override
-    public void setScaledSelectedRange(Range newScaledSelectedRange) {
-        double minAvailable = scale(availableRange.min);
-        double maxAvailable = scale(availableRange.max);
-
-        double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
-        double diffAvail = maxAvailable - minAvailable;
-
-        double ratio = diffAvail / diffScaledAvailable;
-
-        double diffScSelStartScAvaiStart = newScaledSelectedRange.min - scaledAvailableRange.min;
-        double diffscSelEndScAvailStart = newScaledSelectedRange.max - scaledAvailableRange.min;
-
-        double selectedStart = minAvailable + diffScSelStartScAvaiStart * ratio;
-        double selectedEnd = minAvailable + diffscSelEndScAvailStart * ratio;
-        selectedRange = new Range(scale.invScale(selectedStart), scale.invScale(selectedEnd));
-        scaledSelectedRange = new Range(newScaledSelectedRange);
-        fireSelectedRangeChanged();
-    }
-
     protected void fireSelectedRangeChanged() {
         for (ValueSpaceListener vsl : listeners) {
             vsl.valueSpaceChanged(availableRange, selectedRange);
@@ -287,6 +251,7 @@ public class YAxisElement extends AbstractValueSpace {
         scaledSelectedRange = new Range(0, 1);
     }
 
+    @Override
     public double scale(double maxValue) {
         return scale.scale(maxValue);
     }
