@@ -16,8 +16,6 @@ public interface RadioDataManagerListener {
 
     public abstract void downloadRequestDataVisibilityChanged(DownloadRequestData drd);
 
-    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval visibleFreqInterval, FrequencyInterval imageFreqInterval, Rectangle area, long imageID);
-
     public abstract void clearAllSavedImagesForID(long imageID);
 
     public abstract void intervalTooBig();
