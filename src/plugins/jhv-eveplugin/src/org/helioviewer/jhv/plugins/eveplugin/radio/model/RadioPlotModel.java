@@ -96,7 +96,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
      */
     @Override
     public void downloadRequestAnswered(Interval<Date> timeInterval) {
-        zoomManager.addZoomDataConfig(timeInterval, this);
+        zoomManager.addZoomDataConfig(timeInterval);
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }
 
@@ -127,8 +127,8 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void downloadRequestDataRemoved(DownloadRequestData drd) {
         PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
-        noDataConfigList = null;
-        plotConfigList = null;
+        noDataConfigList = new ArrayList<NoDataConfig>();
+        plotConfigList = new HashMap<Long, PlotConfig>();
         downloadRequestData = null;
         zoomManager.removeZoomManagerDataConfig();
         drawController.removeDrawableElement(radioImagePane);
@@ -157,13 +157,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area);
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
-        if (plotConfigList != null) {
-            plotConfigList.put(radioImageID, pc);
-        } else {
-            Map<Long, PlotConfig> tempList = new HashMap<Long, PlotConfig>();
-            tempList.put(radioImageID, pc);
-            plotConfigList = tempList;
-        }
+        plotConfigList.put(radioImageID, pc);
         fireDrawNewBufferedImage();
     }
 
@@ -174,27 +168,18 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         radioImagePane.setIntervalTooBig(false);
         DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area);
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
-        if (plotConfigList != null) {
-            plotConfigList.put(radioImageID, pc);
-        } else {
-            Map<Long, PlotConfig> tempList = new HashMap<Long, PlotConfig>();
-            tempList.put(radioImageID, pc);
-            plotConfigList = tempList;
-        }
+        plotConfigList.put(radioImageID, pc);
         fireDrawNewBufferedImage();
     }
 
     @Override
     public void clearAllSavedImagesForID(long imageID) {
-        if (plotConfigList != null) {
-            plotConfigList.remove(imageID);
-        }
+        plotConfigList.remove(imageID);
     }
 
     @Override
     public void intervalTooBig() {
-        Map<Long, PlotConfig> plotConfigMap = new HashMap<Long, PlotConfig>();
-        plotConfigList = plotConfigMap;
+        plotConfigList = new HashMap<Long, PlotConfig>();
         radioImagePane.setIntervalTooBig(true);
         drawController.updateDrawableElement(radioImagePane);
     }
@@ -202,9 +187,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     @Override
     public void noDataInterval(List<Interval<Date>> noDataList) {
         radioImagePane.setIntervalTooBig(false);
-        if (noDataConfigList == null) {
-            noDataConfigList = new ArrayList<NoDataConfig>();
-        }
         for (Interval<Date> noData : noDataList) {
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
             noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
@@ -275,9 +257,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void updateNoDataConfig() {
-        if (noDataConfigList == null) {
-            noDataConfigList = new ArrayList<NoDataConfig>();
-        }
+        noDataConfigList = new ArrayList<NoDataConfig>();
         for (NoDataConfig ndc : noDataConfigList) {
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().getStart(), ndc.getDateInterval().getEnd());
             ndc.setDrawableAreaMap(dam);
