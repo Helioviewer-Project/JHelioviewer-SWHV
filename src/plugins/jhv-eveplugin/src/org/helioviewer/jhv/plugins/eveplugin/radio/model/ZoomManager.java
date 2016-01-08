@@ -166,7 +166,9 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement) {
-        return displaySize.y + (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
+        Log.debug("displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height)) : ");
+        Log.debug("" + displaySize.height + " - (int) Math.floor((" + frequencyToFind + " - " + yAxisElement.getSelectedRange().min + ") / (1.0 * (" + yAxisElement.getSelectedRange().max + " - " + yAxisElement.getSelectedRange().min + ") / " + displaySize.height + ") = " + (displaySize.y + (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height))));
+        return displaySize.height - (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.height));
     }
 
     private int defineXInDestinationArea(Date dateToFind) {
