@@ -210,6 +210,35 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     @Override
+    public void shiftDownPixels(double distanceY, int height) {
+        double scaledMin = scale(selectedRange.min);
+        double scaledMax = scale(selectedRange.max);
+
+        double ratioValue = (scaledMax - scaledMin) / height;
+        double shift = distanceY * ratioValue;
+        double startValue = scaledMin + shift;
+        double endValue = scaledMax + shift;
+        selectedRange.min = invScale(startValue);
+        selectedRange.max = invScale(endValue);
+        fireSelectedRangeChanged();
+    }
+
+    @Override
+    public void zoomSelectedRange(double scrollValue, double height) {
+        double scaledMin = scale(selectedRange.min);
+        double scaledMax = scale(selectedRange.max);
+        double scaledDiff = scaledMax - scaledMin;
+
+        scaledMax = scaledMax + scrollValue * scaledDiff * 0.01;
+        scaledMin = scaledMin - scrollValue * scaledDiff * 0.01;
+        scaledMin = Math.max(scale(availableRange.min), scaledMin);
+        scaledMax = Math.min(scale(availableRange.max), scaledMax);
+        selectedRange.min = invScale(scaledMin);
+        selectedRange.max = invScale(scaledMax);
+        fireSelectedRangeChanged();
+    }
+
+    @Override
     public double scale(double maxValue) {
         return scale.scale(maxValue);
     }
