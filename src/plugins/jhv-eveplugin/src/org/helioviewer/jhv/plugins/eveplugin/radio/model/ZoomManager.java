@@ -86,21 +86,25 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     }
 
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int startFrequency, int endFrequency, Rectangle area, long downloadID) {
+        Log.debug("DAM for        [" + startDate.toString() + "," + startDate.toString() + "][" + startFrequency + "," + endFrequency + "]");
         ZoomDataConfig zdc = zoomDataConfigMap.get(downloadID);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
         int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, startFrequency, endFrequency, area, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
         int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, startFrequency, endFrequency, area, true);
-        int destX0 = defineXInDestinationArea(startDate, zdc);
-        int destY0 = defineYInDestinationArea(startFrequency, yAxisElement, zdc);
-        int destX1 = defineXInDestinationArea(endDate, zdc);
-        int destY1 = defineYInDestinationArea(endFrequency, yAxisElement, zdc);
         if (sourceY0 == sourceY1) {
             sourceY1 = sourceY0 + 1;
         }
         if (sourceX0 == sourceX1) {
             sourceX1 = sourceX0 + 1;
         }
+        Log.debug("in source:     [" + sourceX0 + ", " + sourceX1 + "][ " + sourceY0 + ", " + sourceY1 + "]");
+        int destX0 = defineXInDestinationArea(startDate, zdc);
+        int destY0 = defineYInDestinationArea(startFrequency, yAxisElement, zdc);
+        int destX1 = defineXInDestinationArea(endDate, zdc);
+        int destY1 = defineYInDestinationArea(endFrequency, yAxisElement, zdc);
+
+        Log.debug("in destination [" + destX0 + ", " + destX1 + "][" + destY0 + ", " + destY1 + "]");
         // Log.trace("Selected interval in getDrawableAreaMap : [" +
         // yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax()
         // + "]");
@@ -178,9 +182,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     }
 
     private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, boolean ceil) {
+        // Log.debug("Find frequency : " + frequencyToFind);
         if (!ceil) {
+            Log.debug("(int) Math.floor((" + frequencyToFind + " - " + startFrequency + ") / (1.0 * (" + endFrequency + " - " + startFrequency + " ) / " + area.height + ")) = " + (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height)));
             return (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
         } else {
+            Log.debug("(int) Math.ceil((" + frequencyToFind + " - " + startFrequency + ") / (1.0 * ( " + endFrequency + " - " + startFrequency + ") / " + area.height + ")) = " + (int) Math.ceil((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height)));
             return (int) Math.ceil((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
         }
     }
