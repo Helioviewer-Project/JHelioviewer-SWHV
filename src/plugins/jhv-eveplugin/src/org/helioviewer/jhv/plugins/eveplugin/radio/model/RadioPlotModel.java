@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -181,21 +180,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     private void fireDrawNewBufferedImage() {// BufferedImage
         radioImagePane.setYAxisElement(yAxisElement);
         drawController.updateDrawableElement(radioImagePane);
-    }
-
-    private BufferedImage createBufferedImage(int width, int height, int[] data) {
-        int[] useData;
-        if (width * height == data.length) {
-            useData = data;
-        } else {
-            Log.error("Data array was too small; white image created");
-            useData = new int[width * height];
-        }
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        DataBufferInt dataBuffer = new DataBufferInt(useData, width * height);
-        Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xFF0000, 0xFF00, 0xFF, 0xFF000000 }, new Point(0, 0));
-        newImage.setData(raster);
-        return newImage;
     }
 
     private BufferedImage createBufferedImage(int width, int height, byte[] data) {
