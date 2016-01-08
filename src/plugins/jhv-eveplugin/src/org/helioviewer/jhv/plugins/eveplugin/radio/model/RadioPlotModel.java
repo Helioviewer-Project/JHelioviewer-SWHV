@@ -257,7 +257,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void updateNoDataConfig() {
-        noDataConfigList = new ArrayList<NoDataConfig>();
         for (NoDataConfig ndc : noDataConfigList) {
             DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().getStart(), ndc.getDateInterval().getEnd());
             ndc.setDrawableAreaMap(dam);
