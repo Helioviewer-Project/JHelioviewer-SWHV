@@ -74,9 +74,15 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
         Log.debug("DAM for        [" + startDate.toString() + "," + startDate.toString() + "][" + visualStartFrequency + "," + visualEndFrequency + "] area: " + area);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
-        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, imageStartFrequency, imageEndFrequency, area, false);
+        int sourceY0 = 0;
+        // int sourceY0 = defineYInSourceArea((int)
+        // yAxisElement.getSelectedRange().max, imageStartFrequency,
+        // imageEndFrequency, area, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, imageStartFrequency, imageEndFrequency, area, true);
+        // int sourceY1 = defineYInSourceArea((int)
+        // yAxisElement.getSelectedRange().min, imageStartFrequency,
+        // imageEndFrequency, area, true);
+        int sourceY1 = area.height;
         Log.debug("in source:     [" + sourceX0 + ", " + sourceX1 + "][ " + sourceY0 + ", " + sourceY1 + "]");
         if (sourceY0 == sourceY1) {
             sourceY1 = sourceY0 + 1;
@@ -87,13 +93,11 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         Log.debug("in source:     [" + sourceX0 + ", " + sourceX1 + "][ " + sourceY0 + ", " + sourceY1 + "]");
 
         int destX0 = defineXInDestinationArea(startDate);
-        // int destY0 = defineYInDestinationArea(visualStartFrequency,
-        // yAxisElement);
-        int destY0 = displaySize.y;
+        int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
+        // int destY0 = displaySize.y;
         int destX1 = defineXInDestinationArea(endDate);
-        // int destY1 = defineYInDestinationArea(visualEndFrequency,
-        // yAxisElement);
-        int destY1 = displaySize.y + displaySize.height;
+        int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
+        // int destY1 = displaySize.y + displaySize.height;
         Log.debug("in destination [" + destX0 + ", " + destX1 + "][" + destY0 + ", " + destY1 + "]");
         // Log.trace("Selected interval in getDrawableAreaMap : [" +
         // yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax()

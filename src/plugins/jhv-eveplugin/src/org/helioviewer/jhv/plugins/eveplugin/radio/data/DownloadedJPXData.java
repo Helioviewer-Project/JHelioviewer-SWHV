@@ -3,11 +3,13 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 import java.awt.Rectangle;
 import java.util.Date;
 
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
+import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
 
 public class DownloadedJPXData implements ImageDataHandler {
 
@@ -63,9 +65,17 @@ public class DownloadedJPXData implements ImageDataHandler {
                 return;
             }
             byte[] data = (byte[]) imageData.getBuffer().array();
-            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+            Region r = imageData.getRegion();
+            Log.debug("region :" + r);
+            // TODO pass the size of the image (
+            // view.getJP2Image().getResolutionSet(0).getResolutionLevel(0))
+            // Pass the location. based on this information the location in the
+            // destination can be defined.
+
+            ResolutionLevel rl = view.getJP2Image().getResolutionSet(0).getResolutionLevel(0);
+
+            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.getResolutionBounds());
             radioDataManager.finishedDownloadingID(imageID);
         }
     }
-
 }
