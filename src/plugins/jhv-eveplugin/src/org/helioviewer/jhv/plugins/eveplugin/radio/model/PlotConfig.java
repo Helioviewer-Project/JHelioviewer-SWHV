@@ -8,15 +8,13 @@ public class PlotConfig {
     private BufferedImage image;
     private final DrawableAreaMap map;
     private boolean visible;
-    private long downloadID;
     private long imageId;
 
-    public PlotConfig(BufferedImage image, DrawableAreaMap map, boolean visible, long downloadID, long imageID) {
+    public PlotConfig(BufferedImage image, DrawableAreaMap map, boolean visible, long imageID) {
         super();
         this.image = image;
         this.map = map;
         this.visible = visible;
-        this.downloadID = downloadID;
         imageId = imageID;
     }
 
@@ -38,14 +36,6 @@ public class PlotConfig {
 
     public int getDrawWidth() {
         return map.getDestinationX1() - map.getDestinationX0();
-    }
-
-    public long getDownloadID() {
-        return downloadID;
-    }
-
-    public void setDownloadID(long downloadID) {
-        this.downloadID = downloadID;
     }
 
     public long getImageId() {

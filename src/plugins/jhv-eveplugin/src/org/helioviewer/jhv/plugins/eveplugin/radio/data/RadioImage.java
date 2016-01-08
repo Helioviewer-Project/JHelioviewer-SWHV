@@ -17,15 +17,13 @@ public class RadioImage {
     private int frameInJPX;
     private ResolutionSet resolutioSet;
     private final List<ResolutionSetting> resolutionSettings;
-    private long downloadID;
     private ResolutionSetting lastUsedResolutionSetting;
     private final long radioImageID;
     private boolean isDownloading;
     private Rectangle lastDataSize;
 
-    public RadioImage(long downloadID, long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
+    public RadioImage(long radioImageID, Interval<Date> timeInterval, FrequencyInterval freqInterval, int frameInJPX, ResolutionSet rs, List<ResolutionSetting> resolutionSettings, boolean isDownloading) {
         super();
-        this.downloadID = downloadID;
         imageTimeInterval = timeInterval;
         imageFreqInterval = freqInterval;
         visibleImageFreqInterval = freqInterval;
@@ -80,14 +78,6 @@ public class RadioImage {
 
     public long getRadioImageID() {
         return radioImageID;
-    }
-
-    public long getDownloadID() {
-        return downloadID;
-    }
-
-    public void setDownloadID(long iD) {
-        downloadID = iD;
     }
 
     public ResolutionSetting getLastUsedResolutionSetting() {

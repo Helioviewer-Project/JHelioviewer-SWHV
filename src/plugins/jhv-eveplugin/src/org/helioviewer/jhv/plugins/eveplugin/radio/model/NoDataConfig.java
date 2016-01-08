@@ -20,9 +20,6 @@ public class NoDataConfig {
     /** The drawable area map for this no data configuration. */
     private DrawableAreaMap drawableAreaMap;
 
-    /** The id of the download */
-    private long downloadId;
-
     /** Is the no data configuration visible */
     private boolean visible;
 
@@ -39,10 +36,9 @@ public class NoDataConfig {
      * @param visible
      *            Is it visible
      */
-    public NoDataConfig(Interval<Date> dateInterval, DrawableAreaMap drawableAreaMap, long downloadId, boolean visible) {
+    public NoDataConfig(Interval<Date> dateInterval, DrawableAreaMap drawableAreaMap, boolean visible) {
         this.dateInterval = dateInterval;
         this.drawableAreaMap = drawableAreaMap;
-        this.downloadId = downloadId;
         this.visible = visible;
     }
 
@@ -82,25 +78,6 @@ public class NoDataConfig {
      */
     public void setDrawableAreaMap(DrawableAreaMap drawableAreaMap) {
         this.drawableAreaMap = drawableAreaMap;
-    }
-
-    /**
-     * The download id.
-     *
-     * @return The download id
-     */
-    public long getDownloadId() {
-        return downloadId;
-    }
-
-    /**
-     * Sets the download id.
-     *
-     * @param downloadId
-     *            The download id
-     */
-    public void setDownloadId(long downloadId) {
-        this.downloadId = downloadId;
     }
 
     /**

@@ -8,11 +8,11 @@ import org.helioviewer.jhv.base.interval.Interval;
 
 public interface RadioDataManagerListener {
 
-    public abstract void downloadRequestAnswered(Interval<Date> timeInterval, long ID);
+    public abstract void downloadRequestAnswered(Interval<Date> timeInterval);
 
-    public abstract void newDataAvailable(DownloadRequestData downloadRequestData, long ID);
+    public abstract void newDataAvailable(DownloadRequestData downloadRequestData);
 
-    public abstract void downloadFinished(long ID);
+    public abstract void downloadFinished();
 
     public abstract void newGlobalFrequencyInterval(FrequencyInterval interval);
 
@@ -20,17 +20,17 @@ public interface RadioDataManagerListener {
 
     public abstract void clearAllSavedImages();
 
-    public abstract void downloadRequestDataRemoved(DownloadRequestData drd, long ID);
+    public abstract void downloadRequestDataRemoved(DownloadRequestData drd);
 
-    public abstract void downloadRequestDataVisibilityChanged(DownloadRequestData drd, long ID);
+    public abstract void downloadRequestDataVisibilityChanged(DownloadRequestData drd);
 
-    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long downloadID, long imageID);
+    public abstract void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long imageID);
 
-    public abstract void clearAllSavedImagesForID(long downloadID, long imageID);
+    public abstract void clearAllSavedImagesForID(long imageID);
 
-    public abstract void intervalTooBig(long iD);
+    public abstract void intervalTooBig();
 
-    public abstract void noDataInterval(List<Interval<Date>> noDataList, long downloadID);
+    public abstract void noDataInterval(List<Interval<Date>> noDataList);
 
     /**
      * The maximum frequency interval for the plot with the given plot
@@ -44,6 +44,6 @@ public interface RadioDataManagerListener {
      */
     public abstract void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval);
 
-    public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, FrequencyInterval imageFrequencyInterval, Rectangle dataSize, long downloadID, long imageID);
+    public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long imageID);
 
 }
