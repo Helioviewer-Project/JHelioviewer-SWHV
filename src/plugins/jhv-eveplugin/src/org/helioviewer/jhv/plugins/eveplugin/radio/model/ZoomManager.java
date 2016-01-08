@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.GraphDimensionListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
@@ -159,7 +160,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
         Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval.containsPointInclusive(startDate) && currentInterval.containsPointInclusive(endDate) && (startFreq >= yAxisElement.getAvailableRange().min && startFreq <= yAxisElement.getAvailableRange().max) && (endFreq >= yAxisElement.getAvailableRange().min && endFreq <= yAxisElement.getAvailableRange().max)) {
             int height = displaySize.height;
-            double ratio = displaySize.getWidth() / (double) (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
+            double ratio = displaySize.getWidth() / (currentInterval.getEnd().getTime() - currentInterval.getStart().getTime());
             int width = (int) Math.round((endDate.getTime() - startDate.getTime()) * ratio);
             return new Rectangle(width, height);
         } else {
@@ -168,6 +169,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener {
     }
 
     private int defineYInDestinationArea(int frequencyToFind, YAxisElement yAxisElement, ZoomDataConfig zdc) {
+        Log.debug(zdc.getDisplaySize().y + " + (int) Math.floor((" + frequencyToFind + " - " + yAxisElement.getSelectedRange().min + ") / (1.0 * (" + yAxisElement.getSelectedRange().max + " - " + yAxisElement.getSelectedRange().min + ") / " + zdc.getDisplaySize().height + ") = " + (zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / zdc.getDisplaySize().height))));
         return zdc.getDisplaySize().y + (int) Math.floor((frequencyToFind - yAxisElement.getSelectedRange().min) / (1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / zdc.getDisplaySize().height));
     }
 
