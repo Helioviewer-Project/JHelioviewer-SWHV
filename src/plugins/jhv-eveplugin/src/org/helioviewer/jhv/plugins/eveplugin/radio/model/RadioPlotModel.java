@@ -101,15 +101,27 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void newDataAvailable(DownloadRequestData data) {
-        downloadRequestData = data;
+        if (downloadRequestData == null) {
+            Log.debug("init downloadrequestdata");
+            downloadRequestData = data;
+        } else {
+            Log.debug("merge downloadrequestdata");
+            downloadRequestData.mergeDownloadRequestData(data);
+        }
+        Log.debug("PlotConfigList will be deleted in new data available");
+        Log.debug("Size before: " + plotConfigList.size());
         plotConfigList = new HashMap<Long, PlotConfig>();
+        Log.debug("size after: " + plotConfigList.size());
     }
 
     @Override
     public void downloadRequestDataRemoved(DownloadRequestData drd) {
         PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
         noDataConfigList = new ArrayList<NoDataConfig>();
+        Log.debug("PlotConfigList will be deleted");
+        Log.debug("Size before: " + plotConfigList.size());
         plotConfigList = new HashMap<Long, PlotConfig>();
+        Log.debug("size after: " + plotConfigList.size());
         downloadRequestData = null;
         zoomManager.removeZoomManagerDataConfig();
         drawController.removeDrawableElement(radioImagePane);
@@ -155,12 +167,18 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void clearAllSavedImagesForID(long imageID) {
+        Log.debug("Remove from plot config");
+        Log.debug("size before: " + plotConfigList.size());
         plotConfigList.remove(imageID);
+        Log.debug("size after: " + plotConfigList.size());
     }
 
     @Override
     public void intervalTooBig() {
+        Log.debug("Remove from plot config in interval too big");
+        Log.debug("size before: " + plotConfigList.size());
         plotConfigList = new HashMap<Long, PlotConfig>();
+        Log.debug("size after: " + plotConfigList.size());
         radioImagePane.setIntervalTooBig(true);
         drawController.updateDrawableElement(radioImagePane);
     }
