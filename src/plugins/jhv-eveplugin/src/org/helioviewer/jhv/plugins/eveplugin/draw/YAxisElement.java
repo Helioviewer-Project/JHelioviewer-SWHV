@@ -23,6 +23,7 @@ public class YAxisElement extends AbstractValueSpace {
 
     private YAxisLocation location;
     private YAxisElementScale scale;
+    private static double ZOOMSTEP_PERCENTAGE = 0.02;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
@@ -224,17 +225,18 @@ public class YAxisElement extends AbstractValueSpace {
     }
 
     @Override
-    public void zoomSelectedRange(double scrollValue, double height) {
+    public void zoomSelectedRange(double scrollValue, double relativeY, double height) {
         double scaledMin = scale(selectedRange.min);
         double scaledMax = scale(selectedRange.max);
-        double scaledDiff = scaledMax - scaledMin;
+        double scaled = scaledMin + (scaledMax - scaledMin) * (relativeY / height);
+        double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
+        double newScaledMin = ((1 + delta) * scaledMin - delta * scaled);
+        double newScaledMax = ((1 + delta) * scaledMax - delta * scaled);
 
-        scaledMax = scaledMax + scrollValue * scaledDiff * 0.01;
-        scaledMin = scaledMin - scrollValue * scaledDiff * 0.01;
-        scaledMin = Math.max(scale(availableRange.min), scaledMin);
-        scaledMax = Math.min(scale(availableRange.max), scaledMax);
-        selectedRange.min = invScale(scaledMin);
-        selectedRange.max = invScale(scaledMax);
+        newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
+        newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
+        selectedRange.min = invScale(newScaledMin);
+        selectedRange.max = invScale(newScaledMax);
         fireSelectedRangeChanged();
     }
 
