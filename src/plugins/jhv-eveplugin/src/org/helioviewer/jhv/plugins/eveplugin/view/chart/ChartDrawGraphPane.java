@@ -34,7 +34,6 @@ import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -495,12 +494,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseHelper(double distanceY) {
         Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
         for (ValueSpace vs : valueSpaces) {
-            Range selectedRange = vs.getSelectedRange();
-            double ratioValue = (vs.scale(selectedRange.max) - vs.scale(selectedRange.min)) / graphArea.height;
-            double startValue = vs.scale(selectedRange.min) + distanceY * ratioValue;
-            double endValue = startValue + graphArea.height * ratioValue;
-
-            vs.setSelectedRange(new Range(vs.invScale(startValue), vs.invScale(endValue)));
+            vs.shiftDownPixels(distanceY, graphArea.height);
         }
     }
 
@@ -617,7 +611,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseWheelMoved(MouseWheelEvent e) {
         int scrollValue = e.getWheelRotation();
         double zoomTimeFactor = 10;
-        double zoomValueFactor = 5;
         Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int scrollDistance = e.getScrollAmount();
@@ -645,27 +638,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 plotAreaSpace.setScaledSelectedTime(startTime, endTime, true);
             }
             if (inGraphArea || inYAxis) {
-                final double ratioYTop = (mouseY - graphArea.y) / (double) graphArea.height;
-                final double ratioYBottom = 1. - ratioYTop;
-
                 for (ValueSpace vs : valueSpaces) {
-                    Range selectedRange = vs.getSelectedRange();
-                    Range availableRange = vs.getAvailableRange();
-                    double startValue = vs.scale(selectedRange.min);
-                    double endValue = vs.scale(selectedRange.max);
-
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        double ratioValue = (endValue - startValue) / graphArea.height;
-
-                        endValue = endValue + scrollValue * zoomValueFactor * scrollDistance * ratioYTop * ratioValue;
-                        startValue = startValue - scrollValue * zoomValueFactor * scrollDistance * ratioYBottom * ratioValue;
-                        startValue = Math.max(vs.scale(availableRange.min), startValue);
-                        endValue = Math.min(vs.scale(availableRange.max), endValue);
-                    }
-
-                    if (startValue <= endValue /* && startTime <= endTime */&& startValue >= vs.scale(availableRange.min) && startValue <= vs.scale(availableRange.max) && endValue >= vs.scale(availableRange.min) && endValue <= vs.scale(availableRange.max) // &&
-                    ) {
-                        vs.setSelectedRange(new Range(vs.invScale(startValue), vs.invScale(endValue)));
+                        vs.zoomSelectedRange(scrollValue, graphArea.height);
                     }
                 }
             }
