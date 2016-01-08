@@ -663,9 +663,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                         endValue = Math.min(vs.scale(availableRange.max), endValue);
                     }
 
-                    if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
-                            ) {
-                        vs.setScaledSelectedRange(new Range(startValue, endValue));
+                    if (startValue <= endValue /* && startTime <= endTime */&& startValue >= vs.scale(availableRange.min) && startValue <= vs.scale(availableRange.max) && endValue >= vs.scale(availableRange.min) && endValue <= vs.scale(availableRange.max) // &&
+                    ) {
+                        vs.setSelectedRange(new Range(vs.invScale(startValue), vs.invScale(endValue)));
                     }
                 }
             }

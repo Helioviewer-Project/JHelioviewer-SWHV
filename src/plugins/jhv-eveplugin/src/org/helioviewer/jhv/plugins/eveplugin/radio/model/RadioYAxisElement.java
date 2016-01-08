@@ -45,20 +45,20 @@ public class RadioYAxisElement extends YAxisElement {
 
     @Override
     public void setSelectedRange(Range newScaledSelectedRange) {
-        double diffScaledAvailable = scaledAvailableRange.max - scaledAvailableRange.min;
+        double diffScaledAvailable = availableRange.max - availableRange.min;
         double diffAvail = availableRange.max - availableRange.min;
 
         double ratio = diffAvail / diffScaledAvailable;
 
-        double diffScSelStartScAvaiStart = newScaledSelectedRange.min - scaledAvailableRange.min;
-        double diffscSelEndScAvailStart = newScaledSelectedRange.max - scaledAvailableRange.min;
+        double diffScSelStartScAvaiStart = newScaledSelectedRange.min - availableRange.min;
+        double diffscSelEndScAvailStart = newScaledSelectedRange.max - availableRange.min;
 
         double selectedEnd = availableRange.max - diffScSelStartScAvaiStart * ratio;
         double selectedStart = availableRange.max - diffscSelEndScAvailStart * ratio;
 
         selectedRange = new Range(selectedStart, selectedEnd);
 
-        scaledSelectedRange = new Range(newScaledSelectedRange);
+        selectedRange = new Range(newScaledSelectedRange);
         fireSelectedRangeChanged();
     }
 
