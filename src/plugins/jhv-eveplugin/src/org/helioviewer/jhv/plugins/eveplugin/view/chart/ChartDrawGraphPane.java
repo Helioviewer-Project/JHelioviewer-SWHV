@@ -640,7 +640,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             if (inGraphArea || inYAxis) {
                 for (ValueSpace vs : valueSpaces) {
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        vs.zoomSelectedRange(scrollValue, graphArea.height);
+                        vs.zoomSelectedRange(scrollValue, getHeight() - mouseY - graphArea.y, graphArea.height);
                     }
                 }
             }

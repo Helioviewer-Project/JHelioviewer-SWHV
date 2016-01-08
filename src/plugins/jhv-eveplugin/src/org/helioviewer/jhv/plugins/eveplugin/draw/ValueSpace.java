@@ -18,5 +18,5 @@ public interface ValueSpace {
 
     public abstract void shiftDownPixels(double distanceY, int height);
 
-    public abstract void zoomSelectedRange(double scrollValue, double height);
+    public abstract void zoomSelectedRange(double scrollValue, double distance, double height);
 }
