@@ -355,24 +355,6 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param dataSize
      *            The height and width of the data
      */
-    private void fireDataforIDReceived(int[] data, long imageID, Rectangle dataSize) {
-        if (downloadRequestData != null) {
-            RadioImage image = downloadRequestData.getRadioImages().get(imageID);
-            if (image != null) {
-                image.setLastDataSize(dataSize);
-                if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
-                    for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), image.getFreqInterval(), dataSize, imageID);
-                    }
-                }
-            } else {
-                // Log.debug("The image was null");
-            }
-        } else {
-            // Log.debug("Download request data was null");
-        }
-    }
-
     private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
         if (downloadRequestData != null) {
             RadioImage image = downloadRequestData.getRadioImages().get(imageID);
