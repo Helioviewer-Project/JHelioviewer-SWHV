@@ -134,12 +134,8 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param dataSize
      *            The height and width of the data
      */
-    public void dataForIDReceived(int[] data, long imageID, Rectangle dataSize) {
-        fireDataforIDReceived(data, imageID, dataSize);
-    }
-
-    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize) {
-        fireDataforIDReceived(byteData, imageID, dataSize);
+    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, Rectangle imageSize) {
+        fireDataforIDReceived(byteData, imageID, dataSize, providedRegion, imageSize);
     }
 
     /**
@@ -377,14 +373,15 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
-    private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize) {
+    private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, Rectangle imageSize) {
         if (downloadRequestData != null) {
             RadioImage image = downloadRequestData.getRadioImages().get(imageID);
             if (image != null) {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
+                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, imageSize);
                     for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), image.getFreqInterval(), dataSize, imageID);
+                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), dataFrequencyInterval, image.getFreqInterval(), dataSize, imageID);
                     }
                 }
             } else {
@@ -393,6 +390,13 @@ public class RadioDataManager implements RadioDownloaderListener {
         } else {
             // Log.debug("Download request data was null");
         }
+    }
+
+    private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, Rectangle imageSize) {
+        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / imageSize.getHeight();
+        double start = providedRegion.getY() * ratio;
+        double end = (providedRegion.getY() + providedRegion.getHeight()) * ratio;
+        return new FrequencyInterval((int) start, (int) end);
     }
 
     /**
