@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.helioviewer.jhv.base.Range;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
@@ -107,24 +106,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
-    public void downloadFinished() {
-    }
-
-    @Override
-    public void newGlobalFrequencyInterval(FrequencyInterval interval) {
-    }
-
-    @Override
-    public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, FrequencyInterval imageFreqInterval, Rectangle area, List<Long> IDList, long radioImageID) {
-        // Log.debug("Size of buffered images: " + bufferedImages.size());
-    }
-
-    @Override
-    public void clearAllSavedImages() {
-        plotConfigList.clear();
-    }
-
-    @Override
     public void downloadRequestDataRemoved(DownloadRequestData drd) {
         PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
         noDataConfigList = new ArrayList<NoDataConfig>();
@@ -192,11 +173,6 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
             noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
         }
         fireDrawNewBufferedImage();
-    }
-
-    @Override
-    public void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval) {
-        yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
     /*
