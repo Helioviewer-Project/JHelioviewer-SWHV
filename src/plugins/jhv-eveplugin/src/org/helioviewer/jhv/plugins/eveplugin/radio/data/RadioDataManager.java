@@ -20,8 +20,8 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
+import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ImageCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.ResolutionLevel;
@@ -397,7 +397,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                     for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, downloadID, imageID);
+                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), image.getFreqInterval(), dataSize, downloadID, imageID);
                     }
                 }
             } else {
@@ -539,10 +539,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                     if (jp2View != null) {
                         JP2ImageCallisto image = jp2View.getJP2Image();
 
-                        image.setViewport(zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(),
-                                                                                   visibleDateInterval.getEnd(),
-                                                                                   visibleFrequencyInterval.getStart(),
-                                                                                   visibleFrequencyInterval.getEnd()));
+                        image.setViewport(zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd()));
                         image.setRegion(ri.getROI());
                         jp2View.render(null, null, 1);
                     }
@@ -618,9 +615,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                         Interval<Date> dateInterval = new Interval<Date>(start, end);
                         for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
                             ResolutionLevel res = rs.getResolutionLevel(j);
-                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width,
-                                                                                 (freqEnd - freqStart) / (double) res.height, j,
-                                                                                 res.width, res.height, res.discardLayers);
+                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
                             resolutionSettings.add(tempResSet);
                         }
 

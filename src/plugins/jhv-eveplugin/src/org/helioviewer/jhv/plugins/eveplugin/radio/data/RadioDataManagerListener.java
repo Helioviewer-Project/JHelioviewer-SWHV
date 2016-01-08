@@ -35,7 +35,7 @@ public interface RadioDataManagerListener {
     /**
      * The maximum frequency interval for the plot with the given plot
      * identifier was changed.
-     * 
+     *
      * @param plotIdentifier
      *            The plot identifier for which the frequency interval was
      *            changed
@@ -44,6 +44,6 @@ public interface RadioDataManagerListener {
      */
     public abstract void frequencyIntervalUpdated(FrequencyInterval maxFrequencyInterval);
 
-    public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, Rectangle dataSize, long downloadID, long imageID);
+    public abstract void newDataForIDReceived(byte[] byteData, Interval<Date> visibleImageTimeInterval, FrequencyInterval visibleImageFreqInterval, FrequencyInterval imageFrequencyInterval, Rectangle dataSize, long downloadID, long imageID);
 
 }
