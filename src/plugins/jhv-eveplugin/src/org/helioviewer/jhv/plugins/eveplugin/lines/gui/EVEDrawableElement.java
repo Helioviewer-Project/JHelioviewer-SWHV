@@ -65,9 +65,7 @@ public class EVEDrawableElement implements DrawableElement {
         double maxValue = yAxisElement.getScaledMaxValue();
 
         double ratioX = !intervalAvailable ? 0 : (double) graphArea.width / (double) (interval.getEnd().getTime() - interval.getStart().getTime());
-        double ratioY = 0.0;
-
-        ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
+        double ratioY = maxValue < minValue ? 0 : graphArea.height / (maxValue - minValue);
 
         graphPolylines.clear();
 
