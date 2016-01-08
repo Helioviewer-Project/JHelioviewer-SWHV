@@ -495,21 +495,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseHelper(double distanceY) {
         Set<ValueSpace> valueSpaces = plotAreaSpace.getValueSpaces();
         for (ValueSpace vs : valueSpaces) {
-            Range selectedRange = vs.getScaledSelectedRange();
-            Range availableRange = vs.getScaledAvailableRange();
-            double ratioValue = (selectedRange.max - selectedRange.min) / graphArea.height;
-            double startValue = selectedRange.min + distanceY * ratioValue;
+            Range selectedRange = vs.getSelectedRange();
+            double ratioValue = (vs.scale(selectedRange.max) - vs.scale(selectedRange.min)) / graphArea.height;
+            double startValue = vs.scale(selectedRange.min) + distanceY * ratioValue;
             double endValue = startValue + graphArea.height * ratioValue;
-            if (startValue < availableRange.min) {
-                startValue = availableRange.min;
-                endValue = startValue + graphArea.height * ratioValue;
-            }
-            if (endValue > availableRange.max) {
-                endValue = availableRange.max;
-                startValue = endValue - graphArea.height * ratioValue;
-            }
 
-            vs.setScaledSelectedRange(new Range(startValue, endValue));
+            vs.setSelectedRange(new Range(vs.invScale(startValue), vs.invScale(endValue)));
         }
     }
 
@@ -658,18 +649,18 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 final double ratioYBottom = 1. - ratioYTop;
 
                 for (ValueSpace vs : valueSpaces) {
-                    Range selectedRange = vs.getScaledSelectedRange();
-                    Range availableRange = vs.getScaledAvailableRange();
-                    double startValue = selectedRange.min;
-                    double endValue = selectedRange.max;
+                    Range selectedRange = vs.getSelectedRange();
+                    Range availableRange = vs.getAvailableRange();
+                    double startValue = vs.scale(selectedRange.min);
+                    double endValue = vs.scale(selectedRange.max);
 
                     if (((e.isControlDown() || e.isAltDown()) && !e.isShiftDown()) || inYAxis) {
-                        double ratioValue = (selectedRange.max - selectedRange.min) / graphArea.height;
+                        double ratioValue = (endValue - startValue) / graphArea.height;
 
-                        endValue = selectedRange.max + scrollValue * zoomValueFactor * scrollDistance * ratioYTop * ratioValue;
-                        startValue = selectedRange.min - scrollValue * zoomValueFactor * scrollDistance * ratioYBottom * ratioValue;
-                        startValue = Math.max(availableRange.min, startValue);
-                        endValue = Math.min(availableRange.max, endValue);
+                        endValue = endValue + scrollValue * zoomValueFactor * scrollDistance * ratioYTop * ratioValue;
+                        startValue = startValue - scrollValue * zoomValueFactor * scrollDistance * ratioYBottom * ratioValue;
+                        startValue = Math.max(vs.scale(availableRange.min), startValue);
+                        endValue = Math.min(vs.scale(availableRange.max), endValue);
                     }
 
                     if (startValue <= endValue /* && startTime <= endTime */&& startValue >= availableRange.min && startValue <= availableRange.max && endValue >= availableRange.min && endValue <= availableRange.max // &&
