@@ -14,12 +14,11 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
     private Date minX;
     private Date maxX;
     private Rectangle displaySize;
-    private long ID;
     private final RadioYAxisElement yAxisElement;
 
     private final List<ZoomDataConfigListener> listeners;
 
-    public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize, long ID) {
+    public ZoomDataConfig(Date minX, Date maxX, Rectangle displaySize) {
         listeners = new ArrayList<ZoomDataConfigListener>();
 
         this.maxX = maxX;
@@ -30,22 +29,14 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         if (displaySize != null) {
             requestData();
         }
-        this.ID = ID;
+
     }
 
     public void addListener(ZoomDataConfigListener l) {
         listeners.add(l);
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
-        l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio, ID);
-    }
-
-    public long getID() {
-        return ID;
-    }
-
-    public void setID(long iD) {
-        ID = iD;
+        l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
     }
 
     public void removeListener(ZoomDataConfigListener l) {
@@ -91,7 +82,7 @@ public class ZoomDataConfig implements ZoomManagerListener, PlotAreaSpaceListene
         double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
         double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
         for (ZoomDataConfigListener l : listeners) {
-            l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio, ID);
+            l.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
         }
     }
 

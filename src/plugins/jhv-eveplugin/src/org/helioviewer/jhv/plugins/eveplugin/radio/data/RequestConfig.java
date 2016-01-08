@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
 import java.util.Date;
-import java.util.List;
 
 public class RequestConfig {
 
@@ -11,9 +10,8 @@ public class RequestConfig {
     private double yEnd;
     private double xRatio;
     private double yRatio;
-    private List<Long> IDs;
 
-    public RequestConfig(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio, List<Long> iDs) {
+    public RequestConfig(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
         super();
         this.xStart = xStart;
         this.xEnd = xEnd;
@@ -21,7 +19,6 @@ public class RequestConfig {
         this.yEnd = yEnd;
         this.xRatio = xRatio;
         this.yRatio = yRatio;
-        this.IDs = iDs;
     }
 
     public double getxRatio() {
@@ -70,14 +67,6 @@ public class RequestConfig {
 
     public void setyEnd(double yEnd) {
         this.yEnd = yEnd;
-    }
-
-    public List<Long> getIDs() {
-        return IDs;
-    }
-
-    public void setIDs(List<Long> iDs) {
-        IDs = iDs;
     }
 
 }

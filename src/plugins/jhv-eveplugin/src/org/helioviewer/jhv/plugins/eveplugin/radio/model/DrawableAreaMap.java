@@ -9,9 +9,8 @@ public class DrawableAreaMap {
     private int destinationY0;
     private int destinationX1;
     private int destinationY1;
-    private long ID;
 
-    public DrawableAreaMap(int sourceX0, int sourceY0, int sourceX1, int sourceY1, int destinationX0, int destinationY0, int destinationX1, int destinationY1, long ID) {
+    public DrawableAreaMap(int sourceX0, int sourceY0, int sourceX1, int sourceY1, int destinationX0, int destinationY0, int destinationX1, int destinationY1) {
         super();
         this.sourceX0 = sourceX0;
         this.sourceY0 = sourceY0;
@@ -21,15 +20,6 @@ public class DrawableAreaMap {
         this.destinationY0 = destinationY0;
         this.destinationX1 = destinationX1;
         this.destinationY1 = destinationY1;
-        this.ID = ID;
-    }
-
-    public long getID() {
-        return ID;
-    }
-
-    public void setID(long iD) {
-        ID = iD;
     }
 
     public int getSourceX0() {

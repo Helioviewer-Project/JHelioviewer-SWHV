@@ -11,21 +11,18 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
 public class DownloadRequestData implements LineDataSelectorElement {
 
     private Map<Long, RadioImage> radioImages;
-    private long downloadID;
     private boolean isDownloading;
     private boolean isVisible;
 
     private RadioDataManager radioDataManager;
 
-    public DownloadRequestData(long ID) {
+    public DownloadRequestData() {
         radioDataManager = RadioDataManager.getSingletonInstance();
-        downloadID = ID;
         radioImages = new HashMap<Long, RadioImage>();
         isVisible = true;
     }
 
-    public DownloadRequestData(long ID, Map<Long, RadioImage> radioImages) {
-        downloadID = ID;
+    public DownloadRequestData(Map<Long, RadioImage> radioImages) {
         this.radioImages = radioImages;
         isVisible = true;
     }
@@ -42,17 +39,9 @@ public class DownloadRequestData implements LineDataSelectorElement {
         this.radioImages = radioImages;
     }
 
-    public long getDownloadID() {
-        return downloadID;
-    }
-
-    public void setDownloadID(long iD) {
-        downloadID = iD;
-    }
-
     @Override
     public void removeLineData() {
-        radioDataManager.removeDownloadRequestData(this);
+        radioDataManager.removeDownloadRequestData();
     }
 
     @Override
@@ -96,9 +85,7 @@ public class DownloadRequestData implements LineDataSelectorElement {
      *            The download request data to be merged in this
      */
     public void mergeDownloadRequestData(DownloadRequestData downloadRequestData) {
-        if (downloadRequestData.getDownloadID() == downloadID) {
-            radioImages.putAll(downloadRequestData.getRadioImages());
-        }
+        radioImages.putAll(downloadRequestData.getRadioImages());
     }
 
     @Override

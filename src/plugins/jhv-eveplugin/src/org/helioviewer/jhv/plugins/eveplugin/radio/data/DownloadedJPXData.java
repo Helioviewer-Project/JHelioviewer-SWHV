@@ -7,7 +7,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageDataHandler;
 import org.helioviewer.jhv.viewmodel.imagedata.SingleChannelByte8ImageData;
-import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
 
 public class DownloadedJPXData implements ImageDataHandler {
@@ -17,9 +16,8 @@ public class DownloadedJPXData implements ImageDataHandler {
     private final Date startDate;
     private final Date endDate;
     private final RadioDataManager radioDataManager;
-    private final long downloadID;
 
-    public DownloadedJPXData(JP2ViewCallisto _view, long _imageID, Date _startDate, Date _endDate, long _downloadID) {
+    public DownloadedJPXData(JP2ViewCallisto _view, long _imageID, Date _startDate, Date _endDate) {
         super();
         radioDataManager = RadioDataManager.getSingletonInstance();
 
@@ -29,7 +27,6 @@ public class DownloadedJPXData implements ImageDataHandler {
         imageID = _imageID;
         startDate = _startDate;
         endDate = _endDate;
-        downloadID = _downloadID;
     }
 
     public JP2ViewCallisto getView() {
@@ -49,7 +46,7 @@ public class DownloadedJPXData implements ImageDataHandler {
     }
 
     public void remove() {
-        radioDataManager.finishedDownloadingID(imageID, downloadID);
+        radioDataManager.finishedDownloadingID(imageID);
 
         if (view != null) {
             view.setDataHandler(null);
@@ -66,8 +63,8 @@ public class DownloadedJPXData implements ImageDataHandler {
                 return;
             }
             byte[] data = (byte[]) imageData.getBuffer().array();
-            radioDataManager.dataForIDReceived(data, imageID, downloadID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
-            radioDataManager.finishedDownloadingID(imageID, downloadID);
+            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()));
+            radioDataManager.finishedDownloadingID(imageID);
         }
     }
 

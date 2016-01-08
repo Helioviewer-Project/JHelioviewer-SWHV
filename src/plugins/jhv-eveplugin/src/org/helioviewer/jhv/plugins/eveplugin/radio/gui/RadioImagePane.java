@@ -38,11 +38,11 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     }
 
     @Override
-    public void changeVisibility(long iD) {
+    public void changeVisibility() {
     }
 
     @Override
-    public void removeDownloadRequestData(long iD) {
+    public void removeDownloadRequestData() {
     }
 
     @Override
