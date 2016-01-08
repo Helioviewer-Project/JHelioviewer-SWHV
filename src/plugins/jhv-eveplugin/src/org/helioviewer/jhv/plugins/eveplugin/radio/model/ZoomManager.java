@@ -157,15 +157,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         return displaySize.x + (int) Math.floor((dateToFind.getTime() - minX.getTime()) / (1.0 * (maxX.getTime() - minX.getTime()) / displaySize.width));
     }
 
-    private int defineYInSourceArea(int frequencyToFind, int imageStartFrequency, int imageEndFrequency, Rectangle area, boolean ceil) {
-        double result = (frequencyToFind - imageStartFrequency) / (1.0 * (imageEndFrequency - imageStartFrequency) / area.height);
-        if (!ceil) {
-            return (int) Math.floor(result);
-        } else {
-            return (int) Math.ceil(result);
-        }
-    }
-
     private int defineXInSourceArea(Date dateToFind, Date startDateArea, Date endDateArea, Rectangle area) {
         long timediff = dateToFind.getTime() - startDateArea.getTime();
         long timeOfArea = endDateArea.getTime() - startDateArea.getTime();
