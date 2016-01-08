@@ -72,11 +72,12 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     }
 
     public DrawableAreaMap getDrawableAreaMap(Date startDate, Date endDate, int visualStartFrequency, int visualEndFrequency, int imageStartFrequency, int imageEndFrequency, Rectangle area) {
-        Log.debug("DAM for        [" + startDate.toString() + "," + startDate.toString() + "][" + visualStartFrequency + "," + visualEndFrequency + "]");
+        Log.debug("DAM for        [" + startDate.toString() + "," + startDate.toString() + "][" + visualStartFrequency + "," + visualEndFrequency + "] area: " + area);
         int sourceX0 = defineXInSourceArea(startDate, startDate, endDate, area);
-        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, visualStartFrequency, visualEndFrequency, area, false);
+        int sourceY0 = defineYInSourceArea((int) yAxisElement.getSelectedRange().max, imageStartFrequency, imageEndFrequency, area, false);
         int sourceX1 = defineXInSourceArea(endDate, startDate, endDate, area);
-        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, visualStartFrequency, visualEndFrequency, area, true);
+        int sourceY1 = defineYInSourceArea((int) yAxisElement.getSelectedRange().min, imageStartFrequency, imageEndFrequency, area, true);
+        Log.debug("in source:     [" + sourceX0 + ", " + sourceX1 + "][ " + sourceY0 + ", " + sourceY1 + "]");
         if (sourceY0 == sourceY1) {
             sourceY1 = sourceY0 + 1;
         }
@@ -86,9 +87,13 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         Log.debug("in source:     [" + sourceX0 + ", " + sourceX1 + "][ " + sourceY0 + ", " + sourceY1 + "]");
 
         int destX0 = defineXInDestinationArea(startDate);
-        int destY0 = defineYInDestinationArea(visualStartFrequency, yAxisElement);
+        // int destY0 = defineYInDestinationArea(visualStartFrequency,
+        // yAxisElement);
+        int destY0 = displaySize.y;
         int destX1 = defineXInDestinationArea(endDate);
-        int destY1 = defineYInDestinationArea(visualEndFrequency, yAxisElement);
+        // int destY1 = defineYInDestinationArea(visualEndFrequency,
+        // yAxisElement);
+        int destY1 = displaySize.y + displaySize.height;
         Log.debug("in destination [" + destX0 + ", " + destX1 + "][" + destY0 + ", " + destY1 + "]");
         // Log.trace("Selected interval in getDrawableAreaMap : [" +
         // yValueModel.getSelectedYMin() + ", " + yValueModel.getSelectedYMax()
@@ -164,14 +169,14 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         return displaySize.x + (int) Math.floor((dateToFind.getTime() - minX.getTime()) / (1.0 * (maxX.getTime() - minX.getTime()) / displaySize.width));
     }
 
-    private int defineYInSourceArea(int frequencyToFind, int startFrequency, int endFrequency, Rectangle area, boolean ceil) {
-        // Log.debug("Find frequency : " + frequencyToFind);
+    private int defineYInSourceArea(int frequencyToFind, int imageStartFrequency, int imageEndFrequency, Rectangle area, boolean ceil) {
+        double result = (frequencyToFind - imageStartFrequency) / (1.0 * (imageEndFrequency - imageStartFrequency) / area.height);
         if (!ceil) {
-            Log.debug("(int) Math.floor((" + frequencyToFind + " - " + startFrequency + ") / (1.0 * (" + endFrequency + " - " + startFrequency + " ) / " + area.height + ")) = " + (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height)));
-            return (int) Math.floor((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
+            Log.debug("(int) Math.floor((" + frequencyToFind + " - " + imageStartFrequency + ") / (1.0 * (" + imageEndFrequency + " - " + imageStartFrequency + " ) / " + area.height + ")) = " + (int) Math.floor(result));
+            return (int) Math.floor(result);
         } else {
-            Log.debug("(int) Math.ceil((" + frequencyToFind + " - " + startFrequency + ") / (1.0 * ( " + endFrequency + " - " + startFrequency + ") / " + area.height + ")) = " + (int) Math.ceil((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height)));
-            return (int) Math.ceil((frequencyToFind - startFrequency) / (1.0 * (endFrequency - startFrequency) / area.height));
+            Log.debug("(int) Math.ceil((" + frequencyToFind + " - " + imageStartFrequency + ") / (1.0 * (" + imageEndFrequency + " - " + imageStartFrequency + " ) / " + area.height + ")) = " + (int) Math.ceil(result));
+            return (int) Math.ceil(result);
         }
     }
 
