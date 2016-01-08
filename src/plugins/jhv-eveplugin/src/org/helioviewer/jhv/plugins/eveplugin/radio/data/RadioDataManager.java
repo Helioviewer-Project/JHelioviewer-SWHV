@@ -134,8 +134,8 @@ public class RadioDataManager implements RadioDownloaderListener {
      * @param dataSize
      *            The height and width of the data
      */
-    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, Rectangle imageSize) {
-        fireDataforIDReceived(byteData, imageID, dataSize, providedRegion, imageSize);
+    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHight) {
+        fireDataforIDReceived(byteData, imageID, dataSize, providedRegion, resolutionHight);
     }
 
     /**
@@ -373,13 +373,13 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
-    private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, Rectangle imageSize) {
+    private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
         if (downloadRequestData != null) {
             RadioImage image = downloadRequestData.getRadioImages().get(imageID);
             if (image != null) {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
-                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, imageSize);
+                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
                     for (RadioDataManagerListener l : listeners) {
                         l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), dataFrequencyInterval, image.getFreqInterval(), dataSize, imageID);
                     }
@@ -392,10 +392,10 @@ public class RadioDataManager implements RadioDownloaderListener {
         }
     }
 
-    private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, Rectangle imageSize) {
-        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / imageSize.getHeight();
-        double start = providedRegion.getY() * ratio;
-        double end = (providedRegion.getY() + providedRegion.getHeight()) * ratio;
+    private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {
+        double ratio = (freqInterval.getEnd() - freqInterval.getStart()) / resolutionHeight;
+        double start = freqInterval.getEnd() - providedRegion.getY() * ratio;
+        double end = freqInterval.getEnd() - (providedRegion.getY() + providedRegion.getHeight()) * ratio;
         return new FrequencyInterval((int) start, (int) end);
     }
 

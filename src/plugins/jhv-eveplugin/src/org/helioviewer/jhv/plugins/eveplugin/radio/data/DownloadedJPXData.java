@@ -74,7 +74,7 @@ public class DownloadedJPXData implements ImageDataHandler {
 
             ResolutionLevel rl = view.getJP2Image().getResolutionSet(0).getResolutionLevel(0);
 
-            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.getResolutionBounds());
+            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.height);
             radioDataManager.finishedDownloadingID(imageID);
         }
     }
