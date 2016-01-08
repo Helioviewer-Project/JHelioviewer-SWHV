@@ -66,12 +66,6 @@ public class DownloadedJPXData implements ImageDataHandler {
             }
             byte[] data = (byte[]) imageData.getBuffer().array();
             Region r = imageData.getRegion();
-            Log.debug("region :" + r);
-            // TODO pass the size of the image (
-            // view.getJP2Image().getResolutionSet(0).getResolutionLevel(0))
-            // Pass the location. based on this information the location in the
-            // destination can be defined.
-
             ResolutionLevel rl = view.getJP2Image().getResolutionSet(0).getResolutionLevel(0);
 
             radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.height);
