@@ -10,6 +10,7 @@ import java.awt.image.ImageObserver;
 import java.util.Collection;
 import java.util.Date;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -60,6 +61,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
                 ndc.draw(g);
             }
             Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
+            Log.debug("plot config size: " + configs.size());
             for (PlotConfig pc : configs) {
                 pc.draw(g);
             }
