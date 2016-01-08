@@ -366,7 +366,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                     for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, imageID);
+                        l.newDataForIDReceived(data, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), image.getFreqInterval(), dataSize, imageID);
                     }
                 }
             } else {
@@ -384,7 +384,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                     for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), dataSize, imageID);
+                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), image.getVisibleImageFreqInterval(), image.getFreqInterval(), dataSize, imageID);
                     }
                 }
             } else {

@@ -115,7 +115,7 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
-    public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, List<Long> IDList, long radioImageID) {
+    public void newDataReceived(byte[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, FrequencyInterval imageFreqInterval, Rectangle area, List<Long> IDList, long radioImageID) {
         // Log.debug("Size of buffered images: " + bufferedImages.size());
     }
 
@@ -151,22 +151,22 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     @Override
-    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long radioImageID) {
+    public void newDataForIDReceived(int[] data, Interval<Date> timeInterval, FrequencyInterval visibleFreqInterval, FrequencyInterval imageFreqInterval, Rectangle area, long radioImageID) {
         BufferedImage newImage = createBufferedImage(area.width, area.height, data);
         bufferedImages.put(radioImageID, newImage);
         radioImagePane.setIntervalTooBig(false);
-        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area);
+        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), visibleFreqInterval.getStart(), visibleFreqInterval.getEnd(), imageFreqInterval.getStart(), imageFreqInterval.getEnd(), area);
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
         plotConfigList.put(radioImageID, pc);
         fireDrawNewBufferedImage();
     }
 
     @Override
-    public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval freqInterval, Rectangle area, long radioImageID) {
+    public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval visibleFreqInterval, FrequencyInterval imageFreqInterval, Rectangle area, long radioImageID) {
         BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
         bufferedImages.put(radioImageID, newImage);
         radioImagePane.setIntervalTooBig(false);
-        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), freqInterval.getStart(), freqInterval.getEnd(), area);
+        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), visibleFreqInterval.getStart(), visibleFreqInterval.getEnd(), imageFreqInterval.getStart(), imageFreqInterval.getEnd(), area);
         PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
         plotConfigList.put(radioImageID, pc);
         fireDrawNewBufferedImage();
