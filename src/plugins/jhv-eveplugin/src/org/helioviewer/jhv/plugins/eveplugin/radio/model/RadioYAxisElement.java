@@ -62,4 +62,34 @@ public class RadioYAxisElement extends YAxisElement {
         fireSelectedRangeChanged();
     }
 
+    @Override
+    public void shiftDownPixels(double distanceY, int height) {
+        double scaledMin = scale(selectedRange.min);
+        double scaledMax = scale(selectedRange.max);
+
+        double ratioValue = (scaledMax - scaledMin) / height;
+        double shift = distanceY * ratioValue;
+        double startValue = scaledMin + shift;
+        double endValue = scaledMax + shift;
+        selectedRange.min = invScale(startValue);
+        selectedRange.max = invScale(endValue);
+        fireSelectedRangeChanged();
+    }
+
+    @Override
+    public void zoomSelectedRange(double scrollValue, double relativeY, double height) {
+        double scaledMin = scale(selectedRange.min);
+        double scaledMax = scale(selectedRange.max);
+        double scaled = scaledMin + (scaledMax - scaledMin) * (relativeY / height);
+        double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
+        double newScaledMin = ((1 + delta) * scaledMin - delta * scaled);
+        double newScaledMax = ((1 + delta) * scaledMax - delta * scaled);
+
+        newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
+        newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
+        selectedRange.min = invScale(newScaledMin);
+        selectedRange.max = invScale(newScaledMax);
+        fireSelectedRangeChanged();
+    }
+
 }
