@@ -4,10 +4,6 @@ import org.helioviewer.jhv.base.Range;
 
 public interface ValueSpace {
 
-    public abstract Range getScaledSelectedRange();
-
-    public abstract Range getScaledAvailableRange();
-
     public abstract void resetScaledSelectedRange();
 
     public abstract Range getSelectedRange();

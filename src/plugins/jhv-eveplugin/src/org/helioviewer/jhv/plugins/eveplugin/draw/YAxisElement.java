@@ -20,10 +20,6 @@ public class YAxisElement extends AbstractValueSpace {
     protected Range availableRange;
     /** The label of the y-axis */
     private String label;
-    /** The scaled selected range */
-    protected Range scaledSelectedRange;
-    /** The scaled available range */
-    protected Range scaledAvailableRange;
 
     private YAxisLocation location;
     private YAxisElementScale scale;
@@ -48,8 +44,6 @@ public class YAxisElement extends AbstractValueSpace {
     public YAxisElement(Range selectedRange, Range availableRange, String label, boolean isLogScale, long activationTime) {
         this.selectedRange = selectedRange;
         this.availableRange = availableRange;
-        scaledSelectedRange = new Range(0, 1);
-        scaledAvailableRange = new Range(0, 1);
         this.label = label;
         setIsLogScale(isLogScale);
     }
@@ -65,8 +59,6 @@ public class YAxisElement extends AbstractValueSpace {
         availableRange = new Range();
         label = "";
         setIsLogScale(true);
-        scaledSelectedRange = new Range(0, 1);
-        scaledAvailableRange = new Range(0, 1);
     }
 
     /**
@@ -114,14 +106,11 @@ public class YAxisElement extends AbstractValueSpace {
                 availableRange.setMax(newAvailableRange.max);
                 availableRange.setMin(newAvailableRange.min);
                 checkSelectedRange();
-                adaptScaledAvailableRange();
             }
         } else {
             availableRange.setMax(newAvailableRange.max);
             availableRange.setMin(newAvailableRange.min);
             selectedRange = new Range(newAvailableRange);
-            scaledAvailableRange = new Range(0, 1);
-            scaledSelectedRange = new Range(0, 1);
         }
     }
 
@@ -129,25 +118,6 @@ public class YAxisElement extends AbstractValueSpace {
         if (selectedRange.min < availableRange.min || selectedRange.max > availableRange.max || selectedRange.min > selectedRange.max) {
             selectedRange = new Range(availableRange);
         }
-    }
-
-    private void adaptScaledAvailableRange() {
-        double selectedMax = scale(selectedRange.max);
-        double selectedMin = scale(selectedRange.min);
-        double availableMax = scale(availableRange.max);
-        double availableMin = scale(availableRange.min);
-
-        double diffSelectedRange = selectedMax - selectedMin;
-        double diffScaledSelectedRange = scaledSelectedRange.max - scaledSelectedRange.min;
-
-        double ratio = diffScaledSelectedRange / diffSelectedRange;
-
-        double diffSelStartAvailStart = selectedMin - availableMin;
-        double diffSelEndAvailEnd = availableMax - selectedMax;
-
-        Double scaledAvailableStart = scaledSelectedRange.min - diffSelStartAvailStart * ratio;
-        Double scaledAvailableEnd = scaledSelectedRange.max + diffSelEndAvailEnd * ratio;
-        scaledAvailableRange = new Range(scaledAvailableStart, scaledAvailableEnd);
     }
 
     /**
@@ -228,16 +198,6 @@ public class YAxisElement extends AbstractValueSpace {
         this.location = location;
     }
 
-    @Override
-    public Range getScaledSelectedRange() {
-        return scaledSelectedRange;
-    }
-
-    @Override
-    public Range getScaledAvailableRange() {
-        return scaledAvailableRange;
-    }
-
     protected void fireSelectedRangeChanged() {
         for (ValueSpaceListener vsl : listeners) {
             vsl.valueSpaceChanged(availableRange, selectedRange);
@@ -247,8 +207,6 @@ public class YAxisElement extends AbstractValueSpace {
     public void reset() {
         availableRange = new Range();
         selectedRange = new Range();
-        scaledAvailableRange = new Range(0, 1);
-        scaledSelectedRange = new Range(0, 1);
     }
 
     @Override
@@ -256,6 +214,7 @@ public class YAxisElement extends AbstractValueSpace {
         return scale.scale(maxValue);
     }
 
+    @Override
     public double invScale(double maxValue) {
         return scale.invScale(maxValue);
     }
