@@ -18,7 +18,7 @@ public abstract class GridScale {
     public static GridScale polar = new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
     public static GridScale latitudinal = new GridScale.GridScaleIdentity(0, 360, -90, 90, Transform.transformlatitudinal);
     public static GridScale logpolar = new GridScale.GridScaleLogY(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar);
-    public static GridScale ortho = new GridScale.GridScaleIdentity(0, 0, 0, 0, Transform.transformlatitudinal);
+    public static GridScale ortho = new GridScale.GridScaleOrtho(0, 0, 0, 0, Transform.transformlatitudinal);
 
     public static GridScale current = ortho;
 
@@ -205,7 +205,6 @@ public abstract class GridScale {
 
             if (gridChoice == GridChoiceType.CARRINGTON && phi < 0)
                 phi += 360;
-
             return new Vec2(phi, theta);
         }
     }
