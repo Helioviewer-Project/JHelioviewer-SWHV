@@ -247,16 +247,18 @@ public class Layers {
         double newSize, size = 0;
 
         for (View v : layers) {
-            MetaData m;
-            ImageData d = v.getImageLayer().getImageData();
-            if (d == null) // not yet decoded
-                m = v.getMetaData(new JHVDate(0));
-            else
+            if (v.getImageLayer().isVisible()) {
+                MetaData m;
+                ImageData d = v.getImageLayer().getImageData();
+                if (d == null) // not yet decoded
+                    m = v.getMetaData(new JHVDate(0));
+                else
                 m = d.getMetaData();
 
-            newSize = m.getPhysicalRegion().height;
-            if (newSize > size) {
-                size = newSize;
+                newSize = m.getPhysicalRegion().height;
+                if (newSize > size) {
+                    size = newSize;
+                }
             }
         }
         return size;
