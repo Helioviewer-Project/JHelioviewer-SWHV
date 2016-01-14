@@ -211,7 +211,7 @@ public class RenderableGrid extends AbstractRenderable {
     }
 
     private void drawAxes(GL2 gl) {
-        gl.glLineWidth(1);
+        gl.glLineWidth(2);
 
         gl.glBegin(GL2.GL_LINES);
         {
