@@ -54,16 +54,16 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         // Log.trace("redraw radio image pane for plot : " + plotIdentifier);
         // Thread.dumpStack();
+        Collection<NoDataConfig> noDataConfigs = RadioPlotModel.getSingletonInstance().getNoDataConfigurations();
+        Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
         if (!intervalTooBig) {
-            Collection<NoDataConfig> noDataConfigs = RadioPlotModel.getSingletonInstance().getNoDataConfigurations();
             for (NoDataConfig ndc : noDataConfigs) {
                 ndc.draw(g);
             }
-            Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
             for (PlotConfig pc : configs) {
                 pc.draw(g);
             }
-        } else {
+        } else if (noDataConfigs.size() != 0 || configs.size() != 0) {
             String text1 = "The selected interval is too big.";
             String text2 = "Reduce the interval to see the radio spectrograms.";
             final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
