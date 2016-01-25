@@ -578,38 +578,34 @@ public class RadioDataManager implements RadioDownloaderListener {
                     FrequencyInterval fi = new FrequencyInterval((int) Math.round(freqStart), (int) Math.round(freqEnd));
 
                     List<ResolutionSetting> resolutionSettings = new ArrayList<ResolutionSetting>();
-                    if (start != null && end != null) {
-                        Interval<Date> dateInterval = new Interval<Date>(start, end);
-                        for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
-                            ResolutionLevel res = rs.getResolutionLevel(j);
-                            ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
-                            resolutionSettings.add(tempResSet);
-                        }
-
-                        RadioImage tempRs = new RadioImage(djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
-
-                        ResolutionSetting lastUsedResolutionSetting = null;
-                        if (Double.isNaN(ratioX) && Double.isNaN(ratioY)) {
-                            int highestLevel = -1;
-                            for (ResolutionSetting rst : resolutionSettings) {
-                                if (rst.getResolutionLevel() > highestLevel) {
-                                    highestLevel = rst.getResolutionLevel();
-                                    lastUsedResolutionSetting = rst;
-                                }
-                            }
-                        } else {
-                            lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
-                        }
-                        image.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
-
-                        tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
-                        image.setRegion(tempRs.getROI());
-                        jp2View.render(null, null, 1);
-
-                        drd.addRadioImage(tempRs);
-                    } else {
-                        Log.error("Start and/or stop is null");
+                    Interval<Date> dateInterval = new Interval<Date>(start, end);
+                    for (int j = 0; j <= rs.getMaxResolutionLevels(); j++) {
+                        ResolutionLevel res = rs.getResolutionLevel(j);
+                        ResolutionSetting tempResSet = new ResolutionSetting((end.getTime() - start.getTime()) / (double) res.width, (freqEnd - freqStart) / res.height, j, res.width, res.height, res.discardLayers);
+                        resolutionSettings.add(tempResSet);
                     }
+
+                    RadioImage tempRs = new RadioImage(djd.getImageID(), dateInterval, fi, i, rs, resolutionSettings, true);
+
+                    ResolutionSetting lastUsedResolutionSetting = null;
+                    if (Double.isNaN(ratioX) && Double.isNaN(ratioY)) {
+                        int highestLevel = -1;
+                        for (ResolutionSetting rst : resolutionSettings) {
+                            if (rst.getResolutionLevel() > highestLevel) {
+                                highestLevel = rst.getResolutionLevel();
+                                lastUsedResolutionSetting = rst;
+                            }
+                        }
+                    } else {
+                        lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
+                    }
+                    image.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
+
+                    tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
+                    image.setRegion(tempRs.getROI());
+                    jp2View.render(null, null, 1);
+
+                    drd.addRadioImage(tempRs);
                 } catch (Exception e) {
                     Log.error("Some of the metadata could not be read, aborting...");
                     return;
