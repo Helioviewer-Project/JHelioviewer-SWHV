@@ -108,8 +108,8 @@ public class EventTypePlotConfiguration {
      * @return null if no event was found, or the event if found
      */
     public JHVEvent getEventOnLocation(Point p) {
-        for (String s : eventPlotConfigurations.keySet()) {
-            for (EventPlotConfiguration epc : eventPlotConfigurations.get(s)) {
+        for (List<EventPlotConfiguration> value : eventPlotConfigurations.values()) {
+            for (EventPlotConfiguration epc : value) {
                 JHVEvent event = epc.getEventAtPoint(p);
                 if (event != null) {
                     return event;
