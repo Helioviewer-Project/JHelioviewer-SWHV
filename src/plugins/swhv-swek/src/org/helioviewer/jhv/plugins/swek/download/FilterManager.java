@@ -109,19 +109,15 @@ public class FilterManager {
      * @return the list with parameter filters
      */
     public Map<SWEKParameter, List<SWEKParam>> getFilterForEventType(SWEKEventType eventType) {
-        Map<SWEKParameter, List<SWEKParam>> filtersPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
-
         if (filters.containsKey(eventType)) {
-            filtersPerEventType = filters.get(eventType);
+            return filters.get(eventType);
         }
-        return filtersPerEventType;
+        return new HashMap<SWEKParameter, List<SWEKParam>>();
     }
 
     public boolean isFiltered(SWEKEventType eventType, SWEKParameter parameter) {
-        Map<SWEKParameter, List<SWEKParam>> filteredParameterPerEventType = new HashMap<SWEKParameter, List<SWEKParam>>();
         if (filters.containsKey(eventType)) {
-            filteredParameterPerEventType = filters.get(eventType);
-            return filteredParameterPerEventType.containsKey(parameter);
+            return filters.get(eventType).containsKey(parameter);
         }
         return false;
     }
