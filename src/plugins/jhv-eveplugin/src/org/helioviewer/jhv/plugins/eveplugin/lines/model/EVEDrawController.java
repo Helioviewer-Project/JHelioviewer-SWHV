@@ -158,8 +158,8 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     private void updateBands() {
-        for (YAxisElement yAxisElement : dataMapPerUnitLabel.keySet()) {
-            for (final Band band : dataMapPerUnitLabel.get(yAxisElement).keySet()) {
+        for (Map<Band, EVEValues> value : dataMapPerUnitLabel.values()) {
+            for (final Band band : value.keySet()) {
                 updateBand(band);
             }
         }
@@ -171,8 +171,11 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     private void fireRedrawRequest(final boolean maxRange) {
         Interval<Date> interval = drawController.getSelectedInterval();
-        for (YAxisElement yAxisElement : dataMapPerUnitLabel.keySet()) {
-            final Band[] bands = dataMapPerUnitLabel.get(yAxisElement).keySet().toArray(new Band[0]);
+        for (Map.Entry<YAxisElement, Map<Band, EVEValues>> entry : dataMapPerUnitLabel.entrySet()) {
+            YAxisElement yAxisElement = entry.getKey();
+            Map<Band, EVEValues> bandMap = entry.getValue();
+
+            final Band[] bands = bandMap.keySet().toArray(new Band[0]);
 
             String unitLabel = "";
             boolean isLog = false;
@@ -186,21 +189,24 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             }
 
             Range newAvailableRange = new Range();
-
-            for (EVEValues v : dataMapPerUnitLabel.get(yAxisElement).values()) {
+            for (EVEValues v : bandMap.values()) {
                 newAvailableRange.setMin(v.getMinimumValue());
                 newAvailableRange.setMax(v.getMaximumValue());
             }
+
             yAxisElement.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
                 yAxisElement.setSelectedRange(new Range(newAvailableRange));
             }
             yAxisElement.set(unitLabel, isLog);
-            eveDrawableElementMap.get(yAxisElement).set(interval, bands, yAxisElement);
+
+            EVEDrawableElement eveDrawableElement = eveDrawableElementMap.get(yAxisElement);
+            eveDrawableElement.set(interval, bands, yAxisElement);
+
             if (bands.length > 0) {
-                drawController.updateDrawableElement(eveDrawableElementMap.get(yAxisElement), false);
+                drawController.updateDrawableElement(eveDrawableElement, false);
             } else {
-                drawController.removeDrawableElement(eveDrawableElementMap.get(yAxisElement));
+                drawController.removeDrawableElement(eveDrawableElement);
             }
         }
         drawController.fireRedrawRequest();
