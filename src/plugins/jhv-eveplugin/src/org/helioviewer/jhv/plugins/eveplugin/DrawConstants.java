@@ -12,16 +12,16 @@ import org.helioviewer.jhv.gui.UIGlobals;
  * */
 public class DrawConstants {
 
-    private static final int GRAPH_LEFT_SPACE = 50;
-    private static final int GRAPH_RIGHT_SPACE = 10;
-    private static final int GRAPH_TOP_SPACE = 20;
-    private static final int GRAPH_BOTTOM_SPACE = 22;
-    private static final int TWO_AXIS_GRAPH_RIGHT = 30;
+    public static final int GRAPH_LEFT_SPACE = 50;
+    public static final int GRAPH_RIGHT_SPACE = 10;
+    public static final int GRAPH_TOP_SPACE = 20;
+    public static final int GRAPH_BOTTOM_SPACE = 22;
+    public static final int TWO_AXIS_GRAPH_RIGHT = 30;
 
-    private static final int MIN_VERTICAL_TICK_SPACE = 20;
+    public static final int MIN_VERTICAL_TICK_SPACE = 20;
 
-    private static final int INTERVAL_SELECTION_HEIGHT = 15;
-    private static final int RANGE_SELECTION_WIDTH = 15;
+    public static final int INTERVAL_SELECTION_HEIGHT = 15;
+    public static final int RANGE_SELECTION_WIDTH = 15;
 
     public static final Color AVAILABLE_INTERVAL_BACKGROUND_COLOR = new Color(224, 224, 224);
     public static final Color SELECTED_INTERVAL_BACKGROUND_COLOR = Color.WHITE;
@@ -49,38 +49,6 @@ public class DrawConstants {
     public static final SimpleDateFormat YEAR_ONLY_TIME_FORMAT = new SimpleDateFormat("yyyy");
 
     public static final int EVENT_OFFSET = 3;
-
-    public static int getGraphLeftSpace() {
-        return GRAPH_LEFT_SPACE;
-    }
-
-    public static int getGraphRightSpace() {
-        return GRAPH_RIGHT_SPACE;
-    }
-
-    public static int getGraphTopSpace() {
-        return GRAPH_TOP_SPACE;
-    }
-
-    public static int getGraphBottomSpace() {
-        return GRAPH_BOTTOM_SPACE;
-    }
-
-    public static int getTwoAxisGraphRight() {
-        return TWO_AXIS_GRAPH_RIGHT;
-    }
-
-    public static int getMinVerticalTickSpace() {
-        return MIN_VERTICAL_TICK_SPACE;
-    }
-
-    public static int getIntervalSelectionHeight() {
-        return INTERVAL_SELECTION_HEIGHT;
-    }
-
-    public static int getRangeSelectionWidth() {
-        return RANGE_SELECTION_WIDTH;
-    }
 
     public static final Font font = UIGlobals.UIFontSmall;
 
