@@ -145,7 +145,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         int width = sx * getWidth();
         int height = sy * getHeight();
 
-        if (width > 0 && height > 0 && sy * (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace() + 1) < height && sx * (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + 1) < width && (!movieLineRequest || forceRedrawGraph)) {
+        if (width > 0 && height > 0 && sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + 1) < height && sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + 1) < width && (!movieLineRequest || forceRedrawGraph)) {
             if (width != lastWidth || height != lastHeight) {
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 GraphicsDevice device = env.getDefaultScreenDevice();
@@ -161,10 +161,10 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             tf.preConcatenate(AffineTransform.getScaleInstance(sx, sy));
             g.setTransform(tf);
             drawBackground(g);
-            BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.getGraphLeftSpace(), sy * DrawConstants.getGraphTopSpace(), width - sx * (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + twoYAxis * DrawConstants.getTwoAxisGraphRight()), height - sy * (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace()));
+            BufferedImage plotPart = screenImage.getSubimage(sx * DrawConstants.GRAPH_LEFT_SPACE, sy * DrawConstants.GRAPH_TOP_SPACE, width - sx * (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT), height - sy * (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
             Graphics2D gplotPart = plotPart.createGraphics();
             gplotPart.setTransform(tf);
-            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * DrawConstants.getGraphLeftSpace(), height);
+            BufferedImage leftAxisPart = screenImage.getSubimage(0, 0, 2 * DrawConstants.GRAPH_LEFT_SPACE, height);
             Graphics2D gleftAxisPart = leftAxisPart.createGraphics();
             gleftAxisPart.setTransform(tf);
             gplotPart.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -281,8 +281,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
-                if (xl + tickTextWidth > getWidth() - DrawConstants.getGraphRightSpace()) {
-                    xl = getWidth() - DrawConstants.getGraphRightSpace() - tickTextWidth;
+                if (xl + tickTextWidth > getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+                    xl = getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
                 }
                 g.drawString(line, xl, yl);
                 yl += g.getFontMetrics().getHeight() * 2 / 3;
@@ -310,16 +310,16 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         // draw rectangle hiding to big radio image
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
-            g.fillRect(0, DrawConstants.getGraphTopSpace(), DrawConstants.getGraphLeftSpace(), graphArea.height);
-            g.fillRect(DrawConstants.getGraphLeftSpace() + graphArea.width, DrawConstants.getGraphTopSpace(), DrawConstants.getTwoAxisGraphRight(), graphArea.height);
+            g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
+            g.fillRect(DrawConstants.GRAPH_LEFT_SPACE + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.TWO_AXIS_GRAPH_RIGHT, graphArea.height);
         } else {
-            g.fillRect(DrawConstants.getGraphLeftSpace() + graphArea.width, DrawConstants.getGraphTopSpace(), DrawConstants.getTwoAxisGraphRight() + DrawConstants.getGraphRightSpace(), graphArea.height);
+            g.fillRect(DrawConstants.GRAPH_LEFT_SPACE + graphArea.width, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.TWO_AXIS_GRAPH_RIGHT + DrawConstants.GRAPH_RIGHT_SPACE, graphArea.height);
         }
         String verticalLabel = yAxisElement.getLabel();
 
         final Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
         g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-        g.drawString(verticalLabel, (int) (DrawConstants.getGraphLeftSpace() + Math.max((-1 * DrawConstants.getGraphLeftSpace() + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - DrawConstants.getTwoAxisGraphRight())))), (int) verticalLabelBounds.getHeight());
+        g.drawString(verticalLabel, (int) (DrawConstants.GRAPH_LEFT_SPACE + Math.max((-1 * DrawConstants.GRAPH_LEFT_SPACE + 3), -((int) verticalLabelBounds.getWidth() / 2 - 3) + leftSide * ((int) verticalLabelBounds.getWidth() / 2 - 3 + graphArea.width - Math.max(verticalLabelBounds.getWidth() / 2, verticalLabelBounds.getWidth() - DrawConstants.TWO_AXIS_GRAPH_RIGHT)))), (int) verticalLabelBounds.getHeight());
 
         double minValue = yAxisElement.getScaledMinValue();
         double maxValue = yAxisElement.getScaledMaxValue();
@@ -333,7 +333,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             minValue = temp;
             useMax = 1;
         }
-        final int sizeSteps = graphArea.height / DrawConstants.getMinVerticalTickSpace();
+        final int sizeSteps = graphArea.height / DrawConstants.MIN_VERTICAL_TICK_SPACE;
         int verticalTicks = 2;
         if (sizeSteps >= 4) {
             verticalTicks = 5;
@@ -433,7 +433,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        JHVEvent event = eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.getGraphLeftSpace(), e.getPoint().y - DrawConstants.getGraphTopSpace()));
+        JHVEvent event = eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE));
         if (event != null) {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event);
             dialog.setLocation(e.getLocationOnScreen());
@@ -460,7 +460,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         mousePressedOnMovieFrame = movieFrame.contains(e.getPoint());
         mousePressedPosition = plotArea.contains(e.getPoint()) ? e.getPoint() : null;
-        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.getGraphLeftSpace(), e.getPoint().y - DrawConstants.getGraphTopSpace())) != null)) {
+        if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height && !(eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) != null)) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -525,12 +525,12 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseMoved(final MouseEvent e) {
-        mousePosition = new Point(e.getPoint().x - DrawConstants.getGraphLeftSpace(), e.getPoint().y - DrawConstants.getGraphTopSpace());
+        mousePosition = new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE);
         final Rectangle frame = new Rectangle(movieLinePosition - 3, graphArea.y, 7, graphArea.height);
 
         if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-        } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.getGraphLeftSpace(), e.getPoint().y - DrawConstants.getGraphTopSpace())) != null) {
+        } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             // redrawGraph();
             updateGraph();
@@ -540,7 +540,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.getGraphLeftSpace(), e.getPoint().y - DrawConstants.getGraphTopSpace())) == null)) {
+        if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) == null)) {
             mouseOverEvent = false;
             updateGraph();
         }

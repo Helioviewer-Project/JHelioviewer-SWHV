@@ -460,15 +460,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     public Rectangle getGraphArea() {
-        return new Rectangle(DrawConstants.getGraphLeftSpace(), DrawConstants.getGraphTopSpace(), getGraphWidth(), getGraphHeight());
+        return new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, getGraphWidth(), getGraphHeight());
     }
 
     public Rectangle getLeftAxisArea() {
-        return new Rectangle(0, DrawConstants.getGraphTopSpace(), DrawConstants.getGraphLeftSpace(), getGraphHeight() - (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace()));
+        return new Rectangle(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, getGraphHeight() - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE));
     }
 
     private int getGraphHeight() {
-        return graphSize.height - (DrawConstants.getGraphTopSpace() + DrawConstants.getGraphBottomSpace());
+        return graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE);
     }
 
     private int getGraphWidth() {
@@ -476,7 +476,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         if (getYAxisElements().size() >= 2) {
             twoYAxis = 1;
         }
-        return graphSize.width - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + twoYAxis * DrawConstants.getTwoAxisGraphRight());
+        return graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + twoYAxis * DrawConstants.TWO_AXIS_GRAPH_RIGHT);
     }
 
     private void createYAxisSet() {

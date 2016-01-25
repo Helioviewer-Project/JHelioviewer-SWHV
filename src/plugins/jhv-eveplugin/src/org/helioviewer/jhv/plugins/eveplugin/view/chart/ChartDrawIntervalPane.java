@@ -66,7 +66,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void initVisualComponents() {
-        setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.getIntervalSelectionHeight()));
+        setPreferredSize(new Dimension(getPreferredSize().width, DrawConstants.INTERVAL_SELECTION_HEIGHT));
         setSize(getPreferredSize());
     }
 
@@ -107,21 +107,21 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         long end = selectedInterval.getEnd().getTime() - availableInterval.getStart().getTime();
         end = Math.round(end / 60000.0);
 
-        final int availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
-        leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + DrawConstants.getGraphLeftSpace();
-        rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + DrawConstants.getGraphLeftSpace();
+        final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+        leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
+        rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalSpace) + DrawConstants.GRAPH_LEFT_SPACE;
     }
 
     private void drawBackground(Graphics2D g) {
-        final int availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
 
         g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(DrawConstants.getGraphLeftSpace(), 2, availableIntervalSpace, getHeight() - 3);
+        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, availableIntervalSpace, getHeight() - 3);
 
     }
 
     private void drawInterval(Graphics2D g) {
-        final int availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         g.setColor(Color.black);
         g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
     }
@@ -135,17 +135,17 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             return;
         }
 
-        final int availableIntervalWidth = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         final double ratioX = (double) availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
 
-        int min = DrawConstants.getGraphLeftSpace();
+        int min = DrawConstants.GRAPH_LEFT_SPACE;
         if (availableInterval.containsPointInclusive(movieInterval.getStart())) {
             min += (int) ((movieInterval.getStart().getTime() - availableInterval.getStart().getTime()) * ratioX);
         }
 
-        int max = DrawConstants.getGraphLeftSpace() + availableIntervalWidth;
+        int max = DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth;
         if (availableInterval.containsPointInclusive(movieInterval.getEnd())) {
-            max = DrawConstants.getGraphLeftSpace() + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
+            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
         }
         int offset = 0;
         g.setColor(DrawConstants.MOVIE_INTERVAL_COLOR);
@@ -182,8 +182,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private void drawIntervalHBar(Graphics2D g) {
         g.setColor(Color.BLACK);
-        g.fill(new RoundRectangle2D.Double(DrawConstants.getGraphLeftSpace(), 0, leftIntervalBorderPosition - DrawConstants.getGraphLeftSpace(), 2, 5, 5));
-        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.getGraphRightSpace(), 2, 5, 5));
+        g.fill(new RoundRectangle2D.Double(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2, 5, 5));
+        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }
 
     private void drawLabels(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval) {
@@ -192,7 +192,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
 
         final int tickTextWidth = (int) g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date()), g).getWidth();
-        final int availableIntervalWidth = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1;
+        final int availableIntervalWidth = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         final int maxTicks = Math.max(2, (availableIntervalWidth - tickTextWidth * 2) / tickTextWidth);
         final double ratioX = availableIntervalWidth / (double) (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime());
 
@@ -355,7 +355,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     private void drawLabel(Graphics2D g, Interval<Date> availableInterval, Interval<Date> selectedInterval, final String tickText, final int availableIntervalWidth, final Date date, final double ratioX) {
         final int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        final int x = DrawConstants.getGraphLeftSpace() + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
+        final int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date.getTime() - availableInterval.getStart().getTime()) * ratioX);
         if (selectedInterval.containsPointInclusive(date)) {
             g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -363,8 +363,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         }
         g.drawLine(x, 2, x, getHeight() - 1);
         g.setColor(DrawConstants.LABEL_TEXT_COLOR);
-        if (x + textWidth > DrawConstants.getGraphLeftSpace() + availableIntervalWidth) {
-            if ((x - 2) < DrawConstants.getGraphLeftSpace() + availableIntervalWidth) {
+        if (x + textWidth > DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth) {
+            if ((x - 2) < DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth) {
                 g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
             }
         } else {
@@ -375,7 +375,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     private void moveSelectedInterval(final Point newMousePosition, boolean forced) {
         if (mousePressed != null) {
             final int diffPixel = mousePressed.x > newMousePosition.x ? mousePressed.x - newMousePosition.x : newMousePosition.x - mousePressed.x;
-            final double availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1.0;
+            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
             final double movedUnits = diffPixel / availableIntervalSpace;
 
             if (mousePressed.x > newMousePosition.x) {
@@ -425,18 +425,18 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
             if (newMousePosition.x >= rightIntervalBorderPosition) {
                 useThisX = rightIntervalBorderPosition;
             }
-            final double availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1.0;
+            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
             final double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            final double timestamp = plotAreaSpace.getScaledMinTime() + ((useThisX - DrawConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
+            final double timestamp = plotAreaSpace.getScaledMinTime() + ((useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
             plotAreaSpace.setScaledSelectedTime(Math.max(timestamp, plotAreaSpace.getScaledMinTime()), plotAreaSpace.getScaledSelectedMaxTime(), forced);
         } else if (mouseOverRightGraspPoint) {
             if (newMousePosition.x <= leftIntervalBorderPosition) {
                 useThisX = leftIntervalBorderPosition;
             }
-            final double availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1.0;
+            final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
             final double diffUnits = plotAreaSpace.getScaledMaxTime() - plotAreaSpace.getScaledMinTime();
-            final double timestamp = plotAreaSpace.getScaledMinTime() + (1.0 * (useThisX - DrawConstants.getGraphLeftSpace()) / availableIntervalSpace) * diffUnits;
+            final double timestamp = plotAreaSpace.getScaledMinTime() + (1.0 * (useThisX - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace) * diffUnits;
 
             plotAreaSpace.setScaledSelectedTime(plotAreaSpace.getScaledSelectedMinTime(), Math.min(timestamp, plotAreaSpace.getScaledMaxTime()), forced);
         }
@@ -458,7 +458,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     @Override
     public void mouseClicked(MouseEvent e) {
         if ((e.getModifiers() & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
-            if (e.getPoint().x >= DrawConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - DrawConstants.getGraphRightSpace()) {
+            if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
                 moveSelectedInterval(e.getPoint(), true);
                 mousePressed = null;
@@ -470,8 +470,8 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void jumpSelectedInterval(Point point) {
-        final double availableIntervalSpace = getWidth() - (DrawConstants.getGraphLeftSpace() + DrawConstants.getGraphRightSpace() + DrawConstants.getRangeSelectionWidth()) - 1.0;
-        final double position = (point.getX() - DrawConstants.getGraphLeftSpace()) / availableIntervalSpace;
+        final double availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1.0;
+        final double position = (point.getX() - DrawConstants.GRAPH_LEFT_SPACE) / availableIntervalSpace;
         Map<PlotAreaSpace, Double> minList = new HashMap<PlotAreaSpace, Double>();
         Map<PlotAreaSpace, Double> maxList = new HashMap<PlotAreaSpace, Double>();
         double middlePosition = plotAreaSpace.getScaledSelectedMinTime() + plotAreaSpace.getScaledSelectedMaxTime() - plotAreaSpace.getScaledSelectedMinTime();
@@ -504,7 +504,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (e.getPoint().x >= DrawConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - DrawConstants.getGraphRightSpace()) {
+        if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         } else {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -573,7 +573,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
 
         // reset cursor if it does not point to the interval area
         if (!mouseOverInterval) {
-            if (e.getPoint().x >= DrawConstants.getGraphLeftSpace() && e.getPoint().x <= getWidth() - DrawConstants.getGraphRightSpace()) {
+            if (e.getPoint().x >= DrawConstants.GRAPH_LEFT_SPACE && e.getPoint().x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
                 setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
