@@ -264,7 +264,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         }
         final Date availableStartDate = availableInterval.getStart();
 
-        if (startDate == null || endDate == null || availableStartDate == null) {
+        if (startDate == null || availableStartDate == null) {
             return new Interval<Date>(null, null);
         }
 
