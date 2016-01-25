@@ -221,8 +221,9 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     public void colorLUTChanged() {
         ColorModel cm = ColorLookupModel.getInstance().getColorModel();
         Map<Long, BufferedImage> newBufferedImages = new HashMap<Long, BufferedImage>();
-        for (long index : bufferedImages.keySet()) {
-            BufferedImage old = bufferedImages.get(index);
+        for (Map.Entry<Long, BufferedImage> entry : bufferedImages.entrySet()) {
+            long index = entry.getKey();
+            BufferedImage old = entry.getValue();
             BufferedImage newIm = new BufferedImage(cm, old.getRaster(), false, null);
             newBufferedImages.put(index, newIm);
         }
@@ -234,13 +235,13 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
     }
 
     private void updatePlotConfigurations() {
-        for (long imageID : plotConfigList.keySet()) {
-            PlotConfig tempPC = plotConfigList.get(imageID);
+        for (Map.Entry<Long, PlotConfig> entry : plotConfigList.entrySet()) {
+            long imageID = entry.getKey();
+            PlotConfig tempPC = entry.getValue();
             if (bufferedImages.containsKey(imageID)) {
                 tempPC.setBufferedImage(bufferedImages.get(imageID));
             }
         }
-
     }
 
     public RadioYAxisElement getYAxisElement() {
