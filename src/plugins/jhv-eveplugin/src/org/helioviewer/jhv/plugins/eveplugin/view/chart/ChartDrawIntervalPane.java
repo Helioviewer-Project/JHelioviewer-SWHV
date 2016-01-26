@@ -121,9 +121,13 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
     }
 
     private void drawInterval(Graphics2D g) {
-        // final int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+        // final int availableIntervalSpace = getWidth() -
+        // (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE +
+        // DrawConstants.RANGE_SELECTION_WIDTH) - 1;
         g.setColor(Color.black);
         g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
+        g.setColor(DrawConstants.BORDER_COLOR);
+        g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
     }
 
     private void drawMovieInterval(Graphics2D g, Interval<Date> availableInterval) {
@@ -147,7 +151,7 @@ public class ChartDrawIntervalPane extends JComponent implements TimingListener,
         if (availableInterval.containsPointInclusive(movieInterval.getEnd())) {
             max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieInterval.getEnd().getTime() - availableInterval.getStart().getTime()) * ratioX);
         }
-        int offset = 0;
+        int offset = 7;
         g.setColor(DrawConstants.MOVIE_INTERVAL_COLOR);
         g.drawLine(min, offset, max, offset);
         g.drawLine(min, offset + 2, max, offset + 2);
