@@ -131,6 +131,12 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
         for (NoDataConfig ndc : noDataConfigList) {
             ndc.setVisible(drd.isVisible());
         }
+        if (drd.isVisible()) {
+            drawController.updateDrawableElement(radioImagePane);
+        } else {
+            drawController.removeDrawableElement(radioImagePane);
+        }
+
         fireChangeVisibility();
     }
 
@@ -173,8 +179,10 @@ public class RadioPlotModel implements RadioDataManagerListener, ZoomDataConfigL
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
-        updateNoDataConfig();
+        if (downloadRequestData != null && downloadRequestData.isVisible()) {
+            radioDataManager.requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
+            updateNoDataConfig();
+        }
     }
 
     private void fireDrawNewBufferedImage() {// BufferedImage
