@@ -121,7 +121,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         View view = Layers.getActiveView();
         if (view != null && view.isMultiFrame()) {
             Interval<Date> interval = new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
-            DrawController.getSingletonInstance().setSelectedInterval(interval, true);
+            DrawController.getSingletonInstance().setSelectedInterval(interval, true, false);
         }
     }
 
@@ -239,7 +239,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         case Carrington:
             newInterval = computeCarringtonInterval(selectedInterval, value);
         }
-        return drawController.setSelectedInterval(newInterval, true);
+        return drawController.setSelectedInterval(newInterval, true, true);
     }
 
     private Interval<Date> computeCarringtonInterval(Interval<Date> interval, long value) {
