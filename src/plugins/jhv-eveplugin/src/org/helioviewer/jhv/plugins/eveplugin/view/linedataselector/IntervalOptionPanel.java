@@ -47,8 +47,11 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         zoomComboBox.addActionListener(this);
         zoomComboBox.setEnabled(false);
 
-        periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.LAYER_MOVIE_TIME));
-        periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
+        periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
+        periodFromLayersButton.setToolTipText("Synchronize movie and time series display"); // TODO
+                                                                                            // should
+                                                                                            // be
+                                                                                            // changed
         periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         periodFromLayersButton.setEnabled(Layers.getActiveView() != null);
         periodFromLayersButton.addActionListener(this);
@@ -65,8 +68,10 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         if (e.getSource() == periodFromLayersButton) {
             TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
             if (periodFromLayersButton.isSelected()) {
+                periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_LINK));
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
             } else {
+                periodFromLayersButton.setIcon(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         } else if (e.getSource().equals(zoomComboBox)) {
@@ -119,10 +124,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarValue, final ZOOM zoom) {
         model.addElement(new ZoomComboboxItem(zoom, calendarValue));
         return true;
-    }
-
-    private void setDateRange() {
-
     }
 
     private void fillZoomComboBox() {
