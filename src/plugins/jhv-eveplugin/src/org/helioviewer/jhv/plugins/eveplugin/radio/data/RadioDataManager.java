@@ -354,7 +354,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The height and width of the data
      */
     private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
-        if (downloadRequestData != null) {
+        if (downloadRequestData != null && downloadRequestData.isVisible()) {
             RadioImage image = downloadRequestData.getRadioImages().get(imageID);
             if (image != null) {
                 image.setLastDataSize(dataSize);
