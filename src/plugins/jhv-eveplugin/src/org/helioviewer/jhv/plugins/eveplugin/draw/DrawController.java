@@ -195,7 +195,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
         // check if selected interval is in available interval and correct it if
         // needed
-        setSelectedInterval(selectedInterval, false);
+        setSelectedInterval(selectedInterval, false, false);
         // PlotTimeSpace.getInstance().setSelectedMinAndMaxTime(interval.getStart(),
         // interval.getEnd());
     }
@@ -274,7 +274,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         }
         TimeIntervalLockModel lockModel = TimeIntervalLockModel.getInstance();
         if (lockModel.isLocked()) {
-            setSelectedInterval(interval, true);
+            setSelectedInterval(interval, true, false);
             lockModel.setLocked(true);
         }
     }
@@ -325,11 +325,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         return interval;
     }
 
-    public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace) {
-        return setSelectedInterval(newSelectedInterval, useFullValueSpace, true);
+    public Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean resetAvailable) {
+        return setSelectedInterval(newSelectedInterval, useFullValueSpace, true, resetAvailable);
     }
 
-    private Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean updatePlotAreaSpace) {
+    private Interval<Date> setSelectedInterval(final Interval<Date> newSelectedInterval, boolean useFullValueSpace, boolean updatePlotAreaSpace, boolean resetAvailable) {
         keepFullValueRange = useFullValueSpace;
         if (availableInterval.getStart() == null || availableInterval.getEnd() == null) {
             selectedInterval = new Interval<Date>(null, null);
@@ -338,6 +338,9 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         } else if (newSelectedInterval.getStart().before(newSelectedInterval.getEnd())) {
             if (availableInterval.containsInclusive(newSelectedInterval)) {
                 selectedInterval = newSelectedInterval;
+                if (resetAvailable) {
+                    setAvailableInterval(newSelectedInterval);
+                }
             } else {
                 Date start = newSelectedInterval.getStart();
                 Date end = newSelectedInterval.getEnd();
@@ -365,9 +368,11 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
                     setAvailableInterval(new Interval<Date>(availableStart, availableEnd));
                 }
             }
+
             if (updatePlotAreaSpace) {
                 updatePlotAreaSpace(selectedInterval);
             }
+
             fireSelectedIntervalChanged(useFullValueSpace);
             fireRedrawRequest();
         } else {
@@ -416,7 +421,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
             // Log.info("plotareachanged starttime: " + newSelectedStartTime
             // + " endtime: " + newSelectedEndTime);
             if (forced || !(newSelectedEndTime.equals(selectedInterval.getEnd()) && newSelectedStartTime.equals(selectedInterval.getStart()))) {
-                setSelectedInterval(new Interval<Date>(newSelectedStartTime, newSelectedEndTime), false, false);
+                setSelectedInterval(new Interval<Date>(newSelectedStartTime, newSelectedEndTime), false, false, false);
             }
         }
     }
