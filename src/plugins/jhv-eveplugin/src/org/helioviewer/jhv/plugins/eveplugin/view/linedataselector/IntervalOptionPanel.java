@@ -34,7 +34,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
     private final DrawController drawController;
 
     private enum ZOOM {
-        CUSTOM, All, Year, Month, Day, Hour, Carrington
+        CUSTOM, All, Year, Month, Day, Hour, Carrington, Movie
     };
 
     public IntervalOptionPanel() {
@@ -65,7 +65,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         if (e.getSource() == periodFromLayersButton) {
             TimeIntervalLockModel.getInstance().setLocked(periodFromLayersButton.isSelected());
             if (periodFromLayersButton.isSelected()) {
-                setDateRange();
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
             } else {
                 periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -112,17 +111,18 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         model.addElement(new ZoomComboboxItem(ZOOM.Carrington, numberOfRotations));
     }
 
+    private void addMovieToModel(DefaultComboBoxModel model) {
+        // TODO Auto-generated method stub
+        model.addElement(new ZoomComboboxItem(ZOOM.Movie, 0));
+    }
+
     private boolean addElementToModel(final DefaultComboBoxModel model, final int calendarValue, final ZOOM zoom) {
         model.addElement(new ZoomComboboxItem(zoom, calendarValue));
         return true;
     }
 
     private void setDateRange() {
-        View view = Layers.getActiveView();
-        if (view != null && view.isMultiFrame()) {
-            Interval<Date> interval = new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
-            DrawController.getSingletonInstance().setSelectedInterval(interval, true, false);
-        }
+
     }
 
     private void fillZoomComboBox() {
@@ -130,7 +130,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         model.removeAllElements();
         model.addElement(new ZoomComboboxItem(ZOOM.CUSTOM, 0));
         model.addElement(new ZoomComboboxItem(ZOOM.All, 0));
-
+        addMovieToModel(model);
         addElementToModel(model, 1, ZOOM.Year);
         addElementToModel(model, 6, ZOOM.Month);
         addElementToModel(model, 3, ZOOM.Month);
@@ -178,6 +178,8 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
                 return Integer.toString(number) + " year" + plural;
             case Carrington:
                 return "Carrington rotation" + plural;
+            case Movie:
+                return "Movie interval";
             default:
                 break;
             }
@@ -238,8 +240,19 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
             break;
         case Carrington:
             newInterval = computeCarringtonInterval(selectedInterval, value);
+            break;
+        case Movie:
+            newInterval = computeMovieInterval();
         }
         return drawController.setSelectedInterval(newInterval, true, true);
+    }
+
+    private Interval<Date> computeMovieInterval() {
+        View view = Layers.getActiveView();
+        if (view != null && view.isMultiFrame()) {
+            return new Interval<Date>(view.getFirstTime().getDate(), view.getLastTime().getDate());
+        }
+        return new Interval<Date>(new Date(), new Date());
     }
 
     private Interval<Date> computeCarringtonInterval(Interval<Date> interval, long value) {
