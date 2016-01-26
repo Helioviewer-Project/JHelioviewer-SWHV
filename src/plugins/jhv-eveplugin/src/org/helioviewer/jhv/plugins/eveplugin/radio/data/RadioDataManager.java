@@ -201,18 +201,16 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The identifier of the plot for which new data is requested
      */
     public void requestForData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging()) {
-            if (!requestBuffer.hasData() && !requestForDataBusy) {
-                requestForDataBusy = true;
-                requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
-                while (requestBuffer.hasData()) {
-                    RequestConfig requestConfig = requestBuffer.getData();
-                    handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
-                }
-                requestForDataBusy = false;
-            } else {
-                requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
+        if (!requestBuffer.hasData() && !requestForDataBusy) {
+            requestForDataBusy = true;
+            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
+            while (requestBuffer.hasData()) {
+                RequestConfig requestConfig = requestBuffer.getData();
+                handleRequestConfig(requestConfig, xStart, xEnd, yStart, yEnd);
             }
+            requestForDataBusy = false;
+        } else {
+            requestBuffer.addRequestConfig(new RequestConfig(xStart, xEnd, yStart, yEnd, xRatio, yRatio));
         }
     }
 
