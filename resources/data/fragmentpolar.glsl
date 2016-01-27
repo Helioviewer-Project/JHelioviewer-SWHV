@@ -6,6 +6,15 @@ vec2 get_polar_texcoord(vec4 rect){
     float start = polarRadii.x;
     float end = polarRadii.y;
     float interpolated = start + scrpos.y * (end-start);
+    if(cutOffValue>=0.){
+        vec3 dpos = vec3(sin(theta), cos(theta), 0.)*interpolated;
+        vec3 cutOffDirectionAlt = vec3(-cutOffDirection.y, cutOffDirection.x, 0.);
+        float geometryFlatDist = abs(dot(dpos, cutOffDirection));
+        float geometryFlatDistAlt = abs(dot(dpos, cutOffDirectionAlt));
+        if(geometryFlatDist>cutOffValue || geometryFlatDistAlt>cutOffValue){
+            discard;
+        }
+    }
     if(interpolated > outerCutOffRadius){
         discard;
     }
