@@ -299,6 +299,7 @@ public class TopToolBar extends JToolBar implements MouseListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Displayer.setMode(el);
+                    el.setGridScale();
                 }
             });
             projectionPopup.add(projectionItem);
