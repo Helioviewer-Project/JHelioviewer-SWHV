@@ -125,7 +125,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
-    public static void renderSceneScale(Camera camera, GL2 gl, GLSLSolarShader shader, GridScale scale) {
+    public static void renderSceneScale(Camera camera, GL2 gl, GLSLSolarShader shader) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
@@ -133,7 +133,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
                 gl.glPushMatrix();
                 gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
-                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, scale);
+                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, GridScale.current);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
                 gl.glPopMatrix();
             }
@@ -183,12 +183,12 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         Camera camera = Displayer.getCamera();
         if (Displayer.mode == Displayer.DisplayMode.POLAR) {
             GridScale.polar.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
-            renderSceneScale(camera, gl, GLSLSolarShader.polar, GridScale.current);
+            renderSceneScale(camera, gl, GLSLSolarShader.polar);
         } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            renderSceneScale(camera, gl, GLSLSolarShader.lati, GridScale.current);
+            renderSceneScale(camera, gl, GLSLSolarShader.lati);
         } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
             GridScale.logpolar.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
-            renderSceneScale(camera, gl, GLSLSolarShader.logpolar, GridScale.current);
+            renderSceneScale(camera, gl, GLSLSolarShader.logpolar);
         } else {
             renderScene(camera, gl);
             renderMiniview(gl);

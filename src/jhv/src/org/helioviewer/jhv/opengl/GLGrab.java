@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.scale.Transform;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
@@ -55,11 +54,11 @@ public class GLGrab {
             fbo.bind(gl);
             Camera camera = Displayer.getCamera();
             if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.polar, new GridScale.GridScaleIdentity(0, 360, 0, 180, Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.polar);
             } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.lati, new GridScale.GridScaleIdentity(0, 360, 0, Layers.getLargestPhysicalSize() / 2, Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.lati);
             } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.logpolar, new GridScale.GridScaleIdentity(0, 360, Math.log(0.05), Math.log(Layers.getLargestPhysicalSize() / 2), Transform.transformpolar));
+                MainComponent.renderSceneScale(camera, gl, GLSLSolarShader.logpolar);
             } else {
                 MainComponent.renderScene(camera, gl);
             }
