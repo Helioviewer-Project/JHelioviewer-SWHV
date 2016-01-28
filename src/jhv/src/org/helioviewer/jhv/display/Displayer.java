@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
@@ -15,6 +16,7 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static enum DisplayMode {
         ORTHO, POLAR, LATITUDINAL, LOGPOLAR;
+
         public String getLabel() {
             String label;
             switch (this) {
@@ -35,6 +37,26 @@ public class Displayer implements JHVEventHighlightListener {
             }
             return label;
         }
+
+        public void setGridScale() {
+            switch (this) {
+            case ORTHO:
+                GridScale.current = GridScale.ortho;
+                break;
+            case POLAR:
+                GridScale.current = GridScale.polar;
+                break;
+            case LATITUDINAL:
+                GridScale.current = GridScale.latitudinal;
+                break;
+            case LOGPOLAR:
+                GridScale.current = GridScale.logpolar;
+                break;
+            default:
+                GridScale.current = null;
+            }
+        }
+
     }
 
     public static DisplayMode mode = DisplayMode.ORTHO;
