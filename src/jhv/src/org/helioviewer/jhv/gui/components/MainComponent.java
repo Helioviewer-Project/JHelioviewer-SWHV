@@ -125,7 +125,13 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
-    public static void renderSceneScale(Camera camera, GL2 gl, GLSLSolarShader shader) {
+    public static void renderSceneScale(Camera camera, GL2 gl) {
+        if (Displayer.mode == Displayer.DisplayMode.POLAR) {
+            GridScale.polar.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
+        } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
+            GridScale.logpolar.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
+        }
+
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Displayer.getViewports()) {
             if (vp != null) {
@@ -133,7 +139,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 CameraHelper.applyPerspectiveLatitudinal(camera, vp, gl);
                 gl.glPushMatrix();
                 gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
-                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, shader, GridScale.current);
+                ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.getSolarShader(), GridScale.current);
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
                 gl.glPopMatrix();
             }
@@ -181,18 +187,13 @@ public class MainComponent extends GLCanvas implements GLEventListener {
         }
 
         Camera camera = Displayer.getCamera();
-        if (Displayer.mode == Displayer.DisplayMode.POLAR) {
-            GridScale.polar.set(0, 360, 0, Layers.getLargestPhysicalSize() / 2);
-            renderSceneScale(camera, gl, GLSLSolarShader.polar);
-        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
-            renderSceneScale(camera, gl, GLSLSolarShader.lati);
-        } else if (Displayer.mode == Displayer.DisplayMode.LOGPOLAR) {
-            GridScale.logpolar.set(0, 360, 0.05, Layers.getLargestPhysicalSize() / 2);
-            renderSceneScale(camera, gl, GLSLSolarShader.logpolar);
-        } else {
+        if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
             renderScene(camera, gl);
             renderMiniview(gl);
+        } else {
+            renderSceneScale(camera, gl);
         }
+
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
     }
