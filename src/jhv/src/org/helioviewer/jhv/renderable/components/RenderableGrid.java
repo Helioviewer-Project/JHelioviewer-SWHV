@@ -154,11 +154,11 @@ public class RenderableGrid extends AbstractRenderable {
                     continue;
                 }
                 float start = -w / 2 + i * w / FLAT_STEPS_THETA;
-                String label = formatStrip(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
+                String label = formatStrip2(scale.getInterpolatedXValue(1. / FLAT_STEPS_THETA * i));
                 renderer.draw3D(label, start, 0, 0, textScaleFactor);
             }
             for (int i = 0; i < (FLAT_STEPS_RADIAL + 1); ++i) {
-                String label = formatStrip(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
+                String label = formatStrip2(scale.getInterpolatedYValue(1. / FLAT_STEPS_RADIAL * i));
                 float start = -h / 2 + i * h / FLAT_STEPS_RADIAL;
                 renderer.draw3D(label, 0, start, 0, textScaleFactor);
             }
@@ -375,6 +375,16 @@ public class RenderableGrid extends AbstractRenderable {
         String txt = String.format("%.1f", v);
         if (txt.endsWith("0")) {
             txt = txt.substring(0, txt.length() - 2);
+        }
+        return txt;
+    }
+
+    private static String formatStrip2(double v) {
+        String txt = String.format("%.2f", v);
+        if (txt.endsWith("00")) {
+            txt = txt.substring(0, txt.length() - 3);
+        } else if (txt.endsWith("0")) {
+            txt = txt.substring(0, txt.length() - 1);
         }
         return txt;
     }
