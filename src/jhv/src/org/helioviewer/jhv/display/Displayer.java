@@ -7,6 +7,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -80,6 +81,10 @@ public class Displayer implements JHVEventHighlightListener {
 
     public static void setMode(DisplayMode newMode) {
         mode = newMode;
+
+        CameraHelper.zoomToFit(ImageViewerGui.getRenderableMiniview().getCamera());
+        //ImageViewerGui.getRenderableMiniview().getCamera().reset();
+
         Displayer.getCamera().reset();
     }
 
