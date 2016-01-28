@@ -11,6 +11,8 @@ void main(void)
     float tmpConvolutionSum = 0.;
     float theta = (scrpos.y)*PI;
     float phi = PI + hgln + scrpos.x*TWOPI;
+    if(cutOffRadius > 1.)
+        discard;
     while(phi>TWOPI){
         phi = phi-TWOPI;
     }
