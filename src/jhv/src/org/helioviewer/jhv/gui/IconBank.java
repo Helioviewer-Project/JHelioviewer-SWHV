@@ -51,7 +51,6 @@ public class IconBank {
         LEFT("arrow_left.gif"), RIGHT("arrow_right.gif"), UP("1uparrow1.png"), DOWN("1downarrow1.png"), RIGHT2("arrow.plain.right.gif"), DOWN2("arrow.plain.down.gif"),
 
         // MOUSE POINTERS
-
         OPEN_HAND("OpenedHand.gif"), OPEN_HAND_SMALL("OpenedHand2.gif"), CLOSED_HAND("ClosedHand.gif"),
 
         PAN("pan24x24.png"), PAN_SELECTED("pan_selected24x24.png"),
@@ -61,7 +60,6 @@ public class IconBank {
         FOCUS("crosshairs24x24.png"), FOCUS_SELECTED("crosshairs_checked24x24.png"),
 
         // MISC ICONS
-
         VISIBLE("layer_visible_dm.png"), HIDDEN("layer_invisible_dm.png"),
 
         REMOVE_LAYER_GRAY("button_cancel_gray.png"), REMOVE_LAYER("button_cancel.png"), INFO("info.png"),
@@ -70,7 +68,7 @@ public class IconBank {
 
         CONNECTED("connected_dm.png"), DISCONNECTED("not_connected_dm.png"),
 
-        MOVIE_LINK("unlocked.png"), MOVIE_UNLINK("locked.png"),
+        MOVIE_LINK("locked.png"), MOVIE_UNLINK("unlocked.png"),
 
         SPLASH("jhv_splash.png"), HVLOGO_SMALL("hvImage_160x160.png"),
 
