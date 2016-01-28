@@ -7,6 +7,7 @@ import org.helioviewer.jhv.viewmodel.imagedata.ColorMask;
 import com.jogamp.opengl.GL2;
 
 public class GLSLSolarShader extends GLSLShader {
+
     public static GLSLSolarShader ortho = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentortho.glsl");
     public static GLSLSolarShader lati = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentlati.glsl");
     public static GLSLSolarShader polar = new GLSLSolarShader("/data/vertex.glsl", "/data/fragmentpolar.glsl");
@@ -258,4 +259,5 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
     }
+
 }

@@ -11,6 +11,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Displayer implements JHVEventHighlightListener {
 
@@ -36,6 +37,21 @@ public class Displayer implements JHVEventHighlightListener {
                 label = "";
             }
             return label;
+        }
+
+        public GLSLSolarShader getSolarShader() {
+            switch (this) {
+            case ORTHO:
+                return GLSLSolarShader.ortho;
+            case POLAR:
+                return GLSLSolarShader.polar;
+            case LATITUDINAL:
+                return GLSLSolarShader.lati;
+            case LOGPOLAR:
+                return GLSLSolarShader.logpolar;
+            default:
+                return null;
+            }
         }
 
         public void setGridScale() {

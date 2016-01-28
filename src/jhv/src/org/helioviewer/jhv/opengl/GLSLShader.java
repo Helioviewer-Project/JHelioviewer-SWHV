@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.FileUtils;
 import com.jogamp.opengl.GL2;
 
 public class GLSLShader {
+
     private int vertexID;
     private int fragmentID;
     protected int progID;
@@ -154,4 +155,5 @@ public class GLSLShader {
             gl.glDeleteShader(fragmentID);
         }
     }
+
 }
