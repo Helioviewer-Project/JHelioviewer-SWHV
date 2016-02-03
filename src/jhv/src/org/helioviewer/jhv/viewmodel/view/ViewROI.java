@@ -17,6 +17,8 @@ public class ViewROI {
     private static final int resolution = 5;
     private static final Vec2[] pointlist = new Vec2[(resolution + 1) * 2 * 2];
 
+    private static final Region unitRadius = new Region(-1, -1, 2, 2);
+
     private static final ViewROI instance = new ViewROI();
 
     private ViewROI() {
@@ -83,6 +85,8 @@ public class ViewROI {
                 newRegion = new Region(minPhysicalX, minPhysicalY, 0, 0);
                 System.out.println(">> empty ROI");
             }
+        } else if (Displayer.mode == Displayer.DisplayMode.LATITUDINAL) {
+            newRegion = unitRadius;
         } else {
             newRegion = m.getPhysicalRegion();
         }
