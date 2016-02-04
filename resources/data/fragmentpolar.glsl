@@ -22,7 +22,6 @@ vec2 get_polar_texcoord(vec4 rect){
         discard;
     }
     vec2 texcoord = rect.zw * (-rect.xy + vec2(cos(theta), sin(theta)) * interpolated);
-    clamp_texcoord(texcoord);
     return texcoord;
 }
 
