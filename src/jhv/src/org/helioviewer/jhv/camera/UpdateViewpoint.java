@@ -6,13 +6,21 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
 
-interface UpdateViewpoint {
+public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    static UpdateViewpoint updateEarth = new UpdateViewpointEarth();
-    static UpdateViewpoint updateExpert = new UpdateViewpointExpert();
-    static UpdateViewpoint updateObserver = new UpdateViewpointObserver();
+    public static UpdateViewpoint updateEarthJ2000 = new UpdateViewpointEarthJ2000();
+    public static UpdateViewpoint updateEarth = new UpdateViewpointEarth();
+    public static UpdateViewpoint updateExpert = new UpdateViewpointExpert();
+    public static UpdateViewpoint updateObserver = new UpdateViewpointObserver();
+
+    static class UpdateViewpointEarthJ2000 implements UpdateViewpoint {
+        @Override
+        public Position.Q update(JHVDate time) {
+            return Sun.EpochEarthQ;
+        }
+    }
 
     static class UpdateViewpointEarth implements UpdateViewpoint {
         @Override
