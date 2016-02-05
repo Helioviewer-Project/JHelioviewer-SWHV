@@ -199,7 +199,7 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements Pos
                 update = UpdateViewpoint.updateObserver;
         }
         Displayer.setViewpointUpdate(update);
-        Displayer.getCamera().refresh();
+        Displayer.getCamera().reset();
 
         switchOptionsPanel(panel);
     }
