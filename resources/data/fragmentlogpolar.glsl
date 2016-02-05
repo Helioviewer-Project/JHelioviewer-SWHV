@@ -22,12 +22,19 @@ vec2 get_polar_texcoord(vec4 rect){
         discard;
     }
     vec2 texcoord = rect.zw * (-rect.xy + vec2(cos(theta), sin(theta)) * interpolated);
+    clamp_texcoord(texcoord);
     return texcoord;
 }
 
 void main(void)
 {  
     vec2 texcoord = get_polar_texcoord(rect);
-    vec2 difftexcoord = get_polar_texcoord(differencerect); 
-    gl_FragColor = getColor(texcoord, difftexcoord);
+    vec4 color;
+    if(isdifference != NODIFFERENCE){
+        vec2 difftexcoord = get_polar_texcoord(differencerect); 
+        color = getColor(texcoord, difftexcoord);
+    } else{
+        color = getColor(texcoord, texcoord);
+    }
+    gl_FragColor = color; 
 }
