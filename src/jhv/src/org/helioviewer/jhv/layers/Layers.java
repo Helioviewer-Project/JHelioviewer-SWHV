@@ -253,7 +253,7 @@ public class Layers {
                 if (d == null) // not yet decoded
                     m = v.getMetaData(new JHVDate(0));
                 else
-                m = d.getMetaData();
+                    m = d.getMetaData();
 
                 newSize = m.getPhysicalRegion().height;
                 if (newSize > size) {

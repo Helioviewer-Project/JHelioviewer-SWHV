@@ -121,8 +121,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
             }
         }
-
-        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
     public static void renderSceneScale(Camera camera, GL2 gl) {
@@ -144,8 +142,6 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 gl.glPopMatrix();
             }
         }
-
-        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
     public static void renderFloatScene(Camera camera, GL2 gl) {
@@ -196,6 +192,8 @@ public class MainComponent extends GLCanvas implements GLEventListener {
 
         renderFloatScene(camera, gl);
         renderFullFloatScene(camera, gl);
+
+        ImageViewerGui.getZoomStatusPanel().update(camera.getWidth());
     }
 
 }
