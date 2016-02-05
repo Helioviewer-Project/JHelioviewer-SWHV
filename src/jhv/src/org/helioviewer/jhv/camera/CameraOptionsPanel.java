@@ -198,7 +198,9 @@ public class CameraOptionsPanel extends ComponentUtils.SmallPanel implements Pos
             default:
                 update = UpdateViewpoint.updateObserver;
         }
-        Displayer.getCamera().setUpdate(update);
+        Displayer.setViewpointUpdate(update);
+        Displayer.getCamera().refresh();
+
         switchOptionsPanel(panel);
     }
 

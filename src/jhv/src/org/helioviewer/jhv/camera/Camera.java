@@ -23,10 +23,9 @@ public class Camera {
     private boolean trackingMode;
 
     private Position.Q viewpoint = Sun.EpochEarthQ;
-    private UpdateViewpoint updateViewpoint = UpdateViewpoint.updateObserver;
 
     private void updateCamera(JHVDate time) {
-        viewpoint = updateViewpoint.update(time);
+        viewpoint = Displayer.getUpdateViewpoint().update(time);
         updateRotation();
         updateWidth();
     }
@@ -42,11 +41,6 @@ public class Camera {
     void refresh() {
         updateCamera(Layers.getLastUpdatedTimestamp());
         Displayer.render(1);
-    }
-
-    void setUpdate(UpdateViewpoint update) {
-        updateViewpoint = update;
-        refresh();
     }
 
     public void reset() {

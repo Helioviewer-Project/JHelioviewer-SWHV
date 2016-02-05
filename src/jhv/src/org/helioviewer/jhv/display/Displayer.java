@@ -8,6 +8,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.UpdateViewpoint;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -85,7 +86,19 @@ public class Displayer implements JHVEventHighlightListener {
         CameraHelper.zoomToFit(ImageViewerGui.getRenderableMiniview().getCamera());
         //ImageViewerGui.getRenderableMiniview().getCamera().reset();
 
-        Displayer.getCamera().reset();
+        camera.reset();
+    }
+
+    private static UpdateViewpoint updateViewpoint = UpdateViewpoint.updateObserver;
+
+    public static void setViewpointUpdate(UpdateViewpoint update) {
+        updateViewpoint = update;
+    }
+
+    public static UpdateViewpoint getUpdateViewpoint() {
+        if (mode == DisplayMode.ORTHO)
+            return updateViewpoint;
+        return UpdateViewpoint.updateEarthJ2000;
     }
 
     static int glWidth = 1;
