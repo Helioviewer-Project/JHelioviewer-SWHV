@@ -10,15 +10,15 @@ public interface UpdateViewpoint {
 
     Position.Q update(JHVDate time);
 
-    public static UpdateViewpoint updateEarthJ2000 = new UpdateViewpointEarthJ2000();
+    public static UpdateViewpoint updateEarthInertial = new UpdateViewpointEarthInertial();
     public static UpdateViewpoint updateEarth = new UpdateViewpointEarth();
     public static UpdateViewpoint updateExpert = new UpdateViewpointExpert();
     public static UpdateViewpoint updateObserver = new UpdateViewpointObserver();
 
-    static class UpdateViewpointEarthJ2000 implements UpdateViewpoint {
+    static class UpdateViewpointEarthInertial implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
-            return Sun.EpochEarthQ;
+            return new Position.Q(time, Sun.EpochEarthQ.distance, Sun.EpochEarthQ.orientation);
         }
     }
 
