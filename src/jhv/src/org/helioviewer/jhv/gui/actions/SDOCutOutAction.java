@@ -61,12 +61,16 @@ public class SDOCutOutAction extends AbstractAction
             double arc_w = arcsec_in_image / fullregion.width;
             double arc_h = arcsec_in_image / fullregion.height;
 
-            url.append("&width=" + (region.width * arc_w));
-            url.append("&height=" + (region.height * arc_h));
-            url.append("&xCen=" + (centr_x * arc_w));
-            url.append("&yCen=" + (-centr_y * arc_h));
+            url.append("&width=" + format_double(region.width * arc_w));
+            url.append("&height=" + format_double(region.height * arc_h));
+            url.append("&xCen=" + format_double(centr_x * arc_w - 0.3));
+            url.append("&yCen=" + format_double(-centr_y * arc_h + 0.3));
         }
 
         JHVGlobals.openURL(url.toString());
+    }
+
+    private String format_double(double x) {
+        return String.format("%.1f", x);
     }
 }
