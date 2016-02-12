@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.viewmodel.imagedata.ImageData;
+import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 import org.helioviewer.jhv.viewmodel.view.View;
 import org.helioviewer.jhv.viewmodel.view.View.AnimationMode;
@@ -264,4 +265,18 @@ public class Layers {
         return size;
     }
 
+    public static String getSDOCutoutString() {
+        StringBuilder str = new StringBuilder();
+        for (View v : layers) {
+            if (v.getImageLayer().isVisible()) {
+                MetaData md = v.getMetaData(Layers.getLastUpdatedTimestamp());
+                if (md instanceof HelioviewerMetaData) {
+                    HelioviewerMetaData hmd = (HelioviewerMetaData) md;
+                    if (hmd.getObservatory().contains("SDO") && hmd.getInstrument().contains("AIA"))
+                        str.append("," + hmd.getMeasurement());
+                }
+            }
+        }
+        return str.toString();
+    }
 }
