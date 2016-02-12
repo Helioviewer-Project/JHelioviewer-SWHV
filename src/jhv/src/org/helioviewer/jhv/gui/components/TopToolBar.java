@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.actions.ResetCameraAction;
+import org.helioviewer.jhv.gui.actions.SDOCutOutAction;
 import org.helioviewer.jhv.gui.actions.ZoomFitAction;
 import org.helioviewer.jhv.gui.actions.ZoomInAction;
 import org.helioviewer.jhv.gui.actions.ZoomOneToOneAction;
@@ -317,6 +318,10 @@ public class TopToolBar extends JToolBar implements MouseListener {
         });
 
         addSeparator();
+
+        addButton(new JButton(new SDOCutOutAction(false, true)));
+        addSeparator();
+
     }
 
     /**
