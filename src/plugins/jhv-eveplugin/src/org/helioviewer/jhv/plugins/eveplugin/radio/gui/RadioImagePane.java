@@ -63,7 +63,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
             for (PlotConfig pc : configs) {
                 pc.draw(g);
             }
-        } else if (noDataConfigs.size() != 0 || configs.size() != 0) {
+        } else {
             String text1 = "The selected interval is too big.";
             String text2 = "Reduce the interval to see the radio spectrograms.";
             final int text1Width = (int) g.getFontMetrics().getStringBounds(text1, g).getWidth();
@@ -93,7 +93,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public boolean hasElementsToDraw() {
-        return (RadioPlotModel.getSingletonInstance().getPlotConfigurations() != null && !RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty()) || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations().isEmpty();
+        return intervalTooBig || (RadioPlotModel.getSingletonInstance().getPlotConfigurations() != null && !RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty()) || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations().isEmpty();
     }
 
     public void setIntervalTooBig(boolean b) {

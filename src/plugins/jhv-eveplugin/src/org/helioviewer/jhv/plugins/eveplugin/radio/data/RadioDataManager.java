@@ -251,7 +251,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      */
     @Override
     public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
-        DownloadRequestData downloadRequestData = new DownloadRequestData();
+        downloadRequestData = new DownloadRequestData();
         lineDataSelectorModel.addLineData(downloadRequestData);
         fireIntervalTooBig();
         fireNewDataAvailable(downloadRequestData);
