@@ -48,7 +48,7 @@ public class DownloadedJPXData implements ImageDataHandler {
     }
 
     public void remove() {
-        radioDataManager.finishedDownloadingID(imageID);
+        radioDataManager.finishedDownloadingImage(imageID);
 
         if (view != null) {
             view.setDataHandler(null);
@@ -68,8 +68,8 @@ public class DownloadedJPXData implements ImageDataHandler {
             Region r = imageData.getRegion();
             ResolutionLevel rl = view.getJP2Image().getResolutionSet(0).getResolutionLevel(0);
 
-            radioDataManager.dataForIDReceived(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.height);
-            radioDataManager.finishedDownloadingID(imageID);
+            radioDataManager.dataForImage(data, imageID, new Rectangle(imageData.getWidth(), imageData.getHeight()), new Rectangle((int) r.llx, (int) r.lly, (int) r.width, (int) r.height), rl.height);
+            radioDataManager.finishedDownloadingImage(imageID);
         }
     }
 }
