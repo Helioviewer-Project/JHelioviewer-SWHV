@@ -330,7 +330,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
         downloadRequestData = new DownloadRequestData();
         lineDataSelectorModel.addLineData(downloadRequestData);
-        fireIntervalTooBig();
+        intervalTooBig();
         downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
@@ -437,7 +437,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      */
     private void handleRequestConfig(RequestConfig requestConfig, Date xStart, Date xEnd, double yStart, double yEnd) {
         if (requestConfig.getxEnd().getTime() - requestConfig.getxStart().getTime() > EVESettings.MAXIMUM_INTERVAL_RANGE_MILLI_SEC_REQ) {
-            fireIntervalTooBig();
+            intervalTooBig();
         } else {
             RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000);
             if (downloadRequestData != null) {
