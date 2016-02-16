@@ -12,6 +12,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
 
 public class ZoomManager implements TimingListener, GraphDimensionListener, PlotAreaSpaceListener, ValueSpaceListener {
 
@@ -19,7 +20,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     private DrawController drawController;
     private PlotAreaSpace plotAreaSpace;
     private YAxisElement yAxisElement;
-    private RadioPlotModel radioPlotModel;
+    private RadioDataManager radioDataManager;
 
     // private ZoomDataConfig zoomDataConfig;
     private boolean isAreaInitialized;
@@ -51,14 +52,14 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         drawController.addTimingListener(this);
         drawController.addGraphDimensionListener(this);
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
-        radioPlotModel = RadioPlotModel.getSingletonInstance();
-        yAxisElement = radioPlotModel.getYAxisElement();
+        radioDataManager = RadioDataManager.getSingletonInstance();
+        yAxisElement = radioDataManager.getYAxisElement();
 
     }
 
     public void addZoomDataConfig(Interval<Date> interval) {
         plotAreaSpace.addPlotAreaSpaceListener(this);
-        radioPlotModel.getYAxisElement().addValueSpaceListener(this);
+        radioDataManager.getYAxisElement().addValueSpaceListener(this);
         Interval<Date> currentInterval = drawController.getSelectedInterval();
         if (currentInterval == null) {
             currentInterval = interval;
@@ -223,7 +224,7 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         if (isAreaInitialized && isMinXInitialized && isMaxXInitialized) {
             double xRatio = 1.0 * (maxX.getTime() - minX.getTime()) / displaySize.getWidth();
             double yRatio = 1.0 * (yAxisElement.getSelectedRange().max - yAxisElement.getSelectedRange().min) / displaySize.getHeight();
-            radioPlotModel.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
+            radioDataManager.requestData(minX, maxX, yAxisElement.getSelectedRange().min, yAxisElement.getSelectedRange().max, xRatio, yRatio);
         }
     }
 
