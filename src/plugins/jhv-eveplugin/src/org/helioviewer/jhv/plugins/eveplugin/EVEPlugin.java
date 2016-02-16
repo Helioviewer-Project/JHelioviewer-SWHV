@@ -9,8 +9,8 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.plugin.interfaces.Plugin;
 import org.helioviewer.jhv.gui.ImageViewerGui;
-import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.gui.dialogs.observation.ObservationDialog;
+import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
@@ -18,7 +18,6 @@ import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModel;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
@@ -48,7 +47,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         // Create an instance of eveDrawController and leave it here
         EVEDrawController.getSingletonInstance();
         RadioDataManager.getSingletonInstance();
-        RadioPlotModel.getSingletonInstance();
         // Avoid concurrent modification error
         TimeIntervalLockModel.getInstance();
         pluginPanes.add(plotOne);
@@ -58,7 +56,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
         ImageViewerGui.getMainContentPanel().addPlugin(EVEPlugin.this);
 
-        RadioPlotModel.getSingletonInstance();
         EventModel.getSingletonInstance().activateEvents();
 
         Layers.addLayersListener(DrawController.getSingletonInstance());

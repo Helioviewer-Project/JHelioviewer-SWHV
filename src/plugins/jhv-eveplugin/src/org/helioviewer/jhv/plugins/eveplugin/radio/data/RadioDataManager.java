@@ -1,8 +1,15 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +18,17 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
+import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModel;
+import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListener;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioYAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomDataConfigListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -35,7 +49,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.Resolution
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements RadioDownloaderListener {
+public class RadioDataManager implements RadioDownloaderListener, ColorLookupModelListener, ZoomDataConfigListener {
 
     /** The singleton instance of the class. */
     private static RadioDataManager instance;
@@ -67,12 +81,32 @@ public class RadioDataManager implements RadioDownloaderListener {
     /** Is there a request for data busy */
     private boolean requestForDataBusy;
 
+    private final DrawController drawController;
+    private Map<Long, BufferedImage> bufferedImages;
+    // private final YValueModel yValueModel;
+    private final RadioYAxisElement yAxisElement;
+    private final RadioImagePane radioImagePane;
+    private Map<Long, PlotConfig> plotConfigList;
+    /** Map containing per download id a list of no data configurations */
+    private List<NoDataConfig> noDataConfigList;
+
     /**
      * private constructor used when the instance is requested for the first
      * time.
      *
      */
     private RadioDataManager() {
+        ColorLookupModel.getInstance().addFilterModelListener(this);
+        zoomManager = ZoomManager.getSingletonInstance();
+        drawController = DrawController.getSingletonInstance();
+        bufferedImages = new HashMap<Long, BufferedImage>();
+        yAxisElement = new RadioYAxisElement();
+        yAxisElement.setLabel("MHz");
+        yAxisElement.setIsLogScale(false);
+        radioImagePane = new RadioImagePane();
+        radioImagePane.setYAxisElement(yAxisElement);
+        plotConfigList = new HashMap<Long, PlotConfig>();
+        noDataConfigList = new ArrayList<NoDataConfig>();
     }
 
     /**
@@ -170,7 +204,21 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download request data for which the visiblility is changed
      */
     public void downloadRequestDataVisibilityChanged(DownloadRequestData drd) {
-        fireDownloadRequestDataVisibilityChanged(drd);
+        downloadRequestData = drd;
+        for (PlotConfig pc : plotConfigList.values()) {
+            pc.setVisible(drd.isVisible());
+        }
+        for (NoDataConfig ndc : noDataConfigList) {
+            ndc.setVisible(drd.isVisible());
+        }
+        if (drd.isVisible()) {
+            drawController.updateDrawableElement(radioImagePane);
+        } else {
+            drawController.removeDrawableElement(radioImagePane);
+        }
+
+        fireChangeVisibility();
+        lineDataSelectorModel.lineDataElementUpdated(drd);
     }
 
     /**
@@ -337,7 +385,6 @@ public class RadioDataManager implements RadioDownloaderListener {
                 maxFrequencyInterval = new FrequencyInterval(0, 0);
             }
         }
-        RadioYAxisElement yAxisElement = RadioPlotModel.getSingletonInstance().getYAxisElement();
         yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
     }
 
@@ -360,9 +407,7 @@ public class RadioDataManager implements RadioDownloaderListener {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                     FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
-                    for (RadioDataManagerListener l : listeners) {
-                        l.newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), dataFrequencyInterval, image.getFreqInterval(), dataSize, imageID);
-                    }
+                    newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), dataFrequencyInterval, image.getFreqInterval(), dataSize, imageID);
                 }
             } else {
                 // Log.debug("The image was null");
@@ -388,9 +433,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download id
      */
     private void fireNewDataAvailable(DownloadRequestData drd) {
-        for (RadioDataManagerListener l : listeners) {
-            l.newDataAvailable(drd);
-        }
+        newDataAvailable(drd);
     }
 
     /**
@@ -400,24 +443,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The data that was removed
      */
     private void fireDownloadRequestDataRemoved(DownloadRequestData drd) {
-        for (RadioDataManagerListener l : listeners) {
-            l.downloadRequestDataRemoved(drd);
-        }
-    }
-
-    /**
-     * Informs the radio data manager listeners about the data visibility that
-     * was changed.
-     *
-     * @param drd
-     *            The download request data for which the data visibility was
-     *            changed.
-     */
-    private void fireDownloadRequestDataVisibilityChanged(DownloadRequestData drd) {
-        for (RadioDataManagerListener l : listeners) {
-            l.downloadRequestDataVisibilityChanged(drd);
-        }
-        lineDataSelectorModel.lineDataElementUpdated(drd);
+        downloadRequestDataRemoved(drd);
     }
 
     /**
@@ -430,9 +456,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            The download id for which the request was answered
      */
     private void fireDownloadRequestAnswered(Interval<Date> timeInterval) {
-        for (RadioDataManagerListener l : listeners) {
-            l.downloadRequestAnswered(timeInterval);
-        }
+        downloadRequestAnswered(timeInterval);
     }
 
     /**
@@ -524,9 +548,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      */
     private void fireClearSavedImages(List<Long> toRemove) {
         for (long imageID : toRemove) {
-            for (RadioDataManagerListener l : listeners) {
-                l.clearAllSavedImagesForID(imageID);
-            }
+            clearAllSavedImagesForID(imageID);
         }
     }
 
@@ -539,9 +561,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            too big
      */
     private void fireIntervalTooBig() {
-        for (RadioDataManagerListener l : listeners) {
-            l.intervalTooBig();
-        }
+        intervalTooBig();
     }
 
     /**
@@ -626,9 +646,7 @@ public class RadioDataManager implements RadioDownloaderListener {
      *            received
      */
     private void fireNoDataIntervalsReceived(List<Interval<Date>> noDataList) {
-        for (RadioDataManagerListener l : listeners) {
-            l.noDataInterval(noDataList);
-        }
+        noDataInterval(noDataList);
     }
 
     @Override
@@ -639,4 +657,156 @@ public class RadioDataManager implements RadioDownloaderListener {
         fireDownloadRequestAnswered(requestInterval);
     }
 
+    public Collection<PlotConfig> getPlotConfigurations() {
+        return plotConfigList.values();
+    }
+
+    /**
+     * Creates a collection of no data configurations for a specific plot
+     * identifier
+     *
+     * @return A collection containing all the no data configurations.
+     */
+    public Collection<NoDataConfig> getNoDataConfigurations() {
+        return noDataConfigList;
+    }
+
+    public void downloadRequestAnswered(Interval<Date> timeInterval) {
+        zoomManager.addZoomDataConfig(timeInterval);
+        PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
+    }
+
+    public void newDataAvailable(DownloadRequestData data) {
+        if (downloadRequestData == null) {
+            downloadRequestData = data;
+        } else {
+            downloadRequestData.mergeDownloadRequestData(data);
+        }
+        // plotConfigList = new HashMap<Long, PlotConfig>();
+    }
+
+    public void downloadRequestDataRemoved(DownloadRequestData drd) {
+        PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
+        noDataConfigList = new ArrayList<NoDataConfig>();
+        plotConfigList = new HashMap<Long, PlotConfig>();
+        downloadRequestData = null;
+        zoomManager.removeZoomManagerDataConfig();
+        drawController.removeDrawableElement(radioImagePane);
+        for (long imageID : drd.getRadioImages().keySet()) {
+            bufferedImages.remove(imageID);
+        }
+        fireRemoveRadioImage();
+    }
+
+    public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval visibleFreqInterval, FrequencyInterval imageFreqInterval, Rectangle area, long radioImageID) {
+        BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
+        bufferedImages.put(radioImageID, newImage);
+        radioImagePane.setIntervalTooBig(false);
+        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), visibleFreqInterval.getStart(), visibleFreqInterval.getEnd(), imageFreqInterval.getStart(), imageFreqInterval.getEnd(), area);
+        PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
+        plotConfigList.put(radioImageID, pc);
+        fireDrawNewBufferedImage();
+    }
+
+    public void clearAllSavedImagesForID(long imageID) {
+        plotConfigList.remove(imageID);
+    }
+
+    public void intervalTooBig() {
+        plotConfigList = new HashMap<Long, PlotConfig>();
+        radioImagePane.setIntervalTooBig(true);
+        drawController.updateDrawableElement(radioImagePane);
+    }
+
+    public void noDataInterval(List<Interval<Date>> noDataList) {
+        radioImagePane.setIntervalTooBig(false);
+        for (Interval<Date> noData : noDataList) {
+            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
+            noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
+        }
+        fireDrawNewBufferedImage();
+    }
+
+    /*
+     * ZoomDataConfigListener
+     */
+
+    @Override
+    public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
+        if (downloadRequestData != null && downloadRequestData.isVisible()) {
+            requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
+            updateNoDataConfig();
+        }
+    }
+
+    private void fireDrawNewBufferedImage() {// BufferedImage
+        radioImagePane.setYAxisElement(yAxisElement);
+        drawController.updateDrawableElement(radioImagePane);
+    }
+
+    private BufferedImage createBufferedImage(int width, int height, byte[] data) {
+        byte[] useData;
+        if (width * height == data.length) {
+            useData = data;
+        } else {
+            Log.error("Data array was too small; white image created");
+            useData = new byte[width * height];
+        }
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, ColorLookupModel.getInstance().getColorModel());
+        DataBufferByte dataBuffer = new DataBufferByte(useData, width * height);
+        Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
+        newImage.setData(raster);
+        return newImage;
+    }
+
+    private void fireRemoveRadioImage() {
+        for (RadioDataManagerListener l : listeners) {
+            l.removeDownloadRequestData();
+        }
+    }
+
+    private void fireChangeVisibility() {
+        for (RadioDataManagerListener l : listeners) {
+            l.changeVisibility();
+        }
+    }
+
+    private void updateNoDataConfig() {
+        for (NoDataConfig ndc : noDataConfigList) {
+            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(ndc.getDateInterval().getStart(), ndc.getDateInterval().getEnd());
+            ndc.setDrawableAreaMap(dam);
+        }
+        fireDrawNewBufferedImage();
+    }
+
+    @Override
+    public void colorLUTChanged() {
+        ColorModel cm = ColorLookupModel.getInstance().getColorModel();
+        Map<Long, BufferedImage> newBufferedImages = new HashMap<Long, BufferedImage>();
+        for (Map.Entry<Long, BufferedImage> entry : bufferedImages.entrySet()) {
+            long index = entry.getKey();
+            BufferedImage old = entry.getValue();
+            BufferedImage newIm = new BufferedImage(cm, old.getRaster(), false, null);
+            newBufferedImages.put(index, newIm);
+        }
+        bufferedImages = newBufferedImages;
+        updatePlotConfigurations();
+        if (!getPlotConfigurations().isEmpty()) {
+            fireDrawNewBufferedImage();
+        }
+    }
+
+    private void updatePlotConfigurations() {
+        for (Map.Entry<Long, PlotConfig> entry : plotConfigList.entrySet()) {
+            long imageID = entry.getKey();
+            PlotConfig tempPC = entry.getValue();
+            if (bufferedImages.containsKey(imageID)) {
+                tempPC.setBufferedImage(bufferedImages.get(imageID));
+            }
+        }
+    }
+
+    public RadioYAxisElement getYAxisElement() {
+        return yAxisElement;
+    }
 }

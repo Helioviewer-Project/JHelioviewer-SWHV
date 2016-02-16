@@ -13,13 +13,13 @@ import java.util.Date;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
+import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManagerListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModel;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.RadioPlotModelListener;
 
-public class RadioImagePane implements ImageObserver, RadioPlotModelListener, DrawableElement {
+public class RadioImagePane implements ImageObserver, RadioDataManagerListener, DrawableElement {
 
     private YAxisElement yAxisElement;
     private boolean intervalTooBig;
@@ -54,8 +54,8 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
     public void draw(Graphics2D g, Graphics2D leftAxisG, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         // Log.trace("redraw radio image pane for plot : " + plotIdentifier);
         // Thread.dumpStack();
-        Collection<NoDataConfig> noDataConfigs = RadioPlotModel.getSingletonInstance().getNoDataConfigurations();
-        Collection<PlotConfig> configs = RadioPlotModel.getSingletonInstance().getPlotConfigurations();
+        Collection<NoDataConfig> noDataConfigs = RadioDataManager.getSingletonInstance().getNoDataConfigurations();
+        Collection<PlotConfig> configs = RadioDataManager.getSingletonInstance().getPlotConfigurations();
         if (!intervalTooBig) {
             for (NoDataConfig ndc : noDataConfigs) {
                 ndc.draw(g);
@@ -93,7 +93,7 @@ public class RadioImagePane implements ImageObserver, RadioPlotModelListener, Dr
 
     @Override
     public boolean hasElementsToDraw() {
-        return intervalTooBig || (RadioPlotModel.getSingletonInstance().getPlotConfigurations() != null && !RadioPlotModel.getSingletonInstance().getPlotConfigurations().isEmpty()) || !RadioPlotModel.getSingletonInstance().getNoDataConfigurations().isEmpty();
+        return intervalTooBig || (RadioDataManager.getSingletonInstance().getPlotConfigurations() != null && !RadioDataManager.getSingletonInstance().getPlotConfigurations().isEmpty()) || !RadioDataManager.getSingletonInstance().getNoDataConfigurations().isEmpty();
     }
 
     public void setIntervalTooBig(boolean b) {
