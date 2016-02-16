@@ -302,7 +302,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         downloadRequestData = new DownloadRequestData();
         lineDataSelectorModel.addLineData(downloadRequestData);
         fireIntervalTooBig();
-        fireNewDataAvailable(downloadRequestData);
         fireDownloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
@@ -317,7 +316,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             }
         }
         defineMaxBounds();
-        fireNewDataAvailable(downloadRequestData);
         fireDownloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
@@ -333,7 +331,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
                 handleDownloadedJPXData(djd, downloadRequestData, ratioX, ratioY);
             }
             defineMaxBounds();
-            fireNewDataAvailable(downloadRequestData);
         }
     }
 
@@ -422,18 +419,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         double start = freqInterval.getEnd() - providedRegion.getY() * ratio;
         double end = freqInterval.getEnd() - (providedRegion.getY() + providedRegion.getHeight()) * ratio;
         return new FrequencyInterval((int) start, (int) end);
-    }
-
-    /**
-     * Informs the radio data manager listeners about new available data.
-     *
-     * @param drd
-     *            The available data
-     * @param iD
-     *            The download id
-     */
-    private void fireNewDataAvailable(DownloadRequestData drd) {
-        newDataAvailable(drd);
     }
 
     /**
@@ -653,7 +638,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     public void noDataInDownloadInterval(Interval<Date> requestInterval) {
         downloadRequestData = new DownloadRequestData();
         lineDataSelectorModel.addLineData(downloadRequestData);
-        fireNewDataAvailable(downloadRequestData);
         fireDownloadRequestAnswered(requestInterval);
     }
 
@@ -674,15 +658,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     public void downloadRequestAnswered(Interval<Date> timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
-    }
-
-    public void newDataAvailable(DownloadRequestData data) {
-        if (downloadRequestData == null) {
-            downloadRequestData = data;
-        } else {
-            downloadRequestData.mergeDownloadRequestData(data);
-        }
-        // plotConfigList = new HashMap<Long, PlotConfig>();
     }
 
     public void downloadRequestDataRemoved(DownloadRequestData drd) {
