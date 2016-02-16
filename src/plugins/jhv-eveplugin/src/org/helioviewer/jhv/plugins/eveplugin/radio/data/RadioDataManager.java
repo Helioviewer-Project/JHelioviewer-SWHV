@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -21,6 +23,7 @@ import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpace;
 import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioImagePane;
+import org.helioviewer.jhv.plugins.eveplugin.radio.gui.RadioOptionsPanel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModel;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ColorLookupModelListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
@@ -31,6 +34,7 @@ import org.helioviewer.jhv.plugins.eveplugin.radio.model.ResolutionSetting;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomDataConfigListener;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.viewmodel.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2Image.ReaderMode;
@@ -49,13 +53,13 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.Resolution
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements RadioDownloaderListener, ColorLookupModelListener, ZoomDataConfigListener {
+public class RadioDataManager implements RadioDownloaderListener, ColorLookupModelListener, ZoomDataConfigListener, LineDataSelectorElement {
 
     /** The singleton instance of the class. */
     private static RadioDataManager instance;
 
     /** A map keeping the download request data. */
-    private DownloadRequestData downloadRequestData;
+    // private DownloadRequestData downloadRequestData;
 
     /** Instance of the radio downloader */
     private RadioDownloader downloader;
@@ -87,6 +91,10 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     /** Map containing per download id a list of no data configurations */
     private List<NoDataConfig> noDataConfigList;
 
+    private Map<Long, RadioImage> radioImages;
+    private boolean isDownloading;
+    private boolean isVisible;
+
     /**
      * private constructor used when the instance is requested for the first
      * time.
@@ -104,6 +112,8 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         radioImagePane.setYAxisElement(yAxisElement);
         plotConfigList = new HashMap<Long, PlotConfig>();
         noDataConfigList = new ArrayList<NoDataConfig>();
+        isVisible = true;
+        isDownloading = false;
     }
 
     /**
@@ -145,8 +155,8 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      *            The height and width of the data
      */
     public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
-        if (downloadRequestData != null && downloadRequestData.isVisible()) {
-            RadioImage image = downloadRequestData.getRadioImages().get(imageID);
+        if (radioImages != null && isVisible) {
+            RadioImage image = radioImages.get(imageID);
             if (image != null) {
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
@@ -155,7 +165,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
                     bufferedImages.put(imageID, newImage);
                     radioImagePane.setIntervalTooBig(false);
                     DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().getStart(), image.getVisibleImageTimeInterval().getEnd(), dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
-                    PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), imageID);
+                    PlotConfig pc = new PlotConfig(newImage, dam, isVisible, imageID);
                     plotConfigList.put(imageID, pc);
                     fireDrawNewBufferedImage();
                     ;
@@ -180,20 +190,18 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      *            The download request data that should be removed
      */
     public void removeDownloadRequestData() {
-        if (downloadRequestData != null) {
-            lineDataSelectorModel.removeLineData(downloadRequestData);
-            for (long imageID : downloadRequestData.getRadioImages().keySet()) {
+        if (radioImages != null) {
+            lineDataSelectorModel.removeLineData(this);
+            for (long imageID : radioImages.keySet()) {
                 cache.remove(imageID);
+                bufferedImages.remove(imageID);
             }
             PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
             noDataConfigList = new ArrayList<NoDataConfig>();
             plotConfigList = new HashMap<Long, PlotConfig>();
             zoomManager.removeZoomManagerDataConfig();
             drawController.removeDrawableElement(radioImagePane);
-            for (long imageID : downloadRequestData.getRadioImages().keySet()) {
-                bufferedImages.remove(imageID);
-            }
-            downloadRequestData = null;
+            radioImages = null;
 
             PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
         }
@@ -207,21 +215,20 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      * @param drd
      *            The download request data for which the visiblility is changed
      */
-    public void downloadRequestDataVisibilityChanged(DownloadRequestData drd) {
-        downloadRequestData = drd;
+    public void downloadRequestDataVisibilityChanged() {
         for (PlotConfig pc : plotConfigList.values()) {
-            pc.setVisible(drd.isVisible());
+            pc.setVisible(isVisible);
         }
         for (NoDataConfig ndc : noDataConfigList) {
-            ndc.setVisible(drd.isVisible());
+            ndc.setVisible(isVisible);
         }
-        if (drd.isVisible()) {
+        if (isVisible) {
             drawController.updateDrawableElement(radioImagePane);
         } else {
             drawController.removeDrawableElement(radioImagePane);
         }
 
-        lineDataSelectorModel.lineDataElementUpdated(drd);
+        lineDataSelectorModel.lineDataElementUpdated(this);
     }
 
     /**
@@ -276,22 +283,22 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      *            The download id of the batch of which the image was part
      */
     public void finishedDownloadingID(long imageID) {
-        if (downloadRequestData != null) {
-            RadioImage image = downloadRequestData.getRadioImages().get(imageID);
+        if (radioImages != null) {
+            RadioImage image = radioImages.get(imageID);
             if (image != null) {
                 image.setDownloading(false);
             }
-            boolean isDownloading = false;
-            for (RadioImage im : downloadRequestData.getRadioImages().values()) {
+            boolean isImDownloading = false;
+            for (RadioImage im : radioImages.values()) {
                 if (im.isDownloading()) {
-                    isDownloading = true;
+                    isImDownloading = true;
                     break;
                 }
             }
-            if (!isDownloading) {
-                if (downloadRequestData.isDownloading()) {
-                    downloadRequestData.setDownloading(false);
-                    lineDataSelectorModel.downloadFinished(downloadRequestData);
+            if (!isImDownloading) {
+                if (isDownloading) {
+                    isDownloading = false;
+                    lineDataSelectorModel.downloadFinished(this);
                 }
             }
         }
@@ -302,20 +309,20 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      */
     @Override
     public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
-        downloadRequestData = new DownloadRequestData();
-        lineDataSelectorModel.addLineData(downloadRequestData);
+        radioImages = new HashMap<Long, RadioImage>();
+        lineDataSelectorModel.addLineData(this);
         intervalTooBig();
         downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
     @Override
     public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime) {
-        downloadRequestData = new DownloadRequestData();
-        downloadRequestData.setDownloading(true);
-        lineDataSelectorModel.addLineData(downloadRequestData);
+        radioImages = new HashMap<Long, RadioImage>();
+        isDownloading = true;
+        lineDataSelectorModel.addLineData(this);
         if (!jpxFiles.isEmpty()) {
             for (DownloadedJPXData djd : jpxFiles) {
-                handleDownloadedJPXData(djd, downloadRequestData, Double.NaN, Double.NaN);
+                handleDownloadedJPXData(djd, Double.NaN, Double.NaN);
             }
         }
         defineMaxBounds();
@@ -324,14 +331,14 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
 
     @Override
     public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, double ratioX, double ratioY) {
-        if (downloadRequestData != null) {
-            boolean oldDownloading = downloadRequestData.isDownloading();
-            downloadRequestData.setDownloading(true);
+        if (radioImages != null) {
+            boolean oldDownloading = isDownloading;
+            isDownloading = true;
             if (!oldDownloading) {
-                lineDataSelectorModel.downloadStarted(downloadRequestData);
+                lineDataSelectorModel.downloadStarted(this);
             }
             for (DownloadedJPXData djd : jpxFiles) {
-                handleDownloadedJPXData(djd, downloadRequestData, ratioX, ratioY);
+                handleDownloadedJPXData(djd, ratioX, ratioY);
             }
             defineMaxBounds();
         }
@@ -343,7 +350,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             radioImagePane.setIntervalTooBig(false);
             for (Interval<Date> noData : noDataList) {
                 DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
-                noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
+                noDataConfigList.add(new NoDataConfig(noData, dam, isVisible));
             }
             fireDrawNewBufferedImage();
         }
@@ -365,8 +372,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      */
     private void defineMaxBounds() {
         FrequencyInterval maxFrequencyInterval = new FrequencyInterval();
-        if (downloadRequestData != null) {
-            Map<Long, RadioImage> radioImages = downloadRequestData.getRadioImages();
+        if (radioImages != null) {
             if (!radioImages.isEmpty()) {
                 int localMinFrequency = -1;
                 int localMaxFrequency = -1;
@@ -419,20 +425,20 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             intervalTooBig();
         } else {
             RadioImageCacheResult result = cache.getRadioImageCacheResultForInterval(requestConfig.getxStart(), requestConfig.getxEnd(), 24L * 60 * 60 * 1000);
-            if (downloadRequestData != null) {
+            if (radioImages != null) {
                 downloader.requestAndOpenIntervals(result.getMissingInterval(), requestConfig.getxRatio(), requestConfig.getyRatio());
             } else {
                 Log.trace("drd is null");
             }
 
-            if (downloadRequestData != null) {
+            if (radioImages != null) {
                 for (long imageID : result.getToRemove()) {
                     plotConfigList.remove(imageID);
                 }
                 // Log.trace("Size of available images : " +
                 // result.getAvailableData().size());
                 for (DownloadedJPXData jpxData : result.getAvailableData()) {
-                    handleAvailableData(jpxData, xStart, xEnd, yStart, yEnd, downloadRequestData);
+                    handleAvailableData(jpxData, xStart, xEnd, yStart, yEnd);
                 }
             }
         }
@@ -459,8 +465,8 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      *            The download request data
      *
      */
-    private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd, DownloadRequestData drd) {
-        RadioImage ri = drd.getRadioImages().get(jpxData.getImageID());
+    private void handleAvailableData(DownloadedJPXData jpxData, Date xStart, Date xEnd, double yStart, double yEnd) {
+        RadioImage ri = radioImages.get(jpxData.getImageID());
         if (ri != null) {
             ri.setVisibleIntervals(xStart, xEnd, (int) Math.floor(yStart), (int) Math.ceil(yEnd));
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
@@ -490,14 +496,14 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      * @param downloadID
      *            The download identifier for which the data was downloaded
      */
-    private void handleDownloadedJPXData(DownloadedJPXData djd, DownloadRequestData drd, double ratioX, double ratioY) {
+    private void handleDownloadedJPXData(DownloadedJPXData djd, double ratioX, double ratioY) {
         JP2ViewCallisto jp2View = djd.getView();
         if (jp2View != null) {
             JP2ImageCallisto image = jp2View.getJP2Image();
             image.setReaderMode(ReaderMode.ONLYFIREONCOMPLETE);
             ResolutionSet rs = image.getResolutionSet(0);
             int maximumFrameNumber = image.getMaximumFrameNumber();
-            LineDataSelectorModel.getSingletonInstance().downloadStarted(drd);
+            LineDataSelectorModel.getSingletonInstance().downloadStarted(this);
 
             XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer();
             for (int i = 0; i <= maximumFrameNumber; i++) {
@@ -539,7 +545,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
                     image.setRegion(tempRs.getROI());
                     jp2View.render(null, null, 1);
 
-                    drd.addRadioImage(tempRs);
+                    radioImages.put(tempRs.getRadioImageID(), tempRs);
                 } catch (Exception e) {
                     Log.error("Some of the metadata could not be read, aborting...");
                     return;
@@ -550,8 +556,8 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
 
     @Override
     public void noDataInDownloadInterval(Interval<Date> requestInterval) {
-        downloadRequestData = new DownloadRequestData();
-        lineDataSelectorModel.addLineData(downloadRequestData);
+        radioImages = new HashMap<Long, RadioImage>();
+        lineDataSelectorModel.addLineData(this);
         downloadRequestAnswered(requestInterval);
     }
 
@@ -586,7 +592,7 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
 
     @Override
     public void requestData(Date xStart, Date xEnd, double yStart, double yEnd, double xRatio, double yRatio) {
-        if (downloadRequestData != null && downloadRequestData.isVisible()) {
+        if (radioImages != null && isVisible) {
             requestForData(xStart, xEnd, yStart, yEnd, xRatio, yRatio);
             updateNoDataConfig();
         }
@@ -649,5 +655,52 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
 
     public RadioYAxisElement getYAxisElement() {
         return yAxisElement;
+    }
+
+    @Override
+    public void removeLineData() {
+        removeDownloadRequestData();
+    }
+
+    @Override
+    public void setVisibility(boolean visible) {
+        isVisible = visible;
+        downloadRequestDataVisibilityChanged();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    @Override
+    public String getName() {
+        return "Callisto radiogram";
+    }
+
+    @Override
+    public Color getDataColor() {
+        return null;
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return isDownloading;
+    }
+
+    @Override
+    public Component getOptionsPanel() {
+        return new RadioOptionsPanel();
+    }
+
+    @Override
+    public boolean hasData() {
+        // TODO maybe implement this too.
+        return true;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 }
