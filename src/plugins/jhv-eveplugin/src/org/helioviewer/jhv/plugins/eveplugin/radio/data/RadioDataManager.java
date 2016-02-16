@@ -209,7 +209,15 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             for (long imageID : downloadRequestData.getRadioImages().keySet()) {
                 cache.remove(imageID);
             }
-            fireDownloadRequestDataRemoved(downloadRequestData);
+            PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
+            noDataConfigList = new ArrayList<NoDataConfig>();
+            plotConfigList = new HashMap<Long, PlotConfig>();
+            zoomManager.removeZoomManagerDataConfig();
+            drawController.removeDrawableElement(radioImagePane);
+            for (long imageID : downloadRequestData.getRadioImages().keySet()) {
+                bufferedImages.remove(imageID);
+            }
+            fireRemoveRadioImage();
             downloadRequestData = null;
 
             PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
@@ -411,16 +419,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         double start = freqInterval.getEnd() - providedRegion.getY() * ratio;
         double end = freqInterval.getEnd() - (providedRegion.getY() + providedRegion.getHeight()) * ratio;
         return new FrequencyInterval((int) start, (int) end);
-    }
-
-    /**
-     * Informs the radio data managers listeners about data that was removed.
-     *
-     * @param drd
-     *            The data that was removed
-     */
-    private void fireDownloadRequestDataRemoved(DownloadRequestData drd) {
-        downloadRequestDataRemoved(drd);
     }
 
     /**
@@ -637,19 +635,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     private void downloadRequestAnswered(Interval<Date> timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
-    }
-
-    public void downloadRequestDataRemoved(DownloadRequestData drd) {
-        PlotAreaSpace.getSingletonInstance().removeValueSpace(yAxisElement);
-        noDataConfigList = new ArrayList<NoDataConfig>();
-        plotConfigList = new HashMap<Long, PlotConfig>();
-        downloadRequestData = null;
-        zoomManager.removeZoomManagerDataConfig();
-        drawController.removeDrawableElement(radioImagePane);
-        for (long imageID : drd.getRadioImages().keySet()) {
-            bufferedImages.remove(imageID);
-        }
-        fireRemoveRadioImage();
     }
 
     public void clearAllSavedImagesForID(long imageID) {
