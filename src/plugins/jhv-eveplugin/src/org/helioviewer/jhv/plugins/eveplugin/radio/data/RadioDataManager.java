@@ -168,8 +168,29 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
      * @param dataSize
      *            The height and width of the data
      */
-    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHight) {
-        fireDataforIDReceived(byteData, imageID, dataSize, providedRegion, resolutionHight);
+    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
+        if (downloadRequestData != null && downloadRequestData.isVisible()) {
+            RadioImage image = downloadRequestData.getRadioImages().get(imageID);
+            if (image != null) {
+                image.setLastDataSize(dataSize);
+                if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
+                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
+                    BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
+                    bufferedImages.put(imageID, newImage);
+                    radioImagePane.setIntervalTooBig(false);
+                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().getStart(), image.getVisibleImageTimeInterval().getEnd(), dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
+                    PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), imageID);
+                    plotConfigList.put(imageID, pc);
+                    fireDrawNewBufferedImage();
+                    ;
+                }
+            } else {
+                // Log.debug("The image was null");
+            }
+        } else {
+            // Log.debug("Download request data was null");
+        }
+        ;
     }
 
     /**
@@ -383,42 +404,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             }
         }
         yAxisElement.setAvailableRange(new Range(maxFrequencyInterval.getStart(), maxFrequencyInterval.getEnd()));
-    }
-
-    /**
-     * Informs all RadioDataManagerListener of new received data.
-     *
-     * @param data
-     *            The data received
-     * @param imageID
-     *            The ID of the image for which data was received
-     * @param downloadID
-     *            The ID of the download batch the image is part of
-     * @param dataSize
-     *            The height and width of the data
-     */
-    private void fireDataforIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
-        if (downloadRequestData != null && downloadRequestData.isVisible()) {
-            RadioImage image = downloadRequestData.getRadioImages().get(imageID);
-            if (image != null) {
-                image.setLastDataSize(dataSize);
-                if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
-                    FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
-                    BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
-                    bufferedImages.put(imageID, newImage);
-                    radioImagePane.setIntervalTooBig(false);
-                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().getStart(), image.getVisibleImageTimeInterval().getEnd(), dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
-                    PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), imageID);
-                    plotConfigList.put(imageID, pc);
-                    fireDrawNewBufferedImage();
-                    ;
-                }
-            } else {
-                // Log.debug("The image was null");
-            }
-        } else {
-            // Log.debug("Download request data was null");
-        }
     }
 
     private FrequencyInterval defineDataFrequencyInterval(FrequencyInterval freqInterval, Rectangle providedRegion, int resolutionHeight) {
