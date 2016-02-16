@@ -447,7 +447,9 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             }
 
             if (downloadRequestData != null) {
-                fireClearSavedImages(result.getToRemove());
+                for (long imageID : result.getToRemove()) {
+                    plotConfigList.remove(imageID);
+                }
                 // Log.trace("Size of available images : " +
                 // result.getAvailableData().size());
                 for (DownloadedJPXData jpxData : result.getAvailableData()) {
@@ -496,21 +498,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Instructs the radio data manager listeners to clear the saved images in
-     * the list.
-     *
-     * @param downloadID
-     *            The download identifier for which the images should be removed
-     * @param toRemove
-     *            The list of image identifiers that should be removed
-     */
-    private void fireClearSavedImages(List<Long> toRemove) {
-        for (long imageID : toRemove) {
-            clearAllSavedImagesForID(imageID);
         }
     }
 
@@ -635,10 +622,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     private void downloadRequestAnswered(Interval<Date> timeInterval) {
         zoomManager.addZoomDataConfig(timeInterval);
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
-    }
-
-    public void clearAllSavedImagesForID(long imageID) {
-        plotConfigList.remove(imageID);
     }
 
     public void intervalTooBig() {
