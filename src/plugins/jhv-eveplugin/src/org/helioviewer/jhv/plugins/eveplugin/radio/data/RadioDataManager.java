@@ -54,9 +54,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     /** The singleton instance of the class. */
     private static RadioDataManager instance;
 
-    /** A list collecting all the radio data manager listeners. */
-    private List<RadioDataManagerListener> listeners;
-
     /** A map keeping the download request data. */
     private DownloadRequestData downloadRequestData;
 
@@ -123,7 +120,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     }
 
     private void init() {
-        listeners = new ArrayList<RadioDataManagerListener>();
         downloader = RadioDownloader.getSingletonInstance();
         downloader.addRadioDownloaderListener(this);
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
@@ -132,26 +128,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         zoomManager = ZoomManager.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
         requestForDataBusy = false;
-    }
-
-    /**
-     * Adds a radio data manager listener.
-     *
-     * @param l
-     *            The listener to add
-     */
-    public void addRadioManagerListener(RadioDataManagerListener l) {
-        listeners.add(l);
-    }
-
-    /**
-     * Removes a radio data manager listener.
-     *
-     * @param l
-     *            The listener to remove
-     */
-    public void removeRadioManagerListener(RadioDataManagerListener l) {
-        listeners.remove(l);
     }
 
     /**
@@ -217,7 +193,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             for (long imageID : downloadRequestData.getRadioImages().keySet()) {
                 bufferedImages.remove(imageID);
             }
-            fireRemoveRadioImage();
             downloadRequestData = null;
 
             PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
@@ -246,7 +221,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             drawController.removeDrawableElement(radioImagePane);
         }
 
-        fireChangeVisibility();
         lineDataSelectorModel.lineDataElementUpdated(drd);
     }
 
@@ -502,18 +476,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     }
 
     /**
-     * Informs the radio data manager listeners about a request for a too big
-     * interval
-     *
-     * @param downloadID
-     *            The download identifier for which the requested interval was
-     *            too big
-     */
-    private void fireIntervalTooBig() {
-        intervalTooBig();
-    }
-
-    /**
      * Handles newly downloaded jpx-data.
      *
      * @param djd
@@ -669,18 +631,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         Raster raster = Raster.createPackedRaster(dataBuffer, width, height, width, new int[] { 0xff }, new Point(0, 0));
         newImage.setData(raster);
         return newImage;
-    }
-
-    private void fireRemoveRadioImage() {
-        for (RadioDataManagerListener l : listeners) {
-            l.removeDownloadRequestData();
-        }
-    }
-
-    private void fireChangeVisibility() {
-        for (RadioDataManagerListener l : listeners) {
-            l.changeVisibility();
-        }
     }
 
     private void updateNoDataConfig() {
