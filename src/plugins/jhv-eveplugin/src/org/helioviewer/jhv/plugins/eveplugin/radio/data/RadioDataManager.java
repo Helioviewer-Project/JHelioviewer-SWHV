@@ -136,20 +136,17 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     /**
-     * Inform the RadioDataManager about the new data that was received. The
-     * RadioDataManagerListeners will be informed about the new received data.
+     * Inform the RadioDataManager about the new data that was received.
      *
      *
      * @param data
      *            The data received
      * @param imageID
      *            The ID of the image for which data was received
-     * @param downloadID
-     *            The ID of the download batch the image is part of
      * @param dataSize
      *            The height and width of the data
      */
-    public void dataForIDReceived(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
+    public void dataForImage(byte[] byteData, long imageID, Rectangle dataSize, Rectangle providedRegion, int resolutionHeight) {
         if (radioImages != null && isVisible) {
             RadioImage image = radioImages.get(imageID);
             if (image != null) {
@@ -184,7 +181,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param drd
      *            The download request data that should be removed
      */
-    public void removeDownloadRequestData() {
+    public void removeRadioData() {
         if (radioImages != null) {
             lineDataSelectorModel.removeLineData(this);
             for (long imageID : radioImages.keySet()) {
@@ -197,7 +194,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             zoomManager.removeZoomManagerDataConfig();
             drawController.removeDrawableElement(radioImagePane);
             radioImages = null;
-
             PlotAreaSpace.getSingletonInstance().resetSelectedValueAndTimeInterval();
         }
     }
@@ -210,7 +206,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param drd
      *            The download request data for which the visiblility is changed
      */
-    public void downloadRequestDataVisibilityChanged() {
+    public void radioDataVisibilityChanged() {
         for (PlotConfig pc : plotConfigList.values()) {
             pc.setVisible(isVisible);
         }
@@ -277,7 +273,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
      * @param downloadID
      *            The download id of the batch of which the image was part
      */
-    public void finishedDownloadingID(long imageID) {
+    public void finishedDownloadingImage(long imageID) {
         if (radioImages != null) {
             RadioImage image = radioImages.get(imageID);
             if (image != null) {
@@ -299,9 +295,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         }
     }
 
-    /*
-     * RadioDownloadListener
-     */
     public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
@@ -348,7 +341,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     }
 
     public void removeSpectrograms() {
-        removeDownloadRequestData();
+        removeRadioData();
     }
 
     /**
@@ -648,13 +641,13 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
 
     @Override
     public void removeLineData() {
-        removeDownloadRequestData();
+        removeRadioData();
     }
 
     @Override
     public void setVisibility(boolean visible) {
         isVisible = visible;
-        downloadRequestDataVisibilityChanged();
+        radioDataVisibilityChanged();
     }
 
     @Override
