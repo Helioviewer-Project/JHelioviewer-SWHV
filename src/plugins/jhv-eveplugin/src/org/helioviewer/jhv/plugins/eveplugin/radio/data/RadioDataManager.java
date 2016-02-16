@@ -53,15 +53,12 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet.Resolution
  * @author Bram.Bourgoignie@oma.be
  *
  */
-public class RadioDataManager implements RadioDownloaderListener, ColorLookupModelListener, ZoomDataConfigListener, LineDataSelectorElement {
+public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfigListener, LineDataSelectorElement {
 
     /** The singleton instance of the class. */
     private static RadioDataManager instance;
 
-    /** A map keeping the download request data. */
-    // private DownloadRequestData downloadRequestData;
-
-    /** Instance of the radio downloader */
+    /** The instance of downloader */
     private RadioDownloader downloader;
 
     /** A buffer holding all the requests for data. */
@@ -84,7 +81,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
 
     private final DrawController drawController;
     private Map<Long, BufferedImage> bufferedImages;
-    // private final YValueModel yValueModel;
     private final RadioYAxisElement yAxisElement;
     private final RadioImagePane radioImagePane;
     private Map<Long, PlotConfig> plotConfigList;
@@ -130,14 +126,13 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     }
 
     private void init() {
-        downloader = RadioDownloader.getSingletonInstance();
-        downloader.addRadioDownloaderListener(this);
         lineDataSelectorModel = LineDataSelectorModel.getSingletonInstance();
         cache = RadioImageCache.getInstance();
         requestBuffer = new RequestForDataBuffer();
         zoomManager = ZoomManager.getSingletonInstance();
         eveState = EVEState.getSingletonInstance();
         requestForDataBusy = false;
+        downloader = RadioDownloader.getSingletonInstance();
     }
 
     /**
@@ -307,7 +302,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     /*
      * RadioDownloadListener
      */
-    @Override
     public void intervalTooBig(Date requestedStartTime, Date requestedEndTime) {
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
@@ -315,7 +309,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
-    @Override
     public void newJPXFilesDownloaded(List<DownloadedJPXData> jpxFiles, Date requestedStartTime, Date requestedEndTime) {
         radioImages = new HashMap<Long, RadioImage>();
         isDownloading = true;
@@ -329,7 +322,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         downloadRequestAnswered(new Interval<Date>(requestedStartTime, requestedEndTime));
     }
 
-    @Override
     public void newAdditionalDataDownloaded(List<DownloadedJPXData> jpxFiles, double ratioX, double ratioY) {
         if (radioImages != null) {
             boolean oldDownloading = isDownloading;
@@ -344,7 +336,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         }
     }
 
-    @Override
     public void newNoData(List<Interval<Date>> noDataList) {
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
             radioImagePane.setIntervalTooBig(false);
@@ -356,7 +347,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         }
     }
 
-    @Override
     public void removeSpectrograms() {
         removeDownloadRequestData();
     }
@@ -554,7 +544,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         }
     }
 
-    @Override
     public void noDataInDownloadInterval(Interval<Date> requestInterval) {
         radioImages = new HashMap<Long, RadioImage>();
         lineDataSelectorModel.addLineData(this);
