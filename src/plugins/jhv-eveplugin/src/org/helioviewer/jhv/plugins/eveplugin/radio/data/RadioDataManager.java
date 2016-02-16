@@ -404,7 +404,14 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
                 image.setLastDataSize(dataSize);
                 if (image.getVisibleImageFreqInterval() != null && image.getVisibleImageTimeInterval() != null) {
                     FrequencyInterval dataFrequencyInterval = defineDataFrequencyInterval(image.getFreqInterval(), providedRegion, resolutionHeight);
-                    newDataForIDReceived(byteData, image.getVisibleImageTimeInterval(), dataFrequencyInterval, image.getFreqInterval(), dataSize, imageID);
+                    BufferedImage newImage = createBufferedImage(dataSize.width, dataSize.height, byteData);
+                    bufferedImages.put(imageID, newImage);
+                    radioImagePane.setIntervalTooBig(false);
+                    DrawableAreaMap dam = zoomManager.getDrawableAreaMap(image.getVisibleImageTimeInterval().getStart(), image.getVisibleImageTimeInterval().getEnd(), dataFrequencyInterval.getStart(), dataFrequencyInterval.getEnd(), image.getFreqInterval().getStart(), image.getFreqInterval().getEnd(), dataSize);
+                    PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), imageID);
+                    plotConfigList.put(imageID, pc);
+                    fireDrawNewBufferedImage();
+                    ;
                 }
             } else {
                 // Log.debug("The image was null");
@@ -658,16 +665,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
             bufferedImages.remove(imageID);
         }
         fireRemoveRadioImage();
-    }
-
-    public void newDataForIDReceived(byte[] byteData, Interval<Date> timeInterval, FrequencyInterval visibleFreqInterval, FrequencyInterval imageFreqInterval, Rectangle area, long radioImageID) {
-        BufferedImage newImage = createBufferedImage(area.width, area.height, byteData);
-        bufferedImages.put(radioImageID, newImage);
-        radioImagePane.setIntervalTooBig(false);
-        DrawableAreaMap dam = zoomManager.getDrawableAreaMap(timeInterval.getStart(), timeInterval.getEnd(), visibleFreqInterval.getStart(), visibleFreqInterval.getEnd(), imageFreqInterval.getStart(), imageFreqInterval.getEnd(), area);
-        PlotConfig pc = new PlotConfig(newImage, dam, downloadRequestData.isVisible(), radioImageID);
-        plotConfigList.put(radioImageID, pc);
-        fireDrawNewBufferedImage();
     }
 
     public void clearAllSavedImagesForID(long imageID) {
