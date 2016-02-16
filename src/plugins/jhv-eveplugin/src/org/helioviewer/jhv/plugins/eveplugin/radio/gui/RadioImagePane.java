@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.Collection;
 import java.util.Date;
@@ -14,12 +13,10 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
-import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManagerListener;
-import org.helioviewer.jhv.plugins.eveplugin.radio.model.DrawableAreaMap;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.NoDataConfig;
 import org.helioviewer.jhv.plugins.eveplugin.radio.model.PlotConfig;
 
-public class RadioImagePane implements ImageObserver, RadioDataManagerListener, DrawableElement {
+public class RadioImagePane implements ImageObserver, DrawableElement {
 
     private YAxisElement yAxisElement;
     private boolean intervalTooBig;
@@ -31,18 +28,6 @@ public class RadioImagePane implements ImageObserver, RadioDataManagerListener, 
     @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
         return false;
-    }
-
-    @Override
-    public void drawBufferedImage(BufferedImage image, DrawableAreaMap map) {
-    }
-
-    @Override
-    public void changeVisibility() {
-    }
-
-    @Override
-    public void removeDownloadRequestData() {
     }
 
     @Override
