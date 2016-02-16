@@ -18,6 +18,7 @@ import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
+import org.helioviewer.jhv.plugins.eveplugin.radio.model.ZoomManager;
 import org.helioviewer.jhv.plugins.eveplugin.settings.BandTypeAPI;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.ObservationDialogUIPanel;
@@ -45,6 +46,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
         DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
         // Create an instance of eveDrawController and leave it here
+        ZoomManager.getSingletonInstance();
         EVEDrawController.getSingletonInstance();
         RadioDataManager.getSingletonInstance();
         // Avoid concurrent modification error
