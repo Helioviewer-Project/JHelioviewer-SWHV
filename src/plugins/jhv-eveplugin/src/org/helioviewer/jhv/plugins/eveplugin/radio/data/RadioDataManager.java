@@ -340,7 +340,12 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
     @Override
     public void newNoData(List<Interval<Date>> noDataList) {
         if (!eveState.isMouseTimeIntervalDragging() && !eveState.isMouseValueIntervalDragging() && noDataList.size() > 0) {
-            fireNoDataIntervalsReceived(noDataList);
+            radioImagePane.setIntervalTooBig(false);
+            for (Interval<Date> noData : noDataList) {
+                DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
+                noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
+            }
+            fireDrawNewBufferedImage();
         }
     }
 
@@ -543,23 +548,6 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         }
     }
 
-    /**
-     * Informs radio data manager listeners about interval with no data that
-     * where receive.
-     *
-     * @param noDataList
-     *            A list with interval for which no data was received
-     * @param downloadID
-     *            The download identifier for which intervals with no data was
-     *            received
-     * @param plotIdentifier
-     *            The plot identifier for which intervals with no data were
-     *            received
-     */
-    private void fireNoDataIntervalsReceived(List<Interval<Date>> noDataList) {
-        noDataInterval(noDataList);
-    }
-
     @Override
     public void noDataInDownloadInterval(Interval<Date> requestInterval) {
         downloadRequestData = new DownloadRequestData();
@@ -586,19 +574,10 @@ public class RadioDataManager implements RadioDownloaderListener, ColorLookupMod
         PlotAreaSpace.getSingletonInstance().addValueSpace(yAxisElement);
     }
 
-    public void intervalTooBig() {
+    private void intervalTooBig() {
         plotConfigList = new HashMap<Long, PlotConfig>();
         radioImagePane.setIntervalTooBig(true);
         drawController.updateDrawableElement(radioImagePane);
-    }
-
-    public void noDataInterval(List<Interval<Date>> noDataList) {
-        radioImagePane.setIntervalTooBig(false);
-        for (Interval<Date> noData : noDataList) {
-            DrawableAreaMap dam = zoomManager.getDrawableAreaMap(noData.getStart(), noData.getEnd());
-            noDataConfigList.add(new NoDataConfig(noData, dam, downloadRequestData.isVisible()));
-        }
-        fireDrawNewBufferedImage();
     }
 
     /*
