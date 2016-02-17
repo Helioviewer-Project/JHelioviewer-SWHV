@@ -23,7 +23,7 @@ public class YAxisElement extends AbstractValueSpace {
 
     private YAxisLocation location;
     private YAxisElementScale scale;
-    protected static double ZOOMSTEP_PERCENTAGE = 0.02;
+    protected static final double ZOOMSTEP_PERCENTAGE = 0.02;
 
     /**
      * Creates a Y-axis element with a selected value range, an available value
