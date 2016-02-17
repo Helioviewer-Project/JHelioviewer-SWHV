@@ -54,7 +54,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         plotAreaSpace = PlotAreaSpace.getSingletonInstance();
         radioDataManager = RadioDataManager.getSingletonInstance();
         yAxisElement = radioDataManager.getYAxisElement();
-
     }
 
     public void addZoomDataConfig(Interval<Date> interval) {
@@ -176,7 +175,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
         isMinXInitialized = true;
         isMaxXInitialized = true;
         requestData();
-
     }
 
     /**
@@ -205,7 +203,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
     @Override
     public void valueSpaceChanged(Range availableRange, Range selectedRange) {
         requestData();
-
     }
 
     @Override
@@ -216,8 +213,6 @@ public class ZoomManager implements TimingListener, GraphDimensionListener, Plot
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        // TODO Auto-generated method stub
-
     }
 
     private void requestData() {

@@ -16,11 +16,14 @@ import org.helioviewer.jhv.viewmodel.metadata.MetaData;
 
 public class SDOCutOutAction extends AbstractAction
 {
+
     private static final String URL = "http://www.lmsal.com/get_aia_data/?";
 
-    public SDOCutOutAction(boolean small, boolean useIcon) {
-        super("SDO Cut-Out", useIcon ? (small ? IconBank.getIcon(JHVIcon.SDO_CUTOUT) : IconBank.getIcon(JHVIcon.SDO_CUTOUT)) : null);
+    private static final double AIA_CDELT = 0.6;
 
+    public SDOCutOutAction(boolean small, boolean useIcon) {
+        super("SDO Cut-out", useIcon ? (small ? IconBank.getIcon(JHVIcon.SDO_CUTOUT) : IconBank.getIcon(JHVIcon.SDO_CUTOUT)) : null);
+        putValue(SHORT_DESCRIPTION, "SDO cut-out service");
     }
 
     @Override
@@ -35,6 +38,7 @@ public class SDOCutOutAction extends AbstractAction
             url.append("startDate=" + startDate);
             url.append("&startTime=" + startTime);
         }
+
         JHVDate enddate = Layers.getEndDate();
         if (enddate != null) {
             String end = enddate.toString();
@@ -55,7 +59,7 @@ public class SDOCutOutAction extends AbstractAction
             Region region = imd.getRegion();
             MetaData md = imd.getMetaData();
             Region fullregion = md.getPhysicalRegion();
-            double arcsec_in_image = 0.6 * 4096;
+            double arcsec_in_image = AIA_CDELT * 4096;
             double centr_x = region.llx + region.width / 2.;
             double centr_y = region.lly + region.height / 2.;
             double arc_w = arcsec_in_image / fullregion.width;
@@ -63,8 +67,8 @@ public class SDOCutOutAction extends AbstractAction
 
             url.append("&width=" + format_double(region.width * arc_w));
             url.append("&height=" + format_double(region.height * arc_h));
-            url.append("&xCen=" + format_double(centr_x * arc_w - 0.3));
-            url.append("&yCen=" + format_double(-centr_y * arc_h + 0.3));
+            url.append("&xCen=" + format_double(centr_x * arc_w - AIA_CDELT / 2.));
+            url.append("&yCen=" + format_double(-centr_y * arc_h + AIA_CDELT / 2.));
         }
 
         JHVGlobals.openURL(url.toString());
@@ -73,4 +77,5 @@ public class SDOCutOutAction extends AbstractAction
     private String format_double(double x) {
         return String.format("%.1f", x);
     }
+
 }

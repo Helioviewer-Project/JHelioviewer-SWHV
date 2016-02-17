@@ -113,4 +113,5 @@ public class BandType {
     public boolean isLogScale() {
         return isLog;
     }
+
 }
