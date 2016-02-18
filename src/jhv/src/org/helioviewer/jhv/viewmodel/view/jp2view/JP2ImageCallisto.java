@@ -17,16 +17,11 @@ public class JP2ImageCallisto extends JP2Image {
         super(_uri, _downloadURI);
     }
 
-    public void setViewport(Rectangle v) {
-        viewport = v;
-    }
-
     public void setRegion(Rectangle r) {
         region = r;
     }
 
     private Rectangle region;
-    private Rectangle viewport;
 
     @Override
     protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, boolean fromReader) {
@@ -38,12 +33,9 @@ public class JP2ImageCallisto extends JP2Image {
         int maxHeight = resolutionSet.getResolutionLevel(0).height;
         int maxWidth = resolutionSet.getResolutionLevel(0).width;
 
-        ResolutionLevel res = resolutionSet.getPreviousResolutionLevel((int) Math.ceil(viewport.width / (double) region.width * maxWidth),
-                                                                   2 * (int) Math.ceil(viewport.height / (double) region.height * maxHeight));
+        ResolutionLevel res = resolutionSet.getResolutionLevel(0);
 
-        SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * res.width), (int) (region.y / (double) maxHeight * res.height),
-                                         (int) Math.ceil(region.width / (double) maxWidth * res.width), (int) Math.ceil(region.height / (double) maxHeight * res.height),
-                                         res.width, res.height);
+        SubImage subImage = new SubImage((int) (region.x / (double) maxWidth * res.width), (int) (region.y / (double) maxHeight * res.height), (int) Math.ceil(region.width / (double) maxWidth * res.width), (int) Math.ceil(region.height / (double) maxHeight * res.height), res.width, res.height);
 
         JP2ImageParameter imageViewParams = new JP2ImageParameter(this, null, subImage, res, frame);
         signalReader(imageViewParams);
