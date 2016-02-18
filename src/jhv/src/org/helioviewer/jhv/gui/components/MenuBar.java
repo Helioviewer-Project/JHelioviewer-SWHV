@@ -99,8 +99,8 @@ public class MenuBar extends JMenuBar {
         helpMenu.add(new OpenURLinBrowserAction("Open User Manual", "http://swhv.oma.be/user_manual/"));
         helpMenu.add(new ShowDialogAction("Show Shortcuts...", HelpDialog.class));
         helpMenu.addSeparator();
-        helpMenu.add(new OpenURLinBrowserAction("Report a Bug", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
-        helpMenu.add(new OpenURLinBrowserAction("Submit a Feature Request", "https://bugs.launchpad.net/jhelioviewer/+filebug"));
+        helpMenu.add(new OpenURLinBrowserAction("Report a Bug", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
+        helpMenu.add(new OpenURLinBrowserAction("Submit a Feature Request", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues"));
         helpMenu.addSeparator();
         helpMenu.add(new OpenURLinBrowserAction("Open Website", "http://www.jhelioviewer.org"));
         add(helpMenu);
