@@ -25,16 +25,15 @@ import org.helioviewer.jhv.gui.ClipBoardCopier;
 
 /**
  * Routines to catch and handle all runtime exceptions.
- * 
+ *
  * @author Malte Nuhn
  */
 public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    /**
-     * Default size of the error dialog.
-     */
-    private final static int default_width = 600;
-    private final static int default_height = 400;
+    private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
+
+    private static final int default_width = 600;
+    private static final int default_height = 400;
 
     private static final JHVUncaughtExceptionHandler handler = new JHVUncaughtExceptionHandler();
 
@@ -63,11 +62,10 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      *            Object to display in the main area of the dialog.
      */
     public static void showErrorDialog(final String title, final Object msg) {
-
         Vector<Object> objects = new Vector<Object>();
         objects.add(new JLabel("Fatal error detected."));
-        objects.add(new JLabel("Please be so kind to report this as a bug on"));
-        JLabel bugLabel = new JLabel("https://bugs.launchpad.net/jhelioviewer/+filebug");
+        objects.add(new JLabel("Please report this as a bug at"));
+        JLabel bugLabel = new JLabel(BUG_URL);
         Font font = bugLabel.getFont();
         font = font.deriveFont(font.getStyle() ^ Font.ITALIC);
         bugLabel.setFont(font);
@@ -77,7 +75,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
         bugLabel.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
-                JHVGlobals.openURL("https://bugs.launchpad.net/jhelioviewer/+filebug");
+                JHVGlobals.openURL(BUG_URL);
             }
         });
 
@@ -182,4 +180,5 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
 
         JHVUncaughtExceptionHandler.showErrorDialog("JHelioviewer: Fatal Error", msg);
     }
+
 }
