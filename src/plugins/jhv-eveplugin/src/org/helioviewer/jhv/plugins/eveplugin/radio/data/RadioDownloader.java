@@ -70,8 +70,6 @@ public class RadioDownloader {
                     List<DownloadedJPXData> jpxList = new ArrayList<DownloadedJPXData>();
                     boolean intervalTooBig = false;
                     long duration = calculateFrequencyDuration(startDateString, endDateString);
-                    long downloadID = getNextID();
-                    Log.debug("Download id is " + downloadID);
                     Date startDate = startDateOuter;
                     Date endDate = endDateOuter;
                     Date requestedStartDate = new Date(startDate.getTime());
