@@ -7,9 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.astronomy.Position;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -301,35 +299,26 @@ public class JP2View extends AbstractView {
             viewpoint = camera.getViewpoint();
         }
 
-        signalRender(_jp2Image, false, factor);
+        signalRender(_jp2Image, factor);
     }
 
-    void signalRenderFromReader(JP2Image jp2Image) {
-        signalRender(jp2Image, true, 1);
+    void signalRenderFromReader(JP2Image jp2Image, double factor) {
+        signalRender(jp2Image, factor);
     }
 
-    protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
+    protected void signalRender(JP2Image jp2Image, double factor) {
         // from reader on EDT, might come after abolish
         if (stopRender == true || jp2Image == null) {
             return;
         }
 
-        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, fromReader);
+        JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, factor);
         if (imageViewParams == null) {
             return;
         }
 
-        if (!(this instanceof JP2ViewCallisto)) {
-            int maxDim = Math.max(imageViewParams.subImage.width, imageViewParams.subImage.height);
-            double adj = 1;
-            if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
-                adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
-            }
-            factor = Math.min(factor, adj);
-        }
-        Log.debug("factor in signalRender:" + factor);
-        Thread.dumpStack();
-        queueSubmitTask(new J2KRender(this, imageViewParams, (float) factor));
+        queueSubmitTask(new J2KRender(this, imageViewParams));
+        System.out.println("render factor: " + imageViewParams.factor);
     }
 
     @Override

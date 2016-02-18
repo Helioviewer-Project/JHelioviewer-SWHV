@@ -28,8 +28,10 @@ public class JP2ImageParameter {
     /** Zero based frame number */
     public final int compositionLayer;
 
+    public final double factor;
+
     /** This constructor assigns all variables... throw NPE if any args are null */
-    public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer) {
+    public JP2ImageParameter(JP2Image _jp2Image, Position.Q _p, SubImage _roi, ResolutionLevel _resolution, int _compositionLayer, double _factor) {
         if (_roi == null || _resolution == null)
             throw new NullPointerException();
         jp2Image = _jp2Image;
@@ -37,11 +39,12 @@ public class JP2ImageParameter {
         subImage = _roi;
         resolution = _resolution;
         compositionLayer = _compositionLayer;
+        factor = _factor;
     }
 
     @Override
     public String toString() {
-        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "]]";
+        return "ImageViewParams[ " + jp2Image + " " + viewpoint + " " + subImage + " " + resolution + " [LayerNum=" + compositionLayer + "] " + factor + "]";
     }
 
     @Override
@@ -50,7 +53,7 @@ public class JP2ImageParameter {
             JP2ImageParameter p = (JP2ImageParameter) o;
             return jp2Image.equals(p.jp2Image) && viewpoint.equals(p.viewpoint) &&
                    subImage.equals(p.subImage) && resolution.equals(p.resolution) &&
-                   compositionLayer == p.compositionLayer;
+                   compositionLayer == p.compositionLayer && factor == p.factor;
         }
         return false;
     }
