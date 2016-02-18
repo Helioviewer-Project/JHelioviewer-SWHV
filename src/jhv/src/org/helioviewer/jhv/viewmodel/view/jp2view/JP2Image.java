@@ -12,6 +12,7 @@ import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.logging.Log;
@@ -20,6 +21,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.filters.lut.DefaultTable;
 import org.helioviewer.jhv.gui.filters.lut.LUT;
 import org.helioviewer.jhv.io.APIResponseDump;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagedata.SubImage;
 import org.helioviewer.jhv.viewmodel.metadata.HelioviewerMetaData;
@@ -248,7 +250,7 @@ public class JP2Image {
 
     // Recalculates the image parameters used within the jp2-package
     // Reader signals only for CURRENTFRAME*
-    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, boolean fromReader) {
+    protected JP2ImageParameter calculateParameter(Camera camera, Viewport vp, Position.Q p, int frame, double factor) {
         MetaData m = metaDataList[frame];
         Region mr = m.getPhysicalRegion();
         Region r = ViewROI.updateROI(camera, vp, p, m);
@@ -265,9 +267,16 @@ public class JP2Image {
         int imagePositionX = +(int) Math.round((r.ulx - mr.ulx) / mr.width * res.width);
         int imagePositionY = -(int) Math.round((r.uly - mr.uly) / mr.height * res.height);
 
+        int maxDim = Math.max(imageWidth, imageHeight);
+        double adj = 1;
+        if (JHVGlobals.GoForTheBroke && maxDim > JHVGlobals.hiDpiCutoff && Layers.isMoviePlaying()) {
+            adj = JHVGlobals.hiDpiCutoff / (double) maxDim;
+        }
+        factor = Math.min(factor, adj);
+
         SubImage subImage = new SubImage(imagePositionX, imagePositionY, imageWidth, imageHeight, res.width, res.height);
 
-        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame);
+        JP2ImageParameter imageViewParams = new JP2ImageParameter(this, p, subImage, res, frame, factor);
 
         boolean viewChanged = oldImageViewParams == null ||
                               !(imageViewParams.subImage.equals(oldImageViewParams.subImage) &&
@@ -276,11 +285,6 @@ public class JP2Image {
         if (viewChanged) {
             signalReader(imageViewParams);
         }
-
-        // if (!fromReader && jp2Image.getImageCacheStatus().getImageStatus(frameNumber) == CacheStatus.COMPLETE && newImageViewParams.equals(oldImageViewParams)) {
-        //    Displayer.display();
-        //    return null;
-        //}
 
         oldImageViewParams = imageViewParams;
 

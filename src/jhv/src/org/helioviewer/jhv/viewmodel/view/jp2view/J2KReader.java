@@ -202,14 +202,14 @@ class J2KReader implements Runnable {
         return query;
     }
 
-    private void signalRender() {
+    private void signalRender(final double factor) {
         if (stop)
             return;
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parentViewRef.signalRenderFromReader(parentImageRef);
+                parentViewRef.signalRenderFromReader(parentImageRef, factor);
             }
         });
     }
@@ -243,7 +243,7 @@ class J2KReader implements Runnable {
                 // nothing
             } else if (readerMode == ReaderMode.SIGNAL_RENDER_ONCE) {
                 parentImageRef.setReaderMode(ReaderMode.NEVERFIRE);
-                signalRender();
+                signalRender(currParams.factor);
             } else {
                 // check whether view parameters have changed
                 viewChanged = prevParams == null || !(currParams.subImage.equals(prevParams.subImage) && currParams.resolution.equals(prevParams.resolution));
@@ -444,12 +444,12 @@ class J2KReader implements Runnable {
                                         switch (strategy) {
                                         case CURRENTFRAMEONLY:
                                         case CURRENTFRAMEFIRST:
-                                            signalRender();
+                                            signalRender(currParams.factor);
                                             break;
                                         default:
                                             /*! not good for on the fly resolution update
                                                 if (curLayer / JPIPConstants.MAX_REQ_LAYERS == current_step) {
-                                                signalRender();
+                                                signalRender(currParams.factor);
                                             } */
                                         }
                                     }
