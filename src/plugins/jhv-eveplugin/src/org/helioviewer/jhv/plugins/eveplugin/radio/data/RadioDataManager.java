@@ -459,10 +459,8 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
                         JP2ImageCallisto image = jp2View.getJP2Image();
-
-                        image.setViewport(zoomManager.getAvailableSpaceForInterval(visibleDateInterval.getStart(), visibleDateInterval.getEnd(), visibleFrequencyInterval.getStart(), visibleFrequencyInterval.getEnd()));
                         image.setRegion(ri.getROI());
-                        jp2View.render(null, null, 1);
+                        jp2View.render(null, null, defineFactor(ri.getVisibleImagePercentage()));
                     }
                 }
             }
@@ -522,18 +520,41 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     } else {
                         lastUsedResolutionSetting = tempRs.defineBestResolutionSetting(ratioX, ratioY);
                     }
-                    image.setViewport(lastUsedResolutionSetting.getRectangleRepresentation());
-
                     tempRs.setLastUsedResolutionSetting(lastUsedResolutionSetting);
                     image.setRegion(tempRs.getROI());
-                    jp2View.render(null, null, 1);
-
+                    jp2View.render(null, null, defineFactor(tempRs.getVisibleImagePercentage()));
                     radioImages.put(tempRs.getRadioImageID(), tempRs);
                 } catch (Exception e) {
                     Log.error("Some of the metadata could not be read, aborting...");
                     return;
                 }
             }
+        }
+    }
+
+    private double defineFactor(double visibleImagePercentage) {
+        if (!Double.isNaN(visibleImagePercentage)) {
+            if (visibleImagePercentage <= 0.03125) {
+                Log.debug("factor: 1");
+                return 1;
+            } else if (visibleImagePercentage <= 0.0625) {
+                Log.debug("factor: 0.5");
+                return 0.5;
+            } else if (visibleImagePercentage <= 0.125) {
+                Log.debug("factor: 0.25");
+                return 0.25;
+            } else if (visibleImagePercentage <= 0.25) {
+                Log.debug("factor: 0.125");
+                return 0.125;
+            } else if (visibleImagePercentage <= 0.5) {
+                Log.debug("factor: 0.0625");
+                return 0.0625;
+            } else {
+                Log.debug("factor: 0.03125");
+                return 0.03125;
+            }
+        } else {
+            return 0;
         }
     }
 

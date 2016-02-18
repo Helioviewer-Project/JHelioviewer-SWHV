@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.astronomy.Position;
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
@@ -30,8 +31,7 @@ import org.helioviewer.jhv.viewmodel.view.jp2view.image.JP2ImageParameter;
 public class JP2View extends AbstractView {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(1);
-    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
-                                                    new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
+    private final ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedThreadFactory("Render"), new ThreadPoolExecutor.DiscardPolicy());
 
     private void queueSubmitTask(Runnable task) {
         blockingQueue.poll();
@@ -115,7 +115,7 @@ public class JP2View extends AbstractView {
                     this.view = view;
                     return this;
                 }
-            }.init(this.view));
+            }.init(view));
         }
     }
 
@@ -202,25 +202,27 @@ public class JP2View extends AbstractView {
     public JHVDate getNextTime(AnimationMode mode) {
         int next = targetFrame + 1;
         switch (mode) {
-            case STOP:
-                if (next > maximumFrame)
-                    return null;
-                break;
-            case SWING:
-                if (targetFrame == maximumFrame) {
-                    Layers.setAnimationMode(AnimationMode.SWINGDOWN);
-                    return metaDataArray[targetFrame - 1].getViewpoint().time;
-                }
-                break;
-            case SWINGDOWN:
-                if (targetFrame == 0) {
-                    Layers.setAnimationMode(AnimationMode.SWING);
-                    return metaDataArray[1].getViewpoint().time;
-                }
+        case STOP:
+            if (next > maximumFrame) {
+                return null;
+            }
+            break;
+        case SWING:
+            if (targetFrame == maximumFrame) {
+                Layers.setAnimationMode(AnimationMode.SWINGDOWN);
                 return metaDataArray[targetFrame - 1].getViewpoint().time;
-            default: // LOOP
-                if (next > maximumFrame)
-                    return metaDataArray[0].getViewpoint().time;
+            }
+            break;
+        case SWINGDOWN:
+            if (targetFrame == 0) {
+                Layers.setAnimationMode(AnimationMode.SWING);
+                return metaDataArray[1].getViewpoint().time;
+            }
+            return metaDataArray[targetFrame - 1].getViewpoint().time;
+        default: // LOOP
+            if (next > maximumFrame) {
+                return metaDataArray[0].getViewpoint().time;
+            }
         }
         return metaDataArray[next].getViewpoint().time;
     }
@@ -231,7 +233,8 @@ public class JP2View extends AbstractView {
         if (frame != targetFrame) {
             CacheStatus status = _jp2Image.getImageCacheStatus().getImageStatus(frame);
             if (status != CacheStatus.PARTIAL && status != CacheStatus.COMPLETE) {
-            //    _jp2Image.signalReader(calculateParameter(_jp2Image, v, frame, false)); // wake up reader
+                // _jp2Image.signalReader(calculateParameter(_jp2Image, v,
+                // frame, false)); // wake up reader
                 return;
             }
             targetFrame = frame;
@@ -255,10 +258,11 @@ public class JP2View extends AbstractView {
 
     @Override
     public JHVDate getFrameTime(int frame) {
-        if (frame < 0)
+        if (frame < 0) {
             frame = 0;
-        else if (frame > maximumFrame)
+        } else if (frame > maximumFrame) {
             frame = maximumFrame;
+        }
 
         return metaDataArray[frame].getViewpoint().time;
     }
@@ -283,7 +287,7 @@ public class JP2View extends AbstractView {
         return metaDataArray[getFrameNumber(time)];
     }
 
-////
+    // //
 
     private Camera camera;
     private Viewport vp;
@@ -293,8 +297,9 @@ public class JP2View extends AbstractView {
     public void render(Camera _camera, Viewport _vp, double factor) {
         vp = _vp;
         camera = _camera;
-        if (camera != null) // Callisto
+        if (camera != null) {
             viewpoint = camera.getViewpoint();
+        }
 
         signalRender(_jp2Image, false, factor);
     }
@@ -305,12 +310,14 @@ public class JP2View extends AbstractView {
 
     protected void signalRender(JP2Image jp2Image, boolean fromReader, double factor) {
         // from reader on EDT, might come after abolish
-        if (stopRender == true || jp2Image == null)
+        if (stopRender == true || jp2Image == null) {
             return;
+        }
 
         JP2ImageParameter imageViewParams = jp2Image.calculateParameter(camera, vp, viewpoint, targetFrame, fromReader);
-        if (imageViewParams == null)
+        if (imageViewParams == null) {
             return;
+        }
 
         if (!(this instanceof JP2ViewCallisto)) {
             int maxDim = Math.max(imageViewParams.subImage.width, imageViewParams.subImage.height);
@@ -320,7 +327,8 @@ public class JP2View extends AbstractView {
             }
             factor = Math.min(factor, adj);
         }
-
+        Log.debug("factor in signalRender:" + factor);
+        Thread.dumpStack();
         queueSubmitTask(new J2KRender(this, imageViewParams, (float) factor));
     }
 
