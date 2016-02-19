@@ -45,14 +45,11 @@ class J2KRender implements Runnable {
 
     private final JP2ImageParameter params;
 
-    private final float scaleFactor;
-
     J2KRender(JP2View _parentViewRef, JP2ImageParameter _currParams) {
         parentViewRef = _parentViewRef;
         params = _currParams;
         parentImageRef = params.jp2Image;
         cacheStatusRef = parentImageRef.getImageCacheStatus();
-        scaleFactor = (float) params.factor;
     }
 
     private void renderLayer(Kdu_region_compositor compositor) throws KduException {
@@ -76,7 +73,7 @@ class J2KRender implements Runnable {
             ilayer = compositor.Add_ilayer(numLayer, dimsRef1, dimsRef2);
         }
 
-        compositor.Set_scale(false, false, false, params.resolution.scaleLevel, scaleFactor);
+        compositor.Set_scale(false, false, false, params.resolution.scaleLevel, (float) params.factor);
         Kdu_dims requestedRegion = KakaduUtils.roiToKdu_dims(params.subImage);
         compositor.Set_buffer_surface(requestedRegion);
 

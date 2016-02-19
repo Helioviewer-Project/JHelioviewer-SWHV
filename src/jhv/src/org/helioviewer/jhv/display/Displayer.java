@@ -18,7 +18,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public class Displayer implements JHVEventHighlightListener {
 
     public static enum DisplayMode {
-        ORTHO, POLAR, LATITUDINAL, LOGPOLAR;
+        ORTHO, LATITUDINAL, LOGPOLAR, POLAR;
 
         public String getLabel() {
             String label;
