@@ -318,7 +318,6 @@ public class JP2View extends AbstractView {
         }
 
         queueSubmitTask(new J2KRender(this, imageViewParams));
-        System.out.println("render factor: " + imageViewParams.factor);
     }
 
     @Override

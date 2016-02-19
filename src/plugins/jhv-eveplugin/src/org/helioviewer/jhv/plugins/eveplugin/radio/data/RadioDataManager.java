@@ -535,22 +535,16 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
     private double defineFactor(double visibleImagePercentage) {
         if (!Double.isNaN(visibleImagePercentage)) {
             if (visibleImagePercentage <= 0.03125) {
-                Log.debug("factor: 1");
                 return 1;
             } else if (visibleImagePercentage <= 0.0625) {
-                Log.debug("factor: 0.5");
                 return 0.5;
             } else if (visibleImagePercentage <= 0.125) {
-                Log.debug("factor: 0.25");
                 return 0.25;
             } else if (visibleImagePercentage <= 0.25) {
-                Log.debug("factor: 0.125");
                 return 0.125;
             } else if (visibleImagePercentage <= 0.5) {
-                Log.debug("factor: 0.0625");
                 return 0.0625;
             } else {
-                Log.debug("factor: 0.03125");
                 return 0.03125;
             }
         } else {
