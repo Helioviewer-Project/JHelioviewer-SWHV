@@ -75,7 +75,7 @@ public class PluginListEntry extends AbstractListEntry implements MouseListener 
         buttonPane.setOpaque(false);
         // buttonPane.add(preferencesLabel);
         buttonPane.add(enableLabel);
-        buttonPane.add(removeLabel);
+        // buttonPane.add(removeLabel);
 
         preferencesLabel.setIcon(IconBank.getIcon(JHVIcon.ADD));
         preferencesLabel.setToolTipText("Shows up the preference dialog of the plug-in.");
