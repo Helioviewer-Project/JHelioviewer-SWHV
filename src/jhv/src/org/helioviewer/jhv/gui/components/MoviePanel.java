@@ -291,14 +291,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, /*
-                                                         * SpeedUnit.
-                                                         * MINUTESPERSECOND,
-                                                         * SpeedUnit
-                                                         * .HOURSPERSECOND,
-                                                         * SpeedUnit
-                                                         * .DAYSPERSECOND
-                                                         */};
+        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND };
         speedUnitComboBox = new JComboBox(units);
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
@@ -412,7 +405,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
                 setText("BUSY");
-                int fps = 30;
+                int fps = 20;
                 if (speedUnitComboBox.getSelectedItem().equals(SpeedUnit.FRAMESPERSECOND))
                     fps = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
                 ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
@@ -467,11 +460,9 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
     private static void updateMovieSpeed() {
         if (speedUnitComboBox.getSelectedItem() == SpeedUnit.FRAMESPERSECOND) {
             Layers.setDesiredRelativeSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue());
-        } /*
-         * else { Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel)
-         * speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit)
-         * speedUnitComboBox.getSelectedItem()).getSecondsPerSecond()); }
-         */
+        } else {
+            Layers.setDesiredAbsoluteSpeed(((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() * ((SpeedUnit) speedUnitComboBox.getSelectedItem()).getSecondsPerSecond());
+        }
     }
 
     /**

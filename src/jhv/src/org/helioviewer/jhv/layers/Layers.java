@@ -48,6 +48,7 @@ public class Layers {
         }
     }
 
+    private static int deltaT = 0;
     private static final Timer frameTimer;
 
     static {
@@ -59,7 +60,7 @@ public class Layers {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (activeView != null) {
-                JHVDate nextTime = activeView.getNextTime(animationMode);
+                JHVDate nextTime = activeView.getNextTime(animationMode, deltaT);
                 if (nextTime == null)
                     pauseMovie();
                 else
@@ -236,6 +237,12 @@ public class Layers {
 
     public static void setDesiredRelativeSpeed(int fps) {
         frameTimer.setDelay(1000 / fps);
+        deltaT = 0;
+    }
+
+    public static void setDesiredAbsoluteSpeed(int sec) {
+        frameTimer.setDelay(1000 / 20);
+        deltaT = (int) (sec / 20.);
     }
 
     private static AnimationMode animationMode = AnimationMode.LOOP;
@@ -279,4 +286,5 @@ public class Layers {
         }
         return str.toString();
     }
+
 }
