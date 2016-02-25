@@ -197,7 +197,7 @@ public class JP2View extends AbstractView {
 
     // to be accessed only from Layers
     @Override
-    public JHVDate getNextTime(AnimationMode mode) {
+    public JHVDate getNextTime(AnimationMode mode, int deltaT) {
         int next = targetFrame + 1;
         switch (mode) {
         case STOP:
