@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.io.APIRequestManager;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.threads.JHVWorker;
 import org.helioviewer.jhv.viewmodel.view.jp2view.JP2ViewCallisto;
@@ -31,6 +32,8 @@ public class RadioDownloader {
     private final RadioDataManager radioDataManager;
 
     private static final long MAXIMUM_DAYS = 172800000;
+
+    private static final String ROBserver = DataSources.ROBsettings.get("API.jp2images.path");
 
     private RadioDownloader() {
         // listeners = new ArrayList<RadioDownloaderListener>();
@@ -76,7 +79,7 @@ public class RadioDownloader {
                     if (duration >= 0 && duration <= MAXIMUM_DAYS) {
                         // case there were not more than three days
                         while (startDate.compareTo(endDate) <= 0) {
-                            JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                            JP2ViewCallisto v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, createDateString(startDate), createDateString(startDate), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                             if (v != null) {
                                 long imageID = getNextID();
                                 DownloadedJPXData newJPXData = new DownloadedJPXData(v, imageID, startDate, endDate);
@@ -180,7 +183,7 @@ public class RadioDownloader {
                 for (Date date : datesToDownload) {
                     JP2ViewCallisto v = null;
                     try {
-                        v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
+                        v = (JP2ViewCallisto) APIRequestManager.requestAndOpenRemoteFile(ROBserver, null, createDateString(date), createDateString(date), "ROB-Humain", "CALLISTO", "CALLISTO", "RADIOGRAM", false);
                     } catch (IOException e) {
                         Log.error("An error occured while opening the remote file!", e);
                     }
