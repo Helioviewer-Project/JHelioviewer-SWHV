@@ -235,8 +235,8 @@ public class YAxisElement extends AbstractValueSpace {
         double newScaledMin = ((1 + delta) * scaledMin - delta * scaled);
         double newScaledMax = ((1 + delta) * scaledMax - delta * scaled);
 
-        newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
-        newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
+        // newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
+        // newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
         if (newScaledMax - newScaledMin > 0.04) {
             selectedRange.min = invScale(newScaledMin);
             selectedRange.max = invScale(newScaledMax);
