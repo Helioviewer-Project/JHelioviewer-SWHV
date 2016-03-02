@@ -106,6 +106,8 @@ public class YAxisElement extends AbstractValueSpace {
             if (availableRange.min != newAvailableRange.min || availableRange.max != newAvailableRange.max) {
                 availableRange.setMax(newAvailableRange.max);
                 availableRange.setMin(newAvailableRange.min);
+                availableRange.setMax(selectedRange.max);
+                availableRange.setMin(selectedRange.min);
                 checkSelectedRange();
             }
         } else {
