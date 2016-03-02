@@ -11,6 +11,8 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
 
     public RadioObservationDialogUIPanel() {
         super();
+
+        /*
         JLabel labelServer = new JLabel("Server", JLabel.RIGHT);
         JPanel container = new JPanel();
 
@@ -18,6 +20,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         container.add(labelServer);
         container.add(ServerListCombo.getInstance());
         add(container);
+        */
     }
 
 }

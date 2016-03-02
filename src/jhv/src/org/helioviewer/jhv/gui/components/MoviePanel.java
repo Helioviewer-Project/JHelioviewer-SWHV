@@ -291,7 +291,7 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);
 
-        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND };
+        SpeedUnit[] units = { SpeedUnit.FRAMESPERSECOND /*, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND */ };
         speedUnitComboBox = new JComboBox(units);
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
         speedUnitComboBox.addActionListener(this);
