@@ -64,7 +64,8 @@ public class APIRequestManager {
         View view = null;
 
         try {
-            view = loadImage(observatory, instrument, detector, measurement, formatter.format(date), message);
+            String server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
+            view = loadImage(server, observatory, instrument, detector, measurement, formatter.format(date), message);
             if (view != null) {
                 date = view.getFirstTime().getDate();
                 readDate = true;
@@ -118,8 +119,8 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImage(String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws IOException {
-        String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2images.path") + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
+    private static View loadImage(String server, String observatory, String instrument, String detector, String measurement, String startTime, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJP2Image&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&date=" + startTime + "&json=true";
         String jpipRequest = fileRequest + "&jpip=true";
 
         // get URL from server where file with image series is located
@@ -163,8 +164,8 @@ public class APIRequestManager {
      * @throws MalformedURLException
      * @throws IOException
      */
-    private static View loadImageSeries(String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws IOException {
-        String fileRequest = Settings.getSingletonInstance().getProperty("API.jp2series.path") + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
+    private static View loadImageSeries(String server, String observatory, String instrument, String detector, String measurement, String startTime, String endTime, String cadence, boolean message) throws IOException {
+        String fileRequest = server + "?action=getJPX&observatory=" + observatory + "&instrument=" + instrument + "&detector=" + detector + "&measurement=" + measurement + "&startTime=" + startTime + "&endTime=" + endTime;
         if (cadence != null) {
             fileRequest += "&cadence=" + cadence;
         }
@@ -288,11 +289,14 @@ public class APIRequestManager {
      * @return new view
      * @throws IOException
      */
-    public static View requestAndOpenRemoteFile(String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+    public static View requestAndOpenRemoteFile(String server, String cadence, String startTime, String endTime, String observatory, String instrument, String detector, String measurement, boolean message) throws IOException {
+        if (server == null) // use default
+            server = Settings.getSingletonInstance().getProperty("API.jp2images.path");
+
         if (endTime.equals("")) {
-            return loadImage(observatory, instrument, detector, measurement, startTime, message);
+            return loadImage(server, observatory, instrument, detector, measurement, startTime, message);
         } else {
-            return loadImageSeries(observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
+            return loadImageSeries(server, observatory, instrument, detector, measurement, startTime, endTime, cadence, message);
         }
     }
 

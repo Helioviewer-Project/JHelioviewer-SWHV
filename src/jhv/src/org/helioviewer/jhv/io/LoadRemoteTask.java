@@ -36,9 +36,9 @@ public class LoadRemoteTask extends LoadURITask {
         View view = null;
         try {
             if (image)
-                view = APIRequestManager.requestAndOpenRemoteFile(null, starttime, "", observation, instrument, measurement, detector, true);
+                view = APIRequestManager.requestAndOpenRemoteFile(null, null, starttime, "", observation, instrument, measurement, detector, true);
             else
-                view = APIRequestManager.requestAndOpenRemoteFile(Integer.toString(cadence), starttime, endtime, observation, instrument, measurement, detector, true);
+                view = APIRequestManager.requestAndOpenRemoteFile(null, Integer.toString(cadence), starttime, endtime, observation, instrument, measurement, detector, true);
         } catch (IOException e) {
             Log.error("An error occured while opening the remote file!", e);
             Message.err("An error occured while opening the remote file!", e.getMessage(), false);
