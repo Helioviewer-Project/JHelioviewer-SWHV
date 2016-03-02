@@ -8,8 +8,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -47,6 +49,53 @@ import org.json.JSONTokener;
  * @author Helge Dietert
  */
 public class DataSources {
+
+    public static final Map<String, String> ROBsettings;
+    public static final Map<String, String> IASsettings;
+    public static final Map<String, String> GSFCsettings;
+
+    static {
+        ROBsettings = new HashMap<String, String>();
+        IASsettings = new HashMap<String, String>();
+        GSFCsettings = new HashMap<String, String>();
+
+        String[][] ROBpairs = {
+            { "API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
+            { "API.jp2images.path", "http://swhv.oma.be/hv/api/index.php" },
+            { "API.jp2series.path", "http://swhv.oma.be/hv/api/index.php" },
+            { "default.remote.path", "jpip://swhv.oma.be:8090" },
+            { "API.event.path", "http://swhv.oma.be/hv/api/" },
+            { "default.httpRemote.path", "http://swhv.oma.be/hv/jp2/" }
+        };
+
+        String[][] IASpairs = {
+            { "API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
+            { "API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
+            { "API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
+            { "default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080" },
+            { "API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/" },
+            { "default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/" }
+        };
+
+        String[][] GSFCpairs = {
+            { "API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
+            { "API.jp2images.path", "http://helioviewer.org/api/index.php" },
+            { "API.jp2series.path", "http://helioviewer.org/api/index.php" },
+            { "default.remote.path", "jpip://helioviewer.org:8090" },
+            { "API.event.path", "http://helioviewer.org/api/" },
+            { "default.httpRemote.path", "http://helioviewer.org/jp2/" }
+        };
+
+        for (String[] pair : ROBpairs) {
+            ROBsettings.put(pair[0], pair[1]);
+        }
+        for (String[] pair : IASpairs) {
+            IASsettings.put(pair[0], pair[1]);
+        }
+        for (String[] pair : GSFCpairs) {
+            GSFCsettings.put(pair[0], pair[1]);
+        }
+    }
 
     public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
@@ -339,27 +388,18 @@ public class DataSources {
 
     public static void changeServer(String server) {
         selectedServer = server;
+
+        Map<String, String> map;
         if (server.contains("ROB")) {
-            Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://swhv.oma.be/hv/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-            Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://swhv.oma.be/hv/api/index.php");
-            Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://swhv.oma.be/hv/api/index.php");
-            Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://swhv.oma.be:8090");
-            Settings.getSingletonInstance().setProperty("API.event.path", "http://swhv.oma.be/hv/api/");
-            Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://swhv.oma.be/hv/jp2/");
+            map = ROBsettings;
         } else if (server.contains("IAS")) {
-            Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-            Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
-            Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php");
-            Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080");
-            Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/");
-            Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/");
-        } else if (server.contains("GSFC")) {
-            Settings.getSingletonInstance().setProperty("API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]");
-            Settings.getSingletonInstance().setProperty("API.jp2images.path", "http://helioviewer.org/api/index.php");
-            Settings.getSingletonInstance().setProperty("API.jp2series.path", "http://helioviewer.org/api/index.php");
-            Settings.getSingletonInstance().setProperty("default.remote.path", "jpip://helioviewer.org:8090");
-            Settings.getSingletonInstance().setProperty("API.event.path", "http://helioviewer.org/api/");
-            Settings.getSingletonInstance().setProperty("default.httpRemote.path", "http://helioviewer.org/jp2/");
+            map = IASsettings;
+        } else /* if (server.contains("GSFC")) */ {
+            map = GSFCsettings;
+        }
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            Settings.getSingletonInstance().setProperty(entry.getKey(), entry.getValue());
         }
 
         JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
