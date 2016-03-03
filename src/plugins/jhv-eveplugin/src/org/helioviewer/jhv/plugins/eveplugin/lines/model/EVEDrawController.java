@@ -193,7 +193,10 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
                 newAvailableRange.setMin(v.getMinimumValue());
                 newAvailableRange.setMax(v.getMaximumValue());
             }
-
+            if (newAvailableRange.max == newAvailableRange.min) {
+                newAvailableRange.setMin(newAvailableRange.min - newAvailableRange.min / 10);
+                newAvailableRange.setMax(newAvailableRange.max + newAvailableRange.max / 10);
+            }
             yAxisElement.setAvailableRange(new Range(newAvailableRange));
             if (maxRange) {
                 yAxisElement.setSelectedRange(new Range(newAvailableRange));
