@@ -221,6 +221,15 @@ public class YAxisElement extends AbstractValueSpace {
         double shift = distanceY * ratioValue;
         double startValue = scaledMin + shift;
         double endValue = scaledMax + shift;
+        if (startValue < Math.log10(Float.MIN_VALUE)) {
+            double oldStart = startValue;
+            startValue = Math.log10(Float.MIN_VALUE);
+            endValue = startValue + (endValue - oldStart);
+        } else if (endValue > Math.log10(Float.MAX_VALUE)) {
+            double oldEnd = endValue;
+            endValue = Math.log10(Float.MAX_VALUE);
+            startValue = endValue - (oldEnd - startValue);
+        }
         selectedRange.min = invScale(startValue);
         selectedRange.max = invScale(endValue);
         fireSelectedRangeChanged();
@@ -232,9 +241,10 @@ public class YAxisElement extends AbstractValueSpace {
         double scaledMax = scale(selectedRange.max);
         double scaled = scaledMin + (scaledMax - scaledMin) * (relativeY / height);
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
-        double newScaledMin = ((1 + delta) * scaledMin - delta * scaled);
-        double newScaledMax = ((1 + delta) * scaledMax - delta * scaled);
-
+        double newScaledMin = (1 + delta) * scaledMin - delta * scaled;
+        double newScaledMax = (1 + delta) * scaledMax - delta * scaled;
+        newScaledMin = Math.max(Math.log10(Float.MIN_VALUE), newScaledMin);
+        newScaledMax = Math.min(Math.log10(Float.MAX_VALUE), newScaledMax);
         // newScaledMin = Math.max(scale(availableRange.min), newScaledMin);
         // newScaledMax = Math.min(scale(availableRange.max), newScaledMax);
         if (newScaledMax - newScaledMin > 0.04) {
