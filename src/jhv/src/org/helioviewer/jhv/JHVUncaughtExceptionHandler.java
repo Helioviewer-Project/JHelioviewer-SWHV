@@ -12,12 +12,16 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.logging.LogSettings;
@@ -28,9 +32,10 @@ import org.helioviewer.jhv.gui.ClipBoardCopier;
  *
  * @author Malte Nuhn
  */
-public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler, HyperlinkListener {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
+    private static final String MAIL_URL = "swhv@oma.be";
 
     private static final int default_width = 600;
     private static final int default_height = 400;
@@ -63,21 +68,19 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
      */
     public static void showErrorDialog(final String title, final Object msg) {
         Vector<Object> objects = new Vector<Object>();
-        objects.add(new JLabel("Fatal error detected."));
-        objects.add(new JLabel("Please report this as a bug at"));
-        JLabel bugLabel = new JLabel(BUG_URL);
-        Font font = bugLabel.getFont();
-        font = font.deriveFont(font.getStyle() ^ Font.ITALIC);
-        bugLabel.setFont(font);
-        bugLabel.setForeground(Color.blue);
 
-        objects.add(bugLabel);
+        JLabel fatal = new JLabel("Fatal error detected.");
+        objects.add(fatal);
 
-        bugLabel.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent me) {
-                JHVGlobals.openURL(BUG_URL);
-            }
-        });
+        Font font = fatal.getFont();
+        JEditorPane report = new JEditorPane("text/html", "<html><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
+                                                          "Please email this report at <a href='mailto:" + MAIL_URL + "'>" + MAIL_URL + "</a> " +
+                                                          "or use it to open an issue at <a href='" + BUG_URL + "'>" + BUG_URL + "</a> " + "</font></html>");
+        report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+        report.setEditable(false);
+        report.setOpaque(false);
+        report.addHyperlinkListener(handler);
+        objects.add(report);
 
         if (msg instanceof String) {
             JLabel copyToClipboard = new JLabel("Click here to copy the error message to the clipboard.");
@@ -85,7 +88,7 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             copyToClipboard.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent me) {
                     ClipBoardCopier.getSingletonInstance().setString((String) msg);
-                    JOptionPane.showMessageDialog(null, "Copied error message to clipboard.");
+                    JOptionPane.showMessageDialog(null, "Error message copied to clipboard.");
                 }
             });
 
@@ -105,9 +108,9 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             JScrollPane sp = new JScrollPane(textArea);
             sp.setPreferredSize(new Dimension(default_width, default_height));
 
+            objects.add(copyToClipboard);
             objects.add(new JSeparator());
             objects.add(sp);
-            objects.add(copyToClipboard);
         } else {
             objects.add(new JSeparator());
             objects.add(msg);
@@ -122,6 +125,13 @@ public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
         dialog.setVisible(true);
         if ("Quit JHelioviewer".equals(optionPane.getValue()))
             System.exit(1);
+    }
+
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            JHVGlobals.openURL(e.getURL().toString());
+        }
     }
 
     private JHVUncaughtExceptionHandler() {
