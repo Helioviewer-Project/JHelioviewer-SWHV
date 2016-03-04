@@ -85,10 +85,6 @@ public class RadioImagePane implements ImageObserver, DrawableElement {
         intervalTooBig = b;
     }
 
-    public boolean getIntervalTooBig() {
-        return intervalTooBig;
-    }
-
     @Override
     public Date getLastDateWithData() {
         return null;
