@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.Timer;
@@ -22,6 +23,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.PlotAreaSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.ValueSpaceListener;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.Band;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.BandColors;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
@@ -255,12 +257,32 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
 
     public void bandRemoved(final Band band) {
         bandTypes.remove(band.getBandType());
-        selectorModel.removeLineData(band);
         DownloadController.getSingletonInstance().stopDownloads(band);
         removeFromMap(band);
+        fixAxis();
+        selectorModel.removeLineData(band);
     }
 
     // EVE Cache Controller Listener
+
+    private void fixAxis() {
+        boolean hadLeftAxis = false;
+        List<Band> rightAxisBands = null;
+        for (Entry<YAxisElement, List<Band>> yEntry : bandsPerYAxis.entrySet()) {
+            if (drawController.getYAxisLocation(yEntry.getKey()) == YAxisLocation.LEFT) {
+                hadLeftAxis = true;
+            } else {
+                rightAxisBands = yEntry.getValue();
+            }
+        }
+        if (!hadLeftAxis && rightAxisBands != null) {
+            for (Band b : rightAxisBands) {
+                if (canChangeAxis(b)) {
+                    changeAxis(b);
+                }
+            }
+        }
+    }
 
     @Override
     public void dataAdded(final Band band) {
