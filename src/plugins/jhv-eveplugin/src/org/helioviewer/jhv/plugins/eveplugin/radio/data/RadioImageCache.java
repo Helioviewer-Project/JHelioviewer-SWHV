@@ -3,9 +3,11 @@ package org.helioviewer.jhv.plugins.eveplugin.radio.data;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -21,6 +23,7 @@ public class RadioImageCache {
     private final Map<DownloadedJPXData, Long> reverseUseCache;
     private final Map<Date, DownloadedJPXData> startDates;
     private final Map<Date, Interval<Date>> noDataCache;
+    private final Set<Long> idsToRemove;
 
     private RadioImageCache() {
         cacheCounter = 0;
@@ -29,6 +32,7 @@ public class RadioImageCache {
         startDates = new HashMap<Date, DownloadedJPXData>();
         noDataCache = new HashMap<Date, Interval<Date>>();
         reverseUseCache = new HashMap<DownloadedJPXData, Long>();
+        idsToRemove = new HashSet<Long>();
     }
 
     public static RadioImageCache getInstance() {
@@ -47,6 +51,7 @@ public class RadioImageCache {
             useCache.remove(key);
             reverseUseCache.remove(oldestJPXData);
             oldestJPXData.remove();
+            idsToRemove.add(oldestJPXData.getImageID());
             Log.debug("remove oldest jpx data " + oldestJPXData + " imageID " + oldestJPXData.getImageID());
         }
 
@@ -94,6 +99,8 @@ public class RadioImageCache {
         List<Interval<Date>> intervalList = new ArrayList<Interval<Date>>();
         List<DownloadedJPXData> dataList = new ArrayList<DownloadedJPXData>();
         List<Long> toRemove = new ArrayList<Long>(dataCache.keySet());
+        toRemove.addAll(idsToRemove);
+        idsToRemove.clear();
         List<Interval<Date>> noDataInterval = new ArrayList<Interval<Date>>();
         while (localStart.compareTo(end) <= 0) {
             if (!startDates.containsKey(localStart) && !noDataCache.containsKey(localStart)) {
