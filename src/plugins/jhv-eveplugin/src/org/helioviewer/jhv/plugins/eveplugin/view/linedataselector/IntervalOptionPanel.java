@@ -48,10 +48,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         zoomComboBox.setEnabled(false);
 
         periodFromLayersButton = new JToggleButton(IconBank.getIcon(JHVIcon.MOVIE_UNLINK));
-        periodFromLayersButton.setToolTipText("Synchronize movie and time series display"); // TODO
-                                                                                            // should
-                                                                                            // be
-                                                                                            // changed
+        periodFromLayersButton.setToolTipText("Synchronize movie and time series display");
         periodFromLayersButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         periodFromLayersButton.setEnabled(Layers.getActiveView() != null);
         periodFromLayersButton.addActionListener(this);
@@ -138,7 +135,7 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         addCarringtonRotationToModel(model, 1);
 
         addElementToModel(model, 7, ZOOM.Day);
-
+        addElementToModel(model, 3, ZOOM.Day);
         addElementToModel(model, 12, ZOOM.Hour);
         addElementToModel(model, 6, ZOOM.Hour);
         addElementToModel(model, 1, ZOOM.Hour);
@@ -297,11 +294,6 @@ public class IntervalOptionPanel extends JPanel implements ActionListener, Layer
         if (sInAvailable && eInAvailable) {
             return new Interval<Date>(startDate, endDate);
         }
-
-        Date availableS = sInAvailable ? availableInterval.getStart() : startDate;
-        Date availableE = eInAvailable ? availableInterval.getEnd() : endDate;
-
-        drawController.setAvailableInterval(new Interval<Date>(availableS, availableE));
 
         return new Interval<Date>(startDate, endDate);
     }
