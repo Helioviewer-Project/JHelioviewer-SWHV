@@ -364,7 +364,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     }
 
     public boolean canChangeAxis(Band band) {
-        return DrawController.getSingletonInstance().canChangeAxis(band.getUnitLabel()) && yAxisElementMap.size() > 1;
+        return DrawController.getSingletonInstance().canChangeAxis(band.getUnitLabel()) && yAxisElementMap.size() > 1 && (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.RIGHT || (drawController.getYAxisLocation(yAxisElementMap.get(band)) == YAxisElement.YAxisLocation.LEFT && bandsPerYAxis.get(yAxisElementMap.get(band)).size() > 1));
     }
 
     public int getAxisLocation(Band band) {
