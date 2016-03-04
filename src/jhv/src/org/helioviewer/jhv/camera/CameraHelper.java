@@ -156,7 +156,7 @@ public class CameraHelper {
         if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
             size = 1.;
         } else {
-            size = Layers.getLargestPhysicalSize();
+            size = Layers.getLargestPhysicalHeight();
         }
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
