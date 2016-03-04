@@ -241,9 +241,9 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
             bandTypes.add(bandType);
             Band band = new Band(bandType);
             band.setDataColor(BandColors.getNextColor());
-            selectorModel.addLineData(band);
             DownloadController.getSingletonInstance().updateBand(band, DrawController.getSingletonInstance().getAvailableInterval(), DrawController.getSingletonInstance().getSelectedInterval());
             addToMap(band);
+            selectorModel.addLineData(band);
         }
     }
 
