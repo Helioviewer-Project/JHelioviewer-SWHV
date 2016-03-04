@@ -14,6 +14,7 @@ public class ServerListCombo extends JComboBox {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DataSources.changeServer((String) ((JComboBox) e.getSource()).getModel().getSelectedItem());
+                ObservationDialog.getInstance().setAvailabilityStatus(DataSources.getSelectedServer());
             }
         };
 

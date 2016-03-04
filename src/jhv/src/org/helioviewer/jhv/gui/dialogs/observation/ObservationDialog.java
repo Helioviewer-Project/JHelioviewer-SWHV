@@ -25,6 +25,7 @@ import org.helioviewer.jhv.base.message.Message;
 //import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
+import org.helioviewer.jhv.io.DataSources;
 
 /**
  * The Observation Dialog provides the main interface to get data from the
@@ -147,11 +148,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         if (selectedPane != null) {
             selectedPane = null;
         }
-
         if (name != null) {
             selectedPane = uiMap.get(name);
         }
-
         resetContentPane();
     }
 
@@ -228,9 +227,7 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         // dispose();
     }
 
-
     // Showable Dialog
-
     /**
      * {@inheritDoc}
      */
@@ -238,7 +235,6 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     public void showDialog() {
         showDialog(null);
     }
-
 
     // Action Listener
     private void addPressed() {
@@ -255,6 +251,13 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         closeDialog();
     }
 
+    public void setAvailabilityStatus(String server) {
+        if (server.equals("ROB"))
+            availabilityButton.setEnabled(true);
+        else
+            availabilityButton.setEnabled(false);
+    }
+
     /**
      * Reacts on user input.
      * */
@@ -262,6 +265,13 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(uiSelectionComboBox)) {
             setUIContainerPane((String) uiSelectionComboBox.getSelectedItem());
+
+            String str = (String) (uiSelectionComboBox.getSelectedItem());
+            if (str.equals("Image data")) {
+                setAvailabilityStatus(DataSources.getSelectedServer());
+            } else
+                availabilityButton.setEnabled(true);
+
         } else if (e.getSource().equals(btnImages)) {
             addPressed();
         } else if (e.getSource().equals(btnClose)) {
