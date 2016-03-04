@@ -251,6 +251,27 @@ public class Layers {
         animationMode = mode;
     }
 
+    public static double getLargestPhysicalHeight() {
+        double newSize, size = 0;
+
+        for (View v : layers) {
+            if (v.getImageLayer().isVisible()) {
+                MetaData m;
+                ImageData d = v.getImageLayer().getImageData();
+                if (d == null) // not yet decoded
+                    m = v.getMetaData(new JHVDate(0));
+                else
+                    m = d.getMetaData();
+                newSize = m.getPhysicalRegion().height;
+
+                if (newSize > size) {
+                    size = newSize;
+                }
+            }
+        }
+        return size;
+    }
+
     public static double getLargestPhysicalSize() {
         double newSize, size = 0;
 
@@ -262,8 +283,10 @@ public class Layers {
                     m = v.getMetaData(new JHVDate(0));
                 else
                     m = d.getMetaData();
+                double h = m.getPhysicalRegion().height;
+                double w = m.getPhysicalRegion().width;
 
-                newSize = m.getPhysicalRegion().height;
+                newSize = Math.sqrt(h * h + w * w);
                 if (newSize > size) {
                     size = newSize;
                 }
