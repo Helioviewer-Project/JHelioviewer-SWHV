@@ -22,6 +22,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
+import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement.YAxisLocation;
 import org.helioviewer.jhv.plugins.eveplugin.lines.data.DownloadController;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -548,7 +549,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         case 1:
             return YAxisElement.YAxisLocation.RIGHT;
         }
-        return null;
+        return YAxisLocation.LEFT;
     }
 
 }
