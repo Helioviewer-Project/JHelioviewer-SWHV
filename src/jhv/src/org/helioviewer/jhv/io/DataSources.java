@@ -219,8 +219,8 @@ public class DataSources {
     public static DataSources getSingletonInstance() {
         if (instance == null) {
             instance = new DataSources();
-            String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
 
+            String prop = Settings.getSingletonInstance().getProperty("supported.data.sources");
             if (prop != null && SupportedObservatories.isEmpty()) {
                 String supportedObservatories[] = prop.split(" ");
                 for (String s : supportedObservatories) {

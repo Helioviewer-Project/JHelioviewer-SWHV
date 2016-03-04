@@ -40,6 +40,10 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             double maskRotation = -Math.toRadians(m.tryGetDouble("CROTA"));
             cutOffValue = -region.ulx;
             cutOffDirection = new Vec3(Math.sin(maskRotation) / 0.9625, Math.cos(maskRotation) / 0.9625, 0);
+        } else if (instrument.equalsIgnoreCase("SWAP")) {
+            double maskRotation = -Math.toRadians(m.tryGetDouble("SOLAR_EP"));
+            cutOffValue = -region.ulx;
+            cutOffDirection = new Vec3(Math.sin(maskRotation), Math.cos(maskRotation), 0);
         }
     }
 
