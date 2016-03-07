@@ -35,7 +35,7 @@ import org.helioviewer.jhv.gui.ClipBoardCopier;
 public class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler, HyperlinkListener {
 
     private static final String BUG_URL = "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/issues";
-    private static final String MAIL_URL = "swhv@oma.be";
+    private static final String MAIL_URL = "swhv@sidc.be";
 
     private static final int default_width = 600;
     private static final int default_height = 400;
