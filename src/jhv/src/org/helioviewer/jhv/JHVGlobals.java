@@ -26,10 +26,10 @@ public class JHVGlobals {
 
     public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
 
-    private static String agent = "JHV/SWHV-";
-    private static String name = "ESA JHelioviewer SWHV";
+    private static final String name = "ESA JHelioviewer SWHV";
     private static String version = "";
     private static String revision = "";
+    private static String agent = "JHV/SWHV-";
 
     private JHVGlobals() {}
 
