@@ -61,7 +61,15 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
 
         Font font = getFont();
 
-        JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" + "<b>" + getVersionString() + "</b><br>" + '\u00A9' + "2016 ESA JHelioviewer Team<br>" + "Part of the ESA/NASA Helioviewer Project<br><br>" + "JHelioviewer is released under the <br>" + "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" + "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" + "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" + "</font></center></html>");
+        JEditorPane content = new JEditorPane("text/html", "<html><center><font style=\"font-family: '" + font.getFamily() + "'; font-size: " + font.getSize() + ";\">" +
+                                               "<b>" + getVersionString() + "</b><br>" +
+                                               '\u00A9' + "2016 <a href='http://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br>" +
+                                               "Part of the ESA/NASA Helioviewer Project<br><br>" +
+                                               "JHelioviewer is released under the<br>" +
+                                               "<a href=JHelioviewer.txt>Mozilla Public License Version 2.0</a><br><br>" +
+                                               "<a href='http://www.jhelioviewer.org'>www.jhelioviewer.org</a><br><br>" +
+                                               "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>" +
+                                               "</font></center></html>");
         content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         content.setEditable(false);
         content.setOpaque(false);
