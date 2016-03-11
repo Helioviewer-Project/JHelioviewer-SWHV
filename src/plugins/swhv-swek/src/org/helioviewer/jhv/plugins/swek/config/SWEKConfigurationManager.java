@@ -950,7 +950,10 @@ public class SWEKConfigurationManager {
      *             if the "group on" could not be parsed from the json.
      */
     private SWEKParameter parseGroupOn(JSONObject object) throws JSONException {
-        return parameters.get(object.getString("group_on"));
+        if (!object.isNull("group_on"))
+            return parameters.get(object.getString("group_on"));
+        else
+            return null;
     }
 
     /**
