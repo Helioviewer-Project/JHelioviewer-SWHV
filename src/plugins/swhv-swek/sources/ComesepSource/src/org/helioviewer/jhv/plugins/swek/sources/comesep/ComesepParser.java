@@ -171,10 +171,11 @@ public class ComesepParser implements SWEKParser {
     private void parseParameter(JSONObject result, Object key, ComesepEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
-            String value = result.getString((String) key);
-            if (value.toLowerCase().equals("null")) {
-                value = null;
-            }
+
+            String value = null;
+            if (!result.isNull(keyString))
+                value = result.optString(keyString); // convert to string
+
             // Event start time
             if (keyString.toLowerCase().equals("atearliest")) {
                 startTimeSet = true;
