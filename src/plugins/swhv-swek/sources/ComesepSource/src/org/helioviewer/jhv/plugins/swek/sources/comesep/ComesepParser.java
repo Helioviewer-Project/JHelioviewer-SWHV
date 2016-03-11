@@ -175,6 +175,8 @@ public class ComesepParser implements SWEKParser {
             String value = null;
             if (!result.isNull(keyString))
                 value = result.optString(keyString); // convert to string
+            else
+                return;
 
             // Event start time
             if (keyString.toLowerCase().equals("atearliest")) {
