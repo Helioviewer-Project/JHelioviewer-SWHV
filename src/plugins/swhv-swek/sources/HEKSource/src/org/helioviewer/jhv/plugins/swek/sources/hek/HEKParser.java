@@ -362,7 +362,7 @@ public class HEKParser implements SWEKParser {
             }
             currentEvent.getEventRelationShip().getRelationshipRules().addAll(getEventRelationShipRules());
             if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
-                Log.error("You might have discovered a wrong parsing of a HEK event. Please send this information to the SWHV people");
+                Log.error("Possible wrong parsing of a HEK event.");
                 Log.error("Event start: " + currentEvent.getStartDate());
                 Log.error("Event end: " + currentEvent.getEndDate());
                 Log.error("Event JSON: ");
@@ -408,10 +408,12 @@ public class HEKParser implements SWEKParser {
             if (keyString.toLowerCase().equals("refs")) {
                 parseRefs(currentEvent, result.getJSONArray((String) key));
             } else {
-                String value = result.getString((String) key);
-                if (value.toLowerCase().equals("null")) {
-                    value = null;
-                }
+                String value = null;
+                if (!result.isNull(keyString))
+                    value = result.optString(keyString); // convert to string
+                else
+                    return;
+
                 // Event start time
                 if (keyString.toLowerCase().equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
@@ -428,17 +430,11 @@ public class HEKParser implements SWEKParser {
                 if (keyString.toLowerCase().equals("event_coordsys")) {
                     coordinateSystemString = value;
                 } else if (keyString.toLowerCase().equals("event_coord1")) {
-                    if (value != null) {
-                        coordinate1 = Double.parseDouble(value);
-                    }
+                    coordinate1 = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("event_coord2")) {
-                    if (value != null) {
-                        coordinate2 = Double.parseDouble(value);
-                    }
+                    coordinate2 = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("event_coord3")) {
-                    if (value != null) {
-                        coordinate3 = Double.parseDouble(value);
-                    }
+                    coordinate3 = Double.parseDouble(value);
                 }
                 // event positions (Not standard)
                 if (keyString.toLowerCase().equals("hgc_bbox")) {
@@ -448,13 +444,9 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.toLowerCase().equals("hgc_coord")) {
                     hgcCentralPoint = parsePoint(value);
                 } else if (keyString.toLowerCase().equals("hgc_x")) {
-                    if (value != null) {
-                        hgcX = Double.parseDouble(value);
-                    }
+                    hgcX = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hgc_y")) {
-                    if (value != null) {
-                        hgcY = Double.parseDouble(value);
-                    }
+                    hgcY = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
                 } else if (keyString.toLowerCase().equals("hgs_boundcc")) {
@@ -462,13 +454,9 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.toLowerCase().equals("hgs_coord")) {
                     hgsCentralPoint = parsePoint(value);
                 } else if (keyString.toLowerCase().equals("hgs_x")) {
-                    if (value != null) {
-                        hgsX = Double.parseDouble(value);
-                    }
+                    hgsX = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hgs_y")) {
-                    if (value != null) {
-                        hgsY = Double.parseDouble(value);
-                    }
+                    hgsY = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hpc_bbox")) {
                     hpcBoundedBox = parsePolygon(value);
                 } else if (keyString.toLowerCase().equals("hpc_boundcc")) {
@@ -476,13 +464,9 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.toLowerCase().equals("hpc_coord")) {
                     hpcCentralPoint = parsePoint(value);
                 } else if (keyString.toLowerCase().equals("hpc_x")) {
-                    if (value != null) {
-                        hpcX = Double.parseDouble(value);
-                    }
+                    hpcX = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hpc_y")) {
-                    if (value != null) {
-                        hpcY = Double.parseDouble(value);
-                    }
+                    hpcY = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hrc_bbox")) {
                     hrcBoundedBox = parsePolygon(value);
                 } else if (keyString.toLowerCase().equals("hrc_boundcc")) {
@@ -490,13 +474,9 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.toLowerCase().equals("hrc_coord")) {
                     hrcCentralPoint = parsePoint(value);
                 } else if (keyString.toLowerCase().equals("hrc_a")) {
-                    if (value != null) {
-                        hrcA = Double.parseDouble(value);
-                    }
+                    hrcA = Double.parseDouble(value);
                 } else if (keyString.toLowerCase().equals("hrc_r")) {
-                    if (value != null) {
-                        hrcR = Double.parseDouble(value);
-                    }
+                    hrcR = Double.parseDouble(value);
                 } else {
                     boolean visible = false;
                     boolean configured = false;
