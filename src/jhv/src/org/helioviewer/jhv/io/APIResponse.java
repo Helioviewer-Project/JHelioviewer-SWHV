@@ -11,17 +11,16 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.json.XML;
 
 /**
  * Wrapper for JSONObject.
- * 
+ *
  * The idea behind this class is simply to get a better name and to prevent the
  * user from handling all the JSONExceptions.
- * 
+ *
  * @author Markus Langenberg
  */
-public class APIResponse {
+class APIResponse {
     /**
      * Complete answer
      */
@@ -33,7 +32,7 @@ public class APIResponse {
 
     /**
      * Constructor with a reader as source
-     * 
+     *
      * @param source
      *            - Reader from which the JSON object will be read
      */
@@ -55,7 +54,7 @@ public class APIResponse {
             }
             // data = new JSONObject(new JSONTokener(source));
             data = new JSONObject(new JSONTokener(new StringReader(sb.toString())));
-            if (data.has("uri")) {
+            if (!data.isNull("uri")) {
                 uri = new URI(data.getString("uri"));
             }
         } catch (JSONException e) {
@@ -66,51 +65,10 @@ public class APIResponse {
     }
 
     /**
-     * Constructor with a complete string.
-     * 
-     * @param source
-     *            string containing the formated JSON object
-     */
-    public APIResponse(String source) {
-        try {
-            data = new JSONObject(source);
-            uri = new URI(data.getString("uri"));
-        } catch (JSONException e) {
-            Log.error("Invalid JSON response " + data, e);
-        } catch (URISyntaxException e) {
-            Log.error("Invalid uri in response " + data, e);
-        }
-    }
-
-    /**
-     * Constructor with a complete XML string
-     * 
-     * @param source
-     *            - string containing the XML or JSON formatted representation
-     * @param isXML
-     *            - true if the string contains a XML representation, false if
-     *            it contains a JSON representation
-     */
-    public APIResponse(String source, boolean isXML) {
-        try {
-            if (isXML) {
-                data = XML.toJSONObject(source);
-            } else {
-                data = new JSONObject(source);
-            }
-            uri = new URI(data.getString("uri"));
-        } catch (JSONException e) {
-            Log.error("Invalid JSON response " + data, e);
-        } catch (URISyntaxException e) {
-            Log.error("Invalid uri in response " + data, e);
-        }
-    }
-
-    /**
      * Returns the value for a given key.
-     * 
-     * If the key does not exist, returns null.
-     * 
+     *
+     * Returns null if the key does not exist or the value is not a string.
+     *
      * @param key
      *            Key to search for
      * @return value for given key
@@ -124,23 +82,10 @@ public class APIResponse {
     }
 
     /**
-     * Return a String representation of the whole API response
-     * 
-     * @return String representing the API response
-     */
-    public String getXMLRepresentation() {
-        try {
-            return XML.toString(data);
-        } catch (JSONException e) {
-            return "";
-        }
-    }
-
-    /**
      * Returns the URI of the image which results from this API response.
-     * 
+     *
      * The URI is used as the unique identifier for the response.
-     * 
+     *
      * @return unique URI corresponding to this response
      */
     public URI getURI() {
@@ -149,7 +94,7 @@ public class APIResponse {
 
     /**
      * Checks if a JSON object could be created
-     * 
+     *
      * @return true if a valid JSON object has been created
      */
     public boolean hasData() {

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -214,7 +213,7 @@ public class APIRequestManager {
     private static View requestData(URL jpipRequest, URI downloadUri, boolean errorMessage) throws IOException {
         try {
             DownloadStream ds = new DownloadStream(jpipRequest, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            APIResponse response = new APIResponse(new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8")));
+            APIResponse response = new APIResponse(new InputStreamReader(ds.getInput(), "UTF-8"));
 
             // Could we handle the answer from the server
             if (!response.hasData()) {
@@ -238,7 +237,7 @@ public class APIRequestManager {
             if (response.getURI() != null) {
                 // The server wants to load us the data
                 String message = response.getString("message");
-                if (message != null && !message.equalsIgnoreCase("null") && errorMessage) {
+                if (message != null && errorMessage) {
                     Message.warn("Warning", Message.formatMessageString(message));
                 }
                 APIResponseDump.getSingletonInstance().putResponse(response);
@@ -246,7 +245,7 @@ public class APIRequestManager {
             } else {
                 // We did not get a reply to load data or no reply at all
                 String message = response.getString("message");
-                if (message != null && !message.equalsIgnoreCase("null")) {
+                if (message != null) {
                     Log.error("No data to load returned from " + jpipRequest);
                     Log.error("Server message: " + message);
                     if (errorMessage) {
