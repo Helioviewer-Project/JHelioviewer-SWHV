@@ -26,6 +26,8 @@ public class JHVGlobals {
 
     public static final String TEMP_FILENAME_DELETE_PLUGIN_FILES = "delete-plugins.tmp";
 
+    public static final String downloadURL = "http://swhv.oma.be/swhv_releasev2.9/";
+
     private static final String name = "ESA JHelioviewer";
     private static String version = "";
     private static String revision = "";

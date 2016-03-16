@@ -144,6 +144,14 @@ public class JavaHelioViewer {
                 JComponent leftScrollPane = ImageViewerGui.getLeftScrollPane();
                 leftScrollPane.setMinimumSize(new Dimension(leftScrollPane.getPreferredSize().width + ImageViewerGui.SIDE_PANEL_WIDTH_EXTRA, -1));
                 ImageViewerGui.getMainFrame().pack();
+
+                try {
+                    JHVUpdate update = new JHVUpdate();
+                    update.check();
+                } catch (Exception e) {
+                    // Should never happen
+                    Log.error("Error retrieving internal update URL", e);
+                }
             }
 
             private String[] theArgs;
