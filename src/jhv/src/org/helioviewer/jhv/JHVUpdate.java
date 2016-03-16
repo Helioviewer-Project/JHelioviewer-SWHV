@@ -8,6 +8,7 @@ import java.net.URL;
 
 import javax.swing.JOptionPane;
 
+import org.helioviewer.jhv.base.AlphanumComparator;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.message.Message;
@@ -44,6 +45,7 @@ public class JHVUpdate implements Runnable {
      */
     private boolean verbose;
 
+    private final AlphanumComparator comparator = new AlphanumComparator();
 
     private NewVersionDialog d = new NewVersionDialog(verbose);
 
@@ -111,7 +113,7 @@ public class JHVUpdate implements Runnable {
                 throw new IOException("JHVUpdate: Empty version string");
             }
 
-            if (version.compareTo(runningVersion) > 0) {
+            if (comparator.compare(version, runningVersion) > 0) {
                 String message = in.readLine();
                 Log.info("Found newer version " + version);
                 d.init(version, message);
