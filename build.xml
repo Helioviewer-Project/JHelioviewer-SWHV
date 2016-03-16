@@ -305,8 +305,12 @@
         </zip>
     </target>
 
+    <target name="version" depends="init">
+        <echo message="${jhv.version}.${jhv.revision}" file="${build}/VERSION"/>
+    </target>
+
     <!-- all -->
-    <target name="release-all" depends="release-no-src, bundle-src"/>
+    <target name="release-all" depends="release-no-src, bundle-src, version"/>
     <target name="release-no-src" depends="release-mac, release-windows, release-tar"/>
     <target name="bundle-all" depends="bundle-no-src, bundle-src"/>
     <target name="bundle-no-src" depends="bundle-mac, bundle-windows, bundle-tar"/>
