@@ -4,12 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -19,13 +22,11 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
 
 /**
  * Dialog to show that a new version is available
- * 
+ *
  * @author Helge Dietert
  */
+@SuppressWarnings("serial")
 public class NewVersionDialog extends JDialog implements ActionListener, ShowableDialog, HyperlinkListener {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * New setting for check.update.next
      */
@@ -76,11 +77,18 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
         closeButton.addActionListener(this);
         closeButtonContainer.add(closeButton);
         add(closeButtonContainer, BorderLayout.SOUTH);
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
      * Creates a dialog with the given parameters
-     * 
+     *
      * @param newVersion
      *            new version which is available
      * @param message
@@ -110,7 +118,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
      * Closes the dialog.
      */
     public void actionPerformed(ActionEvent a) {
-        this.dispose();
+        dispose();
     }
 
     /**
