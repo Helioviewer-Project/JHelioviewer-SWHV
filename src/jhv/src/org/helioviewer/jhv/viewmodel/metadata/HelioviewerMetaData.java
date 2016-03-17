@@ -27,6 +27,13 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
         frameNumber = frame;
 
         identifyObservation(m);
+
+        instrument = instrument.intern();
+        detector = detector.intern();
+        measurement = measurement.intern();
+        observatory = observatory.intern();
+        fullName = fullName.intern();
+
         retrievePosition(m, retrieveDateTime(m));
         retrievePixelParameters(m);
 
