@@ -37,10 +37,10 @@ public class JHVEventParameter {
      *            the parameter value
      */
     public JHVEventParameter(String parameterName, String parameterDisplayName, String parameterValue) {
-        this.parameterName = parameterName;
-        this.parameterDisplayName = parameterDisplayName;
-        this.parameterValue = parameterValue;
-        displayParameterValue = beautifyParameterValue(parameterValue);
+        this.parameterName = parameterName.intern();
+        this.parameterDisplayName = parameterDisplayName.intern();
+        this.parameterValue = parameterValue.intern();
+        displayParameterValue = beautifyParameterValue(parameterValue).intern();
     }
 
     /**
