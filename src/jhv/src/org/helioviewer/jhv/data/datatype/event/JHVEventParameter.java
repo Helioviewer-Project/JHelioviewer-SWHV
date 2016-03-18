@@ -15,9 +15,6 @@ public class JHVEventParameter {
     /** The value of the parameter */
     private String parameterValue;
 
-    /** The parameter display value */
-    private String displayParameterValue;
-
     /**
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
@@ -33,7 +30,6 @@ public class JHVEventParameter {
         this.parameterName = parameterName.intern();
         this.parameterDisplayName = parameterDisplayName.intern();
         this.parameterValue = parameterValue.intern();
-        displayParameterValue = beautifyParameterValue(parameterValue).intern();
     }
 
     /**
@@ -91,14 +87,13 @@ public class JHVEventParameter {
      */
     public void setParameterValue(String parameterValue) {
         this.parameterValue = parameterValue;
-        displayParameterValue = beautifyParameterValue(parameterValue);
     }
 
     /**
      * Gets the parameter display value
      */
     public String getDisplayParameterValue() {
-        return displayParameterValue;
+        return beautifyParameterValue(parameterValue);
     }
 
     private String beautifyParameterValue(String parameterValue) {
