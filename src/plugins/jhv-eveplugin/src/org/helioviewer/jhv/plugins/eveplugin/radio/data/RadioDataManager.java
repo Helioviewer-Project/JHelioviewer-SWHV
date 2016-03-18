@@ -160,7 +160,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
                     PlotConfig pc = new PlotConfig(newImage, dam, isVisible, imageID);
                     plotConfigList.put(imageID, pc);
                     fireDrawNewBufferedImage();
-                    ;
                 }
             } else {
                 // Log.debug("The image was null");
@@ -168,7 +167,6 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
         } else {
             // Log.debug("Download request data was null");
         }
-        ;
     }
 
     /**
@@ -454,7 +452,7 @@ public class RadioDataManager implements ColorLookupModelListener, ZoomDataConfi
             ri.setVisibleIntervals(xStart, xEnd, (int) Math.floor(yStart), (int) Math.ceil(yEnd));
             if (ri.getVisibleImageFreqInterval() != null && ri.getVisibleImageTimeInterval() != null) {
                 Interval<Date> visibleDateInterval = ri.getVisibleImageTimeInterval();
-                FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
+                // FrequencyInterval visibleFrequencyInterval = ri.getVisibleImageFreqInterval();
                 if (!visibleDateInterval.getStart().equals(visibleDateInterval.getEnd())) {
                     JP2ViewCallisto jp2View = jpxData.getView();
                     if (jp2View != null) {
