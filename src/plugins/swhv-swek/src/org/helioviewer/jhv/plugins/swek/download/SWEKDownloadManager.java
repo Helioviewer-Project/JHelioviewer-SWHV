@@ -39,36 +39,16 @@ import org.helioviewer.jhv.threads.JHVThread;
  */
 public class SWEKDownloadManager implements IncomingRequestManagerListener, EventTypePanelModelListener, FilterManagerListener {
 
-    /** Singleton instance of the SWE */
     private static SWEKDownloadManager instance;
-
-    /** Threadpool for downloading events */
     private final ExecutorService downloadEventPool;
-
-    /** Map holding the download workers order by event type and date */
     private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap;
-
-    /** Map holding the active event types and its sources */
     private final Map<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>> activeEventTypes;
-
-    /** Local instance of the request manager */
     private final IncomingRequestManager requestManager;
-
-    /** Local instance of the event container */
     private final JHVEventContainer eventContainer;
-
-    /** Local instance of filter manager */
     private final FilterManager filterManager;
-
-    /** The instance of the SWEKTreeModel */
     private final SWEKTreeModel treeModel;
-
-    /** The configuration manager instance */
     private final SWEKConfigurationManager configInstance = SWEKConfigurationManager.getSingletonInstance();
 
-    /**
-     * private constructor of the SWEKDownloadManager
-     */
     private SWEKDownloadManager() {
         dwMap = new HashMap<SWEKEventType, ArrayList<DownloadWorker>>();
         activeEventTypes = new HashMap<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>>();
@@ -83,11 +63,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         downloadEventPool = new ThreadPoolExecutor(numOfThread, numOfThread, 10000L, TimeUnit.MILLISECONDS, priorityQueue, new JHVThread.NamedThreadFactory("SWEK Download"), new ThreadPoolExecutor.DiscardPolicy());
     }
 
-    /**
-     * Gets the singleton instance of the SWEKDownloadManager
-     *
-     * @return The singleton instance
-     */
     public static SWEKDownloadManager getSingletonInstance() {
         if (instance == null) {
             instance = new SWEKDownloadManager();
@@ -126,12 +101,12 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     }
 
     public void workerForcedToStop(DownloadWorker worker) {
-        removeWorkerFromMap(worker);
+        removeFromDownloaderMap(worker);
         JHVEventContainer.getSingletonInstance().intervalsNotDownloaded(worker.getJHVEventType(), worker.getRequestInterval());
     }
 
     public void workerFinished(DownloadWorker worker) {
-        removeWorkerFromMap(worker);
+        removeFromDownloaderMap(worker);
     }
 
     @Override
@@ -151,17 +126,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         downloadEventType(eventType, interval);
     }
 
-    private void downloadEventType(JHVEventType eventType, Interval<Date> interval) {
-        SWEKEventType swekEventType = SWEKConfigurationManager.getSingletonInstance().getEventType(eventType.getEventType());
-        SWEKSource source = SWEKConfigurationManager.getSingletonInstance().getSWEKSource(eventType.getEventSource());
-        SWEKSupplier supplier = SWEKConfigurationManager.getSingletonInstance().getSWEKSupplier(eventType.getEventProvider(), eventType.getEventType());
-        if (swekEventType != null && source != null && supplier != null) {
-            startDownloadEventType(swekEventType, source, interval, supplier);
-        } else {
-            Log.debug("SWEKType: " + swekEventType + " SWEKSource: " + source + " SWEKSupplier: " + supplier);
-        }
-    }
-
     @Override
     public void filtersAdded(SWEKEventType swekEventType) {
         stopDownloadingEventType(swekEventType, true);
@@ -174,13 +138,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         downloadSelectedSuppliers(swekEventType);
     }
 
-    /**
-     * Removes the worker from the map with workers.
-     *
-     * @param worker
-     *            The worker to remove
-     */
-    private void removeWorkerFromMap(DownloadWorker worker) {
+    private void removeFromDownloaderMap(DownloadWorker worker) {
         ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getEventType());
         if (dwMapList != null)
             dwMapList.remove(worker);
@@ -199,15 +157,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         dwMapList.add(dw);
     }
 
-    /**
-     * Add the combination of an event type and a swek source to the list of
-     * active event types.
-     *
-     * @param eventType
-     *            the event type to add
-     * @param swekSupplier
-     *            the swek source to add
-     */
     private void addEventTypeToActiveEventTypeMap(SWEKEventType eventType, SWEKSource source, SWEKSupplier swekSupplier) {
         Map<SWEKSource, Set<SWEKSupplier>> sourcesPerEventType = new HashMap<SWEKSource, Set<SWEKSupplier>>();
         Set<SWEKSupplier> supplierPerSource = new HashSet<SWEKSupplier>();
@@ -222,17 +171,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         activeEventTypes.put(eventType, sourcesPerEventType);
     }
 
-    /**
-     * Removes the combination of an event type, a swek source and a swek
-     * supplier from the list of active event types.
-     *
-     * @param eventType
-     *            the event type to remove
-     * @param swekSource
-     *            the swek source to remove
-     * @param supplier
-     *            the supplier to remove
-     */
     private void removeEventTypeFromActiveEventTypeMap(SWEKEventType eventType, SWEKSource source, SWEKSupplier swekSupplier) {
         Map<SWEKSource, Set<SWEKSupplier>> sourcesPerEventtype = activeEventTypes.get(eventType);
         if (sourcesPerEventtype != null) {
@@ -245,34 +183,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         }
     }
 
-    /**
-     * Downloads the given combination of event type and swek source for all the
-     * already requested dates.
-     *
-     * @param eventType
-     *            the type to download
-     * @param swekSource
-     *            the source providing the event type
-     * @param supplier
-     *            the supplier to producing the event
-     */
-    private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-
-        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
-        for (Interval<Date> interval : allIntervals) {
-            startDownloadEventType(eventType, swekSource, interval, supplier);
-        }
-    }
-
-    /**
-     * Defines the parameters based on filters and provider.
-     *
-     * @param eventType
-     *            the event type for which the parameters are defined
-     * @param source
-     *            the source from where the events are coming
-     * @return the parameters
-     */
     private List<SWEKParam> defineParameters(SWEKEventType eventType, SWEKSupplier supplier) {
         List<SWEKParam> params = new ArrayList<SWEKParam>();
         params.add(new SWEKParam("provider", supplier.getSupplierName(), SWEKOperand.EQUALS));
@@ -283,33 +193,17 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         return params;
     }
 
-    /**
-     * Starts downloading the event from the source of an interval.
-     *
-     * @param eventType
-     *            the event type to download
-     * @param swekSource
-     *            the source from which to download
-     * @param interval
-     *            the interval over which to download
-     * @param supplier
-     *            the supplier providing the event
-     */
-    private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
-        List<SWEKParam> params = defineParameters(eventType, supplier);
-        for (Interval<Date> intt : Interval.splitInterval(interval, 2)) {
-            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
-            treeModel.setStartLoading(eventType, dw);
-            addToDownloaderMap(eventType, dw);
-            downloadEventPool.execute(dw);
+    private void downloadEventType(JHVEventType eventType, Interval<Date> interval) {
+        SWEKEventType swekEventType = SWEKConfigurationManager.getSingletonInstance().getEventType(eventType.getEventType());
+        SWEKSource source = SWEKConfigurationManager.getSingletonInstance().getSWEKSource(eventType.getEventSource());
+        SWEKSupplier supplier = SWEKConfigurationManager.getSingletonInstance().getSWEKSupplier(eventType.getEventProvider(), eventType.getEventType());
+        if (swekEventType != null && source != null && supplier != null) {
+            startDownloadEventType(swekEventType, source, interval, supplier);
+        } else {
+            Log.debug("SWEKType: " + swekEventType + " SWEKSource: " + source + " SWEKSupplier: " + supplier);
         }
     }
 
-    /**
-     * Downloads the event type for all the dates.
-     *
-     * @param swekEventType
-     */
     private void downloadSelectedSuppliers(SWEKEventType swekEventType) {
         if (activeEventTypes.get(swekEventType) != null) {
             for (SWEKSource source : activeEventTypes.get(swekEventType).keySet()) {
@@ -317,6 +211,24 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
                     downloadForAllDates(swekEventType, source, supplier);
                 }
             }
+        }
+    }
+
+    private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
+
+        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
+        for (Interval<Date> interval : allIntervals) {
+            startDownloadEventType(eventType, swekSource, interval, supplier);
+        }
+    }
+
+    private void startDownloadEventType(SWEKEventType eventType, SWEKSource swekSource, Interval<Date> interval, SWEKSupplier supplier) {
+        List<SWEKParam> params = defineParameters(eventType, supplier);
+        for (Interval<Date> intt : Interval.splitInterval(interval, 2)) {
+            DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
+            treeModel.setStartLoading(eventType, dw);
+            addToDownloaderMap(eventType, dw);
+            downloadEventPool.execute(dw);
         }
     }
 
