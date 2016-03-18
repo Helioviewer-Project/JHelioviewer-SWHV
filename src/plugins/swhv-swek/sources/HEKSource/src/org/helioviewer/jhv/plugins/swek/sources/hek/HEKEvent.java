@@ -30,9 +30,6 @@ public class HEKEvent extends AbstractJHVEvent {
     /** the event display name */
     private final String eventDisplayName;
 
-    /** the event short description */
-    private final String description;
-
     /** all the parameters */
     private Map<String, JHVEventParameter> allParameters;
 
@@ -63,6 +60,8 @@ public class HEKEvent extends AbstractJHVEvent {
     /** List with positioning information for this event */
     private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
 
+    private Integer id;
+
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
@@ -82,7 +81,6 @@ public class HEKEvent extends AbstractJHVEvent {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
-        this.description = "";
         this.eventType = eventType;
     }
 
@@ -150,11 +148,6 @@ public class HEKEvent extends AbstractJHVEvent {
     @Override
     public String getDisplayName() {
         return eventDisplayName;
-    }
-
-    @Override
-    public String getShortDescription() {
-        return description;
     }
 
     @Override
@@ -241,6 +234,10 @@ public class HEKEvent extends AbstractJHVEvent {
      */
     public void addJHVPositionInformation(JHVCoordinateSystem coorSys, JHVPositionInformation positionInformation) {
         this.positionInformation.put(coorSys, positionInformation);
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
 }

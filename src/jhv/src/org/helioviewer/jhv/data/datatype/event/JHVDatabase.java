@@ -137,18 +137,16 @@ public class JHVDatabase {
         }
     }
 
-    private static void insertLinkIfNotExist(Connection connection, String left_uid, String right_uid) {
-        int left_id = getIdFromUID(connection, left_uid);
+    private static Integer[] insertLinkIfNotExist(Connection connection, String left_uid, String right_uid) {
+        Integer[] ids = new Integer[] { getIdFromUID(connection, left_uid), getIdFromUID(connection, right_uid) };
 
-        int right_id = getIdFromUID(connection, right_uid);
-
-        if (left_id != -1 && right_id != -1) {
-            insertLinkIfNotExist(connection, left_id, right_id);
+        if (ids[0] != -1 && ids[1] != -1) {
+            insertLinkIfNotExist(connection, ids[0], ids[1]);
         }
         else {
-            Log.error("Could not add association to database " + left_id + " " + right_id);
-
+            Log.error("Could not add association to database " + ids[0] + " " + ids[1]);
         }
+        return ids;
     }
 
     private static int getIdFromUID(Connection connection, String uid) {
@@ -195,20 +193,22 @@ public class JHVDatabase {
         }
     }
 
-    public static void dump_association2db(JHVAssociation assoc) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpAssociation2Db(assoc));
+    public static Integer[] dump_association2db(JHVAssociation assoc) {
+        FutureTask<Integer[]> ft = new FutureTask<Integer[]>(new DumpAssociation2Db(assoc));
         executor.execute(ft);
 
         try {
-            ft.get();
+            return ft.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return new Integer[] { -1, -1 };
         } catch (ExecutionException e) {
             e.printStackTrace();
+            return new Integer[] { -1, -1 };
         }
     }
 
-    private static class DumpAssociation2Db implements Callable<Integer> {
+    private static class DumpAssociation2Db implements Callable<Integer[]> {
         private final JHVAssociation assoc;
 
         public DumpAssociation2Db(JHVAssociation _assoc) {
@@ -217,30 +217,29 @@ public class JHVDatabase {
         }
 
         @Override
-        public Integer call() {
+        public Integer[] call() {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
-                return -1;
-            insertLinkIfNotExist(connection, assoc.left, assoc.right);
-            return 0;
+                return new Integer[] { -1, -1 };
+            return insertLinkIfNotExist(connection, assoc.left, assoc.right);
         }
     }
 
-    public static Long dump_event2db(String eventStr, JHVEvent event) {
-        FutureTask<Long> ft = new FutureTask<Long>(new DumpEvent2Db(eventStr, event));
+    public static Integer dump_event2db(String eventStr, JHVEvent event) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(eventStr, event));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return -1l;
+            return -1;
         } catch (ExecutionException e) {
             e.printStackTrace();
-            return -1l;
+            return -1;
         }
     }
 
-    private static class DumpEvent2Db implements Callable<Long> {
+    private static class DumpEvent2Db implements Callable<Integer> {
         private final JHVEvent event;
         private final String eventStr;
 
@@ -250,8 +249,8 @@ public class JHVDatabase {
         }
 
         @Override
-        public Long call() {
-            long generatedKey = -1;
+        public Integer call() {
+            int generatedKey = -1;
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return generatedKey;
@@ -278,7 +277,7 @@ public class JHVDatabase {
                     Statement statement = connection.createStatement();
                     ResultSet generatedKeys = statement.executeQuery("SELECT last_insert_rowid()");
                     if (generatedKeys.next()) {
-                        generatedKey = generatedKeys.getLong(1);
+                        generatedKey = generatedKeys.getInt(1);
                     }
                     generatedKeys.close();
                 }

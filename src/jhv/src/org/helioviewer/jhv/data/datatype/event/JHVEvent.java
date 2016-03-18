@@ -38,13 +38,6 @@ public interface JHVEvent {
     public abstract String getDisplayName();
 
     /**
-     * Gets the short description of the event.
-     *
-     * @return the short description
-     */
-    public abstract String getShortDescription();
-
-    /**
      * Gets a list with all the event parameters.
      *
      * @return a list with all the event parameters

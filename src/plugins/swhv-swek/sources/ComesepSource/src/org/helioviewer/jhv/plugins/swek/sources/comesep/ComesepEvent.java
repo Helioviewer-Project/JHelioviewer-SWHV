@@ -33,9 +33,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     /** the event display name */
     private final String eventDisplayName;
 
-    /** the event short description */
-    private final String description;
-
     /** all the parameters */
     private Map<String, JHVEventParameter> allParameters;
 
@@ -75,11 +72,10 @@ public class ComesepEvent extends AbstractJHVEvent {
      * @param eventIcon
      * @param color
      */
-    public ComesepEvent(String eventName, String eventDisplayName, String description, JHVEventType comesepEventType, ImageIcon eventIcon, Color color) {
+    public ComesepEvent(String eventName, String eventDisplayName, JHVEventType comesepEventType, ImageIcon eventIcon, Color color) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
-        this.description = description;
         eventType = comesepEventType;
     }
 
@@ -101,11 +97,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     @Override
     public String getDisplayName() {
         return eventDisplayName;
-    }
-
-    @Override
-    public String getShortDescription() {
-        return description;
     }
 
     @Override
