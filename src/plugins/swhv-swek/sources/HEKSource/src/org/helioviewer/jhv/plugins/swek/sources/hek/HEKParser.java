@@ -549,9 +549,7 @@ public class HEKParser implements SWEKParser {
     private void handleCoordinates(HEKEvent currentEvent) {
         checkAndFixBoundingBox();
         boolean found = false;
-        found = handleStandardPosition(currentEvent);
-        if (!found)
-            found = handleHGSCoordinates(currentEvent);
+        found = handleHGSCoordinates(currentEvent);
         //if (!found)
         //    found = handleHGCCoordinates(currentEvent);
         //if (!found)
@@ -588,24 +586,6 @@ public class HEKParser implements SWEKParser {
                 hrcBoundedBox = null;
             }
         }
-    }
-
-    /**
-     * Handles the standard event position.
-     *
-     * @param currentEvent
-     *            the current event being parsed
-     */
-    private boolean handleStandardPosition(HEKEvent currentEvent) {
-        if (coordinateSystemString != null) {
-            JHVCoordinateSystem coorSys = parseCoordinateSystemString();
-            if (coorSys == JHVCoordinateSystem.JHV) {
-                Vec3 centralPoint = new Vec3(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(new HEKPositionInformation(new ArrayList<Vec3>(), new ArrayList<Vec3>(), centralPoint));
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
