@@ -25,6 +25,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -46,6 +47,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.gui.ImageViewerGui;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.WheelSupport;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -284,9 +286,13 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
-        speedSpinner = new JSpinner(new SpinnerNumberModel(20, 1, 60, 1));
+        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(60), Double.valueOf(1)));
         speedSpinner.addChangeListener(this);
         ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
+
+        JFormattedTextField fx = ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField();
+        fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", 1, 60));
+
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         WheelSupport.installMouseWheelSupport(speedSpinner);
         speedPanel.add(speedSpinner);

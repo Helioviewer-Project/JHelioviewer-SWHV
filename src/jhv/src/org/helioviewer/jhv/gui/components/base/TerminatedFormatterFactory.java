@@ -32,17 +32,19 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
             @Override
             public Object stringToValue(String string) {
                 Double value = 0.;
+
                 if (string != null && string.length() != 0) {
-                    if (string.charAt(string.length() - 1) == terminator.charAt(0)) {
+                    int t = string.indexOf(terminator);
+                    if (t > 0) {
                         try {
-                            value = Double.valueOf(string.substring(0, string.length() - 1));
-                        } catch (NumberFormatException ex2) {
+                            value = Double.valueOf(string.substring(0, t - 1));
+                        } catch (NumberFormatException e) {
                             Log.warn("Could not parse number");
                         }
                     } else {
                         try {
                             value = Double.valueOf(string);
-                        } catch (NumberFormatException ex) {
+                        } catch (NumberFormatException e) {
                             Log.warn("Could not parse number");
                         }
                     }
