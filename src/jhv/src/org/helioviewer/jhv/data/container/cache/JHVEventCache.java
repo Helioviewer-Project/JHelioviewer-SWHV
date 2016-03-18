@@ -6,16 +6,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
@@ -29,7 +27,29 @@ public class JHVEventCache {
     private static JHVEventCache instance;
 
     /** The events received for a certain date */
-    private final Map<Date, Map<Date, List<JHVEvent>>> events;
+    public static class SortedDateInterval implements Comparable<SortedDateInterval> {
+        public final long start;
+        public final long end;
+
+        public SortedDateInterval(long _start, long _end) {
+            start = _start;
+            end = _end;
+        }
+
+        @Override
+        public int compareTo(SortedDateInterval o2) {
+            if (this.start < o2.start)
+                return -1;
+            else if (this.start == o2.start && this.end < o2.end) {
+                return -1;
+            }
+            else if (this.start == o2.start && this.end == o2.end)
+                return 0;
+            return 1;
+        }
+    }
+
+    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events;
 
     /** A set with IDs */
     private final Set<String> eventIDs;
@@ -50,7 +70,7 @@ public class JHVEventCache {
      * private default constructor
      */
     private JHVEventCache() {
-        events = new HashMap<Date, Map<Date, List<JHVEvent>>>();
+        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
         eventIDs = new HashSet<String>();
         allEvents = new HashMap<String, JHVEvent>();
         missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
@@ -72,19 +92,11 @@ public class JHVEventCache {
         return instance;
     }
 
-    /**
-     * Add the JHV event to the cache
-     *
-     * @param event
-     *            the event to add
-     */
     public void add(JHVEvent event) {
         activeEventTypes.add(event.getJHVEventType());
         if (!eventIDs.contains(event.getUniqueID())) {
             allEvents.put(event.getUniqueID(), event);
-            Date startDate = TimeUtils.getCurrentDate(event.getStartDate());
-            Date endDate = TimeUtils.getNextDate(event.getEndDate());
-            addToList(startDate, endDate, event);
+            addToList(event);
             eventIDs.add(event.getUniqueID());
             checkAndFixRelationShip(event);
         } else {
@@ -92,6 +104,14 @@ public class JHVEventCache {
             savedEvent.merge(event);
             checkAndFixRelationShip(savedEvent);
         }
+    }
+
+    private void addToList(JHVEvent event) {
+        SortedDateInterval i = new SortedDateInterval(event.getStartDate().getTime(), event.getEndDate().getTime());
+        if (!events.containsKey(event.getJHVEventType())) {
+            events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVEvent>());
+        }
+        events.get(event.getJHVEventType()).put(i, event);
     }
 
     /**
@@ -104,38 +124,22 @@ public class JHVEventCache {
      * @return the list of events that are available in the interval
      */
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
-        Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult = new HashMap<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>>();
-        if (!activeEventTypes.isEmpty()) {
-            for (Map.Entry<Date, Map<Date, List<JHVEvent>>> entry : events.entrySet()) {
-                Date sDate = entry.getKey();
-                Map<Date, List<JHVEvent>> endDatesEvents = entry.getValue();
 
-                // event starts after interval start but before interval end
-                if (startDate.getTime() - sDate.getTime() <= 0 && endDate.getTime() - sDate.getTime() >= 0) {
-                    for (List<JHVEvent> tempEvent : endDatesEvents.values()) {
-                        addEventsToResult(eventsResult, tempEvent);
-                    }
-                }
-                // event start before interval start and end after interval
-                // start
-                for (Map.Entry<Date, List<JHVEvent>> entry2 : endDatesEvents.entrySet()) {
-                    Date eDate = entry2.getKey();
-                    if (startDate.getTime() - sDate.getTime() >= 0 && startDate.getTime() - eDate.getTime() <= 0) {
-                        addEventsToResult(eventsResult, entry2.getValue());
-                    }
-                }
-            }
-        }
-
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
+            if (events.containsKey(evt)) {
+                long delta = 100 * 60 * 60 * 24;
+                SortedMap<SortedDateInterval, JHVEvent> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
+                eventsResult.put(evt, submap);
+            }
             List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
+                missingIntervals.put(evt, missing);
             }
-            missingIntervals.put(evt, missing);
         }
-        return new JHVEventCacheResult(eventsResult, missingIntervals);
+        return new JHVEventCacheResult(events, missingIntervals);
     }
 
     /**
@@ -154,25 +158,7 @@ public class JHVEventCache {
 
     private void deleteFromCache(JHVEventType eventType) {
         downloadedCache.put(eventType, new RequestCache());
-        for (Iterator<Map.Entry<String, JHVEvent>> it = allEvents.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, JHVEvent> entry = it.next();
-            if (entry.getValue().getJHVEventType().equals(eventType)) {
-                eventIDs.remove(entry.getKey());
-                colorPerId.remove(entry.getKey());
-                eventsWithRelationRules.remove(entry.getValue());
-                missingEventsInEventRelations.remove(entry.getKey());
-                it.remove();
-            }
-        }
-        for (Iterator<Map.Entry<Date, Map<Date, List<JHVEvent>>>> itDate1 = events.entrySet().iterator(); itDate1.hasNext();) {
-            for (Iterator<Map.Entry<Date, List<JHVEvent>>> itDate2 = itDate1.next().getValue().entrySet().iterator(); itDate2.hasNext();) {
-                for (Iterator<JHVEvent> itEvent = itDate2.next().getValue().iterator(); itEvent.hasNext();) {
-                    if (itEvent.next().getJHVEventType().equals(eventType)) {
-                        itEvent.remove();
-                    }
-                }
-            }
-        }
+        events.remove(eventType);
     }
 
     private void checkAndFixRelationShip(JHVEvent event) {
@@ -290,10 +276,6 @@ public class JHVEventCache {
                 if (relatedEvent.getEventRelationShip().getNextEvents().containsKey(event.getUniqueID())) {
                     JHVEventRelation relation = relatedEvent.getEventRelationShip().getNextEvents().get(event.getUniqueID());
                     relation.setTheEvent(event);
-                    // event.getEventRelationShip().setRelationshipColor(relatedEvent.getColor());
-                    // it might be possible there is no definition in the
-                    // current event for the relationship with the related
-                    // event. So we add a preceding event relationship.
                     Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
                     if (!precedingEvents.containsKey(relatedEvent.getUniqueID())) {
                         precedingEvents.put(relatedEvent.getUniqueID(), new JHVEventRelation(relatedEvent.getUniqueID(), relatedEvent));
@@ -302,10 +284,6 @@ public class JHVEventCache {
                 if (relatedEvent.getEventRelationShip().getPrecedingEvents().containsKey(event.getUniqueID())) {
                     JHVEventRelation relation = relatedEvent.getEventRelationShip().getPrecedingEvents().get(event.getUniqueID());
                     relation.setTheEvent(event);
-                    // event.getEventRelationShip().setRelationshipColor(relatedEvent.getEventRelationShip().getRelationshipColor());
-                    // it might be possible there is no definition in the
-                    // current event for the relationship with the related
-                    // event. So we add a next event relationship.
                     Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
                     if (!nextEvents.containsKey(relatedEvent.getUniqueID())) {
                         nextEvents.put(relatedEvent.getUniqueID(), new JHVEventRelation(relatedEvent.getUniqueID(), relatedEvent));
@@ -337,62 +315,6 @@ public class JHVEventCache {
                     JHVEvent savedEvent = allEvents.get(er.getUniqueIdentifier());
                     er.setTheEvent(savedEvent);
                 }
-            }
-        }
-    }
-
-    /**
-     * Adds the event with cache date start date and end date to the event
-     * cache.
-     *
-     * @param startDate
-     *            the cache start date of the event
-     * @param endDate
-     *            the cache end date of the event
-     * @param event
-     *            the event to add
-     */
-    private void addToList(Date startDate, Date endDate, JHVEvent event) {
-        Map<Date, List<JHVEvent>> eventsOnStartDate = new HashMap<Date, List<JHVEvent>>();
-        List<JHVEvent> eventsOnStartEndDate = new ArrayList<JHVEvent>();
-        if (events.containsKey(startDate)) {
-            eventsOnStartDate = events.get(startDate);
-            if (eventsOnStartDate.containsKey(endDate)) {
-                eventsOnStartEndDate = eventsOnStartDate.get(endDate);
-            }
-        }
-        eventsOnStartEndDate.add(event);
-        eventsOnStartDate.put(endDate, eventsOnStartEndDate);
-        events.put(startDate, eventsOnStartDate);
-    }
-
-    /**
-     * Adds a list of events to the given result.
-     *
-     * @param eventsResult
-     *            the result to which the data should be added
-     * @param tempEvents
-     *            the events that should be added
-     */
-    private void addEventsToResult(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventsResult, List<JHVEvent> tempEvents) {
-        for (JHVEvent event : tempEvents) {
-            if (activeEventTypes.contains(event.getJHVEventType())) {
-                NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>> datesPerType = new TreeMap<Date, NavigableMap<Date, List<JHVEvent>>>();
-                NavigableMap<Date, List<JHVEvent>> endDatesPerStartDate = new TreeMap<Date, List<JHVEvent>>();
-                List<JHVEvent> eventsToAdd = new ArrayList<JHVEvent>();
-                if (eventsResult.containsKey(event.getJHVEventType().getEventType().getEventName())) {
-                    datesPerType = eventsResult.get(event.getJHVEventType().getEventType().getEventName());
-                    if (datesPerType.containsKey(event.getStartDate())) {
-                        endDatesPerStartDate = datesPerType.get(event.getStartDate());
-                        if (endDatesPerStartDate.containsKey(event.getEndDate())) {
-                            eventsToAdd = endDatesPerStartDate.get(event.getEndDate());
-                        }
-                    }
-                }
-                eventsToAdd.add(event);
-                endDatesPerStartDate.put(event.getEndDate(), eventsToAdd);
-                datesPerType.put(event.getStartDate(), endDatesPerStartDate);
-                eventsResult.put(event.getJHVEventType().getEventType().getEventName(), datesPerType);
             }
         }
     }

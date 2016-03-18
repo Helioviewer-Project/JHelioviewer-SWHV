@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -40,14 +41,14 @@ public class EventPanel implements DrawableElement {
             int eventTypeNr = 0;
             int previousLine = 0;
 
-            Map<String, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
+            Map<JHVEventType, List<EventPlotConfiguration>> epcs = etpc.getEventPlotConfigurations();
 
             BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
             Stroke normalStroke = g.getStroke();
             JHVEvent highlightedEvent = null;
 
-            for (Map.Entry<String, List<EventPlotConfiguration>> entry : epcs.entrySet()) {
-                String eventType = entry.getKey();
+            for (Map.Entry<JHVEventType, List<EventPlotConfiguration>> entry : epcs.entrySet()) {
+                JHVEventType eventType = entry.getKey();
                 int maxLines = etpc.getMaxLinesPerEventType().get(eventType).intValue();
 
                 boolean first = true;
