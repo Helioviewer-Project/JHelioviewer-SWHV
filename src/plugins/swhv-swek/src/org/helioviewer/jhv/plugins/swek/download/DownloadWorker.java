@@ -72,10 +72,15 @@ public class DownloadWorker implements Runnable {
             int page = 0;
             while (moreDownloads && !isStopped) {
                 InputStream downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params, page);
-                SWEKEventStream swekEventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
-                moreDownloads = swekEventStream.additionalDownloadNeeded();
-                distributeData(swekEventStream);
-                page++;
+                if (downloadInputStream == null) {
+                    isStopped = true;
+                }
+                else {
+                    SWEKEventStream swekEventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
+                    moreDownloads = swekEventStream.additionalDownloadNeeded();
+                    distributeData(swekEventStream);
+                    page++;
+                }
             }
 
         }
