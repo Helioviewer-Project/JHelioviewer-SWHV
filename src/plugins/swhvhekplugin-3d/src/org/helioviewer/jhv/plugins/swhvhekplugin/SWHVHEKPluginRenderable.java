@@ -122,7 +122,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
         String type = evt.getJHVEventType().getEventType().getEventName();
-        bindTexture(gl, type, evt.getIcon());
+        bindTexture(gl, type, evtr.getIcon());
 
         double sz = ICON_SIZE;
         if (evtr.isHighlighted()) {
@@ -205,7 +205,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             if (el.centralPoint() != null) {
                 Vec3 pt = el.centralPoint();
                 String type = evt.getJHVEventType().getEventType().getEventName();
-                bindTexture(gl, type, evt.getIcon());
+                bindTexture(gl, type, evtr.getIcon());
                 if (evtr.isHighlighted()) {
                     drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
@@ -244,7 +244,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 pt = camera.getViewpoint().orientation.rotateVector(pt);
                 Vec2 tf = scale.transform(pt);
                 String type = evt.getJHVEventType().getEventType().getEventName();
-                bindTexture(gl, type, evt.getIcon());
+                bindTexture(gl, type, evtr.getIcon());
                 if (evtr.isHighlighted()) {
                     drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
@@ -302,7 +302,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glEnd();
 
         String type = evt.getJHVEventType().getEventType().getEventName();
-        bindTexture(gl, type, evt.getIcon());
+        bindTexture(gl, type, evtr.getIcon());
         if (evtr.isHighlighted()) {
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
         } else {

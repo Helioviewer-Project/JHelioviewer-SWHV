@@ -58,7 +58,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         addMouseListener(this);
         setLayout(new GridBagLayout());
 
-        labelIcon = new JLabel(event.getIcon());
+        labelIcon = new JLabel(revent.getIcon());
         colorLabel.setBackground(revent.getColor());//.getEventRelationShip().getRelationshipColor());
         colorLabel.setOpaque(true);
 

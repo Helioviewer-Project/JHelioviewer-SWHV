@@ -27,9 +27,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     /** the end date of the event */
     private Date endDate;
 
-    /** the icon */
-    private final ImageIcon icon;
-
     /** the event name */
     private final String eventName;
 
@@ -84,7 +81,6 @@ public class ComesepEvent extends AbstractJHVEvent {
         this.eventDisplayName = eventDisplayName;
         this.description = description;
         eventType = comesepEventType;
-        icon = eventIcon;
     }
 
     @Override
@@ -105,11 +101,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     @Override
     public String getDisplayName() {
         return eventDisplayName;
-    }
-
-    @Override
-    public ImageIcon getIcon() {
-        return icon;
     }
 
     @Override
