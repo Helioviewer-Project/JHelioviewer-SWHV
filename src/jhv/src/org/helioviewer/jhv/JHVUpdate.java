@@ -17,18 +17,18 @@ import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 /**
  * Class to test in a new thread if there is a newer version of JHelioviewer
  * released and shows a message.
- * 
+ *
  * After construction the code is available in run(), ie as a Runnable object.
  * To start in parallel use check().
- * 
+ *
  * If verbose is false, ie. when called during startup, the property
  * update.check.next is used to suspend the checks: - If it is negative, the
  * update check is suspended forever - If it is 0, the update check is done - If
  * it is positive, it is decremented and then checked if 0
- * 
+ *
  * For further version this gives much room for improvement: - automated
  * download - ... ?
- * 
+ *
  * @author Helge Dietert
  */
 public class JHVUpdate implements Runnable {
@@ -39,7 +39,7 @@ public class JHVUpdate implements Runnable {
     /**
      * Determines whether to show a message box if already the latest version is
      * running and if a message box is shown in case of an error.
-     * 
+     *
      * Also it determines whether the properties update.check.* are used to
      * suspend the checks.
      */
@@ -47,17 +47,19 @@ public class JHVUpdate implements Runnable {
 
     private final AlphanumComparator comparator = new AlphanumComparator();
 
-    private NewVersionDialog d = new NewVersionDialog(verbose);
+    private NewVersionDialog dialog;
 
     /**
-     * Constructs a new update object which is not verbose
-     * 
+     * Verbose whether a dialog box should be popped up.
+     * Otherwise a message box is shown in case of an update error.
+     *
      * @throws MalformedURLException
      *             Error while parsing the internal update URL
      */
-    public JHVUpdate() throws MalformedURLException {
+    public JHVUpdate(boolean _verbose) throws MalformedURLException {
+        verbose = _verbose;
         updateURL = new URL(JHVGlobals.downloadURL + "VERSION");
-        verbose = false;
+        dialog = new NewVersionDialog(verbose);
     }
 
     /**
@@ -116,10 +118,10 @@ public class JHVUpdate implements Runnable {
             if (comparator.compare(version, runningVersion) > 0) {
                 String message = in.readLine();
                 Log.info("Found newer version " + version);
-                d.init(version, message);
-                d.showDialog();
+                dialog.init(version, message);
+                dialog.showDialog();
                 if (!verbose) {
-                    Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(d.getNextCheck()));
+                    Settings.getSingletonInstance().setProperty("update.check.next", Integer.toString(dialog.getNextCheck()));
                     Settings.getSingletonInstance().save();
                 }
             } else {
@@ -133,16 +135,6 @@ public class JHVUpdate implements Runnable {
             if (verbose)
                 Message.warn("Update check error", "While checking for a newer version got " + e.getLocalizedMessage());
         }
-    }
-
-    /**
-     * Sets if there should pop up a output anyway. Otherwise only in case of an
-     * update a message box is shown
-     * 
-     * @param verbose
-     */
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
     }
 
 }

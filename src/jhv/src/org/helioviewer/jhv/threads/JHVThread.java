@@ -59,7 +59,7 @@ public class JHVThread {
                         statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (left_id);");
                         statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (right_id);");
                         statement.executeUpdate("CREATE TABLE if not exists date_range (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER , start BIGINTEGER , end BIGINTEGER, FOREIGN KEY(type_id) REFERENCES event_type(id))");
-                        statement.closeOnCompletion();
+                        statement.close();
                     }
                 } catch (SQLException e) {
                     Log.error("Could not create database connection" + e);

@@ -146,7 +146,7 @@ public class JavaHelioViewer {
                 ImageViewerGui.getMainFrame().pack();
 
                 try {
-                    JHVUpdate update = new JHVUpdate();
+                    JHVUpdate update = new JHVUpdate(false);
                     update.check();
                 } catch (Exception e) {
                     // Should never happen

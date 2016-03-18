@@ -34,7 +34,7 @@ public class NewVersionDialog extends JDialog implements ActionListener, Showabl
     /**
      * Suspended startups when clicked remindMeLater
      */
-    private final int suspendedStarts = 5;
+    private static final int suspendedStarts = 5;
 
     private JEditorPane messagePane;
 
