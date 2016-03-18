@@ -360,7 +360,7 @@ public class HEKParser implements SWEKParser {
                     }
                 }
             }
-            currentEvent.getEventRelationShip().getRelationshipRules().addAll(getEventRelationShipRules());
+            currentEvent.getEventRelationShip().setRelationshipRules(getEventRelationShipRules());
             if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
                 Log.error("Possible wrong parsing of a HEK event.");
                 Log.error("Event start: " + currentEvent.getStartDate());
@@ -418,24 +418,30 @@ public class HEKParser implements SWEKParser {
                 if (keyString.toLowerCase().equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else
-                // Event end time
-                if (keyString.toLowerCase().equals("event_endtime")) {
-                    currentEvent.setEndTime(parseDate(value));
-                } else
-                // event unique ID
-                if (keyString.toLowerCase().equals("kb_archivid")) {
-                    currentEvent.setUniqueID(value);
-                } else
-                // event positions (Standard position)
-                if (keyString.toLowerCase().equals("event_coordsys")) {
-                    coordinateSystemString = value;
-                } else if (keyString.toLowerCase().equals("event_coord1")) {
-                    coordinate1 = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("event_coord2")) {
-                    coordinate2 = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("event_coord3")) {
-                    coordinate3 = Double.parseDouble(value);
-                }
+                    // Event end time
+                    if (keyString.toLowerCase().equals("event_endtime")) {
+                        currentEvent.setEndTime(parseDate(value));
+                    } else
+                        // event unique ID
+                        if (keyString.toLowerCase().equals("kb_archivid")) {
+                            currentEvent.setUniqueID(value);
+                        } else
+                            // event positions (Standard position)
+                            if (keyString.toLowerCase().equals("event_coordsys")) {
+                                coordinateSystemString = value;
+                            } else if (keyString.toLowerCase().equals("event_coord1")) {
+                                if (value != null) {
+                                    coordinate1 = Double.parseDouble(value);
+                                }
+                            } else if (keyString.toLowerCase().equals("event_coord2")) {
+                                if (value != null) {
+                                    coordinate2 = Double.parseDouble(value);
+                                }
+                            } else if (keyString.toLowerCase().equals("event_coord3")) {
+                                if (value != null) {
+                                    coordinate3 = Double.parseDouble(value);
+                                }
+                            }
                 // event positions (Not standard)
                 if (keyString.toLowerCase().equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
@@ -935,41 +941,47 @@ public class HEKParser implements SWEKParser {
         }
     }
 
+    private static HashMap<SWEKEventType, List<JHVEventRelationShipRule>> hmr = new HashMap<SWEKEventType, List<JHVEventRelationShipRule>>();
+
     private List<JHVEventRelationShipRule> getEventRelationShipRules() {
-        List<JHVEventRelationShipRule> rules = new ArrayList<JHVEventRelationShipRule>();
-        for (SWEKRelatedEvents er : eventRelationRules) {
-            if (er.getEvent().equals(eventType)) {
-                if (!er.getRelatedOnList().isEmpty()) {
+        if (!hmr.containsKey(this.eventType)) {
+            List<JHVEventRelationShipRule> rules = new ArrayList<JHVEventRelationShipRule>();
+            for (SWEKRelatedEvents er : eventRelationRules) {
+                if (er.getEvent().equals(eventType)) {
+                    if (!er.getRelatedOnList().isEmpty()) {
+                        List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
+                        for (SWEKRelatedOn ro : er.getRelatedOnList()) {
+                            if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
+                                JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
+                                JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
+                                JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
+                                relatedOnList.add(jhvRelatedOn);
+                            }
+                        }
+                        HEKEventType relatedWith = new HEKEventType(er.getRelatedWith().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+                        JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
+                        rules.add(rule);
+                    }
+                }
+                if (er.getRelatedWith().equals(eventType)) {
                     List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
                     for (SWEKRelatedOn ro : er.getRelatedOnList()) {
                         if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                            JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
-                            JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
+                            JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
+                            JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
                             JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
                             relatedOnList.add(jhvRelatedOn);
                         }
                     }
-                    HEKEventType relatedWith = new HEKEventType(er.getRelatedWith().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+                    HEKEventType relatedWith = new HEKEventType(er.getEvent().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
                     JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                     rules.add(rule);
                 }
-            }
-            if (er.getRelatedWith().equals(eventType)) {
-                List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
-                for (SWEKRelatedOn ro : er.getRelatedOnList()) {
-                    if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                        JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
-                        JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
-                        JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
-                        relatedOnList.add(jhvRelatedOn);
-                    }
-                }
-                HEKEventType relatedWith = new HEKEventType(er.getEvent().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
-                JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
-                rules.add(rule);
+                hmr.put(this.eventType, rules);
             }
         }
-        return rules;
+
+        return hmr.get(this.eventType);
     }
 
     private class Association {
