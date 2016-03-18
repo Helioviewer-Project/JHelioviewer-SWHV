@@ -149,7 +149,7 @@ public class ComesepEvent implements JHVEvent {
     }
 
     @Override
-    public void setUniqueID(Integer uniqueID) {
+    public void setUniqueID(Integer id) {
         this.id = id;
     }
 
