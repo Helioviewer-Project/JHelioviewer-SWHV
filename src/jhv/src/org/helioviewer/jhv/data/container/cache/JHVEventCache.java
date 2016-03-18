@@ -49,10 +49,9 @@ public class JHVEventCache {
         }
     }
 
-    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events;
+    private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
 
     /** A set with IDs */
-    private final Set<String> eventIDs;
 
     private final Map<String, JHVEvent> allEvents;
 
@@ -70,8 +69,7 @@ public class JHVEventCache {
      * private default constructor
      */
     private JHVEventCache() {
-        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
-        eventIDs = new HashSet<String>();
+        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         allEvents = new HashMap<String, JHVEvent>();
         missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
         eventsWithRelationRules = new ArrayList<JHVEvent>();
@@ -94,13 +92,12 @@ public class JHVEventCache {
 
     public void add(JHVEvent event) {
         activeEventTypes.add(event.getJHVEventType());
-        if (!eventIDs.contains(event.getUniqueID())) {
+        JHVEvent savedEvent = allEvents.get(event.getUniqueID());
+        if (savedEvent == null) {
             allEvents.put(event.getUniqueID(), event);
             addToList(event);
-            eventIDs.add(event.getUniqueID());
             checkAndFixRelationShip(event);
         } else {
-            JHVEvent savedEvent = allEvents.get(event.getUniqueID());
             savedEvent.merge(event);
             checkAndFixRelationShip(savedEvent);
         }
@@ -109,9 +106,9 @@ public class JHVEventCache {
     private void addToList(JHVEvent event) {
         SortedDateInterval i = new SortedDateInterval(event.getStartDate().getTime(), event.getEndDate().getTime());
         if (!events.containsKey(event.getJHVEventType())) {
-            events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVEvent>());
+            events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
-        events.get(event.getJHVEventType()).put(i, event);
+        events.get(event.getJHVEventType()).put(i, new JHVRelatedEvents(event));
     }
 
     /**
@@ -125,14 +122,15 @@ public class JHVEventCache {
      */
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
 
-        Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
+        //Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
+            /*
             if (events.containsKey(evt)) {
                 long delta = 100 * 60 * 60 * 24;
-                SortedMap<SortedDateInterval, JHVEvent> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
+                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
                 eventsResult.put(evt, submap);
-            }
+            }*/
             List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
@@ -296,25 +294,16 @@ public class JHVEventCache {
 
     private void checkAndFixRelatedEvents(JHVEvent event, Collection<JHVEventRelation> eventRelationCollection) {
         for (JHVEventRelation er : eventRelationCollection) {
-            if (er.getTheEvent() == null) {
-                if (allEvents.containsKey(er.getUniqueIdentifier())) {
-                    er.setTheEvent(allEvents.get(er.getUniqueIdentifier()));
-                } else {
-                    List<JHVEvent> missingRelations;
-                    if (missingEventsInEventRelations.containsKey(er.getUniqueIdentifier())) {
-                        missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
-                    }
-                    else {
-                        missingRelations = new ArrayList<JHVEvent>();
-                    }
-                    missingRelations.add(event);
-                    missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
-                }
-            } else {
-                if (allEvents.containsKey(er.getUniqueIdentifier())) {
-                    JHVEvent savedEvent = allEvents.get(er.getUniqueIdentifier());
-                    er.setTheEvent(savedEvent);
-                }
+            if (allEvents.containsKey(er.getUniqueIdentifier())) {
+                JHVEvent savedEvent = allEvents.get(er.getUniqueIdentifier());
+                er.setTheEvent(savedEvent);
+            }
+            else if (er.getTheEvent() == null) {
+                List<JHVEvent> missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
+                if (missingRelations == null)
+                    missingRelations = new ArrayList<JHVEvent>();
+                missingRelations.add(event);
+                missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
             }
         }
     }

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.container.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
@@ -21,5 +21,5 @@ public interface EventRequesterListener {
      * @param events
      *            the events received
      */
-    public abstract void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events);
+    public abstract void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events);
 }

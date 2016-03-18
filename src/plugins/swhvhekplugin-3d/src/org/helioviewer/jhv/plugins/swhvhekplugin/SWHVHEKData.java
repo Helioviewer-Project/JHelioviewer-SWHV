@@ -12,6 +12,7 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
+import org.helioviewer.jhv.data.container.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -32,7 +33,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     private static SWHVHEKData instance;
     private Date beginDate = null;
     private Date endDate = null;
-    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> data;
+    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data;
 
     private SWHVHEKData() {
     }
@@ -82,7 +83,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     @Override
-    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventList) {
+    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventList) {
         requestEvents();
         displayEvents();
     }
@@ -109,14 +110,16 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
         data = result.getAvailableEvents();
         if (data != null) {
-            for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> v1 : data.entrySet()) {
-                for (Map.Entry<JHVEventCache.SortedDateInterval, JHVEvent> v2 : v1.getValue().entrySet()) {
-                    JHVEvent event = v2.getValue();
-                    SortedDateInterval in = v2.getKey();
-                    if (in.start <= currentDate.getTime() && in.end >= currentDate.getTime()) {
-                        activeEvents.add(event);
+            for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
+                for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
+                    JHVRelatedEvents relatedEvents = v2.getValue();
+                    for (JHVEvent event : relatedEvents.getEvents()) {
+                        SortedDateInterval in = v2.getKey();
+                        if (in.start <= currentDate.getTime() && in.end >= currentDate.getTime()) {
+                            activeEvents.add(event);
+                        }
+                        event.addHighlightListener(Displayer.getSingletonInstance());
                     }
-                    event.addHighlightListener(Displayer.getSingletonInstance());
                 }
             }
         }

@@ -12,6 +12,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
+import org.helioviewer.jhv.data.container.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
@@ -78,7 +79,7 @@ public class JHVEventContainer {
             // "]");
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
-            Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events = result.getAvailableEvents();
+            Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
             for (JHVEventType eventType : result.getMissingIntervals().keySet()) {

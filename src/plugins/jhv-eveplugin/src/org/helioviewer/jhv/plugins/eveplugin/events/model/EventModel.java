@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
+import org.helioviewer.jhv.data.container.cache.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -44,7 +45,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     private boolean eventsVisible;
 
     /** current events */
-    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events;
+    private Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
 
     /** The event panel */
     private final EventPanel eventPanel;
@@ -60,7 +61,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
      */
     private EventModel() {
         eventPlotConfiguration = new EventTypePlotConfiguration();
-        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
+        events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         eventsVisible = false;
         eventPanel = new EventPanel();
         eventSelectorElement = new EventsSelectorElement(this);
@@ -93,7 +94,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     }
 
     @Override
-    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events) {
+    public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
         createEventPlotConfiguration();
     }
@@ -177,9 +178,10 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 nrLines = 0;
                 maxEventLines = 0;
                 int relatedEventPosition = -1;
-                SortedMap<SortedDateInterval, JHVEvent> eventMap = events.get(eventType);
-                for (Entry<SortedDateInterval, JHVEvent> evl : eventMap.entrySet()) {
-                    handleEvent(evl.getValue(), relatedEventPosition, 0);
+                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
+                for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
+                    for (JHVEvent evl : evr.getValue().getEvents())
+                        handleEvent(evl, relatedEventPosition, 0);
                 }
                 linesPerEventType.put(eventType, maxEventLines);
                 maxNrLines += maxEventLines;
