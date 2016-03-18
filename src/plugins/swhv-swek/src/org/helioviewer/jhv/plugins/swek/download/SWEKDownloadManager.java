@@ -145,6 +145,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
 
         if (dwMapList != null)
             dwMapList.remove(worker);
+
         boolean loadingCondition = (dwMapList != null) && !dwMapList.isEmpty();
         if (!loadingCondition)
             treeModel.setStopLoading(worker.getEventType());
@@ -154,8 +155,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         ArrayList<DownloadWorker> dwMapList;
         if (dwMap.containsKey(eventType)) {
             dwMapList = dwMap.get(eventType);
-        }
-        else {
+        } else {
             dwMapList = new ArrayList<DownloadWorker>();
             dwMap.put(eventType, dwMapList);
         }
@@ -224,7 +224,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     }
 
     private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-
         Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
         for (Interval<Date> interval : allIntervals) {
             startDownloadEventType(eventType, swekSource, interval, supplier);
@@ -242,7 +241,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     }
 
     private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
-
         @Override
         public int compare(T l1, T l2) {
             long d1 = l1.getDownloadEndDate().getTime() - Layers.getStartDate().milli;
