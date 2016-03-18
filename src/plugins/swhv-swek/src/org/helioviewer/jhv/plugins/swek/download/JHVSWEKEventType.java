@@ -20,16 +20,6 @@ public class JHVSWEKEventType extends AbstractJHVEventType {
     private final String eventProvider;
 
     /**
-     * Default constructor.
-     *
-     */
-    public JHVSWEKEventType() {
-        eventType = "";
-        eventSource = "";
-        eventProvider = "";
-    }
-
-    /**
      * Creates a JHVSWEK event type from the given event type, event source,
      * event provider.
      *

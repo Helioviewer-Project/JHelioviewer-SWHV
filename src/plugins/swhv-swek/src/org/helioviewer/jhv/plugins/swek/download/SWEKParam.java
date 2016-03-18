@@ -2,9 +2,9 @@ package org.helioviewer.jhv.plugins.swek.download;
 
 /**
  * Contains the combination param and value.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class SWEKParam {
     /** The param name */
@@ -15,18 +15,8 @@ public class SWEKParam {
     public final SWEKOperand operand;
 
     /**
-     * Create default HEK param.
-     * 
-     */
-    public SWEKParam() {
-        param = "";
-        value = "";
-        operand = SWEKOperand.EQUALS;
-    }
-
-    /**
      * Create HEK param for given param, value and operand.
-     * 
+     *
      * @param param
      *            the param
      * @param value
@@ -42,7 +32,7 @@ public class SWEKParam {
 
     /**
      * Gets the param.
-     * 
+     *
      * @return the param
      */
     public String getParam() {
@@ -51,7 +41,7 @@ public class SWEKParam {
 
     /**
      * Gets the value.
-     * 
+     *
      * @return the value
      */
     public String getValue() {
@@ -60,7 +50,7 @@ public class SWEKParam {
 
     /**
      * Gets the operand.
-     * 
+     *
      * @return the operand
      */
     public SWEKOperand getOperand() {
