@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 
 public interface SWEKDownloader {
@@ -17,7 +17,7 @@ public interface SWEKDownloader {
     /**
      * Downloads the data for a given event type over the interval defined by
      * the startDate and the endDate.
-     * 
+     *
      * @param eventType
      *            the type that should be downloaded
      * @param startDate
@@ -32,6 +32,8 @@ public interface SWEKDownloader {
      *            the page that should be downloaded
      * @return an input stream giving access to the data
      */
-    public abstract InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page);
+    public abstract InputStream downloadData(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page);
+
+    public abstract boolean isFromDb();
 
 }

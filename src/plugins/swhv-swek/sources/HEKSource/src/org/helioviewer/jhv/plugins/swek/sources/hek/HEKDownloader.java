@@ -6,26 +6,44 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
+import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 
 public class HEKDownloader implements SWEKDownloader {
+    private boolean fromdb = false;
 
     @Override
     public void stopDownload() {
     }
 
     @Override
-    public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
-        String urlString = createURL(eventType, startDate, endDate, params, page);
+    public boolean isFromDb() {
+        return fromdb;
+    }
+
+    @Override
+    public InputStream downloadData(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
+        ArrayList<Interval<Date>> range = JHVDatabase.db2daterange(eventType);
+        for (Interval<Date> interval : range) {
+            if (interval.getStart().getTime() <= startDate.getTime() && interval.getEnd().getTime() >= endDate.getTime()) {
+                fromdb = true;
+                return JHVDatabase.getEvents(startDate.getTime(), endDate.getTime(), eventType);
+            }
+        }
+
+        String urlString = createURL(eventType.getEventType(), startDate, endDate, params, page);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
@@ -36,7 +54,6 @@ public class HEKDownloader implements SWEKDownloader {
             Log.error("Could not create input stream for given URL: " + urlString + " error : " + e);
             return null;
         }
-
     }
 
     /**

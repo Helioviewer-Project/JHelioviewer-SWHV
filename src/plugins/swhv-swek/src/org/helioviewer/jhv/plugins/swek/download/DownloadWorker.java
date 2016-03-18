@@ -8,6 +8,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
+import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -30,7 +31,7 @@ public class DownloadWorker implements Runnable {
     private static final SWEKSourceManager sourceManager = SWEKSourceManager.getSingletonInstance();
 
     private final JHVEventType jhvType;
-    private boolean isStopped;
+    private volatile boolean isStopped;
     private SWEKDownloader downloader;
     private SWEKParser parser;
     private final Date downloadStartDate;
@@ -72,18 +73,17 @@ public class DownloadWorker implements Runnable {
             boolean moreDownloads = true;
             int page = 0;
             while (moreDownloads && !isStopped) {
-                InputStream downloadInputStream = downloader.downloadData(eventType, downloadStartDate, downloadEndDate, params, page);
+                InputStream downloadInputStream = downloader.downloadData(jhvType, downloadStartDate, downloadEndDate, params, page);
                 if (downloadInputStream == null) {
                     isStopped = true;
                 }
                 else {
-                    SWEKEventStream swekEventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents);
+                    SWEKEventStream swekEventStream = parser.parseEventStream(downloadInputStream, eventType, swekSource, supplier, relatedEvents, !downloader.isFromDb());
                     moreDownloads = swekEventStream.additionalDownloadNeeded();
                     distributeData(swekEventStream);
                     page++;
                 }
             }
-
         }
         if (isStopped) {
             EventQueue.invokeLater(new Runnable() {
@@ -101,27 +101,28 @@ public class DownloadWorker implements Runnable {
                     SWEKDownloadManager.getSingletonInstance().workerFinished(DownloadWorker.this);
                 }
             });
+            JHVDatabase.addDaterange2db(downloadStartDate, downloadEndDate, jhvType);
         }
     }
 
     private void distributeData(final SWEKEventStream eventStream) {
+
         while (eventStream.hasEvents()) {
-            JHVEvent evt = eventStream.next();
+            final JHVEvent evt = eventStream.next();
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     eventContainer.addEvent(evt);
-
                 }
             });
         }
+
         while (eventStream.hasAssociations()) {
-            JHVAssociation association = eventStream.nextAssociation();
+            final JHVAssociation association = eventStream.nextAssociation();
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     eventContainer.addAssociation(association);
-
                 }
             });
         }
