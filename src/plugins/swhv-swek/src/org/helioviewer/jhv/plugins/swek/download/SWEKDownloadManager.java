@@ -76,9 +76,10 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
             ArrayList<DownloadWorker> dwMapList = dwMap.get(eventType);
             for (DownloadWorker dw : dwMapList) {
                 dw.stopWorker();
-                treeModel.setStopLoading(eventType, dw);
             }
         }
+        treeModel.setStopLoading(eventType);
+
         dwMap.remove(eventType);
 
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
@@ -92,10 +93,11 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
             for (DownloadWorker dw : dwMapOnDate) {
                 if (dw.getSupplier().equals(supplier)) {
                     dw.stopWorker();
-                    treeModel.setStopLoading(eventType, dw);
                 }
             }
         }
+        treeModel.setStopLoading(eventType);
+
         dwMap.remove(eventType);
         eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
     }
@@ -140,9 +142,12 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
 
     private void removeFromDownloaderMap(DownloadWorker worker) {
         ArrayList<DownloadWorker> dwMapList = dwMap.get(worker.getEventType());
+
         if (dwMapList != null)
             dwMapList.remove(worker);
-        treeModel.setStopLoading(worker.getEventType(), worker);
+        boolean loadingCondition = (dwMapList != null) && !dwMapList.isEmpty();
+        if (!loadingCondition)
+            treeModel.setStopLoading(worker.getEventType());
     }
 
     private void addToDownloaderMap(SWEKEventType eventType, DownloadWorker dw) {
@@ -226,7 +231,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         List<SWEKParam> params = defineParameters(eventType, supplier);
         for (Interval<Date> intt : Interval.splitInterval(interval, 2)) {
             DownloadWorker dw = new DownloadWorker(eventType, swekSource, supplier, intt, params, configInstance.getSWEKRelatedEvents());
-            treeModel.setStartLoading(eventType, dw);
+            treeModel.setStartLoading(eventType);
             addToDownloaderMap(eventType, dw);
             downloadEventPool.execute(dw);
         }
