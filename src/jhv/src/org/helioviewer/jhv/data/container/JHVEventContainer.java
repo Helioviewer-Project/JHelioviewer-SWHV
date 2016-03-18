@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -77,13 +78,12 @@ public class JHVEventContainer {
             // "]");
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
-            Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events = result.getAvailableEvents();
+            Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events = result.getAvailableEvents();
             // AssociationsPrinter.print(events);
             handler.newEventsReceived(events);
             for (JHVEventType eventType : result.getMissingIntervals().keySet()) {
                 List<Interval<Date>> missingList = result.getMissingIntervals().get(eventType);
                 for (Interval<Date> missing : missingList) {
-                    // Log.debug("Missing interval: " + missing);
                     requestEvents(eventType, missing.getStart(), missing.getEnd());
                 }
             }

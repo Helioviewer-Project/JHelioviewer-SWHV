@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
+import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.JHVEventHandler;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 
@@ -86,7 +88,7 @@ public class EventRequester implements TimingListener, JHVEventHandler {
     }
 
     @Override
-    public void newEventsReceived(final Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> eventList) {
+    public void newEventsReceived(final Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventList) {
         fireNewEventsReceived(eventList);
     }
 
@@ -96,7 +98,7 @@ public class EventRequester implements TimingListener, JHVEventHandler {
         eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 
-    private void fireNewEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
+    private void fireNewEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> events) {
         for (EventRequesterListener l : listeners) {
             l.newEventsReceived(events);
         }

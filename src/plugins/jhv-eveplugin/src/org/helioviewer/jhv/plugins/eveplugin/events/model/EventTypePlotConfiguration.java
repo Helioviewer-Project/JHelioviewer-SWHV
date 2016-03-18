@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 /**
  * Combines everything needed to draw the events on the eve plugin.
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class EventTypePlotConfiguration {
     /** Number of events in this event type plot configuration */
@@ -22,22 +23,22 @@ public class EventTypePlotConfiguration {
     private final int totalNrLines;
 
     /** Maximum of lines for every event type */
-    private final Map<String, Integer> maxLinesPerEventType;
+    private final Map<JHVEventType, Integer> maxLinesPerEventType;
 
     /** The plot configurations for all events ordered per event type */
-    private final Map<String, List<EventPlotConfiguration>> eventPlotConfigurations;
+    private final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations;
 
     private final Date lastDateWithData;
 
     /**
      * Default constructor.
-     * 
+     *
      */
     public EventTypePlotConfiguration() {
         nrOfEventTypes = 0;
         totalNrLines = 0;
-        maxLinesPerEventType = new HashMap<String, Integer>();
-        eventPlotConfigurations = new HashMap<String, List<EventPlotConfiguration>>();
+        maxLinesPerEventType = new HashMap<JHVEventType, Integer>();
+        eventPlotConfigurations = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         lastDateWithData = null;
     }
 
@@ -45,7 +46,7 @@ public class EventTypePlotConfiguration {
      * Creates the event type plot configuration from the given number of
      * events, total number of lines, maximum lines per event type, the event
      * plot configurations and the color of the event type.
-     * 
+     *
      * @param nrOfEventType
      *            the total number of event types to be drawn
      * @param totalNrOfLines
@@ -55,8 +56,8 @@ public class EventTypePlotConfiguration {
      * @param eventPlotConfigurations
      *            the event plot configurations
      */
-    public EventTypePlotConfiguration(int nrOfEventTypes, int totalNrLines, Map<String, Integer> maxLinesPerEventType,
-            Map<String, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
+    public EventTypePlotConfiguration(int nrOfEventTypes, int totalNrLines, Map<JHVEventType, Integer> maxLinesPerEventType,
+            Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
         this.nrOfEventTypes = nrOfEventTypes;
         this.totalNrLines = totalNrLines;
         this.maxLinesPerEventType = maxLinesPerEventType;
@@ -66,7 +67,7 @@ public class EventTypePlotConfiguration {
 
     /**
      * Gets the number of event types in this configuration
-     * 
+     *
      * @return the number of Event types
      */
     public int getNrOfEventTypes() {
@@ -75,7 +76,7 @@ public class EventTypePlotConfiguration {
 
     /**
      * Gets the total number of lines.
-     * 
+     *
      * @return the total number lines
      */
     public int getTotalNrLines() {
@@ -84,25 +85,25 @@ public class EventTypePlotConfiguration {
 
     /**
      * Gets the maximum lines per event type.
-     * 
+     *
      * @return the max lines per event type
      */
-    public Map<String, Integer> getMaxLinesPerEventType() {
+    public Map<JHVEventType, Integer> getMaxLinesPerEventType() {
         return maxLinesPerEventType;
     }
 
     /**
      * Gets the event plot configurations.
-     * 
+     *
      * @return the event plot configurations
      */
-    public Map<String, List<EventPlotConfiguration>> getEventPlotConfigurations() {
+    public Map<JHVEventType, List<EventPlotConfiguration>> getEventPlotConfigurations() {
         return eventPlotConfigurations;
     }
 
     /**
      * Gets the event at the given location.
-     * 
+     *
      * @param p
      *            the location to check.
      * @return null if no event was found, or the event if found
