@@ -193,8 +193,8 @@ public class JHVDatabase {
         }
     }
 
-    public static Integer[] dump_association2db(JHVAssociation assoc) {
-        FutureTask<Integer[]> ft = new FutureTask<Integer[]>(new DumpAssociation2Db(assoc));
+    public static Integer[] dump_association2db(String left, String right) {
+        FutureTask<Integer[]> ft = new FutureTask<Integer[]>(new DumpAssociation2Db(left, right));
         executor.execute(ft);
 
         try {
@@ -209,11 +209,12 @@ public class JHVDatabase {
     }
 
     private static class DumpAssociation2Db implements Callable<Integer[]> {
-        private final JHVAssociation assoc;
+        private final String left;
+        private final String right;
 
-        public DumpAssociation2Db(JHVAssociation _assoc) {
-            assoc = _assoc;
-
+        public DumpAssociation2Db(String _left, String _right) {
+            left = _left;
+            right = _right;
         }
 
         @Override
@@ -221,12 +222,60 @@ public class JHVDatabase {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return new Integer[] { -1, -1 };
-            return insertLinkIfNotExist(connection, assoc.left, assoc.right);
+            return insertLinkIfNotExist(connection, left, right);
         }
     }
 
-    public static Integer dump_event2db(String eventStr, JHVEvent event) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(eventStr, event));
+    public static Integer getEventId(String uid) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new GetEventId(uid));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return -1;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    private static class GetEventId implements Callable<Integer> {
+
+        private final String uid;
+
+        public GetEventId(String _uid) {
+            uid = _uid;
+        }
+
+        @Override
+        public Integer call() {
+            int generatedKey = -1;
+            Connection connection = ConnectionThread.getConnection();
+            if (connection == null)
+                return generatedKey;
+            try
+            {
+                String sql = "SELECT id from events WHERE uid=?";
+                PreparedStatement pstatement = connection.prepareStatement(sql);
+                pstatement.setQueryTimeout(30);
+                pstatement.setString(1, uid);
+                ResultSet generatedKeys = pstatement.executeQuery();
+                if (generatedKeys.next()) {
+                    generatedKey = generatedKeys.getInt(1);
+                }
+                generatedKeys.close();
+                pstatement.close();
+            } catch (SQLException e)
+            {
+                Log.error("Could not select event with uid " + uid + e.getMessage());
+            }
+            return generatedKey;
+        }
+    }
+
+    public static Integer dump_event2db(String eventStr, JHVEvent event, String uid) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(eventStr, event, uid));
         executor.execute(ft);
         try {
             return ft.get();
@@ -242,10 +291,12 @@ public class JHVDatabase {
     private static class DumpEvent2Db implements Callable<Integer> {
         private final JHVEvent event;
         private final String eventStr;
+        private final String uid;
 
-        public DumpEvent2Db(String _eventStr, JHVEvent _event) {
+        public DumpEvent2Db(String _eventStr, JHVEvent _event, String _uid) {
             eventStr = _eventStr;
             event = _event;
+            uid = _uid;
         }
 
         @Override
@@ -268,7 +319,7 @@ public class JHVDatabase {
                     PreparedStatement pstatement = connection.prepareStatement(sql);
                     pstatement.setQueryTimeout(30);
                     pstatement.setInt(1, typeId);
-                    pstatement.setString(2, event.getUniqueID());
+                    pstatement.setString(2, uid);
                     pstatement.setLong(3, event.getStartDate().getTime());
                     pstatement.setLong(4, event.getEndDate().getTime());
                     pstatement.setBinaryStream(5, new ByteArrayInputStream(compressed_data), compressed_data.length);

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
+import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -69,8 +70,8 @@ public class ComesepParser implements SWEKParser {
                 JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
                 eventJSON = new JSONObject(reply);
-                parseAssociation(eventJSON, eventStream);
                 parseEventJSON(eventJSON, eventStream);
+                parseAssociation(eventJSON, eventStream);
                 return eventStream;
             } else {
                 Log.error("Download input stream was null. Probably the comesep server is down.");
@@ -129,46 +130,46 @@ public class ComesepParser implements SWEKParser {
                     endTimeSet = true;
                 }
             } else
-                // Event end time
-                if (keyString.toLowerCase().equals("atlatest")) {
-                    if (!endTimeSet) {
-                        currentEvent.setEndTime(parseDate(value));
-                        endTimeSet = true;
-                    }
-                } else
-                    // event unique ID
-                    if (keyString.toLowerCase().equals("alertid")) {
-                        currentEvent.setUniqueID(value);
-                    } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
-                        cactusLiftOff = Long.parseLong(value);
-                        if (startTimeSet) {
-                            currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
-                            endTimeSet = true;
-                        }
-                    } else if (keyString.toLowerCase().equals("begin_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        startTimeSet = true;
-                    } else if (keyString.toLowerCase().equals("end_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        endTimeSet = true;
+            // Event end time
+            if (keyString.toLowerCase().equals("atlatest")) {
+                if (!endTimeSet) {
+                    currentEvent.setEndTime(parseDate(value));
+                    endTimeSet = true;
+                }
+            } else
+            // event unique ID
+            if (keyString.toLowerCase().equals("alertid")) {
+                currentEvent.setUniqueID(value);
+            } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
+                cactusLiftOff = Long.parseLong(value);
+                if (startTimeSet) {
+                    currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
+                    endTimeSet = true;
+                }
+            } else if (keyString.toLowerCase().equals("begin_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                startTimeSet = true;
+            } else if (keyString.toLowerCase().equals("end_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                endTimeSet = true;
+            } else {
+                boolean visible = false;
+                boolean configured = false;
+                String displayName = keyString;
+                if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
+                    configured = true;
+                    SWEKParameter p = eventSource.getParameter(keyString);
+                    if (p != null) {
+                        visible = p.isDefaultVisible();
+                        displayName = p.getParameterDisplayName();
                     } else {
-                        boolean visible = false;
-                        boolean configured = false;
-                        String displayName = keyString;
-                        if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
-                            configured = true;
-                            SWEKParameter p = eventSource.getParameter(keyString);
-                            if (p != null) {
-                                visible = p.isDefaultVisible();
-                                displayName = p.getParameterDisplayName();
-                            } else {
-                                displayName = keyString.replaceAll("_", " ").trim();
-                            }
-                        }
-                        JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
-
-                        currentEvent.addParameter(parameter, visible, configured);
+                        displayName = keyString.replaceAll("_", " ").trim();
                     }
+                }
+                JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
+
+                currentEvent.addParameter(parameter, visible, configured);
+            }
         }
     }
 
@@ -179,8 +180,10 @@ public class ComesepParser implements SWEKParser {
     private void parseAssociation(JSONObject eventJSON, ComesepEventStream eventStream) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("associations");
         for (int i = 0; i < associations.length() && !parserStopped; i++) {
-            JHVAssociation association = new JHVAssociation(parseAssociationChild(associations.getJSONObject(i)), parseAssociationParent(associations.getJSONObject(i)));
-            eventStream.addJHVAssociation(association);
+            Integer[] idlist = JHVDatabase.dump_association2db(parseAssociationChild(associations.getJSONObject(i)), parseAssociationParent(associations.getJSONObject(i)));
+            JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
+            if (idlist[0] != -1 && idlist[1] != -1)
+                eventStream.addJHVAssociation(association);
         }
     }
 

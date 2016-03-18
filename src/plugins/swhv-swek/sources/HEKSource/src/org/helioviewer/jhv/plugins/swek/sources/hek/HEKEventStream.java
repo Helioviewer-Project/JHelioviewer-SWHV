@@ -45,7 +45,6 @@ public class HEKEventStream implements SWEKEventStream {
 
     public void addJHVAssociation(JHVAssociation association) {
         associationQueue.add(association);
-
     }
 
     @Override

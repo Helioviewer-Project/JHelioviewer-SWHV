@@ -161,8 +161,8 @@ public class HEKEvent extends AbstractJHVEvent {
     }
 
     @Override
-    public String getUniqueID() {
-        return uniqueID;
+    public Integer getUniqueID() {
+        return id;
     }
 
     /**
@@ -215,15 +215,6 @@ public class HEKEvent extends AbstractJHVEvent {
     public void setEndTime(Date endDate) {
         this.endDate = endDate;
 
-    }
-
-    /**
-     * Sets the unique ID for the HekEvent.
-     *
-     * @param uniqueID
-     */
-    public void setUniqueID(String uniqueID) {
-        this.uniqueID = uniqueID;
     }
 
     /**

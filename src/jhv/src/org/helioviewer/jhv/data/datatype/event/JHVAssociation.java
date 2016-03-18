@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 public class JHVAssociation {
-    public String left;
-    public String right;
+    public Integer left;
+    public Integer right;
 
-    public JHVAssociation(String _left, String _right) {
+    public JHVAssociation(Integer _left, Integer _right) {
         left = _left;
         right = _right;
     }
