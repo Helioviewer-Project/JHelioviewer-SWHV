@@ -270,9 +270,9 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.equals("hgs_coord")) {
                     hgsCentralPoint = parsePoint(value);
                 } else if (keyString.equals("hgs_x")) {
-                    hgsX = Double.parseDouble(value);
+                    hgsX = Double.valueOf(value);
                 } else if (keyString.equals("hgs_y")) {
-                    hgsY = Double.parseDouble(value);
+                    hgsY = Double.valueOf(value);
                 } else {
                     boolean visible = false;
                     boolean configured = false;
@@ -425,15 +425,15 @@ public class HEKParser implements SWEKParser {
         coordinatesScanner.useDelimiter(" ");
 
         if (coordinatesScanner.hasNext()) {
-            coordinate1 = Double.parseDouble(coordinatesScanner.next());
+            coordinate1 = Double.valueOf(coordinatesScanner.next());
             coordinate1OK = true;
         }
         if (coordinatesScanner.hasNext()) {
-            coordinate2 = Double.parseDouble(coordinatesScanner.next());
+            coordinate2 = Double.valueOf(coordinatesScanner.next());
             coordinate2OK = true;
         }
         if (coordinatesScanner.hasNext()) {
-            coordinate3 = Double.parseDouble(coordinatesScanner.next());
+            coordinate3 = Double.valueOf(coordinatesScanner.next());
             coordinate3OK = true;
         }
 
@@ -553,6 +553,7 @@ public class HEKParser implements SWEKParser {
         return new Vec3(x, y, z);
     }
 
+    /*
     private static HashMap<SWEKEventType, List<JHVEventRelationShipRule>> hmr = new HashMap<SWEKEventType, List<JHVEventRelationShipRule>>();
 
     private List<JHVEventRelationShipRule> getEventRelationShipRules() {
@@ -595,5 +596,6 @@ public class HEKParser implements SWEKParser {
 
         return hmr.get(this.eventType);
     }
+    */
 
 }
