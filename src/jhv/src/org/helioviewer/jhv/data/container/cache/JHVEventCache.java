@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.data.container.cache;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -25,8 +26,8 @@ public class JHVEventCache {
 
     /** The events received for a certain date */
     public static class SortedDateInterval implements Comparable<SortedDateInterval> {
-        public final long start;
-        public final long end;
+        public long start;
+        public long end;
 
         public SortedDateInterval(long _start, long _end) {
             start = _start;
@@ -48,31 +49,22 @@ public class JHVEventCache {
 
     private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
 
-    /** A set with IDs */
-
-    private final Map<String, JHVEvent> allEvents;
-
-    private final Map<String, List<JHVEvent>> missingEventsInEventRelations;
-
-    private final List<JHVEvent> eventsWithRelationRules;
+    private final Map<String, JHVRelatedEvents> relEvents = new HashMap<String, JHVRelatedEvents>();;
 
     private final Set<JHVEventType> activeEventTypes;
 
     private final Map<JHVEventType, RequestCache> downloadedCache;
 
-    private final Map<String, Color> colorPerId;
+    private final Map<String, ArrayList<JHVAssociation>> assoLeft = new HashMap<String, ArrayList<JHVAssociation>>();
+    private final Map<String, ArrayList<JHVAssociation>> assoRight = new HashMap<String, ArrayList<JHVAssociation>>();
 
     /**
      * private default constructor
      */
     private JHVEventCache() {
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
-        allEvents = new HashMap<String, JHVEvent>();
-        missingEventsInEventRelations = new HashMap<String, List<JHVEvent>>();
-        eventsWithRelationRules = new ArrayList<JHVEvent>();
         activeEventTypes = new HashSet<JHVEventType>();
         downloadedCache = new HashMap<JHVEventType, RequestCache>();
-        colorPerId = new HashMap<String, Color>();
     }
 
     /**
@@ -89,56 +81,95 @@ public class JHVEventCache {
 
     public void add(JHVEvent event) {
         activeEventTypes.add(event.getJHVEventType());
-        JHVEvent savedEvent = allEvents.get(event.getUniqueID());
-        if (savedEvent == null) {
-            allEvents.put(event.getUniqueID(), event);
-            addToList(event);
-        }
-    }
-
-    private void addToList(JHVEvent event) {
-        SortedDateInterval i = new SortedDateInterval(event.getStartDate().getTime(), event.getEndDate().getTime());
         if (!events.containsKey(event.getJHVEventType())) {
             events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
-        events.get(event.getJHVEventType()).put(i, new JHVRelatedEvents(event));
+        JHVRelatedEvents current = null;
+        current = checkAssociation(current, assoLeft, true, event);
+        current = checkAssociation(current, assoRight, true, event);
+        if (current == null) {
+            current = new JHVRelatedEvents(event, events);
+        }
     }
 
-    /**
-     * Gets the events that are available within the interval.
-     *
-     * @param startDate
-     *            start date of the interval
-     * @param endDate
-     *            end date of the interval
-     * @return the list of events that are available in the interval
-     */
+    private JHVRelatedEvents checkAssociation(JHVRelatedEvents current, Map<String, ArrayList<JHVAssociation>> assoList, boolean isLeft, JHVEvent event) {
+        String uid = event.getUniqueID();
+        if (assoList.containsKey(uid)) {
+            for (Iterator<JHVAssociation> iterator = assoList.get(uid).iterator(); iterator.hasNext();) {
+                JHVAssociation tocheck = iterator.next();
+                String founduid = isLeft ? tocheck.left : tocheck.right;
+                JHVRelatedEvents found = relEvents.get(founduid);
+                if (found != null) {
+                    if (current == null) {
+                        found.add(event, events);
+                        relEvents.put(uid, found);
+                        current = found;
+                    }
+                    else {
+                        merge(current, found);
+                    }
+                    //Current association has been treated, remove from list!
+                    iterator.remove();
+                }
+            }
+            if (assoList.get(uid).isEmpty()) {
+                assoList.remove(uid);
+            }
+        }
+        return current;
+    }
+
+    private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
+        current.merge(found);
+        for (JHVEvent foundev : found.getEvents()) {
+            String key = foundev.getUniqueID();
+            relEvents.remove(key);
+            relEvents.put(key, current);
+        }
+    }
+
+    private void addAssociation(boolean isLeft, JHVAssociation association) {
+        String key = isLeft ? association.left : association.right;
+
+        ArrayList<JHVAssociation> leftAss = assoLeft.get(key);
+        if (leftAss == null) {
+            leftAss = new ArrayList<JHVAssociation>();
+        }
+        leftAss.add(association);
+    }
+
+    public void add(JHVAssociation association) {
+        if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
+            JHVRelatedEvents ll = relEvents.get(association.left);
+            JHVRelatedEvents rr = relEvents.get(association.right);
+            merge(ll, rr);
+        }
+        else {
+            addAssociation(true, association);
+            addAssociation(false, association);
+        }
+    }
+
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {
 
-        //Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
+        Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
-            /*
+
             if (events.containsKey(evt)) {
                 long delta = 100 * 60 * 60 * 24;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
                 eventsResult.put(evt, submap);
-            }*/
+            }
             List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
             if (!missing.isEmpty()) {
                 missing = downloadedCache.get(evt).adaptRequestCache(extendedStart, extendedEnd);
                 missingIntervals.put(evt, missing);
             }
         }
-        return new JHVEventCacheResult(events, missingIntervals);
+        return new JHVEventCacheResult(eventsResult, missingIntervals);
     }
 
-    /**
-     * Removes all the events of the given event type from the event cache.
-     *
-     * @param eventType
-     *            the event type to remove
-     */
     public void removeEventType(JHVEventType eventType, boolean keepActive) {
         if (!keepActive) {
             activeEventTypes.remove(eventType);
@@ -191,7 +222,7 @@ public class JHVEventCache {
             }
             eventsWithRelationRules.add(event);
         }
-    */
+     */
     public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }

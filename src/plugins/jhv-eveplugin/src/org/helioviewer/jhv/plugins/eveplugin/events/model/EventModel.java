@@ -14,7 +14,6 @@ import java.util.SortedMap;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
@@ -139,7 +138,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     public void setPlotIdentifier(String plotIdentifier) {
     }
 
-    public JHVEvent getEventAtPosition(Point point) {
+    public JHVRelatedEvents getEventAtPosition(Point point) {
         if (eventPlotConfiguration != null) {
             return eventPlotConfiguration.getEventOnLocation(point);
         } else {
@@ -178,8 +177,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
                 int relatedEventPosition = -1;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
-                    for (JHVEvent evl : evr.getValue().getEvents())
-                        handleEvent(evl, relatedEventPosition, 0);
+                    handleEvent(evr.getValue(), relatedEventPosition, 0);
                 }
                 linesPerEventType.put(eventType, maxEventLines);
                 maxNrLines += maxEventLines;
@@ -213,36 +211,31 @@ public class EventModel implements TimingListener, EventRequesterListener {
         maxEventLines = 0;
     }
 
-    private boolean handleEvent(JHVEvent event, int relatedEventPosition, int relationNr) {
-        if (!uniqueIDs.contains(event.getUniqueID())) {
-            EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
-            plotConfig.add(epc);
-            relatedEventPosition = epc.getEventPosition();
-            int localRelationNr = 0;
-            return true;
-        } else {
-            return false;
-        }
+    private boolean handleEvent(JHVRelatedEvents event, int relatedEventPosition, int relationNr) {
+        EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
+        plotConfig.add(epc);
+        relatedEventPosition = epc.getEventPosition();
+        int localRelationNr = 0;
+        return true;
 
     }
 
-    private EventPlotConfiguration creatEventPlotConfiguration(JHVEvent event, int relatedEventPosition, int relationNr) {
+    private EventPlotConfiguration creatEventPlotConfiguration(JHVRelatedEvents event, int relatedEventPosition, int relationNr) {
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
 
-        uniqueIDs.add(event.getUniqueID());
         int eventPosition = 0;
         if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
-            if (minimalEndDate == null || minimalEndDate.compareTo(event.getStartDate()) >= 0) {
+            if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
                 // first event or event start
                 // before
                 // minimal end
                 // date so next line
-                minimalEndDate = event.getEndDate();
-                endDates.add(event.getEndDate());
+                minimalEndDate = new Date(event.getEnd());
+                endDates.add(minimalEndDate);
                 eventPosition = nrLines;
                 nrLines++;
             } else {
-                if (event.getStartDate().after(maximumEndDate)) {
+                if (event.getStart() > maximumEndDate.getTime()) {
                     // After all other events so
                     // start
                     // new line
@@ -251,35 +244,33 @@ public class EventModel implements TimingListener, EventRequesterListener {
                     eventPosition = 0;
                     nrLines = 1;
                     endDates = new ArrayList<Date>();
-                    endDates.add(event.getEndDate());
+                    endDates.add(new Date(event.getEnd()));
                 } else {
                     // After minimal date so
                     // after
                     // minimal end
                     // date
                     eventPosition = minimalDateLine;
-                    endDates.set(minimalDateLine, event.getEndDate());
+                    endDates.set(minimalDateLine, new Date(event.getEnd()));
                 }
             }
         } else {
-            eventPosition = relatedEventPosition;
-            endDates.set(relatedEventPosition, event.getEndDate());
+            endDates.set(relatedEventPosition, new Date(event.getEnd()));
         }
 
-        eventLocations.put(event.getUniqueID(), eventPosition);
         minimalDateLine = defineMinimalDateLine(endDates);
         minimalEndDate = endDates.get(minimalDateLine);
         maximumDateLine = defineMaximumDateLine(endDates);
         maximumEndDate = endDates.get(maximumDateLine);
-        double scaledX0 = defineScaledValue(event.getStartDate(), selectedInterval);
-        double scaledX1 = defineScaledValue(event.getEndDate(), selectedInterval);
+        double scaledX0 = defineScaledValue(event.getStart(), selectedInterval);
+        double scaledX1 = defineScaledValue(event.getEnd(), selectedInterval);
         if (nrLines > maxEventLines) {
             maxEventLines = nrLines;
         }
-        if (tempLastDateWithData == null || tempLastDateWithData.before(event.getEndDate())) {
-            tempLastDateWithData = event.getEndDate();
+        if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
+            tempLastDateWithData = new Date(event.getEnd());
         }
-        event.addHighlightListener(DrawController.getSingletonInstance());
+        //event.addHighlightListener(DrawController.getSingletonInstance());
         return new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
     }
 
@@ -325,9 +316,9 @@ public class EventModel implements TimingListener, EventRequesterListener {
         return minLine;
     }
 
-    private double defineScaledValue(Date date, Interval<Date> selectedInterval) {
+    private double defineScaledValue(long date, Interval<Date> selectedInterval) {
         double selectedDuration = 1.0 * (selectedInterval.getEnd().getTime() - selectedInterval.getStart().getTime());
-        double position = 1.0 * (date.getTime() - selectedInterval.getStart().getTime());
+        double position = 1.0 * (date - selectedInterval.getStart().getTime());
         return position / selectedDuration;
     }
 
