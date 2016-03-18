@@ -36,7 +36,9 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.layers.Layers;
@@ -433,15 +435,17 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     @Override
     public void mouseClicked(final MouseEvent e) {
         JHVRelatedEvents event = eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE));
-        /*if (event != null) {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event);
-            dialog.setLocation(e.getLocationOnScreen());
-            dialog.validate();
-            dialog.pack();
-            dialog.setVisible(true);
+        if (event != null) {
+            for (JHVEvent evt : event.getEvents()) {
+                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, evt);
+                dialog.setLocation(e.getLocationOnScreen());
+                dialog.validate();
+                dialog.pack();
+                dialog.setVisible(true);
+            }
         } else if (graphArea.contains(e.getPoint())) {
             setMovieFrameManually(e.getPoint());
-        }*/
+        }
     }
 
     @Override
@@ -531,7 +535,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
-            // redrawGraph();
+            redrawGraph();
             updateGraph();
             mouseOverEvent = true;
         } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {

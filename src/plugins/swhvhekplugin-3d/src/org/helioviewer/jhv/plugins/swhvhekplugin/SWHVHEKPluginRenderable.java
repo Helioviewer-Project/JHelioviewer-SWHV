@@ -28,6 +28,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -84,7 +85,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final int texCoordHelpers[][] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    private void drawCactusArc(GL2 gl, JHVEvent evt, Date timestamp) {
+    private void drawCactusArc(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, Date timestamp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
         double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -102,7 +103,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        Color color = evt.getColor();
+        Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
@@ -124,7 +125,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         bindTexture(gl, type, evt.getIcon());
 
         double sz = ICON_SIZE;
-        if (evt.isHighlighted()) {
+        if (evtr.isHighlighted()) {
             sz = ICON_SIZE_HIGHLIGHTED;
         }
 
@@ -146,7 +147,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private void drawPolygon(GL2 gl, JHVEvent evt) {
+    private void drawPolygon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
         if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
             return;
@@ -161,10 +162,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             }
         }
 
-        Color color = evt.getColor();
+        Color color = evtr.getColor();
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
-        gl.glLineWidth(evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
+        gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
 
         // draw bounds
         Vec3 oldBoundaryPoint3d = null;
@@ -197,7 +198,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawIcon(GL2 gl, JHVEvent evt) {
+    private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
@@ -205,7 +206,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 Vec3 pt = el.centralPoint();
                 String type = evt.getJHVEventType().getEventType().getEventName();
                 bindTexture(gl, type, evt.getIcon());
-                if (evt.isHighlighted()) {
+                if (evtr.isHighlighted()) {
                     drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
                     drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
@@ -234,7 +235,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    private void drawIconScale(GL2 gl, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
+    private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
         if (pi.containsKey(JHVCoordinateSystem.JHV)) {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
@@ -244,7 +245,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 Vec2 tf = scale.transform(pt);
                 String type = evt.getJHVEventType().getEventType().getEventName();
                 bindTexture(gl, type, evt.getIcon());
-                if (evt.isHighlighted()) {
+                if (evtr.isHighlighted()) {
                     drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
                 } else {
                     drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE);
@@ -253,7 +254,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawCactusArcScale(GL2 gl, JHVEvent evt, Date timestamp, GridScale scale, Viewport vp) {
+    private void drawCactusArcScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, Date timestamp, GridScale scale, Viewport vp) {
         Map<String, JHVEventParameter> params = evt.getAllEventParameters();
         double angularWidthDegree = SWHVHEKData.readCMEAngularWidthDegree(params);
         double principalAngleDegree = SWHVHEKData.readCMEPrincipalAngleDegree(params) - 90;
@@ -265,7 +266,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        Color color = evt.getColor();
+        Color color = evtr.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
@@ -302,7 +303,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
         String type = evt.getJHVEventType().getEventType().getEventName();
         bindTexture(gl, type, evt.getIcon());
-        if (evt.isHighlighted()) {
+        if (evtr.isHighlighted()) {
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
         } else {
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE);
@@ -353,7 +354,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private final static int MOUSE_OFFSET_X = 25;
     private final static int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(GL2 gl, Viewport vp, JHVEvent evt, Point pt) {
+    private void drawText(GL2 gl, Viewport vp, JHVRelatedEvents mouseOverJHVEvent, Point pt) {
+        JHVEvent evt = mouseOverJHVEvent.getClosestTo(controller.currentTime);
         Map<String, JHVEventParameter> params = evt.getVisibleNotNullEventParameters();
         ArrayList<String> txts = new ArrayList<String>();
 
@@ -371,15 +373,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
-            for (JHVEvent evt : eventsToDraw) {
-                if (evt.getName().equals("Coronal Mass Ejection")) {
-                    drawCactusArc(gl, evt, controller.currentTime);
+            List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVRelatedEvents evtr : eventsToDraw) {
+                JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+                if (evt.getJHVEventType().getEventType().getEventName().equals("Coronal Mass Ejection")) {
+                    drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
-                    drawPolygon(gl, evt);
+                    drawPolygon(gl, evtr, evt);
 
                     gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIcon(gl, evt);
+                    drawIcon(gl, evtr, evt);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
@@ -390,14 +393,15 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (isVisible[vp.idx]) {
-            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
-            for (JHVEvent evt : eventsToDraw) {
+            List<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVRelatedEvents evtr : eventsToDraw) {
+                JHVEvent evt = evtr.getClosestTo(controller.currentTime);
                 if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
-                    drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
+                    drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
                 } else {
-                    drawPolygon(gl, evt);
+                    drawPolygon(gl, evtr, evt);
                     gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIconScale(gl, evt, scale, camera, vp);
+                    drawIconScale(gl, evtr, evt, scale, camera, vp);
                     gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }

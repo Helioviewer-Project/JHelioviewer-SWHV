@@ -24,12 +24,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.controller.InputControllerPlugin;
 import org.helioviewer.jhv.layers.TimeListener;
-import org.helioviewer.jhv.opengl.GLHelper;
 
 public class SWHVHEKPopupController implements MouseListener, MouseMotionListener, InputControllerPlugin, TimeListener {
 
@@ -40,7 +39,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
     private static Component component;
     private static Camera camera;
 
-    protected static JHVEvent mouseOverJHVEvent = null;
+    protected static JHVRelatedEvents mouseOverJHVEvent = null;
     protected static Point mouseOverPosition = null;
     private static Cursor lastCursor;
 
@@ -98,6 +97,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        /*
         if (mouseOverJHVEvent != null) {
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent);
             hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(mouseOverPosition.x, mouseOverPosition.y), hekPopUp.getWidth(), hekPopUp.getHeight()));
@@ -106,6 +106,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
             component.setCursor(helpCursor);
         }
+         */
     }
 
     @Override
@@ -133,7 +134,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        ArrayList<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
+        ArrayList<JHVRelatedEvents> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(currentTime);
         if (eventsToDraw.size() == 0)
             return;
 
@@ -143,7 +144,8 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         Vec3 hitpoint = null;
 
         Viewport vp = Displayer.getActiveViewport();
-        for (JHVEvent evt : eventsToDraw) {
+        for (JHVRelatedEvents evtr : eventsToDraw) {
+            JHVEvent evt = evtr.getClosestTo(this.currentTime);
             HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
@@ -167,7 +169,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                     double deltaY = Math.abs(hitpoint.y - pt.y);
                     double deltaZ = Math.abs(hitpoint.z - pt.z);
                     if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                        mouseOverJHVEvent = evt;
+                        mouseOverJHVEvent = evtr;
                         mouseOverPosition = e.getPoint();
                         break;
                     }
@@ -200,7 +202,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
-                        mouseOverJHVEvent = evt;
+                        mouseOverJHVEvent = evtr;
                         mouseOverPosition = e.getPoint();
                         break;
                     }

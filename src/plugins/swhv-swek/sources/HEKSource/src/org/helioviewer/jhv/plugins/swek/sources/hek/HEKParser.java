@@ -514,15 +514,15 @@ public class HEKParser implements SWEKParser {
         coordinatesScanner.useDelimiter(" ");
 
         if (coordinatesScanner.hasNext()) {
-            coordinate1 = coordinatesScanner.nextDouble();
+            coordinate1 = Double.parseDouble(coordinatesScanner.next());
             coordinate1OK = true;
         }
         if (coordinatesScanner.hasNext()) {
-            coordinate2 = coordinatesScanner.nextDouble();
+            coordinate2 = Double.parseDouble(coordinatesScanner.next());
             coordinate2OK = true;
         }
         if (coordinatesScanner.hasNext()) {
-            coordinate3 = coordinatesScanner.nextDouble();
+            coordinate3 = Double.parseDouble(coordinatesScanner.next());
             coordinate3OK = true;
         }
 

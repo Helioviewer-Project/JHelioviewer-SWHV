@@ -24,6 +24,11 @@ public class ComesepEventStream implements SWEKEventStream {
     }
 
     @Override
+    public boolean hasAssociations() {
+        return !associationQueue.isEmpty();
+    }
+
+    @Override
     public JHVAssociation nextAssociation() {
         return associationQueue.poll();
     }

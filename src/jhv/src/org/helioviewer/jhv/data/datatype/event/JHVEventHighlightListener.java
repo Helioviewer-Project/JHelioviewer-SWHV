@@ -1,5 +1,5 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 public interface JHVEventHighlightListener {
-    public abstract void eventHightChanged(JHVEvent event);
+    public abstract void eventHightChanged(JHVRelatedEvents jhvRelatedEvents);
 }

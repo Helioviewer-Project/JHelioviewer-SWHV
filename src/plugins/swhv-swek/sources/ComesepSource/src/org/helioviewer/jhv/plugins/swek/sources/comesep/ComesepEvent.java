@@ -69,9 +69,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     /** List with positioning information for this event */
     private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
 
-    /** The color in which the event should be drawn */
-    private final Color color;
-
     /**
      *
      * @param eventName
@@ -88,7 +85,6 @@ public class ComesepEvent extends AbstractJHVEvent {
         this.description = description;
         eventType = comesepEventType;
         icon = eventIcon;
-        this.color = color;
     }
 
     @Override
@@ -169,11 +165,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     @Override
     public HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation() {
         return positionInformation;
-    }
-
-    @Override
-    public Color getColor() {
-        return color;
     }
 
     /**

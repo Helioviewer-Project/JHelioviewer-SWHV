@@ -12,6 +12,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -31,7 +32,7 @@ public class JHVEventContainer {
 
     private static final double factor = 0.2;
 
-    private static JHVEvent lastHighlighted = null;
+    private static JHVRelatedEvents lastHighlighted = null;
 
     /**
      * Private constructor.
@@ -99,6 +100,10 @@ public class JHVEventContainer {
      */
     public void addEvent(final JHVEvent event) {
         eventCache.add(event);
+    }
+
+    public void addAssociation(JHVAssociation association) {
+        eventCache.add(association);
     }
 
     /**
@@ -169,7 +174,7 @@ public class JHVEventContainer {
         fireEventCacheChanged();
     }
 
-    public static void highlight(JHVEvent event) {
+    public static void highlight(JHVRelatedEvents event) {
         if (event == lastHighlighted)
             return;
         if (event != null) {
@@ -185,4 +190,5 @@ public class JHVEventContainer {
         this.incomingRequestManager = incomingRequestManager;
 
     }
+
 }

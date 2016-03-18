@@ -2,7 +2,10 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
@@ -13,13 +16,20 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval
 public class JHVRelatedEvents {
     private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
     private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
+    private final ArrayList<JHVAssociation> associations = new ArrayList<JHVAssociation>();
+
     private final Color color;
+
+    protected boolean highlighted;
+    protected Set<JHVEventHighlightListener> listeners;
 
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         super();
         color = JHVCacheColors.getNextColor();
         this.add(event, eventsMap);
         eventsMap.get(event.getJHVEventType()).put(interval, this);
+        highlighted = false;
+        listeners = new HashSet<JHVEventHighlightListener>();
     }
 
     public ArrayList<JHVEvent> getEvents() {
@@ -27,7 +37,6 @@ public class JHVRelatedEvents {
     }
 
     public void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
-
         long time = evt.getStartDate().getTime();
         if (time < interval.start) {
             interval.start = time;
@@ -39,7 +48,6 @@ public class JHVRelatedEvents {
         events.add(evt);
         eventsMap.get(evt.getJHVEventType()).remove(interval, this);
         eventsMap.get(evt.getJHVEventType()).put(interval, this);
-
     }
 
     public long getEnd() {
@@ -68,5 +76,42 @@ public class JHVRelatedEvents {
 
     public JHVEventType getJHVEventType() {
         return events.get(0).getJHVEventType();
+    }
+
+    public void highlight(boolean isHighlighted) {
+        if (isHighlighted != highlighted) {
+            highlighted = isHighlighted;
+            fireHighlightChanged();
+        }
+    }
+
+    public void addHighlightListener(JHVEventHighlightListener l) {
+        listeners.add(l);
+    }
+
+    public void removeHighlightListener(JHVEventHighlightListener l) {
+        listeners.remove(l);
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    private void fireHighlightChanged() {
+        for (JHVEventHighlightListener l : listeners) {
+            l.eventHightChanged(this);
+        }
+    }
+
+    public JHVEvent getClosestTo(Date timestamp) {
+        for (JHVEvent event : events) {
+            if (event.getStartDate().getTime() <= timestamp.getTime() && event.getEndDate().getTime() >= timestamp.getTime())
+                return event;
+        }
+        return null;
+    }
+
+    public void addAssociation(JHVAssociation association) {
+        associations.add(association);
     }
 }

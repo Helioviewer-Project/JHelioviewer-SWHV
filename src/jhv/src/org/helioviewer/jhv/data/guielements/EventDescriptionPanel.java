@@ -15,6 +15,7 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 
 /**
  * This is a panel describing an event in short.
@@ -24,21 +25,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
  */
 @SuppressWarnings("serial")
 public class EventDescriptionPanel extends JPanel implements MouseListener {
-
-    /** The event */
+    private final JHVRelatedEvents revent;
     private final JHVEvent event;
 
-    /** Label showing the event icon in the summary of the event */
     private JLabel labelIcon = new JLabel();
-
-    /**
-     * Label showing the event type in the summary of the event
-     */
     private JTextArea textType = new JTextArea("N/A");
-
-    /**
-     * Label showing the event date in the summary of the event
-     */
     private JTextArea textStartTime = new JTextArea("N/A");
 
     /**
@@ -56,7 +47,8 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
      *
      * @param event
      */
-    public EventDescriptionPanel(JHVEvent event) {
+    public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
+        this.revent = revent;
         this.event = event;
         initVisualComponents();
     }
@@ -67,7 +59,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         setLayout(new GridBagLayout());
 
         labelIcon = new JLabel(event.getIcon());
-        colorLabel.setBackground(event.getColor());//.getEventRelationShip().getRelationshipColor());
+        colorLabel.setBackground(revent.getColor());//.getEventRelationShip().getRelationshipColor());
         colorLabel.setOpaque(true);
 
         GridBagConstraints iconLabelConstraint = new GridBagConstraints();
@@ -126,7 +118,6 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         textType.setBackground(this.getBackground());
         textType.setFont(labelIcon.getFont());
         textType.setMargin(new Insets(0, 0, 0, 0));
-
         textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
         textStartTime.setBackground(this.getBackground());
         textStartTime.setFont(labelIcon.getFont());
@@ -185,7 +176,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        JHVEventContainer.highlight(event);
+        JHVEventContainer.highlight(revent);
     }
 
     @Override

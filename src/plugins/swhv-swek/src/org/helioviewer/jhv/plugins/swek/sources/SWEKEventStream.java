@@ -26,4 +26,6 @@ public interface SWEKEventStream {
     public abstract boolean additionalDownloadNeeded();
 
     public abstract JHVAssociation nextAssociation();
+
+    boolean hasAssociations();
 }
