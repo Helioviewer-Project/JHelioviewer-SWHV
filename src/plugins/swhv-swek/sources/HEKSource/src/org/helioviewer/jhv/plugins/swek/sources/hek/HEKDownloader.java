@@ -78,7 +78,8 @@ public class HEKDownloader implements SWEKDownloader {
         baseURL = appendEventCoorSys(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendX1X2Y1Y2(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendCosec(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendParams(baseURL, eventType, startDate, endDate, params).append("&");
+        baseURL.append("param0=event_starttime&op0=<=&value0=").append(formatDate(endDate)).append("&");
+        baseURL = appendParams(baseURL, eventType, startDate, endDate, params);
         baseURL = appendEventStartTime(baseURL, eventType, startDate).append("&");
         baseURL = appendEventEndTime(baseURL, eventType, endDate).append("&");
         baseURL = appendPage(baseURL, page);
@@ -170,7 +171,7 @@ public class HEKDownloader implements SWEKDownloader {
         baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append("&");
         baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append("&");
         baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append("&");
-        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append("&");
+        baseURL.append("y2=").append(eventType.getSpatialRegion().y2);
         return baseURL;
     }
 
@@ -206,7 +207,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the current URL extended with the params
      */
     private StringBuilder appendParams(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
-        int paramCount = 0;
+        int paramCount = 1;
 
         for (SWEKParam param : params) {
             String encodedValue;
@@ -252,7 +253,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the current URL extended with the end time
      */
     private StringBuilder appendEventEndTime(StringBuilder baseURL, SWEKEventType eventType, Date endDate) {
-        return baseURL.append("event_endtime=").append(formatDate(endDate));
+        return baseURL.append("event_endtime=").append(formatDate(new Date(System.currentTimeMillis())));
     }
 
     /**
