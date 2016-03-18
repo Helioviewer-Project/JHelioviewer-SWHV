@@ -281,7 +281,6 @@ public class JHVDatabase {
                         generatedKey = generatedKeys.getLong(1);
                     }
                     generatedKeys.close();
-                    connection.commit();
                 }
                 else {
                     Log.error("Failed to insert event");
