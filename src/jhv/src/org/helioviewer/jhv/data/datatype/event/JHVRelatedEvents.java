@@ -22,6 +22,7 @@ public class JHVRelatedEvents {
 
     protected boolean highlighted;
     protected Set<JHVEventHighlightListener> listeners;
+    private final JHVEventType eventType;
 
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         super();
@@ -30,6 +31,7 @@ public class JHVRelatedEvents {
         eventsMap.get(event.getJHVEventType()).put(interval, this);
         highlighted = false;
         listeners = new HashSet<JHVEventHighlightListener>();
+        eventType = event.getJHVEventType();
     }
 
     public ArrayList<JHVEvent> getEvents() {
@@ -67,7 +69,7 @@ public class JHVRelatedEvents {
     }
 
     public ImageIcon getIcon() {
-        return events.get(0).getIcon();
+        return eventType.getEventType().getEventIcon();
     }
 
     public void merge(JHVRelatedEvents found) {
@@ -75,7 +77,7 @@ public class JHVRelatedEvents {
     }
 
     public JHVEventType getJHVEventType() {
-        return events.get(0).getJHVEventType();
+        return eventType;
     }
 
     public void highlight(boolean isHighlighted) {

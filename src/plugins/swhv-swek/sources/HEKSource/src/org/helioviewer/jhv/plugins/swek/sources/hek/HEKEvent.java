@@ -1,11 +1,8 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import java.awt.Color;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
@@ -26,9 +23,6 @@ public class HEKEvent extends AbstractJHVEvent {
 
     /** the end date of the event */
     private Date endDate;
-
-    /** the icon */
-    private final ImageIcon icon;
 
     /** the event name */
     private final String eventName;
@@ -84,12 +78,11 @@ public class HEKEvent extends AbstractJHVEvent {
      * @param color
      *            the color
      */
-    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, ImageIcon icon, Color color) {
+    public HEKEvent(String eventName, String eventDisplayName, JHVEventType eventType) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;
-        this.description = description;
-        this.icon = icon;
+        this.description = "";
         this.eventType = eventType;
     }
 
@@ -157,11 +150,6 @@ public class HEKEvent extends AbstractJHVEvent {
     @Override
     public String getDisplayName() {
         return eventDisplayName;
-    }
-
-    @Override
-    public ImageIcon getIcon() {
-        return icon;
     }
 
     @Override

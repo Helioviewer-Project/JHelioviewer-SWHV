@@ -423,7 +423,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         if (movieTimestamp == null || !drawController.getIntervalAvailable()) {
             return;
         }
-
         final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
         final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime());
 

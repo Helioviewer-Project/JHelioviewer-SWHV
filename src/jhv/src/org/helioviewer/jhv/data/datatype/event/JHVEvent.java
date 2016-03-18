@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.ImageIcon;
-
 /**
  *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
@@ -38,13 +36,6 @@ public interface JHVEvent {
      * @return the display name
      */
     public abstract String getDisplayName();
-
-    /**
-     * Gets the icon of the event
-     *
-     * @return the icon
-     */
-    public abstract ImageIcon getIcon();
 
     /**
      * Gets the short description of the event.
