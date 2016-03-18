@@ -8,6 +8,7 @@ import java.util.SortedMap;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 
 public class JHVEventCacheResult {
 
