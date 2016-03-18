@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
@@ -15,7 +15,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class HEKEvent extends AbstractJHVEvent {
+public class HEKEvent implements JHVEvent {
 
     /** the start date of the event */
     private Date startDate;
@@ -209,7 +209,6 @@ public class HEKEvent extends AbstractJHVEvent {
      */
     public void setEndTime(Date endDate) {
         this.endDate = endDate;
-
     }
 
     /**

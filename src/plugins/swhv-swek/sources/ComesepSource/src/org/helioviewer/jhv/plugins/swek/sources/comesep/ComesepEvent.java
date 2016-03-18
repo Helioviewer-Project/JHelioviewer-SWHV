@@ -7,18 +7,18 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
- * Represents a JHVevent coming from the Comsep source.
+ * Represents a JHVevent coming from the Comesep source.
  *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class ComesepEvent extends AbstractJHVEvent {
+public class ComesepEvent implements JHVEvent {
 
     /** the start date of the event */
     private Date startDate;
@@ -197,7 +197,6 @@ public class ComesepEvent extends AbstractJHVEvent {
      */
     public void setEndTime(Date endDate) {
         this.endDate = endDate;
-
     }
 
     /**
@@ -231,4 +230,5 @@ public class ComesepEvent extends AbstractJHVEvent {
         allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
     }
+
 }
