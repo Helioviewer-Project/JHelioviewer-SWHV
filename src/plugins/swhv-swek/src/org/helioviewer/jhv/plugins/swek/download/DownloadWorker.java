@@ -9,10 +9,10 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKSource;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
@@ -123,7 +123,7 @@ public class DownloadWorker implements Runnable {
     }
 
     public JHVEventType getJHVEventType() {
-        return new JHVEventType(eventType.getEventName(), supplier.getSupplierName());
+        return JHVEventType.getJHVEventType(eventType, supplier);
     }
 
     public Date getDownloadEndDate() {

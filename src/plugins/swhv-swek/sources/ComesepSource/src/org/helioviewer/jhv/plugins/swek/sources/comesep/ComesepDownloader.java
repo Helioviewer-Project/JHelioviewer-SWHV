@@ -12,7 +12,7 @@ import java.util.Properties;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 

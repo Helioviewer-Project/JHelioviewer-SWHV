@@ -3,8 +3,8 @@ package org.helioviewer.jhv.plugins.swek.view.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 
 /**
  * Creates the correct FilterPanel depending on the given event type.

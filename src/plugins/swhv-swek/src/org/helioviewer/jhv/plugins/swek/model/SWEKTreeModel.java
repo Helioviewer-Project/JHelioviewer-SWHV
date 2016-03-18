@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.swek.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
 /**
  * This model manages all the SWEKEventTypeTreeModels and delegate events. This

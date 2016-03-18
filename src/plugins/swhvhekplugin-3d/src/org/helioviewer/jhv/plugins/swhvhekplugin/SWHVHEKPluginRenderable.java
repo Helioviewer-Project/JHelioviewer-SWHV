@@ -123,7 +123,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.orientation);
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
-        String type = evt.getJHVEventType().getEventType();
+        String type = evt.getJHVEventType().getEventType().getEventName();
         bindTexture(gl, type, evt.getIcon());
 
         double sz = ICON_SIZE;
@@ -209,7 +209,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
             if (el.centralPoint() != null) {
                 Vec3 pt = el.centralPoint();
-                String type = evt.getJHVEventType().getEventType();
+                String type = evt.getJHVEventType().getEventType().getEventName();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
                     drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -248,7 +248,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 Vec3 pt = el.centralPoint();
                 pt = camera.getViewpoint().orientation.rotateVector(pt);
                 Vec2 tf = scale.transform(pt);
-                String type = evt.getJHVEventType().getEventType();
+                String type = evt.getJHVEventType().getEventType().getEventName();
                 bindTexture(gl, type, evt.getIcon());
                 if (evt.isHighlighted()) {
                     drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
@@ -309,7 +309,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glEnd();
 
-        String type = evt.getJHVEventType().getEventType();
+        String type = evt.getJHVEventType().getEventType().getEventName();
         bindTexture(gl, type, evt.getIcon());
         if (evt.isHighlighted()) {
             drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);

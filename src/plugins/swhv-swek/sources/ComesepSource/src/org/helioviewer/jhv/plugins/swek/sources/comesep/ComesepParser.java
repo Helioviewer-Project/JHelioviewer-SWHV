@@ -14,11 +14,11 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
-import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKSource;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
 import org.json.JSONArray;
@@ -97,7 +97,7 @@ public class ComesepParser implements SWEKParser {
 
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("results");
-        JHVEventType comesepEventType = new JHVEventType(eventType.getEventName(), eventSupplier.getSupplierName());
+        JHVEventType comesepEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             ComesepEvent currentEvent = new ComesepEvent(eventType.getEventName(), eventType.getEventName(), "", comesepEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);

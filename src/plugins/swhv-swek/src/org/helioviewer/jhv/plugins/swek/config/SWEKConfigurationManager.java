@@ -24,6 +24,15 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.SWEKConfiguration;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
+import org.helioviewer.jhv.data.datatype.event.SWEKSource;
+import org.helioviewer.jhv.data.datatype.event.SWEKSpatialRegion;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKSettings;
@@ -667,7 +676,7 @@ public class SWEKConfigurationManager {
      *             if the supplier could not be parsed
      */
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
-        SWEKSupplier supplier = new SWEKSupplier(parseSupplierName(object),
+        SWEKSupplier supplier = SWEKSupplier.getSupplier(parseSupplierName(object),
                 parseSupplierDisplayName(object),
                 parseSupplierSource(object));
         return supplier;

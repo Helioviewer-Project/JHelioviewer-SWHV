@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
 import java.util.List;
@@ -234,12 +234,4 @@ public class SWEKEventType {
         return false;
     }
 
-    @Override
-    public String toString() {
-        String s = "Suppliers: ";
-        for (SWEKSupplier supplier : suppliers) {
-            s += supplier.getSupplierName();
-        }
-        return s;
-    }
 }

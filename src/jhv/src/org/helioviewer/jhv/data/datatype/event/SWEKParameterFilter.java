@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.data.datatype.event;
 
 /**
  * Describes a SWEK parameter filter

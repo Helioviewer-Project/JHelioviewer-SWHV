@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 
 /**
  * SWEKTree representation of a SWEKSupplier.

@@ -192,7 +192,7 @@ public class JHVEventCache {
         List<JHVEventRelationShipRule> rules = event.getEventRelationShip().getRelationshipRules();
         for (JHVEventRelationShipRule rule : rules) {
             for (JHVEvent candidate : eventsWithRelationRules) {
-                if (candidate.getJHVEventType().getEventType().toLowerCase().equals(rule.getRelatedWith().getEventType().toLowerCase())) {
+                if (candidate.getJHVEventType().getEventType().getEventName().toLowerCase().equals(rule.getRelatedWith().getEventType().getEventName().toLowerCase())) {
                     int foundCorrespondinParameters = 0;
 
                     for (JHVRelatedOn relatedOn : rule.getRelatedOn()) {
@@ -393,7 +393,7 @@ public class JHVEventCache {
                 eventsToAdd.add(event);
                 endDatesPerStartDate.put(event.getEndDate(), eventsToAdd);
                 datesPerType.put(event.getStartDate(), endDatesPerStartDate);
-                eventsResult.put(event.getJHVEventType().getEventType(), datesPerType);
+                eventsResult.put(event.getJHVEventType().getEventType().getEventName(), datesPerType);
             }
         }
     }
