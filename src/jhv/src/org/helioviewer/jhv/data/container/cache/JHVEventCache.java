@@ -49,7 +49,7 @@ public class JHVEventCache {
 
     private final Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events;
 
-    private final Map<String, JHVRelatedEvents> relEvents = new HashMap<String, JHVRelatedEvents>();;
+    private final Map<Integer, JHVRelatedEvents> relEvents = new HashMap<Integer, JHVRelatedEvents>();;
 
     private final Set<JHVEventType> activeEventTypes;
 
@@ -100,11 +100,11 @@ public class JHVEventCache {
     }
 
     private JHVRelatedEvents checkAssociation(JHVRelatedEvents current, Map<String, ArrayList<JHVAssociation>> assoList, boolean isLeft, JHVEvent event) {
-        String uid = event.getUniqueID();
+        Integer uid = event.getUniqueID();
         if (assoList.containsKey(uid)) {
             for (Iterator<JHVAssociation> iterator = assoList.get(uid).iterator(); iterator.hasNext();) {
                 JHVAssociation tocheck = iterator.next();
-                String founduid = isLeft ? tocheck.left : tocheck.right;
+                Integer founduid = isLeft ? tocheck.left : tocheck.right;
                 JHVRelatedEvents found = relEvents.get(founduid);
                 if (found != null) {
                     if (current == null) {
@@ -131,14 +131,14 @@ public class JHVEventCache {
     private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
         current.merge(found);
         for (JHVEvent foundev : found.getEvents()) {
-            String key = foundev.getUniqueID();
+            Integer key = foundev.getUniqueID();
             relEvents.remove(key);
             relEvents.put(key, current);
         }
     }
 
     private void addAssociation(boolean isLeft, JHVAssociation association) {
-        String key = isLeft ? association.left : association.right;
+        Integer key = isLeft ? association.left : association.right;
         ArrayList<JHVAssociation> leftAss = assoLeft.get(key);
         if (leftAss == null) {
             leftAss = new ArrayList<JHVAssociation>();

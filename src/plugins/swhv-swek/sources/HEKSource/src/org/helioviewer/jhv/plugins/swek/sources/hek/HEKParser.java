@@ -168,9 +168,8 @@ public class HEKParser implements SWEKParser {
         JSONArray associations = eventJSON.getJSONArray("association");
 
         for (int i = 0; i < associations.length() && !parserStopped; i++) {
-            JHVAssociation association = new JHVAssociation(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
-            if (todb)
-                JHVDatabase.dump_association2db(association);
+            Integer[] idlist = JHVDatabase.dump_association2db(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
+            JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
             eventStream.addJHVAssociation(association);
         }
     }
@@ -213,7 +212,7 @@ public class HEKParser implements SWEKParser {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), hekEventType);
             JSONObject result = results.getJSONObject(i);
 
-            parseResult(result, currentEvent);
+            String uid = parseResult(result, currentEvent);
             handleCoordinates(currentEvent);
 
             if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
@@ -223,12 +222,16 @@ public class HEKParser implements SWEKParser {
                 Log.error("Event JSON: ");
                 Log.error(result.toString());
             }
+            Integer id;
             if (todb) {
-                Integer id = JHVDatabase.dump_event2db(result.toString(), currentEvent);
+                id = JHVDatabase.dump_event2db(result.toString(), currentEvent, uid);
+            }
+            else {
+                id = JHVDatabase.getEventId(uid);
                 currentEvent.setId(id);
             }
+            currentEvent.setId(id);
             eventStream.addJHVEvent(currentEvent);
-
             reinitializeCoordinates();
         }
     }
@@ -243,11 +246,17 @@ public class HEKParser implements SWEKParser {
      * @throws JSONException
      *             if the result could not be parsed
      */
-    private void parseResult(JSONObject result, HEKEvent currentEvent) throws JSONException {
+    private String parseResult(JSONObject result, HEKEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
+        String uid = null;
+
         while (keys.hasNext()) {
-            parseParameter(result, keys.next(), currentEvent);
+            String ret = parseParameter(result, keys.next(), currentEvent);
+            if (ret != null) {
+                uid = ret;
+            }
         }
+        return uid;
     }
 
     /**
@@ -262,7 +271,8 @@ public class HEKParser implements SWEKParser {
      * @throws JSONException
      *             if the parameter could not be parsed
      */
-    private void parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
+    private String parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
+        String uid = null;
         if (key instanceof String) {
             String originalKeyString = ((String) key);
             String keyString = originalKeyString.toLowerCase();
@@ -273,36 +283,30 @@ public class HEKParser implements SWEKParser {
                 if (!result.isNull(keyString))
                     value = result.optString(keyString); // convert to string
                 else
-                    return;
-
-                // Event start time
+                    return uid;
                 if (keyString.equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
-                } else
-                // Event end time
-                if (keyString.equals("event_endtime")) {
+                } else if (keyString.equals("event_endtime")) {
                     currentEvent.setEndTime(parseDate(value));
+                } else if (keyString.equals("kb_archivid")) {
+                    uid = value;
                 } else
-                // event unique ID
-                if (keyString.equals("kb_archivid")) {
-                    currentEvent.setUniqueID(value);
-                } else
-                // event positions (Standard position)
-                if (keyString.equals("event_coordsys")) {
-                    coordinateSystemString = value;
-                } else if (keyString.equals("event_coord1")) {
-                    if (value != null) {
-                        coordinate1 = Double.parseDouble(value);
+                    // event positions (Standard position)
+                    if (keyString.equals("event_coordsys")) {
+                        coordinateSystemString = value;
+                    } else if (keyString.equals("event_coord1")) {
+                        if (value != null) {
+                            coordinate1 = Double.parseDouble(value);
+                        }
+                    } else if (keyString.equals("event_coord2")) {
+                        if (value != null) {
+                            coordinate2 = Double.parseDouble(value);
+                        }
+                    } else if (keyString.equals("event_coord3")) {
+                        if (value != null) {
+                            coordinate3 = Double.parseDouble(value);
+                        }
                     }
-                } else if (keyString.equals("event_coord2")) {
-                    if (value != null) {
-                        coordinate2 = Double.parseDouble(value);
-                    }
-                } else if (keyString.equals("event_coord3")) {
-                    if (value != null) {
-                        coordinate3 = Double.parseDouble(value);
-                    }
-                }
                 // event positions (Not standard)
                 if (keyString.equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
@@ -365,6 +369,7 @@ public class HEKParser implements SWEKParser {
                 }
             }
         }
+        return uid;
     }
 
     private void parseRefs(HEKEvent currentEvent, JSONArray refs) throws JSONException {

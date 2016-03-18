@@ -100,7 +100,7 @@ public interface JHVEvent {
      * Gets an unique identifier.
      *
      */
-    public abstract String getUniqueID();
+    public abstract Integer getUniqueID();
 
     /**
      * Gets the list of available position informations. This is a list because

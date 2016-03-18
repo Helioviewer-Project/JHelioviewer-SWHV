@@ -140,8 +140,8 @@ public class ComesepEvent extends AbstractJHVEvent {
     }
 
     @Override
-    public String getUniqueID() {
-        return uniqueID;
+    public Integer getUniqueID() {
+        return -1;
     }
 
     @Override
