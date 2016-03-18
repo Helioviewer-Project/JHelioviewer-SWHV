@@ -71,7 +71,7 @@ public class SWEKPlugin implements Plugin {
         JHVWorker<Void, Void> loadPlugin = new JHVWorker<Void, Void>() {
 
             @Override
-            protected Void backgroundWork() throws Exception {
+            protected Void backgroundWork() {
                 SWEKConfig.loadConfiguration();
                 SWEKSources.loadSources();
                 return null;

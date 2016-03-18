@@ -62,7 +62,7 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
         JHVWorker<Void, Void> loadSources = new JHVWorker<Void, Void>() {
 
             @Override
-            protected Void backgroundWork() throws Exception {
+            protected Void backgroundWork() {
                 // call BandType API in background => loads the datasets
                 BandTypeAPI.getSingletonInstance();
                 return null;
