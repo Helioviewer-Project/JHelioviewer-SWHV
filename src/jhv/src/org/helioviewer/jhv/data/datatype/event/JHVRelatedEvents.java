@@ -2,46 +2,71 @@ package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.SortedMap;
+
+import javax.swing.ImageIcon;
+
+import org.helioviewer.jhv.data.container.cache.JHVCacheColors;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 
 public class JHVRelatedEvents {
     private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
-    private long start = Long.MAX_VALUE;
-    private long end = Long.MIN_VALUE;
-    private Color color = null;
+    private final SortedDateInterval interval = new SortedDateInterval(Long.MAX_VALUE, Long.MIN_VALUE);
+    private final Color color;
 
-    public JHVRelatedEvents(JHVEvent event) {
+    public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         super();
-        this.add(event);
+        color = JHVCacheColors.getNextColor();
+        this.add(event, eventsMap);
+        eventsMap.get(event.getJHVEventType()).put(interval, this);
     }
 
     public ArrayList<JHVEvent> getEvents() {
         return events;
     }
 
-    public void add(JHVEvent evt) {
-        if (color == null) {
-            color = evt.getColor();
-        }
+    public void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+
         long time = evt.getStartDate().getTime();
-        if (time < start) {
-            start = time;
+        if (time < interval.start) {
+            interval.start = time;
         }
         time = evt.getEndDate().getTime();
-        if (time > end) {
-            end = time;
+        if (time > interval.end) {
+            interval.end = time;
         }
         events.add(evt);
+        eventsMap.get(evt.getJHVEventType()).remove(interval, this);
+        eventsMap.get(evt.getJHVEventType()).put(interval, this);
+
     }
 
     public long getEnd() {
-        return end;
+        return interval.end;
     }
 
     public long getStart() {
-        return start;
+        return interval.start;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public boolean isRelated(JHVEvent event) {
         return event.getJHVEventType() == events.get(0).getJHVEventType();
+    }
+
+    public ImageIcon getIcon() {
+        return events.get(0).getIcon();
+    }
+
+    public void merge(JHVRelatedEvents found) {
+        this.events.addAll(found.getEvents());
+    }
+
+    public JHVEventType getJHVEventType() {
+        return events.get(0).getJHVEventType();
     }
 }

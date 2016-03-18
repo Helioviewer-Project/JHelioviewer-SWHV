@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 
 /**
@@ -16,7 +17,7 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
  */
 public class EventPlotConfiguration {
     /** The event */
-    private final JHVEvent event;
+    private final JHVRelatedEvents event;
 
     /** The scaled x position */
     private final double scaledX0;
@@ -28,7 +29,7 @@ public class EventPlotConfiguration {
     /** The click position */
     private Rectangle clickPosition;
 
-    private boolean shouldRedraw;
+    private final boolean shouldRedraw;
 
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
@@ -44,7 +45,7 @@ public class EventPlotConfiguration {
      *            the y-position of this event in the band provided for this
      *            event type.
      */
-    public EventPlotConfiguration(JHVEvent event, double scaledX0, double scaledX1, int yPosition) {
+    public EventPlotConfiguration(JHVRelatedEvents event, double scaledX0, double scaledX1, int yPosition) {
         this.event = event;
         if (scaledX0 < scaledX1) {
             this.scaledX0 = scaledX0;
@@ -91,6 +92,7 @@ public class EventPlotConfiguration {
         boolean containsMouse = containsPoint(mousePosition);
         boolean eventWasHightlighted = false;
         int endpointsMarkWidth = 0;
+        /*
         if (containsMouse || event.isHighlighted()) {
             endpointsMarkWidth = 5;
             eventWasHightlighted = true;
@@ -109,6 +111,7 @@ public class EventPlotConfiguration {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
         }
+         */
         g.setColor(event.getColor());
         g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
         if (containsMouse || eventWasHightlighted) {
@@ -125,14 +128,14 @@ public class EventPlotConfiguration {
      *            the location to check for an event.
      * @return null if no event is located there, the event if found
      */
-    public JHVEvent getEventAtPoint(Point p) {
+    public JHVRelatedEvents getEventAtPoint(Point p) {
         if (containsPoint(p)) {
             return event;
         }
         return null;
     }
 
-    public JHVEvent getEvent() {
+    public JHVRelatedEvents getEvent() {
         return event;
     }
 
