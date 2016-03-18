@@ -9,8 +9,8 @@ import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.UpdateViewpoint;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
@@ -248,7 +248,7 @@ public class Displayer implements JHVEventHighlightListener {
     }
 
     @Override
-    public void eventHightChanged(JHVEvent event) {
+    public void eventHightChanged(JHVRelatedEvents event) {
         display();
     }
 

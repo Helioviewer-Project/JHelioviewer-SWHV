@@ -69,9 +69,6 @@ public class HEKEvent extends AbstractJHVEvent {
     /** List with positioning information for this event */
     private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
 
-    /** The color in which the event should be drawn */
-    private final Color color;
-
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
@@ -94,7 +91,6 @@ public class HEKEvent extends AbstractJHVEvent {
         this.description = description;
         this.icon = icon;
         this.eventType = eventType;
-        this.color = color;
     }
 
     private void initLists() {
@@ -176,11 +172,6 @@ public class HEKEvent extends AbstractJHVEvent {
     @Override
     public JHVEventType getJHVEventType() {
         return eventType;
-    }
-
-    @Override
-    public Color getColor() {
-        return color;
     }
 
     @Override

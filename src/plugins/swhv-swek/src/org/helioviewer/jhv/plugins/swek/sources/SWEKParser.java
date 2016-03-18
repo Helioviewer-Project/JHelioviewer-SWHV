@@ -17,7 +17,7 @@ public interface SWEKParser {
 
     /**
      * Parses the event stream.
-     * 
+     *
      * @param downloadInputStream
      *            the stream containing the events in specific source format
      * @param eventType

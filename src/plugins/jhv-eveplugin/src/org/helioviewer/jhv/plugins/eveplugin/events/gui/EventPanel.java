@@ -13,8 +13,8 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.container.JHVEventContainer;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
@@ -45,7 +45,7 @@ public class EventPanel implements DrawableElement {
 
             BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
             Stroke normalStroke = g.getStroke();
-            JHVEvent highlightedEvent = null;
+            JHVRelatedEvents highlightedEvent = null;
 
             for (Map.Entry<JHVEventType, List<EventPlotConfiguration>> entry : epcs.entrySet()) {
                 JHVEventType eventType = entry.getKey();
@@ -55,7 +55,7 @@ public class EventPanel implements DrawableElement {
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
                 for (EventPlotConfiguration epc : entry.getValue()) {
-                    JHVEvent rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
                     if (rEvent != null) {
                         highlightedEvent = rEvent;
                     }

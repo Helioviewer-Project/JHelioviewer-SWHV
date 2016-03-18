@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.comparator.JHVEventRelationComparator;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
@@ -55,7 +56,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     private EventDescriptionPanel eventDescriptionPanel;
 
-    private JHVEvent event;
+    private final JHVEvent event;
 
     private Integer nrOfWindowsOpened;
 
@@ -66,21 +67,23 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
      *
      * @param event
      */
-    public SWEKEventInformationDialog(JHVEvent event) {
-        super(ImageViewerGui.getMainFrame(), event.getJHVEventType().getEventType().getEventName());
+    public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
+        super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
+        this.event = event;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
-        initDialog(event);
+        initDialog(revent);
 
     }
 
-    public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
-        super(parent, event.getJHVEventType().getEventType().getEventName(), modal);
-        model = new DataCollapsiblePanelModel();
-        model.addListener(this);
-        initDialog(event);
-    }
-
+    /*
+        public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
+            super(parent, event.getJHVEventType().getEventType().getEventName(), modal);
+            model = new DataCollapsiblePanelModel();
+            model.addListener(this);
+            initDialog(event);
+        }
+     */
     @Override
     public void windowOpened(WindowEvent e) {
     }
@@ -110,10 +113,9 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     public void windowDeactivated(WindowEvent e) {
     }
 
-    private void initDialog(JHVEvent _event) {
-        event = _event;
+    private void initDialog(JHVRelatedEvents revent) {
         nrOfWindowsOpened = 0;
-        eventDescriptionPanel = new EventDescriptionPanel(event);
+        eventDescriptionPanel = new EventDescriptionPanel(revent, event);
 
         initAllTablePanel();
         initParameterCollapsiblePanels();
@@ -183,7 +185,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
                     otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
                 }
-                */
+         */
     }
 
     private boolean notNullRelationShip(Map<String, JHVEventRelation> precedingEvents) {
@@ -276,6 +278,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        /*
                         if (er.getTheEvent() != null) {
                             incrementNrOfWindows();
                             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(), SWEKEventInformationDialog.this, false);
@@ -285,6 +288,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                             dialog.pack();
                             dialog.setVisible(true);
                         }
+                         */
                     }
                 });
 
@@ -296,7 +300,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 c.anchor = GridBagConstraints.CENTER;
                 c.weightx = 1;
                 c.weighty = 1;
-                eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
+                //eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
 
                 c.gridy = 1;
                 c.fill = GridBagConstraints.NONE;

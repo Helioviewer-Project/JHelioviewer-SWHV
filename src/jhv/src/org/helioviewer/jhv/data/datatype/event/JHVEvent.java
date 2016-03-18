@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-import java.awt.Color;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,38 +127,5 @@ public interface JHVEvent {
      * @return a list with positioning information
      */
     public abstract HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation();
-
-    /**
-     * Gets the color in which the event should be drawn.
-     *
-     * @return the color
-     */
-    public abstract Color getColor();
-
-    /**
-     * Highlights the event.
-     *
-     * @param isHighlighted
-     * @param object
-     */
-    public abstract void highlight(boolean isHighlighted);
-
-    /**
-     *
-     * @return
-     */
-    public abstract boolean isHighlighted();
-
-    /**
-     *
-     * @param listener
-     */
-    public abstract void addHighlightListener(JHVEventHighlightListener listener);
-
-    /**
-     *
-     * @param listener
-     */
-    public abstract void removeHighlightListener(JHVEventHighlightListener listener);
 
 }

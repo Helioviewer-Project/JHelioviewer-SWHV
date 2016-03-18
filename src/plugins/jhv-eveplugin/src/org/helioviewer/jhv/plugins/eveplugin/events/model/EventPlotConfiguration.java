@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 
@@ -29,7 +28,7 @@ public class EventPlotConfiguration {
     /** The click position */
     private Rectangle clickPosition;
 
-    private final boolean shouldRedraw;
+    private boolean shouldRedraw;
 
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
@@ -76,8 +75,8 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public JHVEvent draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
-        JHVEvent highlightedEvent = null;
+    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
+        JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
         Rectangle drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
@@ -92,7 +91,7 @@ public class EventPlotConfiguration {
         boolean containsMouse = containsPoint(mousePosition);
         boolean eventWasHightlighted = false;
         int endpointsMarkWidth = 0;
-        /*
+
         if (containsMouse || event.isHighlighted()) {
             endpointsMarkWidth = 5;
             eventWasHightlighted = true;
@@ -111,7 +110,7 @@ public class EventPlotConfiguration {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
         }
-         */
+
         g.setColor(event.getColor());
         g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
         if (containsMouse || eventWasHightlighted) {

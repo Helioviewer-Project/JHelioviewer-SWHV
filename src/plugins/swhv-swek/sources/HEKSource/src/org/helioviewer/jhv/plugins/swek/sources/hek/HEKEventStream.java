@@ -30,6 +30,11 @@ public class HEKEventStream implements SWEKEventStream {
     }
 
     @Override
+    public boolean hasAssociations() {
+        return !associationQueue.isEmpty();
+    }
+
+    @Override
     public JHVAssociation nextAssociation() {
         return associationQueue.poll();
     }

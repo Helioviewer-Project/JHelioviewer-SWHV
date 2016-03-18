@@ -12,7 +12,6 @@ import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -105,21 +104,17 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
         }
     }
 
-    public ArrayList<JHVEvent> getActiveEvents(Date currentDate) {
-        ArrayList<JHVEvent> activeEvents = new ArrayList<JHVEvent>();
+    public ArrayList<JHVRelatedEvents> getActiveEvents(Date currentDate) {
+        long ts = currentDate.getTime();
+        ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<JHVRelatedEvents>();
         JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
         data = result.getAvailableEvents();
         if (data != null) {
             for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
                 for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
-                    JHVRelatedEvents relatedEvents = v2.getValue();
-                    for (JHVEvent event : relatedEvents.getEvents()) {
-                        SortedDateInterval in = v2.getKey();
-                        if (in.start <= currentDate.getTime() && in.end >= currentDate.getTime()) {
-                            activeEvents.add(event);
-                        }
-                        event.addHighlightListener(Displayer.getSingletonInstance());
-                    }
+                    JHVRelatedEvents evr = v2.getValue();
+                    if (evr.getStart() <= ts && evr.getEnd() >= ts)
+                        activeEvents.add(evr);
                 }
             }
         }

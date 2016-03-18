@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -110,6 +111,16 @@ public class DownloadWorker implements Runnable {
                 @Override
                 public void run() {
                     eventContainer.addEvent(evt);
+
+                }
+            });
+        }
+        while (eventStream.hasAssociations()) {
+            JHVAssociation association = eventStream.nextAssociation();
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    eventContainer.addAssociation(association);
 
                 }
             });

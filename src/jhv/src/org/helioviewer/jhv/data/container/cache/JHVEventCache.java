@@ -80,6 +80,9 @@ public class JHVEventCache {
     }
 
     public void add(JHVEvent event) {
+        if (relEvents.containsKey(event.getUniqueID())) {
+            return;
+        }
         activeEventTypes.add(event.getJHVEventType());
         if (!events.containsKey(event.getJHVEventType())) {
             events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVRelatedEvents>());
@@ -89,6 +92,7 @@ public class JHVEventCache {
         current = checkAssociation(current, assoRight, true, event);
         if (current == null) {
             current = new JHVRelatedEvents(event, events);
+            relEvents.put(event.getUniqueID(), current);
         }
     }
 
@@ -106,9 +110,11 @@ public class JHVEventCache {
                         current = found;
                     }
                     else {
-                        merge(current, found);
+                        if (current != found) {
+                            merge(current, found);
+                            current.addAssociation(tocheck);
+                        }
                     }
-                    //Current association has been treated, remove from list!
                     iterator.remove();
                 }
             }
@@ -130,7 +136,6 @@ public class JHVEventCache {
 
     private void addAssociation(boolean isLeft, JHVAssociation association) {
         String key = isLeft ? association.left : association.right;
-
         ArrayList<JHVAssociation> leftAss = assoLeft.get(key);
         if (leftAss == null) {
             leftAss = new ArrayList<JHVAssociation>();
@@ -142,7 +147,10 @@ public class JHVEventCache {
         if (relEvents.containsKey(association.left) && relEvents.containsKey(association.right)) {
             JHVRelatedEvents ll = relEvents.get(association.left);
             JHVRelatedEvents rr = relEvents.get(association.right);
-            merge(ll, rr);
+            if (ll != rr) {
+                merge(ll, rr);
+                ll.addAssociation(association);
+            }
         }
         else {
             addAssociation(true, association);
@@ -157,7 +165,7 @@ public class JHVEventCache {
         for (JHVEventType evt : activeEventTypes) {
 
             if (events.containsKey(evt)) {
-                long delta = 100 * 60 * 60 * 24;
+                long delta = 1000 * 60 * 60 * 24;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
                 eventsResult.put(evt, submap);
             }
