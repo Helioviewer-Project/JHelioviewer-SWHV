@@ -1,9 +1,7 @@
-package org.helioviewer.jhv.data.container.cache;
+package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
 import java.util.ArrayList;
-
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 
 public class JHVRelatedEvents {
     private final ArrayList<JHVEvent> events = new ArrayList<JHVEvent>();
