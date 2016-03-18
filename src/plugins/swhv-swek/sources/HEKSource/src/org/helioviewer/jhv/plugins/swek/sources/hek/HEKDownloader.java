@@ -150,10 +150,10 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the current URL extended with the spatial region
      */
     private StringBuilder appendX1X2Y1Y2(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        baseURL.append("x1=").append(eventType.getSpatialRegion().getX1()).append("&");
-        baseURL.append("x2=").append(eventType.getSpatialRegion().getX2()).append("&");
-        baseURL.append("y1=").append(eventType.getSpatialRegion().getY1()).append("&");
-        baseURL.append("y2=").append(eventType.getSpatialRegion().getY2()).append("&");
+        baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append("&");
+        baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append("&");
+        baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append("&");
+        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append("&");
         return baseURL;
     }
 
