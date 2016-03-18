@@ -98,12 +98,17 @@ public class EventModel implements TimingListener, JHVEventHandler {
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
-        long start = System.currentTimeMillis();
-        createEventPlotConfiguration();
-        Log.debug("time it took to create plotConfigurations " + (System.currentTimeMillis() - start));
+        if (EventModel.getSingletonInstance().isEventsVisible()) {
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+        } else {
+            Log.debug("event plot configurations not visible");
+        }
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
+        long start = System.currentTimeMillis();
+        createEventPlotConfiguration();
+        Log.debug("time it took to create plotConfigurations " + (System.currentTimeMillis() - start));
         if (eventPlotConfiguration != null) {
             return eventPlotConfiguration;
         } else {
@@ -196,11 +201,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
         if (!eventPlotConfiguration.getEventPlotConfigurations().isEmpty() && prevNoPlotConfig) {
             prevNoPlotConfig = false;
         }
-        if (EventModel.getSingletonInstance().isEventsVisible()) {
-            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
-        } else {
-            Log.debug("event plot configurations not visible");
-        }
+
         endDates = new ArrayList<Date>();
         minimalEndDate = null;
         maximumEndDate = null;
