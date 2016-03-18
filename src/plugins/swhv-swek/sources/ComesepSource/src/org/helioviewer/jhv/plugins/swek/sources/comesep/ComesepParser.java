@@ -213,28 +213,19 @@ public class ComesepParser implements SWEKParser {
                     } else {
                         boolean visible = false;
                         boolean configured = false;
-                        JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
-                        if (!eventType.containsParameter(keyString)) {
-                            if (eventSource.containsParameter(keyString)) {
-                                configured = true;
-                                SWEKParameter p = eventSource.getParameter(keyString);
-                                if (p != null) {
-                                    visible = p.isDefaultVisible();
-                                    parameter.setParameterDisplayName(p.getParameterDisplayName());
-                                } else {
-                                    parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                                }
-                            }
-                        } else {
+                        String displayName = keyString;
+                        if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
                             configured = true;
-                            SWEKParameter p = eventType.getParameter(keyString);
+                            SWEKParameter p = eventSource.getParameter(keyString);
                             if (p != null) {
                                 visible = p.isDefaultVisible();
-                                parameter.setParameterDisplayName(p.getParameterDisplayName());
+                                displayName = p.getParameterDisplayName();
                             } else {
-                                parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
+                                displayName = keyString.replaceAll("_", " ").trim();
                             }
                         }
+                        JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
+
                         currentEvent.addParameter(parameter, visible, configured);
                     }
         }
@@ -244,12 +235,6 @@ public class ComesepParser implements SWEKParser {
         return new Date(Long.parseLong(value) * 1000);
     }
 
-    /**
-     *
-     *
-     * @param eventJSON
-     * @throws JSONException
-     */
     private void parseAssociation(JSONObject eventJSON) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("associations");
         for (int i = 0; i < associations.length() && !parserStopped; i++) {

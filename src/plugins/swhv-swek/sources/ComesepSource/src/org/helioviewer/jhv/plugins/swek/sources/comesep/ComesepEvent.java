@@ -78,21 +78,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     private final JHVEventRelationship eventRelationShip;
 
     /**
-     * Default constructor
-     */
-    public ComesepEvent() {
-        super();
-        initLists();
-        eventName = "";
-        eventDisplayName = "";
-        description = "";
-        icon = null;
-        eventType = null;
-        color = Color.black;
-        eventRelationShip = new JHVEventRelationship();
-    }
-
-    /**
      *
      * @param eventName
      * @param eventDisplayName
