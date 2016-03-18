@@ -1,14 +1,9 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.download.DownloadWorker;
 
 /**
  * This model manages all the SWEKEventTypeTreeModels and delegate events. This
@@ -27,11 +22,9 @@ public class SWEKTreeModel {
     private final List<SWEKTreeModelListener> listeners;
 
     /**  */
-    private final Map<SWEKEventType, Set<DownloadWorker>> loadingTypes;
 
     private SWEKTreeModel() {
         listeners = new ArrayList<SWEKTreeModelListener>();
-        loadingTypes = new HashMap<SWEKEventType, Set<DownloadWorker>>();
     }
 
     public static SWEKTreeModel getSingletonInstance() {
@@ -82,17 +75,8 @@ public class SWEKTreeModel {
      *            the event type that started loading
      * @param worker
      */
-    public void setStartLoading(SWEKEventType eventType, DownloadWorker obj) {
-        if (loadingTypes.containsKey(eventType)) {
-            Set<DownloadWorker> objs = loadingTypes.get(eventType);
-            objs.add(obj);
-            loadingTypes.put(eventType, objs);
-        } else {
-            Set<DownloadWorker> objs = new HashSet<DownloadWorker>();
-            objs.add(obj);
-            loadingTypes.put(eventType, objs);
-            fireEventTypeStartLoading(eventType);
-        }
+    public void setStartLoading(SWEKEventType eventType) {
+        fireEventTypeStartLoading(eventType);
     }
 
     /**
@@ -101,23 +85,11 @@ public class SWEKTreeModel {
      * @param eventType
      *            the event type that stopped loading
      */
-    public void setStopLoading(SWEKEventType eventType, DownloadWorker obj) {
-        if (loadingTypes.containsKey(eventType)) {
-            Set<DownloadWorker> objs = loadingTypes.get(eventType);
-            objs.remove(obj);
-            if (objs.isEmpty()) {
-                loadingTypes.remove(eventType);
-                fireEventTypeStopLoading(eventType);
-            } else {
-                loadingTypes.put(eventType, objs);
-            }
-        } else {
-            fireEventTypeStopLoading(eventType);
-        }
+    public void setStopLoading(SWEKEventType eventType) {
+        fireEventTypeStopLoading(eventType);
     }
 
     public void resetEventType(SWEKEventType eventType) {
-        loadingTypes.remove(eventType);
         fireEventTypeStopLoading(eventType);
     }
 
@@ -152,6 +124,5 @@ public class SWEKTreeModel {
         for (SWEKTreeModelListener l : listeners) {
             l.stoppedDownloadingEventType(eventType);
         }
-
     }
 }
