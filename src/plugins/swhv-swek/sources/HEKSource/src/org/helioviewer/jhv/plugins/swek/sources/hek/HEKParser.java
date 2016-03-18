@@ -263,9 +263,7 @@ public class HEKParser implements SWEKParser {
                     currentEvent.setEndTime(parseDate(value));
                 } else if (keyString.equals("kb_archivid")) {
                     uid = value;
-                }
-
-                if (keyString.equals("hgs_bbox")) {
+                } else if (keyString.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
                 } else if (keyString.equals("hgs_boundcc")) {
                     hgsBoundCC = parsePolygon(value);
@@ -544,16 +542,7 @@ public class HEKParser implements SWEKParser {
         return false;
     }
 
-    public Vec3 convertHGSJHV2D(Vec3 el, HEKEvent evt) {
-        double theta = Math.PI / 180 * el.y;
-        double phi = Math.PI / 180 * el.x;
-        double x = Math.cos(theta) * Math.sin(phi);
-        double z = Math.cos(theta) * Math.cos(phi);
-        double y = -Math.sin(theta);
-        return new Vec3(x, y, z);
-    }
-
-    public Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
+    private Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
         Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
