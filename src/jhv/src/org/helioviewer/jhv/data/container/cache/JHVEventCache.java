@@ -119,7 +119,7 @@ public class JHVEventCache {
                 }
                 // event start before interval start and end after interval
                 // start
-                for (Map.Entry<Date, List<JHVEvent>> entry2: endDatesEvents.entrySet()) {
+                for (Map.Entry<Date, List<JHVEvent>> entry2 : endDatesEvents.entrySet()) {
                     Date eDate = entry2.getKey();
                     if (startDate.getTime() - sDate.getTime() >= 0 && startDate.getTime() - eDate.getTime() <= 0) {
                         addEventsToResult(eventsResult, entry2.getValue());
@@ -178,43 +178,41 @@ public class JHVEventCache {
 
     private void checkAndFixRelationShip(JHVEvent event) {
         checkMissingRelations(event);
+
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getNextEvents().values());
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getPrecedingEvents().values());
         checkAndFixRelatedEvents(event, event.getEventRelationShip().getRelatedEventsByRule().values());
+
         executeRelationshipRules(event);
+
         checkRelationColor(event);
     }
 
     private void executeRelationshipRules(JHVEvent event) {
         List<JHVEventRelationShipRule> rules = event.getEventRelationShip().getRelationshipRules();
         for (JHVEventRelationShipRule rule : rules) {
-            // Go over the rules
             for (JHVEvent candidate : eventsWithRelationRules) {
-                // Check new candidate
                 if (candidate.getJHVEventType().getEventType().toLowerCase().equals(rule.getRelatedWith().getEventType().toLowerCase())) {
-                    // Candidate has the correct event type
                     int foundCorrespondinParameters = 0;
+
                     for (JHVRelatedOn relatedOn : rule.getRelatedOn()) {
-                        // Check all the related on parameters
-                        if (candidate.getAllEventParameters().containsKey(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
-                            JHVEventParameter p = candidate.getAllEventParameters().get(relatedOn.getRelatedOnWith().getParameterName().toLowerCase());
-                            // Candidate has the related on parameter
-                            if (event.getAllEventParameters().containsKey(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
-                                JHVEventParameter eventP = event.getAllEventParameters().get(relatedOn.getRelatedOnWith().getParameterName().toLowerCase());
-                                if (eventP.getParameterName().toLowerCase().equals(relatedOn.getRelatedOnWith().getParameterName().toLowerCase())) {
-                                    // Parameter found in the event
-                                    if (eventP.getParameterValue() != null && p.getParameterValue() != null && eventP.getParameterValue().equals(p.getParameterValue())) {
-                                        // at least one of the related on
-                                        // parameters found
-                                        foundCorrespondinParameters++;
-                                    }
-                                } else {
-                                    // parameter not found in the event skip
-                                    // rule.
+
+                        String rel = relatedOn.getRelatedOnWith().getParameterName().toLowerCase();
+
+                        Map<String, JHVEventParameter> params = candidate.getAllEventParameters();
+
+                        JHVEventParameter p = params.get(rel);
+                        if (p != null && p.getParameterValue() != null) {
+                            JHVEventParameter eventP = event.getAllEventParameters().get(rel);
+                            if (eventP != null && eventP.getParameterValue() != null) {
+                                if (eventP.getParameterName().toLowerCase().equals(rel) && eventP.getParameterValue().equals(p.getParameterValue())) {
+                                    foundCorrespondinParameters++;
                                 }
                             }
+
                         }
                     }
+
                     if (foundCorrespondinParameters == rule.getRelatedOn().size()) {
                         event.getEventRelationShip().getRelatedEventsByRule().put(candidate.getUniqueID(), new JHVEventRelation(candidate.getUniqueID(), candidate));
                         candidate.getEventRelationShip().getRelatedEventsByRule().put(event.getUniqueID(), new JHVEventRelation(event.getUniqueID(), event));
@@ -325,9 +323,12 @@ public class JHVEventCache {
                 if (allEvents.containsKey(er.getUniqueIdentifier())) {
                     er.setTheEvent(allEvents.get(er.getUniqueIdentifier()));
                 } else {
-                    List<JHVEvent> missingRelations = new ArrayList<JHVEvent>();
+                    List<JHVEvent> missingRelations;
                     if (missingEventsInEventRelations.containsKey(er.getUniqueIdentifier())) {
                         missingRelations = missingEventsInEventRelations.get(er.getUniqueIdentifier());
+                    }
+                    else {
+                        missingRelations = new ArrayList<JHVEvent>();
                     }
                     missingRelations.add(event);
                     missingEventsInEventRelations.put(er.getUniqueIdentifier(), missingRelations);
