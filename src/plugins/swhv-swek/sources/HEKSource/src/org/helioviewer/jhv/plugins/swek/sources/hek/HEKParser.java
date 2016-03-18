@@ -601,7 +601,7 @@ public class HEKParser implements SWEKParser {
             JHVCoordinateSystem coorSys = parseCoordinateSystemString();
             if (coorSys == JHVCoordinateSystem.JHV) {
                 Vec3 centralPoint = new Vec3(coordinate1, coordinate2, coordinate3);
-                currentEvent.addJHVPositionInformation(new HEKPositionInformation(coorSys, new ArrayList<Vec3>(), new ArrayList<Vec3>(), centralPoint));
+                currentEvent.addJHVPositionInformation(new HEKPositionInformation(new ArrayList<Vec3>(), new ArrayList<Vec3>(), centralPoint));
                 return true;
             }
         }
@@ -700,7 +700,7 @@ public class HEKParser implements SWEKParser {
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
             }
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(JHVCoordinateSystem.JHV, jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
             return true;
         }
         return false;

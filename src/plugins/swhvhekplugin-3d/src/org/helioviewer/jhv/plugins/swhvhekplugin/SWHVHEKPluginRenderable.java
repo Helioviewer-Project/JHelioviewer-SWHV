@@ -24,7 +24,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
@@ -149,9 +148,6 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawPolygon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        if (pi.getCoordinateSystem() != JHVCoordinateSystem.JHV) {
-            return;
-        }
 
         List<Vec3> points = pi.getBoundCC();
         if (points == null || points.isEmpty()) {
@@ -199,16 +195,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
-            if (pi.centralPoint() != null) {
-                Vec3 pt = pi.centralPoint();
-                String type = evt.getJHVEventType().getEventType().getEventName();
-                bindTexture(gl, type, evtr.getIcon());
-                if (evtr.isHighlighted()) {
-                    drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
-                } else {
-                    drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
-                }
+        if (pi.centralPoint() != null) {
+            Vec3 pt = pi.centralPoint();
+            String type = evt.getJHVEventType().getEventType().getEventName();
+            bindTexture(gl, type, evtr.getIcon());
+            if (evtr.isHighlighted()) {
+                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+            } else {
+                drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE, ICON_SIZE);
             }
         }
     }
@@ -235,18 +229,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
         JHVPositionInformation pi = evt.getPositioningInformation();
-        if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
-            if (pi.centralPoint() != null) {
-                Vec3 pt = pi.centralPoint();
-                pt = camera.getViewpoint().orientation.rotateVector(pt);
-                Vec2 tf = scale.transform(pt);
-                String type = evt.getJHVEventType().getEventType().getEventName();
-                bindTexture(gl, type, evtr.getIcon());
-                if (evtr.isHighlighted()) {
-                    drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
-                } else {
-                    drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE);
-                }
+        if (pi.centralPoint() != null) {
+            Vec3 pt = pi.centralPoint();
+            pt = camera.getViewpoint().orientation.rotateVector(pt);
+            Vec2 tf = scale.transform(pt);
+            String type = evt.getJHVEventType().getEventType().getEventName();
+            bindTexture(gl, type, evtr.getIcon());
+            if (evtr.isHighlighted()) {
+                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+            } else {
+                drawImageScale(gl, tf.x * vp.aspect, tf.y, ICON_SIZE, ICON_SIZE);
             }
         }
     }
