@@ -164,12 +164,16 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
 
     private void addEventTypeToActiveEventTypeMap(SWEKEventType eventType, SWEKSource source, SWEKSupplier swekSupplier) {
         Map<SWEKSource, Set<SWEKSupplier>> sourcesPerEventType = new HashMap<SWEKSource, Set<SWEKSupplier>>();
-        Set<SWEKSupplier> supplierPerSource = new HashSet<SWEKSupplier>();
+        Set<SWEKSupplier> supplierPerSource;
         if (activeEventTypes.containsKey(eventType)) {
             sourcesPerEventType = activeEventTypes.get(eventType);
             if (sourcesPerEventType.containsKey(source)) {
                 supplierPerSource = sourcesPerEventType.get(source);
+            } else {
+                supplierPerSource = new HashSet<SWEKSupplier>();
             }
+        } else {
+            supplierPerSource = new HashSet<SWEKSupplier>();
         }
         supplierPerSource.add(swekSupplier);
         sourcesPerEventType.put(source, supplierPerSource);
