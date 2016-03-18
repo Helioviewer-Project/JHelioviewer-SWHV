@@ -22,8 +22,8 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
+import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
 import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
@@ -100,8 +100,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         this.events = events;
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
-        if (selectedInterval != null && availableInterval != null) {
+        if (selectedInterval != null) {
             createEventPlotConfiguration();
         }
     }
