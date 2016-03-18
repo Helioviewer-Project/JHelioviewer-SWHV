@@ -394,7 +394,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     }
 
     private void updatePlotAreaSpace(Interval<Date> selectedInterval) {
-        if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
+        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && selectedInterval != null && selectedInterval.getStart() != null && selectedInterval.getEnd() != null) {
             long diffAvailable = availableInterval.getEnd().getTime() - availableInterval.getStart().getTime();
             double diffPlotAreaTime = pas.getScaledMaxTime() - pas.getScaledMinTime();
             double scaledSelectedStart = pas.getScaledMinTime() + (1.0 * (selectedInterval.getStart().getTime() - availableInterval.getStart().getTime()) * diffPlotAreaTime / diffAvailable);
@@ -429,7 +429,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
 
     @Override
     public void availablePlotAreaSpaceChanged(double oldMinTime, double oldMaxTime, double newMinTime, double newMaxTime) {
-        if (availableInterval != null && availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
+        if (availableInterval.getStart() != null && availableInterval.getEnd() != null && (oldMinTime > newMinTime || oldMaxTime < newMaxTime)) {
             double timeRatio = (availableInterval.getEnd().getTime() - availableInterval.getStart().getTime()) / (oldMaxTime - oldMinTime);
             double startDifference = oldMinTime - newMinTime;
             double endDifference = newMaxTime - oldMaxTime;
