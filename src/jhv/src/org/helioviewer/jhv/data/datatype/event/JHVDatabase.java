@@ -31,6 +31,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
 public class JHVDatabase {
+
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
     private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
@@ -98,8 +99,7 @@ public class JHVDatabase {
                 rs.close();
             }
             pstatement.close();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierName() + e.getMessage());
         }
         return typeId;
@@ -115,11 +115,9 @@ public class JHVDatabase {
             pstatement.setString(2, eventType.getSupplier().getSupplierName());
             pstatement.executeUpdate();
             pstatement.close();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
-
     }
 
     private static void insertLinkIfNotExist(Connection connection, int left_id, int right_id) {
@@ -131,8 +129,7 @@ public class JHVDatabase {
             pstatement.setInt(2, right_id);
             pstatement.executeUpdate();
             pstatement.close();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
     }
@@ -142,8 +139,7 @@ public class JHVDatabase {
 
         if (ids[0] != -1 && ids[1] != -1) {
             insertLinkIfNotExist(connection, ids[0], ids[1]);
-        }
-        else {
+        } else {
             Log.error("Could not add association to database " + ids[0] + " " + ids[1]);
         }
         return ids;
@@ -171,24 +167,21 @@ public class JHVDatabase {
                 rs.close();
             }
             pstatement.close();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             Log.error("Could not fetch id from uid " + e.getMessage());
         }
         return id;
     }
 
     private static void insertVoidEvent(Connection connection, String uid) {
-        try
-        {
+        try {
             String sql = "INSERT INTO events(uid) VALUES(?)";
             PreparedStatement pstatement = connection.prepareStatement(sql);
             pstatement.setQueryTimeout(30);
             pstatement.setString(1, uid);
             pstatement.executeUpdate();
             pstatement.close();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             Log.error("Could not insert event" + e.getMessage());
         }
     }
@@ -254,8 +247,7 @@ public class JHVDatabase {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return generatedKey;
-            try
-            {
+            try {
                 String sql = "SELECT id from events WHERE uid=?";
                 PreparedStatement pstatement = connection.prepareStatement(sql);
                 pstatement.setQueryTimeout(30);
@@ -266,8 +258,7 @@ public class JHVDatabase {
                 }
                 generatedKeys.close();
                 pstatement.close();
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 Log.error("Could not select event with uid " + uid + e.getMessage());
             }
             return generatedKey;
@@ -307,12 +298,11 @@ public class JHVDatabase {
                 return generatedKey;
             byte[] compressed_data;
             try {
-                compressed_data = compress(eventStr.toString());
+                compressed_data = compress(eventStr);
             } catch (IOException e1) {
                 compressed_data = new byte[0];
             }
-            try
-            {
+            try {
                 int typeId = getEventTypeId(connection, event.getJHVEventType());
                 if (typeId != -1) {
                     String sql = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
@@ -331,12 +321,10 @@ public class JHVDatabase {
                         generatedKey = generatedKeys.getInt(1);
                     }
                     generatedKeys.close();
-                }
-                else {
+                } else {
                     Log.error("Failed to insert event");
                 }
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
             }
             return generatedKey;
@@ -348,6 +336,7 @@ public class JHVDatabase {
     }
 
     private static class AddDateRange2db implements Runnable {
+
         private final JHVEventType type;
         private final Date start;
         private final Date end;
@@ -388,12 +377,11 @@ public class JHVDatabase {
                         pstatement.close();
                     }
                 }
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 Log.error("Could not serialize date_range to database " + e.getMessage());
             }
-
         }
+
     }
 
     public static ArrayList<Interval<Date>> db2daterange(JHVEventType type) {
@@ -410,6 +398,7 @@ public class JHVDatabase {
     }
 
     private static class Db2DateRange implements Callable<ArrayList<Interval<Date>>> {
+
         private final JHVEventType type;
 
         public Db2DateRange(JHVEventType _type) {
@@ -438,8 +427,7 @@ public class JHVDatabase {
                             }
                             rs.close();
                             pstatement.close();
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             Log.error("Could db2daterange " + e.getMessage());
                         }
                     }
@@ -456,6 +444,7 @@ public class JHVDatabase {
             }
             return copy;
         }
+
     }
 
     private static long getLastEvent(Connection connection, JHVEventType type) {
@@ -473,8 +462,7 @@ public class JHVDatabase {
                 }
                 rs.close();
                 pstatement.close();
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 Log.error("Could not fetch id from uid " + e.getMessage());
             }
         }
@@ -494,6 +482,7 @@ public class JHVDatabase {
     }
 
     private static class GetEvents implements Callable<InputStream> {
+
         private final JHVEventType type;
         private final long start;
         private final long end;
@@ -532,8 +521,7 @@ public class JHVDatabase {
                     }
                     rs.close();
                     pstatement.close();
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     Log.error("Could not fetch id from uid " + e.getMessage());
                 }
             }
@@ -567,13 +555,13 @@ public class JHVDatabase {
                 }
                 rs.close();
                 pstatement.close();
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 Log.error("Could not fetch id from uid " + e.getMessage());
             }
             events.append("]}");
             return new ByteArrayInputStream(events.toString().getBytes());
         }
+
     }
 
 }
