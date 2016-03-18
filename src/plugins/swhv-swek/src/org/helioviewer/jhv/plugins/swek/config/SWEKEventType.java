@@ -29,7 +29,7 @@ public class SWEKEventType {
     private final boolean standardSelected;
 
     /** On what should events be grouped on */
-    private SWEKParameter groupOn;
+    private final SWEKParameter groupOn;
 
     /** The coordinate system */
     private final String coordinateSystem;
@@ -38,7 +38,7 @@ public class SWEKEventType {
     private final SWEKSpatialRegion spatialRegion;
 
     /** The icon corresponding with the event type */
-    private ImageIcon eventIcon;
+    private final ImageIcon eventIcon;
 
     /** The color used for this event type */
     private final Color color;
@@ -140,16 +140,6 @@ public class SWEKEventType {
     }
 
     /**
-     * Sets the parameter on which corresponding events should be grouped.
-     *
-     * @param groupOn
-     *            the groupOn to set
-     */
-    public void setGroupOn(SWEKParameter groupOn) {
-        this.groupOn = groupOn;
-    }
-
-    /**
      * Gets the coordinate system.
      *
      * @return the coordinate system
@@ -211,16 +201,6 @@ public class SWEKEventType {
     }
 
     /**
-     * Sets the event icon.
-     *
-     * @param eventIcon
-     *            the icon of the event type
-     */
-    public void setEventIcon(ImageIcon eventIcon) {
-        this.eventIcon = eventIcon;
-    }
-
-    /**
      * Gets the color of the event type.
      *
      * @return the color of the event type
@@ -254,4 +234,12 @@ public class SWEKEventType {
         return false;
     }
 
+    @Override
+    public String toString() {
+        String s = "Suppliers: ";
+        for (SWEKSupplier supplier : suppliers) {
+            s += supplier.getSupplierName();
+        }
+        return s;
+    }
 }

@@ -108,15 +108,15 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     }
 
     @Override
-    public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-        addEventTypeToActiveEventTypeMap(eventType, swekSource, supplier);
-        JHVEventContainer.getSingletonInstance().eventTypeActivated(new JHVEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
+    public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSupplier supplier) {
+        addEventTypeToActiveEventTypeMap(eventType, supplier);
+        JHVEventContainer.getSingletonInstance().eventTypeActivated(new JHVEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()));
     }
 
     @Override
-    public void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-        removeEventTypeFromActiveEventTypeMap(eventType, swekSource, supplier);
-        stopDownloadingEventType(eventType, swekSource, supplier, false);
+    public void newEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSupplier supplier) {
+        removeEventTypeFromActiveEventTypeMap(eventType, supplier.getSource(), supplier);
+        stopDownloadingEventType(eventType, supplier.getSource(), supplier, false);
     }
 
     public void newRequestForInterval(JHVEventType eventType, Interval<Date> interval) {
@@ -157,14 +157,14 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         dwMapList.add(dw);
     }
 
-    private void addEventTypeToActiveEventTypeMap(SWEKEventType eventType, SWEKSource source, SWEKSupplier swekSupplier) {
+    private void addEventTypeToActiveEventTypeMap(SWEKEventType eventType, SWEKSupplier swekSupplier) {
+        SWEKSource source = swekSupplier.getSource();
         Map<SWEKSource, Set<SWEKSupplier>> sourcesPerEventType = new HashMap<SWEKSource, Set<SWEKSupplier>>();
         Set<SWEKSupplier> supplierPerSource;
+        sourcesPerEventType = activeEventTypes.get(eventType);
         if (activeEventTypes.containsKey(eventType)) {
-            sourcesPerEventType = activeEventTypes.get(eventType);
-            if (sourcesPerEventType.containsKey(source)) {
-                supplierPerSource = sourcesPerEventType.get(source);
-            } else {
+            supplierPerSource = sourcesPerEventType.get(source);
+            if (supplierPerSource == null) {
                 supplierPerSource = new HashSet<SWEKSupplier>();
             }
         } else {

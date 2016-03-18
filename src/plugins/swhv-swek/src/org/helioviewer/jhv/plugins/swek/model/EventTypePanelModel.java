@@ -243,7 +243,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     private void fireNewEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
-            l.newEventTypeAndSourceActive(eventType, swekSource, swekSupplier);
+            l.newEventTypeAndSourceActive(eventType, swekSupplier);
         }
     }
 
@@ -258,7 +258,7 @@ public class EventTypePanelModel implements TreeModel, TreeExpansionListener {
      */
     private void fireNewEventTypeAndSourceInActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
         for (EventTypePanelModelListener l : panelModelListeners) {
-            l.newEventTypeAndSourceInActive(eventType, swekSource, supplier);
+            l.newEventTypeAndSourceInActive(eventType, supplier);
         }
     }
 
