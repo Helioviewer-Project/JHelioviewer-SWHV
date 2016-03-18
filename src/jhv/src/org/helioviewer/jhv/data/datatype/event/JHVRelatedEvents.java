@@ -47,7 +47,7 @@ public class JHVRelatedEvents {
             interval.end = time;
         }
         events.add(evt);
-        eventsMap.get(evt.getJHVEventType()).remove(interval, this);
+        eventsMap.get(evt.getJHVEventType()).remove(interval);
         eventsMap.get(evt.getJHVEventType()).put(interval, this);
     }
 

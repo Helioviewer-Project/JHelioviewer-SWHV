@@ -1,13 +1,24 @@
 package org.helioviewer.jhv.threads;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.concurrent.ThreadFactory;
+
+import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.base.cache.RequestCache;
+import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 
 public class JHVThread {
 
     // this creates daemon threads
     public static class NamedThreadFactory implements ThreadFactory {
 
-        private final String name;
+        protected final String name;
 
         public NamedThreadFactory(String name) {
             this.name = name;
@@ -21,4 +32,55 @@ public class JHVThread {
         }
     }
 
+    public static class ConnectionThread extends Thread {
+        private static Connection connection;
+        public static final HashMap<JHVEventType, RequestCache> downloadedCache = new HashMap<JHVEventType, RequestCache>();
+
+        public ConnectionThread(Runnable r, String name) {
+            super(r, name);
+        }
+
+        public static Connection getConnection() {
+            if (connection == null) {
+                try {
+                    String filepath = JHVDirectory.EVENTS.getPath() + "events.db";
+                    File f = new File(filepath);
+                    boolean fexist = f.exists() && !f.isDirectory();
+                    connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);
+                    if (!fexist) {
+                        Statement statement = connection.createStatement();
+                        statement.setQueryTimeout(30);
+                        statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING , supplier STRING, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
+                        statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid STRING , start BIGINTEGER , end BIGINTEGER , data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT REPLACE)");
+                        statement.executeUpdate("CREATE INDEX if not exists evt_uid ON events (uid);");
+                        statement.executeUpdate("CREATE INDEX if not exists evt_end ON events (end);");
+                        statement.executeUpdate("CREATE INDEX if not exists evt_start ON events (start);");
+                        statement.executeUpdate("CREATE TABLE if not exists event_link (id INTEGER PRIMARY KEY AUTOINCREMENT, left_id INTEGER, right_id INTEGER, FOREIGN KEY(left_id) REFERENCES events(id), FOREIGN KEY(right_id) REFERENCES events(id), UNIQUE(left_id, right_id) ON CONFLICT IGNORE)");
+                        statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (left_id);");
+                        statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (right_id);");
+                        statement.executeUpdate("CREATE TABLE if not exists date_range (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER , start BIGINTEGER , end BIGINTEGER, FOREIGN KEY(type_id) REFERENCES event_type(id))");
+                        statement.closeOnCompletion();
+                    }
+                } catch (SQLException e) {
+                    Log.error("Could not create database connection" + e);
+                    connection = null;
+                }
+            }
+            return connection;
+        }
+    }
+
+    public static class NamedDbThreadFactory extends NamedThreadFactory {
+
+        public NamedDbThreadFactory(String name) {
+            super(name);
+        }
+
+        @Override
+        public ConnectionThread newThread(Runnable r) {
+            JHVThread.ConnectionThread thread = new JHVThread.ConnectionThread(r, name);
+            thread.setDaemon(true);
+            return thread;
+        }
+    }
 }

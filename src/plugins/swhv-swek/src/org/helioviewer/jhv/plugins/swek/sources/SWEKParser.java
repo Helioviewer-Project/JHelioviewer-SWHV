@@ -28,6 +28,6 @@ public interface SWEKParser {
      * @return the stream containing the events in standard jhelioviewer format
      */
     public abstract SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource,
-            SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents);
+            SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents, boolean todb);
 
 }

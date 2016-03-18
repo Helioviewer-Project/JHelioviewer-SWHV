@@ -195,6 +195,17 @@ public enum JHVDirectory {
         public File getFile() {
             return new File(getPath());
         }
+    },
+    EVENTS {
+        @Override
+        public String getPath() {
+            return HOME.getPath() + "Events" + File.separator;
+        }
+
+        @Override
+        public File getFile() {
+            return new File(getPath());
+        }
     };
 
     /** A String representation of the path of the directory. */

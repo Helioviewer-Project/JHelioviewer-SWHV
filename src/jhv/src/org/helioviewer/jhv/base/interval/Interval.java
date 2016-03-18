@@ -346,7 +346,7 @@ public class Interval<TimeFormat extends Comparable<TimeFormat>> implements Inte
             final Date newStartDate = calendar.getTime();
 
             if (interval.containsPointInclusive(newStartDate)) {
-                calendar.add(Calendar.SECOND, -1);
+                //calendar.add(Calendar.SECOND, -1);
                 intervals.add(new Interval<Date>(startDate, calendar.getTime()));
                 startDate = newStartDate;
             } else {

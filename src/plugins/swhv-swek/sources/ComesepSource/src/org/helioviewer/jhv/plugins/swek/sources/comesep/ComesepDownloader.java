@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
@@ -34,8 +35,8 @@ public class ComesepDownloader implements SWEKDownloader {
     }
 
     @Override
-    public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
-        String urlString = createURL(eventType, startDate, endDate, params);
+    public InputStream downloadData(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
+        String urlString = createURL(eventType.getEventType(), startDate, endDate, params);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
@@ -85,7 +86,7 @@ public class ComesepDownloader implements SWEKDownloader {
 
     /**
      * Appends the event start time to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param startDate
@@ -99,7 +100,7 @@ public class ComesepDownloader implements SWEKDownloader {
     /**
      * Extracts the model from the list of parameters and appends the model to
      * the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param params
@@ -119,7 +120,7 @@ public class ComesepDownloader implements SWEKDownloader {
 
     /**
      * Formats a date in the yyyy-mm-ddThh:mm:ss format.
-     * 
+     *
      * @param date
      *            the date to format
      * @return the date in format yyyy-mm-ddThh:mm-ss
@@ -127,6 +128,11 @@ public class ComesepDownloader implements SWEKDownloader {
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         return sdf.format(date);
+    }
+
+    @Override
+    public boolean isFromDb() {
+        return false;
     }
 
 }

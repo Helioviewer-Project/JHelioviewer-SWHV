@@ -83,9 +83,11 @@ public class JHVEventCache {
         if (relEvents.containsKey(event.getUniqueID())) {
             return;
         }
-        activeEventTypes.add(event.getJHVEventType());
+        JHVEventType evtType = event.getJHVEventType();
+        activeEventTypes.add(evtType);
+
         if (!events.containsKey(event.getJHVEventType())) {
-            events.put(event.getJHVEventType(), new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+            events.put(evtType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         JHVRelatedEvents current = null;
         current = checkAssociation(current, assoLeft, true, event);
@@ -163,10 +165,10 @@ public class JHVEventCache {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsResult = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         Map<JHVEventType, List<Interval<Date>>> missingIntervals = new HashMap<JHVEventType, List<Interval<Date>>>();
         for (JHVEventType evt : activeEventTypes) {
-
-            if (events.containsKey(evt)) {
+            SortedMap<SortedDateInterval, JHVRelatedEvents> sortedEvents = events.get(evt);
+            if (sortedEvents != null) {
                 long delta = 1000 * 60 * 60 * 24;
-                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = events.get(evt).subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
+                SortedMap<SortedDateInterval, JHVRelatedEvents> submap = sortedEvents.subMap(new SortedDateInterval(startDate.getTime() - delta, startDate.getTime() - delta), new SortedDateInterval(endDate.getTime() + delta, endDate.getTime() + delta));
                 eventsResult.put(evt, submap);
             }
             List<Interval<Date>> missing = downloadedCache.get(evt).getMissingIntervals(new Interval<Date>(startDate, endDate));
@@ -187,7 +189,9 @@ public class JHVEventCache {
     }
 
     private void deleteFromCache(JHVEventType eventType) {
-        downloadedCache.put(eventType, new RequestCache());
+        RequestCache cache = new RequestCache();
+        downloadedCache.put(eventType, cache);
+
         events.remove(eventType);
     }
 
@@ -242,7 +246,8 @@ public class JHVEventCache {
     public void eventTypeActivated(JHVEventType eventType) {
         activeEventTypes.add(eventType);
         if (!downloadedCache.containsKey(eventType)) {
-            downloadedCache.put(eventType, new RequestCache());
+            RequestCache cache = new RequestCache();
+            downloadedCache.put(eventType, cache);
         }
     }
 

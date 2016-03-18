@@ -136,8 +136,11 @@ public class SWEKSource {
      *         parameter is not configured for this source
      */
     public boolean containsParameter(String name) {
-        for (SWEKParameter parameter : generalParameters)
-            return parameter.getParameterName().equals(name.toLowerCase());
+        for (SWEKParameter parameter : generalParameters) {
+            if (parameter.getParameterName().toLowerCase().equals(name.toLowerCase())) {
+                return true;
+            }
+        }
         return false;
     }
 

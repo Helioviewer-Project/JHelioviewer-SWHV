@@ -20,6 +20,7 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
+import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -113,7 +114,7 @@ public class HEKParser implements SWEKParser {
     }
 
     @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource, SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules) {
+    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource, SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules, boolean todb) {
         HEKEventStream eventStream = new HEKEventStream();
 
         this.eventType = eventType;
@@ -135,8 +136,8 @@ public class HEKParser implements SWEKParser {
                 eventJSON = new JSONObject(reply);
                 parseOvermax(eventJSON);
                 eventStream.setExtraDownloadNeeded(overmax);
-                parseAssociation(eventJSON, eventStream);
-                parseEventJSON(eventJSON, eventStream);
+                parseAssociation(eventJSON, eventStream, todb);
+                parseEventJSON(eventJSON, eventStream, todb);
                 return eventStream;
             } else {
                 // TODO inform the user hek is probably death...
@@ -163,12 +164,13 @@ public class HEKParser implements SWEKParser {
      * @param eventStream
      * @throws JSONException
      */
-    private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream) throws JSONException {
+    private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("association");
-        // AssociationsPrinter.printNodeColor(c);
-        // AssociationsPrinter.printEdgeColor(c);
+
         for (int i = 0; i < associations.length() && !parserStopped; i++) {
             JHVAssociation association = new JHVAssociation(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
+            if (todb)
+                JHVDatabase.dump_association2db(association);
             eventStream.addJHVAssociation(association);
         }
     }
@@ -202,15 +204,18 @@ public class HEKParser implements SWEKParser {
      * @throws JSONException
      *             if the json object could not be parsed
      */
-    private void parseEventJSON(JSONObject eventJSON, HEKEventStream eventStream) throws JSONException {
+    private void parseEventJSON(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
+
         JSONArray results = eventJSON.getJSONArray("result");
         JHVEventType hekEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
 
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), hekEventType);
             JSONObject result = results.getJSONObject(i);
+
             parseResult(result, currentEvent);
             handleCoordinates(currentEvent);
+
             if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
                 Log.error("Possible wrong parsing of a HEK event.");
                 Log.error("Event start: " + currentEvent.getStartDate());
@@ -218,7 +223,11 @@ public class HEKParser implements SWEKParser {
                 Log.error("Event JSON: ");
                 Log.error(result.toString());
             }
+            if (todb) {
+                JHVDatabase.dump_event2db(result.toString(), currentEvent);
+            }
             eventStream.addJHVEvent(currentEvent);
+
             reinitializeCoordinates();
         }
     }
@@ -268,30 +277,30 @@ public class HEKParser implements SWEKParser {
                 if (keyString.toLowerCase().equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else
-                    // Event end time
-                    if (keyString.toLowerCase().equals("event_endtime")) {
-                        currentEvent.setEndTime(parseDate(value));
-                    } else
-                        // event unique ID
-                        if (keyString.toLowerCase().equals("kb_archivid")) {
-                            currentEvent.setUniqueID(value);
-                        } else
-                            // event positions (Standard position)
-                            if (keyString.toLowerCase().equals("event_coordsys")) {
-                                coordinateSystemString = value;
-                            } else if (keyString.toLowerCase().equals("event_coord1")) {
-                                if (value != null) {
-                                    coordinate1 = Double.parseDouble(value);
-                                }
-                            } else if (keyString.toLowerCase().equals("event_coord2")) {
-                                if (value != null) {
-                                    coordinate2 = Double.parseDouble(value);
-                                }
-                            } else if (keyString.toLowerCase().equals("event_coord3")) {
-                                if (value != null) {
-                                    coordinate3 = Double.parseDouble(value);
-                                }
-                            }
+                // Event end time
+                if (keyString.toLowerCase().equals("event_endtime")) {
+                    currentEvent.setEndTime(parseDate(value));
+                } else
+                // event unique ID
+                if (keyString.toLowerCase().equals("kb_archivid")) {
+                    currentEvent.setUniqueID(value);
+                } else
+                // event positions (Standard position)
+                if (keyString.toLowerCase().equals("event_coordsys")) {
+                    coordinateSystemString = value;
+                } else if (keyString.toLowerCase().equals("event_coord1")) {
+                    if (value != null) {
+                        coordinate1 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord2")) {
+                    if (value != null) {
+                        coordinate2 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord3")) {
+                    if (value != null) {
+                        coordinate3 = Double.parseDouble(value);
+                    }
+                }
                 // event positions (Not standard)
                 if (keyString.toLowerCase().equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);

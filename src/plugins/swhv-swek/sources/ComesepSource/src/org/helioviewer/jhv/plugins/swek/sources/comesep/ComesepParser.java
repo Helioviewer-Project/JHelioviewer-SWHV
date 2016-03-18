@@ -52,7 +52,7 @@ public class ComesepParser implements SWEKParser {
     }
 
     @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents) {
+    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents, boolean todb) {
         final ComesepEventStream eventStream = new ComesepEventStream();
 
         this.eventType = eventType;
@@ -68,14 +68,11 @@ public class ComesepParser implements SWEKParser {
                 }
                 JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                Log.debug("reply:");
-                Log.debug(reply.toString());
                 eventJSON = new JSONObject(reply);
                 parseAssociation(eventJSON, eventStream);
                 parseEventJSON(eventJSON, eventStream);
                 return eventStream;
             } else {
-                // TODO inform the user hek is probably death...
                 Log.error("Download input stream was null. Probably the comesep server is down.");
             }
         } catch (IOException e) {
