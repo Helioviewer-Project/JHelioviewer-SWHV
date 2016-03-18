@@ -214,7 +214,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     }
 
     private void downloadSelectedSuppliers(SWEKEventType swekEventType) {
-        if (activeEventTypes.get(swekEventType) != null) {
+        if (activeEventTypes.containsKey(swekEventType)) {
             for (SWEKSource source : activeEventTypes.get(swekEventType).keySet()) {
                 for (SWEKSupplier supplier : activeEventTypes.get(swekEventType).get(source)) {
                     downloadForAllDates(swekEventType, source, supplier);
