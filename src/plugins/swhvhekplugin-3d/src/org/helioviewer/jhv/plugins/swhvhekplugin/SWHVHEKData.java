@@ -107,14 +107,16 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     public ArrayList<JHVRelatedEvents> getActiveEvents(Date currentDate) {
         long ts = currentDate.getTime();
         ArrayList<JHVRelatedEvents> activeEvents = new ArrayList<JHVRelatedEvents>();
-        JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
-        data = result.getAvailableEvents();
-        if (data != null) {
-            for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
-                for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
-                    JHVRelatedEvents evr = v2.getValue();
-                    if (evr.getStart() <= ts && evr.getEnd() >= ts)
-                        activeEvents.add(evr);
+        if (beginDate != null && endDate != null) {
+            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
+            data = result.getAvailableEvents();
+            if (data != null) {
+                for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
+                    for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
+                        JHVRelatedEvents evr = v2.getValue();
+                        if (evr.getStart() <= ts && evr.getEnd() >= ts)
+                            activeEvents.add(evr);
+                    }
                 }
             }
         }
