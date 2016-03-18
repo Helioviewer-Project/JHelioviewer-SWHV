@@ -282,7 +282,10 @@ public class HEKParser implements SWEKParser {
      */
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("result");
-        JHVEventType hekEventType = new JHVEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+        JHVEventType hekEventType = new JHVEventType(eventType.getEventName(), eventSupplier.getSupplierName());
+        System.out.println(hekEventType);
+        System.out.println(eventType);
+
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
@@ -959,7 +962,7 @@ public class HEKParser implements SWEKParser {
                                 relatedOnList.add(jhvRelatedOn);
                             }
                         }
-                        JHVEventType relatedWith = new JHVEventType(er.getRelatedWith().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+                        JHVEventType relatedWith = new JHVEventType(er.getRelatedWith().getEventName(), eventSupplier.getSupplierName());
                         JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                         rules.add(rule);
                     }
@@ -974,7 +977,7 @@ public class HEKParser implements SWEKParser {
                             relatedOnList.add(jhvRelatedOn);
                         }
                     }
-                    JHVEventType relatedWith = new JHVEventType(er.getEvent().getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+                    JHVEventType relatedWith = new JHVEventType(er.getEvent().getEventName(), eventSupplier.getSupplierName());
                     JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                     rules.add(rule);
                 }

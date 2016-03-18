@@ -29,7 +29,6 @@ public class DownloadWorker implements Runnable {
     private static final SWEKSourceManager sourceManager = SWEKSourceManager.getSingletonInstance();
 
     private final SWEKEventType eventType;
-    private final SWEKSource swekSource;
     private final SWEKSupplier supplier;
     private boolean isStopped;
     private SWEKDownloader downloader;
@@ -41,10 +40,9 @@ public class DownloadWorker implements Runnable {
     private final List<SWEKRelatedEvents> relatedEvents;
     private final Interval<Date> requestInterval;
 
-    public DownloadWorker(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier, Interval<Date> interval, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
+    public DownloadWorker(SWEKEventType eventType, SWEKSupplier supplier, Interval<Date> interval, List<SWEKParam> params, List<SWEKRelatedEvents> relatedEventRules) {
         isStopped = false;
         requestInterval = interval;
-        this.swekSource = swekSource;
         this.eventType = eventType;
         downloadStartDate = new Date(interval.getStart().getTime());
         downloadEndDate = new Date(interval.getEnd().getTime());
@@ -67,6 +65,7 @@ public class DownloadWorker implements Runnable {
     @Override
     public void run() {
         if (!isStopped) {
+            SWEKSource swekSource = supplier.getSource();
             downloader = sourceManager.getDownloader(swekSource);
             parser = sourceManager.getParser(swekSource);
             boolean moreDownloads = true;
@@ -124,7 +123,7 @@ public class DownloadWorker implements Runnable {
     }
 
     public JHVEventType getJHVEventType() {
-        return new JHVEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName());
+        return new JHVEventType(eventType.getEventName(), supplier.getSupplierName());
     }
 
     public Date getDownloadEndDate() {
