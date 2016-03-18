@@ -528,7 +528,7 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      */
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
-        SWEKEventType eventType = new SWEKEventType(parseEventName(object),
+        return new SWEKEventType(parseEventName(object),
                 parseSuppliers(object),
                 parseParameterList(object),
                 parseRequestIntervalExtension(object),
@@ -539,7 +539,6 @@ public class SWEKConfigurationManager {
                 parseEventIcon(object),
                 parseColor(object),
                 parseSpatialRegion(object));
-        return eventType;
     }
 
     /**
@@ -553,21 +552,20 @@ public class SWEKConfigurationManager {
      */
     private Color parseColor(JSONObject object) throws JSONException {
         String color = object.getString("color");
-        if (color != null) {
-            try {
-                URI colorURI = new URI(color);
-                if (colorURI.getScheme().toLowerCase().equals("colorname")) {
-                    return parseColorName(colorURI.getHost());
-                } else if (colorURI.getScheme().toLowerCase().equals("colorcode")) {
-                    return parseColorCode(colorURI.getHost());
-                } else {
-                    Log.info("Could not understand: " + color + ", black returned");
-                    return Color.black;
-                }
-            } catch (URISyntaxException e) {
-                Log.info("Could not parse the URI " + color + ", black returned");
+        try {
+            URI colorURI = new URI(color);
+            if (colorURI.getScheme().toLowerCase().equals("colorname")) {
+                return parseColorName(colorURI.getHost());
+            } else if (colorURI.getScheme().toLowerCase().equals("colorcode")) {
+                return parseColorCode(colorURI.getHost());
+            } else {
+                Log.info("Could not understand: " + color + ", black returned");
+                return Color.black;
             }
+        } catch (URISyntaxException e) {
+            Log.info("Could not parse the URI " + color + ", black returned");
         }
+
         return Color.black;
     }
 
@@ -676,10 +674,9 @@ public class SWEKConfigurationManager {
      *             if the supplier could not be parsed
      */
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
-        SWEKSupplier supplier = SWEKSupplier.getSupplier(parseSupplierName(object),
+        return SWEKSupplier.getSupplier(parseSupplierName(object),
                 parseSupplierDisplayName(object),
                 parseSupplierSource(object));
-        return supplier;
     }
 
     /**
@@ -806,13 +803,12 @@ public class SWEKConfigurationManager {
     private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
         JSONObject filterobject = jsonObject.optJSONObject("filter");
         if (filterobject != null) {
-            SWEKParameterFilter filter = new SWEKParameterFilter(parseFilterType(filterobject),
+            return new SWEKParameterFilter(parseFilterType(filterobject),
                     parseMin(filterobject),
                     parseMax(filterobject),
                     parseStartValue(filterobject),
                     parseStepSize(filterobject),
                     parseUnits(filterobject));
-            return filter;
         } else {
             return null;
         }
@@ -975,12 +971,11 @@ public class SWEKConfigurationManager {
     private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
         JSONObject jsonObject = object.getJSONObject("spatial_region");
 
-        SWEKSpatialRegion spatialRegion = new SWEKSpatialRegion(
+        return new SWEKSpatialRegion(
                 parseX1(jsonObject),
                 parseY1(jsonObject),
                 parseX2(jsonObject),
                 parseY2(jsonObject));
-        return spatialRegion;
     }
 
     /**
@@ -1063,8 +1058,7 @@ public class SWEKConfigurationManager {
      *             if the related events could not be parsed
      */
     private SWEKRelatedEvents parseRelatedEvent(JSONObject jsonObject) throws JSONException {
-        SWEKRelatedEvents relatedEvents = new SWEKRelatedEvents(parseRelatedEventName(jsonObject), parseRelatedWith(jsonObject), parseRelatedOnList(jsonObject));
-        return relatedEvents;
+        return new SWEKRelatedEvents(parseRelatedEventName(jsonObject), parseRelatedWith(jsonObject), parseRelatedOnList(jsonObject));
     }
 
     /**
@@ -1121,8 +1115,7 @@ public class SWEKConfigurationManager {
      *             if the "related on" could not be parsed
      */
     private SWEKRelatedOn parseRelatedOn(JSONObject jsonObject) throws JSONException {
-        SWEKRelatedOn relatedOn = new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject));
-        return relatedOn;
+        return new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject));
     }
 
     /**
