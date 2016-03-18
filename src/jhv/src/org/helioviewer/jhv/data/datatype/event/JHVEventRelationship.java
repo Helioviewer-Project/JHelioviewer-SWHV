@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class JHVEventRelationship {
     /** Events preceding this event */
     private final Map<String, JHVEventRelation> precedingEvents;
     /** Rules for relation with this event */
-    private final List<JHVEventRelationShipRule> relationshipRules;
+    private List<JHVEventRelationShipRule> relationshipRules = null;
     /** Related events */
     private final Map<String, JHVEventRelation> relatedEventsByRule;
     /**  */
@@ -31,7 +30,6 @@ public class JHVEventRelationship {
     public JHVEventRelationship() {
         nextEvents = new HashMap<String, JHVEventRelation>();
         precedingEvents = new HashMap<String, JHVEventRelation>();
-        relationshipRules = new ArrayList<JHVEventRelationShipRule>();
         relatedEventsByRule = new HashMap<String, JHVEventRelation>();
         relationshipColor = null;
     }
@@ -63,13 +61,12 @@ public class JHVEventRelationship {
         return precedingEvents;
     }
 
-    /**
-     * Gets the relationship rules.
-     *
-     * @return the relationshipRules
-     */
     public List<JHVEventRelationShipRule> getRelationshipRules() {
         return relationshipRules;
+    }
+
+    public void setRelationshipRules(List<JHVEventRelationShipRule> relationshipRules) {
+        this.relationshipRules = relationshipRules;
     }
 
     public Color getRelationshipColor() {
