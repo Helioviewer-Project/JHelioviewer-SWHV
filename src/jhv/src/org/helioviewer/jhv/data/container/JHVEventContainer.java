@@ -179,6 +179,7 @@ public class JHVEventContainer {
             return;
         if (event != null) {
             event.highlight(true);
+
         }
         if (lastHighlighted != null) {
             lastHighlighted.highlight(false);

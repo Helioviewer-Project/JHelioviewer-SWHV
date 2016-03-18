@@ -117,6 +117,7 @@ public class EventPlotConfiguration {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x + drawPosition.width - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
         }
+
         return highlightedEvent;
     }
 

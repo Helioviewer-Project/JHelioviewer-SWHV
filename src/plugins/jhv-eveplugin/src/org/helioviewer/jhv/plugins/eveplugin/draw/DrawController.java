@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVEventHighlightListener;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.LayersListener;
 import org.helioviewer.jhv.layers.TimeListener;
@@ -53,6 +54,7 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
     // private final Map<YAxisElement, String> axisUnitMap;
 
     private DrawController() {
+
         drawableElements = new HashMap<DrawableType, Set<DrawableElement>>();
         listeners = new ArrayList<DrawControllerListener>();
         yAxisSet = new ArrayList<YAxisElement>();
@@ -61,12 +63,15 @@ public class DrawController implements LineDataSelectorModelListener, JHVEventHi
         gdListeners = new ArrayList<GraphDimensionListener>();
         graphSize = new Rectangle();
         // axisUnitMap = new HashMap<YAxisElement, String>();
+
     }
 
     public static DrawController getSingletonInstance() {
         if (instance == null) {
             instance = new DrawController();
             instance.init();
+            JHVRelatedEvents.addHighlightListener(instance);
+            JHVRelatedEvents.addHighlightListener(Displayer.getSingletonInstance());
         }
         return instance;
     }

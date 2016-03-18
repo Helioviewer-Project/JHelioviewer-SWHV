@@ -21,7 +21,7 @@ public class JHVRelatedEvents {
     private final Color color;
 
     protected boolean highlighted;
-    protected Set<JHVEventHighlightListener> listeners;
+    protected final static Set<JHVEventHighlightListener> listeners = new HashSet<JHVEventHighlightListener>();
     private final JHVEventType eventType;
 
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
@@ -30,7 +30,6 @@ public class JHVRelatedEvents {
         this.add(event, eventsMap);
         eventsMap.get(event.getJHVEventType()).put(interval, this);
         highlighted = false;
-        listeners = new HashSet<JHVEventHighlightListener>();
         eventType = event.getJHVEventType();
     }
 
@@ -87,11 +86,11 @@ public class JHVRelatedEvents {
         }
     }
 
-    public void addHighlightListener(JHVEventHighlightListener l) {
+    public static void addHighlightListener(JHVEventHighlightListener l) {
         listeners.add(l);
     }
 
-    public void removeHighlightListener(JHVEventHighlightListener l) {
+    public static void removeHighlightListener(JHVEventHighlightListener l) {
         listeners.remove(l);
     }
 

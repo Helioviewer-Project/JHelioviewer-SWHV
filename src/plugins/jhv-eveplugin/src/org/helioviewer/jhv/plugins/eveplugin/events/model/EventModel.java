@@ -215,7 +215,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
         plotConfig.add(epc);
         relatedEventPosition = epc.getEventPosition();
-        int localRelationNr = 0;
         return true;
 
     }
@@ -226,30 +225,17 @@ public class EventModel implements TimingListener, EventRequesterListener {
         int eventPosition = 0;
         if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
             if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
-                // first event or event start
-                // before
-                // minimal end
-                // date so next line
                 minimalEndDate = new Date(event.getEnd());
                 endDates.add(minimalEndDate);
                 eventPosition = nrLines;
                 nrLines++;
             } else {
                 if (event.getStart() > maximumEndDate.getTime()) {
-                    // After all other events so
-                    // start
-                    // new line
-                    // and
-                    // reset everything
                     eventPosition = 0;
                     nrLines = 1;
                     endDates = new ArrayList<Date>();
                     endDates.add(new Date(event.getEnd()));
                 } else {
-                    // After minimal date so
-                    // after
-                    // minimal end
-                    // date
                     eventPosition = minimalDateLine;
                     endDates.set(minimalDateLine, new Date(event.getEnd()));
                 }
@@ -270,7 +256,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
             tempLastDateWithData = new Date(event.getEnd());
         }
-        //event.addHighlightListener(DrawController.getSingletonInstance());
         return new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
     }
 
