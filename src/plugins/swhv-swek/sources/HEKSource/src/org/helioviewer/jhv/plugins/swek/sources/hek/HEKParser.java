@@ -19,7 +19,6 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
-import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
@@ -56,39 +55,12 @@ public class HEKParser implements SWEKParser {
 
     private SWEKSupplier eventSupplier;
 
-    /** Standard coordinate system parameters */
-    private String coordinateSystemString;
-    private double coordinate1;
-    private double coordinate2;
-    private double coordinate3;
-
-    /** HGC coordinates */
-    private List<Vec3> hgcBoundedBox;
-    private List<Vec3> hgcBoundCC;
-    private Vec3 hgcCentralPoint;
-    private Double hgcX;
-    private Double hgcY;
-
     /** HGS coordinates */
     private List<Vec3> hgsBoundedBox;
     private List<Vec3> hgsBoundCC;
     private Vec3 hgsCentralPoint;
     private Double hgsX;
     private Double hgsY;
-
-    /** HPC coordinates */
-    private List<Vec3> hpcBoundedBox;
-    private List<Vec3> hpcBoundCC;
-    private Vec3 hpcCentralPoint;
-    private Double hpcX;
-    private Double hpcY;
-
-    /** HRC coordinates */
-    private List<Vec3> hrcBoundedBox;
-    private List<Vec3> hrcBoundCC;
-    private Vec3 hrcCentralPoint;
-    private Double hrcA;
-    private Double hrcR;
 
     private boolean overmax;
 
@@ -291,27 +263,9 @@ public class HEKParser implements SWEKParser {
                     currentEvent.setEndTime(parseDate(value));
                 } else if (keyString.equals("kb_archivid")) {
                     uid = value;
-                } else if (keyString.equals("event_coordsys")) {
-                    coordinateSystemString = value;
-                } else if (keyString.equals("event_coord1")) {
-                    coordinate1 = Double.parseDouble(value);
-                } else if (keyString.equals("event_coord2")) {
-                    coordinate2 = Double.parseDouble(value);
-                } else if (keyString.equals("event_coord3")) {
-                    coordinate3 = Double.parseDouble(value);
                 }
 
-                if (keyString.equals("hgc_bbox")) {
-                    hgcBoundedBox = parsePolygon(value);
-                } else if (keyString.equals("hgc_boundcc")) {
-                    hgcBoundCC = parsePolygon(value);
-                } else if (keyString.equals("hgc_coord")) {
-                    hgcCentralPoint = parsePoint(value);
-                } else if (keyString.equals("hgc_x")) {
-                    hgcX = Double.parseDouble(value);
-                } else if (keyString.equals("hgc_y")) {
-                    hgcY = Double.parseDouble(value);
-                } else if (keyString.equals("hgs_bbox")) {
+                if (keyString.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
                 } else if (keyString.equals("hgs_boundcc")) {
                     hgsBoundCC = parsePolygon(value);
@@ -321,26 +275,6 @@ public class HEKParser implements SWEKParser {
                     hgsX = Double.parseDouble(value);
                 } else if (keyString.equals("hgs_y")) {
                     hgsY = Double.parseDouble(value);
-                } else if (keyString.equals("hpc_bbox")) {
-                    hpcBoundedBox = parsePolygon(value);
-                } else if (keyString.equals("hpc_boundcc")) {
-                    hpcBoundCC = parsePolygon(value);
-                } else if (keyString.equals("hpc_coord")) {
-                    hpcCentralPoint = parsePoint(value);
-                } else if (keyString.equals("hpc_x")) {
-                    hpcX = Double.parseDouble(value);
-                } else if (keyString.equals("hpc_y")) {
-                    hpcY = Double.parseDouble(value);
-                } else if (keyString.equals("hrc_bbox")) {
-                    hrcBoundedBox = parsePolygon(value);
-                } else if (keyString.equals("hrc_boundcc")) {
-                    hrcBoundCC = parsePolygon(value);
-                } else if (keyString.equals("hrc_coord")) {
-                    hrcCentralPoint = parsePoint(value);
-                } else if (keyString.equals("hrc_a")) {
-                    hrcA = Double.parseDouble(value);
-                } else if (keyString.equals("hrc_r")) {
-                    hrcR = Double.parseDouble(value);
                 } else {
                     boolean visible = false;
                     boolean configured = false;
@@ -423,34 +357,11 @@ public class HEKParser implements SWEKParser {
      *
      */
     private void reinitializeCoordinates() {
-        coordinateSystemString = null;
-        coordinate1 = 0;
-        coordinate2 = 0;
-        coordinate3 = 0;
-
-        hgcBoundedBox = null;
-        hgcBoundCC = null;
-        hgcCentralPoint = null;
-        hgcX = null;
-        hgcY = null;
-
         hgsBoundedBox = null;
         hgsBoundCC = null;
         hgsCentralPoint = null;
         hgsX = null;
         hgsY = null;
-
-        hrcBoundedBox = null;
-        hrcBoundCC = null;
-        hrcCentralPoint = null;
-        hrcA = null;
-        hrcR = null;
-
-        hpcBoundedBox = null;
-        hpcBoundCC = null;
-        hpcCentralPoint = null;
-        hpcX = null;
-        hpcY = null;
     }
 
     /**
@@ -581,60 +492,7 @@ public class HEKParser implements SWEKParser {
             }
             if ((maxX - minX) > 160 && (maxY - minY) > 160) {
                 hgsBoundedBox = null;
-                hgcBoundedBox = null;
-                hpcBoundedBox = null;
-                hrcBoundedBox = null;
             }
-        }
-    }
-
-    /**
-     * Extract the used coordinate system from the coordinate system string.
-     *
-     * @return the correct JHVCoordinateSystem or null if the coordinate system
-     *         could not be parsed.
-     */
-    private JHVCoordinateSystem parseCoordinateSystemString() {
-        if (coordinateSystemString.toLowerCase().contains("hgc")) {
-            return JHVCoordinateSystem.HGC;
-        } else if (coordinateSystemString.toLowerCase().contains("hgs")) {
-            return JHVCoordinateSystem.HGS;
-        } else if (coordinateSystemString.toLowerCase().contains("hpc")) {
-            return JHVCoordinateSystem.HPC;
-        } else if (coordinateSystemString.toLowerCase().contains("hrc")) {
-            return JHVCoordinateSystem.HRC;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Handles the HGC coordinates. Checks if a coordinate of that format was
-     * found and if it is the case it is added to the JHVPositionInformation
-     * list of the current event.
-     *
-     * @param currentEvent
-     *            the current event being parsed.
-     */
-    private void handleHGCCoordinates(HEKEvent currentEvent) {
-        if (hgcBoundedBox != null || hgcCentralPoint != null || (hgcX != null && hgcY != null) || hgcBoundCC != null) {
-            List<Vec3> localHGCBoundedBox = new ArrayList<Vec3>();
-            Vec3 localHGCCentralPoint = null;
-            List<Vec3> localHGCBoundCC = new ArrayList<Vec3>();
-            if (hgcBoundedBox != null) {
-                localHGCBoundedBox = hgcBoundedBox;
-            }
-            if (hgcBoundCC != null) {
-                localHGCBoundCC = hgcBoundCC;
-            }
-            if (hgcCentralPoint != null) {
-                localHGCCentralPoint = hgcCentralPoint;
-            } else {
-                if (hgcX != null && hgcY != null) {
-                    localHGCCentralPoint = new Vec3(hgcX, hgcY, 0);
-                }
-            }
-            //currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGC, new HEKPositionInformation(JHVCoordinateSystem.HGC, localHGCBoundedBox, localHGCBoundCC, localHGCCentralPoint));
         }
     }
 
@@ -704,66 +562,6 @@ public class HEKParser implements SWEKParser {
         double z = Math.cos(theta) * Math.cos(phi);
         double y = -Math.sin(theta);
         return new Vec3(x, y, z);
-    }
-
-    /**
-     * Handles the HRC coordinates. Checks if a coordinate of that format was
-     * found and if it is the case it is added to the JHVPositionInformation
-     * list of the current event.
-     *
-     * @param currentEvent
-     *            the current event being parsed.
-     */
-    private void handleHRCCoordinates(HEKEvent currentEvent) {
-        if (hrcBoundedBox != null || hrcCentralPoint != null || (hrcA != null && hrcR != null) || hrcBoundCC != null) {
-            List<Vec3> localHRCBoundedBox = new ArrayList<Vec3>();
-            List<Vec3> localHRCBoundCC = new ArrayList<Vec3>();
-            Vec3 localHRCCentralPoint = null;
-            if (hrcBoundedBox != null) {
-                localHRCBoundedBox = hrcBoundedBox;
-            }
-            if (hrcBoundCC != null) {
-                localHRCBoundCC = hrcBoundCC;
-            }
-            if (hrcCentralPoint != null) {
-                localHRCCentralPoint = hrcCentralPoint;
-            } else {
-                if (hrcA != null && hrcR != null) {
-                    localHRCCentralPoint = new Vec3(hrcA, hrcR, 0);
-                }
-            }
-            //currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HRC, new HEKPositionInformation(JHVCoordinateSystem.HRC, localHRCBoundedBox, localHRCBoundCC, localHRCCentralPoint));
-        }
-    }
-
-    /**
-     * Handles the HPC coordinates. Checks if a coordinate of that format was
-     * found and if it is the case it is added to the JHVPositionInformation
-     * list of the current event.
-     *
-     * @param currentEvent
-     *            the current event being parsed.
-     */
-    private void handleHPCCoordiantes(HEKEvent currentEvent) {
-        if (hpcBoundedBox != null || hpcCentralPoint != null || (hpcX != null && hpcY != null) || hpcBoundCC != null) {
-            List<Vec3> localHPCBoundedBox = new ArrayList<Vec3>();
-            List<Vec3> localHPCBoundCC = new ArrayList<Vec3>();
-            Vec3 localHPCCentralPoint = null;
-            if (hpcBoundedBox != null) {
-                localHPCBoundedBox = hpcBoundedBox;
-            }
-            if (hpcBoundCC != null) {
-                localHPCBoundCC = hpcBoundCC;
-            }
-            if (hpcCentralPoint != null) {
-                localHPCCentralPoint = hpcCentralPoint;
-            } else {
-                if (hpcX != null && hpcY != null) {
-                    localHPCCentralPoint = new Vec3(hpcX, hpcY, 0);
-                }
-            }
-            //currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HPC, new HEKPositionInformation(JHVCoordinateSystem.HPC, localHPCBoundedBox, localHPCBoundCC, localHPCCentralPoint));
-        }
     }
 
     private static HashMap<SWEKEventType, List<JHVEventRelationShipRule>> hmr = new HashMap<SWEKEventType, List<JHVEventRelationShipRule>>();
