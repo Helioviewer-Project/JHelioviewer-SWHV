@@ -667,10 +667,9 @@ public class SWEKConfigurationManager {
      *             if the supplier could not be parsed
      */
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
-        SWEKSupplier supplier = new SWEKSupplier();
-        supplier.setSupplierName(parseSupplierName(object));
-        supplier.setSupplierDisplayName(parseSupplierDisplayName(object));
-        supplier.setSource(parseSupplierSource(object));
+        SWEKSupplier supplier = new SWEKSupplier(parseSupplierName(object),
+                parseSupplierDisplayName(object),
+                parseSupplierSource(object));
         return supplier;
     }
 
