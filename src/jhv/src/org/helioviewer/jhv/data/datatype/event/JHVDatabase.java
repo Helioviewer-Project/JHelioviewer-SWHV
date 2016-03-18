@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -225,19 +226,21 @@ public class JHVDatabase {
         }
     }
 
-    public static void dump_event2db(String eventStr, JHVEvent event) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(eventStr, event));
+    public static Long dump_event2db(String eventStr, JHVEvent event) {
+        FutureTask<Long> ft = new FutureTask<Long>(new DumpEvent2Db(eventStr, event));
         executor.execute(ft);
         try {
-            ft.get();
+            return ft.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return -1l;
         } catch (ExecutionException e) {
             e.printStackTrace();
+            return -1l;
         }
     }
 
-    private static class DumpEvent2Db implements Callable<Integer> {
+    private static class DumpEvent2Db implements Callable<Long> {
         private final JHVEvent event;
         private final String eventStr;
 
@@ -247,10 +250,11 @@ public class JHVDatabase {
         }
 
         @Override
-        public Integer call() {
+        public Long call() {
+            long generatedKey = -1;
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
-                return -1;
+                return generatedKey;
             byte[] compressed_data;
             try {
                 compressed_data = compress(eventStr.toString());
@@ -271,6 +275,13 @@ public class JHVDatabase {
                     pstatement.setBinaryStream(5, new ByteArrayInputStream(compressed_data), compressed_data.length);
                     pstatement.executeUpdate();
                     pstatement.close();
+                    Statement statement = connection.createStatement();
+                    ResultSet generatedKeys = statement.executeQuery("SELECT last_insert_rowid()");
+                    if (generatedKeys.next()) {
+                        generatedKey = generatedKeys.getLong(1);
+                    }
+                    generatedKeys.close();
+                    connection.commit();
                 }
                 else {
                     Log.error("Failed to insert event");
@@ -279,7 +290,7 @@ public class JHVDatabase {
             {
                 Log.error("Could not insert event " + e.getMessage());
             }
-            return 0;
+            return generatedKey;
         }
     }
 
