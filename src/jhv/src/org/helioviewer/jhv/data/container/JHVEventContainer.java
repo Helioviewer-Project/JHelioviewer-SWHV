@@ -68,16 +68,13 @@ public class JHVEventContainer {
      *            the handler
      */
     public void requestForInterval(final Date startDate, final Date endDate, final JHVEventHandler handler) {
-        // Log.debug("Request for interval : [" + startDate + "," + endDate +
-        // "]");
-        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : "
-        // + handler);
+        // Log.debug("Request for interval : [" + startDate + "," + endDate + "]");
+        // Logger.getLogger(JHVEventContainer.class.getName()).info("handler : " + handler);
         if (startDate != null && endDate != null) {
             long deltaT = endDate.getTime() - startDate.getTime();
             Date newStartDate = new Date((long) (startDate.getTime() - deltaT * factor));
             Date newEndDate = new Date((long) (endDate.getTime() + deltaT * factor));
-            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate +
-            // "]");
+            // Log.debug("new Interval : [" + newStartDate + "," + newEndDate + "]");
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
             Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = result.getAvailableEvents();
@@ -189,7 +186,6 @@ public class JHVEventContainer {
 
     public void registerHandler(JHVEventContainerRequestHandler incomingRequestManager) {
         this.incomingRequestManager = incomingRequestManager;
-
     }
 
 }
