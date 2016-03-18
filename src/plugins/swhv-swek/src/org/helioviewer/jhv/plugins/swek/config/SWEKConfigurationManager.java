@@ -314,17 +314,17 @@ public class SWEKConfigurationManager {
      * @return true if the JSON configuration could be parsed, false if not.
      */
     private boolean parseJSONConfig(JSONObject configJSON) {
-        configuration = new SWEKConfiguration();
         try {
-            configuration.setManuallyChanged(parseManuallyChanged(configJSON));
-            configuration.setConfigurationVersion(parseVersion(configJSON));
-            configuration.setSources(parseSources(configJSON));
-            configuration.setEventTypes(parseEventTypes(configJSON));
-            configuration.setRelatedEvents(parseRelatedEvents(configJSON));
+            configuration = new SWEKConfiguration(parseVersion(configJSON),
+                    parseManuallyChanged(configJSON),
+                    parseSources(configJSON),
+                    parseEventTypes(configJSON),
+                    parseRelatedEvents(configJSON));
             return true;
         } catch (JSONException e) {
             Log.error("Could not parse JSON");
             e.printStackTrace();
+            configuration = new SWEKConfiguration("", false, new ArrayList<SWEKSource>(), new ArrayList<SWEKEventType>(), new ArrayList<SWEKRelatedEvents>());
             return false;
         }
     }
@@ -386,8 +386,7 @@ public class SWEKConfigurationManager {
      *             if the source could not be parsed
      */
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
-        SWEKSource source = new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseDownloader(jsonObject), parseJarLocation(jsonObject), parseEventParser(jsonObject), parseBaseURL(jsonObject), parseGeneralParameters(jsonObject));
-        return source;
+        return new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseDownloader(jsonObject), parseJarLocation(jsonObject), parseEventParser(jsonObject), parseBaseURL(jsonObject), parseGeneralParameters(jsonObject));
     }
 
     /**
@@ -520,17 +519,17 @@ public class SWEKConfigurationManager {
      * @throws JSONException
      */
     private SWEKEventType parseEventType(JSONObject object) throws JSONException {
-        SWEKEventType eventType = new SWEKEventType();
-        eventType.setEventName(parseEventName(object));
-        eventType.setSuppliers(parseSuppliers(object));
-        eventType.setParameterList(parseParameterList(object));
-        eventType.setRequestIntervalExtension(parseRequestIntervalExtension(object));
-        eventType.setStandardSelected(parseStandardSelected(object));
-        eventType.setGroupOn(parseGroupOn(object));
-        eventType.setCoordinateSystem(parseCoordinateSystem(object));
-        eventType.setSpatialRegion(parseSpatialRegion(object));
-        eventType.setEventIcon(parseEventIcon(object));
-        eventType.setColor(parseColor(object));
+        SWEKEventType eventType = new SWEKEventType(parseEventName(object),
+                parseSuppliers(object),
+                parseParameterList(object),
+                parseRequestIntervalExtension(object),
+                parseStandardSelected(object),
+                parseGroupOn(object),
+                parseCoordinateSystem(object),
+
+                parseEventIcon(object),
+                parseColor(object),
+                parseSpatialRegion(object));
         return eventType;
     }
 
@@ -797,15 +796,14 @@ public class SWEKConfigurationManager {
      *             if the filter could not be parsed
      */
     private SWEKParameterFilter parseParameterFilter(JSONObject jsonObject) throws JSONException {
-        SWEKParameterFilter filter = new SWEKParameterFilter();
         JSONObject filterobject = jsonObject.optJSONObject("filter");
         if (filterobject != null) {
-            filter.setFilterType(parseFilterType(filterobject));
-            filter.setMin(parseMin(filterobject));
-            filter.setMax(parseMax(filterobject));
-            filter.setStartValue(parseStartValue(filterobject));
-            filter.setStepSize(parseStepSize(filterobject));
-            filter.setUnits(parseUnits(filterobject));
+            SWEKParameterFilter filter = new SWEKParameterFilter(parseFilterType(filterobject),
+                    parseMin(filterobject),
+                    parseMax(filterobject),
+                    parseStartValue(filterobject),
+                    parseStepSize(filterobject),
+                    parseUnits(filterobject));
             return filter;
         } else {
             return null;
@@ -1116,9 +1114,7 @@ public class SWEKConfigurationManager {
      *             if the "related on" could not be parsed
      */
     private SWEKRelatedOn parseRelatedOn(JSONObject jsonObject) throws JSONException {
-        SWEKRelatedOn relatedOn = new SWEKRelatedOn();
-        relatedOn.setParameterFrom(parseParameterFrom(jsonObject));
-        relatedOn.setParameterWith(parseParameterWith(jsonObject));
+        SWEKRelatedOn relatedOn = new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject));
         return relatedOn;
     }
 

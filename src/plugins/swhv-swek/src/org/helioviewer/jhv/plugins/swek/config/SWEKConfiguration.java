@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,34 +11,19 @@ import java.util.List;
 public class SWEKConfiguration {
 
     /** The configuration version */
-    private String configurationVersion;
+    private final String configurationVersion;
 
     /** Manually changed configuration */
     private boolean manuallyChanged;
 
     /** The SWEK sources */
-    private List<SWEKSource> sources;
+    private final List<SWEKSource> sources;
 
     /** The SWEK event types */
-    private List<SWEKEventType> eventTypes;
+    private final List<SWEKEventType> eventTypes;
 
     /** The SWEK related events */
-    private List<SWEKRelatedEvents> relatedEvents;
-
-    /**
-     * Creates a SWEKConfiguration with an empty configuration version, not
-     * manually changed with an empty list of sources, event types and related
-     * events.
-     *
-     */
-    public SWEKConfiguration() {
-        super();
-        configurationVersion = "";
-        manuallyChanged = false;
-        sources = new ArrayList<SWEKSource>();
-        eventTypes = new ArrayList<SWEKEventType>();
-        relatedEvents = new ArrayList<SWEKRelatedEvents>();
-    }
+    private final List<SWEKRelatedEvents> relatedEvents;
 
     /**
      * Creates a SWEK configuration based on the given configuration version,
@@ -58,7 +42,6 @@ public class SWEKConfiguration {
      *            List of related events
      */
     public SWEKConfiguration(String configurationVersion, boolean manuallyChanged, List<SWEKSource> sources, List<SWEKEventType> eventTypes, List<SWEKRelatedEvents> relatedEvents) {
-        super();
         this.configurationVersion = configurationVersion;
         this.manuallyChanged = manuallyChanged;
         this.sources = sources;
@@ -73,16 +56,6 @@ public class SWEKConfiguration {
      */
     public String getConfigurationVersion() {
         return configurationVersion;
-    }
-
-    /**
-     * Sets the version of the configuration file.
-     *
-     * @param configurationVersion
-     *            the configurationVersion to set
-     */
-    public void setConfigurationVersion(String configurationVersion) {
-        this.configurationVersion = configurationVersion;
     }
 
     /**
@@ -116,16 +89,6 @@ public class SWEKConfiguration {
     }
 
     /**
-     * Sets the list of SWEK sources.
-     *
-     * @param sources
-     *            the sources to set
-     */
-    public void setSources(List<SWEKSource> sources) {
-        this.sources = sources;
-    }
-
-    /**
      * Gets the list of event types.
      *
      * @return the eventTypes
@@ -135,32 +98,12 @@ public class SWEKConfiguration {
     }
 
     /**
-     * Sets the list of event types.
-     *
-     * @param eventTypes
-     *            the eventTypes to set
-     */
-    public void setEventTypes(List<SWEKEventType> eventTypes) {
-        this.eventTypes = eventTypes;
-    }
-
-    /**
      * Gets the list of related events.
      *
      * @return the relatedEvents
      */
     public List<SWEKRelatedEvents> getRelatedEvents() {
         return relatedEvents;
-    }
-
-    /**
-     * Sets the list of related events.
-     *
-     * @param relatedEvents
-     *            the relatedEvents to set
-     */
-    public void setRelatedEvents(List<SWEKRelatedEvents> relatedEvents) {
-        this.relatedEvents = relatedEvents;
     }
 
     public SWEKSource getSWEKSource(String sourceName) {

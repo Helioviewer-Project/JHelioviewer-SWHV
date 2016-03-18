@@ -19,7 +19,7 @@ public class SWEKSource {
     private final String providerName;
 
     /** The downloader for the events */
-    private String downloaderClass;
+    private final String downloaderClass;
 
     /** The parser of the events */
     private final String eventParserClass;
@@ -89,16 +89,6 @@ public class SWEKSource {
      */
     public String getDownloaderClass() {
         return downloaderClass;
-    }
-
-    /**
-     * Sets the downloader class for this SWEK source
-     *
-     * @param downloaderClass
-     *            the downloader class to set
-     */
-    public void setDownloaderClass(String downloaderClass) {
-        this.downloaderClass = downloaderClass;
     }
 
     /**
