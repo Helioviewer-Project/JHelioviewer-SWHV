@@ -160,6 +160,11 @@ public class HEKEvent implements JHVEvent {
         return id;
     }
 
+    @Override
+    public void setUniqueID(Integer id) {
+        this.id = id;
+    }
+
     /**
      * Adds a parameter to the event.
      *
@@ -219,10 +224,6 @@ public class HEKEvent implements JHVEvent {
      */
     public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
         this.positionInformation = positionInformation;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
 }

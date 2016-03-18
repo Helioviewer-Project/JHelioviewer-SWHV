@@ -194,15 +194,15 @@ public class HEKParser implements SWEKParser {
                 Log.error("Event JSON: ");
                 Log.error(result.toString());
             }
+
             Integer id;
             if (todb) {
                 id = JHVDatabase.dump_event2db(result.toString(), currentEvent, uid);
-            }
-            else {
+            } else {
                 id = JHVDatabase.getEventId(uid);
-                currentEvent.setId(id);
             }
-            currentEvent.setId(id);
+            currentEvent.setUniqueID(id);
+
             eventStream.addJHVEvent(currentEvent);
             reinitializeCoordinates();
         }

@@ -139,7 +139,7 @@ public class ComesepParser implements SWEKParser {
             } else
             // event unique ID
             if (keyString.toLowerCase().equals("alertid")) {
-                currentEvent.setUniqueID(value);
+                currentEvent.setUniqueID(value.hashCode());
             } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
                 cactusLiftOff = Long.parseLong(value);
                 if (startTimeSet) {
