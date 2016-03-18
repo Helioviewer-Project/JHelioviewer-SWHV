@@ -148,15 +148,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawPolygon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
-        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-        if (!pi.containsKey(JHVCoordinateSystem.JHV)) {
+        JHVPositionInformation pi = evt.getPositioningInformation();
+        if (pi.getCoordinateSystem() != JHVCoordinateSystem.JHV) {
             return;
         }
 
-        JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-        List<Vec3> points = el.getBoundCC();
+        List<Vec3> points = pi.getBoundCC();
         if (points == null || points.isEmpty()) {
-            points = el.getBoundBox();
+            points = pi.getBoundBox();
             if (points == null || points.isEmpty()) {
                 return;
             }
@@ -199,11 +198,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawIcon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
-        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-        if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-            if (el.centralPoint() != null) {
-                Vec3 pt = el.centralPoint();
+        JHVPositionInformation pi = evt.getPositioningInformation();
+        if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
+            if (pi.centralPoint() != null) {
+                Vec3 pt = pi.centralPoint();
                 String type = evt.getJHVEventType().getEventType().getEventName();
                 bindTexture(gl, type, evtr.getIcon());
                 if (evtr.isHighlighted()) {
@@ -236,11 +234,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     }
 
     private void drawIconScale(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt, GridScale scale, Camera camera, Viewport vp) {
-        Map<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
-        if (pi.containsKey(JHVCoordinateSystem.JHV)) {
-            JHVPositionInformation el = pi.get(JHVCoordinateSystem.JHV);
-            if (el.centralPoint() != null) {
-                Vec3 pt = el.centralPoint();
+        JHVPositionInformation pi = evt.getPositioningInformation();
+        if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
+            if (pi.centralPoint() != null) {
+                Vec3 pt = pi.centralPoint();
                 pt = camera.getViewpoint().orientation.rotateVector(pt);
                 Vec2 tf = scale.transform(pt);
                 String type = evt.getJHVEventType().getEventType().getEventName();

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
@@ -55,7 +54,7 @@ public class HEKEvent extends AbstractJHVEvent {
     private final JHVEventType eventType;
 
     /** List with positioning information for this event */
-    private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
+    private JHVPositionInformation positionInformation;
 
     private Integer id;
 
@@ -89,7 +88,6 @@ public class HEKEvent extends AbstractJHVEvent {
         allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
         allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
-        positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
     }
 
     @Override
@@ -153,7 +151,7 @@ public class HEKEvent extends AbstractJHVEvent {
     }
 
     @Override
-    public HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation() {
+    public JHVPositionInformation getPositioningInformation() {
         return positionInformation;
     }
 
@@ -220,8 +218,8 @@ public class HEKEvent extends AbstractJHVEvent {
      * @param positionInformation
      *            the position information to add
      */
-    public void addJHVPositionInformation(JHVCoordinateSystem coorSys, JHVPositionInformation positionInformation) {
-        this.positionInformation.put(coorSys, positionInformation);
+    public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
+        this.positionInformation = positionInformation;
     }
 
     public void setId(Integer id) {
