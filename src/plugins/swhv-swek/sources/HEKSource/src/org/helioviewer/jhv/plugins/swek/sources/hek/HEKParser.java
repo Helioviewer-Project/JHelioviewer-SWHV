@@ -291,22 +291,22 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.equals("kb_archivid")) {
                     uid = value;
                 } else
-                    // event positions (Standard position)
-                    if (keyString.equals("event_coordsys")) {
-                        coordinateSystemString = value;
-                    } else if (keyString.equals("event_coord1")) {
-                        if (value != null) {
-                            coordinate1 = Double.parseDouble(value);
-                        }
-                    } else if (keyString.equals("event_coord2")) {
-                        if (value != null) {
-                            coordinate2 = Double.parseDouble(value);
-                        }
-                    } else if (keyString.equals("event_coord3")) {
-                        if (value != null) {
-                            coordinate3 = Double.parseDouble(value);
-                        }
+                // event positions (Standard position)
+                if (keyString.equals("event_coordsys")) {
+                    coordinateSystemString = value;
+                } else if (keyString.equals("event_coord1")) {
+                    if (value != null) {
+                        coordinate1 = Double.parseDouble(value);
                     }
+                } else if (keyString.equals("event_coord2")) {
+                    if (value != null) {
+                        coordinate2 = Double.parseDouble(value);
+                    }
+                } else if (keyString.equals("event_coord3")) {
+                    if (value != null) {
+                        coordinate3 = Double.parseDouble(value);
+                    }
+                }
                 // event positions (Not standard)
                 if (keyString.equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
@@ -365,7 +365,8 @@ public class HEKParser implements SWEKParser {
                         displayName = originalKeyString.replaceAll("_", " ").trim();
                     }
                     JHVEventParameter parameter = new JHVEventParameter(originalKeyString, displayName, value);
-                    currentEvent.addParameter(parameter, visible, configured);
+                    if (visible)// && configured)
+                        currentEvent.addParameter(parameter, visible, configured);
                 }
             }
         }
