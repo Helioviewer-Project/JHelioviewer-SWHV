@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -211,8 +212,14 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private static class ComparePriority<T extends DownloadWorker> implements Comparator<T> {
         @Override
         public int compare(T l1, T l2) {
-            long d1 = l1.getDownloadEndDate().getTime() - Layers.getStartDate().milli;
-            long d2 = l2.getDownloadEndDate().getTime() - Layers.getStartDate().milli;
+            JHVDate startDate = Layers.getStartDate();
+            long start;
+            if (Layers.getStartDate() != null)
+                start = startDate.milli;
+            else
+                start = System.currentTimeMillis();
+            long d1 = l1.getDownloadEndDate().getTime() - start;
+            long d2 = l2.getDownloadEndDate().getTime() - start;
             return d1 < d2 ? 1 : -1;
         }
     }
