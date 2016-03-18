@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -110,6 +109,6 @@ public interface JHVEvent {
      *
      * @return a list with positioning information
      */
-    public abstract HashMap<JHVCoordinateSystem, JHVPositionInformation> getPositioningInformation();
+    public abstract JHVPositionInformation getPositioningInformation();
 
 }

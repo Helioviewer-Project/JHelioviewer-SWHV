@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.astronomy.Position;
@@ -148,7 +147,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
         Viewport vp = Displayer.getActiveViewport();
         for (JHVRelatedEvents evtr : eventsToDraw) {
             JHVEvent evt = evtr.getClosestTo(this.currentTime);
-            HashMap<JHVCoordinateSystem, JHVPositionInformation> pi = evt.getPositioningInformation();
+            JHVPositionInformation pi = evt.getPositioningInformation();
             if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                 if (evt.getName().equals("Coronal Mass Ejection")) {
                     Map<String, JHVEventParameter> params = evt.getAllEventParameters();
@@ -161,9 +160,9 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
                     hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(e, vp));
                     pt = p.orientation.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
-                } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                } else if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
                     hitpoint = getHitPoint(e, vp);
-                    pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
+                    pt = pi.centralPoint();
                 }
 
                 if (pt != null && hitpoint != null) {
@@ -191,9 +190,9 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
                         mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
                     }
-                } else if (pi.containsKey(JHVCoordinateSystem.JHV)) {
+                } else if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
                     hitpoint = getHitPoint(e, vp);
-                    pt = pi.get(JHVCoordinateSystem.JHV).centralPoint();
+                    pt = pi.centralPoint();
                     pt = camera.getViewpoint().orientation.rotateVector(pt);
                     GridScale scale = GridScale.current;
                     tf = scale.transform(pt);
