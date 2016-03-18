@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
 
@@ -26,13 +24,9 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
-import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
@@ -386,30 +380,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void render(Camera camera, Viewport vp, GL2 gl) {
         if (isVisible[vp.idx]) {
-            Date beginDate = SWHVHEKData.getSingletonInstance().getStart();
-            Date endDate = SWHVHEKData.getSingletonInstance().getEnd();
+            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVEvent evt : eventsToDraw) {
+                if (evt.getName().equals("Coronal Mass Ejection")) {
+                    drawCactusArc(gl, evt, controller.currentTime);
+                } else {
+                    drawPolygon(gl, evt);
 
-            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
-            Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> data = result.getAvailableEvents();
-            if (data != null) {
-                long currentDate = controller.currentTime.getTime();
-                for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> v1 : data.entrySet()) {
-                    for (Map.Entry<JHVEventCache.SortedDateInterval, JHVEvent> v2 : v1.getValue().entrySet()) {
-                        JHVEvent evt = v2.getValue();
-                        SortedDateInterval in = v2.getKey();
-                        if (in.start <= currentDate && in.end >= currentDate) {
-                            if (evt.getName().equals("Coronal Mass Ejection")) {
-                                drawCactusArc(gl, evt, controller.currentTime);
-                            } else {
-                                drawPolygon(gl, evt);
-
-                                gl.glDisable(GL2.GL_DEPTH_TEST);
-                                drawIcon(gl, evt);
-                                gl.glEnable(GL2.GL_DEPTH_TEST);
-                            }
-                        }
-                        evt.addHighlightListener(Displayer.getSingletonInstance());
-                    }
+                    gl.glDisable(GL2.GL_DEPTH_TEST);
+                    drawIcon(gl, evt);
+                    gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
             SWHVHEKSettings.resetCactusColor();
@@ -419,28 +399,15 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     @Override
     public void renderScale(Camera camera, Viewport vp, GL2 gl, GLSLSolarShader shader, GridScale scale) {
         if (isVisible[vp.idx]) {
-            Date beginDate = SWHVHEKData.getSingletonInstance().getStart();
-            Date endDate = SWHVHEKData.getSingletonInstance().getEnd();
-
-            JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
-            Map<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> data = result.getAvailableEvents();
-            if (data != null) {
-                long currentDate = controller.currentTime.getTime();
-                for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>> v1 : data.entrySet()) {
-                    for (Map.Entry<JHVEventCache.SortedDateInterval, JHVEvent> v2 : v1.getValue().entrySet()) {
-                        JHVEvent evt = v2.getValue();
-                        SortedDateInterval in = v2.getKey();
-                        if (in.start <= currentDate && in.end >= currentDate) {
-                            if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
-                                drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
-                            } else {
-                                drawPolygon(gl, evt);
-                                gl.glDisable(GL2.GL_DEPTH_TEST);
-                                drawIconScale(gl, evt, scale, camera, vp);
-                                gl.glEnable(GL2.GL_DEPTH_TEST);
-                            }
-                        }
-                    }
+            List<JHVEvent> eventsToDraw = SWHVHEKData.getSingletonInstance().getActiveEvents(controller.currentTime);
+            for (JHVEvent evt : eventsToDraw) {
+                if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
+                    drawCactusArcScale(gl, evt, controller.currentTime, scale, vp);
+                } else {
+                    drawPolygon(gl, evt);
+                    gl.glDisable(GL2.GL_DEPTH_TEST);
+                    drawIconScale(gl, evt, scale, camera, vp);
+                    gl.glEnable(GL2.GL_DEPTH_TEST);
                 }
             }
             SWHVHEKSettings.resetCactusColor();
