@@ -39,7 +39,6 @@ public class HEKDownloader implements SWEKDownloader {
         for (Interval<Date> interval : range) {
             if (interval.getStart().getTime() <= startDate.getTime() && interval.getEnd().getTime() >= endDate.getTime()) {
                 fromdb = true;
-                Log.debug("Get data from database");
                 return JHVDatabase.getEvents(startDate.getTime(), endDate.getTime(), eventType);
             }
         }
