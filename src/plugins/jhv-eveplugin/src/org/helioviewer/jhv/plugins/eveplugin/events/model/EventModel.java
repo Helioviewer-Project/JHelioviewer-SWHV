@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
@@ -25,9 +24,7 @@ import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
-import org.helioviewer.jhv.plugins.eveplugin.settings.EVESettings;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
-import org.helioviewer.jhv.threads.JHVWorker;
 
 /**
  *
@@ -52,9 +49,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
     /** The event panel */
     private final EventPanel eventPanel;
 
-    /** The swing worker creating the event type plot configurations */
-    private JHVWorker<EventTypePlotConfiguration, Void> currentSwingWorker;
-
     private final EventsSelectorElement eventSelectorElement;
 
     private boolean eventsActivated;
@@ -69,7 +63,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVEvent>>();
         eventsVisible = false;
         eventPanel = new EventPanel();
-        currentSwingWorker = null;
         eventSelectorElement = new EventsSelectorElement(this);
         eventsActivated = false;
         LineDataSelectorModel.getSingletonInstance().addLineData(eventSelectorElement);
@@ -155,185 +148,170 @@ public class EventModel implements TimingListener, EventRequesterListener {
         }
     }
 
-    private void createEventPlotConfiguration() {
-        if (currentSwingWorker != null) {
-            currentSwingWorker.cancel(true);
+    private Set<String> uniqueIDs = new HashSet<String>();
+    private Map<String, Integer> eventLocations = new HashMap<String, Integer>();
+    private ArrayList<Date> endDates = new ArrayList<Date>();
+    private Date minimalEndDate = null;
+    private Date maximumEndDate = null;
+    private int minimalDateLine = 0;
+    private int maximumDateLine = 0;
+    private int nrLines = 0;
+    private List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
+    private int maxNrLines = 0;
+    private Date tempLastDateWithData = null;
+    private int maxEventLines = 0;
+
+    public void backgroundWork() {
+
+        final Map<JHVEventType, Integer> linesPerEventType = new HashMap<JHVEventType, Integer>();
+        final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
+
+        if (events.size() > 0) {
+            for (JHVEventType eventType : events.keySet()) {
+                endDates = new ArrayList<Date>();
+                plotConfig = new ArrayList<EventPlotConfiguration>();
+                minimalEndDate = null;
+                maximumEndDate = null;
+                minimalDateLine = 0;
+                maximumDateLine = 0;
+                nrLines = 0;
+                maxEventLines = 0;
+                int relatedEventPosition = -1;
+                SortedMap<SortedDateInterval, JHVEvent> eventMap = events.get(eventType);
+                for (Entry<SortedDateInterval, JHVEvent> evl : eventMap.entrySet()) {
+                    handleEvent(evl.getValue(), relatedEventPosition, 0);
+                }
+                linesPerEventType.put(eventType, maxEventLines);
+                maxNrLines += maxEventLines;
+                eventPlotConfigPerEventType.put(eventType, plotConfig);
+            }
+
+            eventPlotConfiguration = new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType, tempLastDateWithData);
+        } else {
+            eventPlotConfiguration = new EventTypePlotConfiguration();
         }
+
+        if (!eventPlotConfiguration.getEventPlotConfigurations().isEmpty() && prevNoPlotConfig) {
+            prevNoPlotConfig = false;
+        }
+        if (EventModel.getSingletonInstance().isEventsVisible()) {
+            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
+        } else {
+            Log.debug("event plot configurations not visible");
+        }
+        uniqueIDs = new HashSet<String>();
+        eventLocations = new HashMap<String, Integer>();
+        endDates = new ArrayList<Date>();
+        minimalEndDate = null;
+        maximumEndDate = null;
+        minimalDateLine = 0;
+        maximumDateLine = 0;
+        nrLines = 0;
+        plotConfig = new ArrayList<EventPlotConfiguration>();
+        maxNrLines = 0;
+        tempLastDateWithData = null;
+        maxEventLines = 0;
+    }
+
+    private boolean handleEvent(JHVEvent event, int relatedEventPosition, int relationNr) {
+        if (!uniqueIDs.contains(event.getUniqueID())) {
+            EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
+            plotConfig.add(epc);
+            relatedEventPosition = epc.getEventPosition();
+            int localRelationNr = 0;
+            for (JHVEventRelation jer : event.getEventRelationShip().getNextEvents().values()) {
+                if (jer.getTheEvent() != null) {
+                    if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
+                        localRelationNr++;
+                    }
+                }
+            }
+            for (JHVEventRelation jer : event.getEventRelationShip().getPrecedingEvents().values()) {
+                if (jer.getTheEvent() != null) {
+                    if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
+                        localRelationNr++;
+                    }
+                }
+            }
+            TreeMap<Date, JHVEvent> sortedRelatedEvents = new TreeMap<Date, JHVEvent>();
+            for (JHVEventRelation jer : event.getEventRelationShip().getRelatedEventsByRule().values()) {
+                if (jer.getTheEvent() != null) {
+                    sortedRelatedEvents.put(jer.getTheEvent().getStartDate(), jer.getTheEvent());
+                }
+            }
+            for (JHVEvent relEvent : sortedRelatedEvents.values()) {
+                if (relEvent.getJHVEventType().equals(event.getJHVEventType())) {
+                    if (!uniqueIDs.contains(relEvent.getUniqueID())) {
+                        plotConfig.add(creatEventPlotConfiguration(relEvent, relatedEventPosition, localRelationNr));
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    private EventPlotConfiguration creatEventPlotConfiguration(JHVEvent event, int relatedEventPosition, int relationNr) {
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
 
-        currentSwingWorker = new JHVWorker<EventTypePlotConfiguration, Void>() {
-
-            private final Set<String> uniqueIDs = new HashSet<String>();
-            private final Map<String, Integer> eventLocations = new HashMap<String, Integer>();
-            private int maxNrLines = 0;
-            private final Map<JHVEventType, Integer> linesPerEventType = new HashMap<JHVEventType, Integer>();
-            private final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
-            private Date tempLastDateWithData = null;
-
-            private ArrayList<Date> endDates = new ArrayList<Date>();
-            private List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
-            private Date minimalEndDate = null;
-            private Date maximumEndDate = null;
-            private int minimalDateLine = 0;
-            private int maximumDateLine = 0;
-            private int nrLines = 0;
-            private int maxEventLines = 0;
-
-            @Override
-            public EventTypePlotConfiguration backgroundWork() {
-                if (events.size() > 0) {
-                    for (JHVEventType eventType : events.keySet()) {
-                        endDates = new ArrayList<Date>();
-                        plotConfig = new ArrayList<EventPlotConfiguration>();
-                        minimalEndDate = null;
-                        maximumEndDate = null;
-                        minimalDateLine = 0;
-                        maximumDateLine = 0;
-                        nrLines = 0;
-                        maxEventLines = 0;
-                        int relatedEventPosition = -1;
-                        SortedMap<SortedDateInterval, JHVEvent> eventMap = events.get(eventType);
-                        for (Entry<SortedDateInterval, JHVEvent> evl : eventMap.entrySet()) {
-                            if (Thread.currentThread().isInterrupted()) {
-                                return new EventTypePlotConfiguration();
-                            } else {
-                                handleEvent(evl.getValue(), relatedEventPosition, 0);
-                            }
-                        }
-                        linesPerEventType.put(eventType, maxEventLines);
-                        maxNrLines += maxEventLines;
-                        eventPlotConfigPerEventType.put(eventType, plotConfig);
-                    }
-
-                    return new EventTypePlotConfiguration(events.size(), maxNrLines, linesPerEventType, eventPlotConfigPerEventType, tempLastDateWithData);
+        uniqueIDs.add(event.getUniqueID());
+        int eventPosition = 0;
+        if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
+            if (minimalEndDate == null || minimalEndDate.compareTo(event.getStartDate()) >= 0) {
+                // first event or event start
+                // before
+                // minimal end
+                // date so next line
+                minimalEndDate = event.getEndDate();
+                endDates.add(event.getEndDate());
+                eventPosition = nrLines;
+                nrLines++;
+            } else {
+                if (event.getStartDate().after(maximumEndDate)) {
+                    // After all other events so
+                    // start
+                    // new line
+                    // and
+                    // reset everything
+                    eventPosition = 0;
+                    nrLines = 1;
+                    endDates = new ArrayList<Date>();
+                    endDates.add(event.getEndDate());
                 } else {
-                    return new EventTypePlotConfiguration();
+                    // After minimal date so
+                    // after
+                    // minimal end
+                    // date
+                    eventPosition = minimalDateLine;
+                    endDates.set(minimalDateLine, event.getEndDate());
                 }
             }
+        } else {
+            eventPosition = relatedEventPosition;
+            endDates.set(relatedEventPosition, event.getEndDate());
+        }
 
-            private boolean handleEvent(JHVEvent event, int relatedEventPosition, int relationNr) {
-                if (!uniqueIDs.contains(event.getUniqueID())) {
-                    EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
-                    plotConfig.add(epc);
-                    relatedEventPosition = epc.getEventPosition();
-                    int localRelationNr = 0;
-                    for (JHVEventRelation jer : event.getEventRelationShip().getNextEvents().values()) {
-                        if (jer.getTheEvent() != null) {
-                            if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
-                                localRelationNr++;
-                            }
-                        }
-                    }
-                    for (JHVEventRelation jer : event.getEventRelationShip().getPrecedingEvents().values()) {
-                        if (jer.getTheEvent() != null) {
-                            if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
-                                localRelationNr++;
-                            }
-                        }
-                    }
-                    TreeMap<Date, JHVEvent> sortedRelatedEvents = new TreeMap<Date, JHVEvent>();
-                    for (JHVEventRelation jer : event.getEventRelationShip().getRelatedEventsByRule().values()) {
-                        if (jer.getTheEvent() != null) {
-                            sortedRelatedEvents.put(jer.getTheEvent().getStartDate(), jer.getTheEvent());
-                        }
-                    }
-                    for (JHVEvent relEvent : sortedRelatedEvents.values()) {
-                        if (relEvent.getJHVEventType().equals(event.getJHVEventType())) {
-                            if (!uniqueIDs.contains(relEvent.getUniqueID())) {
-                                plotConfig.add(creatEventPlotConfiguration(relEvent, relatedEventPosition, localRelationNr));
-                            }
-                        }
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
+        eventLocations.put(event.getUniqueID(), eventPosition);
+        minimalDateLine = defineMinimalDateLine(endDates);
+        minimalEndDate = endDates.get(minimalDateLine);
+        maximumDateLine = defineMaximumDateLine(endDates);
+        maximumEndDate = endDates.get(maximumDateLine);
+        double scaledX0 = defineScaledValue(event.getStartDate(), selectedInterval);
+        double scaledX1 = defineScaledValue(event.getEndDate(), selectedInterval);
+        if (nrLines > maxEventLines) {
+            maxEventLines = nrLines;
+        }
+        if (tempLastDateWithData == null || tempLastDateWithData.before(event.getEndDate())) {
+            tempLastDateWithData = event.getEndDate();
+        }
+        event.addHighlightListener(DrawController.getSingletonInstance());
+        return new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
+    }
 
-            }
-
-            private EventPlotConfiguration creatEventPlotConfiguration(JHVEvent event, int relatedEventPosition, int relationNr) {
-                uniqueIDs.add(event.getUniqueID());
-                int eventPosition = 0;
-                if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
-                    if (minimalEndDate == null || minimalEndDate.compareTo(event.getStartDate()) >= 0) {
-                        // first event or event start
-                        // before
-                        // minimal end
-                        // date so next line
-                        minimalEndDate = event.getEndDate();
-                        endDates.add(event.getEndDate());
-                        eventPosition = nrLines;
-                        nrLines++;
-                    } else {
-                        if (event.getStartDate().after(maximumEndDate)) {
-                            // After all other events so
-                            // start
-                            // new line
-                            // and
-                            // reset everything
-                            eventPosition = 0;
-                            nrLines = 1;
-                            endDates = new ArrayList<Date>();
-                            endDates.add(event.getEndDate());
-                        } else {
-                            // After minimal date so
-                            // after
-                            // minimal end
-                            // date
-                            eventPosition = minimalDateLine;
-                            endDates.set(minimalDateLine, event.getEndDate());
-                        }
-                    }
-                } else {
-                    eventPosition = relatedEventPosition;
-                    endDates.set(relatedEventPosition, event.getEndDate());
-                }
-
-                eventLocations.put(event.getUniqueID(), eventPosition);
-                minimalDateLine = defineMinimalDateLine(endDates);
-                minimalEndDate = endDates.get(minimalDateLine);
-                maximumDateLine = defineMaximumDateLine(endDates);
-                maximumEndDate = endDates.get(maximumDateLine);
-                double scaledX0 = defineScaledValue(event.getStartDate(), selectedInterval);
-                double scaledX1 = defineScaledValue(event.getEndDate(), selectedInterval);
-                if (nrLines > maxEventLines) {
-                    maxEventLines = nrLines;
-                }
-                if (tempLastDateWithData == null || tempLastDateWithData.before(event.getEndDate())) {
-                    tempLastDateWithData = event.getEndDate();
-                }
-                event.addHighlightListener(DrawController.getSingletonInstance());
-                return new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
-            }
-
-            @Override
-            public void done() {
-                try {
-                    if (!isCancelled()) {
-                        eventPlotConfiguration = get();
-
-                        if (!eventPlotConfiguration.getEventPlotConfigurations().isEmpty() && prevNoPlotConfig) {
-                            prevNoPlotConfig = false;
-                        }
-                        if (EventModel.getSingletonInstance().isEventsVisible()) {
-                            DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
-                        } else {
-                            Log.debug("event plot configurations not visible");
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    Log.error("Could not create the event type plot configurations" + e.getMessage());
-                    Log.error("The error" + e.getMessage());
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    Log.error("Could not create the event type plot configurations" + e.getMessage());
-                    Log.error("The error" + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        };
-        currentSwingWorker.setThreadName("EVE--EventModel");
-        EVESettings.getExecutorService().execute(currentSwingWorker);
+    private void createEventPlotConfiguration() {
+        backgroundWork();
     }
 
     private int defineMaximumDateLine(ArrayList<Date> endDates) {
