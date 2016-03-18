@@ -20,8 +20,7 @@ public class CheckUpdateAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent arg0) {
         try {
-            JHVUpdate update = new JHVUpdate();
-            update.setVerbose(true);
+            JHVUpdate update = new JHVUpdate(true);
             update.check();
         } catch (Exception e) {
             // Should not happen
