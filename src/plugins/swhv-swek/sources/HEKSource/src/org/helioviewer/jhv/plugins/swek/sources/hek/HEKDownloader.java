@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.DownloadStream;
@@ -20,27 +19,13 @@ import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 
 public class HEKDownloader implements SWEKDownloader {
 
-    /** The hek source properties */
-    private final Properties hekSourceProperties;
-
-    /**
-     * Default constructor.
-     */
-    public HEKDownloader() {
-        HEKSourceProperties hsp = HEKSourceProperties.getSingletonInstance();
-        hekSourceProperties = hsp.getHEKSourceProperties();
-    }
-
     @Override
     public void stopDownload() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
         String urlString = createURL(eventType, startDate, endDate, params, page);
-        Log.info("Download events using following URL: " + urlString);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
@@ -69,7 +54,7 @@ public class HEKDownloader implements SWEKDownloader {
      * @return the url represented as string
      */
     private String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
-        StringBuilder baseURL = new StringBuilder(hekSourceProperties.getProperty("heksource.baseurl")).append("?");
+        StringBuilder baseURL = new StringBuilder(HEKSourceProperties.getSingletonInstance().getHEKSourceProperties().getProperty("heksource.baseurl")).append("?");
         baseURL = appendCmd(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendType(baseURL, eventType, startDate, endDate).append("&");
         baseURL = appendEventType(baseURL, eventType, startDate, endDate).append("&");

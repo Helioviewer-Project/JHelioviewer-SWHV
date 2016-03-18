@@ -36,7 +36,6 @@ public class ComesepDownloader implements SWEKDownloader {
     @Override
     public InputStream downloadData(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
         String urlString = createURL(eventType, startDate, endDate, params);
-        Log.info("Download events using following URL: " + urlString);
         try {
             DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
             return ds.getInput();
@@ -51,7 +50,7 @@ public class ComesepDownloader implements SWEKDownloader {
 
     /**
      * Creates the download URL for the HEK.
-     * 
+     *
      * @param eventType
      *            the event type that should be downloaded
      * @param startDate
@@ -73,7 +72,7 @@ public class ComesepDownloader implements SWEKDownloader {
 
     /**
      * Appends the event end time to the given URL.
-     * 
+     *
      * @param baseURL
      *            the current URL
      * @param endDate
