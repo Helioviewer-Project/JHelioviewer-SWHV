@@ -123,7 +123,7 @@ public class DownloadStream {
      *             From accessing the network
      */
     public void connect() throws IOException {
-        Log.info("Connect to " + url);
+        Log.debug("Connect to " + url);
         URLConnection connection = url.openConnection();
         // Set timeouts
         connection.setConnectTimeout(connectTimeout);
