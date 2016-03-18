@@ -40,7 +40,9 @@ public class SWEKSupplier {
     public static SWEKSupplier getSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
         SWEKSupplier supp = suppliers.get(supplierName + source.getSourceName());
         if (supp == null) {
-            return new SWEKSupplier(supplierName, supplierDisplayName, source);
+            SWEKSupplier newSupplier = new SWEKSupplier(supplierName, supplierDisplayName, source);
+            suppliers.put(supplierName + source.getSourceName(), newSupplier);
+            return newSupplier;
         }
         return supp;
     }
