@@ -203,9 +203,9 @@ public class MetaDataDialog extends JDialog implements ActionListener, ShowableD
             setSize(450, 600);
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-        getRootPane().setDefaultButton(closeButton);
 
         pack();
+        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 

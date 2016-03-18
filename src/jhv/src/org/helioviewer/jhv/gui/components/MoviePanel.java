@@ -249,7 +249,6 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
 
         playButton = ButtonCreator.createButton(playIcon, "Play movie", this);
         buttonPanel.add(playButton);
-        ImageViewerGui.getMainFrame().getRootPane().setDefaultButton(playButton);
 
         nextFrameButton = ButtonCreator.createButton(IconBank.getIcon(JHVIcon.FORWARD), "Step to next frame", this);
         buttonPanel.add(nextFrameButton);
@@ -286,12 +285,14 @@ public class MoviePanel extends JPanel implements ActionListener, ChangeListener
         speedPanel = new ComponentUtils.SmallPanel(new FlowLayout(FlowLayout.RIGHT));
         speedPanel.add(new JLabel("Speed", JLabel.RIGHT));
 
-        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(60), Double.valueOf(1)));
+        int speedMin = 1, speedMax = 60;
+        speedSpinner = new JSpinner(new SpinnerNumberModel(Double.valueOf(20), Double.valueOf(1), Double.valueOf(speedMax), Double.valueOf(speedMin)));
+        speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
         speedSpinner.addChangeListener(this);
         ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField().addActionListener(this);
 
         JFormattedTextField fx = ((JSpinner.DefaultEditor) speedSpinner.getEditor()).getTextField();
-        fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", 1, 60));
+        fx.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "", speedMin, speedMax));
 
         speedSpinner.setMaximumSize(speedSpinner.getPreferredSize());
         WheelSupport.installMouseWheelSupport(speedSpinner);

@@ -142,7 +142,6 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
      */
     @Override
     public void showDialog() {
-        pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
 
@@ -152,6 +151,9 @@ public final class AboutDialog extends JDialog implements ActionListener, Showab
                 scrollPane.getVerticalScrollBar().setValue(0);
             }
         });
+
+        pack();
+        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 
