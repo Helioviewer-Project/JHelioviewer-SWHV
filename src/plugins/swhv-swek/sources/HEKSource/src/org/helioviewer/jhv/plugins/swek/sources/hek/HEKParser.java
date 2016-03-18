@@ -334,24 +334,14 @@ public class HEKParser implements SWEKParser {
                             // the associated event is available
                             HEKEvent associatedEvent = associationEventsMap.get(association.getAssociationIvorn1());
                             if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                // Is a sequence relation so the current event
-                                // is
-                                // the follow-up of the associated event
                                 associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
                                 currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                                 currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
                             } else {
-                                // it is not a sequence relationship just add
-                                // the
-                                // relation to the related events by rule.
                                 associatedEvent.getEventRelationShip().getRelatedEventsByRule().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
                                 currentEvent.getEventRelationShip().getRelatedEventsByRule().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
                             }
                         } else {
-                            // The associated event is not in the list so we
-                            // start a
-                            // new color add we already add a reference to the
-                            // previous event without event type.
                             currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
                             if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
                                 currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
@@ -420,30 +410,30 @@ public class HEKParser implements SWEKParser {
                 if (keyString.toLowerCase().equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else
-                    // Event end time
-                    if (keyString.toLowerCase().equals("event_endtime")) {
-                        currentEvent.setEndTime(parseDate(value));
-                    } else
-                        // event unique ID
-                        if (keyString.toLowerCase().equals("kb_archivid")) {
-                            currentEvent.setUniqueID(value);
-                        } else
-                            // event positions (Standard position)
-                            if (keyString.toLowerCase().equals("event_coordsys")) {
-                                coordinateSystemString = value;
-                            } else if (keyString.toLowerCase().equals("event_coord1")) {
-                                if (value != null) {
-                                    coordinate1 = Double.parseDouble(value);
-                                }
-                            } else if (keyString.toLowerCase().equals("event_coord2")) {
-                                if (value != null) {
-                                    coordinate2 = Double.parseDouble(value);
-                                }
-                            } else if (keyString.toLowerCase().equals("event_coord3")) {
-                                if (value != null) {
-                                    coordinate3 = Double.parseDouble(value);
-                                }
-                            }
+                // Event end time
+                if (keyString.toLowerCase().equals("event_endtime")) {
+                    currentEvent.setEndTime(parseDate(value));
+                } else
+                // event unique ID
+                if (keyString.toLowerCase().equals("kb_archivid")) {
+                    currentEvent.setUniqueID(value);
+                } else
+                // event positions (Standard position)
+                if (keyString.toLowerCase().equals("event_coordsys")) {
+                    coordinateSystemString = value;
+                } else if (keyString.toLowerCase().equals("event_coord1")) {
+                    if (value != null) {
+                        coordinate1 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord2")) {
+                    if (value != null) {
+                        coordinate2 = Double.parseDouble(value);
+                    }
+                } else if (keyString.toLowerCase().equals("event_coord3")) {
+                    if (value != null) {
+                        coordinate3 = Double.parseDouble(value);
+                    }
+                }
                 // event positions (Not standard)
                 if (keyString.toLowerCase().equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
