@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,23 +11,13 @@ import java.util.List;
 public class SWEKRelatedEvents {
 
     /** The source event */
-    private SWEKEventType event;
+    private final SWEKEventType event;
 
     /** The related event */
     private SWEKEventType relatedWith;
 
     /** The parameters on which they are related */
-    private List<SWEKRelatedOn> relatedOnList;
-
-    /**
-     * Creates a related events with no source event, no related event and an empty related on list.
-     */
-    public SWEKRelatedEvents() {
-        super();
-        this.event = null;
-        this.relatedWith = null;
-        this.relatedOnList = new ArrayList<SWEKRelatedOn>();
-    }
+    private final List<SWEKRelatedOn> relatedOnList;
 
     /**
      * Creates a related on relation between the source event and the related with event with the given related on list.
@@ -51,15 +40,6 @@ public class SWEKRelatedEvents {
      */
     public SWEKEventType getEvent() {
         return event;
-    }
-
-    /**
-     * Sets the source event
-     *
-     * @param event the event to set
-     */
-    public void setEvent(SWEKEventType event) {
-        this.event = event;
     }
 
     /**
@@ -87,15 +67,6 @@ public class SWEKRelatedEvents {
      */
     public List<SWEKRelatedOn> getRelatedOnList() {
         return relatedOnList;
-    }
-
-    /**
-     * Sets the list of corresponding event parameters.
-     *
-     * @param relatedOnList the relatedOnList to set
-     */
-    public void setRelatedOnList(List<SWEKRelatedOn> relatedOnList) {
-        this.relatedOnList = relatedOnList;
     }
 
 }
