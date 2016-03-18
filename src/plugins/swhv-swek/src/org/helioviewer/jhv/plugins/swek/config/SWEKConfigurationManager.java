@@ -967,12 +967,11 @@ public class SWEKConfigurationManager {
     private SWEKSpatialRegion parseSpatialRegion(JSONObject object) throws JSONException {
         JSONObject jsonObject = object.getJSONObject("spatial_region");
 
-        SWEKSpatialRegion spatialRegion = new SWEKSpatialRegion();
-        spatialRegion.setX1(parseX1(jsonObject));
-        spatialRegion.setY1(parseY1(jsonObject));
-        spatialRegion.setX2(parseX2(jsonObject));
-        spatialRegion.setY2(parseY2(jsonObject));
-
+        SWEKSpatialRegion spatialRegion = new SWEKSpatialRegion(
+                parseX1(jsonObject),
+                parseY1(jsonObject),
+                parseX2(jsonObject),
+                parseY2(jsonObject));
         return spatialRegion;
     }
 

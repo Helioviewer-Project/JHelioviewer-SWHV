@@ -27,7 +27,6 @@ public class SWEKRelatedEvents {
      * @param relatedOnList     The list of parameters on which the related events are related
      */
     public SWEKRelatedEvents(SWEKEventType event, SWEKEventType relatedWith, List<SWEKRelatedOn> relatedOnList) {
-        super();
         this.event = event;
         this.relatedWith = relatedWith;
         this.relatedOnList = relatedOnList;
