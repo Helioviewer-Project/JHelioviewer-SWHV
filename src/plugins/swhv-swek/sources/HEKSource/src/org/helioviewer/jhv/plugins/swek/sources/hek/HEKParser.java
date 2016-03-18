@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.helioviewer.jhv.base.astronomy.Position;
@@ -19,9 +18,9 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.base.time.TimeUtils;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
@@ -47,9 +46,6 @@ public class HEKParser implements SWEKParser {
 
     /** Is the parser stopped */
     private boolean parserStopped;
-
-    /** The hek event stream */
-    private final HEKEventStream eventStream;
 
     /** The event type for this parser */
     private SWEKEventType eventType;
@@ -93,9 +89,6 @@ public class HEKParser implements SWEKParser {
     private Double hrcA;
     private Double hrcR;
 
-    private final Map<String, List<Association>> associationsMap;
-    private final Map<String, HEKEvent> associationEventsMap;
-
     private boolean overmax;
 
     private List<SWEKRelatedEvents> eventRelationRules;
@@ -111,9 +104,6 @@ public class HEKParser implements SWEKParser {
      */
     public HEKParser() {
         parserStopped = false;
-        eventStream = new HEKEventStream();
-        associationsMap = new HashMap<String, List<Association>>();
-        associationEventsMap = new HashMap<String, HEKEvent>();
         overmax = false;
     }
 
@@ -124,6 +114,8 @@ public class HEKParser implements SWEKParser {
 
     @Override
     public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource, SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules) {
+        HEKEventStream eventStream = new HEKEventStream();
+
         this.eventType = eventType;
         this.eventSource = eventSource;
         this.eventSupplier = eventSupplier;
@@ -143,8 +135,8 @@ public class HEKParser implements SWEKParser {
                 eventJSON = new JSONObject(reply);
                 parseOvermax(eventJSON);
                 eventStream.setExtraDownloadNeeded(overmax);
-                parseAssociation(eventJSON);
-                parseEventJSON(eventJSON);
+                parseAssociation(eventJSON, eventStream);
+                parseEventJSON(eventJSON, eventStream);
                 return eventStream;
             } else {
                 // TODO inform the user hek is probably death...
@@ -168,48 +160,17 @@ public class HEKParser implements SWEKParser {
     /**
      *
      * @param eventJSON
+     * @param eventStream
      * @throws JSONException
      */
-    private void parseAssociation(JSONObject eventJSON) throws JSONException {
+    private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("association");
         // AssociationsPrinter.printNodeColor(c);
         // AssociationsPrinter.printEdgeColor(c);
         for (int i = 0; i < associations.length() && !parserStopped; i++) {
-            Association currentAssociation = new Association();
-            currentAssociation.setAssociationType(parseAssociationType(associations.getJSONObject(i)));
-            currentAssociation.setAssociationIvorn1(parseFirstIvorn(associations.getJSONObject(i)));
-            currentAssociation.setAssociationIvorn2(parseSecondIvorn(associations.getJSONObject(i)));
-            // AssociationsPrinter.printAssociation(currentAssociation.associationIvorn1,
-            // currentAssociation.associationIvorn2);
-            // Log.debug("************************************************************************************************");
-            // Log.debug("ivorn1 : " +
-            // currentAssociation.getAssociationIvorn1());
-            // Log.debug("ivorn2 : " +
-            // currentAssociation.getAssociationIvorn2());
-            // Log.debug("************************************************************************************************");
-            List<Association> associationsIvorn1 = new ArrayList<Association>();
-            List<Association> associationsIvorn2 = new ArrayList<Association>();
-            if (associationsMap.containsKey(currentAssociation.getAssociationIvorn1())) {
-                associationsIvorn1 = associationsMap.get(currentAssociation.getAssociationIvorn1());
-            }
-            if (associationsMap.containsKey(currentAssociation.getAssociationIvorn2())) {
-                associationsIvorn2 = associationsMap.get(currentAssociation.getAssociationIvorn2());
-            }
-            associationsIvorn1.add(currentAssociation);
-            associationsIvorn2.add(currentAssociation);
-            associationsMap.put(currentAssociation.getAssociationIvorn1(), associationsIvorn1);
-            associationsMap.put(currentAssociation.getAssociationIvorn2(), associationsIvorn2);
+            JHVAssociation association = new JHVAssociation(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
+            eventStream.addJHVAssociation(association);
         }
-    }
-
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
-    private String parseAssociationType(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("edge_type");
     }
 
     /**
@@ -233,54 +194,15 @@ public class HEKParser implements SWEKParser {
     }
 
     /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
-    private String parseEventType1(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("first_event_type");
-    }
-
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
-    private String parseEventType2(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("second_event_type");
-    }
-
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
-    private String parseId1(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("first_id");
-    }
-
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
-    private String parseId2(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("second_id");
-    }
-
-    /**
      * Parses the event JSON returned by the server.
      *
      * @param eventJSON
      *            the JSON object
+     * @param eventStream
      * @throws JSONException
      *             if the json object could not be parsed
      */
-    private void parseEventJSON(JSONObject eventJSON) throws JSONException {
+    private void parseEventJSON(JSONObject eventJSON, HEKEventStream eventStream) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("result");
         JHVEventType hekEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
 
@@ -289,70 +211,6 @@ public class HEKParser implements SWEKParser {
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
             handleCoordinates(currentEvent);
-            if (associationsMap.containsKey(currentEvent.getUniqueID())) {
-                // There is an association with the current event
-                associationEventsMap.put(currentEvent.getUniqueID(), currentEvent);
-                List<Association> associationsList = associationsMap.get(currentEvent.getUniqueID());
-                for (Association association : associationsList) {
-                    if (association.getAssociationIvorn1().equals(currentEvent.getUniqueID())) {
-                        // current event is the first element of the association
-                        if (associationEventsMap.containsKey(association.getAssociationIvorn2())) {
-                            // The other event of the association is available
-                            HEKEvent associatedEvent = associationEventsMap.get(association.getAssociationIvorn2());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                // Is a sequence relation so associated event is
-                                // follow-up of current event
-                                if (currentEvent.getEventRelationShip().getPrecedingEvents().isEmpty()) {
-                                    currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
-                                }
-                                associatedEvent.getEventRelationShip().getPrecedingEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent.getEventRelationShip().getNextEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                                associatedEvent.getEventRelationShip().setRelationshipColor(currentEvent.getEventRelationShip().getRelationshipColor());
-
-                            } else {
-                                // is not a sequence relationship just add the
-                                // relation to the related events by rule
-                                associatedEvent.getEventRelationShip().getRelatedEventsByRule().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            }
-                        } else {
-                            // The associated event is not in the list so we
-                            // start a
-                            // new color and add an association in the list
-                            // without
-                            // event reference.
-                            currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                currentEvent.getEventRelationShip().getNextEvents().put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
-                            } else {
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(association.getAssociationIvorn2(), new JHVEventRelation(association.getAssociationIvorn2()));
-                            }
-                        }
-                    } else if (association.getAssociationIvorn2().equals(currentEvent.getUniqueID())) {
-                        // current event is the second event of the relationship
-                        if (associationEventsMap.containsKey(association.getAssociationIvorn1())) {
-                            // the associated event is available
-                            HEKEvent associatedEvent = associationEventsMap.get(association.getAssociationIvorn1());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                                currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
-                            } else {
-                                associatedEvent.getEventRelationShip().getRelatedEventsByRule().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            }
-                        } else {
-                            currentEvent.getEventRelationShip().setRelationshipColor(HEKColors.getNextColor());
-                            if (association.getAssociationType().toLowerCase().equals("is_followed_by") || association.getAssociationType().toLowerCase().equals("splits_into") || association.getAssociationType().toLowerCase().equals("merges_into")) {
-                                currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
-                            } else {
-                                currentEvent.getEventRelationShip().getRelatedEventsByRule().put(association.getAssociationIvorn1(), new JHVEventRelation(association.getAssociationIvorn1()));
-                            }
-                        }
-                    }
-                }
-            }
-            currentEvent.getEventRelationShip().setRelationshipRules(getEventRelationShipRules());
             if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
                 Log.error("Possible wrong parsing of a HEK event.");
                 Log.error("Event start: " + currentEvent.getStartDate());
@@ -974,64 +832,6 @@ public class HEKParser implements SWEKParser {
         }
 
         return hmr.get(this.eventType);
-    }
-
-    private class Association {
-
-        private String associationType;
-        private String associationIvorn1;
-        private String associationIvorn2;
-
-        public Association() {
-            associationType = "";
-            associationIvorn1 = "";
-            associationIvorn2 = "";
-        }
-
-        /**
-         * @return the associationType
-         */
-        public String getAssociationType() {
-            return associationType;
-        }
-
-        /**
-         * @param associationType
-         *            the associationType to set
-         */
-        public void setAssociationType(String associationType) {
-            this.associationType = associationType;
-        }
-
-        /**
-         * @return the associationIvorn1
-         */
-        public String getAssociationIvorn1() {
-            return associationIvorn1;
-        }
-
-        /**
-         * @param associationIvorn1
-         *            the associationIvorn1 to set
-         */
-        public void setAssociationIvorn1(String associationIvorn1) {
-            this.associationIvorn1 = associationIvorn1;
-        }
-
-        /**
-         * @return the associationIvorn2
-         */
-        public String getAssociationIvorn2() {
-            return associationIvorn2;
-        }
-
-        /**
-         * @param associationIvorn2
-         *            the associationIvorn2 to set
-         */
-        public void setAssociationIvorn2(String associationIvorn2) {
-            this.associationIvorn2 = associationIvorn2;
-        }
     }
 
 }

@@ -9,9 +9,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelationship;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
@@ -74,9 +72,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     /** The color in which the event should be drawn */
     private final Color color;
 
-    /** The event relation ships of the event */
-    private final JHVEventRelationship eventRelationShip;
-
     /**
      *
      * @param eventName
@@ -94,7 +89,6 @@ public class ComesepEvent extends AbstractJHVEvent {
         eventType = comesepEventType;
         icon = eventIcon;
         this.color = color;
-        eventRelationShip = new JHVEventRelationship();
     }
 
     @Override
@@ -180,16 +174,6 @@ public class ComesepEvent extends AbstractJHVEvent {
     @Override
     public Color getColor() {
         return color;
-    }
-
-    @Override
-    public JHVEventRelationship getEventRelationShip() {
-        return eventRelationShip;
-    }
-
-    @Override
-    public void merge(JHVEvent event) {
-        eventRelationShip.merge(event.getEventRelationShip());
     }
 
     /**

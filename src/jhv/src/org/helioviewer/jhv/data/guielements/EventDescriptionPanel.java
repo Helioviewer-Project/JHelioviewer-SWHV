@@ -67,7 +67,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         setLayout(new GridBagLayout());
 
         labelIcon = new JLabel(event.getIcon());
-        colorLabel.setBackground(event.getEventRelationShip().getRelationshipColor());
+        colorLabel.setBackground(event.getColor());//.getEventRelationShip().getRelationshipColor());
         colorLabel.setOpaque(true);
 
         GridBagConstraints iconLabelConstraint = new GridBagConstraints();

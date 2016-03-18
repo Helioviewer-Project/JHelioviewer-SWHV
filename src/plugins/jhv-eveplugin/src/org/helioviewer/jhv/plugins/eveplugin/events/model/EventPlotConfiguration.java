@@ -109,7 +109,7 @@ public class EventPlotConfiguration {
             g.setColor(Color.black);
             g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
         }
-        g.setColor(event.getEventRelationShip().getRelationshipColor());
+        g.setColor(event.getColor());
         g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
         if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);

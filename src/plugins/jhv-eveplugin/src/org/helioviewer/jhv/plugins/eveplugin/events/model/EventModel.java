@@ -10,13 +10,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
@@ -221,33 +219,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
             plotConfig.add(epc);
             relatedEventPosition = epc.getEventPosition();
             int localRelationNr = 0;
-            for (JHVEventRelation jer : event.getEventRelationShip().getNextEvents().values()) {
-                if (jer.getTheEvent() != null) {
-                    if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
-                        localRelationNr++;
-                    }
-                }
-            }
-            for (JHVEventRelation jer : event.getEventRelationShip().getPrecedingEvents().values()) {
-                if (jer.getTheEvent() != null) {
-                    if (handleEvent(jer.getTheEvent(), relatedEventPosition, localRelationNr)) {
-                        localRelationNr++;
-                    }
-                }
-            }
-            TreeMap<Date, JHVEvent> sortedRelatedEvents = new TreeMap<Date, JHVEvent>();
-            for (JHVEventRelation jer : event.getEventRelationShip().getRelatedEventsByRule().values()) {
-                if (jer.getTheEvent() != null) {
-                    sortedRelatedEvents.put(jer.getTheEvent().getStartDate(), jer.getTheEvent());
-                }
-            }
-            for (JHVEvent relEvent : sortedRelatedEvents.values()) {
-                if (relEvent.getJHVEventType().equals(event.getJHVEventType())) {
-                    if (!uniqueIDs.contains(relEvent.getUniqueID())) {
-                        plotConfig.add(creatEventPlotConfiguration(relEvent, relatedEventPosition, localRelationNr));
-                    }
-                }
-            }
             return true;
         } else {
             return false;

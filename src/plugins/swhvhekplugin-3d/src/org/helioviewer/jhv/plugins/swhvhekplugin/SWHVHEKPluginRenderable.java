@@ -102,10 +102,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        Color color = evt.getEventRelationShip().getRelationshipColor();
-        if (color == null) {
-            color = evt.getColor();
-        }
+        Color color = evt.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);
@@ -164,10 +161,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             }
         }
 
-        Color color = evt.getEventRelationShip().getRelationshipColor();
-        if (color == null) {
-            color = evt.getColor();
-        }
+        Color color = evt.getColor();
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         gl.glLineWidth(evt.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
@@ -271,10 +265,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        Color color = evt.getEventRelationShip().getRelationshipColor();
-        if (color == null) {
-            color = evt.getColor();
-        }
+        Color color = evt.getColor();
 
         gl.glColor3f(0, 0, 0);
         gl.glLineWidth(LINEWIDTH_CACTUS * 1.2f);

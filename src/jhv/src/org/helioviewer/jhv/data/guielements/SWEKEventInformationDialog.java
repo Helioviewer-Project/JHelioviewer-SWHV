@@ -168,21 +168,22 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
+        /*
+                Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
+                if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
+                    precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", precedingEvents);
+                }
 
-        Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
-        if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
-            precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", precedingEvents);
-        }
+                Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
+                if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
+                    followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", nextEvents);
+                }
 
-        Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
-        if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
-            followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", nextEvents);
-        }
-
-        Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
-        if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
-            otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
-        }
+                Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
+                if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
+                    otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
+                }
+                */
     }
 
     private boolean notNullRelationShip(Map<String, JHVEventRelation> precedingEvents) {

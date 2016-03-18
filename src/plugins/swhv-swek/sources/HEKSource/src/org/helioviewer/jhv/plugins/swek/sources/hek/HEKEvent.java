@@ -9,9 +9,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.data.datatype.event.AbstractJHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelationship;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
@@ -74,51 +72,6 @@ public class HEKEvent extends AbstractJHVEvent {
     /** The color in which the event should be drawn */
     private final Color color;
 
-    /** The event relation ships of the event */
-    private final JHVEventRelationship eventRelationShip;
-
-    /**
-     * Default constructor
-     */
-    public HEKEvent() {
-        super();
-        initLists();
-        eventName = "";
-        eventDisplayName = "";
-        description = "";
-        icon = null;
-        eventType = null;
-        color = Color.black;
-        eventRelationShip = new JHVEventRelationship();
-    }
-
-    /**
-     * Creates a HEK event with an event name, event display name, short
-     * description, an event type and color.
-     *
-     *
-     * @param eventName
-     *            the event name
-     * @param eventDisplayName
-     *            the event display name
-     * @param description
-     *            the short description
-     * @param eventType
-     *            the event type
-     * @param color
-     *            the color
-     */
-    public HEKEvent(String eventName, String eventDisplayName, String description, JHVEventType eventType, Color color) {
-        initLists();
-        this.eventName = eventName;
-        this.eventDisplayName = eventDisplayName;
-        this.description = description;
-        icon = null;
-        this.eventType = eventType;
-        this.color = color;
-        eventRelationShip = new JHVEventRelationship();
-    }
-
     /**
      * Creates a HEK event with an event name, event display name, short
      * description, event type, an icon and color.
@@ -142,7 +95,17 @@ public class HEKEvent extends AbstractJHVEvent {
         this.icon = icon;
         this.eventType = eventType;
         this.color = color;
-        eventRelationShip = new JHVEventRelationship();
+    }
+
+    private void initLists() {
+        allParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
+        positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
     }
 
     @Override
@@ -230,16 +193,6 @@ public class HEKEvent extends AbstractJHVEvent {
         return uniqueID;
     }
 
-    @Override
-    public JHVEventRelationship getEventRelationShip() {
-        return eventRelationShip;
-    }
-
-    @Override
-    public void merge(JHVEvent event) {
-        eventRelationShip.merge(event.getEventRelationShip());
-    }
-
     /**
      * Adds a parameter to the event.
      *
@@ -311,17 +264,4 @@ public class HEKEvent extends AbstractJHVEvent {
         this.positionInformation.put(coorSys, positionInformation);
     }
 
-    /**
-     * Initialize all the lists.
-     */
-    private void initLists() {
-        allParameters = new HashMap<String, JHVEventParameter>();
-        allVisibleParameters = new HashMap<String, JHVEventParameter>();
-        allVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
-        allVisibleNullParameters = new HashMap<String, JHVEventParameter>();
-        allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
-        allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
-        allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
-        positionInformation = new HashMap<JHVCoordinateSystem, JHVPositionInformation>();
-    }
 }
