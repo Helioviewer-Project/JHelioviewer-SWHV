@@ -109,7 +109,7 @@ public class JHVRelatedEvents {
             if (event.getStartDate().getTime() <= timestamp.getTime() && event.getEndDate().getTime() >= timestamp.getTime())
                 return event;
         }
-        return null;
+        return events.get(0);
     }
 
     public void addAssociation(JHVAssociation association) {
