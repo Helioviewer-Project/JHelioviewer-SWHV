@@ -14,7 +14,6 @@ import org.helioviewer.jhv.gui.interfaces.MainContentPanelPlugin;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimeIntervalLockModel;
-import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequester;
 import org.helioviewer.jhv.plugins.eveplugin.events.model.EventModel;
 import org.helioviewer.jhv.plugins.eveplugin.lines.model.EVEDrawController;
 import org.helioviewer.jhv.plugins.eveplugin.radio.data.RadioDataManager;
@@ -40,9 +39,6 @@ public class EVEPlugin implements Plugin, MainContentPanelPlugin {
 
     @Override
     public void installPlugin() {
-        EventRequester eventRequester = EventRequester.getSingletonInstance();
-        DrawController.getSingletonInstance().addTimingListener(eventRequester);
-        eventRequester.addListener(EventModel.getSingletonInstance());
         DrawController.getSingletonInstance().addTimingListener(EventModel.getSingletonInstance());
         DrawController.getSingletonInstance().setAvailableInterval(new Interval<Date>(new Date(), new Date()));
         // Create an instance of eveDrawController and leave it here

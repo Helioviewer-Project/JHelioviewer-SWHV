@@ -11,13 +11,14 @@ import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.container.JHVEventContainer;
+import org.helioviewer.jhv.data.container.JHVEventHandler;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.EVEState;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawController;
 import org.helioviewer.jhv.plugins.eveplugin.draw.TimingListener;
-import org.helioviewer.jhv.plugins.eveplugin.events.data.EventRequesterListener;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventPanel;
 import org.helioviewer.jhv.plugins.eveplugin.events.gui.EventsSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorModel;
@@ -28,13 +29,16 @@ import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelec
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class EventModel implements TimingListener, EventRequesterListener {
+public class EventModel implements TimingListener, JHVEventHandler {
 
     /** Singleton instance of the Event model */
     private static EventModel instance;
 
     /** event plot configurations */
     private EventTypePlotConfiguration eventPlotConfiguration;
+
+    /** Instance of the event container */
+    private final JHVEventContainer eventContainer;
 
     /** events visible */
     private boolean eventsVisible;
@@ -55,6 +59,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
      * Private default constructor.
      */
     private EventModel() {
+        eventContainer = JHVEventContainer.getSingletonInstance();
         eventPlotConfiguration = new EventTypePlotConfiguration();
         events = new HashMap<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>>();
         eventsVisible = false;
@@ -79,6 +84,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
 
     @Override
     public void availableIntervalChanged() {
+        Interval<Date> availableInterval = DrawController.getSingletonInstance().getAvailableInterval();
+        eventContainer.requestForInterval(availableInterval.getStart(), availableInterval.getEnd(), EventModel.this);
     }
 
     @Override
@@ -95,7 +102,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
-
         if (eventPlotConfiguration != null) {
             return eventPlotConfiguration;
         } else {
@@ -307,6 +313,12 @@ public class EventModel implements TimingListener, EventRequesterListener {
             prevNoPlotConfig = true;
         }
         return !tempPrevZero || !eventPlotConfiguration.getEventPlotConfigurations().isEmpty();
+    }
+
+    @Override
+    public void cacheUpdated() {
+        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+        eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
     }
 
 }
