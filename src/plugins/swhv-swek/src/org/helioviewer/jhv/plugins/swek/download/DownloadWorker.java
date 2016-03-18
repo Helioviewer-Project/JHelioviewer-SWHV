@@ -154,4 +154,5 @@ public class DownloadWorker implements Runnable {
     public int hashCode() {
         return (int) this.downloadStartDate.getTime();
     }
+
 }
