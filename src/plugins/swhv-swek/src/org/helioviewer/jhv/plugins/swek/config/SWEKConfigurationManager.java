@@ -1058,10 +1058,7 @@ public class SWEKConfigurationManager {
      *             if the related events could not be parsed
      */
     private SWEKRelatedEvents parseRelatedEvent(JSONObject jsonObject) throws JSONException {
-        SWEKRelatedEvents relatedEvents = new SWEKRelatedEvents();
-        relatedEvents.setEvent(parseRelatedEventName(jsonObject));
-        relatedEvents.setRelatedWith(parseRelatedWith(jsonObject));
-        relatedEvents.setRelatedOnList(parseRelatedOnList(jsonObject));
+        SWEKRelatedEvents relatedEvents = new SWEKRelatedEvents(parseRelatedEventName(jsonObject), parseRelatedWith(jsonObject), parseRelatedOnList(jsonObject));
         return relatedEvents;
     }
 
