@@ -13,6 +13,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
 import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
@@ -96,7 +97,7 @@ public class ComesepParser implements SWEKParser {
 
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("results");
-        ComesepEventType comesepEventType = new ComesepEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
+        JHVEventType comesepEventType = new JHVEventType(eventType.getEventName(), eventSource.getSourceName(), eventSupplier.getSupplierName());
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             ComesepEvent currentEvent = new ComesepEvent(eventType.getEventName(), eventType.getEventName(), "", comesepEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
@@ -187,55 +188,55 @@ public class ComesepParser implements SWEKParser {
                     endTimeSet = true;
                 }
             } else
-                // Event end time
-                if (keyString.toLowerCase().equals("atlatest")) {
-                    if (!endTimeSet) {
-                        currentEvent.setEndTime(parseDate(value));
-                        endTimeSet = true;
-                    }
-                } else
-                    // event unique ID
-                    if (keyString.toLowerCase().equals("alertid")) {
-                        currentEvent.setUniqueID(value);
-                    } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
-                        cactusLiftOff = Long.parseLong(value);
-                        if (startTimeSet) {
-                            currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
-                            endTimeSet = true;
-                        }
-                    } else if (keyString.toLowerCase().equals("begin_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        startTimeSet = true;
-                    } else if (keyString.toLowerCase().equals("end_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        endTimeSet = true;
-                    } else {
-                        boolean visible = false;
-                        boolean configured = false;
-                        JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
-                        if (!eventType.containsParameter(keyString)) {
-                            if (eventSource.containsParameter(keyString)) {
-                                configured = true;
-                                SWEKParameter p = eventSource.getParameter(keyString);
-                                if (p != null) {
-                                    visible = p.isDefaultVisible();
-                                    parameter.setParameterDisplayName(p.getParameterDisplayName());
-                                } else {
-                                    parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                                }
-                            }
+            // Event end time
+            if (keyString.toLowerCase().equals("atlatest")) {
+                if (!endTimeSet) {
+                    currentEvent.setEndTime(parseDate(value));
+                    endTimeSet = true;
+                }
+            } else
+            // event unique ID
+            if (keyString.toLowerCase().equals("alertid")) {
+                currentEvent.setUniqueID(value);
+            } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
+                cactusLiftOff = Long.parseLong(value);
+                if (startTimeSet) {
+                    currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
+                    endTimeSet = true;
+                }
+            } else if (keyString.toLowerCase().equals("begin_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                startTimeSet = true;
+            } else if (keyString.toLowerCase().equals("end_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                endTimeSet = true;
+            } else {
+                boolean visible = false;
+                boolean configured = false;
+                JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
+                if (!eventType.containsParameter(keyString)) {
+                    if (eventSource.containsParameter(keyString)) {
+                        configured = true;
+                        SWEKParameter p = eventSource.getParameter(keyString);
+                        if (p != null) {
+                            visible = p.isDefaultVisible();
+                            parameter.setParameterDisplayName(p.getParameterDisplayName());
                         } else {
-                            configured = true;
-                            SWEKParameter p = eventType.getParameter(keyString);
-                            if (p != null) {
-                                visible = p.isDefaultVisible();
-                                parameter.setParameterDisplayName(p.getParameterDisplayName());
-                            } else {
-                                parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                            }
+                            parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
                         }
-                        currentEvent.addParameter(parameter, visible, configured);
                     }
+                } else {
+                    configured = true;
+                    SWEKParameter p = eventType.getParameter(keyString);
+                    if (p != null) {
+                        visible = p.isDefaultVisible();
+                        parameter.setParameterDisplayName(p.getParameterDisplayName());
+                    } else {
+                        parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
+                    }
+                }
+                currentEvent.addParameter(parameter, visible, configured);
+            }
         }
     }
 

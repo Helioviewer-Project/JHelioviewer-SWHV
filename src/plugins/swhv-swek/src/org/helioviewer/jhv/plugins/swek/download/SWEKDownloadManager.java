@@ -26,8 +26,6 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
-import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManager;
-import org.helioviewer.jhv.plugins.swek.request.IncomingRequestManagerListener;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
 import org.helioviewer.jhv.threads.JHVThread;
 
@@ -37,13 +35,12 @@ import org.helioviewer.jhv.threads.JHVThread;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-public class SWEKDownloadManager implements IncomingRequestManagerListener, EventTypePanelModelListener, FilterManagerListener {
+public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener {
 
     private static SWEKDownloadManager instance;
     private final ExecutorService downloadEventPool;
     private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap;
     private final Map<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>> activeEventTypes;
-    private final IncomingRequestManager requestManager;
     private final JHVEventContainer eventContainer;
     private final FilterManager filterManager;
     private final SWEKTreeModel treeModel;
@@ -52,8 +49,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     private SWEKDownloadManager() {
         dwMap = new HashMap<SWEKEventType, ArrayList<DownloadWorker>>();
         activeEventTypes = new HashMap<SWEKEventType, Map<SWEKSource, Set<SWEKSupplier>>>();
-        requestManager = IncomingRequestManager.getSingletonInstance();
-        requestManager.addRequestManagerListener(this);
+
         eventContainer = JHVEventContainer.getSingletonInstance();
         filterManager = FilterManager.getSingletonInstance();
         filterManager.addFilterManagerListener(this);
@@ -83,7 +79,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         dwMap.remove(eventType);
 
         for (SWEKSupplier supplier : eventType.getSuppliers()) {
-            eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()), keepActive);
+            eventContainer.removeEvents(new JHVEventType(eventType.getEventName(), supplier.getSource().getSourceName(), supplier.getSupplierName()), keepActive);
         }
     }
 
@@ -99,7 +95,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         treeModel.setStopLoading(eventType);
 
         dwMap.remove(eventType);
-        eventContainer.removeEvents(new JHVSWEKEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
+        eventContainer.removeEvents(new JHVEventType(eventType.getEventName(), source.getSourceName(), supplier.getSupplierName()), keepActive);
     }
 
     public void workerForcedToStop(DownloadWorker worker) {
@@ -114,7 +110,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     @Override
     public void newEventTypeAndSourceActive(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
         addEventTypeToActiveEventTypeMap(eventType, swekSource, supplier);
-        JHVEventContainer.getSingletonInstance().eventTypeActivated(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
+        JHVEventContainer.getSingletonInstance().eventTypeActivated(new JHVEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
     }
 
     @Override
@@ -123,7 +119,6 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
         stopDownloadingEventType(eventType, swekSource, supplier, false);
     }
 
-    @Override
     public void newRequestForInterval(JHVEventType eventType, Interval<Date> interval) {
         downloadEventType(eventType, interval);
     }
@@ -224,7 +219,7 @@ public class SWEKDownloadManager implements IncomingRequestManagerListener, Even
     }
 
     private void downloadForAllDates(SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier supplier) {
-        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
+        Collection<Interval<Date>> allIntervals = JHVEventContainer.getSingletonInstance().getAllRequestIntervals(new JHVEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName()));
         for (Interval<Date> interval : allIntervals) {
             startDownloadEventType(eventType, swekSource, interval, supplier);
         }

@@ -101,7 +101,7 @@ public class ComesepEvent extends AbstractJHVEvent {
      * @param eventIcon
      * @param color
      */
-    public ComesepEvent(String eventName, String eventDisplayName, String description, ComesepEventType comesepEventType, ImageIcon eventIcon, Color color) {
+    public ComesepEvent(String eventName, String eventDisplayName, String description, JHVEventType comesepEventType, ImageIcon eventIcon, Color color) {
         initLists();
         this.eventName = eventName;
         this.eventDisplayName = eventDisplayName;

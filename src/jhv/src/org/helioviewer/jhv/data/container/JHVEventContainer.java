@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.data.container;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -20,14 +19,13 @@ public class JHVEventContainer {
     /** Singleton instance */
     private static JHVEventContainer singletonInstance;
 
-    /** The handlers of requests */
-    private final List<JHVEventContainerRequestHandler> requestHandlers;
-
     /** the event cache */
     private final JHVEventCache eventCache;
 
     /** the event handler cache */
     private final JHVEventHandlerCache eventHandlerCache;
+
+    private JHVEventContainerRequestHandler incomingRequestManager;
 
     private static final double factor = 0.2;
 
@@ -37,7 +35,6 @@ public class JHVEventContainer {
      * Private constructor.
      */
     private JHVEventContainer() {
-        requestHandlers = new ArrayList<JHVEventContainerRequestHandler>();
         eventHandlerCache = JHVEventHandlerCache.getSingletonInstance();
         eventCache = JHVEventCache.getSingletonInstance();
     }
@@ -52,27 +49,6 @@ public class JHVEventContainer {
             singletonInstance = new JHVEventContainer();
         }
         return singletonInstance;
-    }
-
-    /**
-     * Register a JHV event container request handler.
-     *
-     *
-     * @param handler
-     *            the handler to register
-     */
-    public void registerHandler(JHVEventContainerRequestHandler handler) {
-        requestHandlers.add(handler);
-    }
-
-    /**
-     * Removes the JHV event container request handler.
-     *
-     * @param handler
-     *            the handler to remove
-     */
-    public void removeHandler(JHVEventContainerRequestHandler handler) {
-        requestHandlers.remove(handler);
     }
 
     /**
@@ -157,10 +133,7 @@ public class JHVEventContainer {
      *            the end of the interval
      */
     private void requestEvents(JHVEventType eventType, Date startDate, Date endDate) {
-        // Log.debug("Request for events: " + requestHandlers.size());
-        for (JHVEventContainerRequestHandler handler : requestHandlers) {
-            handler.handleRequestForInterval(eventType, startDate, endDate);
-        }
+        incomingRequestManager.handleRequestForInterval(eventType, startDate, endDate);
     }
 
     /**
@@ -207,4 +180,8 @@ public class JHVEventContainer {
         lastHighlighted = event;
     }
 
+    public void registerHandler(JHVEventContainerRequestHandler incomingRequestManager) {
+        this.incomingRequestManager = incomingRequestManager;
+
+    }
 }
