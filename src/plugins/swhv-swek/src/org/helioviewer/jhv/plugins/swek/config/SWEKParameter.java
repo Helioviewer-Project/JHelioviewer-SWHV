@@ -10,31 +10,19 @@ package org.helioviewer.jhv.plugins.swek.config;
 public class SWEKParameter {
 
     /** The source from where this parameter comes*/
-    private String source;
+    private final String source;
 
     /**The name of the parameter*/
-    private String parameterName;
+    private final String parameterName;
 
     /**The display name of the source*/
-    private String parameterDisplayName;
+    private final String parameterDisplayName;
 
     /**The filter of this parameter*/
-    private SWEKParameterFilter parameterFilter;
+    private final SWEKParameterFilter parameterFilter;
 
     /** Is the parameter default visible*/
     private boolean defaultVisible;
-
-    /**
-     * Creates a SWEK parameter with empty source name, parameter name, parameter display name, parameter filter and
-     * false default visibility.
-     */
-    public SWEKParameter(){
-        this.source = "";
-        this.parameterName = "";
-        this.parameterDisplayName = "";
-        this.parameterFilter = null;
-        this.defaultVisible = false;
-    }
 
     /**
      * Creates a SWEL parameter for a given source with the given parameter name, display name, filter and default visibility.
@@ -46,7 +34,6 @@ public class SWEKParameter {
      * @param defaultVisible            True is the parameter is default visible, false if not
      */
     public SWEKParameter(String source, String parameterName, String parameterDisplayName, SWEKParameterFilter parameterFilter, boolean defaultVisible) {
-        super();
         this.source = source;
         this.parameterName = parameterName;
         this.parameterDisplayName = parameterDisplayName;
@@ -64,30 +51,12 @@ public class SWEKParameter {
     }
 
     /**
-     * Sets the source for this parameter.
-     *
-     * @param source the source to set
-     */
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    /**
      * Gets the name of this parameter.
      *
      * @return the parameterName
      */
     public String getParameterName() {
         return parameterName;
-    }
-
-    /**
-     * Sets the name of this parameter
-     *
-     * @param parameterName the parameterName to set
-     */
-    public void setParameterName(String parameterName) {
-        this.parameterName = parameterName;
     }
 
     /**
@@ -100,30 +69,12 @@ public class SWEKParameter {
     }
 
     /**
-     * Sets the display name of this parameter.
-     *
-     * @param parameterDisplayName the parameterDisplayName to set
-     */
-    public void setParameterDisplayName(String parameterDisplayName) {
-        this.parameterDisplayName = parameterDisplayName;
-    }
-
-    /**
      * Gets the filter of this parameter.
      *
      * @return the parameterFilter
      */
     public SWEKParameterFilter getParameterFilter() {
         return parameterFilter;
-    }
-
-    /**
-     * Sets the filter of this parameter.
-     *
-     * @param parameterFilter the parameterFilter to set
-     */
-    public void setParameterFilter(SWEKParameterFilter parameterFilter) {
-        this.parameterFilter = parameterFilter;
     }
 
     /**

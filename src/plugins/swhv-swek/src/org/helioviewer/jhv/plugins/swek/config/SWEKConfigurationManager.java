@@ -386,14 +386,7 @@ public class SWEKConfigurationManager {
      *             if the source could not be parsed
      */
     private SWEKSource parseSource(JSONObject jsonObject) throws JSONException {
-        SWEKSource source = new SWEKSource();
-        source.setSourceName(parseSourceName(jsonObject));
-        source.setProviderName(parseProviderName(jsonObject));
-        source.setDownloaderClass(parseDownloader(jsonObject));
-        source.setEventParserClass(parseEventParser(jsonObject));
-        source.setJarLocation(parseJarLocation(jsonObject));
-        source.setBaseURL(parseBaseURL(jsonObject));
-        source.setGeneralParameters(parseGeneralParameters(jsonObject));
+        SWEKSource source = new SWEKSource(parseSourceName(jsonObject), parseProviderName(jsonObject), parseDownloader(jsonObject), parseJarLocation(jsonObject), parseEventParser(jsonObject), parseBaseURL(jsonObject), parseGeneralParameters(jsonObject));
         return source;
     }
 
@@ -751,12 +744,7 @@ public class SWEKConfigurationManager {
      *             if the parameter could not be parsed
      */
     private SWEKParameter parseParameter(JSONObject jsonObject) throws JSONException {
-        SWEKParameter parameter = new SWEKParameter();
-        parameter.setSource(parseSourceInParameter(jsonObject));
-        parameter.setParameterName(parseParameterName(jsonObject));
-        parameter.setParameterDisplayName(parseParameterDisplayName(jsonObject));
-        parameter.setParameterFilter(parseParameterFilter(jsonObject));
-        parameter.setDefaultVisible(parseDefaultVisible(jsonObject));
+        SWEKParameter parameter = new SWEKParameter(parseSourceInParameter(jsonObject), parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
         return parameter;
     }
 
