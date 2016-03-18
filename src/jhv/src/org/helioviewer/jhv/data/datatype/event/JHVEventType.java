@@ -1,30 +1,56 @@
 package org.helioviewer.jhv.data.datatype.event;
 
-/**
- * Describes the type of an event.
- * 
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
- */
-public interface JHVEventType {
-    /**
-     * Gets the event type.
-     * 
-     * @return the event type
-     */
-    public abstract String getEventType();
+public class JHVEventType {
+
+    /** The event type */
+    private final String eventType;
+
+    /** The event source */
+    private final String eventSource;
+
+    /** The event provider */
+    private final String eventProvider;
 
     /**
-     * Gets the event source.
-     * 
-     * @return the event source
+     * Default constructor.
      */
-    public abstract String getEventSource();
+    public JHVEventType() {
+        eventType = "";
+        eventSource = "";
+        eventProvider = "";
+    }
 
-    /**
-     * Gets the event provider.
-     * 
-     * @return the provider
-     */
-    public abstract String getEventProvider();
+    public JHVEventType(String eventType, String eventSource, String eventProvider) {
+        this.eventType = eventType;
+        this.eventSource = eventSource;
+        this.eventProvider = eventProvider;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public String getEventSource() {
+        return eventSource;
+    }
+
+    public String getEventProvider() {
+        return eventProvider;
+    }
+
+    @Override
+    public final boolean equals(Object otherEventType) {
+        if (otherEventType instanceof JHVEventType) {
+            JHVEventType otherHekEvent = (JHVEventType) otherEventType;
+            return otherHekEvent.getEventType().equals(getEventType()) && otherHekEvent.getEventSource().equals(getEventSource()) && otherHekEvent.getEventProvider().equals(getEventProvider());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public final int hashCode() {
+        return (getEventType() + getEventSource() + getEventProvider()).hashCode();
+    }
+
 }

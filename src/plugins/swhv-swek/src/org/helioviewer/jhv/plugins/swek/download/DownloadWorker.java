@@ -124,7 +124,7 @@ public class DownloadWorker implements Runnable {
     }
 
     public JHVEventType getJHVEventType() {
-        return new JHVSWEKEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName());
+        return new JHVEventType(eventType.getEventName(), swekSource.getSourceName(), supplier.getSupplierName());
     }
 
     public Date getDownloadEndDate() {
