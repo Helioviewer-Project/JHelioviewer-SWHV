@@ -14,7 +14,7 @@ public class SWEKRelatedEvents {
     private final SWEKEventType event;
 
     /** The related event */
-    private SWEKEventType relatedWith;
+    private final SWEKEventType relatedWith;
 
     /** The parameters on which they are related */
     private final List<SWEKRelatedOn> relatedOnList;
@@ -49,15 +49,6 @@ public class SWEKRelatedEvents {
      */
     public SWEKEventType getRelatedWith() {
         return relatedWith;
-    }
-
-    /**
-     * Sets the related event
-     *
-     * @param relatedWith the relatedWith to set
-     */
-    public void setRelatedWith(SWEKEventType relatedWith) {
-        this.relatedWith = relatedWith;
     }
 
     /**

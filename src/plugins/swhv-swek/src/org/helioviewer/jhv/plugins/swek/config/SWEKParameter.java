@@ -22,7 +22,7 @@ public class SWEKParameter {
     private final SWEKParameterFilter parameterFilter;
 
     /** Is the parameter default visible*/
-    private boolean defaultVisible;
+    private final boolean defaultVisible;
 
     /**
      * Creates a SWEL parameter for a given source with the given parameter name, display name, filter and default visibility.
@@ -84,15 +84,6 @@ public class SWEKParameter {
      */
     public boolean isDefaultVisible() {
         return defaultVisible;
-    }
-
-    /**
-     * Sets the default visibility.
-     *
-     * @param defaultVisible True if default visible, false if not.
-     */
-    public void setDefaultVisible(boolean defaultVisible) {
-        this.defaultVisible = defaultVisible;
     }
 
 }
