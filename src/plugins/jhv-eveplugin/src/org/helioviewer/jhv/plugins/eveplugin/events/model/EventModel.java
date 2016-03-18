@@ -4,11 +4,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.interval.Interval;
@@ -146,8 +144,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         }
     }
 
-    private Set<String> uniqueIDs = new HashSet<String>();
-    private Map<String, Integer> eventLocations = new HashMap<String, Integer>();
     private ArrayList<Date> endDates = new ArrayList<Date>();
     private Date minimalEndDate = null;
     private Date maximumEndDate = null;
@@ -197,8 +193,6 @@ public class EventModel implements TimingListener, EventRequesterListener {
         } else {
             Log.debug("event plot configurations not visible");
         }
-        uniqueIDs = new HashSet<String>();
-        eventLocations = new HashMap<String, Integer>();
         endDates = new ArrayList<Date>();
         minimalEndDate = null;
         maximumEndDate = null;
