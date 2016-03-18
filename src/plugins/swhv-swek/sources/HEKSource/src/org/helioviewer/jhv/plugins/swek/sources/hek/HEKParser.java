@@ -224,7 +224,7 @@ public class HEKParser implements SWEKParser {
                 Log.error(result.toString());
             }
             if (todb) {
-                JHVDatabase.dump_event2db(result.toString(), currentEvent);
+                Long id = JHVDatabase.dump_event2db(result.toString(), currentEvent);
             }
             eventStream.addJHVEvent(currentEvent);
 
@@ -278,30 +278,30 @@ public class HEKParser implements SWEKParser {
                 if (keyString.equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else
-                // Event end time
-                if (keyString.equals("event_endtime")) {
-                    currentEvent.setEndTime(parseDate(value));
-                } else
-                // event unique ID
-                if (keyString.equals("kb_archivid")) {
-                    currentEvent.setUniqueID(value);
-                } else
-                // event positions (Standard position)
-                if (keyString.equals("event_coordsys")) {
-                    coordinateSystemString = value;
-                } else if (keyString.equals("event_coord1")) {
-                    if (value != null) {
-                        coordinate1 = Double.parseDouble(value);
-                    }
-                } else if (keyString.equals("event_coord2")) {
-                    if (value != null) {
-                        coordinate2 = Double.parseDouble(value);
-                    }
-                } else if (keyString.equals("event_coord3")) {
-                    if (value != null) {
-                        coordinate3 = Double.parseDouble(value);
-                    }
-                }
+                    // Event end time
+                    if (keyString.equals("event_endtime")) {
+                        currentEvent.setEndTime(parseDate(value));
+                    } else
+                        // event unique ID
+                        if (keyString.equals("kb_archivid")) {
+                            currentEvent.setUniqueID(value);
+                        } else
+                            // event positions (Standard position)
+                            if (keyString.equals("event_coordsys")) {
+                                coordinateSystemString = value;
+                            } else if (keyString.equals("event_coord1")) {
+                                if (value != null) {
+                                    coordinate1 = Double.parseDouble(value);
+                                }
+                            } else if (keyString.equals("event_coord2")) {
+                                if (value != null) {
+                                    coordinate2 = Double.parseDouble(value);
+                                }
+                            } else if (keyString.equals("event_coord3")) {
+                                if (value != null) {
+                                    coordinate3 = Double.parseDouble(value);
+                                }
+                            }
                 // event positions (Not standard)
                 if (keyString.equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
@@ -346,28 +346,20 @@ public class HEKParser implements SWEKParser {
                 } else {
                     boolean visible = false;
                     boolean configured = false;
-                    JHVEventParameter parameter = new JHVEventParameter(originalKeyString, originalKeyString, value);
-                    if (!eventType.containsParameter(originalKeyString)) {
-                        if (eventSource.containsParameter(originalKeyString)) {
-                            configured = true;
-                            SWEKParameter p = eventSource.getParameter(originalKeyString);
-                            if (p != null) {
-                                visible = p.isDefaultVisible();
-                                parameter.setParameterDisplayName(p.getParameterDisplayName());
-                            } else {
-                                parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                            }
-                        }
-                    } else {
-                        configured = true;
-                        SWEKParameter p = eventType.getParameter(originalKeyString);
-                        if (p != null) {
-                            visible = p.isDefaultVisible();
-                            parameter.setParameterDisplayName(p.getParameterDisplayName());
-                        } else {
-                            parameter.setParameterDisplayName(parameter.getParameterName().replaceAll("_", " ").trim());
-                        }
+                    String displayName;
+                    SWEKParameter p = eventType.getParameter(originalKeyString);
+                    if (p == null) {
+                        p = eventSource.getParameter(originalKeyString);
                     }
+                    if (p != null) {
+                        configured = true;
+                        visible = p.isDefaultVisible();
+                        displayName = p.getParameterDisplayName();
+                    }
+                    else {
+                        displayName = originalKeyString.replaceAll("_", " ").trim();
+                    }
+                    JHVEventParameter parameter = new JHVEventParameter(originalKeyString, displayName, value);
                     currentEvent.addParameter(parameter, visible, configured);
                 }
             }
