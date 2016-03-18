@@ -15,13 +15,9 @@ import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
  *
  */
 public class SWEKTreeModel {
-    /** The singleton instance of the SWEKTreeModel */
+
     private static SWEKTreeModel singletonInstance;
-
-    /** Holder for the SWEK event type tree models */
     private final List<SWEKTreeModelListener> listeners;
-
-    /**  */
 
     private SWEKTreeModel() {
         listeners = new ArrayList<SWEKTreeModelListener>();
@@ -34,95 +30,42 @@ public class SWEKTreeModel {
         return singletonInstance;
     }
 
-    /**
-     * Adds a new SWEK tree model listener.
-     *
-     * @param swekTreeModelListener
-     *            the listener to add
-     */
     public void addSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
         listeners.add(swekTreeModelListener);
     }
 
-    /**
-     * removes a SWEK tree model listener.
-     *
-     * @param swekTreeModelListener
-     *            the listener to remove
-     */
     public void removeSWEKTreeModelListener(SWEKTreeModelListener swekTreeModelListener) {
         listeners.remove(swekTreeModelListener);
     }
 
-    /**
-     * Inform the SWEK tree model about a subtree that was collapsed.
-     */
     public void subTreeCollapsed() {
         fireTreeExpansionChanged();
     }
 
-    /**
-     * Inform the SWEK tree model about a subtree that was expanded.
-     */
     public void subTreeExpanded() {
         fireTreeExpansionChanged();
     }
 
-    /**
-     * Sets the event type to start loading.
-     *
-     * @param eventType
-     *            the event type that started loading
-     * @param worker
-     */
     public void setStartLoading(SWEKEventType eventType) {
-        fireEventTypeStartLoading(eventType);
+        for (SWEKTreeModelListener l : listeners) {
+            l.startedDownloadingEventType(eventType);
+        }
     }
 
-    /**
-     * Sets the event type to stop loading.
-     *
-     * @param eventType
-     *            the event type that stopped loading
-     */
     public void setStopLoading(SWEKEventType eventType) {
-        fireEventTypeStopLoading(eventType);
+        for (SWEKTreeModelListener l : listeners) {
+            l.stoppedDownloadingEventType(eventType);
+        }
     }
 
     public void resetEventType(SWEKEventType eventType) {
-        fireEventTypeStopLoading(eventType);
+        setStopLoading(eventType);
     }
 
-    /**
-     * Inform the SWEK tree model listeners about a change of the tree.
-     */
     private void fireTreeExpansionChanged() {
         for (SWEKTreeModelListener l : listeners) {
             l.expansionChanged();
         }
     }
 
-    /**
-     * Inform the tree model listeners an event type started loading.
-     *
-     * @param eventType
-     *            the event type that started loading
-     */
-    private void fireEventTypeStartLoading(SWEKEventType eventType) {
-        for (SWEKTreeModelListener l : listeners) {
-            l.startedDownloadingEventType(eventType);
-        }
-    }
-
-    /**
-     * Inform the tree model listeners an event type stopped loading.
-     *
-     * @param eventType
-     *            the event type that stopped loading
-     */
-    private void fireEventTypeStopLoading(SWEKEventType eventType) {
-        for (SWEKTreeModelListener l : listeners) {
-            l.stoppedDownloadingEventType(eventType);
-        }
-    }
 }
