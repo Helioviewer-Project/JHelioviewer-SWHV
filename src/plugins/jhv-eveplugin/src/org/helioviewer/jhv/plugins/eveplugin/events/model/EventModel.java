@@ -98,7 +98,9 @@ public class EventModel implements TimingListener, JHVEventHandler {
     @Override
     public void newEventsReceived(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events) {
         this.events = events;
+        long start = System.currentTimeMillis();
         createEventPlotConfiguration();
+        Log.debug("time it took to create plotConfigurations " + (System.currentTimeMillis() - start));
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
