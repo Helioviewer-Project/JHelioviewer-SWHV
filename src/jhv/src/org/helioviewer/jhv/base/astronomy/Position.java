@@ -43,15 +43,6 @@ public class Position {
             return String.format("%s [%f,%s]", time, distance, orientation);
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof Q) {
-                Q p = (Q) o;
-                return time.equals(p.time) && distance == p.distance && orientation.equals(p.orientation);
-            }
-            return false;
-        }
-
     }
 
 }

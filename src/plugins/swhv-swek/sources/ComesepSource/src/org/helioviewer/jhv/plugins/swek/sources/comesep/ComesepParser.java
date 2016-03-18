@@ -141,7 +141,7 @@ public class ComesepParser implements SWEKParser {
             if (keyString.toLowerCase().equals("alertid")) {
                 currentEvent.setUniqueID(value.hashCode());
             } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
-                cactusLiftOff = Long.parseLong(value);
+                cactusLiftOff = Long.valueOf(value);
                 if (startTimeSet) {
                     currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
                     endTimeSet = true;
