@@ -57,7 +57,7 @@ public class ComesepEvent implements JHVEvent {
     private final JHVEventType eventType;
 
     /** The unique identifier */
-    private String uniqueID;
+    private Integer id;
 
     /** List with positioning information for this event */
     private JHVPositionInformation positionInformation;
@@ -139,13 +139,18 @@ public class ComesepEvent implements JHVEvent {
     }
 
     @Override
-    public Integer getUniqueID() {
-        return -1;
+    public JHVPositionInformation getPositioningInformation() {
+        return positionInformation;
     }
 
     @Override
-    public JHVPositionInformation getPositioningInformation() {
-        return positionInformation;
+    public Integer getUniqueID() {
+        return id;
+    }
+
+    @Override
+    public void setUniqueID(Integer uniqueID) {
+        this.id = id;
     }
 
     /**
@@ -197,15 +202,6 @@ public class ComesepEvent implements JHVEvent {
      */
     public void setEndTime(Date endDate) {
         this.endDate = endDate;
-    }
-
-    /**
-     * Sets the unique ID for the HekEvent.
-     *
-     * @param uniqueID
-     */
-    public void setUniqueID(String uniqueID) {
-        this.uniqueID = uniqueID;
     }
 
     /**

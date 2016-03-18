@@ -102,6 +102,12 @@ public interface JHVEvent {
     public abstract Integer getUniqueID();
 
     /**
+     * Sets an unique identifier.
+     *
+     */
+    public abstract void setUniqueID(Integer id);
+
+    /**
      * Gets the list of available position informations. This is a list because
      * the position information can be added to the event in different
      * coordinate systems. Each element describes the same information but in a
