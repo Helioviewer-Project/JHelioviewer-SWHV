@@ -11,15 +11,6 @@ public class JHVEventType {
     /** The event provider */
     private final String eventProvider;
 
-    /**
-     * Default constructor.
-     */
-    public JHVEventType() {
-        eventType = "";
-        eventSource = "";
-        eventProvider = "";
-    }
-
     public JHVEventType(String eventType, String eventSource, String eventProvider) {
         this.eventType = eventType;
         this.eventSource = eventSource;
