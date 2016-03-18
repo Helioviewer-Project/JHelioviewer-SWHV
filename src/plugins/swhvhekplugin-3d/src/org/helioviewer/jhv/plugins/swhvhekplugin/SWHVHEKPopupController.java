@@ -19,7 +19,6 @@ import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
-import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
@@ -160,7 +159,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
 
                     hitpoint = p.orientation.rotateInverseVector(getHitPointPlane(e, vp));
                     pt = p.orientation.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
-                } else if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
+                } else {
                     hitpoint = getHitPoint(e, vp);
                     pt = pi.centralPoint();
                 }
@@ -190,7 +189,7 @@ public class SWHVHEKPopupController implements MouseListener, MouseMotionListene
                         tf = new Vec2(scale.getXValueInv(principalAngle), scale.getYValueInv(distSun));
                         mousepos = scale.mouseToGridInv(e.getPoint(), vp, camera);
                     }
-                } else if (pi.getCoordinateSystem() == JHVCoordinateSystem.JHV) {
+                } else {
                     hitpoint = getHitPoint(e, vp);
                     pt = pi.centralPoint();
                     pt = camera.getViewpoint().orientation.rotateVector(pt);

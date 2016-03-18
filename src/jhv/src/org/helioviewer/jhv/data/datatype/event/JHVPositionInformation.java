@@ -11,12 +11,6 @@ import org.helioviewer.jhv.base.math.Vec3;
  *
  */
 public interface JHVPositionInformation {
-    /**
-     * Gets the coordinate system in which the position is described.
-     *
-     * @return the coordinate system
-     */
-    public abstract JHVCoordinateSystem getCoordinateSystem();
 
     /**
      * Gets a list with coordinates defining the bounding box of the event.

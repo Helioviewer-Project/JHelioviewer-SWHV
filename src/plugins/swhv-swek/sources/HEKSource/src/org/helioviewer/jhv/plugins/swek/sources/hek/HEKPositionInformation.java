@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek.sources.hek;
 import java.util.List;
 
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.data.datatype.event.JHVCoordinateSystem;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 
 /**
@@ -13,9 +12,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
  *
  */
 public class HEKPositionInformation implements JHVPositionInformation {
-
-    /** coordinate system */
-    private final JHVCoordinateSystem coordinateSystem;
 
     /** bound box */
     private final List<Vec3> boundBox;
@@ -37,17 +33,11 @@ public class HEKPositionInformation implements JHVPositionInformation {
      * @param centralPoint
      *            the central point
      */
-    public HEKPositionInformation(JHVCoordinateSystem coordinateSystem, List<Vec3> boundBox, List<Vec3> boundCC,
+    public HEKPositionInformation(List<Vec3> boundBox, List<Vec3> boundCC,
             Vec3 centralPoint) {
-        this.coordinateSystem = coordinateSystem;
         this.boundBox = boundBox;
         this.centralPoint = centralPoint;
         this.boundCC = boundCC;
-    }
-
-    @Override
-    public JHVCoordinateSystem getCoordinateSystem() {
-        return coordinateSystem;
     }
 
     @Override
