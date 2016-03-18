@@ -167,8 +167,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
         contentPane.add(buttonPane);
         contentPane.revalidate();
-        getRootPane().setDefaultButton(btnImages);
+
         pack();
+        getRootPane().setDefaultButton(btnImages);
     }
 
     /**
@@ -212,10 +213,9 @@ public class ObservationDialog extends JDialog implements ActionListener, Showab
         }
 
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
-        getRootPane().setDefaultButton(btnImages);
 
         pack();
-
+        getRootPane().setDefaultButton(btnImages);
         setVisible(true);
     }
 

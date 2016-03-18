@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -16,12 +17,13 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import org.helioviewer.jhv.JHVDirectory;
@@ -40,7 +42,7 @@ import org.helioviewer.jhv.gui.interfaces.ShowableDialog;
  *
  * @author Stephan Pagel
  * */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class PluginsDialog extends JDialog implements ShowableDialog, ActionListener, WindowListener, ListEntryChangeListener {
 
     private boolean changesMade = false;
@@ -60,7 +62,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     private final JPanel listContainerPane = new JPanel();
     private final CardLayout listLayout = new CardLayout();
 
-    private final JButton okButton = new JButton("OK", IconBank.getIcon(JHVIcon.CHECK));
+    private final JButton closeButton = new JButton("Close");
 
     public PluginsDialog() {
         super(ImageViewerGui.getMainFrame(), "Plug-in Manager", true);
@@ -78,16 +80,8 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         addWindowListener(this);
 
         // header
-        final StringBuilder headerText = new StringBuilder();
-        headerText.append("<html><font style=\"font-family: '" + getFont().getFamily() + "'; font-size: " + getFont().getSize() + ";\">");
-        headerText.append("<p style=\"padding-left:10px\">");
-        headerText.append("You can import, enable or delete JHelioviewer plug-ins."); // TODO
-        headerText.append("</p></font></html>");
-
-        final JEditorPane headerPane = new JEditorPane("text/html", headerText.toString());
-        headerPane.setBorder(BorderFactory.createEmptyBorder(3, 3, 6, 3));
-        headerPane.setEditable(false);
-        headerPane.setOpaque(false);
+        JLabel headerLabel = new JLabel("You can import, enable or disable JHelioviewer plug-ins.");
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(3, 3, 6, 3));
 
         // center - installed plug-ins
         final JPanel installedFilterPane = new JPanel();
@@ -120,7 +114,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         addButton.addActionListener(this);
         downloadButton.addActionListener(this);
 
-        final JPanel installedPane = new JPanel();
+        JPanel installedPane = new JPanel();
         installedPane.setLayout(new BorderLayout());
         installedPane.setBorder(BorderFactory.createTitledBorder(" Installed Plug-ins "));
         installedPane.add(installedFilterPane, BorderLayout.PAGE_START);
@@ -128,25 +122,31 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         installedPane.add(installedButtonPane, BorderLayout.PAGE_END);
 
         // center
-        final JPanel centerPane = new JPanel();
+        JPanel centerPane = new JPanel();
         centerPane.setLayout(new BorderLayout());
         centerPane.add(installedPane, BorderLayout.CENTER);
 
         // footer
-        final JPanel footer = new JPanel();
+        JPanel footer = new JPanel();
         footer.setLayout(new FlowLayout(FlowLayout.RIGHT));
         footer.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
-        footer.add(okButton);
+        footer.add(closeButton);
 
-        okButton.setToolTipText("Close the dialog");
-        okButton.addActionListener(this);
+        closeButton.addActionListener(this);
 
         // content pane
         contentPane.setLayout(new BorderLayout());
         contentPane.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        contentPane.add(headerPane, BorderLayout.PAGE_START);
+        contentPane.add(headerLabel, BorderLayout.PAGE_START);
         contentPane.add(centerPane, BorderLayout.CENTER);
         contentPane.add(footer, BorderLayout.PAGE_END);
+
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeDialog();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -274,9 +274,11 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
         updatePluginList();
         pluginList.selectFirstItem();
 
-        pack();
         setSize(getPreferredSize());
         setLocationRelativeTo(ImageViewerGui.getMainFrame());
+
+        pack();
+        getRootPane().setDefaultButton(closeButton);
         setVisible(true);
     }
 
@@ -287,7 +289,7 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
      * */
     @Override
     public void actionPerformed(final ActionEvent e) {
-        if (e.getSource().equals(okButton)) {
+        if (e.getSource().equals(closeButton)) {
             closeDialog();
         } else if (e.getSource().equals(addButton)) {
             importPlugin();
@@ -358,7 +360,6 @@ public class PluginsDialog extends JDialog implements ShowableDialog, ActionList
     @Override
     public void itemChanged() {
         changesMade = true;
-
         updatePluginList();
     }
 

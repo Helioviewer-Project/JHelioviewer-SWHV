@@ -22,10 +22,10 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 /**
  * Dialog that is used to display information about a plug-in.
- * 
+ *
  * @author Stephan Pagel
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings("serial")
 public class PluginAboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
     private static final Dimension DIALOG_SIZE = new Dimension(500, 350);
