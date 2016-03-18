@@ -135,7 +135,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
     public static EventModel getSingletonInstance() {
         if (instance == null) {
             instance = new EventModel();
-
         }
         return instance;
     }
@@ -170,7 +169,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
         } else {
             return new EventTypePlotConfiguration();
         }
-
     }
 
     public boolean isEventsVisible() {
@@ -183,7 +181,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
             DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
             LineDataSelectorModel.getSingletonInstance().lineDataElementUpdated(eventSelectorElement);
         }
-
     }
 
     public void deactivateEvents() {
@@ -200,9 +197,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
             eventsActivated = true;
             DrawController.getSingletonInstance().updateDrawableElement(eventPanel);
         }
-    }
-
-    public void setPlotIdentifier(String plotIdentifier) {
     }
 
     public JHVRelatedEvents getEventAtPosition(Point point) {
@@ -229,7 +223,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
         plotConfig.add(epc);
         relatedEventPosition = epc.getEventPosition();
         return true;
-
     }
 
     private EventPlotConfiguration creatEventPlotConfiguration(JHVRelatedEvents event, int relatedEventPosition, int relationNr) {

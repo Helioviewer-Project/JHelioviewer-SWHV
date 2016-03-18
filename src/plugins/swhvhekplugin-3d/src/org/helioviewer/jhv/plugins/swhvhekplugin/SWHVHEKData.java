@@ -99,7 +99,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
 
     private void displayEvents() {
         if (beginDate != null && endDate != null) {
-
             Displayer.display();
         }
     }
@@ -129,7 +128,6 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
             if (params.containsKey("cme_radiallinvel"))
                 speed = Double.parseDouble(params.get("cme_radiallinvel").getParameterValue());
         } catch (Exception e) {
-
         }
         return speed;
     }
@@ -155,10 +153,11 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
     }
 
     public Date getStart() {
-        return this.beginDate;
+        return beginDate;
     }
 
     public Date getEnd() {
-        return this.endDate;
+        return endDate;
     }
+
 }
