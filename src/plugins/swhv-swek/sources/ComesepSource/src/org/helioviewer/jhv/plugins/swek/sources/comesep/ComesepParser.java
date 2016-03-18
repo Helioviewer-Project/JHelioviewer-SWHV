@@ -4,15 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
@@ -30,10 +28,7 @@ public class ComesepParser implements SWEKParser {
     private SWEKEventType eventType;
     private SWEKSource eventSource;
     private SWEKSupplier eventSupplier;
-    private final ComesepEventStream eventStream;
     private boolean parserStopped;
-    private final HashMap<String, List<Association>> associationsMap;
-    private final HashMap<String, ComesepEvent> associationEventsMap;
     private Long cactusLiftOff = null;
     private boolean startTimeSet = false;
     private boolean endTimeSet = false;
@@ -49,19 +44,17 @@ public class ComesepParser implements SWEKParser {
      */
     public ComesepParser() {
         parserStopped = false;
-        eventStream = new ComesepEventStream();
-        associationsMap = new HashMap<String, List<Association>>();
-        associationEventsMap = new HashMap<String, ComesepEvent>();
     }
 
     @Override
     public void stopParser() {
         parserStopped = true;
-
     }
 
     @Override
     public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents) {
+        final ComesepEventStream eventStream = new ComesepEventStream();
+
         this.eventType = eventType;
         eventSource = swekSource;
         eventSupplier = swekSupplier;
@@ -78,8 +71,8 @@ public class ComesepParser implements SWEKParser {
                 Log.debug("reply:");
                 Log.debug(reply.toString());
                 eventJSON = new JSONObject(reply);
-                parseAssociation(eventJSON);
-                parseEventJSON(eventJSON);
+                parseAssociation(eventJSON, eventStream);
+                parseEventJSON(eventJSON, eventStream);
                 return eventStream;
             } else {
                 // TODO inform the user hek is probably death...
@@ -95,62 +88,13 @@ public class ComesepParser implements SWEKParser {
         return eventStream;
     }
 
-    private void parseEventJSON(JSONObject eventJSON) throws JSONException {
+    private void parseEventJSON(JSONObject eventJSON, ComesepEventStream eventStream) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("results");
         JHVEventType comesepEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             ComesepEvent currentEvent = new ComesepEvent(eventType.getEventName(), eventType.getEventName(), "", comesepEventType, eventType.getEventIcon(), eventType.getColor());
             JSONObject result = results.getJSONObject(i);
             parseResult(result, currentEvent);
-            if (associationsMap.containsKey(currentEvent.getUniqueID())) {
-                // There is an association with the current event
-                associationEventsMap.put(currentEvent.getUniqueID(), currentEvent);
-                List<Association> associationsList = associationsMap.get(currentEvent.getUniqueID());
-                for (Association association : associationsList) {
-                    if (association.getAssociationParent().equals(currentEvent.getUniqueID())) {
-                        // current event is the parent of the association
-                        if (associationEventsMap.containsKey(association.getAssociationChild())) {
-                            // The parent event of the association is available
-                            ComesepEvent associatedEvent = associationEventsMap.get(association.getAssociationChild());
-                            // Is a sequence relation so associated event is
-                            // follow-up of current event
-                            if (currentEvent.getEventRelationShip().getPrecedingEvents().isEmpty()) {
-                                currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
-                            }
-                            associatedEvent.getEventRelationShip().getPrecedingEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                            currentEvent.getEventRelationShip().getNextEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            associatedEvent.getEventRelationShip().setRelationshipColor(currentEvent.getEventRelationShip().getRelationshipColor());
-                        } else {
-                            // The associated event is not in the list so we
-                            // start a
-                            // new color and add an association in the list
-                            // without
-                            // event reference.
-                            currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
-                            currentEvent.getEventRelationShip().getNextEvents().put(association.getAssociationChild(), new JHVEventRelation(association.getAssociationChild()));
-                        }
-                    } else if (association.getAssociationChild().equals(currentEvent.getUniqueID())) {
-                        // current event is the child event of the relationship
-                        if (associationEventsMap.containsKey(association.getAssociationParent())) {
-                            // the associated event is available
-                            ComesepEvent associatedEvent = associationEventsMap.get(association.getAssociationParent());
-                            // Is a sequence relation so the current event
-                            // is
-                            // the follow-up of the associated event
-                            associatedEvent.getEventRelationShip().getNextEvents().put(currentEvent.getUniqueID(), new JHVEventRelation(currentEvent.getUniqueID(), currentEvent));
-                            currentEvent.getEventRelationShip().getPrecedingEvents().put(associatedEvent.getUniqueID(), new JHVEventRelation(associatedEvent.getUniqueID(), associatedEvent));
-                            currentEvent.getEventRelationShip().setRelationshipColor(associatedEvent.getEventRelationShip().getRelationshipColor());
-                        } else {
-                            // The associated event is not in the list so we
-                            // start a
-                            // new color add we already add a reference to the
-                            // previous event without event type.
-                            currentEvent.getEventRelationShip().setRelationshipColor(ComesepColors.getNextColor());
-                            currentEvent.getEventRelationShip().getPrecedingEvents().put(association.getAssociationParent(), new JHVEventRelation(association.getAssociationParent()));
-                        }
-                    }
-                }
-            }
             initLocalVariables();
             eventStream.addJHVEvent(currentEvent);
         }
@@ -188,46 +132,46 @@ public class ComesepParser implements SWEKParser {
                     endTimeSet = true;
                 }
             } else
-                // Event end time
-                if (keyString.toLowerCase().equals("atlatest")) {
-                    if (!endTimeSet) {
-                        currentEvent.setEndTime(parseDate(value));
-                        endTimeSet = true;
-                    }
-                } else
-                    // event unique ID
-                    if (keyString.toLowerCase().equals("alertid")) {
-                        currentEvent.setUniqueID(value);
-                    } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
-                        cactusLiftOff = Long.parseLong(value);
-                        if (startTimeSet) {
-                            currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
-                            endTimeSet = true;
-                        }
-                    } else if (keyString.toLowerCase().equals("begin_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        startTimeSet = true;
-                    } else if (keyString.toLowerCase().equals("end_time_value")) {
-                        currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
-                        endTimeSet = true;
+            // Event end time
+            if (keyString.toLowerCase().equals("atlatest")) {
+                if (!endTimeSet) {
+                    currentEvent.setEndTime(parseDate(value));
+                    endTimeSet = true;
+                }
+            } else
+            // event unique ID
+            if (keyString.toLowerCase().equals("alertid")) {
+                currentEvent.setUniqueID(value);
+            } else if (keyString.toLowerCase().equals("liftoffduration_value")) {
+                cactusLiftOff = Long.parseLong(value);
+                if (startTimeSet) {
+                    currentEvent.setEndTime(new Date(currentEvent.getStartDate().getTime() + cactusLiftOff * 60000));
+                    endTimeSet = true;
+                }
+            } else if (keyString.toLowerCase().equals("begin_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                startTimeSet = true;
+            } else if (keyString.toLowerCase().equals("end_time_value")) {
+                currentEvent.setStartTime(new Date(Long.parseLong(value) * 1000));
+                endTimeSet = true;
+            } else {
+                boolean visible = false;
+                boolean configured = false;
+                String displayName = keyString;
+                if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
+                    configured = true;
+                    SWEKParameter p = eventSource.getParameter(keyString);
+                    if (p != null) {
+                        visible = p.isDefaultVisible();
+                        displayName = p.getParameterDisplayName();
                     } else {
-                        boolean visible = false;
-                        boolean configured = false;
-                        String displayName = keyString;
-                        if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
-                            configured = true;
-                            SWEKParameter p = eventSource.getParameter(keyString);
-                            if (p != null) {
-                                visible = p.isDefaultVisible();
-                                displayName = p.getParameterDisplayName();
-                            } else {
-                                displayName = keyString.replaceAll("_", " ").trim();
-                            }
-                        }
-                        JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
-
-                        currentEvent.addParameter(parameter, visible, configured);
+                        displayName = keyString.replaceAll("_", " ").trim();
                     }
+                }
+                JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
+
+                currentEvent.addParameter(parameter, visible, configured);
+            }
         }
     }
 
@@ -235,89 +179,20 @@ public class ComesepParser implements SWEKParser {
         return new Date(Long.parseLong(value) * 1000);
     }
 
-    private void parseAssociation(JSONObject eventJSON) throws JSONException {
+    private void parseAssociation(JSONObject eventJSON, ComesepEventStream eventStream) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("associations");
         for (int i = 0; i < associations.length() && !parserStopped; i++) {
-            Association currentAssociation = new Association();
-            currentAssociation.setAssociationChild(parseAssociationChild(associations.getJSONObject(i)));
-            currentAssociation.setAssociationParent(parseAssociationParent(associations.getJSONObject(i)));
-            List<Association> associationsChildren = new ArrayList<Association>();
-            List<Association> associationsParents = new ArrayList<Association>();
-            if (associationsMap.containsKey(currentAssociation.getAssociationChild())) {
-                associationsChildren = associationsMap.get(currentAssociation.getAssociationChild());
-            }
-            if (associationsMap.containsKey(currentAssociation.getAssociationParent())) {
-                associationsParents = associationsMap.get(currentAssociation.getAssociationParent());
-            }
-            associationsChildren.add(currentAssociation);
-            associationsParents.add(currentAssociation);
-            associationsMap.put(currentAssociation.getAssociationChild(), associationsChildren);
-            associationsMap.put(currentAssociation.getAssociationParent(), associationsParents);
+            JHVAssociation association = new JHVAssociation(parseAssociationChild(associations.getJSONObject(i)), parseAssociationParent(associations.getJSONObject(i)));
+            eventStream.addJHVAssociation(association);
         }
     }
 
-    /**
-     *
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
     private String parseAssociationParent(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("parent");
     }
 
-    /**
-     *
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
     private String parseAssociationChild(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("child");
-    }
-
-    private class Association {
-
-        private String associationChild;
-        private String associationParent;
-
-        public Association() {
-            associationChild = "";
-            associationParent = "";
-        }
-
-        /**
-         * @return the associationIvorn1
-         */
-        public String getAssociationChild() {
-            return associationChild;
-        }
-
-        /**
-         * @param associationChild
-         *            the associationChild to set
-         */
-        public void setAssociationChild(String associationChild) {
-            this.associationChild = associationChild;
-        }
-
-        /**
-         * @return the associationParent
-         */
-        public String getAssociationParent() {
-            return associationParent;
-        }
-
-        /**
-         * @param associationParent
-         *            the associationParent to set
-         */
-        public void setAssociationParent(String associationParent) {
-            this.associationParent = associationParent;
-        }
-
     }
 
 }
