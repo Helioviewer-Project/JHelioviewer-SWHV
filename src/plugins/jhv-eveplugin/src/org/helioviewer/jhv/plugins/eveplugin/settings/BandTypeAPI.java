@@ -21,7 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class BandTypeAPI extends APIAbstract {
+public class BandTypeAPI {
 
     private static BandTypeAPI singletonInstance;
     private BandType[] bandtypes;
@@ -31,6 +31,7 @@ public class BandTypeAPI extends APIAbstract {
     private boolean isUpdated = false;
 
     private final Properties defaultProperties = new Properties();
+    private String baseUrl;
 
     public static BandTypeAPI getSingletonInstance() {
         if (singletonInstance == null) {
@@ -56,12 +57,15 @@ public class BandTypeAPI extends APIAbstract {
     }
 
     private String getDatasetUrl() {
-        return this.getBaseUrl() + "/datasets/index.php";
+        return this.baseUrl + "/datasets/index.php";
     }
 
-    @Override
     public String getUrl() {
-        return this.getBaseUrl();
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     private String readJSON() {
