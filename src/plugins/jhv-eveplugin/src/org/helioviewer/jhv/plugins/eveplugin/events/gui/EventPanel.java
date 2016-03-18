@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -55,7 +54,6 @@ public class EventPanel implements DrawableElement {
                 boolean first = true;
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
-                Log.debug("Drawed events " + entry.getValue().size() + "for event type " + eventType.getEventType().getEventName());
                 for (EventPlotConfiguration epc : entry.getValue()) {
                     JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
                     if (rEvent != null) {
