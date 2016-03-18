@@ -263,8 +263,9 @@ public class HEKParser implements SWEKParser {
      */
     private void parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
         if (key instanceof String) {
-            String keyString = (String) key;
-            if (keyString.toLowerCase().equals("refs")) {
+            String originalKeyString = ((String) key);
+            String keyString = originalKeyString.toLowerCase();
+            if (keyString.equals("refs")) {
                 parseRefs(currentEvent, result.getJSONArray((String) key));
             } else {
                 String value = null;
@@ -274,82 +275,82 @@ public class HEKParser implements SWEKParser {
                     return;
 
                 // Event start time
-                if (keyString.toLowerCase().equals("event_starttime")) {
+                if (keyString.equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else
                 // Event end time
-                if (keyString.toLowerCase().equals("event_endtime")) {
+                if (keyString.equals("event_endtime")) {
                     currentEvent.setEndTime(parseDate(value));
                 } else
                 // event unique ID
-                if (keyString.toLowerCase().equals("kb_archivid")) {
+                if (keyString.equals("kb_archivid")) {
                     currentEvent.setUniqueID(value);
                 } else
                 // event positions (Standard position)
-                if (keyString.toLowerCase().equals("event_coordsys")) {
+                if (keyString.equals("event_coordsys")) {
                     coordinateSystemString = value;
-                } else if (keyString.toLowerCase().equals("event_coord1")) {
+                } else if (keyString.equals("event_coord1")) {
                     if (value != null) {
                         coordinate1 = Double.parseDouble(value);
                     }
-                } else if (keyString.toLowerCase().equals("event_coord2")) {
+                } else if (keyString.equals("event_coord2")) {
                     if (value != null) {
                         coordinate2 = Double.parseDouble(value);
                     }
-                } else if (keyString.toLowerCase().equals("event_coord3")) {
+                } else if (keyString.equals("event_coord3")) {
                     if (value != null) {
                         coordinate3 = Double.parseDouble(value);
                     }
                 }
                 // event positions (Not standard)
-                if (keyString.toLowerCase().equals("hgc_bbox")) {
+                if (keyString.equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hgc_boundcc")) {
+                } else if (keyString.equals("hgc_boundcc")) {
                     hgcBoundCC = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hgc_coord")) {
+                } else if (keyString.equals("hgc_coord")) {
                     hgcCentralPoint = parsePoint(value);
-                } else if (keyString.toLowerCase().equals("hgc_x")) {
+                } else if (keyString.equals("hgc_x")) {
                     hgcX = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hgc_y")) {
+                } else if (keyString.equals("hgc_y")) {
                     hgcY = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hgs_bbox")) {
+                } else if (keyString.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hgs_boundcc")) {
+                } else if (keyString.equals("hgs_boundcc")) {
                     hgsBoundCC = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hgs_coord")) {
+                } else if (keyString.equals("hgs_coord")) {
                     hgsCentralPoint = parsePoint(value);
-                } else if (keyString.toLowerCase().equals("hgs_x")) {
+                } else if (keyString.equals("hgs_x")) {
                     hgsX = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hgs_y")) {
+                } else if (keyString.equals("hgs_y")) {
                     hgsY = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hpc_bbox")) {
+                } else if (keyString.equals("hpc_bbox")) {
                     hpcBoundedBox = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hpc_boundcc")) {
+                } else if (keyString.equals("hpc_boundcc")) {
                     hpcBoundCC = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hpc_coord")) {
+                } else if (keyString.equals("hpc_coord")) {
                     hpcCentralPoint = parsePoint(value);
-                } else if (keyString.toLowerCase().equals("hpc_x")) {
+                } else if (keyString.equals("hpc_x")) {
                     hpcX = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hpc_y")) {
+                } else if (keyString.equals("hpc_y")) {
                     hpcY = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hrc_bbox")) {
+                } else if (keyString.equals("hrc_bbox")) {
                     hrcBoundedBox = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hrc_boundcc")) {
+                } else if (keyString.equals("hrc_boundcc")) {
                     hrcBoundCC = parsePolygon(value);
-                } else if (keyString.toLowerCase().equals("hrc_coord")) {
+                } else if (keyString.equals("hrc_coord")) {
                     hrcCentralPoint = parsePoint(value);
-                } else if (keyString.toLowerCase().equals("hrc_a")) {
+                } else if (keyString.equals("hrc_a")) {
                     hrcA = Double.parseDouble(value);
-                } else if (keyString.toLowerCase().equals("hrc_r")) {
+                } else if (keyString.equals("hrc_r")) {
                     hrcR = Double.parseDouble(value);
                 } else {
                     boolean visible = false;
                     boolean configured = false;
-                    JHVEventParameter parameter = new JHVEventParameter(keyString, keyString, value);
-                    if (!eventType.containsParameter(keyString)) {
-                        if (eventSource.containsParameter(keyString)) {
+                    JHVEventParameter parameter = new JHVEventParameter(originalKeyString, originalKeyString, value);
+                    if (!eventType.containsParameter(originalKeyString)) {
+                        if (eventSource.containsParameter(originalKeyString)) {
                             configured = true;
-                            SWEKParameter p = eventSource.getParameter(keyString);
+                            SWEKParameter p = eventSource.getParameter(originalKeyString);
                             if (p != null) {
                                 visible = p.isDefaultVisible();
                                 parameter.setParameterDisplayName(p.getParameterDisplayName());
@@ -359,7 +360,7 @@ public class HEKParser implements SWEKParser {
                         }
                     } else {
                         configured = true;
-                        SWEKParameter p = eventType.getParameter(keyString);
+                        SWEKParameter p = eventType.getParameter(originalKeyString);
                         if (p != null) {
                             visible = p.isDefaultVisible();
                             parameter.setParameterDisplayName(p.getParameterDisplayName());
