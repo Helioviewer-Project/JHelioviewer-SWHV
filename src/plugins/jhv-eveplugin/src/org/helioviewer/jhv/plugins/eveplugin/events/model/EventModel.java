@@ -164,9 +164,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
-        long start = System.currentTimeMillis();
         createEventPlotConfiguration();
-        Log.debug("time it took to create plotConfigurations " + (System.currentTimeMillis() - start));
         if (eventPlotConfiguration != null) {
             return eventPlotConfiguration;
         } else {
