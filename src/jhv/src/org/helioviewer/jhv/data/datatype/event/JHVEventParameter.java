@@ -18,13 +18,6 @@ public class JHVEventParameter {
     /** The parameter display value */
     private String displayParameterValue;
 
-    public JHVEventParameter() {
-        parameterName = "";
-        parameterDisplayName = "";
-        parameterValue = "";
-        displayParameterValue = "";
-    }
-
     /**
      * Creates a JHVEvent parameter with a parameter name, parameter display
      * name and parameter value.
