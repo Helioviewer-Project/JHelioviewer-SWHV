@@ -54,9 +54,6 @@ public class HEKEvent extends AbstractJHVEvent {
     /** The event type */
     private final JHVEventType eventType;
 
-    /** The unique identifier */
-    private String uniqueID;
-
     /** List with positioning information for this event */
     private HashMap<JHVCoordinateSystem, JHVPositionInformation> positionInformation;
 
