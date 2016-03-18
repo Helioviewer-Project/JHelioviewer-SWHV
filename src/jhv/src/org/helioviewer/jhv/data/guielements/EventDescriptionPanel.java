@@ -25,40 +25,35 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
  */
 @SuppressWarnings("serial")
 public class EventDescriptionPanel extends JPanel implements MouseListener {
+
     private final JHVRelatedEvents revent;
     private final JHVEvent event;
 
-    private JLabel labelIcon = new JLabel();
-    private JTextArea textType = new JTextArea("N/A");
-    private JTextArea textStartTime = new JTextArea("N/A");
-
-    /**
-     * Label showing the event coordinates in the summary of the event
-     */
-    private JTextArea textEndTime = new JTextArea("N/A");
-
-    /**
-     * Label showing the color of the selected event.
-     */
-    private final JLabel colorLabel = new JLabel();
-
-    /**
-     *
-     *
-     * @param event
-     */
     public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
         this.revent = revent;
         this.event = event;
-        initVisualComponents();
-    }
 
-    private void initVisualComponents() {
-        initDescriptionText();
+        JLabel labelIcon = new JLabel(revent.getIcon());
+
+        JTextArea textType = new JTextArea(event.getJHVEventType().getEventType().getEventName());
+        textType.setBackground(this.getBackground());
+        textType.setFont(labelIcon.getFont());
+        textType.setMargin(new Insets(0, 0, 0, 0));
+
+        JTextArea textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
+        textStartTime.setBackground(this.getBackground());
+        textStartTime.setFont(labelIcon.getFont());
+        textStartTime.setMargin(new Insets(0, 0, 0, 0));
+
+        JTextArea textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
+        textEndTime.setBackground(this.getBackground());
+        textEndTime.setFont(labelIcon.getFont());
+        textEndTime.setMargin(new Insets(0, 0, 0, 0));
+
         addMouseListener(this);
         setLayout(new GridBagLayout());
 
-        labelIcon = new JLabel(revent.getIcon());
+        JLabel colorLabel = new JLabel();
         colorLabel.setBackground(revent.getColor());//.getEventRelationShip().getRelationshipColor());
         colorLabel.setOpaque(true);
 
@@ -72,14 +67,14 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         iconLabelConstraint.ipadx = 10;
 
         // add the icon
-        this.add(labelIcon, iconLabelConstraint);
+        add(labelIcon, iconLabelConstraint);
 
         // setup the summary panel
         JPanel summaryPanel = new JPanel(new GridBagLayout());
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 20));
 
-        this.addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
-        this.addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
+        addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
+        addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
         // this.addLineToSummaryPanel(summaryPanel, 2, "object_id", new
         // JTextArea(event.toString()));
         // this.addLineToSummaryPanel(summaryPanel, 4, "event_id", new
@@ -106,27 +101,7 @@ public class EventDescriptionPanel extends JPanel implements MouseListener {
         shortPanelConstraint.weightx = 1;
         shortPanelConstraint.weighty = 0;
         shortPanelConstraint.gridwidth = 1;
-        this.add(summaryPanel, shortPanelConstraint);
-    }
-
-    /**
-     * Initialize the short description.
-     *
-     */
-    private void initDescriptionText() {
-        textType = new JTextArea(event.getJHVEventType().getEventType().getEventName());
-        textType.setBackground(this.getBackground());
-        textType.setFont(labelIcon.getFont());
-        textType.setMargin(new Insets(0, 0, 0, 0));
-        textStartTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getStartDate()));
-        textStartTime.setBackground(this.getBackground());
-        textStartTime.setFont(labelIcon.getFont());
-        textStartTime.setMargin(new Insets(0, 0, 0, 0));
-
-        textEndTime = new JTextArea(TimeUtils.utcDateFormat.format(event.getEndDate()));
-        textEndTime.setBackground(this.getBackground());
-        textEndTime.setFont(labelIcon.getFont());
-        textEndTime.setMargin(new Insets(0, 0, 0, 0));
+        add(summaryPanel, shortPanelConstraint);
     }
 
     /**

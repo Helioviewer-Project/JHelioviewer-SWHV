@@ -535,7 +535,6 @@ public class SWEKConfigurationManager {
                 parseStandardSelected(object),
                 parseGroupOn(object),
                 parseCoordinateSystem(object),
-
                 parseEventIcon(object),
                 parseColor(object),
                 parseSpatialRegion(object));
@@ -565,7 +564,6 @@ public class SWEKConfigurationManager {
         } catch (URISyntaxException e) {
             Log.info("Could not parse the URI " + color + ", black returned");
         }
-
         return Color.black;
     }
 
@@ -582,8 +580,8 @@ public class SWEKConfigurationManager {
             return Color.decode(colorCode);
         } catch (NumberFormatException ex) {
             Log.info("Could not parse the color code " + colorCode + ", black returned");
-            return Color.black;
         }
+        return Color.black;
     }
 
     /**
@@ -600,9 +598,8 @@ public class SWEKConfigurationManager {
             return (Color) field.get(null);
         } catch (Exception e) {
             Log.info("Could not parse the color name " + colorName + ", black returned");
-            return Color.black; // Not defined
         }
-
+        return Color.black; // Not defined
     }
 
     /**
@@ -616,19 +613,16 @@ public class SWEKConfigurationManager {
      */
     private ImageIcon parseEventIcon(JSONObject object) throws JSONException {
         String eventIconValue = object.getString("icon");
-        if (eventIconValue != null) {
-            try {
-                URI eventIconURI = new URI(eventIconValue);
-                if (eventIconURI.getScheme().toLowerCase().equals("iconbank")) {
-                    return SWEKIconBank.getSingletonInstance().getIcon(eventIconURI.getHost());
-                } else {
-                    return SWEKIconBank.getSingletonInstance().getIcon("Other");
-                }
-                // TODO Bram : Add other ways to add icons (file,url,...)
-            } catch (URISyntaxException e) {
-                Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
-                return null;
+        try {
+            URI eventIconURI = new URI(eventIconValue);
+            if (eventIconURI.getScheme().toLowerCase().equals("iconbank")) {
+                return SWEKIconBank.getSingletonInstance().getIcon(eventIconURI.getHost());
+            } else {
+                return SWEKIconBank.getSingletonInstance().getIcon("Other");
             }
+            // TODO Bram : Add other ways to add icons (file,url,...)
+        } catch (URISyntaxException e) {
+            Log.info("Could not parse the URI " + eventIconValue + ", null icon returned");
         }
         return null;
     }
@@ -748,8 +742,7 @@ public class SWEKConfigurationManager {
      *             if the parameter could not be parsed
      */
     private SWEKParameter parseParameter(JSONObject jsonObject) throws JSONException {
-        SWEKParameter parameter = new SWEKParameter(parseSourceInParameter(jsonObject), parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
-        return parameter;
+        return new SWEKParameter(parseSourceInParameter(jsonObject), parseParameterName(jsonObject), parseParameterDisplayName(jsonObject), parseParameterFilter(jsonObject), parseDefaultVisible(jsonObject));
     }
 
     /**
@@ -809,9 +802,8 @@ public class SWEKConfigurationManager {
                     parseStartValue(filterobject),
                     parseStepSize(filterobject),
                     parseUnits(filterobject));
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
