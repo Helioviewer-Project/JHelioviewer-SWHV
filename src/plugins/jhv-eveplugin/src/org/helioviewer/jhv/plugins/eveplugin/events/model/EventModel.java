@@ -99,10 +99,7 @@ public class EventModel implements TimingListener, EventRequesterListener {
     @Override
     public void newEventsReceived(Map<String, NavigableMap<Date, NavigableMap<Date, List<JHVEvent>>>> events) {
         this.events = events;
-        Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        if (selectedInterval != null) {
-            createEventPlotConfiguration();
-        }
+        createEventPlotConfiguration();
     }
 
     public EventTypePlotConfiguration getEventTypePlotConfiguration() {
@@ -160,7 +157,8 @@ public class EventModel implements TimingListener, EventRequesterListener {
             currentSwingWorker.cancel(true);
         }
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-
+        if (selectedInterval == null)
+            return;
         currentSwingWorker = new JHVWorker<EventTypePlotConfiguration, Void>() {
 
             private final Set<String> uniqueIDs = new HashSet<String>();
