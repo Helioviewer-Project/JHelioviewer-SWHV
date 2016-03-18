@@ -284,30 +284,23 @@ public class HEKParser implements SWEKParser {
                     value = result.optString(keyString); // convert to string
                 else
                     return uid;
+
                 if (keyString.equals("event_starttime")) {
                     currentEvent.setStartTime(parseDate(value));
                 } else if (keyString.equals("event_endtime")) {
                     currentEvent.setEndTime(parseDate(value));
                 } else if (keyString.equals("kb_archivid")) {
                     uid = value;
-                } else
-                // event positions (Standard position)
-                if (keyString.equals("event_coordsys")) {
+                } else if (keyString.equals("event_coordsys")) {
                     coordinateSystemString = value;
                 } else if (keyString.equals("event_coord1")) {
-                    if (value != null) {
-                        coordinate1 = Double.parseDouble(value);
-                    }
+                    coordinate1 = Double.parseDouble(value);
                 } else if (keyString.equals("event_coord2")) {
-                    if (value != null) {
-                        coordinate2 = Double.parseDouble(value);
-                    }
+                    coordinate2 = Double.parseDouble(value);
                 } else if (keyString.equals("event_coord3")) {
-                    if (value != null) {
-                        coordinate3 = Double.parseDouble(value);
-                    }
+                    coordinate3 = Double.parseDouble(value);
                 }
-                // event positions (Not standard)
+
                 if (keyString.equals("hgc_bbox")) {
                     hgcBoundedBox = parsePolygon(value);
                 } else if (keyString.equals("hgc_boundcc")) {
