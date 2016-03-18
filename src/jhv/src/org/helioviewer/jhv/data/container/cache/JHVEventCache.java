@@ -80,11 +80,12 @@ public class JHVEventCache {
     }
 
     public void add(JHVEvent event) {
+        //TBD what on double update?
         if (relEvents.containsKey(event.getUniqueID())) {
             return;
         }
+
         JHVEventType evtType = event.getJHVEventType();
-        activeEventTypes.add(evtType);
 
         if (!events.containsKey(event.getJHVEventType())) {
             events.put(evtType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
