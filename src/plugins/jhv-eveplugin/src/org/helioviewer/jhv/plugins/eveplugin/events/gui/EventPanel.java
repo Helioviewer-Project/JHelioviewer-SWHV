@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
@@ -32,9 +33,18 @@ public class EventPanel implements DrawableElement {
         return DrawableElementType.EVENT;
     }
 
+    private long times = 0;
+    private long runStart = System.currentTimeMillis();
+    private boolean setRunStart = true;
+
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
         if (EventModel.getSingletonInstance().isEventsVisible()) {
+            long start = System.currentTimeMillis();
+            if (setRunStart) {
+                runStart = start;
+                setRunStart = false;
+            }
             EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
             int nrEventTypes = etpc.getNrOfEventTypes();
             int totalLines = etpc.getTotalNrLines();
@@ -54,6 +64,7 @@ public class EventPanel implements DrawableElement {
                 boolean first = true;
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
+                Log.debug("Drawed events " + entry.getValue().size() + "for event type " + eventType.getEventType().getEventName());
                 for (EventPlotConfiguration epc : entry.getValue()) {
                     JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
                     if (rEvent != null) {
@@ -87,6 +98,7 @@ public class EventPanel implements DrawableElement {
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
             }
+            Log.debug("time to draw: " + (System.currentTimeMillis() - start) + " drawn " + times++ + " times in " + (System.currentTimeMillis() - runStart) + " time");
         }
     }
 
