@@ -67,7 +67,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
      * @param event
      */
     public SWEKEventInformationDialog(JHVEvent event) {
-        super(ImageViewerGui.getMainFrame(), event.getJHVEventType().getEventType());
+        super(ImageViewerGui.getMainFrame(), event.getJHVEventType().getEventType().getEventName());
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(event);
@@ -75,7 +75,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
-        super(parent, event.getJHVEventType().getEventType(), modal);
+        super(parent, event.getJHVEventType().getEventType().getEventName(), modal);
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(event);

@@ -1,44 +1,39 @@
 package org.helioviewer.jhv.data.datatype.event;
 
+import java.util.ArrayList;
+
 public class JHVEventType {
 
     /** The event type */
-    private final String eventType;
+    private final SWEKEventType eventType;
 
     /** The event provider */
-    private final String eventProvider;
+    private final SWEKSupplier supplier;
 
-    public JHVEventType(String eventType, String eventProvider) {
+    private JHVEventType(SWEKEventType eventType, SWEKSupplier supplier) {
         this.eventType = eventType;
-        this.eventProvider = eventProvider;
+        this.supplier = supplier;
     }
 
-    public String getEventType() {
+    private static ArrayList<JHVEventType> evtList = new ArrayList<JHVEventType>();
+
+    public static JHVEventType getJHVEventType(SWEKEventType eventType, SWEKSupplier supplier) {
+        for (JHVEventType evt : evtList) {
+            if (evt.getEventType() == eventType && evt.supplier == supplier) {
+                return evt;
+            }
+        }
+        JHVEventType toAdd = new JHVEventType(eventType, supplier);
+        evtList.add(toAdd);
+        return toAdd;
+    }
+
+    public SWEKEventType getEventType() {
         return eventType;
     }
 
-    public String getEventProvider() {
-        return eventProvider;
-    }
-
-    @Override
-    public String toString() {
-        return eventProvider + " " + eventType;
-    }
-
-    @Override
-    public final boolean equals(Object otherEventType) {
-        if (otherEventType instanceof JHVEventType) {
-            JHVEventType otherHekEvent = (JHVEventType) otherEventType;
-            return otherHekEvent.getEventType().equals(getEventType()) && otherHekEvent.getEventProvider().equals(getEventProvider());
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public final int hashCode() {
-        return (getEventType() + getEventProvider()).hashCode();
+    public SWEKSupplier getSupplier() {
+        return supplier;
     }
 
 }

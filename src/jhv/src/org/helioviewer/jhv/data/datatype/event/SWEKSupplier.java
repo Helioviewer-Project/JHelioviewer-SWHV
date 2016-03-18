@@ -1,4 +1,6 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.data.datatype.event;
+
+import java.util.HashMap;
 
 /**
  * Defines an event type supplier.
@@ -16,6 +18,7 @@ public class SWEKSupplier {
 
     /** The display name of the supplier */
     private final String supplierDisplayName;
+    private static HashMap<String, SWEKSupplier> suppliers = new HashMap<String, SWEKSupplier>();
 
     /**
      * Creates a SWEK supplier with an supplier name and a source.
@@ -27,10 +30,19 @@ public class SWEKSupplier {
      * @param source
      *            The source on which the supplier supplies its events
      */
-    public SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
+    private SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
+
         this.supplierName = supplierName;
         this.supplierDisplayName = supplierDisplayName;
         this.source = source;
+    }
+
+    public static SWEKSupplier getSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
+        SWEKSupplier supp = suppliers.get(supplierName + source.getSourceName());
+        if (supp == null) {
+            return new SWEKSupplier(supplierName, supplierDisplayName, source);
+        }
+        return supp;
     }
 
     /**

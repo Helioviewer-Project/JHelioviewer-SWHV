@@ -6,8 +6,8 @@ import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModelListener;
 

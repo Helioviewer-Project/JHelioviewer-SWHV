@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek.model;
 
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
 /**
  * 

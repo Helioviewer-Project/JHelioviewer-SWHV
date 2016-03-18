@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.config;
+package org.helioviewer.jhv.data.datatype.event;
 
 /**
  * Describes a parameter of an event. A parameter has a source, a parameter name, a parameter display name,

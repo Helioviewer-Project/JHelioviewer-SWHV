@@ -25,12 +25,12 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
-import org.helioviewer.jhv.plugins.swek.config.SWEKEventType;
-import org.helioviewer.jhv.plugins.swek.config.SWEKParameter;
-import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedEvents;
-import org.helioviewer.jhv.plugins.swek.config.SWEKRelatedOn;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSource;
-import org.helioviewer.jhv.plugins.swek.config.SWEKSupplier;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
+import org.helioviewer.jhv.data.datatype.event.SWEKSource;
+import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
 import org.json.JSONArray;
@@ -282,9 +282,7 @@ public class HEKParser implements SWEKParser {
      */
     private void parseEventJSON(JSONObject eventJSON) throws JSONException {
         JSONArray results = eventJSON.getJSONArray("result");
-        JHVEventType hekEventType = new JHVEventType(eventType.getEventName(), eventSupplier.getSupplierName());
-        System.out.println(hekEventType);
-        System.out.println(eventType);
+        JHVEventType hekEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
 
         for (int i = 0; i < results.length() && !parserStopped; i++) {
             HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), "", hekEventType, eventType.getEventIcon(), eventType.getColor());
@@ -962,7 +960,7 @@ public class HEKParser implements SWEKParser {
                                 relatedOnList.add(jhvRelatedOn);
                             }
                         }
-                        JHVEventType relatedWith = new JHVEventType(er.getRelatedWith().getEventName(), eventSupplier.getSupplierName());
+                        JHVEventType relatedWith = JHVEventType.getJHVEventType(er.getRelatedWith(), eventSupplier);
                         JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                         rules.add(rule);
                     }
@@ -977,7 +975,7 @@ public class HEKParser implements SWEKParser {
                             relatedOnList.add(jhvRelatedOn);
                         }
                     }
-                    JHVEventType relatedWith = new JHVEventType(er.getEvent().getEventName(), eventSupplier.getSupplierName());
+                    JHVEventType relatedWith = JHVEventType.getJHVEventType(er.getEvent(), eventSupplier);
                     JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
                     rules.add(rule);
                 }
