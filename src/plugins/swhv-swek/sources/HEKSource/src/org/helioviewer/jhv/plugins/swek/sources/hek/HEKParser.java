@@ -21,13 +21,10 @@ import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelationShipRule;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.JHVRelatedOn;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
-import org.helioviewer.jhv.data.datatype.event.SWEKRelatedOn;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
@@ -44,18 +41,14 @@ import org.json.JSONObject;
  */
 public class HEKParser implements SWEKParser {
 
-    /** Is the parser stopped */
     private boolean parserStopped;
 
-    /** The event type for this parser */
     private SWEKEventType eventType;
 
-    /** the event source for this parser */
     private SWEKSource eventSource;
 
     private SWEKSupplier eventSupplier;
 
-    /** HGS coordinates */
     private List<Vec3> hgsBoundedBox;
     private List<Vec3> hgsBoundCC;
     private Vec3 hgsCentralPoint;
@@ -66,15 +59,6 @@ public class HEKParser implements SWEKParser {
 
     private List<SWEKRelatedEvents> eventRelationRules;
 
-    /**
-     * Creates a parser for the given event type and event source.
-     *
-     * @param eventType
-     *            the type of the event
-     * @param source
-     *            the source of the event
-     *
-     */
     public HEKParser() {
         parserStopped = false;
         overmax = false;
@@ -103,8 +87,6 @@ public class HEKParser implements SWEKParser {
                 }
                 JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                // Log.debug("reply:");
-                // Log.debug(reply.toString());
                 eventJSON = new JSONObject(reply);
                 parseOvermax(eventJSON);
                 eventStream.setExtraDownloadNeeded(overmax);
@@ -112,7 +94,6 @@ public class HEKParser implements SWEKParser {
                 parseEventJSON(eventJSON, eventStream, todb);
                 return eventStream;
             } else {
-                // TODO inform the user hek is probably death...
                 Log.error("Download input stream was null. Probably the hek is down.");
             }
         } catch (IOException e) {
@@ -123,19 +104,12 @@ public class HEKParser implements SWEKParser {
             e.printStackTrace();
         }
         return eventStream;
-
     }
 
     private void parseOvermax(JSONObject eventJSON) throws JSONException {
         overmax = eventJSON.getBoolean("overmax");
     }
 
-    /**
-     *
-     * @param eventJSON
-     * @param eventStream
-     * @throws JSONException
-     */
     private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
         JSONArray associations = eventJSON.getJSONArray("association");
 
@@ -146,37 +120,15 @@ public class HEKParser implements SWEKParser {
         }
     }
 
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
     private String parseFirstIvorn(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("first_ivorn");
     }
 
-    /**
-     *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
-     */
     private String parseSecondIvorn(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("second_ivorn");
     }
 
-    /**
-     * Parses the event JSON returned by the server.
-     *
-     * @param eventJSON
-     *            the JSON object
-     * @param eventStream
-     * @throws JSONException
-     *             if the json object could not be parsed
-     */
     private void parseEventJSON(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
-
         JSONArray results = eventJSON.getJSONArray("result");
         JHVEventType hekEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
 
@@ -208,16 +160,6 @@ public class HEKParser implements SWEKParser {
         }
     }
 
-    /**
-     * Parses one result returned by the HEK server.
-     *
-     * @param result
-     *            the result to be parsed.
-     * @param currentEvent
-     *            the current event the is parsed
-     * @throws JSONException
-     *             if the result could not be parsed
-     */
     private String parseResult(JSONObject result, HEKEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
         String uid = null;
@@ -231,22 +173,10 @@ public class HEKParser implements SWEKParser {
         return uid;
     }
 
-    /**
-     * Parses the parameter
-     *
-     * @param result
-     *            the result from where to parse the parameter
-     * @param key
-     *            the key in the json
-     * @param currentEvent
-     *            the event currently parsed
-     * @throws JSONException
-     *             if the parameter could not be parsed
-     */
     private String parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
         String uid = null;
         if (key instanceof String) {
-            String originalKeyString = ((String) key);
+            String originalKeyString = (String) key;
             String keyString = originalKeyString.toLowerCase();
             if (keyString.equals("refs")) {
                 parseRefs(currentEvent, result.getJSONArray((String) key));
@@ -414,37 +344,23 @@ public class HEKParser implements SWEKParser {
      * @return the GL3DVec3 or null of it could not be parsed
      */
     private Vec3 parseCoordinates(String coordinateString) {
-        Double coordinate1 = 0.0;
-        Double coordinate2 = 0.0;
-        Double coordinate3 = 0.0;
-        boolean coordinate1OK = false;
-        boolean coordinate2OK = false;
-        boolean coordinate3OK = false;
+        double[] coordinate = new double[] { 0., 0., 0. };
+        boolean notnull = false;
 
         Scanner coordinatesScanner = new Scanner(coordinateString);
         coordinatesScanner.useDelimiter(" ");
 
-        if (coordinatesScanner.hasNext()) {
-            coordinate1 = Double.valueOf(coordinatesScanner.next());
-            coordinate1OK = true;
-        }
-        if (coordinatesScanner.hasNext()) {
-            coordinate2 = Double.valueOf(coordinatesScanner.next());
-            coordinate2OK = true;
-        }
-        if (coordinatesScanner.hasNext()) {
-            coordinate3 = Double.valueOf(coordinatesScanner.next());
-            coordinate3OK = true;
+        for (int i = 0; i < 3; i++) {
+            if (coordinatesScanner.hasNext()) {
+                coordinate[i] = Double.valueOf(coordinatesScanner.next());
+                notnull = true;
+            }
         }
 
         coordinatesScanner.close();
 
-        if (coordinate1OK && coordinate2OK && coordinate3OK) {
-            return new Vec3(coordinate1, coordinate2, coordinate3);
-        } else if (coordinate1OK && coordinate2OK) {
-            return new Vec3(coordinate1, coordinate2, 0);
-        } else if (coordinate1OK) {
-            return new Vec3(coordinate1, 0, 0);
+        if (notnull) {
+            return new Vec3(coordinate[0], coordinate[1], coordinate[2]);
         }
         return null;
     }
@@ -504,15 +420,22 @@ public class HEKParser implements SWEKParser {
      */
     private boolean handleHGSCoordinates(HEKEvent currentEvent) {
         if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
-            List<Vec3> localHGSBoundedBox = new ArrayList<Vec3>();
-            List<Vec3> localHGSBoundCC = new ArrayList<Vec3>();
+            List<Vec3> localHGSBoundedBox;
+            List<Vec3> localHGSBoundCC;
             Vec3 localHGSCentralPoint = null;
+
             if (hgsBoundedBox != null) {
                 localHGSBoundedBox = hgsBoundedBox;
+            } else {
+                localHGSBoundedBox = new ArrayList<Vec3>();
             }
+
             if (hgsBoundCC != null) {
                 localHGSBoundCC = hgsBoundCC;
+            } else {
+                localHGSBoundCC = new ArrayList<Vec3>();
             }
+
             if (hgsCentralPoint != null) {
                 localHGSCentralPoint = hgsCentralPoint;
             } else {
@@ -520,14 +443,13 @@ public class HEKParser implements SWEKParser {
                     localHGSCentralPoint = new Vec3(hgsX, hgsY, 0);
                 }
             }
-            //currentEvent.addJHVPositionInformation(JHVCoordinateSystem.HGS, new HEKPositionInformation(JHVCoordinateSystem.HGS, localHGSBoundedBox, localHGSBoundCC, localHGSCentralPoint));
 
-            ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>();
+            ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
                 jhvBoundedBox.add(convertHGSJHV(el, currentEvent));
             }
 
-            ArrayList<Vec3> jhvBoundCC = new ArrayList<Vec3>();
+            ArrayList<Vec3> jhvBoundCC = new ArrayList<Vec3>(localHGSBoundCC.size());
             for (Vec3 el : localHGSBoundCC) {
                 jhvBoundCC.add(convertHGSJHV(el, currentEvent));
             }
@@ -536,13 +458,14 @@ public class HEKParser implements SWEKParser {
             if (localHGSCentralPoint != null) {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
             }
+
             currentEvent.addJHVPositionInformation(new HEKPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
             return true;
         }
         return false;
     }
 
-    private Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
+    private static Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
         Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
