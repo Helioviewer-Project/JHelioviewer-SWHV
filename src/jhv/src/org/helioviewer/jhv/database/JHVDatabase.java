@@ -26,6 +26,7 @@ import java.util.zip.GZIPOutputStream;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
@@ -629,38 +630,72 @@ public class JHVDatabase {
                     pstatement.close();
                 } catch (SQLException e)
                 {
-                    Log.error("Could not fetch id from uid " + e.getMessage());
+                    Log.error("Could not fetch events " + e.getMessage());
                     return eventList;
                 }
             }
-            /*
-            try {
-                String sqlt = "SELECT left_events.uid, right_events.uid FROM event_link "
-                        + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
-                        + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
-                        + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
-                PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                pstatement.setQueryTimeout(30);
-                pstatement.setLong(1, start);
-                pstatement.setLong(2, end);
-                pstatement.setInt(3, typeId);
-                ResultSet rs = pstatement.executeQuery();
-                boolean next = rs.next();
-
-                while (!rs.isClosed() && next) {
-                    events.append(rs.getString(1));
-                    events.append(rs.getString(1));
-                    next = rs.next();
-                }
-                rs.close();
-                pstatement.close();
-
-            } catch (SQLException e)
-            {
-            Log.error("Could not fetch id from uid " + e.getMessage());
-            }*/
             return eventList;
         }
     }
 
+    public static ArrayList<JHVAssociation> associations2Program(long start, long end, JHVEventType type) {
+        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<ArrayList<JHVAssociation>>(new Associations2Program(start, end, type));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException e) {
+            return new ArrayList<JHVAssociation>();
+        } catch (ExecutionException e) {
+            return new ArrayList<JHVAssociation>();
+        }
+    }
+
+    private static class Associations2Program implements Callable<ArrayList<JHVAssociation>> {
+        private final JHVEventType type;
+        private final long start;
+        private final long end;
+        private static String sqlt = "SELECT left_events.uid, right_events.uid FROM event_link "
+                + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
+                + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
+                + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
+
+        public Associations2Program(long _start, long _end, JHVEventType _type) {
+            type = _type;
+            start = _start;
+            end = _end;
+        }
+
+        @Override
+        public ArrayList<JHVAssociation> call() {
+            Connection connection = ConnectionThread.getConnection();
+            ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
+            if (connection == null)
+                return assocList;
+            int typeId = getEventTypeId(connection, type);
+            if (typeId != -1) {
+                try {
+                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
+                    pstatement.setQueryTimeout(30);
+                    pstatement.setLong(1, start);
+                    pstatement.setLong(2, end);
+                    pstatement.setInt(3, typeId);
+                    ResultSet rs = pstatement.executeQuery();
+                    boolean next = rs.next();
+                    while (!rs.isClosed() && next) {
+                        int left = rs.getInt(1);
+                        int right = rs.getInt(2);
+                        assocList.add(new JHVAssociation(left, right));
+                        next = rs.next();
+                    }
+                    rs.close();
+                    pstatement.close();
+                } catch (SQLException e)
+                {
+                    Log.error("Could not fetch associations " + e.getMessage());
+                    return assocList;
+                }
+            }
+            return assocList;
+        }
+    }
 }
