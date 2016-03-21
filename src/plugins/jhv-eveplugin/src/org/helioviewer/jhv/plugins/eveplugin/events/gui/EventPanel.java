@@ -37,7 +37,6 @@ public class EventPanel implements DrawableElement {
         if (EventModel.getSingletonInstance().isEventsVisible()) {
             EventTypePlotConfiguration etpc = EventModel.getSingletonInstance().getEventTypePlotConfiguration();
             int nrEventTypes = etpc.getNrOfEventTypes();
-            int totalLines = etpc.getTotalNrLines();
             int eventTypeNr = 0;
             int previousLine = 0;
 
@@ -55,7 +54,7 @@ public class EventPanel implements DrawableElement {
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
                 for (EventPlotConfiguration epc : entry.getValue()) {
-                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, previousLine, mousePosition);
                     if (rEvent != null) {
                         highlightedEvent = rEvent;
                     }
@@ -64,7 +63,7 @@ public class EventPanel implements DrawableElement {
                         shouldRedraw = epc;
                     }
                     if (first) {
-                        spacePerLine = 2 * Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
+                        spacePerLine = 6;
                         int spaceNeeded = spacePerLine * maxLines;
                         ImageIcon icon = epc.getEvent().getIcon();
                         leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
@@ -72,7 +71,7 @@ public class EventPanel implements DrawableElement {
                     first = false;
                 }
                 if (shouldRedraw != null) {
-                    shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, totalLines, previousLine, mousePosition);
+                    shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, previousLine, mousePosition);
                 }
                 previousLine += maxLines;
                 if (eventTypeNr != epcs.size() - 1) {

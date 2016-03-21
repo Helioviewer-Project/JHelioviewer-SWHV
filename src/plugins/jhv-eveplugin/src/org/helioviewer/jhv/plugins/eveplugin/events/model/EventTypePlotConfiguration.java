@@ -19,9 +19,6 @@ public class EventTypePlotConfiguration {
     /** Number of events in this event type plot configuration */
     private final int nrOfEventTypes;
 
-    /** Maximum number of lines needed for all events */
-    private final int totalNrLines;
-
     /** Maximum of lines for every event type */
     private final Map<JHVEventType, Integer> maxLinesPerEventType;
 
@@ -36,7 +33,6 @@ public class EventTypePlotConfiguration {
      */
     public EventTypePlotConfiguration() {
         nrOfEventTypes = 0;
-        totalNrLines = 0;
         maxLinesPerEventType = new HashMap<JHVEventType, Integer>();
         eventPlotConfigurations = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         lastDateWithData = null;
@@ -56,10 +52,8 @@ public class EventTypePlotConfiguration {
      * @param eventPlotConfigurations
      *            the event plot configurations
      */
-    public EventTypePlotConfiguration(int nrOfEventTypes, int totalNrLines, Map<JHVEventType, Integer> maxLinesPerEventType,
-            Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
+    public EventTypePlotConfiguration(int nrOfEventTypes, Map<JHVEventType, Integer> maxLinesPerEventType, Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
         this.nrOfEventTypes = nrOfEventTypes;
-        this.totalNrLines = totalNrLines;
         this.maxLinesPerEventType = maxLinesPerEventType;
         this.eventPlotConfigurations = eventPlotConfigurations;
         this.lastDateWithData = lastDateWithData;
@@ -72,15 +66,6 @@ public class EventTypePlotConfiguration {
      */
     public int getNrOfEventTypes() {
         return nrOfEventTypes;
-    }
-
-    /**
-     * Gets the total number of lines.
-     *
-     * @return the total number lines
-     */
-    public int getTotalNrLines() {
-        return totalNrLines;
     }
 
     /**
