@@ -15,6 +15,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.json.JSONArray;
@@ -303,10 +304,10 @@ public class HEKParser implements SWEKParser {
                 jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
             }
 
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
+            currentEvent.addJHVPositionInformation(new JHVPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
         }
         else {
-            currentEvent.addJHVPositionInformation(new HEKPositionInformation(null, null, null));
+            currentEvent.addJHVPositionInformation(JHVPositionInformation.NULLINFO);
         }
     }
 

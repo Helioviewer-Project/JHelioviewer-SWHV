@@ -18,7 +18,7 @@ public class JHVEvent {
     private Map<String, JHVEventParameter> allNonVisibleNotNullParameters;
     private Map<String, JHVEventParameter> allNonVisibleNullParameters;
     private final JHVEventType eventType;
-    private JHVPositionInformation positionInformation;
+    private JHVPositionInformation positionInformation = JHVPositionInformation.NULLINFO;
     private Integer id;
 
     public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, Date _start, Date _end) {
