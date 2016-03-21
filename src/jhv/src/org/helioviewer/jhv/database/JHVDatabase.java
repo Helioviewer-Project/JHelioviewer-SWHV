@@ -652,7 +652,7 @@ public class JHVDatabase {
         private final JHVEventType type;
         private final long start;
         private final long end;
-        private static String sqlt = "SELECT left_events.uid, right_events.uid FROM event_link "
+        private static String sqlt = "SELECT left_events.id, right_events.id FROM event_link "
                 + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
                 + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
                 + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
@@ -682,6 +682,7 @@ public class JHVDatabase {
                     while (!rs.isClosed() && next) {
                         int left = rs.getInt(1);
                         int right = rs.getInt(2);
+
                         assocList.add(new JHVAssociation(left, right));
                         next = rs.next();
                     }
