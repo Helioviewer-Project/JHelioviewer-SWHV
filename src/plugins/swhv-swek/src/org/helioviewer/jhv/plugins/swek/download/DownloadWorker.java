@@ -58,7 +58,7 @@ public class DownloadWorker implements Runnable {
             success = downloader.extern2db(jhvType, downloadStartDate, downloadEndDate, params);
             if (success) {
                 SWEKParser parser = sourceManager.getParser(swekSource);
-                ArrayList<JHVAssociation> associationList = JHVDatabase.associations2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType);
+                final ArrayList<JHVAssociation> associationList = JHVDatabase.associations2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
