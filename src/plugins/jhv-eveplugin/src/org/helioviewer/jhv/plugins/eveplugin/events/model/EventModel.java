@@ -232,7 +232,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
                 int maximumDateLine = 0;
                 int nrLines = 0;
                 int maxEventLines = 0;
-                int relatedEventPosition = -1;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
                     // Log.debug(eventType.getEventType() + " " + nrLines);
@@ -242,25 +241,21 @@ public class EventModel implements TimingListener, JHVEventHandler {
                     int relationNr = 0;
                     JHVRelatedEvents event = evr.getValue();
                     int eventPosition = 0;
-                    if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
-                        if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
-                            minimalEndDate = new Date(event.getEnd());
-                            endDates.add(minimalEndDate);
-                            eventPosition = nrLines;
-                            nrLines++;
-                        } else {
-                            if (event.getStart() > maximumEndDate.getTime()) {
-                                eventPosition = 0;
-                                nrLines = 1;
-                                endDates = new ArrayList<Date>();
-                                endDates.add(new Date(event.getEnd()));
-                            } else {
-                                eventPosition = minimalDateLine;
-                                endDates.set(minimalDateLine, new Date(event.getEnd()));
-                            }
-                        }
+                    if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
+                        minimalEndDate = new Date(event.getEnd());
+                        endDates.add(minimalEndDate);
+                        eventPosition = nrLines;
+                        nrLines++;
                     } else {
-                        endDates.set(relatedEventPosition, new Date(event.getEnd()));
+                        if (event.getStart() > maximumEndDate.getTime()) {
+                            eventPosition = 0;
+                            nrLines = 1;
+                            endDates = new ArrayList<Date>();
+                            endDates.add(new Date(event.getEnd()));
+                        } else {
+                            eventPosition = minimalDateLine;
+                            endDates.set(minimalDateLine, new Date(event.getEnd()));
+                        }
                     }
 
                     minimalDateLine = defineMinimalDateLine(endDates);
@@ -275,7 +270,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
                     if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
                         tempLastDateWithData = new Date(event.getEnd());
                     }
-                    Log.debug("event id " + event + " Event start :" + event.getStart() + " event end: " + event.getEnd() + " EventPositions: " + eventPosition + " scaledX0 " + scaledX0 + " scaledx1 " + scaledX1);
                     EventPlotConfiguration epc = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
                     plotConfig.add(epc);
                     // relatedEventPosition = epc.getEventPosition();
