@@ -22,7 +22,6 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;
 import org.helioviewer.jhv.plugins.swek.model.EventTypePanelModelListener;
 import org.helioviewer.jhv.plugins.swek.model.SWEKTreeModel;
 import org.helioviewer.jhv.plugins.swek.settings.SWEKProperties;
@@ -43,7 +42,6 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     private final JHVEventContainer eventContainer;
     private final FilterManager filterManager;
     private final SWEKTreeModel treeModel;
-    private final SWEKConfigurationManager configInstance = SWEKConfigurationManager.getSingletonInstance();
 
     private SWEKDownloadManager() {
         dwMap = new HashMap<SWEKEventType, ArrayList<DownloadWorker>>();
