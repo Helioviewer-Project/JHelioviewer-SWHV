@@ -26,15 +26,13 @@ public class ComesepParser implements SWEKParser {
             String keyString = (String) key;
             String lowerkey = keyString.toLowerCase();
             String value = null;
-            if (!result.isNull(keyString))
+            if (!result.isNull(keyString)) {
                 value = result.optString(keyString);
-            else
+            } else {
                 return;
+            }
 
-            if (!(lowerkey.equals("atearliest") ||
-                    lowerkey.equals("atlatest") ||
-                    lowerkey.equals("begin_time_value") ||
-                    lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
+            if (!(lowerkey.equals("atearliest") || lowerkey.equals("atlatest") || lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
                 currentEvent.addParameter(keyString, value);
             }
         }

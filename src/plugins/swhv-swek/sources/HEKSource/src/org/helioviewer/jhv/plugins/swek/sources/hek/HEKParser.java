@@ -29,15 +29,16 @@ import org.json.JSONObject;
  */
 public class HEKParser implements SWEKParser {
     /*
-        private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
-            JSONArray associations = eventJSON.getJSONArray("association");
-
-            for (int i = 0; i < associations.length() && !parserStopped; i++) {
-                Integer[] idlist = JHVDatabase.dump_association2db(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
-                JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
-                eventStream.addJHVAssociation(association);
-            }
-        }
+     * private void parseAssociation(JSONObject eventJSON, HEKEventStream
+     * eventStream, boolean todb) throws JSONException { JSONArray associations
+     * = eventJSON.getJSONArray("association");
+     * 
+     * for (int i = 0; i < associations.length() && !parserStopped; i++) {
+     * Integer[] idlist =
+     * JHVDatabase.dump_association2db(parseFirstIvorn(associations
+     * .getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
+     * JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
+     * eventStream.addJHVAssociation(association); } }
      */
 
     @Override
@@ -46,8 +47,9 @@ public class HEKParser implements SWEKParser {
         String name = type.getEventType().getEventName();
         final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
         boolean success = parseResult(result, currentEvent);
-        if (!success)
+        if (!success) {
             return false;
+        }
 
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -82,10 +84,11 @@ public class HEKParser implements SWEKParser {
                 parseRefs(currentEvent, result.getJSONArray((String) key));
             } else {
                 String value = null;
-                if (!result.isNull(keyString))
+                if (!result.isNull(keyString)) {
                     value = result.optString(keyString);
-                else
+                } else {
                     return false;
+                }
                 if (keyString.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
                 } else if (keyString.equals("hgs_boundcc")) {
@@ -287,8 +290,7 @@ public class HEKParser implements SWEKParser {
             }
 
             currentEvent.addJHVPositionInformation(new JHVPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
-        }
-        else {
+        } else {
             currentEvent.addJHVPositionInformation(JHVPositionInformation.NULLINFO);
         }
     }
