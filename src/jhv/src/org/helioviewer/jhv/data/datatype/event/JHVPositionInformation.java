@@ -4,33 +4,30 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.math.Vec3;
 
-/**
- * Interface defining the position of a JHVEvent.
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- *
- */
-public interface JHVPositionInformation {
+public class JHVPositionInformation {
 
-    /**
-     * Gets a list with coordinates defining the bounding box of the event.
-     *
-     * @return a list with coordinates defining the bounding box
-     */
-    public abstract List<Vec3> getBoundBox();
+    private final List<Vec3> boundBox;
+    private final List<Vec3> boundCC;
+    private final Vec3 centralPoint;
+    public static JHVPositionInformation NULLINFO = new JHVPositionInformation(null, null, null);
 
-    /**
-     * Gets the central point of the event.
-     *
-     * @return the central point.
-     */
-    public abstract Vec3 centralPoint();
+    public JHVPositionInformation(List<Vec3> boundBox, List<Vec3> boundCC,
+            Vec3 centralPoint) {
+        this.boundBox = boundBox;
+        this.centralPoint = centralPoint;
+        this.boundCC = boundCC;
+    }
 
-    /**
-     * Gets the bound coordinates. Finer grained than the bound box.
-     *
-     * @return the bound coordinates
-     */
-    public abstract List<Vec3> getBoundCC();
+    public List<Vec3> getBoundBox() {
+        return boundBox;
+    }
+
+    public Vec3 centralPoint() {
+        return centralPoint;
+    }
+
+    public List<Vec3> getBoundCC() {
+        return boundCC;
+    }
 
 }
