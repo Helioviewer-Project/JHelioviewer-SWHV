@@ -148,7 +148,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     @Override
     public void selectedIntervalChanged(boolean keepFullValueRange) {
         if (!EVEState.getSingletonInstance().isMouseTimeIntervalDragging()) {
-            createEventPlotConfiguration();
+            // createEventPlotConfiguration();
         }
     }
 
@@ -207,25 +207,16 @@ public class EventModel implements TimingListener, JHVEventHandler {
         }
     }
 
-    private ArrayList<Date> endDates = new ArrayList<Date>();
-    private Date minimalEndDate = null;
-    private Date maximumEndDate = null;
-    private int minimalDateLine = 0;
-    private int maximumDateLine = 0;
-    private int nrLines = 0;
-    private List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
-    private int maxNrLines = 0;
-    private Date tempLastDateWithData = null;
-    private int maxEventLines = 0;
+    /*
+     * private boolean handleEvent(JHVRelatedEvents event, int
+     * relatedEventPosition, int relationNr, ArrayList<Date> endDates, Date
+     * minimalEndDate) { EventPlotConfiguration epc =
+     * creatEventPlotConfiguration(event, relatedEventPosition, relationNr,
+     * endDates, minimalEndDate); plotConfig.add(epc); relatedEventPosition =
+     * epc.getEventPosition(); return true; }
+     */
 
-    private boolean handleEvent(JHVRelatedEvents event, int relatedEventPosition, int relationNr) {
-        EventPlotConfiguration epc = creatEventPlotConfiguration(event, relatedEventPosition, relationNr);
-        plotConfig.add(epc);
-        relatedEventPosition = epc.getEventPosition();
-        return true;
-    }
-
-    private EventPlotConfiguration creatEventPlotConfiguration(JHVRelatedEvents event, int relatedEventPosition, int relationNr) {
+    private EventPlotConfiguration creatEventPlotConfiguration(JHVRelatedEvents event, int relatedEventPosition, int relationNr, ArrayList<Date> endDates, Date minimalEndDate, Date maximumEndDate, int minimalDateLine, int maximumDateLine, int nrLines, Date tempLastDateWithData, int maxEventLines) {
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
 
         int eventPosition = 0;
@@ -268,21 +259,26 @@ public class EventModel implements TimingListener, JHVEventHandler {
     private void createEventPlotConfiguration() {
         final Map<JHVEventType, Integer> linesPerEventType = new HashMap<JHVEventType, Integer>();
         final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
-
         if (events.size() > 0) {
+            int maxNrLines = 0;
+            Date tempLastDateWithData = null;
             for (JHVEventType eventType : events.keySet()) {
-                endDates = new ArrayList<Date>();
-                plotConfig = new ArrayList<EventPlotConfiguration>();
-                minimalEndDate = null;
-                maximumEndDate = null;
-                minimalDateLine = 0;
-                maximumDateLine = 0;
-                nrLines = 0;
-                maxEventLines = 0;
+                ArrayList<Date> endDates = new ArrayList<Date>();
+                List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
+                Date minimalEndDate = null;
+                Date maximumEndDate = null;
+                int minimalDateLine = 0;
+                int maximumDateLine = 0;
+                int nrLines = 0;
+                int maxEventLines = 0;
                 int relatedEventPosition = -1;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
-                    handleEvent(evr.getValue(), relatedEventPosition, 0);
+                    // handleEvent(evr.getValue(), relatedEventPosition, 0,
+                    // endDates, minimalEndDate);
+                    EventPlotConfiguration epc = creatEventPlotConfiguration(evr.getValue(), relatedEventPosition, 0, endDates, minimalEndDate, maximumEndDate, minimalDateLine, maximumDateLine, nrLines, tempLastDateWithData, maxEventLines);
+                    plotConfig.add(epc);
+                    relatedEventPosition = epc.getEventPosition();
                 }
                 linesPerEventType.put(eventType, maxEventLines);
                 maxNrLines += maxEventLines;
@@ -298,16 +294,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
             prevNoPlotConfig = false;
         }
 
-        endDates = new ArrayList<Date>();
-        minimalEndDate = null;
-        maximumEndDate = null;
-        minimalDateLine = 0;
-        maximumDateLine = 0;
-        nrLines = 0;
-        plotConfig = new ArrayList<EventPlotConfiguration>();
-        maxNrLines = 0;
-        tempLastDateWithData = null;
-        maxEventLines = 0;
     }
 
     private int defineMaximumDateLine(ArrayList<Date> endDates) {
