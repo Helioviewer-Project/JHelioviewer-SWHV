@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -42,8 +41,6 @@ public class EventPanel implements DrawableElement {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
         if (EventModel.getSingletonInstance().isEventsVisible() && events.size() > 0) {
             final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-            // EventTypePlotConfiguration etpc =
-            // EventModel.getSingletonInstance().getEventTypePlotConfiguration();
 
             int nrEventTypes = events.size();
             int eventTypeNr = 0;
@@ -54,10 +51,7 @@ public class EventPanel implements DrawableElement {
             JHVRelatedEvents highlightedEvent = null;
 
             for (JHVEventType eventType : events.keySet()) {
-                // int maxLines =
-                // etpc.getMaxLinesPerEventType().get(eventType).intValue();
                 ArrayList<Date> endDates = new ArrayList<Date>();
-                List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
                 Date minimalEndDate = null;
                 Date maximumEndDate = null;
                 int minimalDateLine = 0;
