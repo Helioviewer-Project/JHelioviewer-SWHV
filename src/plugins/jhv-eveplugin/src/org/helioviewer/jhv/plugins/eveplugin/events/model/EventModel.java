@@ -113,6 +113,8 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     private boolean prevNoPlotConfig;
 
+    private Date lastDateWithData;
+
     /**
      * Private default constructor.
      */
@@ -207,11 +209,14 @@ public class EventModel implements TimingListener, JHVEventHandler {
         }
     }
 
+    public Date getLastDateWithData() {
+        return lastDateWithData;
+    }
+
     private void createEventPlotConfiguration() {
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         if (events.size() > 0) {
-            Date tempLastDateWithData = null;
             for (JHVEventType eventType : events.keySet()) {
                 ArrayList<Date> endDates = new ArrayList<Date>();
                 List<EventPlotConfiguration> plotConfig = new ArrayList<EventPlotConfiguration>();
@@ -250,8 +255,8 @@ public class EventModel implements TimingListener, JHVEventHandler {
                     if (nrLines > maxEventLines) {
                         maxEventLines = nrLines;
                     }
-                    if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
-                        tempLastDateWithData = new Date(event.getEnd());
+                    if (lastDateWithData == null || lastDateWithData.getTime() < (event.getEnd())) {
+                        lastDateWithData = new Date(event.getEnd());
                     }
                     EventPlotConfiguration epc = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
                     plotConfig.add(epc);
@@ -259,7 +264,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
                 eventPlotConfigPerEventType.put(eventType, plotConfig);
             }
 
-            eventPlotConfiguration = new EventTypePlotConfiguration(events.size(), eventPlotConfigPerEventType, tempLastDateWithData);
+            eventPlotConfiguration = new EventTypePlotConfiguration(events.size(), eventPlotConfigPerEventType);
         } else {
             eventPlotConfiguration = new EventTypePlotConfiguration();
         }
