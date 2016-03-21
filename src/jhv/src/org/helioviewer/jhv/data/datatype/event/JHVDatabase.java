@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class JHVDatabase {
     private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     private static long ENDOFTIMES = Long.MAX_VALUE;
 
-    private static byte[] compress(final String str) throws IOException {
+    public static byte[] compress(final String str) throws IOException {
         if ((str == null) || (str.length() == 0)) {
             return null;
         }
@@ -52,7 +51,7 @@ public class JHVDatabase {
         return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
     }
 
-    private static String decompress(final byte[] compressed) {
+    public static String decompress(final byte[] compressed) {
         String outStr = "";
         try {
             if ((compressed == null) || (compressed.length == 0)) {
@@ -189,7 +188,6 @@ public class JHVDatabase {
     public static Integer[] dump_association2db(String left, String right) {
         FutureTask<Integer[]> ft = new FutureTask<Integer[]>(new DumpAssociation2Db(left, right));
         executor.execute(ft);
-
         try {
             return ft.get();
         } catch (InterruptedException e) {
@@ -265,8 +263,8 @@ public class JHVDatabase {
         }
     }
 
-    public static Integer dump_event2db(String eventStr, JHVEvent event, String uid) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(eventStr, event, uid));
+    public static Integer dump_event2db(byte[] compressedJson, long start, long end, String uid, JHVEventType type) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(compressedJson, start, end, uid, type));
         executor.execute(ft);
         try {
             return ft.get();
@@ -280,54 +278,50 @@ public class JHVDatabase {
     }
 
     private static class DumpEvent2Db implements Callable<Integer> {
-        private final JHVEvent event;
-        private final String eventStr;
+        private final long start;
+        private final long end;
+        private final byte[] compressedJson;
         private final String uid;
+        JHVEventType type;
 
-        public DumpEvent2Db(String _eventStr, JHVEvent _event, String _uid) {
-            eventStr = _eventStr;
-            event = _event;
+        public DumpEvent2Db(byte[] _compressedJson, long _start, long _end, String _uid, JHVEventType _type) {
+            compressedJson = _compressedJson;
             uid = _uid;
+            start = _start;
+            end = _end;
+            type = _type;
         }
 
         @Override
         public Integer call() {
-            int generatedKey = -1;
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
-                return generatedKey;
-            byte[] compressed_data;
-            try {
-                compressed_data = compress(eventStr);
-            } catch (IOException e1) {
-                compressed_data = new byte[0];
-            }
-            try {
-                int typeId = getEventTypeId(connection, event.getJHVEventType());
+
+                return -1;
+            try
+            {
+                int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
                     String sql = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
                     PreparedStatement pstatement = connection.prepareStatement(sql);
                     pstatement.setQueryTimeout(30);
                     pstatement.setInt(1, typeId);
                     pstatement.setString(2, uid);
-                    pstatement.setLong(3, event.getStartDate().getTime());
-                    pstatement.setLong(4, event.getEndDate().getTime());
-                    pstatement.setBinaryStream(5, new ByteArrayInputStream(compressed_data), compressed_data.length);
+                    pstatement.setLong(3, start);
+                    pstatement.setLong(4, end);
+                    pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
                     pstatement.executeUpdate();
                     pstatement.close();
-                    Statement statement = connection.createStatement();
-                    ResultSet generatedKeys = statement.executeQuery("SELECT last_insert_rowid()");
-                    if (generatedKeys.next()) {
-                        generatedKey = generatedKeys.getInt(1);
-                    }
-                    generatedKeys.close();
-                } else {
+
+                }
+                else {
                     Log.error("Failed to insert event");
                 }
             } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
+                return -1;
             }
-            return generatedKey;
+            return 0;
         }
     }
 
@@ -562,6 +556,112 @@ public class JHVDatabase {
             return new ByteArrayInputStream(events.toString().getBytes());
         }
 
+    }
+
+    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type, SWEKParser parser) {
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type, parser));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException e) {
+            return new ArrayList<JsonEvent>();
+        } catch (ExecutionException e) {
+            return new ArrayList<JsonEvent>();
+        }
+    }
+
+    public static class JsonEvent {
+
+        public int id;
+        public byte[] json;
+        public JHVEventType type;
+        public long start;
+        public long end;
+
+        public JsonEvent(byte[] _json, JHVEventType _type, int _id, long _start, long _end) {
+            start = _start;
+            end = _end;
+            type = _type;
+            id = _id;
+            json = _json;
+        }
+
+    }
+
+    private static class Events2Program implements Callable<ArrayList<JsonEvent>> {
+        private final JHVEventType type;
+        private final long start;
+        private final long end;
+        SWEKParser parser;
+        private static String sqlt = "SELECT id, start, end, data FROM events WHERE start>=? and end <=? and type_id=? order by start, end ";
+
+        public Events2Program(long _start, long _end, JHVEventType _type, SWEKParser _parser) {
+            type = _type;
+            start = _start;
+            end = _end;
+            parser = _parser;
+        }
+
+        @Override
+        public ArrayList<JsonEvent> call() {
+            Connection connection = ConnectionThread.getConnection();
+            ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
+            if (connection == null)
+                return eventList;
+            int typeId = getEventTypeId(connection, type);
+            if (typeId != -1) {
+                try {
+                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
+                    pstatement.setQueryTimeout(30);
+                    pstatement.setLong(1, start);
+                    pstatement.setLong(2, end);
+                    pstatement.setInt(3, typeId);
+                    ResultSet rs = pstatement.executeQuery();
+                    boolean next = rs.next();
+                    while (!rs.isClosed() && next) {
+                        int id = rs.getInt(1);
+                        long start = rs.getLong(2);
+                        long end = rs.getLong(3);
+                        byte[] json = rs.getBytes(4);
+                        eventList.add(new JsonEvent(json, type, id, start, end));
+                        next = rs.next();
+                    }
+                    rs.close();
+                    pstatement.close();
+                } catch (SQLException e)
+                {
+                    Log.error("Could not fetch id from uid " + e.getMessage());
+                    return eventList;
+                }
+            }
+            /*
+            try {
+                String sqlt = "SELECT left_events.uid, right_events.uid FROM event_link "
+                        + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
+                        + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
+                        + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
+                PreparedStatement pstatement = connection.prepareStatement(sqlt);
+                pstatement.setQueryTimeout(30);
+                pstatement.setLong(1, start);
+                pstatement.setLong(2, end);
+                pstatement.setInt(3, typeId);
+                ResultSet rs = pstatement.executeQuery();
+                boolean next = rs.next();
+
+                while (!rs.isClosed() && next) {
+                    events.append(rs.getString(1));
+                    events.append(rs.getString(1));
+                    next = rs.next();
+                }
+                rs.close();
+                pstatement.close();
+
+            } catch (SQLException e)
+            {
+            Log.error("Could not fetch id from uid " + e.getMessage());
+            }*/
+            return eventList;
+        }
     }
 
 }

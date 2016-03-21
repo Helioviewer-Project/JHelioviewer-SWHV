@@ -30,11 +30,6 @@ public class ComesepDownloader implements SWEKDownloader {
         comesepSourceProperties = csp.getComesepProperties();
     }
 
-    @Override
-    public void stopDownload() {
-    }
-
-    @Override
     public InputStream downloadData(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
         String urlString = createURL(eventType.getEventType(), startDate, endDate, params);
         try {
@@ -131,7 +126,7 @@ public class ComesepDownloader implements SWEKDownloader {
     }
 
     @Override
-    public boolean isFromDb() {
+    public boolean extern2db(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         return false;
     }
 

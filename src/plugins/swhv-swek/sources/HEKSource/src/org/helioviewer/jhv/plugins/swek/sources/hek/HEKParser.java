@@ -1,34 +1,21 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.ParseException;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.base.time.TimeUtils;
-import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
-import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
+import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
-import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
-import org.helioviewer.jhv.data.datatype.event.SWEKSource;
-import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,141 +27,53 @@ import org.json.JSONObject;
  *
  */
 public class HEKParser implements SWEKParser {
+    /*
+        private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
+            JSONArray associations = eventJSON.getJSONArray("association");
 
-    private boolean parserStopped;
-
-    private SWEKEventType eventType;
-
-    private SWEKSource eventSource;
-
-    private SWEKSupplier eventSupplier;
-
-    private List<Vec3> hgsBoundedBox;
-    private List<Vec3> hgsBoundCC;
-    private Vec3 hgsCentralPoint;
-    private Double hgsX;
-    private Double hgsY;
-
-    private boolean overmax;
-
-    private List<SWEKRelatedEvents> eventRelationRules;
-
-    public HEKParser() {
-        parserStopped = false;
-        overmax = false;
-    }
+            for (int i = 0; i < associations.length() && !parserStopped; i++) {
+                Integer[] idlist = JHVDatabase.dump_association2db(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
+                JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
+                eventStream.addJHVAssociation(association);
+            }
+        }
+     */
 
     @Override
-    public void stopParser() {
-        parserStopped = true;
-    }
+    public boolean parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
+        JSONObject result = new JSONObject(json);
+        String name = type.getEventType().getEventName();
+        HEKEvent currentEvent = new HEKEvent(name, name, type, id, new Date(start), new Date(end));
+        boolean success = parseResult(result, currentEvent);
+        if (!success)
+            return false;
 
-    @Override
-    public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource eventSource, SWEKSupplier eventSupplier, List<SWEKRelatedEvents> relationEventRules, boolean todb) {
-        HEKEventStream eventStream = new HEKEventStream();
-
-        this.eventType = eventType;
-        this.eventSource = eventSource;
-        this.eventSupplier = eventSupplier;
-        eventRelationRules = relationEventRules;
-        try {
-            StringBuilder sb = new StringBuilder();
-            if (downloadInputStream != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(downloadInputStream, "UTF-8"));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-                JSONObject eventJSON;
-                String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                eventJSON = new JSONObject(reply);
-                parseOvermax(eventJSON);
-                eventStream.setExtraDownloadNeeded(overmax);
-                parseAssociation(eventJSON, eventStream, todb);
-                parseEventJSON(eventJSON, eventStream, todb);
-                return eventStream;
-            } else {
-                Log.error("Download input stream was null. Probably the hek is down.");
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JHVEventCache.getSingletonInstance().add(currentEvent);
             }
-        } catch (IOException e) {
-            Log.error("Could not read the inputstream. " + e);
-            e.printStackTrace();
-        } catch (JSONException e) {
-            Log.error("Could not create the JSON object from stream. " + e);
-            e.printStackTrace();
-        }
-        return eventStream;
+        });
+        return true;
     }
 
-    private void parseOvermax(JSONObject eventJSON) throws JSONException {
-        overmax = eventJSON.getBoolean("overmax");
-    }
-
-    private void parseAssociation(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
-        JSONArray associations = eventJSON.getJSONArray("association");
-
-        for (int i = 0; i < associations.length() && !parserStopped; i++) {
-            Integer[] idlist = JHVDatabase.dump_association2db(parseFirstIvorn(associations.getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
-            JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
-            eventStream.addJHVAssociation(association);
-        }
-    }
-
-    private String parseFirstIvorn(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("first_ivorn");
-    }
-
-    private String parseSecondIvorn(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString("second_ivorn");
-    }
-
-    private void parseEventJSON(JSONObject eventJSON, HEKEventStream eventStream, boolean todb) throws JSONException {
-        JSONArray results = eventJSON.getJSONArray("result");
-        JHVEventType hekEventType = JHVEventType.getJHVEventType(eventType, eventSupplier);
-
-        for (int i = 0; i < results.length() && !parserStopped; i++) {
-            HEKEvent currentEvent = new HEKEvent(eventType.getEventName(), eventType.getEventName(), hekEventType);
-            JSONObject result = results.getJSONObject(i);
-
-            String uid = parseResult(result, currentEvent);
-            handleCoordinates(currentEvent);
-
-            if (currentEvent.getEndDate().getTime() - currentEvent.getStartDate().getTime() > 3 * 24 * 60 * 60 * 1000) {
-                Log.error("Possible wrong parsing of a HEK event.");
-                Log.error("Event start: " + currentEvent.getStartDate());
-                Log.error("Event end: " + currentEvent.getEndDate());
-                Log.error("Event JSON: ");
-                Log.error(result.toString());
-            }
-
-            Integer id;
-            if (todb) {
-                id = JHVDatabase.dump_event2db(result.toString(), currentEvent, uid);
-            } else {
-                id = JHVDatabase.getEventId(uid);
-            }
-            currentEvent.setUniqueID(id);
-
-            eventStream.addJHVEvent(currentEvent);
-            reinitializeCoordinates();
-        }
-    }
-
-    private String parseResult(JSONObject result, HEKEvent currentEvent) throws JSONException {
+    private static boolean parseResult(JSONObject result, HEKEvent currentEvent) throws JSONException {
+        List<Vec3> hgsBoundedBox = null;
+        List<Vec3> hgsBoundCC = null;
+        Vec3 hgsCentralPoint = null;
+        Double hgsX = null;
+        Double hgsY = null;
         Iterator<?> keys = result.keys();
-        String uid = null;
-
+        boolean success = true;
         while (keys.hasNext()) {
-            String ret = parseParameter(result, keys.next(), currentEvent);
-            if (ret != null) {
-                uid = ret;
-            }
+            success = parseParameter(result, keys.next(), currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
         }
-        return uid;
+        handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
+
+        return success;
     }
 
-    private String parseParameter(JSONObject result, Object key, HEKEvent currentEvent) throws JSONException {
-        String uid = null;
+    private static boolean parseParameter(JSONObject result, Object key, HEKEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) throws JSONException {
         if (key instanceof String) {
             String originalKeyString = (String) key;
             String keyString = originalKeyString.toLowerCase();
@@ -183,17 +82,10 @@ public class HEKParser implements SWEKParser {
             } else {
                 String value = null;
                 if (!result.isNull(keyString))
-                    value = result.optString(keyString); // convert to string
+                    value = result.optString(keyString);
                 else
-                    return uid;
-
-                if (keyString.equals("event_starttime")) {
-                    currentEvent.setStartTime(parseDate(value));
-                } else if (keyString.equals("event_endtime")) {
-                    currentEvent.setEndTime(parseDate(value));
-                } else if (keyString.equals("kb_archivid")) {
-                    uid = value;
-                } else if (keyString.equals("hgs_bbox")) {
+                    return false;
+                if (keyString.equals("hgs_bbox")) {
                     hgsBoundedBox = parsePolygon(value);
                 } else if (keyString.equals("hgs_boundcc")) {
                     hgsBoundCC = parsePolygon(value);
@@ -207,9 +99,9 @@ public class HEKParser implements SWEKParser {
                     boolean visible = false;
                     boolean configured = false;
                     String displayName;
-                    SWEKParameter p = eventType.getParameter(originalKeyString);
+                    SWEKParameter p = currentEvent.getJHVEventType().getEventType().getParameter(originalKeyString);
                     if (p == null) {
-                        p = eventSource.getParameter(originalKeyString);
+                        p = currentEvent.getJHVEventType().getSupplier().getSource().getParameter(originalKeyString);
                     }
                     if (p != null) {
                         configured = true;
@@ -225,16 +117,16 @@ public class HEKParser implements SWEKParser {
                 }
             }
         }
-        return uid;
+        return true;
     }
 
-    private void parseRefs(HEKEvent currentEvent, JSONArray refs) throws JSONException {
-        for (int i = 0; i < refs.length() && !parserStopped; i++) {
+    private static void parseRefs(HEKEvent currentEvent, JSONArray refs) throws JSONException {
+        for (int i = 0; i < refs.length(); i++) {
             parseRef(currentEvent, refs.getJSONObject(i));
         }
     }
 
-    private void parseRef(HEKEvent currentEvent, JSONObject ref) throws JSONException {
+    private static void parseRef(HEKEvent currentEvent, JSONObject ref) throws JSONException {
         Iterator<?> keys = ref.keys();
         String url = "", type = "";
         boolean ok = false;
@@ -265,34 +157,6 @@ public class HEKParser implements SWEKParser {
     }
 
     /**
-     * Parses a date represented in the format yyyy-MM-dd'T'HH:mm:ss to a date.
-     *
-     * @param date
-     *            the date to parse
-     * @return the parsed date
-     */
-    private Date parseDate(String date) {
-        try {
-            return TimeUtils.utcDateFormat.parse(date);
-        } catch (ParseException e) {
-            Log.error("The date " + date + " could not be parsed.");
-            return null;
-        }
-    }
-
-    /**
-     * Set all coordinate again to null.
-     *
-     */
-    private void reinitializeCoordinates() {
-        hgsBoundedBox = null;
-        hgsBoundCC = null;
-        hgsCentralPoint = null;
-        hgsX = null;
-        hgsY = null;
-    }
-
-    /**
      * Parse a string of the format
      * "POLYGON((0.745758 77.471192,0.667026 75.963757,...,0.691115 69.443955,0.767379 71.565051,0.745758 77.471192))"
      *
@@ -300,7 +164,7 @@ public class HEKParser implements SWEKParser {
      *            the value to parse
      * @return a list of JHV points
      */
-    private List<Vec3> parsePolygon(String value) {
+    private static List<Vec3> parsePolygon(String value) {
         List<Vec3> polygonPoints = new ArrayList<Vec3>();
         if (value.toLowerCase().contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
@@ -327,7 +191,7 @@ public class HEKParser implements SWEKParser {
      *            the point to parse
      * @return The GL3DVec3 or null if it could not be parsed.
      */
-    private Vec3 parsePoint(String value) {
+    private static Vec3 parsePoint(String value) {
         if (value.toLowerCase().contains("point")) {
             String coordinates = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
             return parseCoordinates(coordinates);
@@ -343,7 +207,7 @@ public class HEKParser implements SWEKParser {
      *            the string to parse
      * @return the GL3DVec3 or null of it could not be parsed
      */
-    private Vec3 parseCoordinates(String coordinateString) {
+    private static Vec3 parseCoordinates(String coordinateString) {
         double[] coordinate = new double[] { 0., 0., 0. };
         boolean notnull = false;
 
@@ -356,7 +220,6 @@ public class HEKParser implements SWEKParser {
                 notnull = true;
             }
         }
-
         coordinatesScanner.close();
 
         if (notnull) {
@@ -365,25 +228,12 @@ public class HEKParser implements SWEKParser {
         return null;
     }
 
-    /**
-     * Handle the parsed information for positions
-     *
-     * @param currentEvent
-     *            the current event being parsed
-     */
-    private void handleCoordinates(HEKEvent currentEvent) {
-        checkAndFixBoundingBox();
-        boolean found = false;
-        found = handleHGSCoordinates(currentEvent);
-        //if (!found)
-        //    found = handleHGCCoordinates(currentEvent);
-        //if (!found)
-        //    found = handleHRCCoordinates(currentEvent);
-        //if (!found)
-        //    found = handleHPCCoordiantes(currentEvent);
+    private static void handleCoordinates(HEKEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
+        hgsBoundedBox = checkAndFixBoundingBox(hgsBoundedBox);
+        handleHGSCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
     }
 
-    private void checkAndFixBoundingBox() {
+    private static List<Vec3> checkAndFixBoundingBox(List<Vec3> hgsBoundedBox) {
         if (hgsBoundedBox != null) {
             double minX = 0.0;
             double minY = 0.0;
@@ -408,17 +258,10 @@ public class HEKParser implements SWEKParser {
                 hgsBoundedBox = null;
             }
         }
+        return hgsBoundedBox;
     }
 
-    /**
-     * Handles the HGS coordinates. Checks if a coordinate of that format was
-     * found and if it is the case it is added to the JHVPositionInformation
-     * list of the current event.
-     *
-     * @param currentEvent
-     *            the current event being parsed.
-     */
-    private boolean handleHGSCoordinates(HEKEvent currentEvent) {
+    private static void handleHGSCoordinates(HEKEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) {
         if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
             List<Vec3> localHGSBoundedBox;
             List<Vec3> localHGSBoundCC;
@@ -460,9 +303,10 @@ public class HEKParser implements SWEKParser {
             }
 
             currentEvent.addJHVPositionInformation(new HEKPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
-            return true;
         }
-        return false;
+        else {
+            currentEvent.addJHVPositionInformation(new HEKPositionInformation(null, null, null));
+        }
     }
 
     private static Vec3 convertHGSJHV(Vec3 el, HEKEvent evt) {
@@ -475,50 +319,4 @@ public class HEKParser implements SWEKParser {
         double y = -Math.sin(theta);
         return new Vec3(x, y, z);
     }
-
-    /*
-    private static HashMap<SWEKEventType, List<JHVEventRelationShipRule>> hmr = new HashMap<SWEKEventType, List<JHVEventRelationShipRule>>();
-
-    private List<JHVEventRelationShipRule> getEventRelationShipRules() {
-        if (!hmr.containsKey(this.eventType)) {
-            List<JHVEventRelationShipRule> rules = new ArrayList<JHVEventRelationShipRule>();
-            for (SWEKRelatedEvents er : eventRelationRules) {
-                if (er.getEvent().equals(eventType)) {
-                    if (!er.getRelatedOnList().isEmpty()) {
-                        List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
-                        for (SWEKRelatedOn ro : er.getRelatedOnList()) {
-                            if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                                JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
-                                JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
-                                JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
-                                relatedOnList.add(jhvRelatedOn);
-                            }
-                        }
-                        JHVEventType relatedWith = JHVEventType.getJHVEventType(er.getRelatedWith(), eventSupplier);
-                        JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
-                        rules.add(rule);
-                    }
-                }
-                if (er.getRelatedWith().equals(eventType)) {
-                    List<JHVRelatedOn> relatedOnList = new ArrayList<JHVRelatedOn>();
-                    for (SWEKRelatedOn ro : er.getRelatedOnList()) {
-                        if (ro.getParameterFrom() != null && ro.getParameterWith() != null) {
-                            JHVEventParameter relatedOnFrom = new JHVEventParameter(ro.getParameterWith().getParameterName(), ro.getParameterWith().getParameterDisplayName(), "");
-                            JHVEventParameter relatedOnWith = new JHVEventParameter(ro.getParameterFrom().getParameterName(), ro.getParameterFrom().getParameterDisplayName(), "");
-                            JHVRelatedOn jhvRelatedOn = new JHVRelatedOn(relatedOnFrom, relatedOnWith);
-                            relatedOnList.add(jhvRelatedOn);
-                        }
-                    }
-                    JHVEventType relatedWith = JHVEventType.getJHVEventType(er.getEvent(), eventSupplier);
-                    JHVEventRelationShipRule rule = new JHVEventRelationShipRule(relatedWith, relatedOnList);
-                    rules.add(rule);
-                }
-                hmr.put(this.eventType, rules);
-            }
-        }
-
-        return hmr.get(this.eventType);
-    }
-    */
-
 }

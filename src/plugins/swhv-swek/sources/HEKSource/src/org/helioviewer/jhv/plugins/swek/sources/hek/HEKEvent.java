@@ -17,67 +17,29 @@ import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
  */
 public class HEKEvent implements JHVEvent {
 
-    /** the start date of the event */
-    private Date startDate;
-
-    /** the end date of the event */
-    private Date endDate;
-
-    /** the event name */
+    private final Date startDate;
+    private final Date endDate;
     private final String eventName;
-
-    /** the event display name */
     private final String eventDisplayName;
-
-    /** all the parameters */
     private Map<String, JHVEventParameter> allParameters;
-
-    /** all the visible parameters */
     private Map<String, JHVEventParameter> allVisibleParameters;
-
-    /** all the visible not null parameters */
     private Map<String, JHVEventParameter> allVisibleNotNullParameters;
-
-    /** all the visible null parameters */
     private Map<String, JHVEventParameter> allVisibleNullParameters;
-
-    /** all the non visible parameters */
     private Map<String, JHVEventParameter> allNonVisibleParameters;
-
-    /** all the non visible not null parameters */
     private Map<String, JHVEventParameter> allNonVisibleNotNullParameters;
-
-    /** all the non visible null parameters */
     private Map<String, JHVEventParameter> allNonVisibleNullParameters;
-
-    /** The event type */
     private final JHVEventType eventType;
-
-    /** List with positioning information for this event */
     private JHVPositionInformation positionInformation;
-
     private Integer id;
 
-    /**
-     * Creates a HEK event with an event name, event display name, short
-     * description, event type, an icon and color.
-     *
-     * @param eventName
-     *            the event name
-     * @param eventDisplayName
-     *            the display name
-     * @param description
-     *            the description
-     * @param icon
-     *            the icon
-     * @param color
-     *            the color
-     */
-    public HEKEvent(String eventName, String eventDisplayName, JHVEventType eventType) {
+    public HEKEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, Date _start, Date _end) {
         initLists();
-        this.eventName = eventName;
-        this.eventDisplayName = eventDisplayName;
-        this.eventType = eventType;
+        eventName = _eventName;
+        eventDisplayName = _eventDisplayName;
+        eventType = _eventType;
+        startDate = _start;
+        endDate = _end;
+        id = _id;
     }
 
     private void initLists() {
@@ -196,32 +158,6 @@ public class HEKEvent implements JHVEvent {
         }
     }
 
-    /**
-     * Sets the start date of the HEKEvent.
-     *
-     * @param startDate
-     *            the start date
-     */
-    public void setStartTime(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    /**
-     * Sets the end date of the HEKEvent.
-     *
-     * @param endDate
-     *            the end date
-     */
-    public void setEndTime(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    /**
-     * Adds position information to the HEKEvent.
-     *
-     * @param positionInformation
-     *            the position information to add
-     */
     public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
         this.positionInformation = positionInformation;
     }
