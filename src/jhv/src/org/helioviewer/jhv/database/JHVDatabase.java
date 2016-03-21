@@ -27,7 +27,6 @@ import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
@@ -560,8 +559,8 @@ public class JHVDatabase {
 
     }
 
-    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type, SWEKParser parser) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type, parser));
+    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type) {
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type));
         executor.execute(ft);
         try {
             return ft.get();
@@ -594,14 +593,12 @@ public class JHVDatabase {
         private final JHVEventType type;
         private final long start;
         private final long end;
-        SWEKParser parser;
         private static String sqlt = "SELECT id, start, end, data FROM events WHERE start>=? and end <=? and type_id=? order by start, end ";
 
-        public Events2Program(long _start, long _end, JHVEventType _type, SWEKParser _parser) {
+        public Events2Program(long _start, long _end, JHVEventType _type) {
             type = _type;
             start = _start;
             end = _end;
-            parser = _parser;
         }
 
         @Override

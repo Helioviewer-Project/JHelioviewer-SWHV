@@ -56,7 +56,7 @@ public class DownloadWorker implements Runnable {
             success = downloader.extern2db(jhvType, downloadStartDate, downloadEndDate, params);
             if (success) {
                 SWEKParser parser = sourceManager.getParser(swekSource);
-                ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType, parser);
+                ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType);
                 for (JsonEvent event : eventList) {
                     parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);
                 }
