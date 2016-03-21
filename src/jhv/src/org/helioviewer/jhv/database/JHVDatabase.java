@@ -36,7 +36,6 @@ public class JHVDatabase {
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
     private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
-    private static long ENDOFTIMES = Long.MAX_VALUE;
 
     public static byte[] compress(final String str) throws IOException {
         if ((str == null) || (str.length() == 0)) {
@@ -408,6 +407,8 @@ public class JHVDatabase {
             RequestCache typedCache = dCache.get(type);
             if (typedCache == null) {
                 typedCache = new RequestCache();
+                long lastEvent = Math.min(System.currentTimeMillis(), getLastEvent(connection, type));
+                long invalidationDate = lastEvent - ONEWEEK * 4;
                 dCache.put(type, typedCache);
                 if (connection != null) {
                     int typeId = getEventTypeId(connection, type);
@@ -419,7 +420,9 @@ public class JHVDatabase {
                             pstatement.setInt(1, typeId);
                             ResultSet rs = pstatement.executeQuery();
                             while (!rs.isClosed() && rs.next()) {
-                                typedCache.adaptRequestCache(new Date(rs.getLong(1)), new Date(rs.getLong(2)));
+                                Date beginDate = new Date(Math.min(invalidationDate, rs.getLong(1)));
+                                Date endDate = new Date(Math.min(invalidationDate, rs.getLong(2)));
+                                typedCache.adaptRequestCache(beginDate, endDate);
                             }
                             rs.close();
                             pstatement.close();
@@ -428,10 +431,6 @@ public class JHVDatabase {
                         }
                     }
                 }
-                long lastEvent = getLastEvent(connection, type);
-                if (lastEvent != -1)
-                    typedCache.removeRequestedIntervals(new Interval<Date>(new Date(lastEvent - ONEWEEK), new Date(ENDOFTIMES)));
-
             }
             /* for usage in other thread return full copy! */
             ArrayList<Interval<Date>> copy = new ArrayList<Interval<Date>>();
@@ -440,7 +439,6 @@ public class JHVDatabase {
             }
             return copy;
         }
-
     }
 
     private static long getLastEvent(Connection connection, JHVEventType type) {
