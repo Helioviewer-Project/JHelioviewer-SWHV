@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -19,7 +20,7 @@ public class ComesepParser implements SWEKParser {
     private SWEKEventType eventType;
     private SWEKSource eventSource;
 
-    private boolean parseResult(JSONObject result, ComesepEvent currentEvent) throws JSONException {
+    private boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
         while (keys.hasNext()) {
             parseParameter(result, keys.next(), currentEvent);
@@ -27,7 +28,7 @@ public class ComesepParser implements SWEKParser {
         return true;
     }
 
-    private void parseParameter(JSONObject result, Object key, ComesepEvent currentEvent) throws JSONException {
+    private void parseParameter(JSONObject result, Object key, JHVEvent currentEvent) throws JSONException {
         if (key instanceof String) {
             String keyString = (String) key;
             String lowerkey = keyString.toLowerCase();
@@ -72,7 +73,7 @@ public class ComesepParser implements SWEKParser {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
 
-        ComesepEvent currentEvent = new ComesepEvent(name, name, type, id, new Date(start), new Date(end));
+        JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
         boolean success = parseResult(result, currentEvent);
         if (!success) {
             return false;
