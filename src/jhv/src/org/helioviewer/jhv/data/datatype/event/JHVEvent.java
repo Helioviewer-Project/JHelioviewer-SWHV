@@ -136,4 +136,25 @@ public class JHVEvent {
         this.positionInformation = positionInformation;
     }
 
+    public void addParameter(String keyString, String value) {
+        boolean visible = false;
+        boolean configured = false;
+        String displayName;
+        SWEKParameter p = this.getJHVEventType().getEventType().getParameter(keyString);
+        if (p == null) {
+            p = this.getJHVEventType().getSupplier().getSource().getParameter(keyString);
+        }
+        if (p != null) {
+            configured = true;
+            visible = p.isDefaultVisible();
+            displayName = p.getParameterDisplayName();
+        }
+        else {
+            displayName = keyString.replaceAll("_", " ").trim();
+        }
+
+        JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
+        this.addParameter(parameter, visible, configured);
+    }
+
 }
