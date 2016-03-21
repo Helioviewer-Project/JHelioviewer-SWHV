@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.plugin.controller.PluginManager;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.plugins.swek.config.SWEKConfigurationManager;

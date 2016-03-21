@@ -1,11 +1,14 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,193 +23,158 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class HEKDownloader implements SWEKDownloader {
-    private boolean fromdb = false;
+    private boolean overmax = true;
 
     @Override
-    public void stopDownload() {
-    }
-
-    @Override
-    public boolean isFromDb() {
-        return fromdb;
-    }
-
-    @Override
-    public InputStream downloadData(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
+    public boolean extern2db(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         ArrayList<Interval<Date>> range = JHVDatabase.db2daterange(eventType);
         for (Interval<Date> interval : range) {
             if (interval.getStart().getTime() <= startDate.getTime() && interval.getEnd().getTime() >= endDate.getTime()) {
-                fromdb = true;
-                return JHVDatabase.getEvents(startDate.getTime(), endDate.getTime(), eventType);
+                return true;
             }
         }
 
-        String urlString = createURL(eventType.getEventType(), startDate, endDate, params, page);
         try {
-            DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
-            return ds.getInput();
+            int page = 0;
+            boolean succes = true;
+            while (overmax && succes) {
+                String urlString = createURL(eventType.getEventType(), startDate, endDate, params, page);
+                DownloadStream ds = new DownloadStream(new URL(urlString), JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
+                succes = parseStream(ds.getInput(), eventType);
+                page++;
+            }
+            return succes;
         } catch (MalformedURLException e) {
-            Log.error("Could not create URL from given string: " + urlString + " error : " + e);
-            return null;
+            Log.error("Could not create URL from given string error : " + e);
+            return false;
         } catch (IOException e) {
-            Log.error("Could not create input stream for given URL: " + urlString + " error : " + e);
-            return null;
+            Log.error("Could not create input stream for given URL error : " + e);
+            return false;
         }
     }
 
-    /**
-     * Creates the download URL for the HEK.
-     *
-     * @param eventType
-     *            the event type that should be downloaded
-     * @param startDate
-     *            the start date of the interval over which to download the
-     *            event
-     * @param endDate
-     *            the end date of the interval over which to download the event
-     * @param page
-     *            the page that should be downloaded
-     * @return the url represented as string
-     */
-    private String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
+    private boolean parseStream(InputStream stream, JHVEventType type) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            if (stream != null) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                JSONObject eventJSON;
+                String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
+                eventJSON = new JSONObject(reply);
+                overmax = eventJSON.getBoolean("overmax");
+                boolean success = parseEvents(eventJSON, type);
+                if (!success)
+                    return false;
+
+                success = parseAssociations(eventJSON);
+                return success;
+            } else {
+                Log.error("Download input stream was null. Probably the hek is down.");
+                return false;
+            }
+        } catch (IOException e) {
+            overmax = false;
+            Log.error("Could not read the inputstream. " + e);
+            e.printStackTrace();
+            return false;
+        } catch (JSONException e) {
+            overmax = false;
+            Log.error("JSON parsing error " + e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean parseEvents(JSONObject eventJSON, JHVEventType type) {
+        JSONArray results = eventJSON.getJSONArray("result");
+
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject result = results.getJSONObject(i);
+
+            String uid = result.getString("kb_archivid");
+            long start;
+            long end;
+            try {
+                start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
+                end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            if (end - start > 3 * 24 * 60 * 60 * 1000) {
+                Log.error("Possible wrong parsing of a HEK event.");
+                Log.error("Event start: " + start);
+                Log.error("Event end: " + end);
+                Log.error("Event JSON: ");
+                Log.error(result.toString());
+                return false;
+            }
+            byte[] compressedJson;
+            try {
+                compressedJson = JHVDatabase.compress(result.toString());
+            } catch (IOException e) {
+                Log.error("compression error");
+                return false;
+            }
+            int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type);
+            if (id == -1) {
+                Log.error("failed to dump to database");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean parseAssociations(JSONObject eventJSON) {
+        JSONArray associations = eventJSON.getJSONArray("association");
+        for (int i = 0; i < associations.length(); i++) {
+            JSONObject asobj = associations.getJSONObject(i);
+            Integer[] ret = JHVDatabase.dump_association2db(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
+            if (ret[0] == -1 && ret[1] == -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void db2program() {
+
+    }
+
+    private static String createURL(SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params, int page) {
         StringBuilder baseURL = new StringBuilder(HEKSourceProperties.getSingletonInstance().getHEKSourceProperties().getProperty("heksource.baseurl")).append("?");
-        baseURL = appendCmd(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendType(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendEventType(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendEventCoorSys(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendX1X2Y1Y2(baseURL, eventType, startDate, endDate).append("&");
-        baseURL = appendCosec(baseURL, eventType, startDate, endDate).append("&");
-        baseURL.append("param0=event_starttime&op0=<=&value0=").append(formatDate(endDate)).append("&");
-        baseURL = appendParams(baseURL, eventType, startDate, endDate, params);
-        baseURL = appendEventStartTime(baseURL, eventType, startDate).append("&");
-        baseURL = appendEventEndTime(baseURL, eventType, endDate).append("&");
-        baseURL = appendPage(baseURL, page);
-        return baseURL.toString();
-    }
-
-    /**
-     * Appends the command to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the command
-     */
-    private StringBuilder appendCmd(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("cmd=search");
-    }
-
-    /**
-     * Appends the type to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the type
-     */
-    private StringBuilder appendType(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("type=column");
-    }
-
-    /**
-     * Appends the event type to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the event type
-     */
-    private StringBuilder appendEventType(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation());
-    }
-
-    /**
-     * Appends the event coordinate system to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the event coordinate system
-     */
-    private StringBuilder appendEventCoorSys(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("event_coordsys=").append(eventType.getCoordinateSystem());
-    }
-
-    /**
-     * Appends the spatial region to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the spatial region
-     */
-    private StringBuilder appendX1X2Y1Y2(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
+        baseURL.append("cmd=search&");
+        baseURL.append("type=column&");
+        baseURL.append("event_type=").append(HEKEventFactory.getHEKEvent(eventType.getEventName()).getAbbreviation()).append("&");
+        baseURL.append("event_coordsys=").append(eventType.getCoordinateSystem()).append("&");
         baseURL.append("x1=").append(eventType.getSpatialRegion().x1).append("&");
         baseURL.append("x2=").append(eventType.getSpatialRegion().x2).append("&");
         baseURL.append("y1=").append(eventType.getSpatialRegion().y1).append("&");
-        baseURL.append("y2=").append(eventType.getSpatialRegion().y2);
-        return baseURL;
+        baseURL.append("y2=").append(eventType.getSpatialRegion().y2).append("&");
+        baseURL.append("cosec=2&");
+        baseURL.append("param0=event_starttime&op0=<=&value0=").append(TimeUtils.utcDateFormat.format(endDate)).append("&");
+        baseURL = appendParams(baseURL, params);
+        baseURL.append("event_starttime=").append(TimeUtils.utcDateFormat.format(startDate)).append("&");
+        long max = Math.max(System.currentTimeMillis(), endDate.getTime());
+        baseURL.append("event_endtime=").append(TimeUtils.utcDateFormat.format(new Date(max))).append("&");
+        baseURL.append("page=").append(page);
+        return baseURL.toString();
     }
 
-    /**
-     * Append cosec to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with cosec
-     */
-    private StringBuilder appendCosec(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate) {
-        return baseURL.append("cosec=2");
-    }
-
-    /**
-     * Appends params to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @param endDate
-     *            the end date
-     * @param params
-     * @return the current URL extended with the params
-     */
-    private StringBuilder appendParams(StringBuilder baseURL, SWEKEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
+    private static StringBuilder appendParams(StringBuilder baseURL, List<SWEKParam> params) {
         int paramCount = 1;
 
         for (SWEKParam param : params) {
@@ -224,50 +192,5 @@ public class HEKDownloader implements SWEKDownloader {
             paramCount++;
         }
         return baseURL;
-    }
-
-    /**
-     * Appends the event start time to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param startDate
-     *            the start date
-     * @return the current URL extended with the start time
-     */
-    private StringBuilder appendEventStartTime(StringBuilder baseURL, SWEKEventType eventType, Date startDate) {
-        return baseURL.append("event_starttime=").append(formatDate(startDate));
-    }
-
-    /**
-     * Appends the event end time to the given URL.
-     *
-     * @param baseURL
-     *            the current URL
-     * @param eventType
-     *            the event type
-     * @param endDate
-     *            the end date
-     * @return the current URL extended with the end time
-     */
-    private StringBuilder appendEventEndTime(StringBuilder baseURL, SWEKEventType eventType, Date endDate) {
-        return baseURL.append("event_endtime=").append(formatDate(new Date(System.currentTimeMillis())));
-    }
-
-    /**
-     * Formats a date in the yyyy-mm-ddThh:mm:ss format.
-     *
-     * @param date
-     *            the date to format
-     * @return the date in format yyyy-mm-ddThh:mm-ss
-     */
-    private String formatDate(Date date) {
-        return TimeUtils.utcDateFormat.format(date);
-    }
-
-    private StringBuilder appendPage(StringBuilder baseURL, int page) {
-        return baseURL.append("page=").append(page);
     }
 }

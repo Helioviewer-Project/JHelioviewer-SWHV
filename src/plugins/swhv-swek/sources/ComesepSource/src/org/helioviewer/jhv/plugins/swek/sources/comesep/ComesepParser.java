@@ -15,11 +15,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKRelatedEvents;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.helioviewer.jhv.data.datatype.event.SWEKSupplier;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKEventStream;
-import org.helioviewer.jhv.plugins.swek.sources.SWEKParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,12 +47,10 @@ public class ComesepParser implements SWEKParser {
         parserStopped = false;
     }
 
-    @Override
     public void stopParser() {
         parserStopped = true;
     }
 
-    @Override
     public SWEKEventStream parseEventStream(InputStream downloadInputStream, SWEKEventType eventType, SWEKSource swekSource, SWEKSupplier swekSupplier, List<SWEKRelatedEvents> relatedEvents, boolean todb) {
         final ComesepEventStream eventStream = new ComesepEventStream();
 
@@ -193,6 +191,12 @@ public class ComesepParser implements SWEKParser {
 
     private String parseAssociationChild(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString("child");
+    }
+
+    @Override
+    public boolean parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }
