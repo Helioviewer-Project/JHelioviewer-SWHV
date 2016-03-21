@@ -75,9 +75,9 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int totalLines, int nrPreviousLines, Point mousePosition) {
+    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int nrPreviousLines, Point mousePosition) {
         JHVRelatedEvents highlightedEvent = null;
-        int spacePerLine = Math.max(3, Math.min(4, (int) Math.floor(graphArea.height / (2. * totalLines))));
+        int spacePerLine = 3;
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
         Rectangle drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
         // minimal width is 1
