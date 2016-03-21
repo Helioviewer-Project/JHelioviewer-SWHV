@@ -6,9 +6,7 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,24 +37,7 @@ public class ComesepParser implements SWEKParser {
                     lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
             }
             else {
-                boolean visible = false;
-                boolean configured = false;
-                String displayName = keyString;
-                SWEKParameter p = currentEvent.getJHVEventType().getEventType().getParameter(keyString);
-                if (p == null) {
-                    p = currentEvent.getJHVEventType().getSupplier().getSource().getParameter(keyString);
-                }
-                if (p != null) {
-                    configured = true;
-                    visible = p.isDefaultVisible();
-                    displayName = p.getParameterDisplayName();
-                }
-                else {
-                    displayName = keyString.replaceAll("_", " ").trim();
-                }
-
-                JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
-                currentEvent.addParameter(parameter, visible, configured);
+                currentEvent.addParameter(keyString, value);
             }
         }
     }

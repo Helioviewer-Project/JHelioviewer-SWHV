@@ -16,7 +16,6 @@ import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVPositionInformation;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -98,24 +97,7 @@ public class HEKParser implements SWEKParser {
                 } else if (keyString.equals("hgs_y")) {
                     hgsY = Double.valueOf(value);
                 } else {
-                    boolean visible = false;
-                    boolean configured = false;
-                    String displayName;
-                    SWEKParameter p = currentEvent.getJHVEventType().getEventType().getParameter(originalKeyString);
-                    if (p == null) {
-                        p = currentEvent.getJHVEventType().getSupplier().getSource().getParameter(originalKeyString);
-                    }
-                    if (p != null) {
-                        configured = true;
-                        visible = p.isDefaultVisible();
-                        displayName = p.getParameterDisplayName();
-                    }
-                    else {
-                        displayName = originalKeyString.replaceAll("_", " ").trim();
-                    }
-                    JHVEventParameter parameter = new JHVEventParameter(originalKeyString, displayName, value);
-                    if (visible)// && configured)
-                        currentEvent.addParameter(parameter, visible, configured);
+                    currentEvent.addParameter(originalKeyString, value);
                 }
             }
         }
