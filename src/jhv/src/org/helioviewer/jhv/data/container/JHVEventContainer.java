@@ -12,8 +12,6 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
-import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 
@@ -87,20 +85,6 @@ public class JHVEventContainer {
                 }
             }
         }
-    }
-
-    /**
-     * Add an event to the event cache.
-     *
-     * @param event
-     *            the event to add to the event cache
-     */
-    public void addEvent(final JHVEvent event) {
-        eventCache.add(event);
-    }
-
-    public void addAssociation(JHVAssociation association) {
-        eventCache.add(association);
     }
 
     /**
