@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
-import org.helioviewer.jhv.data.datatype.event.JHVDatabase;
-import org.helioviewer.jhv.data.datatype.event.JHVDatabase.JsonEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.data.datatype.event.SWEKSource;
+import org.helioviewer.jhv.database.JHVDatabase;
+import org.helioviewer.jhv.database.JHVDatabase.JsonEvent;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKSourceManager;
 

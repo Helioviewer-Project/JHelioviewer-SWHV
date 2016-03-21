@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.data.datatype.event;
+package org.helioviewer.jhv.database;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -26,6 +26,8 @@ import java.util.zip.GZIPOutputStream;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
+import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParser;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
