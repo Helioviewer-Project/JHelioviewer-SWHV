@@ -115,4 +115,38 @@ public class JHVRelatedEvents {
     public void addAssociation(JHVAssociation association) {
         associations.add(association);
     }
+
+    private JHVEvent findEvent(Integer id) {
+        for (JHVEvent evt : events) {
+            if (evt.getUniqueID() == id)
+                return evt;
+        }
+        return null;
+    }
+
+    public ArrayList<JHVEvent> getNextEvents(JHVEvent event) {
+        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+        for (JHVAssociation assoc : this.associations) {
+            if (assoc.left == event.getUniqueID()) {
+                JHVEvent newEvt = findEvent(assoc.right);
+                if (newEvt != null) {
+                    nEvents.add(newEvt);
+                }
+            }
+        }
+        return nEvents;
+    }
+
+    public ArrayList<JHVEvent> getPreviousEvents(JHVEvent event) {
+        ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
+        for (JHVAssociation assoc : this.associations) {
+            if (assoc.right == event.getUniqueID()) {
+                JHVEvent newEvt = findEvent(assoc.left);
+                if (newEvt != null) {
+                    nEvents.add(newEvt);
+                }
+            }
+        }
+        return nEvents;
+    }
 }
