@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.plugins.eveplugin.events.gui;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -10,12 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.ImageIcon;
-
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
-import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElementType;
 import org.helioviewer.jhv.plugins.eveplugin.draw.YAxisElement;
@@ -48,13 +44,14 @@ public class EventPanel implements DrawableElement {
 
             for (Map.Entry<JHVEventType, List<EventPlotConfiguration>> entry : epcs.entrySet()) {
                 JHVEventType eventType = entry.getKey();
-                int maxLines = etpc.getMaxLinesPerEventType().get(eventType).intValue();
+                // int maxLines =
+                // etpc.getMaxLinesPerEventType().get(eventType).intValue();
 
                 boolean first = true;
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
                 for (EventPlotConfiguration epc : entry.getValue()) {
-                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, previousLine, mousePosition);
                     if (rEvent != null) {
                         highlightedEvent = rEvent;
                     }
@@ -62,25 +59,31 @@ public class EventPanel implements DrawableElement {
                     if (epc.shouldRedraw()) {
                         shouldRedraw = epc;
                     }
-                    if (first) {
-                        spacePerLine = 6;
-                        int spaceNeeded = spacePerLine * maxLines;
-                        ImageIcon icon = epc.getEvent().getIcon();
-                        leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-                    }
+                    /*
+                     * if (first) { spacePerLine = 6; int spaceNeeded =
+                     * spacePerLine * maxLines; ImageIcon icon =
+                     * epc.getEvent().getIcon();
+                     * leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y +
+                     * previousLine * spacePerLine + spaceNeeded / 2 -
+                     * icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2,
+                     * leftAxisArea.y + previousLine * spacePerLine +
+                     * spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0,
+                     * icon.getIconWidth(), icon.getIconHeight(), null); } ICON
+                     * SHOULD BE DRAWN AFTER ALL EPC ARE DRAWN TOGETHER WITH
+                     * DASHED LINE
+                     */
                     first = false;
                 }
                 if (shouldRedraw != null) {
-                    shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, maxLines, previousLine, mousePosition);
+                    shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, previousLine, mousePosition);
                 }
-                previousLine += maxLines;
-                if (eventTypeNr != epcs.size() - 1) {
-                    g.setStroke(dashed);
-                    g.setColor(Color.black);
-                    int sepLinePos = previousLine * spacePerLine - spacePerLine / 4 + DrawConstants.EVENT_OFFSET;
-                    g.drawLine(0, sepLinePos, graphArea.width, sepLinePos);
-                    g.setStroke(normalStroke);
-                }
+                /*
+                 * previousLine += maxLines; if (eventTypeNr != epcs.size() - 1)
+                 * { g.setStroke(dashed); g.setColor(Color.black); int
+                 * sepLinePos = previousLine * spacePerLine - spacePerLine / 4 +
+                 * DrawConstants.EVENT_OFFSET; g.drawLine(0, sepLinePos,
+                 * graphArea.width, sepLinePos); g.setStroke(normalStroke); }
+                 */
                 eventTypeNr++;
             }
             if (mousePosition != null) {
