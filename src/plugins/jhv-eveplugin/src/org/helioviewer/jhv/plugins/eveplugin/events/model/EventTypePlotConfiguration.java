@@ -19,9 +19,6 @@ public class EventTypePlotConfiguration {
     /** Number of events in this event type plot configuration */
     private final int nrOfEventTypes;
 
-    /** Maximum of lines for every event type */
-    private final Map<JHVEventType, Integer> maxLinesPerEventType;
-
     /** The plot configurations for all events ordered per event type */
     private final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations;
 
@@ -33,7 +30,6 @@ public class EventTypePlotConfiguration {
      */
     public EventTypePlotConfiguration() {
         nrOfEventTypes = 0;
-        maxLinesPerEventType = new HashMap<JHVEventType, Integer>();
         eventPlotConfigurations = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         lastDateWithData = null;
     }
@@ -52,9 +48,8 @@ public class EventTypePlotConfiguration {
      * @param eventPlotConfigurations
      *            the event plot configurations
      */
-    public EventTypePlotConfiguration(int nrOfEventTypes, Map<JHVEventType, Integer> maxLinesPerEventType, Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
+    public EventTypePlotConfiguration(int nrOfEventTypes, Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigurations, Date lastDateWithData) {
         this.nrOfEventTypes = nrOfEventTypes;
-        this.maxLinesPerEventType = maxLinesPerEventType;
         this.eventPlotConfigurations = eventPlotConfigurations;
         this.lastDateWithData = lastDateWithData;
     }
@@ -66,15 +61,6 @@ public class EventTypePlotConfiguration {
      */
     public int getNrOfEventTypes() {
         return nrOfEventTypes;
-    }
-
-    /**
-     * Gets the maximum lines per event type.
-     *
-     * @return the max lines per event type
-     */
-    public Map<JHVEventType, Integer> getMaxLinesPerEventType() {
-        return maxLinesPerEventType;
     }
 
     /**

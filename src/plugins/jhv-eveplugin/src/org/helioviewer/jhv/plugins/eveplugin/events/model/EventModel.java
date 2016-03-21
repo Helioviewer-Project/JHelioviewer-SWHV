@@ -209,7 +209,6 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     private void createEventPlotConfiguration() {
         final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-        final Map<JHVEventType, Integer> linesPerEventType = new HashMap<JHVEventType, Integer>();
         final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         if (events.size() > 0) {
             Date tempLastDateWithData = null;
@@ -257,11 +256,10 @@ public class EventModel implements TimingListener, JHVEventHandler {
                     EventPlotConfiguration epc = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
                     plotConfig.add(epc);
                 }
-                linesPerEventType.put(eventType, maxEventLines);
                 eventPlotConfigPerEventType.put(eventType, plotConfig);
             }
 
-            eventPlotConfiguration = new EventTypePlotConfiguration(events.size(), linesPerEventType, eventPlotConfigPerEventType, tempLastDateWithData);
+            eventPlotConfiguration = new EventTypePlotConfiguration(events.size(), eventPlotConfigPerEventType, tempLastDateWithData);
         } else {
             eventPlotConfiguration = new EventTypePlotConfiguration();
         }

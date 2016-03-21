@@ -75,7 +75,7 @@ public class EventPlotConfiguration {
      * @param nrPreviousLines
      *            the number of lines used already
      */
-    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int linesForEventType, int nrPreviousLines, Point mousePosition) {
+    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int nrPreviousLines, Point mousePosition) {
         JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = 3;
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
