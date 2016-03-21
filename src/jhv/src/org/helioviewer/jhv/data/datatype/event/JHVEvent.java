@@ -1,120 +1,139 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- */
-public interface JHVEvent {
-    /**
-     * Gets the start date of the event
-     *
-     * @return the start date of the event
-     */
-    public abstract Date getStartDate();
+public class JHVEvent {
+
+    private final Date startDate;
+    private final Date endDate;
+    private final String eventName;
+    private final String eventDisplayName;
+    private Map<String, JHVEventParameter> allParameters;
+    private Map<String, JHVEventParameter> allVisibleParameters;
+    private Map<String, JHVEventParameter> allVisibleNotNullParameters;
+    private Map<String, JHVEventParameter> allVisibleNullParameters;
+    private Map<String, JHVEventParameter> allNonVisibleParameters;
+    private Map<String, JHVEventParameter> allNonVisibleNotNullParameters;
+    private Map<String, JHVEventParameter> allNonVisibleNullParameters;
+    private final JHVEventType eventType;
+    private JHVPositionInformation positionInformation;
+    private Integer id;
+
+    public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, Date _start, Date _end) {
+        initLists();
+        eventName = _eventName;
+        eventDisplayName = _eventDisplayName;
+        eventType = _eventType;
+        startDate = _start;
+        endDate = _end;
+        id = _id;
+    }
+
+    private void initLists() {
+        allParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allVisibleNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNotNullParameters = new HashMap<String, JHVEventParameter>();
+        allNonVisibleNullParameters = new HashMap<String, JHVEventParameter>();
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public Map<String, JHVEventParameter> getAllEventParameters() {
+        return allParameters;
+    }
+
+    public Map<String, JHVEventParameter> getVisibleEventParameters() {
+        return allVisibleParameters;
+    }
+
+    public Map<String, JHVEventParameter> getVisibleNotNullEventParameters() {
+        return allVisibleNotNullParameters;
+    }
+
+    public Map<String, JHVEventParameter> getVisibleNullEventParameters() {
+        return allVisibleNullParameters;
+    }
+
+    public Map<String, JHVEventParameter> getNonVisibleEventParameters() {
+        return allNonVisibleParameters;
+    }
+
+    public Map<String, JHVEventParameter> getNonVisibleNotNullEventParameters() {
+        return allNonVisibleNotNullParameters;
+    }
+
+    public Map<String, JHVEventParameter> getNonVisibleNullEventParameters() {
+        return allNonVisibleNullParameters;
+    }
+
+    public String getName() {
+        return eventName;
+    }
+
+    public String getDisplayName() {
+        return eventDisplayName;
+    }
+
+    public JHVEventType getJHVEventType() {
+        return eventType;
+    }
+
+    public JHVPositionInformation getPositioningInformation() {
+        return positionInformation;
+    }
+
+    public Integer getUniqueID() {
+        return id;
+    }
+
+    public void setUniqueID(Integer id) {
+        this.id = id;
+    }
 
     /**
-     * Gets the end date of the event
+     * Adds a parameter to the event.
      *
-     * @return the end date of the event
+     * @param parameter
+     *            the parameter to add
+     * @param visible
+     *            is the parameter visible
+     * @param configured
+     *            was the event in the configuration file
      */
-    public abstract Date getEndDate();
+    public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured) {
+        allParameters.put(parameter.getParameterName(), parameter);
+        if (configured) {
+            if (visible) {
+                allVisibleParameters.put(parameter.getParameterName(), parameter);
+                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
+                    allVisibleNullParameters.put(parameter.getParameterName(), parameter);
+                } else {
+                    allVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
+                }
+            } else {
+                allNonVisibleParameters.put(parameter.getParameterName(), parameter);
+                if (parameter.getParameterValue() == null || (parameter.getParameterValue().trim().length() == 0)) {
+                    allNonVisibleNullParameters.put(parameter.getParameterName(), parameter);
+                } else {
+                    allNonVisibleNotNullParameters.put(parameter.getParameterName(), parameter);
+                }
+            }
+        }
+    }
 
-    /**
-     * Gets the name of the event.
-     *
-     * @return the name
-     */
-    public abstract String getName();
-
-    /**
-     * Gets the display name of the event.
-     *
-     * @return the display name
-     */
-    public abstract String getDisplayName();
-
-    /**
-     * Gets a list with all the event parameters.
-     *
-     * @return a list with all the event parameters
-     */
-    public abstract Map<String, JHVEventParameter> getAllEventParameters();
-
-    /**
-     * Gets a list with all the visible configured event parameters.
-     *
-     * @return a list with all the visible event parameters
-     */
-    public abstract Map<String, JHVEventParameter> getVisibleEventParameters();
-
-    /**
-     * Gets a list with all the visible configured parameters that were not
-     * null.
-     *
-     * @return a list with visible parameters that are not null
-     */
-    public abstract Map<String, JHVEventParameter> getVisibleNotNullEventParameters();
-
-    /**
-     * Gets a list with all the visible configured parameters that were null.
-     *
-     * @return a list with all the visible null parameters
-     */
-    public abstract Map<String, JHVEventParameter> getVisibleNullEventParameters();
-
-    /**
-     * Gets a list with all the non visible configured parameters.
-     *
-     * @return a list with all the non visible parameters
-     */
-    public abstract Map<String, JHVEventParameter> getNonVisibleEventParameters();
-
-    /**
-     * Gets a list with all the non visible configured parameters that were not
-     * null.
-     *
-     * @return a list with all not null non visible parameters
-     */
-    public abstract Map<String, JHVEventParameter> getNonVisibleNotNullEventParameters();
-
-    /**
-     * Gets a list with all the non visible configured parameters that were
-     * null.
-     *
-     * @return a list with all null non visible parameters
-     */
-    public abstract Map<String, JHVEventParameter> getNonVisibleNullEventParameters();
-
-    /**
-     * Gets the event type of the event.
-     *
-     * @return the event type of the event
-     */
-    public abstract JHVEventType getJHVEventType();
-
-    /**
-     * Gets an unique identifier.
-     *
-     */
-    public abstract Integer getUniqueID();
-
-    /**
-     * Sets an unique identifier.
-     *
-     */
-    public abstract void setUniqueID(Integer id);
-
-    /**
-     * Gets the list of available position informations. This is a list because
-     * the position information can be added to the event in different
-     * coordinate systems. Each element describes the same information but in a
-     * different format. One is free whatever format fits the best.
-     *
-     * @return a list with positioning information
-     */
-    public abstract JHVPositionInformation getPositioningInformation();
+    public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
+        this.positionInformation = positionInformation;
+    }
 
 }
