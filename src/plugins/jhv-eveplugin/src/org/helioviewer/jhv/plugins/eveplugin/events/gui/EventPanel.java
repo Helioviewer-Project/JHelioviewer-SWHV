@@ -108,7 +108,7 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public Date getLastDateWithData() {
-        return EventModel.getSingletonInstance().getEventTypePlotConfiguration().getLastDateWithData();
+        return EventModel.getSingletonInstance().getLastDateWithData();
     }
 
 }
