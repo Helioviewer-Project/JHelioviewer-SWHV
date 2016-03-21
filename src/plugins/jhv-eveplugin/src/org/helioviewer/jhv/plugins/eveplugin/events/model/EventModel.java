@@ -216,47 +216,8 @@ public class EventModel implements TimingListener, JHVEventHandler {
      * epc.getEventPosition(); return true; }
      */
 
-    private EventPlotConfiguration creatEventPlotConfiguration(JHVRelatedEvents event, int relatedEventPosition, int relationNr, ArrayList<Date> endDates, Date minimalEndDate, Date maximumEndDate, int minimalDateLine, int maximumDateLine, int nrLines, Date tempLastDateWithData, int maxEventLines) {
-        final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
-
-        int eventPosition = 0;
-        if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
-            if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
-                minimalEndDate = new Date(event.getEnd());
-                endDates.add(minimalEndDate);
-                eventPosition = nrLines;
-                nrLines++;
-            } else {
-                if (event.getStart() > maximumEndDate.getTime()) {
-                    eventPosition = 0;
-                    nrLines = 1;
-                    endDates = new ArrayList<Date>();
-                    endDates.add(new Date(event.getEnd()));
-                } else {
-                    eventPosition = minimalDateLine;
-                    endDates.set(minimalDateLine, new Date(event.getEnd()));
-                }
-            }
-        } else {
-            endDates.set(relatedEventPosition, new Date(event.getEnd()));
-        }
-
-        minimalDateLine = defineMinimalDateLine(endDates);
-        minimalEndDate = endDates.get(minimalDateLine);
-        maximumDateLine = defineMaximumDateLine(endDates);
-        maximumEndDate = endDates.get(maximumDateLine);
-        double scaledX0 = defineScaledValue(event.getStart(), selectedInterval);
-        double scaledX1 = defineScaledValue(event.getEnd(), selectedInterval);
-        if (nrLines > maxEventLines) {
-            maxEventLines = nrLines;
-        }
-        if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
-            tempLastDateWithData = new Date(event.getEnd());
-        }
-        return new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
-    }
-
     private void createEventPlotConfiguration() {
+        final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         final Map<JHVEventType, Integer> linesPerEventType = new HashMap<JHVEventType, Integer>();
         final Map<JHVEventType, List<EventPlotConfiguration>> eventPlotConfigPerEventType = new HashMap<JHVEventType, List<EventPlotConfiguration>>();
         if (events.size() > 0) {
@@ -274,11 +235,50 @@ public class EventModel implements TimingListener, JHVEventHandler {
                 int relatedEventPosition = -1;
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
+                    // Log.debug(eventType.getEventType() + " " + nrLines);
                     // handleEvent(evr.getValue(), relatedEventPosition, 0,
                     // endDates, minimalEndDate);
-                    EventPlotConfiguration epc = creatEventPlotConfiguration(evr.getValue(), relatedEventPosition, 0, endDates, minimalEndDate, maximumEndDate, minimalDateLine, maximumDateLine, nrLines, tempLastDateWithData, maxEventLines);
+
+                    int relationNr = 0;
+                    JHVRelatedEvents event = evr.getValue();
+                    int eventPosition = 0;
+                    if (relatedEventPosition == -1 || (relatedEventPosition != -1 && relationNr > 0)) {
+                        if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
+                            minimalEndDate = new Date(event.getEnd());
+                            endDates.add(minimalEndDate);
+                            eventPosition = nrLines;
+                            nrLines++;
+                        } else {
+                            if (event.getStart() > maximumEndDate.getTime()) {
+                                eventPosition = 0;
+                                nrLines = 1;
+                                endDates = new ArrayList<Date>();
+                                endDates.add(new Date(event.getEnd()));
+                            } else {
+                                eventPosition = minimalDateLine;
+                                endDates.set(minimalDateLine, new Date(event.getEnd()));
+                            }
+                        }
+                    } else {
+                        endDates.set(relatedEventPosition, new Date(event.getEnd()));
+                    }
+
+                    minimalDateLine = defineMinimalDateLine(endDates);
+                    minimalEndDate = endDates.get(minimalDateLine);
+                    maximumDateLine = defineMaximumDateLine(endDates);
+                    maximumEndDate = endDates.get(maximumDateLine);
+                    double scaledX0 = defineScaledValue(event.getStart(), selectedInterval);
+                    double scaledX1 = defineScaledValue(event.getEnd(), selectedInterval);
+                    if (nrLines > maxEventLines) {
+                        maxEventLines = nrLines;
+                    }
+                    if (tempLastDateWithData == null || tempLastDateWithData.getTime() < (event.getEnd())) {
+                        tempLastDateWithData = new Date(event.getEnd());
+                    }
+                    Log.debug("event id " + event + " Event start :" + event.getStart() + " event end: " + event.getEnd() + " EventPositions: " + eventPosition + " scaledX0 " + scaledX0 + " scaledx1 " + scaledX1);
+                    EventPlotConfiguration epc = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
                     plotConfig.add(epc);
-                    relatedEventPosition = epc.getEventPosition();
+                    // relatedEventPosition = epc.getEventPosition();
                 }
                 linesPerEventType.put(eventType, maxEventLines);
                 maxNrLines += maxEventLines;
