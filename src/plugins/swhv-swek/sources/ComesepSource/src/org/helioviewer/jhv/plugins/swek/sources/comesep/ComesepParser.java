@@ -8,17 +8,12 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
-import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
-import org.helioviewer.jhv.data.datatype.event.SWEKSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ComesepParser implements SWEKParser {
-
-    private SWEKEventType eventType;
-    private SWEKSource eventSource;
 
     private boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
         Iterator<?> keys = result.keys();
@@ -47,21 +42,19 @@ public class ComesepParser implements SWEKParser {
                 boolean visible = false;
                 boolean configured = false;
                 String displayName = keyString;
-                if (eventType.containsParameter(keyString) || eventSource.containsParameter(keyString)) {
-                    configured = true;
-                    SWEKParameter p = currentEvent.getJHVEventType().getEventType().getParameter(keyString);
-                    if (p == null) {
-                        p = currentEvent.getJHVEventType().getSupplier().getSource().getParameter(keyString);
-                    }
-                    if (p != null) {
-                        configured = true;
-                        visible = p.isDefaultVisible();
-                        displayName = p.getParameterDisplayName();
-                    }
-                    else {
-                        displayName = keyString.replaceAll("_", " ").trim();
-                    }
+                SWEKParameter p = currentEvent.getJHVEventType().getEventType().getParameter(keyString);
+                if (p == null) {
+                    p = currentEvent.getJHVEventType().getSupplier().getSource().getParameter(keyString);
                 }
+                if (p != null) {
+                    configured = true;
+                    visible = p.isDefaultVisible();
+                    displayName = p.getParameterDisplayName();
+                }
+                else {
+                    displayName = keyString.replaceAll("_", " ").trim();
+                }
+
                 JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
                 currentEvent.addParameter(parameter, visible, configured);
             }
