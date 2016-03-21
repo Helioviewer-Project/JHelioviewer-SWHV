@@ -81,8 +81,7 @@ public class DownloadWorker implements Runnable {
                     SWEKDownloadManager.getSingletonInstance().workerForcedToStop(DownloadWorker.this);
                 }
             });
-        }
-        else {
+        } else {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -112,7 +111,7 @@ public class DownloadWorker implements Runnable {
 
     @Override
     public int hashCode() {
-        return (int) this.downloadStartDate.getTime();
+        return (int) downloadStartDate.getTime();
     }
 
 }
