@@ -35,8 +35,6 @@ public class ComesepParser implements SWEKParser {
                     lowerkey.equals("atlatest") ||
                     lowerkey.equals("begin_time_value") ||
                     lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
-            }
-            else {
                 currentEvent.addParameter(keyString, value);
             }
         }
