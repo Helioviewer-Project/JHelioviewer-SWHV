@@ -66,10 +66,10 @@ public class ComesepDownloader extends SWEKDownloader {
 
     @Override
     protected boolean parseAssociations(JSONObject eventJSON) {
-        JSONArray associations = eventJSON.getJSONArray("association");
+        JSONArray associations = eventJSON.getJSONArray("associations");
         for (int i = 0; i < associations.length(); i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            Integer[] ret = JHVDatabase.dump_association2db(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
+            Integer[] ret = JHVDatabase.dump_association2db(asobj.getString("parent"), asobj.getString("child"));
             if (ret[0] == -1 && ret[1] == -1) {
                 return false;
             }

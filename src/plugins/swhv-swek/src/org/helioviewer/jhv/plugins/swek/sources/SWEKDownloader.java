@@ -22,7 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class SWEKDownloader {
-    protected boolean overmax = false;
+    protected boolean overmax = true;
 
     public boolean extern2db(JHVEventType eventType, Date startDate, Date endDate, List<SWEKParam> params) {
         ArrayList<Interval<Date>> range = JHVDatabase.db2daterange(eventType);
@@ -63,7 +63,10 @@ public abstract class SWEKDownloader {
                 JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
                 eventJSON = new JSONObject(reply);
-                overmax = eventJSON.getBoolean("overmax");
+                if (eventJSON.has("overmax"))
+                    overmax = eventJSON.getBoolean("overmax");
+                else
+                    overmax = false;
                 boolean success = parseEvents(eventJSON, type);
                 if (!success)
                     return false;
