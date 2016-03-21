@@ -37,7 +37,10 @@ public class ComesepParser implements SWEKParser {
             else
                 return;
 
-            if (lowerkey.equals("atearliest") || lowerkey.equals("atlatest") || lowerkey.equals("begin_time_value") || lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value")) {
+            if (!(lowerkey.equals("atearliest") ||
+                    lowerkey.equals("atlatest") ||
+                    lowerkey.equals("begin_time_value") ||
+                    lowerkey.equals("end_time_value") || lowerkey.equalsIgnoreCase("liftoffduration_value"))) {
             }
             else {
                 boolean visible = false;
