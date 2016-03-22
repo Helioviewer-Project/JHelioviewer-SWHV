@@ -139,6 +139,7 @@ public class JHVDatabase {
 
         if (ids[0] != -1 && ids[1] != -1) {
             insertLinkIfNotExist(connection, ids[0], ids[1]);
+
         } else {
             Log.error("Could not add association to database " + ids[0] + " " + ids[1]);
         }
@@ -654,7 +655,7 @@ public class JHVDatabase {
         private final long end;
         private static String sqlt = "SELECT left_events.id, right_events.id FROM event_link "
                 + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
-                + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
+                + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id "
                 + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
 
         public Associations2Program(long _start, long _end, JHVEventType _type) {

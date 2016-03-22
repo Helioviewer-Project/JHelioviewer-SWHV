@@ -55,8 +55,8 @@ public class JHVEventCache {
 
     private final Map<JHVEventType, RequestCache> downloadedCache;
 
-    private final Map<String, ArrayList<JHVAssociation>> assoLeft = new HashMap<String, ArrayList<JHVAssociation>>();
-    private final Map<String, ArrayList<JHVAssociation>> assoRight = new HashMap<String, ArrayList<JHVAssociation>>();
+    private final Map<Integer, ArrayList<JHVAssociation>> assoLeft = new HashMap<Integer, ArrayList<JHVAssociation>>();
+    private final Map<Integer, ArrayList<JHVAssociation>> assoRight = new HashMap<Integer, ArrayList<JHVAssociation>>();
 
     /**
      * private default constructor
@@ -80,14 +80,13 @@ public class JHVEventCache {
     }
 
     public void add(JHVEvent event) {
-        //TBD what on double update?
         if (relEvents.containsKey(event.getUniqueID())) {
             return;
         }
 
         JHVEventType evtType = event.getJHVEventType();
 
-        if (!events.containsKey(event.getJHVEventType())) {
+        if (!events.containsKey(evtType)) {
             events.put(evtType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         JHVRelatedEvents current = null;
@@ -99,7 +98,7 @@ public class JHVEventCache {
         }
     }
 
-    private JHVRelatedEvents checkAssociation(JHVRelatedEvents current, Map<String, ArrayList<JHVAssociation>> assoList, boolean isLeft, JHVEvent event) {
+    private JHVRelatedEvents checkAssociation(JHVRelatedEvents current, Map<Integer, ArrayList<JHVAssociation>> assoList, boolean isLeft, JHVEvent event) {
         Integer uid = event.getUniqueID();
         if (assoList.containsKey(uid)) {
             for (Iterator<JHVAssociation> iterator = assoList.get(uid).iterator(); iterator.hasNext();) {
@@ -109,6 +108,7 @@ public class JHVEventCache {
                 if (found != null) {
                     if (current == null) {
                         found.add(event, events);
+                        found.addAssociation(tocheck);
                         relEvents.put(uid, found);
                         current = found;
                     }
@@ -129,7 +129,7 @@ public class JHVEventCache {
     }
 
     private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
-        current.merge(found);
+        current.merge(found, events);
         for (JHVEvent foundev : found.getEvents()) {
             Integer key = foundev.getUniqueID();
             relEvents.remove(key);
@@ -139,11 +139,13 @@ public class JHVEventCache {
 
     private void addAssociation(boolean isLeft, JHVAssociation association) {
         Integer key = isLeft ? association.left : association.right;
-        ArrayList<JHVAssociation> leftAss = assoLeft.get(key);
-        if (leftAss == null) {
-            leftAss = new ArrayList<JHVAssociation>();
+        Map<Integer, ArrayList<JHVAssociation>> assoMap = isLeft ? assoLeft : assoRight;
+        ArrayList<JHVAssociation> assocs = assoMap.get(key);
+        if (assocs == null) {
+            assocs = new ArrayList<JHVAssociation>();
+            assoMap.put(key, assocs);
         }
-        leftAss.add(association);
+        assocs.add(association);
     }
 
     public void add(JHVAssociation association) {
@@ -196,46 +198,6 @@ public class JHVEventCache {
         events.remove(eventType);
     }
 
-    private void checkAndFixRelationShip(JHVEvent event) {
-        //executeRelationshipRules(event);
-    }
-
-    /*
-        private void executeRelationshipRules(JHVEvent event) {
-            List<JHVEventRelationShipRule> rules = event.getEventRelationShip().getRelationshipRules();
-            for (JHVEventRelationShipRule rule : rules) {
-                for (JHVEvent candidate : eventsWithRelationRules) {
-                    if (candidate.getJHVEventType().getEventType().getEventName().toLowerCase().equals(rule.getRelatedWith().getEventType().getEventName().toLowerCase())) {
-                        int foundCorrespondinParameters = 0;
-
-                        for (JHVRelatedOn relatedOn : rule.getRelatedOn()) {
-
-                            String rel = relatedOn.getRelatedOnWith().getParameterName().toLowerCase();
-
-                            Map<String, JHVEventParameter> params = candidate.getAllEventParameters();
-
-                            JHVEventParameter p = params.get(rel);
-                            if (p != null && p.getParameterValue() != null) {
-                                JHVEventParameter eventP = event.getAllEventParameters().get(rel);
-                                if (eventP != null && eventP.getParameterValue() != null) {
-                                    if (eventP.getParameterName().toLowerCase().equals(rel) && eventP.getParameterValue().equals(p.getParameterValue())) {
-                                        foundCorrespondinParameters++;
-                                    }
-                                }
-
-                            }
-                        }
-
-                        if (foundCorrespondinParameters == rule.getRelatedOn().size()) {
-                            event.getEventRelationShip().getRelatedEventsByRule().put(candidate.getUniqueID(), new JHVEventRelation(candidate.getUniqueID(), candidate));
-                            candidate.getEventRelationShip().getRelatedEventsByRule().put(event.getUniqueID(), new JHVEventRelation(event.getUniqueID(), event));
-                        }
-                    }
-                }
-            }
-            eventsWithRelationRules.add(event);
-        }
-     */
     public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {
         return downloadedCache.get(eventType).getAllRequestIntervals();
     }

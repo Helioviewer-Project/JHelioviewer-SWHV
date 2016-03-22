@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
 
@@ -47,8 +48,7 @@ public class JHVRelatedEvents {
             interval.end = time;
         }
         events.add(evt);
-        eventsMap.get(evt.getJHVEventType()).remove(interval);
-        eventsMap.get(evt.getJHVEventType()).put(interval, this);
+        forceSort(eventsMap);
     }
 
     public long getEnd() {
@@ -63,16 +63,28 @@ public class JHVRelatedEvents {
         return color;
     }
 
-    public boolean isRelated(JHVEvent event) {
-        return event.getJHVEventType() == events.get(0).getJHVEventType();
-    }
-
     public ImageIcon getIcon() {
         return eventType.getEventType().getEventIcon();
     }
 
-    public void merge(JHVRelatedEvents found) {
-        this.events.addAll(found.getEvents());
+    private void forceSort(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        if (!eventsMap.containsKey(eventType)) {
+            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+        }
+        eventsMap.get(eventType).remove(interval);
+        eventsMap.get(eventType).put(interval, this);
+    }
+
+    public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        interval.start = Math.min(interval.start, found.getStart());
+        interval.end = Math.max(interval.end, found.getEnd());
+        events.addAll(found.getEvents());
+        associations.addAll(found.getAssociations());
+        forceSort(eventsMap);
+    }
+
+    private ArrayList<JHVAssociation> getAssociations() {
+        return associations;
     }
 
     public JHVEventType getJHVEventType() {
