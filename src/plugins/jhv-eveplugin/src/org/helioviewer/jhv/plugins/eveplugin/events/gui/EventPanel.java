@@ -63,10 +63,9 @@ public class EventPanel implements DrawableElement {
                 SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
-                ImageIcon icon = null;
+                ImageIcon icon = eventType.getEventType().getEventIcon();
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
                     JHVRelatedEvents event = evr.getValue();
-                    icon = event.getIcon();
                     int eventPosition = 0;
                     if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
                         minimalEndDate = new Date(event.getEnd());
@@ -93,7 +92,7 @@ public class EventPanel implements DrawableElement {
                     if (nrLines > maxEventLines) {
                         maxEventLines = nrLines;
                     }
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, graphArea, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition);
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(event, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
@@ -101,14 +100,12 @@ public class EventPanel implements DrawableElement {
 
                 }
                 if (shouldRedraw != null) {
-                    shouldRedraw.draw(g, graphArea, previousLine, mousePosition);
+                    shouldRedraw.draw(g, previousLine, mousePosition);
                 }
 
-                if (icon != null) {
-                    spacePerLine = 6;
-                    int spaceNeeded = spacePerLine * maxEventLines;
-                    leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
-                }
+                spacePerLine = 6;
+                int spaceNeeded = spacePerLine * maxEventLines;
+                leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
                 previousLine += maxEventLines;
                 if (eventTypeNr != nrEventTypes - 1) {

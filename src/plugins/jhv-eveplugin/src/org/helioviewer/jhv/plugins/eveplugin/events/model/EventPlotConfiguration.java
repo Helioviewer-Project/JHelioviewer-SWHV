@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.eveplugin.events.model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
@@ -29,11 +28,11 @@ public class EventPlotConfiguration {
         this.yPosition = yPosition;
     }
 
-    public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrPreviousLines, Point mousePosition) {
-        return draw(event, x0, x1, yPosition, g, graphArea, nrPreviousLines, mousePosition);
+    public JHVRelatedEvents draw(Graphics2D g, int nrPreviousLines, Point mousePosition) {
+        return draw(event, x0, x1, yPosition, g, nrPreviousLines, mousePosition);
     }
 
-    public static JHVRelatedEvents draw(JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Rectangle graphArea, int nrPreviousLines, Point mousePosition) {
+    public static JHVRelatedEvents draw(JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition) {
         JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = 3;
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
@@ -67,10 +66,6 @@ public class EventPlotConfiguration {
         g.fillRect(x0, startPosition, w, spacePerLine);
 
         return highlightedEvent;
-    }
-
-    public JHVRelatedEvents getEvent() {
-        return event;
     }
 
     private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
