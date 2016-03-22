@@ -28,18 +28,6 @@ import org.json.JSONObject;
  *
  */
 public class HEKParser implements SWEKParser {
-    /*
-     * private void parseAssociation(JSONObject eventJSON, HEKEventStream
-     * eventStream, boolean todb) throws JSONException { JSONArray associations
-     * = eventJSON.getJSONArray("association");
-     * 
-     * for (int i = 0; i < associations.length() && !parserStopped; i++) {
-     * Integer[] idlist =
-     * JHVDatabase.dump_association2db(parseFirstIvorn(associations
-     * .getJSONObject(i)), parseSecondIvorn(associations.getJSONObject(i)));
-     * JHVAssociation association = new JHVAssociation(idlist[0], idlist[1]);
-     * eventStream.addJHVAssociation(association); } }
-     */
 
     @Override
     public boolean parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
