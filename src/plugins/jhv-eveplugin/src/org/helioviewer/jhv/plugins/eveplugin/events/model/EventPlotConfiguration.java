@@ -25,9 +25,6 @@ public class EventPlotConfiguration {
     /** the Y position */
     private final int yPosition;
 
-    /** The click position */
-    private Rectangle clickPosition;
-
     private boolean shouldRedraw;
 
     /**
@@ -86,9 +83,7 @@ public class EventPlotConfiguration {
             drawPosition.width = 5;
         }
 
-        clickPosition = new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2);
-
-        boolean containsMouse = containsPoint(mousePosition);
+        boolean containsMouse = containsPoint(mousePosition, new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2));
         boolean eventWasHightlighted = false;
         int endpointsMarkWidth = 0;
 
@@ -121,20 +116,6 @@ public class EventPlotConfiguration {
         return highlightedEvent;
     }
 
-    /**
-     * Gets the event at the given point.
-     *
-     * @param p
-     *            the location to check for an event.
-     * @return null if no event is located there, the event if found
-     */
-    public JHVRelatedEvents getEventAtPoint(Point p) {
-        if (containsPoint(p)) {
-            return event;
-        }
-        return null;
-    }
-
     public JHVRelatedEvents getEvent() {
         return event;
     }
@@ -144,10 +125,11 @@ public class EventPlotConfiguration {
      *
      * @param p
      *            the point to check
+     * @param rectangle
      * @return true if the point is located in the event area, false if the
      *         point is not located in the event area.
      */
-    private boolean containsPoint(Point p) {
+    private boolean containsPoint(Point p, Rectangle clickPosition) {
         if (clickPosition != null && p != null) {
             return clickPosition.contains(p);
         }

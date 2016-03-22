@@ -532,10 +532,8 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
         if (movieLinePosition >= 0 && drawController.getIntervalAvailable() && frame.contains(e.getPoint())) {
             setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-        } else if (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) != null) {
+        } else if (EventModel.getSingletonInstance().getEventUnderMouse() != null) {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
-            redrawGraph();
-            updateGraph();
             mouseOverEvent = true;
         } else if (e.getPoint().x >= graphArea.x && e.getPoint().x <= graphArea.x + graphArea.width && e.getPoint().y >= graphArea.y && e.getPoint().y <= graphArea.y + graphArea.height) {
             setCursor(UIGlobals.openHandCursor);
@@ -544,8 +542,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         }
         if (mouseOverEvent && (eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE)) == null)) {
             mouseOverEvent = false;
-            updateGraph();
         }
+        redrawGraph();
+        updateGraph();
     }
 
     // Component Listener

@@ -112,6 +112,8 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     private Date lastDateWithData;
 
+    private JHVRelatedEvents eventUnderMouse;
+
     /**
      * Private default constructor.
      */
@@ -231,6 +233,14 @@ public class EventModel implements TimingListener, JHVEventHandler {
         Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
         eventContainer.requestForInterval(selectedInterval.getStart(), selectedInterval.getEnd(), this);
         DrawController.getSingletonInstance().fireRedrawRequest();
+    }
+
+    public JHVRelatedEvents getEventUnderMouse() {
+        return eventUnderMouse;
+    }
+
+    public void setEventUnderMouse(JHVRelatedEvents event) {
+        eventUnderMouse = event;
     }
 
 }

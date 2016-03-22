@@ -122,6 +122,7 @@ public class EventPanel implements DrawableElement {
 
                 eventTypeNr++;
             }
+            EventModel.getSingletonInstance().setEventUnderMouse(highlightedEvent);
             if (mousePosition != null) {
                 JHVEventContainer.highlight(highlightedEvent);
             }
