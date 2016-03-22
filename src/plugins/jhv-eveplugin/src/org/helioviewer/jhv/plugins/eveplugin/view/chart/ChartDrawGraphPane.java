@@ -196,16 +196,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             }
             Set<DrawableElement> del = drawableElements.get(dt);
             if (del != null) {
-                // Log.trace("Drawable element list is not null. Size is " +
-                // del.size());
-                // Log.info("Drawable Elements size : " + del.size());
                 for (DrawableElement de : del) {
-                    // Log.info("drawable element" + de);
                     de.draw(chartg, leftAxisG, plotArea, leftAxisArea, mousePosition);
                 }
-
-            } else {
-                // Log.trace("Drawable element list is null");
             }
         }
     }
@@ -222,15 +215,11 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     }
 
     private void drawLabels(final Graphics2D g) {
-        // Log.debug("Draw Labels");
-        // Thread.dumpStack();
         List<YAxisElement> yAxisElements = drawController.getYAxisElements();
         Interval<Date> interval = drawController.getSelectedInterval();
         if (!drawController.getIntervalAvailable()) {
             return;
         }
-
-        // draw vertical ticks
         int counter = 0;
 
         for (YAxisElement yAxisElement : yAxisElements) {
@@ -242,8 +231,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
                 counter++;
             }
         }
-
-        // draw horizontal ticks and labels
 
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(DrawConstants.FULL_DATE_TIME_FORMAT.format(new Date(interval.getStart().getTime())), g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
@@ -301,13 +288,9 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
             g.setColor(DrawConstants.LABEL_TEXT_COLOR);
             g.drawString(text, x, y);
         }
-        // Log.debug("Time to draw labels: " + (System.currentTimeMillis() -
-        // start) + " total time: " + drawLabelsOperarionTime +
-        // " total time over running time : " + timeOverTotalTime);
     }
 
     private void drawVerticalLabels(Graphics2D g, YAxisElement yAxisElement, int leftSide) {
-        // draw rectangle hiding to big radio image
         g.setColor(Color.WHITE);
         if (leftSide == 0) {
             g.fillRect(0, DrawConstants.GRAPH_TOP_SPACE, DrawConstants.GRAPH_LEFT_SPACE, graphArea.height);
@@ -657,7 +640,6 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
         @Override
         public void run() {
             if (updateRequestReceived) {
-                // Log.debug("Do drawing");
                 updateRequestReceived = false;
                 timerRedrawGraph();
             }

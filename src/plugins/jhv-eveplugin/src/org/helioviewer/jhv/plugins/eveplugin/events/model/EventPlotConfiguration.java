@@ -25,8 +25,6 @@ public class EventPlotConfiguration {
     /** the Y position */
     private final int yPosition;
 
-    private boolean shouldRedraw;
-
     /**
      * Creates a EventPlotConfiguration for the given event with scaledX0 start
      * position and scaledX1 end position.
@@ -51,66 +49,52 @@ public class EventPlotConfiguration {
             this.scaledX1 = scaledX0;
         }
         this.yPosition = yPosition;
-        shouldRedraw = false;
     }
 
-    /**
-     * Draws the event plot configuration on the given graph area.
-     *
-     * @param g
-     *            the graphics on which to draw
-     * @param graphArea
-     *            the area available to draw
-     * @param nrOfEventTypes
-     *            the number of event types to be drawn
-     * @param eventTypeNR
-     *            the number of this event type
-     * @param linesForEventType
-     *            maximum of lines needed for this event type
-     * @param totalLines
-     *            the total number of lines for all events
-     * @param nrPreviousLines
-     *            the number of lines used already
-     */
     public JHVRelatedEvents draw(Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int nrPreviousLines, Point mousePosition) {
+        return draw(event, scaledX0, scaledX1, yPosition, g, graphArea, nrOfEventTypes, eventTypeNR, nrPreviousLines, mousePosition);
+    }
+
+    public static JHVRelatedEvents draw(JHVRelatedEvents event, double scaledX0, double scaledX1, int yPosition, Graphics2D g, Rectangle graphArea, int nrOfEventTypes, int eventTypeNR, int nrPreviousLines, Point mousePosition) {
         JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = 3;
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
-        Rectangle drawPosition = new Rectangle((int) Math.floor(graphArea.width * scaledX0), startPosition, (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1, spacePerLine);
+        int x = (int) Math.floor(graphArea.width * scaledX0);
+        int y = startPosition;
+        int w = (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1;
+        int h = spacePerLine;
         // minimal width is 1
-        if (drawPosition.width < 5) {
-            drawPosition.x = drawPosition.x - (5 / drawPosition.width);
-            drawPosition.width = 5;
+        if (w < 5) {
+            x = x - (5 / w);
+            w = 5;
         }
 
-        boolean containsMouse = containsPoint(mousePosition, new Rectangle(drawPosition.x - 1, drawPosition.y - 1, drawPosition.width + 2, drawPosition.height + 2));
+        boolean containsMouse = containsPoint(mousePosition, new Rectangle(x - 1, y - 1, w + 2, h + 2));
         boolean eventWasHightlighted = false;
         int endpointsMarkWidth = 0;
 
         if (containsMouse || event.isHighlighted()) {
             endpointsMarkWidth = 5;
             eventWasHightlighted = true;
-            drawPosition.x = drawPosition.x - 10;
-            drawPosition.y = drawPosition.y - 1;
+            x = x - 10;
+            y = y - 1;
             startPosition = startPosition - 1;
-            drawPosition.width = drawPosition.width + 20;
-            drawPosition.height = drawPosition.height + 2;
-            shouldRedraw = true;
-            spacePerLine = drawPosition.height;
+            w = w + 20;
+            h = h + 2;
+            spacePerLine = h;
         }
         if (mousePosition != null && containsMouse) {
             highlightedEvent = event;
         }
         if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);
-            g.fillRect(drawPosition.x, startPosition, endpointsMarkWidth, spacePerLine);
+            g.fillRect(x, startPosition, endpointsMarkWidth, spacePerLine);
         }
-
         g.setColor(event.getColor());
-        g.fillRect(drawPosition.x + endpointsMarkWidth, startPosition, drawPosition.width - 2 * endpointsMarkWidth, spacePerLine);
+        g.fillRect(x + endpointsMarkWidth, startPosition, w - 2 * endpointsMarkWidth, spacePerLine);
         if (containsMouse || eventWasHightlighted) {
             g.setColor(Color.black);
-            g.fillRect(drawPosition.x + drawPosition.width - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
+            g.fillRect(x + w - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
         }
 
         return highlightedEvent;
@@ -129,19 +113,11 @@ public class EventPlotConfiguration {
      * @return true if the point is located in the event area, false if the
      *         point is not located in the event area.
      */
-    private boolean containsPoint(Point p, Rectangle clickPosition) {
+    private static boolean containsPoint(Point p, Rectangle clickPosition) {
         if (clickPosition != null && p != null) {
             return clickPosition.contains(p);
         }
         return false;
-    }
-
-    public int getEventPosition() {
-        return yPosition;
-    }
-
-    public boolean shouldRedraw() {
-        return shouldRedraw;
     }
 
 }

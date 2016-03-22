@@ -91,17 +91,14 @@ public class EventPanel implements DrawableElement {
                     if (nrLines > maxEventLines) {
                         maxEventLines = nrLines;
                     }
-                    EventPlotConfiguration epc = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
-                    JHVRelatedEvents rEvent = epc.draw(g, graphArea, nrEventTypes, eventTypeNr, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, scaledX0, scaledX1, eventPosition, g, graphArea, nrEventTypes, eventTypeNr, previousLine, mousePosition);
                     if (rEvent != null) {
+                        shouldRedraw = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
                         highlightedEvent = rEvent;
                     }
 
-                    if (epc.shouldRedraw()) {
-                        shouldRedraw = epc;
-                    }
                 }
-                if (shouldRedraw != null) {
+                if (highlightedEvent != null) {
                     shouldRedraw.draw(g, graphArea, nrEventTypes, eventTypeNr, previousLine, mousePosition);
                 }
 
