@@ -433,7 +433,7 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        JHVRelatedEvents event = eventModel.getEventAtPosition(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE));
+        JHVRelatedEvents event = eventModel.getEventUnderMouse();
         if (event != null) {
             for (JHVEvent evt : event.getEvents()) {
                 SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, evt);
