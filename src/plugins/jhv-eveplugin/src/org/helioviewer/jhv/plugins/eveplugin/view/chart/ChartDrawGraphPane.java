@@ -36,7 +36,6 @@ import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.SWEKEventInformationDialog;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -435,16 +434,22 @@ public class ChartDrawGraphPane extends JComponent implements MouseInputListener
     public void mouseClicked(final MouseEvent e) {
         JHVRelatedEvents event = eventModel.getEventUnderMouse();
         if (event != null) {
-            for (JHVEvent evt : event.getEvents()) {
-                SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, evt);
-                dialog.setLocation(e.getLocationOnScreen());
-                dialog.validate();
-                dialog.pack();
-                dialog.setVisible(true);
-            }
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(mouseToDate(new Point(e.getPoint().x - DrawConstants.GRAPH_LEFT_SPACE, e.getPoint().y - DrawConstants.GRAPH_TOP_SPACE))));
+            dialog.setLocation(e.getLocationOnScreen());
+            dialog.validate();
+            dialog.pack();
+            dialog.setVisible(true);
+
         } else if (graphArea.contains(e.getPoint())) {
             setMovieFrameManually(e.getPoint());
         }
+    }
+
+    private Date mouseToDate(Point point) {
+        Interval<Date> interval = drawController.getSelectedInterval();
+        final int x = Math.max(graphArea.x, Math.min(graphArea.x + graphArea.width, point.x));
+        final long millis = ((long) ((x - graphArea.x) / ratioX) + interval.getStart().getTime());
+        return new Date(millis);
     }
 
     @Override
