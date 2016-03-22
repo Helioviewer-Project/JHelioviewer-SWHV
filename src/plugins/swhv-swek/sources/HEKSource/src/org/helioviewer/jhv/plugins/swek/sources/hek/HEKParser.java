@@ -107,14 +107,15 @@ public class HEKParser implements SWEKParser {
                 String lkeyString = keyString.toLowerCase();
 
                 String value = ref.getString(keyString);
+                String lvalue = value.toLowerCase();
                 if (lkeyString.equals("ref_type")) {
-                    if (value.toLowerCase().equals("movie")) {
+                    if (lvalue.equals("movie")) {
                         type = "Reference Movie";
                         ok = true;
-                    } else if (lkeyString.equals("image")) {
+                    } else if (lvalue.equals("image")) {
                         type = "Reference Image";
                         ok = true;
-                    } else if (lkeyString.equals("html")) {
+                    } else if (lvalue.equals("html")) {
                         type = "Reference Link";
                         ok = true;
                     }
