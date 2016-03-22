@@ -34,19 +34,19 @@ public class HEKDownloader extends SWEKDownloader {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
             } catch (JSONException e) {
-                e.printStackTrace();
                 return false;
             } catch (ParseException e) {
-                e.printStackTrace();
                 return false;
             }
 
             if (end - start > 3 * 24 * 60 * 60 * 1000) {
+                /*
                 Log.error("Possible wrong parsing of a HEK event.");
                 Log.error("Event start: " + start);
                 Log.error("Event end: " + end);
                 Log.error("Event JSON: ");
                 Log.error(result.toString());
+                 */
                 return false;
             }
             byte[] compressedJson;
