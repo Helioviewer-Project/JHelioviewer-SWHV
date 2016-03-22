@@ -88,14 +88,14 @@ public class EventPanel implements DrawableElement {
                     minimalEndDate = endDates.get(minimalDateLine);
                     maximumDateLine = defineMaximumDateLine(endDates);
                     maximumEndDate = endDates.get(maximumDateLine);
-                    double scaledX0 = defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd);
-                    double scaledX1 = defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd);
+                    int x0 = (int) (graphArea.width * defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd));
+                    int x1 = (int) (graphArea.width * defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd));
                     if (nrLines > maxEventLines) {
                         maxEventLines = nrLines;
                     }
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, scaledX0, scaledX1, eventPosition, g, graphArea, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, graphArea, previousLine, mousePosition);
                     if (rEvent != null) {
-                        shouldRedraw = new EventPlotConfiguration(event, scaledX0, scaledX1, eventPosition);
+                        shouldRedraw = new EventPlotConfiguration(event, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
                     }
 
