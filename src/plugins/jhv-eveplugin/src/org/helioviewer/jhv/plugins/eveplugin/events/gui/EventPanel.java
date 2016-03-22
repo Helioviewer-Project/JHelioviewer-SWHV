@@ -51,47 +51,30 @@ public class EventPanel implements DrawableElement {
             BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dash1, 0f);
             Stroke normalStroke = g.getStroke();
             JHVRelatedEvents highlightedEvent = null;
+            int spacePerLine = 6;
 
             for (JHVEventType eventType : events.keySet()) {
-                ArrayList<Date> endDates = new ArrayList<Date>();
-                Date minimalEndDate = null;
-                Date maximumEndDate = null;
-                int minimalDateLine = 0;
-                int maximumDateLine = 0;
+
+                ArrayList<Long> endDates = new ArrayList<Long>();
                 int nrLines = 0;
-                int maxEventLines = 0;
-                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
-                int spacePerLine = 0;
                 EventPlotConfiguration shouldRedraw = null;
-                ImageIcon icon = eventType.getEventType().getEventIcon();
+
+                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
                 for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
                     JHVRelatedEvents event = evr.getValue();
-                    int eventPosition = 0;
-                    if (minimalEndDate == null || minimalEndDate.getTime() >= event.getStart()) {
-                        minimalEndDate = new Date(event.getEnd());
-                        endDates.add(minimalEndDate);
-                        eventPosition = nrLines;
-                        nrLines++;
-                    } else {
-                        if (event.getStart() > maximumEndDate.getTime()) {
-                            eventPosition = 0;
-                            nrLines = 1;
-                            endDates = new ArrayList<Date>();
-                            endDates.add(new Date(event.getEnd()));
-                        } else {
-                            eventPosition = minimalDateLine;
-                            endDates.set(minimalDateLine, new Date(event.getEnd()));
-                        }
+                    int i = 0;
+                    while (i < nrLines && endDates.get(i) >= event.getStart()) {
+                        i++;
                     }
-                    minimalDateLine = defineMinimalDateLine(endDates);
-                    minimalEndDate = endDates.get(minimalDateLine);
-                    maximumDateLine = defineMaximumDateLine(endDates);
-                    maximumEndDate = endDates.get(maximumDateLine);
+                    if (i == nrLines)
+                        endDates.add(event.getEnd());
+                    else
+                        endDates.set(i, event.getEnd());
+                    int eventPosition = i;
+                    nrLines = endDates.size();
+
                     int x0 = (int) (graphArea.width * defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd));
                     int x1 = (int) (graphArea.width * defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd));
-                    if (nrLines > maxEventLines) {
-                        maxEventLines = nrLines;
-                    }
                     JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition);
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(event, x0, x1, eventPosition);
@@ -103,11 +86,11 @@ public class EventPanel implements DrawableElement {
                     shouldRedraw.draw(g, previousLine, mousePosition);
                 }
 
-                spacePerLine = 6;
-                int spaceNeeded = spacePerLine * maxEventLines;
+                int spaceNeeded = spacePerLine * nrLines;
+                ImageIcon icon = eventType.getEventType().getEventIcon();
                 leftAxis.drawImage(icon.getImage(), 0, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 - icon.getIconHeight() / 2 / 2, icon.getIconWidth() / 2, leftAxisArea.y + previousLine * spacePerLine + spaceNeeded / 2 + icon.getIconHeight() / 2 / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
-                previousLine += maxEventLines;
+                previousLine += nrLines;
                 if (eventTypeNr != nrEventTypes - 1) {
                     g.setStroke(dashed);
                     g.setColor(Color.black);
