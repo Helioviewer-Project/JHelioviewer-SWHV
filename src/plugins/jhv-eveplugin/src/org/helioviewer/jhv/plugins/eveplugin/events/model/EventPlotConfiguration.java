@@ -15,30 +15,13 @@ import org.helioviewer.jhv.plugins.eveplugin.DrawConstants;
  *
  */
 public class EventPlotConfiguration {
-    /** The event */
     private final JHVRelatedEvents event;
 
-    /** The scaled x position */
     private final double scaledX0;
     private final double scaledX1;
 
-    /** the Y position */
     private final int yPosition;
 
-    /**
-     * Creates a EventPlotConfiguration for the given event with scaledX0 start
-     * position and scaledX1 end position.
-     *
-     * @param event
-     *            the event for this plot configuration
-     * @param scaledX0
-     *            the scaled start position
-     * @param scaledX1
-     *            the scaled end position
-     * @param yPosition
-     *            the y-position of this event in the band provided for this
-     *            event type.
-     */
     public EventPlotConfiguration(JHVRelatedEvents event, double scaledX0, double scaledX1, int yPosition) {
         this.event = event;
         this.scaledX0 = scaledX0;
@@ -56,7 +39,7 @@ public class EventPlotConfiguration {
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
         int x = (int) Math.floor(graphArea.width * scaledX0);
         int y = startPosition;
-        int w = (int) Math.floor(graphArea.width * (scaledX1 - scaledX0)) + 1;
+        int w = Math.max((int) (graphArea.width * (scaledX1 - scaledX0)), 1);
         int h = spacePerLine;
         if (w < 5) {
             x = x - (5 / w);

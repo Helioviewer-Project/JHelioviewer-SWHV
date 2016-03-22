@@ -41,6 +41,8 @@ public class EventPanel implements DrawableElement {
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
         if (EventModel.getSingletonInstance().isEventsVisible() && events.size() > 0) {
             final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
+            long selectedIntervalStart = selectedInterval.getStart().getTime();
+            long selectedIntervalEnd = selectedInterval.getEnd().getTime();
 
             int nrEventTypes = events.size();
             int eventTypeNr = 0;
@@ -86,8 +88,8 @@ public class EventPanel implements DrawableElement {
                     minimalEndDate = endDates.get(minimalDateLine);
                     maximumDateLine = defineMaximumDateLine(endDates);
                     maximumEndDate = endDates.get(maximumDateLine);
-                    double scaledX0 = defineScaledValue(event.getStart(), selectedInterval);
-                    double scaledX1 = defineScaledValue(event.getEnd(), selectedInterval);
+                    double scaledX0 = defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd);
+                    double scaledX1 = defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd);
                     if (nrLines > maxEventLines) {
                         maxEventLines = nrLines;
                     }
@@ -164,10 +166,8 @@ public class EventPanel implements DrawableElement {
         return minLine;
     }
 
-    private double defineScaledValue(long date, Interval<Date> selectedInterval) {
-        double selectedDuration = 1.0 * (selectedInterval.getEnd().getTime() - selectedInterval.getStart().getTime());
-        double position = 1.0 * (date - selectedInterval.getStart().getTime());
-        return position / selectedDuration;
+    private double defineScaledValue(long date, long start, long end) {
+        return (1.0 * (date - start)) / (end - start);
     }
 
     @Override
