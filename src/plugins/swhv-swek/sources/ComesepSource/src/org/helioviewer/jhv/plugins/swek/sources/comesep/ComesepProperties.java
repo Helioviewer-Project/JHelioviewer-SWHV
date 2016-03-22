@@ -6,9 +6,9 @@ import java.util.Properties;
 
 /**
  * Gives access to the COMESEP source properties
- * 
+ *
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
- * 
+ *
  */
 public class ComesepProperties {
     private static ComesepProperties singletonInstance;
@@ -26,7 +26,7 @@ public class ComesepProperties {
 
     /**
      * Gets the singleton instance of the COMESEP source properties
-     * 
+     *
      * @return the COMESEP source properties
      */
     public static ComesepProperties getSingletonInstance() {
@@ -38,7 +38,7 @@ public class ComesepProperties {
 
     /**
      * Gets the COMESEP source properties.
-     * 
+     *
      * @return the comesep source properties
      */
     public Properties getComesepProperties() {
@@ -53,7 +53,7 @@ public class ComesepProperties {
         try {
             comesepProperties.load(defaultPropStream);
         } catch (IOException ex) {
-            System.out.println("Could not load the hek settings." + ex);
+            System.out.println("Could not load the comesep settings." + ex);
         }
     }
 }
