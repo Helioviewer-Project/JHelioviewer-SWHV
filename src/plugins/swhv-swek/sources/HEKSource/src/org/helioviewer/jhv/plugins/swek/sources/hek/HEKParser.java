@@ -56,8 +56,7 @@ public class HEKParser implements SWEKParser {
         Double hgsX = null;
         Double hgsY = null;
         Iterator<?> keys = result.keys();
-        boolean success = true;
-        while (keys.hasNext() && success) {
+        while (keys.hasNext()) {
             Object key = keys.next();
             if (key instanceof String) {
                 String originalKeyString = (String) key;
@@ -88,8 +87,7 @@ public class HEKParser implements SWEKParser {
             }
         }
         handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
-
-        return success;
+        return true;
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
@@ -106,19 +104,21 @@ public class HEKParser implements SWEKParser {
             Object key = keys.next();
             if (key instanceof String) {
                 String keyString = (String) key;
+                String lkeyString = keyString.toLowerCase();
+
                 String value = ref.getString(keyString);
-                if (keyString.toLowerCase().equals("ref_type")) {
+                if (lkeyString.equals("ref_type")) {
                     if (value.toLowerCase().equals("movie")) {
                         type = "Reference Movie";
                         ok = true;
-                    } else if (value.toLowerCase().equals("image")) {
+                    } else if (lkeyString.equals("image")) {
                         type = "Reference Image";
                         ok = true;
-                    } else if (value.toLowerCase().equals("html")) {
+                    } else if (lkeyString.equals("html")) {
                         type = "Reference Link";
                         ok = true;
                     }
-                } else if (keyString.toLowerCase().equals("ref_url")) {
+                } else if (lkeyString.equals("ref_url")) {
                     url = value;
                 }
             }
