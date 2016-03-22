@@ -35,6 +35,7 @@ public class HEKParser implements SWEKParser {
         String name = type.getEventType().getEventName();
         final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
         boolean success = parseResult(result, currentEvent);
+
         if (!success) {
             return false;
         }
@@ -56,43 +57,39 @@ public class HEKParser implements SWEKParser {
         Double hgsY = null;
         Iterator<?> keys = result.keys();
         boolean success = true;
-        while (keys.hasNext()) {
-            success = parseParameter(result, keys.next(), currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
+        while (keys.hasNext() && success) {
+            Object key = keys.next();
+            if (key instanceof String) {
+                String originalKeyString = (String) key;
+                String keyString = originalKeyString.toLowerCase();
+                if (keyString.equals("refs")) {
+                    parseRefs(currentEvent, result.getJSONArray(originalKeyString));
+                } else {
+                    String value = null;
+                    if (!result.isNull(keyString)) {
+                        value = result.optString(keyString);
+                    } else {
+                        continue;
+                    }
+                    if (keyString.equals("hgs_bbox")) {
+                        hgsBoundedBox = parsePolygon(value);
+                    } else if (keyString.equals("hgs_boundcc")) {
+                        hgsBoundCC = parsePolygon(value);
+                    } else if (keyString.equals("hgs_coord")) {
+                        hgsCentralPoint = parsePoint(value);
+                    } else if (keyString.equals("hgs_x")) {
+                        hgsX = Double.valueOf(value);
+                    } else if (keyString.equals("hgs_y")) {
+                        hgsY = Double.valueOf(value);
+                    } else {
+                        currentEvent.addParameter(originalKeyString, value);
+                    }
+                }
+            }
         }
         handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
 
         return success;
-    }
-
-    private static boolean parseParameter(JSONObject result, Object key, JHVEvent currentEvent, List<Vec3> hgsBoundedBox, List<Vec3> hgsBoundCC, Vec3 hgsCentralPoint, Double hgsX, Double hgsY) throws JSONException {
-        if (key instanceof String) {
-            String originalKeyString = (String) key;
-            String keyString = originalKeyString.toLowerCase();
-            if (keyString.equals("refs")) {
-                parseRefs(currentEvent, result.getJSONArray((String) key));
-            } else {
-                String value = null;
-                if (!result.isNull(keyString)) {
-                    value = result.optString(keyString);
-                } else {
-                    return false;
-                }
-                if (keyString.equals("hgs_bbox")) {
-                    hgsBoundedBox = parsePolygon(value);
-                } else if (keyString.equals("hgs_boundcc")) {
-                    hgsBoundCC = parsePolygon(value);
-                } else if (keyString.equals("hgs_coord")) {
-                    hgsCentralPoint = parsePoint(value);
-                } else if (keyString.equals("hgs_x")) {
-                    hgsX = Double.valueOf(value);
-                } else if (keyString.equals("hgs_y")) {
-                    hgsY = Double.valueOf(value);
-                } else {
-                    currentEvent.addParameter(originalKeyString, value);
-                }
-            }
-        }
-        return true;
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
