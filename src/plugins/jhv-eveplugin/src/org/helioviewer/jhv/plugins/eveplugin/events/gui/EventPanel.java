@@ -66,10 +66,11 @@ public class EventPanel implements DrawableElement {
                     while (i < nrLines && endDates.get(i) >= event.getStart()) {
                         i++;
                     }
-                    if (i == nrLines)
+                    if (i == nrLines) {
                         endDates.add(event.getEnd());
-                    else
+                    } else {
                         endDates.set(i, event.getEnd());
+                    }
                     int eventPosition = i;
                     nrLines = endDates.size();
 
@@ -77,7 +78,7 @@ public class EventPanel implements DrawableElement {
                     int x1 = (int) (graphArea.width * defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd));
                     JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition);
                     if (rEvent != null) {
-                        shouldRedraw = new EventPlotConfiguration(event, x0, x1, eventPosition);
+                        shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
                     }
 
