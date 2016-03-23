@@ -27,11 +27,11 @@ import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 public class EventDescriptionPanel extends JPanel implements MouseListener {
 
     private final JHVRelatedEvents revent;
-    private final JHVEvent event;
+    // private final JHVEvent event;
 
     public EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
         this.revent = revent;
-        this.event = event;
+        // this.event = event;
 
         JLabel labelIcon = new JLabel(revent.getIcon());
 
