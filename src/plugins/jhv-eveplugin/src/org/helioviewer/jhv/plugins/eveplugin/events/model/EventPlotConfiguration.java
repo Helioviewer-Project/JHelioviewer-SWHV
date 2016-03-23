@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.events.model;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
@@ -50,17 +49,12 @@ public class EventPlotConfiguration {
             highlightedEvent = event;
         }
         if (eventWasHightlighted) {
-            int endpointsMarkWidth = 5;
             x0 = x0 - 10;
             y = y - 1;
             startPosition = startPosition - 1;
             w = w + 20;
             h = h + 2;
             spacePerLine = h;
-
-            g.setColor(Color.black);
-            g.fillRect(x0, startPosition, endpointsMarkWidth, spacePerLine);
-            g.fillRect(x0 + w - endpointsMarkWidth, startPosition, endpointsMarkWidth, spacePerLine);
         }
         g.setColor(event.getColor());
         g.fillRect(x0, startPosition, w, spacePerLine);
