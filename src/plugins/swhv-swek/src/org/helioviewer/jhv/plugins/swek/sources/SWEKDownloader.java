@@ -60,9 +60,8 @@ public abstract class SWEKDownloader {
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
-                JSONObject eventJSON;
                 String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                eventJSON = new JSONObject(reply);
+                JSONObject eventJSON = new JSONObject(reply);
                 if (eventJSON.has("overmax"))
                     overmax = eventJSON.getBoolean("overmax");
                 else
