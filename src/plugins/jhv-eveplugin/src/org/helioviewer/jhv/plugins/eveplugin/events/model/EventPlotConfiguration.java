@@ -51,13 +51,12 @@ public class EventPlotConfiguration {
         if (eventWasHightlighted) {
             x0 = x0 - 10;
             y = y - 1;
-            startPosition = startPosition - 1;
             w = w + 20;
             h = h + 2;
             spacePerLine = h;
         }
         g.setColor(event.getColor());
-        g.fillRect(x0, startPosition, w, spacePerLine);
+        g.fillRect(x0, y, w, spacePerLine);
 
         return highlightedEvent;
     }
