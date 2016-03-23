@@ -110,7 +110,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
 
     // private boolean prevNoPlotConfig;
 
-    private Date lastDateWithData;
+    // private Date lastDateWithData;
 
     private JHVRelatedEvents eventUnderMouse;
 
@@ -213,8 +213,7 @@ public class EventModel implements TimingListener, JHVEventHandler {
     }
 
     public Date getLastDateWithData() {
-
-        return lastDateWithData;
+        return null; // lastDateWithData;
     }
 
     public boolean hasElementsToDraw() {
