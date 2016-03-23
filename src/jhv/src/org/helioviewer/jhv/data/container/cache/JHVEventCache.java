@@ -170,7 +170,7 @@ public class JHVEventCache {
             if (assoLeft.containsKey(association.left)) {
                 ArrayList<JHVAssociation> res = assoLeft.get(association.left);
                 for (JHVAssociation el : res) {
-                    if (el.right == association.right) {
+                    if (el.right.equals(association.right)) {
                         alreadyin = true;
                         break;
                     }

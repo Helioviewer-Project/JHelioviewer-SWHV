@@ -38,8 +38,11 @@ public class EventPanel implements DrawableElement {
 
     @Override
     public void draw(Graphics2D g, Graphics2D leftAxis, Rectangle graphArea, Rectangle leftAxisArea, Point mousePosition) {
+        if (!EventModel.getSingletonInstance().isEventsVisible())
+            return;
+
         Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> events = EventModel.getSingletonInstance().getEvents();
-        if (EventModel.getSingletonInstance().isEventsVisible() && events.size() > 0) {
+        if (events.size() > 0) {
             final Interval<Date> selectedInterval = DrawController.getSingletonInstance().getSelectedInterval();
             long selectedIntervalStart = selectedInterval.getStart().getTime();
             long selectedIntervalEnd = selectedInterval.getEnd().getTime();
