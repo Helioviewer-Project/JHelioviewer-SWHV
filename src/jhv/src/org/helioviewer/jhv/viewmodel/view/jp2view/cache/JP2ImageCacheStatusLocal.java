@@ -3,7 +3,6 @@ package org.helioviewer.jhv.viewmodel.view.jp2view.cache;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_region_compositor;
 
-import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatus;
 import org.helioviewer.jhv.viewmodel.imagecache.ImageCacheStatusLocal;
 import org.helioviewer.jhv.viewmodel.view.jp2view.image.ResolutionSet;
 import org.helioviewer.jhv.viewmodel.view.jp2view.kakadu.KakaduHelper;
