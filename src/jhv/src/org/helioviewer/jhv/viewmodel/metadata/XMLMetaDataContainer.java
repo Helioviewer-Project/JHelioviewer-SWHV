@@ -79,7 +79,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
                 return Double.parseDouble(string);
             } catch (NumberFormatException e) {
                 Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                return 0.0;
+                return Double.NaN;
             }
         }
         return 0.0;
@@ -96,7 +96,7 @@ public class XMLMetaDataContainer implements MetaDataContainer {
                 return Integer.parseInt(string);
             } catch (NumberFormatException e) {
                 Log.warn("NumberFormatException while trying to parse value \"" + string + "\" of key " + key);
-                return 0;
+                return Integer.MIN_VALUE;
             }
         }
         return 0;
