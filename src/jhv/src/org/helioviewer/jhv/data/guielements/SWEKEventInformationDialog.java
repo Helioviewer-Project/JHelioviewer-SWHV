@@ -6,9 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,7 +18,6 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
-import org.helioviewer.jhv.data.datatype.event.comparator.JHVEventRelationComparator;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
 import org.helioviewer.jhv.gui.ImageViewerGui;
@@ -57,7 +55,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     private EventDescriptionPanel eventDescriptionPanel;
 
     private final JHVEvent event;
-
+    private final JHVRelatedEvents rEvent;
     private Integer nrOfWindowsOpened;
 
     private final DataCollapsiblePanelModel model;
@@ -70,6 +68,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
         this.event = event;
+        rEvent = revent;
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(revent);
@@ -77,12 +76,11 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     }
 
     /*
-        public SWEKEventInformationDialog(JHVEvent event, SWEKEventInformationDialog parent, boolean modal) {
-            super(parent, event.getJHVEventType().getEventType().getEventName(), modal);
-            model = new DataCollapsiblePanelModel();
-            model.addListener(this);
-            initDialog(event);
-        }
+     * public SWEKEventInformationDialog(JHVEvent event,
+     * SWEKEventInformationDialog parent, boolean modal) { super(parent,
+     * event.getJHVEventType().getEventType().getEventName(), modal); model =
+     * new DataCollapsiblePanelModel(); model.addListener(this);
+     * initDialog(event); }
      */
     @Override
     public void windowOpened(WindowEvent e) {
@@ -170,21 +168,23 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters().values());
         allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
+
+        ArrayList<JHVEvent> precedingEvents = rEvent.getPreviousEvents(event);
+        if (!precedingEvents.isEmpty()) {
+            precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", rEvent, precedingEvents);
+        }
+
+        ArrayList<JHVEvent> nextEvents = rEvent.getNextEvents(event);
+        if (!nextEvents.isEmpty()) {
+            followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", rEvent, nextEvents);
+        }
         /*
-                Map<String, JHVEventRelation> precedingEvents = event.getEventRelationShip().getPrecedingEvents();
-                if (!precedingEvents.isEmpty() && notNullRelationShip(precedingEvents)) {
-                    precedingEventsPanel = createRelatedEventsCollapsiblePane("Preceding Events", precedingEvents);
-                }
-
-                Map<String, JHVEventRelation> nextEvents = event.getEventRelationShip().getNextEvents();
-                if (!nextEvents.isEmpty() && notNullRelationShip(nextEvents)) {
-                    followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", nextEvents);
-                }
-
-                Map<String, JHVEventRelation> relatedEvents = event.getEventRelationShip().getRelatedEventsByRule();
-                if (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
-                    otherRelatedEventsPanel = createRelatedEventsCollapsiblePane("Other Related Events", relatedEvents);
-                }
+         * Map<String, JHVEventRelation> relatedEvents =
+         * event.getEventRelationShip().getRelatedEventsByRule(); if
+         * (!relatedEvents.isEmpty() && notNullRelationShip(relatedEvents)) {
+         * otherRelatedEventsPanel =
+         * createRelatedEventsCollapsiblePane("Other Related Events",
+         * relatedEvents); }
          */
     }
 
@@ -260,17 +260,11 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         }
     }
 
-    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, Map<String, JHVEventRelation> relations) {
+    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(String relation, JHVRelatedEvents rEvents, ArrayList<JHVEvent> relations) {
         JPanel allPrecedingEvents = new JPanel();
         allPrecedingEvents.setLayout(new BoxLayout(allPrecedingEvents, BoxLayout.Y_AXIS));
-        SortedSet<JHVEventRelation> sortedER = new TreeSet<JHVEventRelation>(new JHVEventRelationComparator());
-        for (final JHVEventRelation er : relations.values()) {
-            if (er.getTheEvent() != null) {
-                sortedER.add(er);
-            }
-        }
-        for (final JHVEventRelation er : sortedER) {
-            if (er.getTheEvent() != null) {
+        for (final JHVEvent event : relations) {
+            if (event != null) {
                 JPanel eventAndButtonPanel = new JPanel();
 
                 JButton detailsButton = new JButton("Details");
@@ -278,17 +272,16 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        /*
-                        if (er.getTheEvent() != null) {
+
+                        if (event != null) {
                             incrementNrOfWindows();
-                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(er.getTheEvent(), SWEKEventInformationDialog.this, false);
-                            // dialog.setLocation();
+                            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvent, event);
                             dialog.addWindowListener(SWEKEventInformationDialog.this);
                             dialog.validate();
                             dialog.pack();
                             dialog.setVisible(true);
                         }
-                         */
+
                     }
                 });
 
@@ -300,7 +293,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 c.anchor = GridBagConstraints.CENTER;
                 c.weightx = 1;
                 c.weighty = 1;
-                //eventAndButtonPanel.add(new EventDescriptionPanel(er.getTheEvent()), c);
+                // eventAndButtonPanel.add(new
+                // EventDescriptionPanel(er.getTheEvent()), c);
 
                 c.gridy = 1;
                 c.fill = GridBagConstraints.NONE;
