@@ -1,11 +1,5 @@
 package org.helioviewer.jhv.plugins.eveplugin.view;
 
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.helioviewer.jhv.gui.dialogs.observation.ServerListCombo;
-
 @SuppressWarnings("serial")
 public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPanel {
 
@@ -20,7 +14,7 @@ public class RadioObservationDialogUIPanel extends SimpleObservationDialogUIPane
         container.add(labelServer);
         container.add(ServerListCombo.getInstance());
         add(container);
-        */
+         */
     }
 
 }
