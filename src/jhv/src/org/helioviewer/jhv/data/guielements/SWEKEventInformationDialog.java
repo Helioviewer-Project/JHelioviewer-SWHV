@@ -178,6 +178,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         if (!nextEvents.isEmpty()) {
             followingEventsPanel = createRelatedEventsCollapsiblePane("Following Events", rEvent, nextEvents);
         }
+
         /*
          * Map<String, JHVEventRelation> relatedEvents =
          * event.getEventRelationShip().getRelatedEventsByRule(); if
@@ -293,8 +294,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                 c.anchor = GridBagConstraints.CENTER;
                 c.weightx = 1;
                 c.weighty = 1;
-                // eventAndButtonPanel.add(new
-                // EventDescriptionPanel(er.getTheEvent()), c);
+                eventAndButtonPanel.add(new EventDescriptionPanel(rEvents, event), c);
 
                 c.gridy = 1;
                 c.fill = GridBagConstraints.NONE;
