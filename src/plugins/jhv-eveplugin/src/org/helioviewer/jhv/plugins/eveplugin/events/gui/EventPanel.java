@@ -76,7 +76,7 @@ public class EventPanel implements DrawableElement {
 
                     int x0 = (int) (graphArea.width * defineScaledValue(event.getStart(), selectedIntervalStart, selectedIntervalEnd));
                     int x1 = (int) (graphArea.width * defineScaledValue(event.getEnd(), selectedIntervalStart, selectedIntervalEnd));
-                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition);
+                    JHVRelatedEvents rEvent = EventPlotConfiguration.draw(event, x0, x1, eventPosition, g, previousLine, mousePosition, event.isHighlighted());
                     if (rEvent != null) {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
