@@ -177,8 +177,8 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
             }
         }
 
-        double stonyhurstLatitude, theta;
-        if ((stonyhurstLatitude = m.tryGetDouble("HGLT_OBS")) == 0) {
+        double stonyhurstLatitude = m.tryGetDouble("HGLT_OBS");
+        if (Double.isNaN(stonyhurstLatitude) || stonyhurstLatitude == 0 /* not found */) {
             if ((stonyhurstLatitude = m.tryGetDouble("CRLT_OBS")) == 0) {
                 if ((stonyhurstLatitude = m.tryGetDouble("REF_B0")) == 0) {
                     // presumably not found
@@ -186,16 +186,16 @@ public class HelioviewerMetaData extends AbstractMetaData implements ObserverMet
                 }
             }
         }
-        theta = stonyhurstLatitude / MathUtils.radeg;
+        double theta = stonyhurstLatitude / MathUtils.radeg;
 
-        double stonyhurstLongitude, phi;
-        if ((stonyhurstLongitude = m.tryGetDouble("HGLN_OBS")) == 0) {
+        double stonyhurstLongitude = m.tryGetDouble("HGLN_OBS");
+        if (Double.isNaN(stonyhurstLongitude) /* HMI */ || stonyhurstLongitude == 0 /* not found */) {
             stonyhurstLongitude = m.tryGetDouble("REF_L0");
             if (stonyhurstLongitude != 0) {
                 stonyhurstLongitude += p.lon * MathUtils.radeg;
             }
         }
-        phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
+        double phi = p.lon - stonyhurstLongitude / MathUtils.radeg;
 
         viewpoint = new Position.Q(dateObs, distanceObs, new Quat(theta, phi));
         viewpointL = new Position.L(dateObs, distanceObs, phi, theta);
