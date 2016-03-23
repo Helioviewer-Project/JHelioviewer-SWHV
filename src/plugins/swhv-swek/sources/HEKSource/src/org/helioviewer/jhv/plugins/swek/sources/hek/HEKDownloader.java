@@ -40,13 +40,6 @@ public class HEKDownloader extends SWEKDownloader {
             }
 
             if (end - start < 0 || end - start > 3 * 24 * 60 * 60 * 1000) {
-                /*
-                Log.error("Possible wrong parsing of a HEK event.");
-                Log.error("Event start: " + start);
-                Log.error("Event end: " + end);
-                Log.error("Event JSON: ");
-                Log.error(result.toString());
-                 */
                 return false;
             }
             byte[] compressedJson;
@@ -76,10 +69,6 @@ public class HEKDownloader extends SWEKDownloader {
             }
         }
         return true;
-    }
-
-    public void db2program() {
-
     }
 
     @Override
