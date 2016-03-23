@@ -107,8 +107,8 @@ public class HEKParser implements SWEKParser {
                 String lkeyString = keyString.toLowerCase();
 
                 String value = ref.getString(keyString);
-                String lvalue = value.toLowerCase();
                 if (lkeyString.equals("ref_type")) {
+                    String lvalue = value.toLowerCase();
                     if (lvalue.equals("movie")) {
                         type = "Reference Movie";
                         ok = true;
@@ -189,7 +189,7 @@ public class HEKParser implements SWEKParser {
 
         for (int i = 0; i < 3; i++) {
             if (coordinatesScanner.hasNext()) {
-                coordinate[i] = Double.valueOf(coordinatesScanner.next());
+                coordinate[i] = Double.parseDouble(coordinatesScanner.next());
                 notnull = true;
             }
         }
