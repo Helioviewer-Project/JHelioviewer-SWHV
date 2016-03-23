@@ -28,10 +28,10 @@ public class EventPlotConfiguration {
     }
 
     public JHVRelatedEvents draw(Graphics2D g, int nrPreviousLines, Point mousePosition) {
-        return draw(event, x0, x1, yPosition, g, nrPreviousLines, mousePosition);
+        return draw(event, x0, x1, yPosition, g, nrPreviousLines, mousePosition, true);
     }
 
-    public static JHVRelatedEvents draw(JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition) {
+    public static JHVRelatedEvents draw(JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, int nrPreviousLines, Point mousePosition, boolean highlight) {
         JHVRelatedEvents highlightedEvent = null;
         int spacePerLine = 3;
         int startPosition = spacePerLine * 2 * (nrPreviousLines + yPosition) + DrawConstants.EVENT_OFFSET;
@@ -48,13 +48,15 @@ public class EventPlotConfiguration {
         if (mousePosition != null && containsMouse) {
             highlightedEvent = event;
         }
-        if (eventWasHightlighted) {
+
+        if (eventWasHightlighted && highlight) {
             x0 = x0 - 10;
             y = y - 1;
             w = w + 20;
             h = h + 2;
             spacePerLine = h;
         }
+
         g.setColor(event.getColor());
         g.fillRect(x0, y, w, spacePerLine);
 
