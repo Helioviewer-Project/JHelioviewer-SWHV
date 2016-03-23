@@ -108,44 +108,6 @@ public class EventPanel implements DrawableElement {
         }
     }
 
-    private int defineMaximumDateLine(ArrayList<Date> endDates) {
-        Date maxDate = null;
-        int maxLine = 0;
-        for (Date d : endDates) {
-            if (maxDate == null) {
-                // first case
-                maxDate = d;
-                maxLine = 0;
-            } else {
-                // the rest
-                if (d.after(maxDate)) {
-                    maxDate = d;
-                    maxLine = endDates.indexOf(d);
-                }
-            }
-        }
-        return maxLine;
-    }
-
-    private int defineMinimalDateLine(ArrayList<Date> endDates) {
-        Date minDate = null;
-        int minLine = 0;
-        for (Date d : endDates) {
-            if (minDate == null) {
-                // first case
-                minDate = d;
-                minLine = 0;
-            } else {
-                // the rest
-                if (d.before(minDate)) {
-                    minDate = d;
-                    minLine = endDates.indexOf(d);
-                }
-            }
-        }
-        return minLine;
-    }
-
     private double defineScaledValue(long date, long start, long end) {
         return (1.0 * (date - start)) / (end - start);
     }
