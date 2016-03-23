@@ -140,9 +140,9 @@ public class JHVEvent {
         boolean visible = false;
         boolean configured = false;
         String displayName;
-        SWEKParameter p = this.getJHVEventType().getEventType().getParameter(keyString);
+        SWEKParameter p = eventType.getEventType().getParameter(keyString);
         if (p == null) {
-            p = this.getJHVEventType().getSupplier().getSource().getParameter(keyString);
+            p = eventType.getSupplier().getSource().getParameter(keyString);
         }
         if (p != null) {
             configured = true;
@@ -154,7 +154,7 @@ public class JHVEvent {
         }
 
         JHVEventParameter parameter = new JHVEventParameter(keyString, displayName, value);
-        this.addParameter(parameter, visible, configured);
+        addParameter(parameter, visible, configured);
     }
 
 }
