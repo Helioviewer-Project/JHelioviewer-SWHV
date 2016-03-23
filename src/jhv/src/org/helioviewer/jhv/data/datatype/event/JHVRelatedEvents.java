@@ -162,4 +162,29 @@ public class JHVRelatedEvents {
         }
         return nEvents;
     }
+
+    public void swapEvent(JHVEvent event) {
+        int i = 0;
+        while (!events.get(i).getUniqueID().equals(event.getUniqueID())) {
+            i++;
+        }
+        events.remove(i);
+        events.add(event);
+        resetTime();
+    }
+
+    private void resetTime() {
+        interval.start = Long.MAX_VALUE;
+        interval.end = Long.MIN_VALUE;
+        for (JHVEvent evt : events) {
+            long time = evt.getStartDate().getTime();
+            if (time < interval.start) {
+                interval.start = time;
+            }
+            time = evt.getEndDate().getTime();
+            if (time > interval.end) {
+                interval.end = time;
+            }
+        }
+    }
 }
