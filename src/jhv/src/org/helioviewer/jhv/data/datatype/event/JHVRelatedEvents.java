@@ -28,10 +28,9 @@ public class JHVRelatedEvents {
     public JHVRelatedEvents(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         super();
         color = JHVCacheColors.getNextColor();
-        this.add(event, eventsMap);
-        eventsMap.get(event.getJHVEventType()).put(interval, this);
-        highlighted = false;
         eventType = event.getJHVEventType();
+        this.add(event, eventsMap);
+        highlighted = false;
     }
 
     public ArrayList<JHVEvent> getEvents() {
