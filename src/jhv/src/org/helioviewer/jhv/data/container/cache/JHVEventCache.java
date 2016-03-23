@@ -91,7 +91,7 @@ public class JHVEventCache {
         }
         JHVRelatedEvents current = null;
         current = checkAssociation(current, assoLeft, true, event);
-        current = checkAssociation(current, assoRight, true, event);
+        current = checkAssociation(current, assoRight, false, event);
         if (current == null) {
             current = new JHVRelatedEvents(event, events);
             relEvents.put(event.getUniqueID(), current);
