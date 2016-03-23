@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
 
+import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVCacheColors;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 
@@ -82,7 +83,7 @@ public class JHVRelatedEvents {
         forceSort(eventsMap);
     }
 
-    private ArrayList<JHVAssociation> getAssociations() {
+    public ArrayList<JHVAssociation> getAssociations() {
         return associations;
     }
 
@@ -117,8 +118,9 @@ public class JHVRelatedEvents {
 
     public JHVEvent getClosestTo(Date timestamp) {
         for (JHVEvent event : events) {
-            if (event.getStartDate().getTime() <= timestamp.getTime() && event.getEndDate().getTime() >= timestamp.getTime())
+            if (event.getStartDate().getTime() <= timestamp.getTime() && event.getEndDate().getTime() >= timestamp.getTime()) {
                 return event;
+            }
         }
         return events.get(0);
     }
@@ -129,35 +131,42 @@ public class JHVRelatedEvents {
 
     private JHVEvent findEvent(Integer id) {
         for (JHVEvent evt : events) {
-            if (evt.getUniqueID() == id)
+            if (evt.getUniqueID().equals(id)) {
                 return evt;
+            }
         }
         return null;
     }
 
     public ArrayList<JHVEvent> getNextEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
-        for (JHVAssociation assoc : this.associations) {
-            if (assoc.left == event.getUniqueID()) {
+        for (JHVAssociation assoc : associations) {
+            if (assoc.left.equals(event.getUniqueID())) {
                 JHVEvent newEvt = findEvent(assoc.right);
                 if (newEvt != null) {
                     nEvents.add(newEvt);
+                } else {
+                    Log.debug("event is null");
                 }
             }
         }
+        Log.debug(nEvents.size());
         return nEvents;
     }
 
     public ArrayList<JHVEvent> getPreviousEvents(JHVEvent event) {
         ArrayList<JHVEvent> nEvents = new ArrayList<JHVEvent>();
-        for (JHVAssociation assoc : this.associations) {
-            if (assoc.right == event.getUniqueID()) {
+        for (JHVAssociation assoc : associations) {
+            if (assoc.right.equals(event.getUniqueID())) {
                 JHVEvent newEvt = findEvent(assoc.left);
                 if (newEvt != null) {
                     nEvents.add(newEvt);
+                } else {
+                    Log.debug("event is null");
                 }
             }
         }
+        Log.debug(nEvents.size());
         return nEvents;
     }
 }
