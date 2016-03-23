@@ -90,8 +90,9 @@ public class JHVEventCache {
             events.put(evtType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         JHVRelatedEvents current = null;
-        current = checkAssociation(current, assoLeft, true, event);
-        current = checkAssociation(current, assoRight, false, event);
+        current = checkAssociation(current, assoLeft, false, event);
+        current = checkAssociation(current, assoRight, true, event);
+
         if (current == null) {
             current = new JHVRelatedEvents(event, events);
             relEvents.put(event.getUniqueID(), current);
