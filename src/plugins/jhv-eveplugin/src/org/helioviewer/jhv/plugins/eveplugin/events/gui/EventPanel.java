@@ -53,15 +53,15 @@ public class EventPanel implements DrawableElement {
             JHVRelatedEvents highlightedEvent = null;
             int spacePerLine = 6;
 
-            for (JHVEventType eventType : events.keySet()) {
+            for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> entry : events.entrySet()) {
+                JHVEventType eventType = entry.getKey();
+                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = entry.getValue();
 
                 ArrayList<Long> endDates = new ArrayList<Long>();
                 int nrLines = 0;
                 EventPlotConfiguration shouldRedraw = null;
 
-                SortedMap<SortedDateInterval, JHVRelatedEvents> eventMap = events.get(eventType);
-                for (Entry<SortedDateInterval, JHVRelatedEvents> evr : eventMap.entrySet()) {
-                    JHVRelatedEvents event = evr.getValue();
+                for (JHVRelatedEvents event : eventMap.values()) {
                     int i = 0;
                     while (i < nrLines && endDates.get(i) >= event.getStart()) {
                         i++;
@@ -81,8 +81,8 @@ public class EventPanel implements DrawableElement {
                         shouldRedraw = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
                         highlightedEvent = rEvent;
                     }
-
                 }
+
                 if (shouldRedraw != null) {
                     shouldRedraw.draw(g, previousLine, mousePosition);
                 }
