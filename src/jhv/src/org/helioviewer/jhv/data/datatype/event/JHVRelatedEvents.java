@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.container.cache.JHVCacheColors;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache.SortedDateInterval;
 
@@ -145,12 +144,9 @@ public class JHVRelatedEvents {
                 JHVEvent newEvt = findEvent(assoc.right);
                 if (newEvt != null) {
                     nEvents.add(newEvt);
-                } else {
-                    Log.debug("event is null");
                 }
             }
         }
-        Log.debug(nEvents.size());
         return nEvents;
     }
 
@@ -161,12 +157,9 @@ public class JHVRelatedEvents {
                 JHVEvent newEvt = findEvent(assoc.left);
                 if (newEvt != null) {
                     nEvents.add(newEvt);
-                } else {
-                    Log.debug("event is null");
                 }
             }
         }
-        Log.debug(nEvents.size());
         return nEvents;
     }
 }
