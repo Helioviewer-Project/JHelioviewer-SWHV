@@ -199,7 +199,7 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         SWEKSupplier supplier = jhvType.getSupplier();
         SWEKEventType eventType = jhvType.getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);
-        for (Interval<Date> intt : Interval.splitInterval(interval, 2)) {
+        for (Interval<Date> intt : Interval.splitInterval(interval, 7)) {
             DownloadWorker dw = new DownloadWorker(jhvType, intt, params);
             treeModel.setStartLoading(eventType);
             addToDownloaderMap(eventType, dw);

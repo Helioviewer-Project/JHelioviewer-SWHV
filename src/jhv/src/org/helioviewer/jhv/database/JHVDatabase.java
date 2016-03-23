@@ -409,7 +409,7 @@ public class JHVDatabase {
             if (typedCache == null) {
                 typedCache = new RequestCache();
                 long lastEvent = Math.min(System.currentTimeMillis(), getLastEvent(connection, type));
-                long invalidationDate = lastEvent - ONEWEEK * 4;
+                long invalidationDate = lastEvent - ONEWEEK * 2;
                 dCache.put(type, typedCache);
                 if (connection != null) {
                     int typeId = getEventTypeId(connection, type);
