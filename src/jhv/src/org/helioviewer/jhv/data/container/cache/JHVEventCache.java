@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -83,50 +82,57 @@ public class JHVEventCache {
         if (relEvents.containsKey(event.getUniqueID())) {
             return;
         }
-
-        JHVEventType evtType = event.getJHVEventType();
-
-        if (!events.containsKey(evtType)) {
-            events.put(evtType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
-        }
-        JHVRelatedEvents current = null;
-        current = checkAssociation(current, assoLeft, false, event);
-        current = checkAssociation(current, assoRight, true, event);
-
-        if (current == null) {
-            current = new JHVRelatedEvents(event, events);
-            relEvents.put(event.getUniqueID(), current);
-        }
+        checkAssociation(true, event);
+        checkAssociation(false, event);
     }
 
-    private JHVRelatedEvents checkAssociation(JHVRelatedEvents current, Map<Integer, ArrayList<JHVAssociation>> assoList, boolean isLeft, JHVEvent event) {
+    private void checkAssociation(boolean isLeft, JHVEvent event) {
+        Map<Integer, ArrayList<JHVAssociation>> assoList = isLeft ? assoLeft : assoRight;
+        Map<Integer, ArrayList<JHVAssociation>> assoOther = isLeft ? assoRight : assoLeft;
+
         Integer uid = event.getUniqueID();
         if (assoList.containsKey(uid)) {
             for (Iterator<JHVAssociation> iterator = assoList.get(uid).iterator(); iterator.hasNext();) {
                 JHVAssociation tocheck = iterator.next();
-                Integer founduid = isLeft ? tocheck.left : tocheck.right;
+                Integer founduid = isLeft ? tocheck.right : tocheck.left;
+
                 JHVRelatedEvents found = relEvents.get(founduid);
                 if (found != null) {
-                    if (current == null) {
-                        found.add(event, events);
-                        found.addAssociation(tocheck);
-                        relEvents.put(uid, found);
-                        current = found;
-                    }
-                    else {
-                        if (current != found) {
-                            merge(current, found);
-                            current.addAssociation(tocheck);
+                    if (relEvents.containsKey(uid)) {
+                        JHVRelatedEvents revent = relEvents.get(uid);
+                        merge(revent, relEvents.get(founduid));
+                        revent.addAssociation(tocheck);
+
+                        iterator.remove();
+                        for (Iterator<JHVAssociation> it = assoOther.get(founduid).iterator(); it.hasNext();) {
+                            JHVAssociation checkrem = it.next();
+                            Integer side = isLeft ? checkrem.left : checkrem.right;
+                            if (side.equals(uid)) {
+                                it.remove();
+                                break;
+                            }
+                        }
+                        if (assoOther.get(founduid).isEmpty()) {
+                            assoOther.remove(founduid);
                         }
                     }
-                    iterator.remove();
+                    else {
+                        createNewRelatedEvent(event);
+                    }
                 }
             }
             if (assoList.get(uid).isEmpty()) {
                 assoList.remove(uid);
             }
         }
-        return current;
+        else {
+            createNewRelatedEvent(event);
+        }
+    }
+
+    private void createNewRelatedEvent(JHVEvent event) {
+        JHVRelatedEvents revent = new JHVRelatedEvents(event, events);
+        relEvents.put(event.getUniqueID(), revent);
     }
 
     private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
@@ -159,8 +165,20 @@ public class JHVEventCache {
             }
         }
         else {
-            addAssociation(true, association);
-            addAssociation(false, association);
+            boolean alreadyin = false;
+            if (assoLeft.containsKey(association.left)) {
+                ArrayList<JHVAssociation> res = assoLeft.get(association.left);
+                for (JHVAssociation el : res) {
+                    if (el.right == association.right) {
+                        alreadyin = true;
+                        break;
+                    }
+                }
+            }
+            if (!alreadyin) {
+                addAssociation(true, association);
+                addAssociation(false, association);
+            }
         }
     }
 
