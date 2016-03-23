@@ -80,6 +80,7 @@ public class JHVEventCache {
 
     public void add(JHVEvent event) {
         if (relEvents.containsKey(event.getUniqueID())) {
+            relEvents.get(event.getUniqueID()).swapEvent(event);
             return;
         }
         checkAssociation(true, event);
