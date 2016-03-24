@@ -242,11 +242,11 @@ public class JHVEventCache {
     }
 
     public void reset(SWEKEventType eventType) {
-        for (JHVEventType key : downloadedCache.keySet()) {
-            if (key.getEventType() == eventType) {
-                downloadedCache.remove(key);
-                RequestCache cache = new RequestCache();
-                downloadedCache.put(key, cache);
+        Iterator it = downloadedCache.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<JHVEventType, RequestCache> pair = (Map.Entry) it.next();
+            if (pair.getKey().getEventType() == eventType) {
+                it.remove();
             }
         }
     }
