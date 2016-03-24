@@ -38,7 +38,7 @@ import org.helioviewer.jhv.gui.ImageViewerGui;
  * @author Bram.Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class SWEKEventInformationDialog extends JDialog implements WindowListener, DataCollapsiblePanelModelListener {
 
     private JPanel allTablePanel;
@@ -60,11 +60,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
     private final DataCollapsiblePanelModel model;
 
-    /**
-     *
-     *
-     * @param event
-     */
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent event) {
         super(ImageViewerGui.getMainFrame(), revent.getJHVEventType().getEventType().getEventName());
         this.event = event;
@@ -72,7 +67,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         model = new DataCollapsiblePanelModel();
         model.addListener(this);
         initDialog(revent);
-
     }
 
     /*
@@ -189,6 +183,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
          */
     }
 
+    /*
     private boolean notNullRelationShip(Map<String, JHVEventRelation> precedingEvents) {
         for (JHVEventRelation r : precedingEvents.values()) {
             if (r.getTheEvent() != null) {
@@ -197,6 +192,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         }
         return false;
     }
+    */
 
     private void setCollapsiblePanels() {
         GridBagConstraints gc = new GridBagConstraints();
@@ -270,10 +266,8 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
 
                 JButton detailsButton = new JButton("Details");
                 detailsButton.addActionListener(new ActionListener() {
-
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
                         if (event != null) {
                             incrementNrOfWindows();
                             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvent, event);
@@ -282,7 +276,6 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
                             dialog.pack();
                             dialog.setVisible(true);
                         }
-
                     }
                 });
 
@@ -320,16 +313,14 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
     @Override
     public void repack() {
         int newExpandedPanels = nrOfExpandedPanels();
-        // if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 &&
-        // expandedPanels == 0))) {
-        // this.setPreferredSize(new Dimension(this.getWidth(),
-        // this.getHeight()));
+        // if (!(newExpandedPanels == 0 || (newExpandedPanels == 1 && expandedPanels == 0))) {
+        // setPreferredSize(new Dimension(getWidth(), getHeight()));
         // }
         allTablePanel.removeAll();
         setCollapsiblePanels();
-        this.invalidate();
-        this.validate();
-        this.pack();
+        // invalidate();
+        // validate();
+        pack();
         expandedPanels = newExpandedPanels;
     }
 

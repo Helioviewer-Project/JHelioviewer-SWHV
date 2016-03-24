@@ -35,11 +35,7 @@ import org.helioviewer.jhv.viewmodel.view.View;
 @SuppressWarnings("serial")
 public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPanel implements JHVCalendarListener, LayersListener, ObservationDialogDateModelListener {
 
-    protected boolean enableLoadButton = true;
-
     private final JHVCalendarDatePicker calendarStartDate;
-    protected JComboBox comboBoxGroup;
-    protected JComboBox comboBoxData;
 
     public SimpleObservationDialogUIPanel() {
         ObservationDialogDateModel.getInstance().addListener(this);
@@ -47,8 +43,8 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         JLabel labelStartDate = new JLabel("Start date");
 
         calendarStartDate = new JHVCalendarDatePicker();
-        comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
-        comboBoxData = new JComboBox(new DefaultComboBoxModel());
+        JComboBox comboBoxGroup = new JComboBox(new DefaultComboBoxModel());
+        JComboBox comboBoxData = new JComboBox(new DefaultComboBoxModel());
         JPanel timePane = new JPanel();
         JPanel plotPane = new JPanel();
 
@@ -56,7 +52,7 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         calendarStartDate.addJHVCalendarListener(this);
         calendarStartDate.setToolTipText("UTC date for observation start");
 
-        final JPanel startDatePane = new JPanel(new BorderLayout());
+        JPanel startDatePane = new JPanel(new BorderLayout());
         startDatePane.add(labelStartDate, BorderLayout.PAGE_START);
         startDatePane.add(calendarStartDate, BorderLayout.CENTER);
 
@@ -64,14 +60,14 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
         timePane.add(startDatePane);
 
         // set basic layout
-        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        this.add(timePane);
-        this.add(plotPane);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        add(timePane);
+        add(plotPane);
 
-        Layers.addLayersListener(SimpleObservationDialogUIPanel.this);
+        Layers.addLayersListener(this);
     }
 
-    public void setDate(final Date start) {
+    public void setDate(Date start) {
         calendarStartDate.setDate(start);
     }
 
@@ -175,8 +171,8 @@ public abstract class SimpleObservationDialogUIPanel extends ObservationDialogPa
     // JHV Calendar Listener
 
     @Override
-    public void actionPerformed(final JHVCalendarEvent e) {
-        if (e.getSource() == calendarStartDate && calendarStartDate.getDate() != null) {
+    public void actionPerformed(JHVCalendarEvent e) {
+        if (e.getSource() == calendarStartDate) {
             ObservationDialogDateModel.getInstance().setStartDate(calendarStartDate.getDate(), true);
         }
         /*

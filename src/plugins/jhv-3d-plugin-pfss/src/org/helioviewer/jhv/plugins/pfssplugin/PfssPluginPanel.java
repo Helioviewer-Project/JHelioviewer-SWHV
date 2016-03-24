@@ -27,10 +27,8 @@ import org.helioviewer.jhv.gui.components.base.WheelSupport;
 public class PfssPluginPanel extends ComponentUtils.SmallPanel {
 
     private JSpinner levelSpinner;
-    public static PfssPluginPanel currentPluginPanel;
 
     public PfssPluginPanel() {
-        currentPluginPanel = this;
         initVisualComponents();
         setSmall();
     }
@@ -94,16 +92,6 @@ public class PfssPluginPanel extends ComponentUtils.SmallPanel {
 
     @Override
     public void setEnabled(boolean b) {
-    }
-
-    public void enableComponents(Container container, boolean enable) {
-        Component[] components = container.getComponents();
-        for (Component component : components) {
-            component.setEnabled(enable);
-            if (component instanceof Container) {
-                enableComponents((Container) component, enable);
-            }
-        }
     }
 
 }
