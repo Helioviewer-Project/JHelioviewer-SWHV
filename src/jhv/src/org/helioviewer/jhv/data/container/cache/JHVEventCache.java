@@ -215,8 +215,14 @@ public class JHVEventCache {
     private void deleteFromCache(JHVEventType eventType) {
         RequestCache cache = new RequestCache();
         downloadedCache.put(eventType, cache);
-
         events.remove(eventType);
+        Iterator it = relEvents.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Integer, JHVRelatedEvents> pair = (Map.Entry) it.next();
+            if (pair.getValue().getJHVEventType() == eventType) {
+                it.remove();
+            }
+        }
     }
 
     public Collection<Interval<Date>> getAllRequestIntervals(JHVEventType eventType) {

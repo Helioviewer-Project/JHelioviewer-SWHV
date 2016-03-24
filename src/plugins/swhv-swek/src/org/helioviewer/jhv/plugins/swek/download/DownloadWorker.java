@@ -9,6 +9,7 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.data.container.JHVEventContainer;
 import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
+import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
@@ -71,7 +72,15 @@ public class DownloadWorker implements Runnable {
                 });
                 ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType, params);
                 for (JsonEvent event : eventList) {
-                    parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);
+                    JHVEvent ev = parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isStopped) {
+                                JHVEventCache.getSingletonInstance().add(ev);
+                            }
+                        }
+                    });
                 }
             }
         }

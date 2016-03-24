@@ -1,10 +1,8 @@
 package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
-import java.awt.EventQueue;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParser;
@@ -39,21 +37,16 @@ public class ComesepParser implements SWEKParser {
     }
 
     @Override
-    public boolean parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
+    public JHVEvent parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
 
         final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
         boolean success = parseResult(result, currentEvent);
         if (!success) {
-            return false;
+            return null;
         }
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JHVEventCache.getSingletonInstance().add(currentEvent);
-            }
-        });
-        return true;
+
+        return currentEvent;
     }
 }
