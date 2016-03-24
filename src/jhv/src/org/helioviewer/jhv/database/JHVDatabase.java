@@ -4,15 +4,16 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,9 @@ import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParam;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
@@ -115,6 +119,19 @@ public class JHVDatabase {
             pstatement.setString(2, eventType.getSupplier().getSupplierName());
             pstatement.executeUpdate();
             pstatement.close();
+
+            String dbName = eventType.getSupplier().getDatabaseName();
+            String createtbl = "CREATE TABLE " + dbName + " (";
+            for (SWEKParameter p : eventType.getEventType().getParameterList()) {
+                SWEKParameterFilter pf = p.getParameterFilter();
+                if (pf != null)
+                    createtbl += p.getParameterName() + " " + pf.getDbType() + ",";
+            }
+            createtbl += "event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );";
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+            statement.executeUpdate(createtbl);
+
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
@@ -265,8 +282,8 @@ public class JHVDatabase {
         }
     }
 
-    public static Integer dump_event2db(byte[] compressedJson, long start, long end, String uid, JHVEventType type) {
-        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(compressedJson, start, end, uid, type));
+    public static Integer dump_event2db(byte[] compressedJson, long start, long end, String uid, JHVEventType type, ArrayList<JHVDatabaseParam> paramList) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpEvent2Db(compressedJson, start, end, uid, type, paramList));
         executor.execute(ft);
         try {
             return ft.get();
@@ -285,13 +302,15 @@ public class JHVDatabase {
         private final byte[] compressedJson;
         private final String uid;
         JHVEventType type;
+        private final ArrayList<JHVDatabaseParam> paramList;
 
-        public DumpEvent2Db(byte[] _compressedJson, long _start, long _end, String _uid, JHVEventType _type) {
+        public DumpEvent2Db(byte[] _compressedJson, long _start, long _end, String _uid, JHVEventType _type, ArrayList<JHVDatabaseParam> _paramList) {
             compressedJson = _compressedJson;
             uid = _uid;
             start = _start;
             end = _end;
             type = _type;
+            paramList = _paramList;
         }
 
         @Override
@@ -304,17 +323,52 @@ public class JHVDatabase {
             {
                 int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
-                    String sql = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
-                    PreparedStatement pstatement = connection.prepareStatement(sql);
-                    pstatement.setQueryTimeout(30);
-                    pstatement.setInt(1, typeId);
-                    pstatement.setString(2, uid);
-                    pstatement.setLong(3, start);
-                    pstatement.setLong(4, end);
-                    pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
-                    pstatement.executeUpdate();
-                    pstatement.close();
-
+                    {
+                        String sql = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
+                        PreparedStatement pstatement = connection.prepareStatement(sql);
+                        pstatement.setQueryTimeout(30);
+                        pstatement.setInt(1, typeId);
+                        pstatement.setString(2, uid);
+                        pstatement.setLong(3, start);
+                        pstatement.setLong(4, end);
+                        pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
+                        pstatement.executeUpdate();
+                        pstatement.close();
+                    }
+                    int generatedKey = -1;
+                    {
+                        String sql = "SELECT last_insert_rowid()";
+                        PreparedStatement pstatement = connection.prepareStatement(sql);
+                        pstatement.setQueryTimeout(30);
+                        ResultSet generatedKeys = pstatement.executeQuery();
+                        if (generatedKeys.next()) {
+                            generatedKey = generatedKeys.getInt(1);
+                        }
+                        pstatement.close();
+                    }
+                    {
+                        String fieldString = "";
+                        String varString = "";
+                        for (JHVDatabaseParam p : this.paramList) {
+                            fieldString += "," + p.getParamName();
+                            varString += ",?";
+                        }
+                        String sql = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
+                        PreparedStatement pstatement = connection.prepareStatement(sql);
+                        pstatement.setQueryTimeout(30);
+                        pstatement.setInt(1, generatedKey);
+                        int index = 2;
+                        for (JHVDatabaseParam p : this.paramList) {
+                            if (p.isInt()) {
+                                pstatement.setInt(index, p.getIntValue());
+                            } else if (p.isString()) {
+                                pstatement.setString(index, p.getStringValue());
+                            }
+                            index++;
+                        }
+                        pstatement.executeUpdate();
+                        pstatement.close();
+                    }
                 }
                 else {
                     Log.error("Failed to insert event");
@@ -464,103 +518,8 @@ public class JHVDatabase {
         return last_timestamp;
     }
 
-    public static InputStream getEvents(long start, long end, JHVEventType type) {
-        FutureTask<InputStream> ft = new FutureTask<InputStream>(new GetEvents(start, end, type));
-        executor.execute(ft);
-        try {
-            return ft.get();
-        } catch (InterruptedException e) {
-            return null;
-        } catch (ExecutionException e) {
-            return null;
-        }
-    }
-
-    private static class GetEvents implements Callable<InputStream> {
-
-        private final JHVEventType type;
-        private final long start;
-        private final long end;
-
-        public GetEvents(long _start, long _end, JHVEventType _type) {
-            type = _type;
-            start = _start;
-            end = _end;
-        }
-
-        @Override
-        public InputStream call() {
-            Connection connection = ConnectionThread.getConnection();
-            if (connection == null)
-                return null;
-            int typeId = getEventTypeId(connection, type);
-            StringBuilder events = new StringBuilder();
-            events.append("{\"result\":[");
-            if (typeId != -1) {
-                try {
-                    String sqlt = "SELECT data FROM events WHERE start>=? and end <=? and type_id=? order by start, end ";
-                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                    pstatement.setQueryTimeout(30);
-                    pstatement.setLong(1, start);
-                    pstatement.setLong(2, end);
-                    pstatement.setInt(3, typeId);
-                    ResultSet rs = pstatement.executeQuery();
-                    boolean next = rs.next();
-
-                    while (!rs.isClosed() && next) {
-                        events.append(decompress(rs.getBytes(1)));
-                        next = rs.next();
-                        if (next) {
-                            events.append(",");
-                        }
-                    }
-                    rs.close();
-                    pstatement.close();
-                } catch (SQLException e) {
-                    Log.error("Could not fetch id from uid " + e.getMessage());
-                }
-            }
-            events.append("]");
-            events.append(",\"overmax\":false");
-            events.append(",\"association\":[");
-            try {
-                String sqlt = "SELECT left_events.uid, right_events.uid FROM event_link "
-                        + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
-                        + "LEFT JOIN events AS right_events ON right_events.id=event_link.left_id "
-                        + "WHERE left_events.start>=? and left_events.end <=? and left_events.type_id=? order by left_events.start, left_events.end ";
-                PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                pstatement.setQueryTimeout(30);
-                pstatement.setLong(1, start);
-                pstatement.setLong(2, end);
-                pstatement.setInt(3, typeId);
-                ResultSet rs = pstatement.executeQuery();
-                boolean next = rs.next();
-
-                while (!rs.isClosed() && next) {
-                    events.append("{\"first_ivorn\":\"");
-                    events.append(rs.getString(1));
-                    events.append("\",");
-                    events.append("\"second_ivorn\":\"");
-                    events.append(rs.getString(1));
-                    events.append("\"}");
-                    next = rs.next();
-                    if (next) {
-                        events.append(",");
-                    }
-                }
-                rs.close();
-                pstatement.close();
-            } catch (SQLException e) {
-                Log.error("Could not fetch id from uid " + e.getMessage());
-            }
-            events.append("]}");
-            return new ByteArrayInputStream(events.toString().getBytes());
-        }
-
-    }
-
-    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type) {
-        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type));
+    public static ArrayList<JsonEvent> events2Program(long start, long end, JHVEventType type, List<SWEKParam> params) {
+        FutureTask<ArrayList<JsonEvent>> ft = new FutureTask<ArrayList<JsonEvent>>(new Events2Program(start, end, type, params));
         executor.execute(ft);
         try {
             return ft.get();
@@ -593,12 +552,13 @@ public class JHVDatabase {
         private final JHVEventType type;
         private final long start;
         private final long end;
-        private static String sqlt = "SELECT id, start, end, data FROM events WHERE start>=? and end <=? and type_id=? order by start, end ";
+        private final List<SWEKParam> params;
 
-        public Events2Program(long _start, long _end, JHVEventType _type) {
+        public Events2Program(long _start, long _end, JHVEventType _type, List<SWEKParam> _params) {
             type = _type;
             start = _start;
             end = _end;
+            params = _params;
         }
 
         @Override
@@ -610,6 +570,18 @@ public class JHVDatabase {
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
                 try {
+                    String join = "LEFT JOIN " + type.getSupplier().getDatabaseName() + " AS tp ON tp.event_id=e.id";
+                    String and = "";
+                    for (SWEKParam p : params) {
+                        if (!p.param.equals("provider")) {
+                            and += "AND tp." + p.param + p.operand.getStringRepresentation() + p.value + " ";
+                        }
+                    }
+                    String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e "
+                            + join
+                            + " WHERE e.start>=? and e.end <=? and e.type_id=? "
+                            + and + " order by e.start, e.end ";
+
                     PreparedStatement pstatement = connection.prepareStatement(sqlt);
                     pstatement.setQueryTimeout(30);
                     pstatement.setLong(1, start);

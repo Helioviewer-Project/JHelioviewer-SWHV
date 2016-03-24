@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.swek.sources.comesep;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -9,8 +10,9 @@ import java.util.Properties;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.database.JHVDatabase;
-import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
+import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +53,7 @@ public class ComesepDownloader extends SWEKDownloader {
                     Log.error("compression error");
                     return false;
                 }
-                int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type);
+                int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type, new ArrayList<JHVDatabaseParam>());
                 if (id == -1) {
                     Log.error("failed to dump to database");
                     return false;

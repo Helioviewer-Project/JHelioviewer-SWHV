@@ -282,12 +282,14 @@
         {
             "event_name"    : "Active Region",
             "suppliers"     : [
-                {
+                {   
+                    "db": "ar_noaa_swpc",
                     "supplier_name" : "NOAA SWPC Observer",
                     "supplier_display_name" : "NOAA SWPC",
                     "source"        : "HEK"
                 },
                 {
+                    "db": "ar_spoca",
                     "supplier_name" : "SPoCA",
                     "supplier_display_name" : "SPoCA",
                     "source"        : "HEK"
@@ -356,7 +358,9 @@
                 {
                     "supplier_name" : "CACTus (Computer Aided CME Tracking)",
                     "supplier_display_name" : "CACTus",
+                    "db": "cactus",
                     "source"        : "HEK"
+                    
                 }
             ],
             "parameter_list"        : [
@@ -406,7 +410,8 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : "km/s"
+                            "units"         : "km/s",
+                            "dbtype"        : "INTEGER"
                         },
                     "default_visible"           : true
                 },
@@ -427,7 +432,9 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : "km/s"
+                            "units"         : "km/s",
+                            "dbtype"        : "INTEGER"
+                            
                         },
                     "default_visible"           : false
                 },
@@ -441,7 +448,8 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 1,
-                            "units"         : "km/s"
+                            "units"         : "km/s",
+                            "dbtype"        : "INTEGER"
                         },
                     "default_visible"           : false
                 },
@@ -507,11 +515,13 @@
                 {
                     "supplier_name" : "halocme",
                     "supplier_display_name" : "Halo CME",
+                    "db": "coronal_dimming_halo",
                     "source"        : "HEK"
                 },
                 {
                     "supplier_name" : "Coronal Dimming Module",
                     "supplier_display_name" : "Coronal Dimming Module",
+                    "db": "coronal_dimming",
                     "source"        : "HEK"
                 }
             ],
@@ -585,7 +595,8 @@
                 {
                     "supplier_name" : "SPoCA",
                     "supplier_display_name" : "SPoCA",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "coronal_hole_spoca"                    
                 }
             ],
             "parameter_list"        : [
@@ -644,7 +655,8 @@
                 {
                     "supplier_name" : "halocme",
                     "supplier_display_name" : "Halo CME",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "coronal_wave_halo"
                 }
             ],
             "parameter_list"        : [
@@ -703,7 +715,8 @@
                 {
                     "supplier_name" : "AAFDCC",
                     "supplier_display_name" : "AAFDCC",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "aafdcc"
                 }
             ],
             "parameter_list"        : [
@@ -783,6 +796,7 @@
                 {
                     "supplier_name" : "halocme",
                     "supplier_display_name" : "Halo CME",
+                    "db": "halocme",
                     "source"        : "HEK"
                 }
             ],
@@ -842,12 +856,14 @@
                 {
                     "supplier_name" : "SWPC",
                     "supplier_display_name" : "NOAA SWPC",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "flare_swpc"
                 },
                 {
                     "supplier_name" : "Flare Detective - Trigger Module",
                     "supplier_display_name" : "Flare Detective",
-                    "source"                : "HEK"
+                    "source"                : "HEK",
+                    "db": "flare_trigger"
                 }
             ],
             "parameter_list"        : [
@@ -934,7 +950,8 @@
                 {
                     "supplier_name" : "EGSO_SFC",
                     "supplier_display_name" : "EGSO_SFC",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "sunspot"
                 }
             ],
             "parameter_list"        : [
@@ -1000,7 +1017,8 @@
                 {
                     "supplier_name" : "Emerging flux region module",
                     "supplier_display_name" : "EFRM",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "efrm"
                 }
             ],
             "parameter_list"                : [
@@ -1059,7 +1077,8 @@
                 {
                     "supplier_name" : "EruptionPatrol",
                     "supplier_display_name" : "Eruption Patrol",
-                    "source"        : "HEK"
+                    "source"        : "HEK",
+                    "db": "eruptionpatrol"
                 }
             ],
             "parameter_list"        : [
@@ -1117,37 +1136,46 @@
                 {
                     "supplier_name" : "cactus",
                     "supplier_display_name" : "CACTus",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_cactus"
                 },
                 {
                     "supplier_name" : "flaremail",
                     "supplier_display_name" : "Flaremail",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_flaremail"
                 },
                 {
                     "supplier_name" : "solardemon",
                     "supplier_display_name" : "Solar Demon",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_solardemon"
                 },{
                     "supplier_name" : "dbm",
                     "supplier_display_name" : "Drag Based Model",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_dbm"
                 },{
                     "supplier_name" : "cgft",
                     "supplier_display_name" : "cgft",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_cgft"
+                    
                 },{
                     "supplier_name" : "sepforecast",
                     "supplier_display_name" : "SEP Forecast",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_sepforecast"
                 },{
                     "supplier_name" : "glealert",
                     "supplier_display_name" : "GLE Alert",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_gle"
                 },{
                     "supplier_name" : "geomag24",
                     "supplier_display_name" : "Geomag24",
-                    "source"        : "COMESEP"
+                    "source"        : "COMESEP",
+                    "db": "com_geomag"
                 }
             ],
             "parameter_list"        : [],

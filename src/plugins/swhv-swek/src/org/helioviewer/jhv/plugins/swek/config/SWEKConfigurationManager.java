@@ -670,7 +670,8 @@ public class SWEKConfigurationManager {
     private SWEKSupplier parseSupplier(JSONObject object) throws JSONException {
         return SWEKSupplier.getSupplier(parseSupplierName(object),
                 parseSupplierDisplayName(object),
-                parseSupplierSource(object));
+                parseSupplierSource(object),
+                parseDbName(object));
     }
 
     /**
@@ -710,6 +711,10 @@ public class SWEKConfigurationManager {
      */
     private SWEKSource parseSupplierSource(JSONObject object) throws JSONException {
         return sources.get(object.getString("source"));
+    }
+
+    private String parseDbName(JSONObject object) throws JSONException {
+        return object.getString("db");
     }
 
     /**
@@ -801,9 +806,14 @@ public class SWEKConfigurationManager {
                     parseMax(filterobject),
                     parseStartValue(filterobject),
                     parseStepSize(filterobject),
-                    parseUnits(filterobject));
+                    parseUnits(filterobject),
+                    parseDbType(filterobject));
         }
         return null;
+    }
+
+    private String parseDbType(JSONObject filterobject) throws JSONException {
+        return filterobject.getString("dbtype");
     }
 
     /**

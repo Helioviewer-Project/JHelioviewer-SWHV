@@ -21,6 +21,7 @@ public class SWEKParameterFilter {
     private final Double stepSize;
     /** The units for this filter */
     private final String units;
+    private final String dbType;
 
     /**
      * Creates a SWEK parameter filter description based on the given filter
@@ -35,16 +36,22 @@ public class SWEKParameterFilter {
      *            the maximum value
      * @param startValue
      *            the start value
+     * @param dbtype
      * @param stepSize
      *            the stepsize
      */
-    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize, String units) {
+    public SWEKParameterFilter(String filterType, double min, double max, double startValue, Double stepsize, String units, String dbType) {
         this.filterType = filterType;
         this.min = min;
         this.max = max;
         this.startValue = startValue;
         stepSize = stepsize;
         this.units = units;
+        this.dbType = dbType;
+    }
+
+    public String getDbType() {
+        return dbType;
     }
 
     /**
