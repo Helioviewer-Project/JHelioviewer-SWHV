@@ -17,6 +17,7 @@ import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
 public class JHVEventCache {
 
@@ -234,4 +235,13 @@ public class JHVEventCache {
         }
     }
 
+    public void reset(SWEKEventType eventType) {
+        for (JHVEventType key : downloadedCache.keySet()) {
+            if (key.getEventType() == eventType) {
+                downloadedCache.remove(key);
+                RequestCache cache = new RequestCache();
+                downloadedCache.put(key, cache);
+            }
+        }
+    }
 }

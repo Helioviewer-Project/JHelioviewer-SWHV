@@ -125,12 +125,14 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
     public void filtersAdded(SWEKEventType swekEventType) {
         stopDownloadingEventType(swekEventType, true);
         downloadSelectedSuppliers(swekEventType);
+        JHVEventContainer.getSingletonInstance().reset(swekEventType);
     }
 
     @Override
     public void filtersRemoved(SWEKEventType swekEventType, SWEKParameter parameter) {
         stopDownloadingEventType(swekEventType, true);
         downloadSelectedSuppliers(swekEventType);
+        JHVEventContainer.getSingletonInstance().reset(swekEventType);
     }
 
     private void removeFromDownloaderMap(DownloadWorker worker) {
