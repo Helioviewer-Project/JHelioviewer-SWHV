@@ -14,6 +14,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
+import org.helioviewer.jhv.database.JHVDatabase;
 
 public class JHVThread {
 
@@ -57,13 +58,15 @@ public class JHVThread {
                 statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (left_id);");
                 statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (right_id);");
                 statement.executeUpdate("CREATE TABLE if not exists date_range (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER , start BIGINTEGER , end BIGINTEGER, FOREIGN KEY(type_id) REFERENCES event_type(id))");
-                statement.executeUpdate("CREATE TABLE if not exists version (version INTEGER PRIMARY KEY );");
+                statement.executeUpdate("CREATE TABLE if not exists version (version INTEGER PRIMARY KEY, hash INTEGER );");
                 statement.close();
-                String sqlt = "INSERT INTO version(version) VALUES(?)";
+                String sqlt = "INSERT INTO version(version, hash) VALUES(?, ?)";
 
                 PreparedStatement pstatement = connection.prepareStatement(sqlt);
                 pstatement.setQueryTimeout(30);
                 pstatement.setInt(1, CURRENT_VERSION_SCHEMA);
+                pstatement.setInt(2, JHVDatabase.config_hash);
+
                 pstatement.executeUpdate();
                 pstatement.close();
             } catch (SQLException e) {
@@ -84,17 +87,19 @@ public class JHVThread {
                         createSchema();
                     }
                     else {
-                        String sqlt = "SELECT version from version LIMIT 1";
+                        String sqlt = "SELECT version, hash from version LIMIT 1";
                         int found_version = -1;
+                        int found_hash = -1;
                         PreparedStatement pstatement = connection.prepareStatement(sqlt);
                         pstatement.setQueryTimeout(30);
                         ResultSet rs = pstatement.executeQuery();
                         if (!rs.isClosed() && rs.next()) {
                             found_version = rs.getInt(1);
+                            found_hash = rs.getInt(2);
                         }
                         rs.close();
                         pstatement.close();
-                        if (found_version != CURRENT_VERSION_SCHEMA) {
+                        if (found_version != CURRENT_VERSION_SCHEMA || JHVDatabase.config_hash != found_hash) {
                             connection.close();
                             new File(filepath).delete();
                             connection = DriverManager.getConnection("jdbc:sqlite:" + filepath);

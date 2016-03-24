@@ -40,6 +40,7 @@ public class JHVDatabase {
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
     private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
+    public static int config_hash;
 
     public static byte[] compress(final String str) throws IOException {
         if ((str == null) || (str.length() == 0)) {
