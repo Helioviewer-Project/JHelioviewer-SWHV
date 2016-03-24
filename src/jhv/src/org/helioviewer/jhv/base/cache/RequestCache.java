@@ -173,9 +173,11 @@ public class RequestCache {
 
         for (Date date : intervalsToRemove) {
             requestedAndDownloadedCache.remove(date);
+            requestedCache.remove(date);
         }
         for (Interval<Date> intToAdd : intervalsToAdd) {
             requestedAndDownloadedCache.put(intToAdd.getStart(), intToAdd);
+            requestedCache.put(intToAdd.getStart(), intToAdd);
         }
     }
 

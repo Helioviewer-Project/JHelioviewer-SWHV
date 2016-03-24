@@ -14,6 +14,7 @@ import org.helioviewer.jhv.data.container.cache.JHVEventCacheResult;
 import org.helioviewer.jhv.data.container.cache.JHVEventHandlerCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
+import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 
 public class JHVEventContainer {
 
@@ -148,6 +149,7 @@ public class JHVEventContainer {
 
     public void intervalsNotDownloaded(JHVEventType eventType, Interval<Date> interval) {
         JHVEventCache.getSingletonInstance().removeRequestedIntervals(eventType, interval);
+        JHVEventCache.getSingletonInstance().get(interval.getStart(), interval.getEnd(), interval.getStart(), interval.getEnd());
     }
 
     public void eventTypeActivated(JHVEventType eventType) {
@@ -170,6 +172,10 @@ public class JHVEventContainer {
 
     public void registerHandler(JHVEventContainerRequestHandler incomingRequestManager) {
         this.incomingRequestManager = incomingRequestManager;
+    }
+
+    public void reset(SWEKEventType eventType) {
+        eventCache.reset(eventType);
     }
 
 }
