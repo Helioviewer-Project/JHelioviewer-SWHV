@@ -524,8 +524,10 @@ public class JHVDatabase {
         try {
             return ft.get();
         } catch (InterruptedException e) {
+            System.out.println(e);
             return new ArrayList<JsonEvent>();
         } catch (ExecutionException e) {
+            System.out.println(e);
             return new ArrayList<JsonEvent>();
         }
     }
@@ -581,7 +583,6 @@ public class JHVDatabase {
                             + join
                             + " WHERE e.start>=? and e.end <=? and e.type_id=? "
                             + and + " order by e.start, e.end ";
-
                     PreparedStatement pstatement = connection.prepareStatement(sqlt);
                     pstatement.setQueryTimeout(30);
                     pstatement.setLong(1, start);

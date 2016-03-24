@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek.sources.hek;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -11,7 +10,6 @@ import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
-import org.helioviewer.jhv.data.container.cache.JHVEventCache;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
@@ -30,23 +28,16 @@ import org.json.JSONObject;
 public class HEKParser implements SWEKParser {
 
     @Override
-    public boolean parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
+    public JHVEvent parseEventJSON(String json, JHVEventType type, int id, long start, long end) throws JSONException {
         JSONObject result = new JSONObject(json);
         String name = type.getEventType().getEventName();
         final JHVEvent currentEvent = new JHVEvent(name, name, type, id, new Date(start), new Date(end));
         boolean success = parseResult(result, currentEvent);
 
         if (!success) {
-            return false;
+            return null;
         }
-
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JHVEventCache.getSingletonInstance().add(currentEvent);
-            }
-        });
-        return true;
+        return currentEvent;
     }
 
     private static boolean parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
