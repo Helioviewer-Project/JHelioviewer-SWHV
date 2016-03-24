@@ -72,7 +72,7 @@ public class DownloadWorker implements Runnable {
                 });
                 ArrayList<JsonEvent> eventList = JHVDatabase.events2Program(downloadStartDate.getTime(), downloadEndDate.getTime(), jhvType, params);
                 for (JsonEvent event : eventList) {
-                    JHVEvent ev = parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);
+                    final JHVEvent ev = parser.parseEventJSON(JHVDatabase.decompress(event.json), event.type, event.id, event.start, event.end);
                     EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
