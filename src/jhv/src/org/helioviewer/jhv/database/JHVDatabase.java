@@ -67,10 +67,12 @@ public class JHVDatabase {
                 GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
 
+                StringBuffer buf = new StringBuffer();
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    outStr += line;
+                    buf.append(line);
                 }
+                outStr = buf.toString();
             } else {
                 outStr = new String(compressed);
             }
@@ -86,7 +88,6 @@ public class JHVDatabase {
             insertEventTypeIfNotExist(connection, eventType);
             typeId = _getEventTypeId(connection, eventType);
         }
-
         return typeId;
     }
 
@@ -132,7 +133,6 @@ public class JHVDatabase {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
             statement.executeUpdate(createtbl);
-
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
@@ -157,7 +157,6 @@ public class JHVDatabase {
 
         if (ids[0] != -1 && ids[1] != -1) {
             insertLinkIfNotExist(connection, ids[0], ids[1]);
-
         } else {
             Log.error("Could not add association to database " + ids[0] + " " + ids[1]);
         }
@@ -265,6 +264,7 @@ public class JHVDatabase {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
                 return generatedKey;
+
             try {
                 String sql = "SELECT id from events WHERE uid=?";
                 PreparedStatement pstatement = connection.prepareStatement(sql);
@@ -318,8 +318,8 @@ public class JHVDatabase {
         public Integer call() {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
-
                 return -1;
+
             try
             {
                 int typeId = getEventTypeId(connection, type);
@@ -370,8 +370,7 @@ public class JHVDatabase {
                         pstatement.executeUpdate();
                         pstatement.close();
                     }
-                }
-                else {
+                } else {
                     Log.error("Failed to insert event");
                 }
             } catch (SQLException e) {
@@ -445,7 +444,6 @@ public class JHVDatabase {
         } catch (ExecutionException e) {
             return new ArrayList<Interval<Date>>();
         }
-
     }
 
     private static class Db2DateRange implements Callable<ArrayList<Interval<Date>>> {
@@ -458,7 +456,13 @@ public class JHVDatabase {
 
         @Override
         public ArrayList<Interval<Date>> call() {
+            /* for usage in other thread return full copy! */
+            ArrayList<Interval<Date>> copy = new ArrayList<Interval<Date>>();
             Connection connection = ConnectionThread.getConnection();
+            if (connection == null) {
+                return copy;
+            }
+
             HashMap<JHVEventType, RequestCache> dCache = ConnectionThread.downloadedCache;
             RequestCache typedCache = dCache.get(type);
             if (typedCache == null) {
@@ -466,30 +470,28 @@ public class JHVDatabase {
                 long lastEvent = Math.min(System.currentTimeMillis(), getLastEvent(connection, type));
                 long invalidationDate = lastEvent - ONEWEEK * 2;
                 dCache.put(type, typedCache);
-                if (connection != null) {
-                    int typeId = getEventTypeId(connection, type);
-                    if (typeId != -1) {
-                        try {
-                            String sqlt = "SELECT start, end FROM date_range where type_id=? order by start, end ";
-                            PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                            pstatement.setQueryTimeout(30);
-                            pstatement.setInt(1, typeId);
-                            ResultSet rs = pstatement.executeQuery();
-                            while (!rs.isClosed() && rs.next()) {
-                                Date beginDate = new Date(Math.min(invalidationDate, rs.getLong(1)));
-                                Date endDate = new Date(Math.min(invalidationDate, rs.getLong(2)));
-                                typedCache.adaptRequestCache(beginDate, endDate);
-                            }
-                            rs.close();
-                            pstatement.close();
-                        } catch (SQLException e) {
-                            Log.error("Could db2daterange " + e.getMessage());
+
+                int typeId = getEventTypeId(connection, type);
+                if (typeId != -1) {
+                    try {
+                        String sqlt = "SELECT start, end FROM date_range where type_id=? order by start, end ";
+                        PreparedStatement pstatement = connection.prepareStatement(sqlt);
+                        pstatement.setQueryTimeout(30);
+                        pstatement.setInt(1, typeId);
+                        ResultSet rs = pstatement.executeQuery();
+                        while (!rs.isClosed() && rs.next()) {
+                            Date beginDate = new Date(Math.min(invalidationDate, rs.getLong(1)));
+                            Date endDate = new Date(Math.min(invalidationDate, rs.getLong(2)));
+                            typedCache.adaptRequestCache(beginDate, endDate);
                         }
+                        rs.close();
+                        pstatement.close();
+                    } catch (SQLException e) {
+                        Log.error("Could db2daterange " + e.getMessage());
                     }
                 }
             }
-            /* for usage in other thread return full copy! */
-            ArrayList<Interval<Date>> copy = new ArrayList<Interval<Date>>();
+
             for (Interval<Date> interval : typedCache.getAllRequestIntervals()) {
                 copy.add(new Interval(new Date(interval.getStart().getTime()), new Date(interval.getEnd().getTime())));
             }
@@ -570,6 +572,7 @@ public class JHVDatabase {
             ArrayList<JsonEvent> eventList = new ArrayList<JsonEvent>();
             if (connection == null)
                 return eventList;
+
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
                 try {
@@ -601,8 +604,7 @@ public class JHVDatabase {
                     }
                     rs.close();
                     pstatement.close();
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     Log.error("Could not fetch events " + e.getMessage());
                     return eventList;
                 }
@@ -644,6 +646,7 @@ public class JHVDatabase {
             ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
             if (connection == null)
                 return assocList;
+
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
                 try {
@@ -663,8 +666,7 @@ public class JHVDatabase {
                     }
                     rs.close();
                     pstatement.close();
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
                     return assocList;
                 }
@@ -672,4 +674,5 @@ public class JHVDatabase {
             return assocList;
         }
     }
+
 }
