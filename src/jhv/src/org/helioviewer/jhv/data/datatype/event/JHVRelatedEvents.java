@@ -79,7 +79,12 @@ public class JHVRelatedEvents {
         interval.end = Math.max(interval.end, found.getEnd());
         events.addAll(found.getEvents());
         associations.addAll(found.getAssociations());
+        eventsMap.remove(found.getInterval());
         forceSort(eventsMap);
+    }
+
+    private SortedDateInterval getInterval() {
+        return interval;
     }
 
     public ArrayList<JHVAssociation> getAssociations() {
