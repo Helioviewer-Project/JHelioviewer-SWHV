@@ -1,4 +1,6 @@
-package org.helioviewer.jhv.plugins.swek.download;
+package org.helioviewer.jhv.data.datatype.event;
+
+import org.helioviewer.jhv.data.container.cache.SWEKOperand;
 
 /**
  * Contains the combination param and value.

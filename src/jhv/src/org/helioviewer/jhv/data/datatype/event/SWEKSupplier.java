@@ -12,6 +12,7 @@ public class SWEKSupplier {
 
     /** Name of the supplier */
     private final String supplierName;
+    private final String db;
 
     /** The source from where is supplied */
     private final SWEKSource source;
@@ -30,17 +31,18 @@ public class SWEKSupplier {
      * @param source
      *            The source on which the supplier supplies its events
      */
-    private SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
+    private SWEKSupplier(String supplierName, String supplierDisplayName, SWEKSource source, String db) {
 
         this.supplierName = supplierName;
         this.supplierDisplayName = supplierDisplayName;
         this.source = source;
+        this.db = db;
     }
 
-    public static SWEKSupplier getSupplier(String supplierName, String supplierDisplayName, SWEKSource source) {
+    public static SWEKSupplier getSupplier(String supplierName, String supplierDisplayName, SWEKSource source, String db) {
         SWEKSupplier supp = suppliers.get(supplierName + source.getSourceName());
         if (supp == null) {
-            SWEKSupplier newSupplier = new SWEKSupplier(supplierName, supplierDisplayName, source);
+            SWEKSupplier newSupplier = new SWEKSupplier(supplierName, supplierDisplayName, source, db);
             suppliers.put(supplierName + source.getSourceName(), newSupplier);
             return newSupplier;
         }
@@ -63,6 +65,10 @@ public class SWEKSupplier {
      */
     public String getSupplierDisplayName() {
         return supplierDisplayName;
+    }
+
+    public String getDatabaseName() {
+        return db;
     }
 
     /**

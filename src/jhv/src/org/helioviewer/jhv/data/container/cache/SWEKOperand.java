@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.download;
+package org.helioviewer.jhv.data.container.cache;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

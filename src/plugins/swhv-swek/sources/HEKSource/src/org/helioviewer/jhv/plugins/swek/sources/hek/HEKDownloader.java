@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,8 +12,11 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParam;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
+import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
 import org.helioviewer.jhv.database.JHVDatabase;
-import org.helioviewer.jhv.plugins.swek.download.SWEKParam;
+import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,9 +34,23 @@ public class HEKDownloader extends SWEKDownloader {
             String uid = result.getString("kb_archivid");
             long start;
             long end;
+            ArrayList<JHVDatabaseParam> paramList = new ArrayList<JHVDatabaseParam>();
             try {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
+                for (SWEKParameter p : type.getEventType().getParameterList()) {
+                    SWEKParameterFilter pf = p.getParameterFilter();
+                    if (pf != null) {
+                        if (result.has(p.getParameterName().toLowerCase())) {
+                            if (pf.getDbType().equals(JHVDatabaseParam.DBINTTYPE)) {
+                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(p.getParameterName().toLowerCase()), p.getParameterName()));
+                            }
+                            if (pf.getDbType().equals(JHVDatabaseParam.DBSTRINGTYPE)) {
+                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(p.getParameterName().toLowerCase()), p.getParameterName()));
+                            }
+                        }
+                    }
+                }
             } catch (JSONException e) {
                 return false;
             } catch (ParseException e) {
@@ -49,7 +67,7 @@ public class HEKDownloader extends SWEKDownloader {
                 Log.error("compression error");
                 return false;
             }
-            int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type);
+            int id = JHVDatabase.dump_event2db(compressedJson, start, end, uid, type, paramList);
             if (id == -1) {
                 Log.error("failed to dump to database");
                 return false;
@@ -96,18 +114,16 @@ public class HEKDownloader extends SWEKDownloader {
         int paramCount = 1;
 
         for (SWEKParam param : params) {
-            String encodedValue;
-            try {
-                encodedValue = URLEncoder.encode(param.getValue(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                encodedValue = param.getValue();
-            }
             if (param.getParam().toLowerCase().equals("provider")) {
+                String encodedValue;
+                try {
+                    encodedValue = URLEncoder.encode(param.getValue(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    encodedValue = param.getValue();
+                }
                 baseURL.append("param").append(paramCount).append("=").append("frm_name").append("&").append("op").append(paramCount).append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount).append("=").append(encodedValue).append("&");
-            } else {
-                baseURL.append("param").append(paramCount).append("=").append(param.getParam()).append("&").append("op").append(paramCount).append("=").append(param.getOperand().URLEncodedRepresentation()).append("&").append("value").append(paramCount).append("=").append(encodedValue).append("&");
+                paramCount++;
             }
-            paramCount++;
         }
         return baseURL;
     }

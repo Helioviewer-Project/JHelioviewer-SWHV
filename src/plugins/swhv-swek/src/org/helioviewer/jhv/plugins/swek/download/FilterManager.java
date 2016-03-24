@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
+import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
 
 /**
