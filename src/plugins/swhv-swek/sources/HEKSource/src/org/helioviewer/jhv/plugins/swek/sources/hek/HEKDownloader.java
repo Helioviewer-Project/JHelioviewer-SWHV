@@ -6,15 +6,15 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
 import org.helioviewer.jhv.database.JHVDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.plugins.swek.sources.SWEKDownloader;
@@ -38,19 +38,24 @@ public class HEKDownloader extends SWEKDownloader {
             try {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
-                for (SWEKParameter p : type.getEventType().getParameterList()) {
-                    SWEKParameterFilter pf = p.getParameterFilter();
-                    if (pf != null) {
-                        if (result.has(p.getParameterName().toLowerCase())) {
-                            if (pf.getDbType().equals(JHVDatabaseParam.DBINTTYPE)) {
-                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(p.getParameterName().toLowerCase()), p.getParameterName()));
-                            }
-                            if (pf.getDbType().equals(JHVDatabaseParam.DBSTRINGTYPE)) {
-                                paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(p.getParameterName().toLowerCase()), p.getParameterName()));
+                HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
+                for (Entry<String, String> entry : dbFields.entrySet()) {
+                    String dbType = entry.getValue();
+                    String fieldName = entry.getKey();
+                    String lfieldName = fieldName.toLowerCase();
+                    if (dbType.equals(JHVDatabaseParam.DBINTTYPE)) {
+                        if (!result.isNull(lfieldName)) {
+                            paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(lfieldName), fieldName));
+                            if (result.getInt(lfieldName) == 0) {
+                                System.out.println(result);
                             }
                         }
+                    } else if (dbType.equals(JHVDatabaseParam.DBSTRINGTYPE)) {
+                        if (!result.isNull(lfieldName))
+                            paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBSTRINGTYPE, result.getString(lfieldName), fieldName));
                     }
                 }
+
             } catch (JSONException e) {
                 return false;
             } catch (ParseException e) {

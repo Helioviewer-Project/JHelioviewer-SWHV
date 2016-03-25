@@ -35,7 +35,7 @@ public class JHVDatabaseParam {
         return stringp;
     }
 
-    public Integer getIntValue() {
+    public int getIntValue() {
         return intp;
     }
 

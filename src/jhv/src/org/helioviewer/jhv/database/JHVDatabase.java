@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,8 +31,6 @@ import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVAssociation;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKParam;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameter;
-import org.helioviewer.jhv.data.datatype.event.SWEKParameterFilter;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
@@ -124,10 +123,10 @@ public class JHVDatabase {
 
             String dbName = eventType.getSupplier().getDatabaseName();
             String createtbl = "CREATE TABLE " + dbName + " (";
-            for (SWEKParameter p : eventType.getEventType().getParameterList()) {
-                SWEKParameterFilter pf = p.getParameterFilter();
-                if (pf != null)
-                    createtbl += p.getParameterName() + " " + pf.getDbType() + ",";
+            HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
+
+            for (Entry<String, String> entry : fields.entrySet()) {
+                createtbl += entry.getKey() + " " + entry.getValue() + " DEFAULT NULL,";
             }
             createtbl += "event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );";
             Statement statement = connection.createStatement();

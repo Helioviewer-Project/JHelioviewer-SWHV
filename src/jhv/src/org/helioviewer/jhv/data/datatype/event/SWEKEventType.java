@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.data.datatype.event;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -12,7 +13,7 @@ import javax.swing.ImageIcon;
  *
  */
 public class SWEKEventType {
-
+    private static List<SWEKRelatedEvents> swekrelEvents;
     /** The name of the event */
     private final String eventName;
 
@@ -44,6 +45,7 @@ public class SWEKEventType {
     private final Color color;
 
     private final boolean containsParameterFilter;
+    private HashMap<String, String> databaseFields;
 
     /**
      * Creates an event type for the given event name, suppliers list, parameter
@@ -68,6 +70,7 @@ public class SWEKEventType {
      *            the icon of the event type
      * @param color
      *            the color of the event type
+     * @param list
      */
     public SWEKEventType(String eventName, List<SWEKSupplier> suppliers, List<SWEKParameter> parameterList, Long requestIntervalExtension,
             boolean standardSelected, SWEKParameter groupOn, String coordinateSystem, ImageIcon eventIcon, Color color, SWEKSpatialRegion spatialRegion) {
@@ -82,6 +85,50 @@ public class SWEKEventType {
         this.color = color;
         containsParameterFilter = checkFilters(parameterList);
         this.spatialRegion = spatialRegion;
+    }
+
+    public HashMap<String, String> getAllDatabaseFields() {
+        if (databaseFields == null)
+            createAllDatabaseFields();
+        return databaseFields;
+    }
+
+    private void createAllDatabaseFields() {
+        HashMap<String, String> fields = new HashMap<String, String>();
+        for (SWEKParameter p : getParameterList()) {
+            SWEKParameterFilter pf = p.getParameterFilter();
+            if (pf != null)
+                fields.put(p.getParameterName().intern(), pf.getDbType());
+        }
+        for (SWEKRelatedEvents re : getSwekRelatedEvents()) {
+            if (re.getEvent() == this) {
+                List<SWEKRelatedOn> relon = re.getRelatedOnList();
+
+                for (SWEKRelatedOn swon : relon) {
+                    SWEKParameter p = swon.getParameterFrom();
+                    String dbtype = swon.getDatabaseType();
+                    fields.put(p.getParameterName().intern(), dbtype);
+                }
+            }
+            if (re.getRelatedWith() == this) {
+                List<SWEKRelatedOn> relon = re.getRelatedOnList();
+
+                for (SWEKRelatedOn swon : relon) {
+                    SWEKParameter p = swon.getParameterWith();
+                    String dbtype = swon.getDatabaseType();
+                    fields.put(p.getParameterName().intern(), dbtype);
+                }
+            }
+        }
+        databaseFields = fields;
+    }
+
+    public static void setSwekRelatedEvents(List<SWEKRelatedEvents> _relatedEvents) {
+        swekrelEvents = _relatedEvents;
+    }
+
+    public List<SWEKRelatedEvents> getSwekRelatedEvents() {
+        return swekrelEvents;
     }
 
     /**
