@@ -16,7 +16,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
 
     public TerminatedFormatterFactory(String format, String terminator, double min, double max) {
         super();
-        this.format = format + terminator;
+        this.format = format;
         this.terminator = terminator;
 
         if (min > max)
@@ -37,7 +37,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
                     int t = string.indexOf(terminator);
                     if (t > 0) {
                         try {
-                            value = Double.valueOf(string.substring(0, t - 1));
+                            value = Double.valueOf(string.substring(0, t));
                         } catch (NumberFormatException e) {
                             Log.warn("Could not parse number");
                         }
@@ -60,7 +60,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
 
             @Override
             public String valueToString(Object value) {
-                return String.format(format, value);
+                return String.format(format, value) + terminator;
             }
 
             @Override

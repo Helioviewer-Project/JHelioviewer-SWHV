@@ -50,7 +50,7 @@ public class RenderableMiniviewOptionsPanel extends ComponentUtils.SmallPanel {
         xSpinner = new JSpinner();
         xSpinner.setModel(new SpinnerNumberModel(Double.valueOf(DEFAULT), Double.valueOf(min), Double.valueOf(max), Double.valueOf(1)));
         JFormattedTextField f = ((JSpinner.DefaultEditor) xSpinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%%", min, max));
+        f.setFormatterFactory(new TerminatedFormatterFactory("%.0f", "%", min, max));
 
         xSpinner.addChangeListener(new ChangeListener() {
             @Override
