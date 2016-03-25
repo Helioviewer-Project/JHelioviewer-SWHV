@@ -57,7 +57,12 @@ public class ParameterTableModel extends AbstractTableModel {
             if (columnIndex == 0) {
                 return parameters.get(rowIndex).getParameterDisplayName();
             } else if (columnIndex == 1) {
-                return parameters.get(rowIndex).getDisplayParameterValue();
+                String result = parameters.get(rowIndex).getDisplayParameterValue();
+                if (result.length() > 100) {
+                    return result.substring(0, 100) + "...";
+                } else {
+                    return result;
+                }
             } else {
                 return null;
             }
