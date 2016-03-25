@@ -273,7 +273,7 @@ public class HEKParser implements SWEKParser {
     }
 
     private static Vec3 convertHGSJHV(Vec3 el, JHVEvent evt) {
-        Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime())));
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
 

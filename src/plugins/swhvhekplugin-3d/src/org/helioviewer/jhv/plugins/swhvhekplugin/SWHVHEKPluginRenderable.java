@@ -43,9 +43,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
 
-    private static final float LINEWIDTH = 0.5f;
-    private static final float LINEWIDTH_HI = 1;
-    private static final float LINEWIDTH_CACTUS = 1.01f;
+    private static final float LINEWIDTH = 1;
+    private static final float LINEWIDTH_HIGHLIGHT = 2;
+    private static final float LINEWIDTH_CACTUS = 2.02f;
 
     private static HashMap<String, GLTexture> iconCacheId = new HashMap<String, GLTexture>();
     private final static double ICON_SIZE = 0.1;
@@ -160,7 +160,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         Color color = evtr.getColor();
         gl.glColor3f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
-        gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HI : LINEWIDTH);
+        gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
 
         // draw bounds
         Vec3 oldBoundaryPoint3d = null;
@@ -199,6 +199,8 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             Vec3 pt = pi.centralPoint();
             String type = evt.getJHVEventType().getEventType().getEventName();
             bindTexture(gl, type, evtr.getIcon());
+            Color color = evtr.getColor();
+            gl.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.6f);
             if (evtr.isHighlighted()) {
                 drawImage3d(gl, pt.x, pt.y, pt.z, ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
             } else {
