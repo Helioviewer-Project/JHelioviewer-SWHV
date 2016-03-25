@@ -576,7 +576,7 @@ public class JHVDatabase {
                     }
                     String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e "
                             + join
-                            + " WHERE e.start>=? and e.end <=? and e.type_id=? "
+                            + " WHERE e.start BETWEEN ? AND ? and e.type_id=? "
                             + and + " order by e.start, e.end ";
                     PreparedStatement pstatement = connection.prepareStatement(sqlt);
                     pstatement.setQueryTimeout(30);
@@ -623,7 +623,7 @@ public class JHVDatabase {
         private static String sqlt = "SELECT left_events.id, right_events.id FROM event_link "
                 + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
                 + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id "
-                + "WHERE left_events.start>=? and left_events.start <=? and left_events.type_id=? order by left_events.start, left_events.end ";
+                + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
 
         public Associations2Program(long _start, long _end, JHVEventType _type) {
             type = _type;
