@@ -46,9 +46,6 @@ public class HEKDownloader extends SWEKDownloader {
                     if (dbType.equals(JHVDatabaseParam.DBINTTYPE)) {
                         if (!result.isNull(lfieldName)) {
                             paramList.add(new JHVDatabaseParam(JHVDatabaseParam.DBINTTYPE, result.getInt(lfieldName), fieldName));
-                            if (result.getInt(lfieldName) == 0) {
-                                System.out.println(result);
-                            }
                         }
                     } else if (dbType.equals(JHVDatabaseParam.DBSTRINGTYPE)) {
                         if (!result.isNull(lfieldName))
