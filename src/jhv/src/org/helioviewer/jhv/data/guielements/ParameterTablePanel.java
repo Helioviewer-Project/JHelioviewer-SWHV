@@ -3,7 +3,6 @@ package org.helioviewer.jhv.data.guielements;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -12,9 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 
 import javax.swing.JCheckBox;
@@ -27,6 +23,7 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
 import org.helioviewer.jhv.data.guielements.model.EmptyRowFilter;
@@ -112,7 +109,6 @@ public class ParameterTablePanel extends JPanel {
                     }
                     sorter.setRowFilter(rf);
                 }
-
             }
         });
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -229,17 +225,7 @@ public class ParameterTablePanel extends JPanel {
             }
 
             if (isURLColumn(table, ccol, crow)) {
-                String value = (String) table.getValueAt(crow, ccol);
-                try {
-                    URL url = new URL(value);
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().browse(url.toURI());
-                    }
-                } catch (URISyntaxException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                JHVGlobals.openURL((String) table.getValueAt(crow, ccol));
             }
         }
 
@@ -260,4 +246,5 @@ public class ParameterTablePanel extends JPanel {
         }
 
     }
+
 }
