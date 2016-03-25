@@ -82,7 +82,7 @@ public class JHVEventCache {
 
     public void add(JHVEvent event) {
         if (relEvents.containsKey(event.getUniqueID())) {
-            relEvents.get(event.getUniqueID()).swapEvent(event);
+            relEvents.get(event.getUniqueID()).swapEvent(event, events);
             return;
         }
         checkAssociation(true, event);
@@ -139,6 +139,8 @@ public class JHVEventCache {
     }
 
     private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
+        if (current == found)
+            return;
         current.merge(found, events);
         for (JHVEvent foundev : found.getEvents()) {
             Integer key = foundev.getUniqueID();
@@ -183,6 +185,7 @@ public class JHVEventCache {
                 addAssociation(false, association);
             }
         }
+
     }
 
     public JHVEventCacheResult get(Date startDate, Date endDate, Date extendedStart, Date extendedEnd) {

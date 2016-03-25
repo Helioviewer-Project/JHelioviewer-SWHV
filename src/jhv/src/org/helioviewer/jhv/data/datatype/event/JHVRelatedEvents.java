@@ -38,6 +38,10 @@ public class JHVRelatedEvents {
     }
 
     public void add(JHVEvent evt, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        if (!eventsMap.containsKey(eventType)) {
+            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+        }
+        eventsMap.get(eventType).remove(interval);
         long time = evt.getStartDate().getTime();
         if (time < interval.start) {
             interval.start = time;
@@ -47,7 +51,7 @@ public class JHVRelatedEvents {
             interval.end = time;
         }
         events.add(evt);
-        forceSort(eventsMap);
+        eventsMap.get(eventType).put(interval, this);
     }
 
     public long getEnd() {
@@ -66,24 +70,20 @@ public class JHVRelatedEvents {
         return eventType.getEventType().getEventIcon();
     }
 
-    private void forceSort(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+    public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         if (!eventsMap.containsKey(eventType)) {
             eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
         }
         eventsMap.get(eventType).remove(interval);
-        eventsMap.get(eventType).put(interval, this);
-    }
-
-    public void merge(JHVRelatedEvents found, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         interval.start = Math.min(interval.start, found.getStart());
         interval.end = Math.max(interval.end, found.getEnd());
         events.addAll(found.getEvents());
         associations.addAll(found.getAssociations());
         eventsMap.remove(found.getInterval());
-        forceSort(eventsMap);
+        eventsMap.get(eventType).put(interval, this);
     }
 
-    private SortedDateInterval getInterval() {
+    public SortedDateInterval getInterval() {
         return interval;
     }
 
@@ -168,17 +168,21 @@ public class JHVRelatedEvents {
         return nEvents;
     }
 
-    public void swapEvent(JHVEvent event) {
+    public void swapEvent(JHVEvent event, Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
         int i = 0;
         while (!events.get(i).getUniqueID().equals(event.getUniqueID())) {
             i++;
         }
         events.remove(i);
         events.add(event);
-        resetTime();
+        resetTime(eventsMap);
     }
 
-    private void resetTime() {
+    private void resetTime(Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> eventsMap) {
+        if (!eventsMap.containsKey(eventType)) {
+            eventsMap.put(eventType, new TreeMap<SortedDateInterval, JHVRelatedEvents>());
+        }
+        eventsMap.get(eventType).remove(interval);
         interval.start = Long.MAX_VALUE;
         interval.end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {
@@ -191,5 +195,6 @@ public class JHVRelatedEvents {
                 interval.end = time;
             }
         }
+        eventsMap.get(eventType).put(interval, this);
     }
 }
