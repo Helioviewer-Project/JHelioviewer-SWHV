@@ -11,7 +11,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorElement;
 import org.helioviewer.jhv.plugins.eveplugin.view.linedataselector.LineDataSelectorTablePanel;
 
-//Class will not be serialized so we suppress the warnings
 @SuppressWarnings("serial")
 public class LoadingCellRenderer extends DefaultTableCellRenderer {
 
@@ -20,8 +19,6 @@ public class LoadingCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value != null) { // In some case this can be called with value null
-            // (getAccessibleChild(int i) of JTable )
-
             LineDataSelectorElement element = (LineDataSelectorElement) value;
             if (element.isDownloading()) {
                 downloadProgressBar.setIndeterminate(true);
