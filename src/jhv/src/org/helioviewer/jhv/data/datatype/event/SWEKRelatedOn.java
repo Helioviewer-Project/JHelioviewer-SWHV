@@ -13,6 +13,7 @@ public class SWEKRelatedOn {
 
     /** The parameter from the related event */
     private final SWEKParameter parameterWith;
+    private final String dbType;
 
     /**
      * Creates a related on with the given from and with event parameters.
@@ -20,9 +21,14 @@ public class SWEKRelatedOn {
      * @param parameterFrom     The parameter from the source event
      * @param parameterWith     The parameter from the related event
      */
-    public SWEKRelatedOn(SWEKParameter parameterFrom, SWEKParameter parameterWith) {
+    public SWEKRelatedOn(SWEKParameter parameterFrom, SWEKParameter parameterWith, String dbType) {
         this.parameterFrom = parameterFrom;
         this.parameterWith = parameterWith;
+        this.dbType = dbType;
+    }
+
+    public String getDatabaseType() {
+        return dbType;
     }
 
     /**

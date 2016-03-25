@@ -334,6 +334,8 @@ public class SWEKConfigurationManager {
                     parseSources(configJSON),
                     parseEventTypes(configJSON),
                     parseRelatedEvents(configJSON));
+            configuration.getRelatedEvents();
+            SWEKEventType.setSwekRelatedEvents(configuration.getRelatedEvents());
             return true;
         } catch (JSONException e) {
             Log.error("Could not parse JSON");
@@ -508,6 +510,7 @@ public class SWEKConfigurationManager {
      *
      * @param configJSON
      *            the JSON from which to parse the event types
+     * @param relatedEvents
      * @return a list of event types parsed from the JSON
      * @throws JSONException
      *             if the event types could not be parsed
@@ -529,6 +532,7 @@ public class SWEKConfigurationManager {
      *
      * @param object
      *            The event type to parse
+     * @param list
      * @return The parsed event type
      * @throws JSONException
      */
@@ -1122,7 +1126,7 @@ public class SWEKConfigurationManager {
      *             if the "related on" could not be parsed
      */
     private SWEKRelatedOn parseRelatedOn(JSONObject jsonObject) throws JSONException {
-        return new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject));
+        return new SWEKRelatedOn(parseParameterFrom(jsonObject), parseParameterWith(jsonObject), parseDbType(jsonObject));
     }
 
     /**

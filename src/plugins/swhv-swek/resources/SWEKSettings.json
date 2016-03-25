@@ -1197,7 +1197,8 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum"
+                    "parameter_with" : "ar_noaanum",
+                    "dbtype": "INTEGER"
                 }
             ]
         },{
@@ -1206,7 +1207,8 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum"
+                    "parameter_with" : "ar_noaanum",
+                    "dbtype": "INTEGER"
                 }
             ]
         }
