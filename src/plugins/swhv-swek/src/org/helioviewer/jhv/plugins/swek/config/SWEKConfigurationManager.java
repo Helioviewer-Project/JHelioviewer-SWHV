@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -307,7 +308,8 @@ public class SWEKConfigurationManager {
                 sb.append(line);
             }
             String cf = sb.toString();
-            JHVDatabase.config_hash = java.util.Arrays.hashCode(JHVDatabase.compress(cf));
+            JHVDatabase.config_hash = Arrays.hashCode(cf.toCharArray());
+
             JSONObject configJSON = new JSONObject(cf);
             return parseJSONConfig(configJSON);
         } catch (IOException e) {
