@@ -664,4 +664,74 @@ public class JHVDatabase {
         }
     }
 
+    public static ArrayList<JHVAssociation> relations2Program(int event_id, JHVEventType type_left, JHVEventType type_right, String param_left, String param_right) {
+        FutureTask<ArrayList<JHVAssociation>> ft = new FutureTask<ArrayList<JHVAssociation>>(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
+        executor.execute(ft);
+        try {
+            return ft.get();
+        } catch (InterruptedException e) {
+            return new ArrayList<JHVAssociation>();
+        } catch (ExecutionException e) {
+            return new ArrayList<JHVAssociation>();
+        }
+    }
+
+    private static class Relations2Program implements Callable<ArrayList<JHVAssociation>> {
+        private final JHVEventType type_left;
+        private final JHVEventType type_right;
+        private final String param_left;
+        private final String param_right;
+
+        private final int event_id;
+
+        public Relations2Program(int _event_id, JHVEventType _type_left, JHVEventType _type_right, String _param_left, String _param_right) {
+            type_left = _type_left;
+            type_right = _type_right;
+            param_left = _param_left;
+            param_right = _param_right;
+            event_id = _event_id;
+        }
+
+        @Override
+        public ArrayList<JHVAssociation> call() {
+            Connection connection = ConnectionThread.getConnection();
+            ArrayList<JHVAssociation> assocList = new ArrayList<JHVAssociation>();
+            if (connection == null)
+                return assocList;
+
+            int type_left_id = getEventTypeId(connection, type_left);
+            int type_right_id = getEventTypeId(connection, type_right);
+
+            if (type_left_id != -1 && type_right_id != -1) {
+                try {
+                    String table_left_name = type_left.getSupplier().getDatabaseName();
+                    String table_right_name = type_left.getSupplier().getDatabaseName();
+
+                    String sqlt = "SELECT tl.event_id, tr.event_id FROM "
+                            + table_left_name + " AS tl," + table_right_name + " AS tr"
+                            + " WHERE tl." + param_left + "=tr." + param_right
+                            + " AND tl.event_id!=tr.event_id"
+                            + " tl.event_id=? OR tl.right_id=?";
+                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
+                    pstatement.setQueryTimeout(30);
+                    pstatement.setLong(1, event_id);
+                    pstatement.setLong(2, event_id);
+                    ResultSet rs = pstatement.executeQuery();
+                    boolean next = rs.next();
+                    while (!rs.isClosed() && next) {
+                        int left = rs.getInt(1);
+                        int right = rs.getInt(2);
+                        assocList.add(new JHVAssociation(left, right));
+                        next = rs.next();
+                    }
+                    rs.close();
+                    pstatement.close();
+                } catch (SQLException e) {
+                    Log.error("Could not fetch associations " + e.getMessage());
+                    return assocList;
+                }
+            }
+            return assocList;
+        }
+    }
 }
