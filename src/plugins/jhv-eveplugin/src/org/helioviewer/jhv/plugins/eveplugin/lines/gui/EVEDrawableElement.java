@@ -74,8 +74,8 @@ public class EVEDrawableElement implements DrawableElement {
 
         for (int i = 0; i < bands.length; ++i) {
             if (bands[i].isVisible()) {
-
                 EVEValues values = EVEDrawController.getSingletonInstance().getValues(bands[i], interval, graphArea);
+                // Log.debug(values.dates.length);
                 int num = values.getNumberOfValues();
                 final ArrayList<Point> pointList = new ArrayList<Point>();
                 final LinkedList<Integer> warnLevels = new LinkedList<Integer>();
@@ -187,13 +187,10 @@ public class EVEDrawableElement implements DrawableElement {
             while (index < len) {
                 Point point = points.get(index);
                 /*
-                if (previousX != null) {
-                    if ((point.x - previousX) != 0) {
-                        // Log.debug("distance between previous and folowing x : "
-                        // + ((point.x - previousX) / ratioX));
-                    }
-                }
-                */
+                 * if (previousX != null) { if ((point.x - previousX) != 0) { //
+                 * Log.debug("distance between previous and folowing x : " // +
+                 * ((point.x - previousX) / ratioX)); } }
+                 */
                 if (previousX == null || (point.x - previousX) / ratioX > Math.max(1 / ratioX, 120000)) {
                     xPoints.add(new ArrayList<Integer>());
                     yPoints.add(new ArrayList<Integer>());
