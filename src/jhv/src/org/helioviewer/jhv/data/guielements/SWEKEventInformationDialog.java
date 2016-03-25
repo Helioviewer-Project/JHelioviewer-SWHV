@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
-import org.helioviewer.jhv.data.datatype.event.JHVEventRelation;
 import org.helioviewer.jhv.data.datatype.event.JHVRelatedEvents;
 import org.helioviewer.jhv.data.guielements.listeners.DataCollapsiblePanelModelListener;
 import org.helioviewer.jhv.data.guielements.model.DataCollapsiblePanelModel;
@@ -192,7 +190,7 @@ public class SWEKEventInformationDialog extends JDialog implements WindowListene
         }
         return false;
     }
-    */
+     */
 
     private void setCollapsiblePanels() {
         GridBagConstraints gc = new GridBagConstraints();
