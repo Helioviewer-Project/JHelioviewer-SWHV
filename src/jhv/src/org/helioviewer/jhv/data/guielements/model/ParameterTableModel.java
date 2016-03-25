@@ -14,11 +14,13 @@ import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
  * @author Bram Bourgoignie (Bram.Bourgoignie@oma.be)
  *
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings("serial")
 public class ParameterTableModel extends AbstractTableModel {
 
     /** The parameters in this model */
     private final List<JHVEventParameter> parameters;
+
+    private static final int STRING_CUTOFF = 256;
 
     /**
      * Creates a parameter model for the given parameters.
@@ -58,8 +60,8 @@ public class ParameterTableModel extends AbstractTableModel {
                 return parameters.get(rowIndex).getParameterDisplayName();
             } else if (columnIndex == 1) {
                 String result = parameters.get(rowIndex).getDisplayParameterValue();
-                if (result.length() > 100) {
-                    return result.substring(0, 100) + "...";
+                if (result.length() > STRING_CUTOFF) {
+                    return result.substring(0, STRING_CUTOFF) + "...";
                 } else {
                     return result;
                 }
