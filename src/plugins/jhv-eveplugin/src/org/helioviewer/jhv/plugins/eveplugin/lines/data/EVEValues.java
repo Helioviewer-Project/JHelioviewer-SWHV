@@ -5,8 +5,8 @@ public class EVEValues {
     public final long[] dates;
     public final float[] maxValues;
 
-    private double minValue = Float.MAX_VALUE;
-    private double maxValue = Float.MIN_VALUE;
+    private float minValue = Float.MAX_VALUE;
+    private float maxValue = Float.MIN_VALUE;
 
     private final long intervalStart;
     private final long binStart;
@@ -47,15 +47,14 @@ public class EVEValues {
             }
 
             while (j < indates.length && indates[j] - startt <= tg) {
-                double value = invalues[j];
-                if (!Double.isNaN(invalues[j])) {
-                    maxValues[i] = (float) Math.max(maxValues[i], value);
-                    minValue = value < minValue ? value : minValue;
-                    maxValue = value > maxValue ? value : maxValue;
+                float value = invalues[j];
+                if (!Float.isNaN(value)) {
+                    maxValues[i] = Math.max(maxValues[i], value);
+                    minValue = Math.min(value, minValue);
                 }
                 j++;
-
             }
+            maxValue = Math.max(maxValues[i], maxValue);
         }
     }
 
@@ -63,11 +62,11 @@ public class EVEValues {
         return numOfBins;
     }
 
-    public double getMinimumValue() {
+    public float getMinimumValue() {
         return minValue;
     }
 
-    public double getMaximumValue() {
+    public float getMaximumValue() {
         return maxValue;
     }
 
