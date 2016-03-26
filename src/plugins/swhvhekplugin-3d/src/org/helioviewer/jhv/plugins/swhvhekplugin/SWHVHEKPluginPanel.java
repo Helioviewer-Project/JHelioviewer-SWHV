@@ -21,7 +21,7 @@ public class SWHVHEKPluginPanel extends ComponentUtils.SmallPanel {
         setLayout(gridBagLayout);
 
         GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.WEST;
+        c0.anchor = GridBagConstraints.CENTER;
         c0.weightx = 1.;
         c0.weighty = 1.;
         c0.gridy = 0;
