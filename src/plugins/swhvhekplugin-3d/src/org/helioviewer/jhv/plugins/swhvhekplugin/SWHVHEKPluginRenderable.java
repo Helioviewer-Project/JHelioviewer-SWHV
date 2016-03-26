@@ -72,11 +72,16 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private void interPolatedDraw(GL2 gl, int mres, double r_start, double r_end, double t_start, double t_end, Quat q) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         {
+            Vec3 v = new Vec3();
             for (int i = 0; i <= mres; i++) {
                 double alpha = 1. - i / (double) mres;
                 double r = alpha * r_start + (1 - alpha) * (r_end);
                 double theta = alpha * t_start + (1 - alpha) * (t_end);
-                Vec3 res = q.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
+
+                v.x = r * Math.cos(theta);
+                v.y = r * Math.sin(theta);
+                Vec3 res = q.rotateInverseVector(v);
+
                 gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
             }
         }
@@ -133,13 +138,18 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
             gl.glEnable(GL2.GL_TEXTURE_2D);
             gl.glBegin(GL2.GL_QUADS);
             {
+                Vec3 v = new Vec3();
                 for (int i = 0; i < texCoordHelpers.length; i++) {
                     int[] el = texCoordHelpers[i];
                     double deltatheta = sz / distSun * (el[1] * 2 - 1);
                     double deltar = sz * (el[0] * 2 - 1);
                     double r = distSun + deltar;
                     double theta = principalAngle + deltatheta;
-                    Vec3 res = p.orientation.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
+
+                    v.x = r * Math.cos(theta);
+                    v.y = r * Math.sin(theta);
+                    Vec3 res = p.orientation.rotateInverseVector(v);
+
                     gl.glTexCoord2f(el[0], el[1]);
                     gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
                 }
@@ -166,6 +176,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         gl.glLineWidth(evtr.isHighlighted() ? LINEWIDTH_HIGHLIGHT : LINEWIDTH);
 
         // draw bounds
+        Vec3 pt = new Vec3();
         Vec3 oldBoundaryPoint3d = null;
         for (Vec3 point : points) {
             int divpoints = 10;
@@ -178,14 +189,15 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * point.y;
                     double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * point.z;
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
+
                     if (Displayer.mode == Displayer.DisplayMode.ORTHO) {
                         gl.glVertex3f((float) (xnew / r), (float) -(ynew / r), (float) (znew / r));
-                    }
-                    else {
-                        Vec3 pt = new Vec3(xnew / r, -ynew / r, znew / r);
-                        pt = Displayer.getCamera().getViewpoint().orientation.rotateVector(new Vec3(pt.x, -pt.y, pt.z));
+                    } else {
+                        pt.x = xnew / r;
+                        pt.y = ynew / r;
+                        pt.z = znew / r;
+                        Vec2 tf = GridScale.current.transform(Displayer.getCamera().getViewpoint().orientation(pt));
 
-                        Vec2 tf = GridScale.current.transform(pt);
                         gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
                     }
                 }
