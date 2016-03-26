@@ -41,6 +41,7 @@ import com.jogamp.opengl.GL2;
 
 public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
+    private static final SWHVHEKPluginPanel optionsPanel = new SWHVHEKPluginPanel();
     private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
 
     private static final float LINEWIDTH = 1;
@@ -120,30 +121,32 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, p.orientation);
         interPolatedDraw(gl, lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, p.orientation);
 
-        String type = evt.getJHVEventType().getEventType().getEventName();
-        bindTexture(gl, type, evtr.getIcon());
+        if (optionsPanel.icons) {
+            String type = evt.getJHVEventType().getEventType().getEventName();
+            bindTexture(gl, type, evtr.getIcon());
 
-        double sz = ICON_SIZE;
-        if (evtr.isHighlighted()) {
-            sz = ICON_SIZE_HIGHLIGHTED;
-        }
-
-        gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glBegin(GL2.GL_QUADS);
-        {
-            for (int i = 0; i < texCoordHelpers.length; i++) {
-                int[] el = texCoordHelpers[i];
-                double deltatheta = sz / distSun * (el[1] * 2 - 1);
-                double deltar = sz * (el[0] * 2 - 1);
-                double r = distSun + deltar;
-                double theta = principalAngle + deltatheta;
-                Vec3 res = p.orientation.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
-                gl.glTexCoord2f(el[0], el[1]);
-                gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
+            double sz = ICON_SIZE;
+            if (evtr.isHighlighted()) {
+                sz = ICON_SIZE_HIGHLIGHTED;
             }
+
+            gl.glEnable(GL2.GL_TEXTURE_2D);
+            gl.glBegin(GL2.GL_QUADS);
+            {
+                for (int i = 0; i < texCoordHelpers.length; i++) {
+                    int[] el = texCoordHelpers[i];
+                    double deltatheta = sz / distSun * (el[1] * 2 - 1);
+                    double deltar = sz * (el[0] * 2 - 1);
+                    double r = distSun + deltar;
+                    double theta = principalAngle + deltatheta;
+                    Vec3 res = p.orientation.rotateInverseVector(new Vec3(r * Math.cos(theta), r * Math.sin(theta), 0));
+                    gl.glTexCoord2f(el[0], el[1]);
+                    gl.glVertex3f((float) res.x, (float) res.y, (float) res.z);
+                }
+            }
+            gl.glEnd();
+            gl.glDisable(GL2.GL_TEXTURE_2D);
         }
-        gl.glEnd();
-        gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
     private void drawPolygon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
@@ -292,12 +295,14 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
         gl.glEnd();
 
-        String type = evt.getJHVEventType().getEventType().getEventName();
-        bindTexture(gl, type, evtr.getIcon());
-        if (evtr.isHighlighted()) {
-            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
-        } else {
-            drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE);
+        if (optionsPanel.icons) {
+            String type = evt.getJHVEventType().getEventType().getEventName();
+            bindTexture(gl, type, evtr.getIcon());
+            if (evtr.isHighlighted()) {
+                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE_HIGHLIGHTED, ICON_SIZE_HIGHLIGHTED);
+            } else {
+                drawImageScale(gl, scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), ICON_SIZE, ICON_SIZE);
+            }
         }
     }
 
@@ -372,9 +377,11 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 } else {
                     drawPolygon(gl, evtr, evt);
 
-                    gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIcon(gl, evtr, evt);
-                    gl.glEnable(GL2.GL_DEPTH_TEST);
+                    if (optionsPanel.icons) {
+                        gl.glDisable(GL2.GL_DEPTH_TEST);
+                        drawIcon(gl, evtr, evt);
+                        gl.glEnable(GL2.GL_DEPTH_TEST);
+                    }
                 }
             }
             SWHVHEKSettings.resetCactusColor();
@@ -391,9 +398,12 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
                 } else {
                     drawPolygon(gl, evtr, evt);
-                    gl.glDisable(GL2.GL_DEPTH_TEST);
-                    drawIconScale(gl, evtr, evt, scale, camera, vp);
-                    gl.glEnable(GL2.GL_DEPTH_TEST);
+
+                    if (optionsPanel.icons) {
+                        gl.glDisable(GL2.GL_DEPTH_TEST);
+                        drawIconScale(gl, evtr, evt, scale, camera, vp);
+                        gl.glEnable(GL2.GL_DEPTH_TEST);
+                    }
                 }
             }
             SWHVHEKSettings.resetCactusColor();
@@ -415,7 +425,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
 
     @Override
     public Component getOptionsPanel() {
-        return null;
+        return optionsPanel;
     }
 
     @Override
