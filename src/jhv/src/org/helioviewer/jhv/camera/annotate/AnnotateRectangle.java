@@ -63,11 +63,11 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                Vec2 tf = GridScale.current.transform(pc);
+                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
+                Vec2 tf = GridScale.current.transform(pt);
 
                 gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
-                pc = camera.getViewpoint().orientation.rotateInverseVector(pc);
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
@@ -82,23 +82,16 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-
-            Vec3 start = camera.getViewpoint().orientation.rotateVector(startPoint);
-            Vec3 end = camera.getViewpoint().orientation.rotateVector(endPoint);
-            drawRectangle(gl, toSpherical(start), toSpherical(end));
+            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
         }
 
-        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
             else
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-
-            Vec3 start = camera.getViewpoint().orientation.rotateVector(rectangleStartPoints.get(i));
-            Vec3 end = camera.getViewpoint().orientation.rotateVector(rectangleEndPoints.get(i));
-            drawRectangle(gl, toSpherical(start), toSpherical(end));
+            drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
         }
     }
 
