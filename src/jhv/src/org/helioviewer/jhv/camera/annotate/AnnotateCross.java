@@ -8,8 +8,8 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -44,14 +44,16 @@ public class AnnotateCross extends AbstractAnnotateable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            Vec3 pc = toCart(camera, radius, y, z);
+            Vec3 pc = toCart(radius, y, z);
+
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                Viewport vp = Displayer.getActiveViewport();
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(pc.x, -pc.y, pc.z));
+                pc.y = -pc.y;
+                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc); // ???
                 Vec2 tf = GridScale.current.transform(pt);
 
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
+                pc = camera.getViewpoint().orientation.rotateInverseVector(pc);
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
@@ -68,12 +70,13 @@ public class AnnotateCross extends AbstractAnnotateable {
         int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawCross(gl, toSpherical(camera, crossPoints.get(i)));
-        }
+                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
+            else
+                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
 
-        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-        if (sz - 1 >= 0)
-            drawCross(gl, toSpherical(camera, crossPoints.get(activeIndex)));
+            Vec3 p = camera.getViewpoint().orientation.rotateVector(crossPoints.get(i));
+            drawCross(gl, toSpherical(p));
+        }
     }
 
     @Override
@@ -111,7 +114,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = vectorFromSphere(camera, e.getPoint());
+        Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
             crossPoints.add(pt);
             activeIndex = crossPoints.size() - 1;

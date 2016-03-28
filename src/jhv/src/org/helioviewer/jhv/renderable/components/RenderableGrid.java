@@ -251,8 +251,7 @@ public class RenderableGrid extends AbstractRenderable {
                 for (float i = START_RADIUS; i <= END_RADIUS; i++) {
                     if (i % 10 == 0) {
                         gl.glLineWidth(2);
-                    }
-                    else {
+                    } else {
                         gl.glLineWidth(1);
                     }
                     gl.glScalef(i / (i - 1), i / (i - 1), i / (i - 1));

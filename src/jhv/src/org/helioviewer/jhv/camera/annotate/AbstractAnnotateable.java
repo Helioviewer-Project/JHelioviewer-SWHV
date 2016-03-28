@@ -1,12 +1,9 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
-import java.awt.Point;
 
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Displayer;
 
 public abstract class AbstractAnnotateable implements Annotateable {
 
@@ -29,9 +26,7 @@ public abstract class AbstractAnnotateable implements Annotateable {
         camera = _camera;
     }
 
-    protected static Vec3 toSpherical(Camera _camera, Vec3 _p) {
-        Vec3 p = _camera.getViewpoint().orientation.rotateVector(_p);
-
+    protected static Vec3 toSpherical(Vec3 p) {
         Vec3 pt = new Vec3();
         pt.x = p.length();
         pt.y = Math.acos(p.y / pt.x);
@@ -40,17 +35,10 @@ public abstract class AbstractAnnotateable implements Annotateable {
         return pt;
     }
 
-    protected static Vec3 toCart(Camera _camera, double x, double y, double z) {
-        Vec3 pt = new Vec3();
-        pt.z = x * Math.sin(y) * Math.cos(z);
-        pt.x = x * Math.sin(y) * Math.sin(z);
-        pt.y = x * Math.cos(y);
-
-        return _camera.getViewpoint().orientation.rotateInverseVector(pt);
-    }
-
-    protected static Vec3 vectorFromSphere(Camera _camera, Point p) {
-        return CameraHelper.getVectorFromSphere(_camera, Displayer.getActiveViewport(), p);
+    protected static Vec3 toCart(double x, double y, double z) {
+        return new Vec3(x * Math.sin(y) * Math.sin(z),
+                        x * Math.cos(y),
+                        x * Math.sin(y) * Math.cos(z));
     }
 
 }

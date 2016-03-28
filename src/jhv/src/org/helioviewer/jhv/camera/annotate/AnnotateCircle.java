@@ -8,8 +8,8 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -28,7 +28,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     private void drawCircle(GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = bp.dot(ep);
         double r = Math.sqrt(1 - cosf * cosf);
-        //P = center + r cos(A) (bp x ep) + r sin(A) ep
+        // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
         Vec3 center = Vec3.multiply(bp, cosf);
         center.multiply(radius);
@@ -39,7 +39,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         gl.glBegin(GL2.GL_LINE_STRIP);
         int subdivs = 100;
-
         for (int i = 0; i <= subdivs; i++) {
             double t = i * 2. * Math.PI / subdivs;
             double cosr = Math.cos(t) * r;
@@ -47,12 +46,12 @@ public class AnnotateCircle extends AbstractAnnotateable {
             float x = (float) (center.x + cosr * u.x + sinr * v.x);
             float y = (float) (center.y + cosr * u.y + sinr * v.y);
             float z = (float) (center.z + cosr * u.z + sinr * v.z);
+
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                Viewport vp = Displayer.getActiveViewport();
                 Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(x, -y, z));
                 Vec2 tf = GridScale.current.transform(pt);
 
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
                 gl.glVertex3f(x, y, z);
             }
@@ -97,7 +96,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3 pt = vectorFromSphere(camera, e.getPoint());
+        Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -138,7 +137,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = vectorFromSphere(camera, e.getPoint());
+        Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }
