@@ -404,17 +404,17 @@ public class DataSources {
 
         JHVWorker<Void, Void> reloadTask = new JHVWorker<Void, Void>() {
 
+            private JSONObject newJsonResult = null;
+
             @Override
             protected Void backgroundWork() {
-                jsonResult = null;
-
                 while (true) {
                     try {
                         String queryString = Settings.getSingletonInstance().getProperty("API.dataSources.path");
                         URL query = new URL(queryString);
                         DownloadStream ds = new DownloadStream(query, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
                         Reader reader = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                        jsonResult = new JSONObject(new JSONTokener(reader));
+                        newJsonResult = new JSONObject(new JSONTokener(reader));
                         break;
                     } catch (MalformedURLException e) {
                         Log.error("Invalid url to retrieve data source", e);
@@ -438,8 +438,10 @@ public class DataSources {
 
             @Override
             protected void done() {
-                if (jsonResult == null)
+                if (newJsonResult == null)
                     return;
+
+                jsonResult = newJsonResult;
 
                 ImageDataPanel idp = ObservationDialog.getInstance().getObservationImagePane();
 
