@@ -42,11 +42,6 @@ import org.json.JSONTokener;
  * <li>Detector
  * <li>Measurement (171..)
  * </ul>
- * <p>
- * For further improvements in the result also the URL for the data query could
- * be encoded to distribute the load to different server this way.
- *
- * @author Helge Dietert
  */
 public class DataSources {
 
@@ -99,30 +94,20 @@ public class DataSources {
 
     public static final HashSet<String> SupportedObservatories = new HashSet<String>();
 
-    /**
-     * Item to select. Has a nice toString() so that a list can be put into a
-     * JComboBox
-     * <p>
-     * Also has some advanced sorting and overloaded equal.
-     *
-     * @author Helge Dietert
-     */
+    private static final Comparator<String> keyComparator = new AlphanumComparator();
+
     public class Item implements Comparable<Item> {
-        /**
-         * Flag if this should take as default item
-         */
+
+        // Flag if this should take as default item
         private final boolean defaultItem;
-        /**
-         * Tooltip description
-         */
+
+        // Tooltip description
         private final String description;
-        /**
-         * Key as needed to send to the API for this item
-         */
+
+        // Key as needed to send to the API for this item
         private final String key;
-        /**
-         * Display name for a dropdown list
-         */
+
+        // Display name for a dropdown list
         private final String name;
 
         /**
@@ -144,72 +129,39 @@ public class DataSources {
             this.description = description;
         }
 
-        /**
-         * Compare it to some other item with the advanced key
-         *
-         * @see java.lang.Comparable#compareTo(java.lang.Object)
-         */
         @Override
         public int compareTo(Item other) {
             return keyComparator.compare(key, other.key);
         }
 
-        /**
-         * Sorting and equal from sortKey,key
-         *
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-
-        @Override
-        public boolean equals(Object obj) {
-            try {
-                Item other = (Item) obj;
-                return key == other.key;
-            } catch (ClassCastException e) {
-                return false;
-            } catch (NullPointerException e) {
-                return false;
-            }
+       @Override
+        public boolean equals(Object o) {
+            if (o instanceof Item)
+                return key == ((Item) o).key;
+            return false;
         }
 
-        /**
-         * @return the description
-         */
         public String getDescription() {
             return description;
         }
 
-        /**
-         * @return the key
-         */
         public String getKey() {
             return key;
         }
 
-        /**
-         * @return the name
-         */
         public String getName() {
             return name;
         }
 
-        /**
-         * True if it was created as default item
-         *
-         * @return the defaultItem
-         */
         public boolean isDefaultItem() {
             return defaultItem;
         }
-
-        /**
-         * Shows a nice string (name)
-         */
 
         @Override
         public String toString() {
             return name;
         }
+
     }
 
     private static DataSources instance;
@@ -244,16 +196,6 @@ public class DataSources {
     }
 
     /**
-     * Result with the available data sources
-     */
-    private static JSONObject jsonResult;
-
-    /**
-     * Used comparator to sort the items after the key
-     */
-    private final Comparator<String> keyComparator = new AlphanumComparator();
-
-    /**
      * For the given root this will create a sorted list or items
      *
      * @param root
@@ -279,20 +221,13 @@ public class DataSources {
         return null;
     }
 
-    /**
-     * Gives the JSON Object for an detector
-     *
-     * @param observatory
-     *            Key of the observatory
-     * @param instrument
-     *            Key of the instrument
-     * @param detector
-     *            Key of the detector
-     * @return JSON object for the given observatory
-     * @throws JSONException
-     */
-    private JSONObject getDetector(String observatory, String instrument, String detector) throws JSONException {
-        return getInstrument(observatory, instrument).getJSONObject("children").getJSONObject(detector);
+    private static JSONObject jsonResult;
+
+    private JSONObject getJSONItemChildren(String... spec) throws JSONException {
+        JSONObject o = jsonResult.getJSONObject(spec[0]).getJSONObject("children");
+        for (int i = 1; i < spec.length; i++)
+            o = o.getJSONObject(spec[i]).getJSONObject("children");
+        return o;
     }
 
     /**
@@ -306,25 +241,11 @@ public class DataSources {
      */
     public Item[] getDetectors(String observatory, String instrument) {
         try {
-            return getChildrenList(getInstrument(observatory, instrument).getJSONObject("children"));
+            return getChildrenList(getJSONItemChildren(observatory, instrument));
         } catch (JSONException e) {
             Log.error("Cannot find instruments for " + observatory, e);
             return null;
         }
-    }
-
-    /**
-     * Gives the JSON Object for an instrument
-     *
-     * @param observatory
-     *            Key of the observatory
-     * @param instrument
-     *            Key of the instrument
-     * @return JSON object for the given observatory
-     * @throws JSONException
-     */
-    private JSONObject getInstrument(String observatory, String instrument) throws JSONException {
-        return getObservatory(observatory).getJSONObject("children").getJSONObject(instrument);
     }
 
     /**
@@ -337,7 +258,7 @@ public class DataSources {
      */
     public Item[] getInstruments(String observatory) {
         try {
-            return getChildrenList(getObservatory(observatory).getJSONObject("children"));
+            return getChildrenList(getJSONItemChildren(observatory));
         } catch (JSONException e) {
             Log.error("Cannot find instruments for " + observatory, e);
             return null;
@@ -357,7 +278,7 @@ public class DataSources {
      */
     public Item[] getMeasurements(String observatory, String instrument, String detector) {
         try {
-            return getChildrenList(getDetector(observatory, instrument, detector).getJSONObject("children"));
+            return getChildrenList(getJSONItemChildren(observatory, instrument, detector));
         } catch (JSONException e) {
             Log.error("Cannot find instruments for " + observatory, e);
             return null;
@@ -377,10 +298,6 @@ public class DataSources {
             }
         }
         return result.toArray(new Item[result.size()]);
-    }
-
-    private JSONObject getObservatory(String observatory) throws JSONException {
-        return jsonResult.getJSONObject(observatory);
     }
 
     private static String selectedServer = "";
