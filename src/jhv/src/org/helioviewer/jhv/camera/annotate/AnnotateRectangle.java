@@ -8,8 +8,8 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Displayer;
-import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -59,14 +59,16 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
-            Vec3 pc = toCart(camera, radius, y, z);
+            Vec3 pc = toCart(radius, y, z);
+
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                Viewport vp = Displayer.getActiveViewport();
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(pc.x, -pc.y, pc.z));
+                pc.y = -pc.y;
+                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc); // ???
                 Vec2 tf = GridScale.current.transform(pt);
 
-                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
+                pc = camera.getViewpoint().orientation.rotateInverseVector(pc);
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
@@ -79,21 +81,26 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         gl.glLineWidth(lineWidth);
 
-        gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
         if (beingDragged()) {
-            drawRectangle(gl, toSpherical(camera, startPoint), toSpherical(camera, endPoint));
+            gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
+
+            Vec3 start = camera.getViewpoint().orientation.rotateVector(startPoint);
+            Vec3 end = camera.getViewpoint().orientation.rotateVector(endPoint);
+            drawRectangle(gl, toSpherical(start), toSpherical(end));
         }
 
         gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = rectangleStartPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
-                drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(i)), toSpherical(camera, rectangleEndPoints.get(i)));
-        }
+                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
+            else
+                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
 
-        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-        if (sz - 1 >= 0)
-            drawRectangle(gl, toSpherical(camera, rectangleStartPoints.get(activeIndex)), toSpherical(camera, rectangleEndPoints.get(activeIndex)));
+            Vec3 start = camera.getViewpoint().orientation.rotateVector(rectangleStartPoints.get(i));
+            Vec3 end = camera.getViewpoint().orientation.rotateVector(rectangleEndPoints.get(i));
+            drawRectangle(gl, toSpherical(start), toSpherical(end));
+        }
     }
 
     @Override
@@ -105,7 +112,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3 pt = vectorFromSphere(camera, e.getPoint());
+        Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -147,7 +154,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = vectorFromSphere(camera, e.getPoint());
+        Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
             startPoint = pt;
         }
