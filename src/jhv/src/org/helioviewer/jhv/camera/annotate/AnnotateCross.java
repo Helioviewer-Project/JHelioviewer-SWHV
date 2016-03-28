@@ -39,7 +39,6 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     private void interpolatedDraw(GL2 gl, Vec3 p1s, Vec3 p2s) {
         int subdivisions = 2;
-
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
@@ -48,11 +47,11 @@ public class AnnotateCross extends AbstractAnnotateable {
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                Vec2 tf = GridScale.current.transform(pc);
+                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
+                Vec2 tf = GridScale.current.transform(pt);
 
                 gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
-                pc = camera.getViewpoint().orientation.rotateInverseVector(pc);
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
         }
@@ -65,16 +64,13 @@ public class AnnotateCross extends AbstractAnnotateable {
 
         gl.glLineWidth(lineWidth);
 
-        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
         int sz = crossPoints.size();
         for (int i = 0; i < sz; i++) {
             if (i != activeIndex)
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
             else
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-
-            Vec3 p = camera.getViewpoint().orientation.rotateVector(crossPoints.get(i));
-            drawCross(gl, toSpherical(p));
+            drawCross(gl, toSpherical(crossPoints.get(i)));
         }
     }
 
