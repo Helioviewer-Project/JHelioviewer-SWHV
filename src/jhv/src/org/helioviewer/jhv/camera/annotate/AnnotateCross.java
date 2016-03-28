@@ -48,8 +48,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc); // ???
-                Vec2 tf = GridScale.current.transform(pt);
+                Vec2 tf = GridScale.current.transform(pc);
 
                 gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
             } else {
