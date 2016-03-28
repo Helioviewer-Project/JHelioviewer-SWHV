@@ -44,6 +44,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
     private static final SWHVHEKPluginPanel optionsPanel = new SWHVHEKPluginPanel();
     private static final SWHVHEKPopupController controller = new SWHVHEKPopupController();
 
+    private static final int DIVPOINTS = 10;
     private static final float LINEWIDTH = 1;
     private static final float LINEWIDTH_HIGHLIGHT = 2;
     private static final float LINEWIDTH_CACTUS = 2.02f;
@@ -159,7 +160,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         }
     }
 
-    private void drawPolygon(GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Camera camera, Viewport vp, GL2 gl, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositioningInformation();
 
         List<Vec3> points = pi.getBoundCC();
@@ -179,12 +180,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         Vec3 pt = new Vec3();
         Vec3 oldBoundaryPoint3d = null;
         for (Vec3 point : points) {
-            int divpoints = 10;
-
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
-                for (int j = 0; j <= divpoints; j++) {
-                    double alpha = 1. - j / (double) divpoints;
+                for (int j = 0; j <= DIVPOINTS; j++) {
+                    double alpha = 1. - j / (double) DIVPOINTS;
                     double xnew = alpha * oldBoundaryPoint3d.x + (1 - alpha) * point.x;
                     double ynew = alpha * oldBoundaryPoint3d.y + (1 - alpha) * point.y;
                     double znew = alpha * oldBoundaryPoint3d.z + (1 - alpha) * point.z;
@@ -196,9 +195,9 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
-                        Vec2 tf = GridScale.current.transform(Displayer.getCamera().getViewpoint().orientation.rotateVector(pt));
+                        Vec2 tf = GridScale.current.transform(camera.getViewpoint().orientation.rotateVector(pt));
 
-                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                        gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
                     }
                 }
             }
@@ -387,7 +386,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 if (evt.getJHVEventType().getEventType().getEventName().equals("Coronal Mass Ejection")) {
                     drawCactusArc(gl, evtr, evt, controller.currentTime);
                 } else {
-                    drawPolygon(gl, evtr, evt);
+                    drawPolygon(camera, vp, gl, evtr, evt);
 
                     if (optionsPanel.icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
@@ -409,7 +408,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                 if (evt.getName().equals("Coronal Mass Ejection") && (Displayer.mode == Displayer.DisplayMode.LOGPOLAR || Displayer.mode == Displayer.DisplayMode.POLAR)) {
                     drawCactusArcScale(gl, evtr, evt, controller.currentTime, scale, vp);
                 } else {
-                    drawPolygon(gl, evtr, evt);
+                    drawPolygon(camera, vp, gl, evtr, evt);
 
                     if (optionsPanel.icons) {
                         gl.glDisable(GL2.GL_DEPTH_TEST);
