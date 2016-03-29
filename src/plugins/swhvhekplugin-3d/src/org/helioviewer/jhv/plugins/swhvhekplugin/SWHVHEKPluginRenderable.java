@@ -104,7 +104,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
-        Position.Q p = Sun.getEarthQuat(new JHVDate((evt.getStartDate().getTime() + evt.getEndDate().getTime()) / 2));
+        Position.Q p = Sun.getEarthQuat(new JHVDate(evt.getStartDate().getTime()));
 
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
