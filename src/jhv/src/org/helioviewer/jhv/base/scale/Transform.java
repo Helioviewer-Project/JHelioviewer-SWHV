@@ -3,6 +3,7 @@ package org.helioviewer.jhv.base.scale;
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
 import org.helioviewer.jhv.base.math.MathUtils;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.layers.Layers;
@@ -19,6 +20,9 @@ public interface Transform {
     public static class TransformPolar implements Transform {
         @Override
         public Vec2 transform(Vec3 pt, GridScale scale) {
+            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Quat q = new Quat(p.lat, 0);
+            pt = q.rotateInverseVector(pt);
             double r = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
             double theta = Math.atan2(-pt.x, -pt.y);
             theta += 2 * Math.PI;
@@ -30,12 +34,15 @@ public interface Transform {
 
         @Override
         public Vec3 transformInverse(Vec2 pt, GridScale scale) {
-            double r = pt.x;
-            double theta = pt.y / MathUtils.radeg;
-            //TBD
-            return new Vec3();
+            double r = pt.y;
+            double theta = -pt.x / MathUtils.radeg;
+            double y = r * Math.cos(theta);
+            double x = r * Math.sin(theta);
+            double z = Math.sqrt(1 - x * x - y * y);
+            Position.L p = Sun.getEarth(Layers.getLastUpdatedTimestamp());
+            Quat q = new Quat(p.lat, p.lon);
+            return q.rotateInverseVector(new Vec3(x, y, z));
         }
-
     }
 
     public static class TransformLatitudinal implements Transform {
