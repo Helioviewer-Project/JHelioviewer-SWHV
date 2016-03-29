@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.viewmodel.view.jp2view.io.jpip;
 
 import java.util.Map;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  * A class that helps build a JPIP query string.
@@ -10,10 +10,10 @@ import java.util.Hashtable;
  * @author Juan Pablo
  */
 public class JPIPQuery implements Cloneable {
-    /** The hashtable holding the jpip-request-fields */
-    protected Hashtable<String, String> fields = new Hashtable<String, String>();
 
-    /** Default constructor. */
+    /** HashMap holding the jpip-request-fields */
+    private HashMap<String, String> fields = new HashMap<String, String>();
+
     public JPIPQuery() {
         fields.put("len", Integer.toString(JPIPConstants.MIN_REQUEST_LEN));
     }
