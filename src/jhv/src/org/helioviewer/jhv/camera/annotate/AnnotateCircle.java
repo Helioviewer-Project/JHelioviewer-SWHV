@@ -104,4 +104,9 @@ public class AnnotateCircle extends AbstractAnnotateable {
             startPoint = pt;
     }
 
+    @Override
+    public boolean isDraggable() {
+        return true;
+    }
+
 }

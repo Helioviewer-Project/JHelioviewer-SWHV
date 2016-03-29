@@ -16,4 +16,6 @@ public interface Annotateable {
 
     public boolean beingDragged();
 
+    public boolean isDraggable();
+
 }

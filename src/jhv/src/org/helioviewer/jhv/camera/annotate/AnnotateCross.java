@@ -88,4 +88,8 @@ public class AnnotateCross extends AbstractAnnotateable {
         return true;
     }
 
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
 }
