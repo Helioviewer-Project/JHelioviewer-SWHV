@@ -134,6 +134,9 @@ public class JHVEventCache {
     }
 
     private void createNewRelatedEvent(JHVEvent event) {
+        if (relEvents.containsKey(event.getUniqueID())) {
+            return;
+        }
         JHVRelatedEvents revent = new JHVRelatedEvents(event, events);
         relEvents.put(event.getUniqueID(), revent);
     }
