@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 
@@ -53,39 +52,15 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         Vec2 previous = null;
+
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
             double z = (1 - t) * p1s.z + t * p2s.z;
             Vec3 pc = toCart(radius, y, z);
-
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
-                Vec2 tf = GridScale.current.transform(pt);
-                if (previous != null) {
-                    if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {
-                        gl.glVertex2f((float) (0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
-                        gl.glEnd();
-                        gl.glBegin(GL2.GL_LINE_STRIP);
-                        gl.glVertex2f((float) (-0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
-                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
-                    }
-                    else if (tf.x >= 0 && previous.x <= 0 && Math.abs(previous.x - tf.x) > 0.5) {
-                        gl.glVertex2f((float) (-0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
-                        gl.glEnd();
-                        gl.glBegin(GL2.GL_LINE_STRIP);
-                        gl.glVertex2f((float) (0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
-                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
-                    }
-                    else {
-                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
-                    }
-                }
-                else {
-                    gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
-                }
-                previous = tf;
+                previous = drawVertex(gl, pc, previous);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }

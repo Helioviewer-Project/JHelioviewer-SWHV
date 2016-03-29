@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
-import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 
@@ -36,6 +35,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         gl.glBegin(GL2.GL_LINE_STRIP);
         int subdivs = 100;
+        Vec2 previous = null;
         for (int i = 0; i <= subdivs; i++) {
             double t = i * 2. * Math.PI / subdivs;
             double cosr = Math.cos(t) * r;
@@ -45,10 +45,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             float z = (float) (center.z + cosr * u.z + sinr * v.z);
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                Vec3 pt = camera.getViewpoint().orientation.rotateVector(new Vec3(x, -y, z));
-                Vec2 tf = GridScale.current.transform(pt);
-
-                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                previous = drawVertex(gl, new Vec3(x, -y, z), previous);
             } else {
                 gl.glVertex3f(x, y, z);
             }
