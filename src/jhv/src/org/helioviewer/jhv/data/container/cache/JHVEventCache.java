@@ -42,7 +42,7 @@ public class JHVEventCache {
             else if (this.start == o2.start && this.end < o2.end) {
                 return -1;
             }
-            else if (this.start == o2.start && this.end == o2.end)
+            else if (this.start == o2.start && this.end == o2.end && o2 == this)
                 return 0;
             return 1;
         }
