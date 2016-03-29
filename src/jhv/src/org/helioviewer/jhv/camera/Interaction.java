@@ -9,6 +9,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -20,7 +21,7 @@ public class Interaction implements MouseWheelListener, MouseMotionListener, Mou
         camera = _camera;
     }
 
-    public void drawInteractionFeedback(GL2 gl) {
+    public void drawInteractionFeedback(Viewport vp, GL2 gl) {
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -44,15 +45,15 @@ public class InteractionAnnotate extends Interaction {
     }
 
     @Override
-    public void drawInteractionFeedback(GL2 gl) {
+    public void drawInteractionFeedback(Viewport vp, GL2 gl) {
         Annotateable activeAnnotatable = null;
         if (activeIndex >= 0)
             activeAnnotatable = annotateables.get(activeIndex);
         for (Annotateable ann : annotateables) {
-            ann.render(gl, ann == activeAnnotatable);
+            ann.render(vp, gl, ann == activeAnnotatable);
         }
         if (newAnnotatable != null) {
-            newAnnotatable.render(gl, false);
+            newAnnotatable.render(vp, gl, false);
         }
     }
 
