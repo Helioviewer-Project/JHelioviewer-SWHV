@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.helioviewer.jhv.base.astronomy.Position;
+
 public class JHVEvent {
 
     private final Date startDate;
@@ -19,6 +21,7 @@ public class JHVEvent {
     private Map<String, JHVEventParameter> allNonVisibleNullParameters;
     private final JHVEventType eventType;
     private JHVPositionInformation positionInformation = JHVPositionInformation.NULLINFO;
+    private Position.Q earthPosition = null;
     private Integer id;
 
     public JHVEvent(String _eventName, String _eventDisplayName, JHVEventType _eventType, int _id, Date _start, Date _end) {
@@ -134,6 +137,14 @@ public class JHVEvent {
 
     public void addJHVPositionInformation(JHVPositionInformation positionInformation) {
         this.positionInformation = positionInformation;
+    }
+
+    public void addEarthPosition(Position.Q p) {
+        earthPosition = p;
+    }
+
+    public Position.Q getEarthPosition() {
+        return earthPosition;
     }
 
     public void addParameter(String keyString, String value) {

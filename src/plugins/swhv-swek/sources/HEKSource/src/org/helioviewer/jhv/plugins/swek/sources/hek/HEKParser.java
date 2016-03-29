@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
@@ -252,6 +253,8 @@ public class HEKParser implements SWEKParser {
             }
 
             Position.L p = Sun.getEarth(new JHVDate(currentEvent.getStartDate().getTime()));
+            if (currentEvent.getName().equals("Coronal Mass Ejection")) // reduce memory usage
+                currentEvent.addEarthPosition(new Position.Q(p.time, p.rad, new Quat(p.lat, p.lon)));
 
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
