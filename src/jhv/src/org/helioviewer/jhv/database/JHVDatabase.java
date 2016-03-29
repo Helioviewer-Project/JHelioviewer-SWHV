@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -125,7 +125,7 @@ public class JHVDatabase {
             String createtbl = "CREATE TABLE " + dbName + " (";
             HashMap<String, String> fields = eventType.getEventType().getAllDatabaseFields();
 
-            for (Entry<String, String> entry : fields.entrySet()) {
+            for (Map.Entry<String, String> entry : fields.entrySet()) {
                 createtbl += entry.getKey() + " " + entry.getValue() + " DEFAULT NULL,";
             }
             createtbl += "event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE );";

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.Timer;
@@ -268,7 +267,7 @@ public class EVEDrawController implements TimingListener, EVECacheControllerList
     private void fixAxis() {
         boolean hadLeftAxis = false;
         List<Band> rightAxisBands = null;
-        for (Entry<YAxisElement, List<Band>> yEntry : bandsPerYAxis.entrySet()) {
+        for (Map.Entry<YAxisElement, List<Band>> yEntry : bandsPerYAxis.entrySet()) {
             if (drawController.getYAxisLocation(yEntry.getKey()) == YAxisLocation.LEFT) {
                 hadLeftAxis = true;
             } else {

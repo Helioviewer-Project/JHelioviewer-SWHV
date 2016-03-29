@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.plugins.eveplugin.draw.DrawableElement;
@@ -82,7 +81,7 @@ public class EVEDrawableElement implements DrawableElement {
                 final LinkedList<String> warnLabels = new LinkedList<String>();
                 HashMap<String, Double> unconvertedWarnLevels = bands[i].getBandType().getWarnLevels();
 
-                Iterator<Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
+                Iterator<Map.Entry<String, Double>> it = unconvertedWarnLevels.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, Double> pairs = it.next();
                     warnLevels.add(dY - computeY(yAxisElement.scale(pairs.getValue()), ratioY, minValue));
