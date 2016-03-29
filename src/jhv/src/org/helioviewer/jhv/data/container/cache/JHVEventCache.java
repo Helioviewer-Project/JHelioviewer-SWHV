@@ -39,10 +39,11 @@ public class JHVEventCache {
         public int compareTo(SortedDateInterval o2) {
             if (this.start < o2.start)
                 return -1;
-            else if (this.start == o2.start && this.end < o2.end) {
+            else if (this.start == o2.start && this.end < o2.end)
                 return -1;
-            }
-            else if (this.start == o2.start && this.end == o2.end && o2 == this)
+            else if (this.start == o2.start && this.end == o2.end && o2.hashCode() < this.hashCode())
+                return -1;
+            else if (this.start == o2.start && this.end == o2.end && o2.hashCode() == this.hashCode())
                 return 0;
             return 1;
         }
