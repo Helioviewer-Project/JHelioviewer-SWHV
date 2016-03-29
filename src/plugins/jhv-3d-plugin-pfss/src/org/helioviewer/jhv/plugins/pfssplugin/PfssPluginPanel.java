@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.pfssplugin;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
