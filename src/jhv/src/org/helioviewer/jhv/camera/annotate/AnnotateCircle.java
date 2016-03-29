@@ -83,10 +83,8 @@ public class AnnotateCircle extends AbstractAnnotateable {
     @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 pt = computePoint(e.getPoint());
-        if (pt != null) {
+        if (pt != null)
             endPoint = pt;
-            Displayer.display();
-        }
     }
 
     @Override
@@ -102,9 +100,8 @@ public class AnnotateCircle extends AbstractAnnotateable {
     @Override
     public void mousePressed(MouseEvent e) {
         Vec3 pt = computePoint(e.getPoint());
-        if (pt != null) {
+        if (pt != null)
             startPoint = pt;
-        }
     }
 
 }
