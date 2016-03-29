@@ -251,19 +251,21 @@ public class HEKParser implements SWEKParser {
                 }
             }
 
+            Position.L p = Sun.getEarth(new JHVDate(currentEvent.getStartDate().getTime()));
+
             ArrayList<Vec3> jhvBoundedBox = new ArrayList<Vec3>(localHGSBoundedBox.size());
             for (Vec3 el : localHGSBoundedBox) {
-                jhvBoundedBox.add(convertHGSJHV(el, currentEvent));
+                jhvBoundedBox.add(convertHGSJHV(el, p));
             }
 
             ArrayList<Vec3> jhvBoundCC = new ArrayList<Vec3>(localHGSBoundCC.size());
             for (Vec3 el : localHGSBoundCC) {
-                jhvBoundCC.add(convertHGSJHV(el, currentEvent));
+                jhvBoundCC.add(convertHGSJHV(el, p));
             }
 
             Vec3 jhvCentralPoint = null;
             if (localHGSCentralPoint != null) {
-                jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, currentEvent);
+                jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, p);
             }
 
             currentEvent.addJHVPositionInformation(new JHVPositionInformation(jhvBoundedBox, jhvBoundCC, jhvCentralPoint));
@@ -272,8 +274,7 @@ public class HEKParser implements SWEKParser {
         }
     }
 
-    private static Vec3 convertHGSJHV(Vec3 el, JHVEvent evt) {
-        Position.L p = Sun.getEarth(new JHVDate((evt.getStartDate().getTime())));
+    private static Vec3 convertHGSJHV(Vec3 el, Position.L p) {
         double theta = Math.PI / 180 * el.y;
         double phi = Math.PI / 180 * el.x - p.lon;
 
@@ -282,4 +283,5 @@ public class HEKParser implements SWEKParser {
         double y = -Math.sin(theta);
         return new Vec3(x, y, z);
     }
+
 }
