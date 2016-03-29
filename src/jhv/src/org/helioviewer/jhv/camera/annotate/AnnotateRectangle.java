@@ -115,4 +115,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             startPoint = pt;
     }
 
+    @Override
+    public boolean isDraggable() {
+        return true;
+    }
 }

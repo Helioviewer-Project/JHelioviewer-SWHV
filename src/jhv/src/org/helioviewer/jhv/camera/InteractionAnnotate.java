@@ -60,21 +60,21 @@ public class InteractionAnnotate extends Interaction {
     public void mousePressed(MouseEvent e) {
         newAnnotatable = mode.generateAnnotateable(camera);
         newAnnotatable.mousePressed(e);
-        if (mode == AnnotationMode.CROSS) {
-            mouseReleased(e);
+        if (!newAnnotatable.isDraggable()) {
+            finishAnnotateable(e);
         }
         Displayer.display();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (newAnnotatable != null)
+        if (newAnnotatable != null && newAnnotatable.isDraggable()) {
             newAnnotatable.mouseDragged(e);
-        Displayer.display();
+            Displayer.display();
+        }
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
+    private void finishAnnotateable(MouseEvent e) {
         if (newAnnotatable != null && newAnnotatable.beingDragged()) {
             newAnnotatable.mouseReleased(e);
             annotateables.add(newAnnotatable);
@@ -82,6 +82,11 @@ public class InteractionAnnotate extends Interaction {
         }
         newAnnotatable = null;
         Displayer.display();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        finishAnnotateable(e);
     }
 
     @Override
