@@ -118,4 +118,9 @@ public class JHVEventParameter {
         return value != null && Regex.Integer.matcher(value).matches();
     }
 
+    @Override
+    public String toString() {
+        return parameterValue;
+    }
+
 }

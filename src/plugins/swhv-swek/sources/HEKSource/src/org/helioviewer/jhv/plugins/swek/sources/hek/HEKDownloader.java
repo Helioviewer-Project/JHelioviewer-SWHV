@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.base.time.TimeUtils;
@@ -39,7 +39,7 @@ public class HEKDownloader extends SWEKDownloader {
                 start = TimeUtils.utcDateFormat.parse(result.getString("event_starttime")).getTime();
                 end = TimeUtils.utcDateFormat.parse(result.getString("event_endtime")).getTime();
                 HashMap<String, String> dbFields = type.getEventType().getAllDatabaseFields();
-                for (Entry<String, String> entry : dbFields.entrySet()) {
+                for (Map.Entry<String, String> entry : dbFields.entrySet()) {
                     String dbType = entry.getValue();
                     String fieldName = entry.getKey();
                     String lfieldName = fieldName.toLowerCase();

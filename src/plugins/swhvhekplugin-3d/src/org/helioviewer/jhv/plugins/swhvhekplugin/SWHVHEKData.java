@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swhvhekplugin;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.helioviewer.jhv.base.time.JHVDate;
@@ -109,7 +108,7 @@ public class SWHVHEKData implements LayersListener, JHVEventHandler {
             JHVEventCacheResult result = JHVEventCache.getSingletonInstance().get(beginDate, endDate, beginDate, endDate);
             Map<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> data = result.getAvailableEvents();
             if (data != null) {
-                for (Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
+                for (Map.Entry<JHVEventType, SortedMap<SortedDateInterval, JHVRelatedEvents>> v1 : data.entrySet()) {
                     for (Map.Entry<JHVEventCache.SortedDateInterval, JHVRelatedEvents> v2 : v1.getValue().entrySet()) {
                         JHVRelatedEvents evr = v2.getValue();
                         if (evr.getStart() <= ts && evr.getEnd() >= ts)
