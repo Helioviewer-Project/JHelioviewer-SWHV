@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -18,7 +19,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(_camera);
     }
 
-    private void drawCross(GL2 gl, Vec3 bp) {
+    private void drawCross(Viewport vp, GL2 gl, Vec3 bp) {
         double delta = Math.PI * 2.5 / 180;
         Vec3 p1 = new Vec3(radius, bp.y - delta, bp.z);
         Vec3 p2 = new Vec3(radius, bp.y + delta, bp.z);
@@ -26,15 +27,15 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec3 p4 = new Vec3(radius, bp.y, bp.z + delta);
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(gl, p1, p2);
+        interpolatedDraw(vp, gl, p1, p2);
         gl.glEnd();
 
         gl.glBegin(GL2.GL_LINE_STRIP);
-        interpolatedDraw(gl, p3, p4);
+        interpolatedDraw(vp, gl, p3, p4);
         gl.glEnd();
     }
 
-    private void interpolatedDraw(GL2 gl, Vec3 p1s, Vec3 p2s) {
+    private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         int subdivisions = 2;
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
@@ -47,7 +48,7 @@ public class AnnotateCross extends AbstractAnnotateable {
                 Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
                 Vec2 tf = GridScale.current.transform(pt);
 
-                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
@@ -55,7 +56,7 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(GL2 gl, boolean active) {
+    public void render(Viewport vp, GL2 gl, boolean active) {
         if (crossPoint == null)
             return;
 
@@ -65,7 +66,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
         else
             gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-        drawCross(gl, toSpherical(crossPoint));
+        drawCross(vp, gl, toSpherical(crossPoint));
     }
 
     @Override
@@ -92,4 +93,5 @@ public class AnnotateCross extends AbstractAnnotateable {
     public boolean isDraggable() {
         return false;
     }
+
 }

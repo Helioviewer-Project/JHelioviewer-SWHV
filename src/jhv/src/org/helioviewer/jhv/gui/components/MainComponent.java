@@ -118,7 +118,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 CameraHelper.applyPerspective(camera, vp, gl);
                 renderBlackCircle(gl, inverse.m);
                 ImageViewerGui.getRenderableContainer().render(camera, vp, gl);
-                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
+                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
             }
         }
     }
@@ -138,7 +138,7 @@ public class MainComponent extends GLCanvas implements GLEventListener {
                 gl.glPushMatrix();
                 gl.glTranslatef((float) (camera.getCurrentTranslation().x), (float) (camera.getCurrentTranslation().y), 0f);
                 ImageViewerGui.getRenderableContainer().renderScale(camera, vp, gl, Displayer.mode.getSolarShader(), GridScale.current);
-                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(gl);
+                ImageViewerGui.getAnnotateInteraction().drawInteractionFeedback(vp, gl);
                 gl.glPopMatrix();
             }
         }

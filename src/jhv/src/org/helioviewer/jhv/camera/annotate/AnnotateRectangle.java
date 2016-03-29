@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -21,9 +22,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         super(_camera);
     }
 
-    private void drawRectangle(GL2 gl, Vec3 bp, Vec3 ep) {
-        gl.glBegin(GL2.GL_LINE_STRIP);
-
+    private void drawRectangle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         if (bp.z * ep.z < 0) {
             if (ep.z < bp.z && bp.z > Math.PI / 2)
                 ep.z += 2 * Math.PI;
@@ -36,10 +35,11 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p3 = ep;
         Vec3 p4 = new Vec3(radius, bp.y, ep.z);
 
-        interpolatedDraw(gl, p1, p2);
-        interpolatedDraw(gl, p2, p3);
-        interpolatedDraw(gl, p3, p4);
-        interpolatedDraw(gl, p4, p1);
+        gl.glBegin(GL2.GL_LINE_STRIP);
+        interpolatedDraw(vp, gl, p1, p2);
+        interpolatedDraw(vp, gl, p2, p3);
+        interpolatedDraw(vp, gl, p3, p4);
+        interpolatedDraw(vp, gl, p4, p1);
         gl.glEnd();
     }
 
@@ -48,7 +48,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         return endPoint != null && startPoint != null;
     }
 
-    private void interpolatedDraw(GL2 gl, Vec3 p1s, Vec3 p2s) {
+    private void interpolatedDraw(Viewport vp, GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
         Vec2 previous = null;
@@ -60,7 +60,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = toCart(radius, y, z);
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                previous = drawVertex(gl, pc, previous);
+                previous = drawVertex(vp, gl, pc, previous);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
@@ -68,7 +68,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(GL2 gl, boolean active) {
+    public void render(Viewport vp, GL2 gl, boolean active) {
         if ((rectangleStartPoint == null || rectangleEndPoint == null) && !beingDragged())
             return;
 
@@ -76,22 +76,21 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
+            drawRectangle(vp, gl, toSpherical(startPoint), toSpherical(endPoint));
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawRectangle(gl, toSpherical(rectangleStartPoint), toSpherical(rectangleEndPoint));
+            drawRectangle(vp, gl, toSpherical(rectangleStartPoint), toSpherical(rectangleEndPoint));
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         Vec3 pt = computePoint(e.getPoint());
-        if (pt != null) {
+        if (pt != null)
             endPoint = pt;
-        }
     }
 
     @Override
@@ -115,4 +114,5 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     public boolean isDraggable() {
         return true;
     }
+
 }

@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Viewport;
 
 import com.jogamp.opengl.GL2;
 
@@ -21,7 +22,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(_camera);
     }
 
-    private void drawCircle(GL2 gl, Vec3 bp, Vec3 ep) {
+    private void drawCircle(Viewport vp, GL2 gl, Vec3 bp, Vec3 ep) {
         double cosf = bp.dot(ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -45,7 +46,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             float z = (float) (center.z + cosr * u.z + sinr * v.z);
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                previous = drawVertex(gl, new Vec3(x, -y, z), previous);
+                previous = drawVertex(vp, gl, new Vec3(x, -y, z), previous);
             } else {
                 gl.glVertex3f(x, y, z);
             }
@@ -59,7 +60,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(GL2 gl, boolean active) {
+    public void render(Viewport vp, GL2 gl, boolean active) {
         if ((circleStartPoint == null || circleEndPoint == null) && !beingDragged())
             return;
 
@@ -67,13 +68,13 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
-            drawCircle(gl, startPoint, endPoint);
+            drawCircle(vp, gl, startPoint, endPoint);
         } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            drawCircle(gl, circleStartPoint, circleEndPoint);
+            drawCircle(vp, gl, circleStartPoint, circleEndPoint);
         }
     }
 
