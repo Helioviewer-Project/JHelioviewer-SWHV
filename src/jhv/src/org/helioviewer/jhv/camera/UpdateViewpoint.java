@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.base.astronomy.Position;
 import org.helioviewer.jhv.base.astronomy.Sun;
+import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.viewmodel.view.View;
@@ -18,7 +19,8 @@ public interface UpdateViewpoint {
     static class UpdateViewpointEarthInertial implements UpdateViewpoint {
         @Override
         public Position.Q update(JHVDate time) {
-            return new Position.Q(time, Sun.EpochEarthQ.distance, Sun.EpochEarthQ.orientation);
+            Position.L p = Sun.getEarth(time);
+            return new Position.Q(time, Sun.EpochEarthQ.distance, new Quat(0, p.lon));
         }
     }
 
