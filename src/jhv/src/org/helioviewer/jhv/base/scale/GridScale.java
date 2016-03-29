@@ -46,6 +46,8 @@ public abstract class GridScale {
 
     abstract public Vec2 transform(Vec3 pt);
 
+    abstract public Vec3 transformInverse(Vec2 pt);
+
     abstract public Vec2 mouseToGrid(Point point, Viewport vp, Camera camera, GridChoiceType gridChoice);
 
     abstract public Vec2 mouseToGridInv(Point point, Viewport vp, Camera camera);
@@ -107,6 +109,11 @@ public abstract class GridScale {
         @Override
         public Vec2 transform(Vec3 pt) {
             return transform.transform(pt, this);
+        }
+
+        @Override
+        public Vec3 transformInverse(Vec2 pt) {
+            return transform.transformInverse(pt, this);
         }
 
         @Override
@@ -208,5 +215,4 @@ public abstract class GridScale {
             return new Vec2(phi, theta);
         }
     }
-
 }

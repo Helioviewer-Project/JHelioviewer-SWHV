@@ -69,6 +69,7 @@ public class InteractionAnnotate extends Interaction {
     public void mouseDragged(MouseEvent e) {
         if (newAnnotatable != null)
             newAnnotatable.mouseDragged(e);
+        Displayer.display();
     }
 
     @Override

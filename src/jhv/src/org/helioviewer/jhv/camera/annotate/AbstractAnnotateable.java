@@ -1,9 +1,15 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.display.Displayer;
+import org.helioviewer.jhv.display.Displayer.DisplayMode;
+import org.helioviewer.jhv.renderable.components.RenderableGrid.GridChoiceType;
 
 public abstract class AbstractAnnotateable implements Annotateable {
 
@@ -35,8 +41,18 @@ public abstract class AbstractAnnotateable implements Annotateable {
 
     protected static Vec3 toCart(double x, double y, double z) {
         return new Vec3(x * Math.sin(y) * Math.sin(z),
-                        x * Math.cos(y),
-                        x * Math.sin(y) * Math.cos(z));
+                x * Math.cos(y),
+                x * Math.sin(y) * Math.cos(z));
     }
 
+    protected Vec3 computePoint(MouseEvent e) {
+        Vec3 pt;
+        if (Displayer.mode == DisplayMode.ORTHO) {
+            pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
+        }
+        else {
+            pt = GridScale.current.transformInverse(GridScale.current.mouseToGrid(e.getPoint(), Displayer.getActiveViewport(), camera, GridChoiceType.VIEWPOINT));
+        }
+        return pt;
+    }
 }

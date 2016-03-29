@@ -11,6 +11,8 @@ public interface Transform {
 
     public Vec2 transform(Vec3 pt, GridScale scale);
 
+    public Vec3 transformInverse(Vec2 pt, GridScale scale);
+
     public static Transform transformpolar = new TransformPolar();
     public static Transform transformlatitudinal = new TransformLatitudinal();
 
@@ -25,6 +27,15 @@ public interface Transform {
             double scaledtheta = scale.getXValueInv(theta * MathUtils.radeg);
             return new Vec2(scaledtheta, scaledr);
         }
+
+        @Override
+        public Vec3 transformInverse(Vec2 pt, GridScale scale) {
+            double r = pt.x;
+            double theta = pt.y / MathUtils.radeg;
+            //TBD
+            return new Vec3();
+        }
+
     }
 
     public static class TransformLatitudinal implements Transform {
@@ -39,6 +50,15 @@ public interface Transform {
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
             double scaledtheta = scale.getYValueInv(theta * MathUtils.radeg);
             return new Vec2(scaledphi, scaledtheta);
+        }
+
+        @Override
+        public Vec3 transformInverse(Vec2 pt, GridScale scale) {
+            double phi = pt.x / MathUtils.radeg;
+            double theta = pt.y / MathUtils.radeg;
+            phi += Math.PI;
+            theta = -theta + Math.PI / 2;
+            return new Vec3(Math.sin(theta) * Math.sin(phi), Math.cos(theta), Math.sin(theta) * Math.cos(phi));
         }
     }
 
