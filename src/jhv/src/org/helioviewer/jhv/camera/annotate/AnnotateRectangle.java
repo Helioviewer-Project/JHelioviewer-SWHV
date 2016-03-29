@@ -52,7 +52,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     private void interpolatedDraw(GL2 gl, Vec3 p1s, Vec3 p2s) {
         double delta = Math.PI * 2.5 / 180;
         int subdivisions = (int) Math.max(Math.abs(p1s.y - p2s.y) / delta, Math.abs(p1s.z - p2s.z) / delta);
-
+        Vec2 previous = null;
         for (double i = 0; i <= subdivisions; i++) {
             double t = i / subdivisions;
             double y = (1 - t) * p1s.y + t * p2s.y;
@@ -63,8 +63,29 @@ public class AnnotateRectangle extends AbstractAnnotateable {
                 pc.y = -pc.y;
                 Vec3 pt = camera.getViewpoint().orientation.rotateVector(pc);
                 Vec2 tf = GridScale.current.transform(pt);
-
-                gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                if (previous != null) {
+                    if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+                        gl.glVertex2f((float) (0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
+                        gl.glEnd();
+                        gl.glBegin(GL2.GL_LINE_STRIP);
+                        gl.glVertex2f((float) (-0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
+                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                    }
+                    else if (tf.x >= 0 && previous.x <= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+                        gl.glVertex2f((float) (-0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
+                        gl.glEnd();
+                        gl.glBegin(GL2.GL_LINE_STRIP);
+                        gl.glVertex2f((float) (0.5 * Displayer.getActiveViewport().aspect), (float) tf.y);
+                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                    }
+                    else {
+                        gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                    }
+                }
+                else {
+                    gl.glVertex2f((float) (tf.x * Displayer.getActiveViewport().aspect), (float) tf.y);
+                }
+                previous = tf;
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
