@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.base.math.Vec2;
@@ -82,21 +81,18 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         if (beingDragged()) {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
             drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
-        }
-        else {
+        } else {
             if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
             else
                 gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-
             drawRectangle(gl, toSpherical(rectangleStartPoint), toSpherical(rectangleEndPoint));
         }
-
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        Vec3 pt = computePoint(e);
+        Vec3 pt = computePoint(e.getPoint());
         if (pt != null) {
             endPoint = pt;
             Displayer.display();
@@ -109,20 +105,16 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             rectangleStartPoint = startPoint;
             rectangleEndPoint = endPoint;
         }
-
         endPoint = null;
         startPoint = null;
         Displayer.display();
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
-        Vec3 pt = computePoint(e);
+        Vec3 pt = computePoint(e.getPoint());
         if (pt != null)
             startPoint = pt;
     }
+
 }
