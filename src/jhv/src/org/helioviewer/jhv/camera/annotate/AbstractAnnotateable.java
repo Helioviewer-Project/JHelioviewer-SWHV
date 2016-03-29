@@ -20,8 +20,6 @@ public abstract class AbstractAnnotateable implements Annotateable {
 
     protected final Camera camera;
 
-    protected int activeIndex = -1;
-
     public AbstractAnnotateable(Camera _camera) {
         camera = _camera;
     }
