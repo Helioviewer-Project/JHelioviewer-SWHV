@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -15,7 +14,7 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCross extends AbstractAnnotateable {
 
-    private final ArrayList<Vec3> crossPoints = new ArrayList<Vec3>();
+    private Vec3 crossPoint;
 
     public AnnotateCross(Camera _camera) {
         super(_camera);
@@ -58,26 +57,19 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(GL2 gl) {
-        if (crossPoints.size() == 0)
+    public void render(GL2 gl, boolean active) {
+        if (crossPoint == null)
             return;
 
         gl.glLineWidth(lineWidth);
 
-        int sz = crossPoints.size();
-        for (int i = 0; i < sz; i++) {
-            if (i != activeIndex)
-                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            else
-                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-            drawCross(gl, toSpherical(crossPoints.get(i)));
-        }
-    }
+        if (active)
+            gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
+        else
+            gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
 
-    @Override
-    public void clear() {
-        crossPoints.clear();
-        activeIndex = -1;
+        drawCross(gl, toSpherical(crossPoint));
+
     }
 
     @Override
@@ -90,31 +82,19 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-
-        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
-            if (activeIndex >= 0) {
-                crossPoints.remove(activeIndex);
-            }
-            activeIndex = crossPoints.size() - 1;
-            Displayer.display();
-        } else if (code == KeyEvent.VK_N) {
-            if (activeIndex >= 0) {
-                activeIndex++;
-                activeIndex = activeIndex % crossPoints.size();
-                Displayer.display();
-            }
-        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         Vec3 pt = CameraHelper.getVectorFromSphere(camera, Displayer.getActiveViewport(), e.getPoint());
         if (pt != null) {
-            crossPoints.add(pt);
-            activeIndex = crossPoints.size() - 1;
-            Displayer.display();
+            crossPoint = pt;
         }
+    }
+
+    @Override
+    public boolean beingDragged() {
+        return true;
     }
 
 }

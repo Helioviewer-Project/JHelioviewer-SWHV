@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -15,8 +14,8 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
 
-    private final ArrayList<Vec3> rectangleStartPoints = new ArrayList<Vec3>();
-    private final ArrayList<Vec3> rectangleEndPoints = new ArrayList<Vec3>();
+    private Vec3 rectangleStartPoint;
+    private Vec3 rectangleEndPoint;
 
     private Vec3 startPoint;
     private Vec3 endPoint;
@@ -47,7 +46,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         gl.glEnd();
     }
 
-    private boolean beingDragged() {
+    @Override
+    public boolean beingDragged() {
         return endPoint != null && startPoint != null;
     }
 
@@ -74,8 +74,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void render(GL2 gl) {
-        if (rectangleStartPoints.size() == 0 && !beingDragged())
+    public void render(GL2 gl, boolean active) {
+        if ((rectangleStartPoint == null || rectangleEndPoint == null) && !beingDragged())
             return;
 
         gl.glLineWidth(lineWidth);
@@ -84,22 +84,15 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             gl.glColor3f(dragColor[0], dragColor[1], dragColor[2]);
             drawRectangle(gl, toSpherical(startPoint), toSpherical(endPoint));
         }
-
-        int sz = rectangleStartPoints.size();
-        for (int i = 0; i < sz; i++) {
-            if (i != activeIndex)
-                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-            else
+        else {
+            if (active)
                 gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-            drawRectangle(gl, toSpherical(rectangleStartPoints.get(i)), toSpherical(rectangleEndPoints.get(i)));
-        }
-    }
+            else
+                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
 
-    @Override
-    public void clear() {
-        rectangleStartPoints.clear();
-        rectangleEndPoints.clear();
-        activeIndex = -1;
+            drawRectangle(gl, toSpherical(rectangleStartPoint), toSpherical(rectangleEndPoint));
+        }
+
     }
 
     @Override
@@ -114,9 +107,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (beingDragged()) {
-            rectangleStartPoints.add(startPoint);
-            rectangleEndPoints.add(endPoint);
-            activeIndex = rectangleEndPoints.size() - 1;
+            rectangleStartPoint = startPoint;
+            rectangleEndPoint = endPoint;
         }
 
         endPoint = null;
@@ -126,22 +118,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-
-        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
-            if (activeIndex >= 0) {
-                rectangleEndPoints.remove(activeIndex);
-                rectangleStartPoints.remove(activeIndex);
-            }
-            activeIndex = rectangleEndPoints.size() - 1;
-            Displayer.display();
-        } else if (code == KeyEvent.VK_N) {
-            if (activeIndex >= 0) {
-                activeIndex++;
-                activeIndex = activeIndex % rectangleStartPoints.size();
-                Displayer.display();
-            }
-        }
     }
 
     @Override

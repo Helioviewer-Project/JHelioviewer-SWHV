@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
@@ -15,8 +14,8 @@ import com.jogamp.opengl.GL2;
 
 public class AnnotateCircle extends AbstractAnnotateable {
 
-    private final ArrayList<Vec3> circleStartPoints = new ArrayList<Vec3>();
-    private final ArrayList<Vec3> circleEndPoints = new ArrayList<Vec3>();
+    private Vec3 circleStartPoint;
+    private Vec3 circleEndPoint;
 
     private Vec3 startPoint;
     private Vec3 endPoint;
@@ -59,13 +58,14 @@ public class AnnotateCircle extends AbstractAnnotateable {
         gl.glEnd();
     }
 
-    private boolean beingDragged() {
+    @Override
+    public boolean beingDragged() {
         return endPoint != null && startPoint != null;
     }
 
     @Override
-    public void render(GL2 gl) {
-        if (circleStartPoints.size() == 0 && !beingDragged())
+    public void render(GL2 gl, boolean active) {
+        if ((circleStartPoint == null || circleEndPoint == null) && !beingDragged())
             return;
 
         gl.glLineWidth(lineWidth);
@@ -74,24 +74,14 @@ public class AnnotateCircle extends AbstractAnnotateable {
         if (beingDragged()) {
             drawCircle(gl, startPoint, endPoint);
         }
+        else {
+            if (active)
+                gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
+            else
+                gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
 
-        gl.glColor3f(baseColor[0], baseColor[1], baseColor[2]);
-        int sz = circleStartPoints.size();
-        for (int i = 0; i < sz; i++) {
-            if (i != activeIndex)
-                drawCircle(gl, circleStartPoints.get(i), circleEndPoints.get(i));
+            drawCircle(gl, circleStartPoint, circleEndPoint);
         }
-
-        gl.glColor3f(activeColor[0], activeColor[1], activeColor[2]);
-        if (sz - 1 >= 0)
-            drawCircle(gl, circleStartPoints.get(activeIndex), circleEndPoints.get(activeIndex));
-    }
-
-    @Override
-    public void clear() {
-        circleStartPoints.clear();
-        circleEndPoints.clear();
-        activeIndex = -1;
     }
 
     @Override
@@ -106,9 +96,8 @@ public class AnnotateCircle extends AbstractAnnotateable {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (beingDragged()) {
-            circleStartPoints.add(startPoint);
-            circleEndPoints.add(endPoint);
-            activeIndex = circleEndPoints.size() - 1;
+            circleStartPoint = startPoint;
+            circleEndPoint = endPoint;
         }
 
         endPoint = null;
@@ -118,21 +107,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
-            if (activeIndex >= 0) {
-                circleEndPoints.remove(activeIndex);
-                circleStartPoints.remove(activeIndex);
-            }
-            activeIndex = circleEndPoints.size() - 1;
-            Displayer.display();
-        } else if (code == KeyEvent.VK_N) {
-            if (activeIndex >= 0) {
-                activeIndex++;
-                activeIndex = activeIndex % circleEndPoints.size();
-                Displayer.display();
-            }
-        }
     }
 
     @Override

@@ -7,9 +7,7 @@ import com.jogamp.opengl.GL2;
 
 public interface Annotateable {
 
-    public void render(GL2 gl);
-
-    public void clear();
+    public void render(GL2 gl, boolean active);
 
     public void mouseDragged(MouseEvent e);
 
@@ -18,5 +16,7 @@ public interface Annotateable {
     public void keyPressed(KeyEvent e);
 
     public void mousePressed(MouseEvent e);
+
+    public boolean beingDragged();
 
 }
