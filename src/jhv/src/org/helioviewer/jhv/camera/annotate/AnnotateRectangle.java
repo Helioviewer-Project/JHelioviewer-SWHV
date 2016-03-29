@@ -95,7 +95,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 pt = computePoint(e.getPoint());
         if (pt != null) {
             endPoint = pt;
-            Displayer.display();
         }
     }
 
@@ -107,7 +106,6 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         }
         endPoint = null;
         startPoint = null;
-        Displayer.display();
     }
 
     @Override

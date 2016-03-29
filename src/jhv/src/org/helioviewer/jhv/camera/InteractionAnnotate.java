@@ -22,7 +22,7 @@ public class InteractionAnnotate extends Interaction {
             return vals[(this.ordinal() + 1) % vals.length];
         }
 
-        public Annotateable generateAnnotatable(Camera camera) {
+        public Annotateable generateAnnotateable(Camera camera) {
             switch (this) {
             case CIRCLE:
                 return new AnnotateCircle(camera);
@@ -58,11 +58,12 @@ public class InteractionAnnotate extends Interaction {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        newAnnotatable = mode.generateAnnotatable(camera);
+        newAnnotatable = mode.generateAnnotateable(camera);
         newAnnotatable.mousePressed(e);
         if (mode == AnnotationMode.CROSS) {
             mouseReleased(e);
         }
+        Displayer.display();
     }
 
     @Override
