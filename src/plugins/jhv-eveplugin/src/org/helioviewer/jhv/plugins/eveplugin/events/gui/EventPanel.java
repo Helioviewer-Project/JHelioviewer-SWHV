@@ -9,7 +9,6 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import javax.swing.ImageIcon;
