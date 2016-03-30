@@ -22,7 +22,6 @@ import org.helioviewer.jhv.base.math.Quat;
 import org.helioviewer.jhv.base.math.Vec2;
 import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.base.scale.GridScale;
-import org.helioviewer.jhv.base.time.JHVDate;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.data.datatype.event.JHVEvent;
 import org.helioviewer.jhv.data.datatype.event.JHVEventParameter;
@@ -32,6 +31,7 @@ import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.ImageViewerGui;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -178,6 +178,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
         // draw bounds
         Vec3 pt = new Vec3();
         Vec3 oldBoundaryPoint3d = null;
+        Vec2 previous = null;
         for (Vec3 point : points) {
             gl.glBegin(GL2.GL_LINE_STRIP);
             if (oldBoundaryPoint3d != null) {
@@ -194,9 +195,10 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
-                        Vec2 tf = GridScale.current.transform(camera.getViewpoint().orientation.rotateVector(pt));
+                        previous = GLHelper.drawVertex(vp, camera, gl, pt, previous);
+                        //Vec2 tf = GridScale.current.transform(camera.getViewpoint().orientation.rotateVector(pt));
 
-                        gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+                        //gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
                     }
                 }
             }

@@ -3,6 +3,12 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import org.helioviewer.jhv.base.math.Vec2;
+import org.helioviewer.jhv.base.math.Vec3;
+import org.helioviewer.jhv.base.scale.GridScale;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Viewport;
+
 import com.jogamp.opengl.GL2;
 
 public class GLHelper {
@@ -59,4 +65,28 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
+    public static Vec2 drawVertex(Viewport vp, Camera camera, GL2 gl, Vec3 current, Vec2 previous) {
+        Vec3 pt = camera.getViewpoint().orientation.rotateVector(current);
+        Vec2 tf = GridScale.current.transform(pt);
+        if (previous != null) {
+            if (tf.x <= 0 && previous.x >= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+                gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
+                gl.glEnd();
+                gl.glBegin(GL2.GL_LINE_STRIP);
+                gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+            } else if (tf.x >= 0 && previous.x <= 0 && Math.abs(previous.x - tf.x) > 0.5) {
+                gl.glVertex2f((float) (-0.5 * vp.aspect), (float) tf.y);
+                gl.glEnd();
+                gl.glBegin(GL2.GL_LINE_STRIP);
+                gl.glVertex2f((float) (0.5 * vp.aspect), (float) tf.y);
+                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+            } else {
+                gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+            }
+        } else {
+            gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+        }
+        return tf;
+    }
 }
