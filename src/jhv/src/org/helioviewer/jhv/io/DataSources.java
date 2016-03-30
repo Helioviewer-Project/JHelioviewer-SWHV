@@ -96,7 +96,7 @@ public class DataSources {
 
     private static final Comparator<String> keyComparator = new AlphanumComparator();
 
-    public class Item implements Comparable<Item> {
+    public static class Item implements Comparable<Item> {
 
         // Flag if this should take as default item
         private final boolean defaultItem;
@@ -160,6 +160,12 @@ public class DataSources {
         @Override
         public String toString() {
             return name;
+        }
+
+        @Override
+        public int hashCode() {
+            assert false : "hashCode not designed";
+            return 42;
         }
 
     }
