@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -46,7 +47,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             float z = (float) (center.z + cosr * u.z + sinr * v.z);
 
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
-                previous = drawVertex(vp, gl, new Vec3(x, -y, z), previous);
+                previous = GLHelper.drawVertex(vp, camera, gl, new Vec3(x, -y, z), previous);
             } else {
                 gl.glVertex3f(x, y, z);
             }

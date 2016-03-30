@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.math.Vec3;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Displayer;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.opengl.GLHelper;
 
 import com.jogamp.opengl.GL2;
 
@@ -60,7 +61,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = toCart(radius, y, z);
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                previous = drawVertex(vp, gl, pc, previous);
+                previous = GLHelper.drawVertex(vp, camera, gl, pc, previous);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }
