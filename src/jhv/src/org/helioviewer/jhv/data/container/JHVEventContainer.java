@@ -72,7 +72,7 @@ public class JHVEventContainer {
         if (startDate != null && endDate != null) {
             long deltaT = Math.max((long) ((endDate.getTime() - startDate.getTime()) * factor), 1000 * 60 * 60 * 24 * 5);
             Date newStartDate = new Date(startDate.getTime() - deltaT);
-            Date newEndDate = new Date(Math.max(endDate.getTime() + deltaT, System.currentTimeMillis()));
+            Date newEndDate = new Date(endDate.getTime() + deltaT);
             // Log.debug("new Interval : [" + newStartDate + "," + newEndDate + "]");
             eventHandlerCache.add(handler);
             JHVEventCacheResult result = eventCache.get(startDate, endDate, newStartDate, newEndDate);
