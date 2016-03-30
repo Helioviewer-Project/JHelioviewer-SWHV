@@ -37,6 +37,7 @@ import org.helioviewer.jhv.threads.JHVThread;
  */
 public class SWEKDownloadManager implements EventTypePanelModelListener, FilterManagerListener {
 
+    private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static SWEKDownloadManager instance;
     private final ExecutorService downloadEventPool;
     private final Map<SWEKEventType, ArrayList<DownloadWorker>> dwMap;
@@ -204,10 +205,12 @@ public class SWEKDownloadManager implements EventTypePanelModelListener, FilterM
         SWEKEventType eventType = jhvType.getEventType();
         List<SWEKParam> params = defineParameters(eventType, supplier);
         for (Interval<Date> intt : Interval.splitInterval(interval, 7)) {
-            DownloadWorker dw = new DownloadWorker(jhvType, intt, params);
-            treeModel.setStartLoading(eventType);
-            addToDownloaderMap(eventType, dw);
-            downloadEventPool.execute(dw);
+            if (intt.getStart().getTime() < System.currentTimeMillis() + SIXHOURS) {
+                DownloadWorker dw = new DownloadWorker(jhvType, intt, params);
+                treeModel.setStartLoading(eventType);
+                addToDownloaderMap(eventType, dw);
+                downloadEventPool.execute(dw);
+            }
         }
     }
 
