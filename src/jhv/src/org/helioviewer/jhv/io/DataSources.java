@@ -64,21 +64,21 @@ public class DataSources {
         };
 
         String[][] IASpairs = {
-            { "API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
-            { "API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
-            { "API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
-            { "default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080" },
-            { "API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/" },
-            { "default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/" }
+                { "API.dataSources.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]" },
+                { "API.jp2images.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
+                { "API.jp2series.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/index.php" },
+                { "default.remote.path", "jpip://helioviewer.ias.u-psud.fr:8080" },
+                { "API.event.path", "http://helioviewer.ias.u-psud.fr/helioviewer/api/" },
+                { "default.httpRemote.path", "http://helioviewer.ias.u-psud.fr/helioviewer/jp2/" }
         };
 
         String[][] GSFCpairs = {
-            { "API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[STEREO_A,STEREO_B,PROBA2]" },
-            { "API.jp2images.path", "http://helioviewer.org/api/index.php" },
-            { "API.jp2series.path", "http://helioviewer.org/api/index.php" },
-            { "default.remote.path", "jpip://helioviewer.org:8090" },
-            { "API.event.path", "http://helioviewer.org/api/" },
-            { "default.httpRemote.path", "http://helioviewer.org/jp2/" }
+                { "API.dataSources.path", "http://helioviewer.org/api/?action=getDataSources&verbose=true&enable=[TRACE,Yohkoh,STEREO_A,STEREO_B,PROBA2]" },
+                { "API.jp2images.path", "http://helioviewer.org/api/index.php" },
+                { "API.jp2series.path", "http://helioviewer.org/api/index.php" },
+                { "default.remote.path", "jpip://helioviewer.org:8090" },
+                { "API.event.path", "http://helioviewer.org/api/" },
+                { "default.httpRemote.path", "http://helioviewer.org/jp2/" }
         };
 
         for (String[] pair : ROBpairs) {
