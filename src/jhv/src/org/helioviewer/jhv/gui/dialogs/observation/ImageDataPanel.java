@@ -597,7 +597,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return;
                 }
             }
-            container.setSelectedIndex(0);
+            if (items.length > 0)
+                container.setSelectedIndex(0);
         }
 
         /**
@@ -618,7 +619,8 @@ public class ImageDataPanel extends ObservationDialogPanel {
                     return;
                 }
             }
-            container.setSelectedIndex(0);
+            if (items.size() > 0)
+                container.setSelectedIndex(0);
         }
 
         /**
