@@ -218,7 +218,7 @@ public class DataSources {
         } catch (JSONException e) {
             Log.error("Error finding children of " + root, e);
         }
-        return null;
+        return new Item[0];
     }
 
     private static JSONObject jsonResult;
@@ -243,9 +243,9 @@ public class DataSources {
         try {
             return getChildrenList(getJSONItemChildren(observatory, instrument));
         } catch (JSONException e) {
-            Log.error("Cannot find instruments for " + observatory, e);
-            return null;
+            Log.error("Cannot find detectors for " + observatory, e);
         }
+        return new Item[0];
     }
 
     /**
@@ -261,8 +261,8 @@ public class DataSources {
             return getChildrenList(getJSONItemChildren(observatory));
         } catch (JSONException e) {
             Log.error("Cannot find instruments for " + observatory, e);
-            return null;
         }
+        return new Item[0];
     }
 
     /**
@@ -280,9 +280,9 @@ public class DataSources {
         try {
             return getChildrenList(getJSONItemChildren(observatory, instrument, detector));
         } catch (JSONException e) {
-            Log.error("Cannot find instruments for " + observatory, e);
-            return null;
+            Log.error("Cannot find measurements for " + observatory, e);
         }
+        return new Item[0];
     }
 
     /**
