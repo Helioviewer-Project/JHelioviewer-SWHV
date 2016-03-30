@@ -29,10 +29,13 @@ public class JHVEventCache {
     public static class SortedDateInterval implements Comparable<SortedDateInterval> {
         public long start;
         public long end;
+        private final long id;
+        private static long id_gen = 0;
 
         public SortedDateInterval(long _start, long _end) {
             start = _start;
             end = _end;
+            id = id_gen++;
         }
 
         @Override
@@ -41,9 +44,9 @@ public class JHVEventCache {
                 return -1;
             else if (this.start == o2.start && this.end < o2.end)
                 return -1;
-            else if (this.start == o2.start && this.end == o2.end && o2.hashCode() < this.hashCode())
+            else if (this.start == o2.start && this.end == o2.end && o2.id < this.id)
                 return -1;
-            else if (this.start == o2.start && this.end == o2.end && o2.hashCode() == this.hashCode())
+            else if (this.start == o2.start && this.end == o2.end && o2.id == this.id)
                 return 0;
             return 1;
         }
