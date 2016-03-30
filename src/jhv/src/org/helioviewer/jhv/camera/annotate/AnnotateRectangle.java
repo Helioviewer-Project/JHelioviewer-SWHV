@@ -61,7 +61,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = toCart(radius, y, z);
             if (Displayer.mode != Displayer.DisplayMode.ORTHO) {
                 pc.y = -pc.y;
-                previous = GLHelper.drawVertex(vp, camera, gl, pc, previous);
+                previous = GLHelper.drawVertex(camera, vp, gl, pc, previous);
             } else {
                 gl.glVertex3f((float) pc.x, (float) pc.y, (float) pc.z);
             }

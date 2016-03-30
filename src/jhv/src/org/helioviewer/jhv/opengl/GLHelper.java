@@ -65,7 +65,7 @@ public class GLHelper {
         return new Dimension((int) (x / GLInfo.pixelScaleFloat[0]), (int) (y / GLInfo.pixelScaleFloat[1]));
     }
 
-    public static Vec2 drawVertex(Viewport vp, Camera camera, GL2 gl, Vec3 current, Vec2 previous) {
+    public static Vec2 drawVertex(Camera camera, Viewport vp, GL2 gl, Vec3 current, Vec2 previous) {
         Vec3 pt = camera.getViewpoint().orientation.rotateVector(current);
         Vec2 tf = GridScale.current.transform(pt);
         if (previous != null) {
