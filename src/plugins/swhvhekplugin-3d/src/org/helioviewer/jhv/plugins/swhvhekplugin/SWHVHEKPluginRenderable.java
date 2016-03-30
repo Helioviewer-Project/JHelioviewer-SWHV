@@ -195,10 +195,7 @@ public class SWHVHEKPluginRenderable extends AbstractRenderable {
                         pt.x = xnew / r;
                         pt.y = ynew / r;
                         pt.z = znew / r;
-                        previous = GLHelper.drawVertex(vp, camera, gl, pt, previous);
-                        //Vec2 tf = GridScale.current.transform(camera.getViewpoint().orientation.rotateVector(pt));
-
-                        //gl.glVertex2f((float) (tf.x * vp.aspect), (float) tf.y);
+                        previous = GLHelper.drawVertex(camera, vp, gl, pt, previous);
                     }
                 }
             }
