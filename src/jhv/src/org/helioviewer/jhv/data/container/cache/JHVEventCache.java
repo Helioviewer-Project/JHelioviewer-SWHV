@@ -29,8 +29,8 @@ public class JHVEventCache {
     public static class SortedDateInterval implements Comparable<SortedDateInterval> {
         public long start;
         public long end;
-        private final long id;
-        private static long id_gen = 0;
+        private final int id;
+        private static int id_gen = Integer.MIN_VALUE;
 
         public SortedDateInterval(long _start, long _end) {
             start = _start;
