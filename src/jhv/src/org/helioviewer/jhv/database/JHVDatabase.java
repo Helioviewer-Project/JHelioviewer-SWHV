@@ -457,10 +457,15 @@ public class JHVDatabase {
             RequestCache typedCache = dCache.get(type);
             if (typedCache == null) {
                 typedCache = new RequestCache();
-                long lastEvent = Math.min(System.currentTimeMillis(), getLastEvent(connection, type));
+                long last_timestamp = getLastEvent(connection, type);
+                long lastEvent;
+                if (last_timestamp != Long.MIN_VALUE) {
+                    lastEvent = Math.min(System.currentTimeMillis(), last_timestamp);
+                } else {
+                    lastEvent = Long.MAX_VALUE;
+                }
                 long invalidationDate = lastEvent - ONEWEEK * 2;
                 dCache.put(type, typedCache);
-
                 int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
                     try {
@@ -491,7 +496,7 @@ public class JHVDatabase {
 
     private static long getLastEvent(Connection connection, JHVEventType type) {
         int typeId = getEventTypeId(connection, type);
-        long last_timestamp = -1;
+        long last_timestamp = Long.MIN_VALUE;
         if (typeId != -1) {
             try {
                 String sqlt = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
