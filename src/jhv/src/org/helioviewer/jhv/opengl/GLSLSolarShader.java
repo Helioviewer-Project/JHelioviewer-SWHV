@@ -267,12 +267,10 @@ public class GLSLSolarShader extends GLSLShader {
         if (_enhanced) {
             enhanced[0] = 1;
             gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
-        }
-        else {
+        } else {
             enhanced[0] = 0;
             gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
         }
-
     }
 
 }

@@ -26,9 +26,6 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
 
     private final Map<String, LUT> lutMap;
 
-    /**
-     * Shown combobox to choose
-     */
     private final JComboBox combobox;
     private final JPanel buttonPanel;
     private final JToggleButton invertButton;
@@ -40,7 +37,6 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         lutMap = LUT.getStandardList();
 
         title = new JLabel("Color", JLabel.RIGHT);
-
         combobox = new JComboBox(lutMap.keySet().toArray());
         combobox.setMaximumSize(combobox.getPreferredSize());
         combobox.setToolTipText("Choose a color table");
@@ -52,7 +48,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         invertButton.addActionListener(this);
 
         enhanceButton = new JToggleButton(enhanceIcon);
-        enhanceButton.setToolTipText("Enhance corona (multiply with squared radius).");
+        enhanceButton.setToolTipText("Radially enhance corona");
         enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         enhanceButton.addActionListener(this);
         buttonPanel = new JPanel();
@@ -60,9 +56,6 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         buttonPanel.add(enhanceButton);
     }
 
-    /**
-     * Sets the color table
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == invertButton) {
@@ -71,8 +64,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
             } else {
                 invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
-        }
-        if (e.getSource() == enhanceButton) {
+        } else if (e.getSource() == enhanceButton) {
             boolean isSelected = enhanceButton.isSelected();
             image.setEnhanced(isSelected);
             if (isSelected) {
@@ -81,37 +73,27 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
                 enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         }
+
         LUT newMap = lutMap.get(combobox.getSelectedItem());
         image.setLUT(newMap, invertButton.isSelected());
         Displayer.display();
     }
 
-    /**
-     * Set the filter to the filter with the given name if the filter exists for
-     * this panel
-     *
-     * @param name
-     *            Name of the filter
-     */
     public void setLutByName(String name) {
         combobox.setSelectedItem(name);
     }
-
-    /**
-     * Adds a color table to the available list and set it active
-     *
-     * @param lut
-     *            Color table to add
-     */
+/*
     public void addLut(LUT lut) {
         if (lutMap.put(lut.getName(), lut) == null)
             combobox.addItem(lut.getName());
         combobox.setSelectedItem(lut.getName());
         image.setLUT(lut, invertButton.isSelected());
     }
+*/
 
-    void setValue(LUT lut, boolean invertLUT) {
+    void setValue(LUT lut, boolean invertLUT, boolean enhanced) {
         invertButton.setSelected(invertLUT);
+        enhanceButton.setSelected(enhanced);
         combobox.setSelectedItem(lut.getName());
 
         if (invertLUT) {
@@ -119,13 +101,19 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         } else {
             invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         }
+
+        if (enhanced) {
+            enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        } else {
+            enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        }
     }
 
     @Override
     public void setGLImage(GLImage image) {
         super.setGLImage(image);
         if (image != null) {
-            setValue(image.getLUT(), image.getInvertLUT());
+            setValue(image.getLUT(), image.getInvertLUT(), image.getEnhanced());
         }
     }
 

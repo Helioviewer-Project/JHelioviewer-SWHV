@@ -68,13 +68,13 @@ public class GLImage {
         shader.setContrast(contrast);
         shader.setGamma(gamma);
         shader.setAlpha(opacity);
+        shader.setEnhanced(gl, enhanced);
 
         int w = imageData.getWidth();
         int h = imageData.getHeight();
         shader.setFactors(sharpen, 1f / w, 1f / h, 1f);
 
         applyLUT(gl);
-        shader.setEnhanced(gl, enhanced);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
@@ -250,6 +250,10 @@ public class GLImage {
 
     public void setEnhanced(boolean enhanced) {
         this.enhanced = enhanced;
+    }
+
+    public boolean getEnhanced() {
+        return enhanced;
     }
 
     public float getTruncation() {
