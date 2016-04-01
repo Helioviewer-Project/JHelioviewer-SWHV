@@ -35,11 +35,45 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.JHVThread.ConnectionThread;
 
 public class JHVDatabase {
-
     private final static ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(10000);
     private final static ExecutorService executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue, new JHVThread.NamedDbThreadFactory("JHVDatabase"), new ThreadPoolExecutor.DiscardPolicy());
+
     private static long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
+
+    private static final String INSERT_EVENT = "INSERT INTO events(uid) VALUES(?)";
+    private static final String INSERT_FULL_EVENT = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
+    private static final String SELECT_EVENT_TYPE = "SELECT id FROM event_type WHERE name=? AND supplier=?";
+    private static final String INSERT_EVENT_TYPE = "INSERT INTO event_type(name, supplier) VALUES(?,?)";
+    private static final String INSERT_LINK = "INSERT INTO event_link(left_id, right_id) VALUES(?,?)";
+    private static final String SELECT_EVENT_ID_FROM_UID = "SELECT id FROM events WHERE uid=?";
+    private static final String SELECT_LAST_INSERT = "SELECT last_insert_rowid()";
+    private static final String UPDATE_EVENT = "UPDATE events SET type_id=?, uid=?,  start=?, end=?, data=? WHERE id=?";
+    private static final String DELETE_DATERANGE = "DELETE FROM date_range where type_id=?";
+    private static final String INSERT_DATERANGE = "INSERT INTO date_range(type_id,  start, end) VALUES(?,?,?)";
+    private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
+    private static final String SELECT_LAST_EVENT = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
+    private static final String SELECT_ASSOCIATIONS = "SELECT left_events.id, right_events.id FROM event_link "
+            + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
+            + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id "
+            + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
+
+    private static HashMap<Object, PreparedStatement> statements = new HashMap<Object, PreparedStatement>();
+
+    private static PreparedStatement getPreparedStatement(Connection connection, String statement) {
+        statement = statement.intern();
+        PreparedStatement pstat = statements.get(statement);
+        if (pstat == null) {
+            try {
+                pstat = connection.prepareStatement(statement);
+                pstat.setQueryTimeout(30);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            statements.put(statement, pstat);
+        }
+        return pstat;
+    }
 
     public static byte[] compress(final String str) throws IOException {
         if ((str == null) || (str.length() == 0)) {
@@ -92,10 +126,8 @@ public class JHVDatabase {
 
     private static int _getEventTypeId(Connection connection, JHVEventType event) {
         int typeId = -1;
-        String sqlt = "SELECT id FROM event_type WHERE name=? AND supplier=?";
         try {
-            PreparedStatement pstatement = connection.prepareStatement(sqlt);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_TYPE);
             pstatement.setString(1, event.getEventType().getEventName());
             pstatement.setString(2, event.getSupplier().getSupplierName());
             ResultSet rs = pstatement.executeQuery();
@@ -103,7 +135,6 @@ public class JHVDatabase {
                 typeId = rs.getInt(1);
                 rs.close();
             }
-            pstatement.close();
         } catch (SQLException e) {
             Log.error("Could not fetch event type " + event.getEventType().getEventName() + event.getSupplier().getSupplierName() + e.getMessage());
         }
@@ -112,14 +143,11 @@ public class JHVDatabase {
 
     private static void insertEventTypeIfNotExist(Connection connection, JHVEventType eventType) {
         try {
-            String sqlt = "INSERT INTO event_type(name, supplier) VALUES(?,?)";
 
-            PreparedStatement pstatement = connection.prepareStatement(sqlt);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
             pstatement.setString(1, eventType.getEventType().getEventName());
             pstatement.setString(2, eventType.getSupplier().getSupplierName());
             pstatement.executeUpdate();
-            pstatement.close();
 
             String dbName = eventType.getSupplier().getDatabaseName();
             String createtbl = "CREATE TABLE " + dbName + " (";
@@ -139,13 +167,10 @@ public class JHVDatabase {
 
     private static void insertLinkIfNotExist(Connection connection, int left_id, int right_id) {
         try {
-            String sqlt = "INSERT INTO event_link(left_id, right_id) VALUES(?,?)";
-            PreparedStatement pstatement = connection.prepareStatement(sqlt);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
             pstatement.setInt(1, left_id);
             pstatement.setInt(2, right_id);
             pstatement.executeUpdate();
-            pstatement.close();
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
@@ -173,17 +198,14 @@ public class JHVDatabase {
 
     private static int _getIdFromUID(Connection connection, String uid) {
         int id = -1;
-        String sqlt = "SELECT id FROM events WHERE uid=?";
         try {
-            PreparedStatement pstatement = connection.prepareStatement(sqlt);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
             ResultSet rs = pstatement.executeQuery();
             if (!rs.isClosed() && rs.next()) {
                 id = rs.getInt(1);
                 rs.close();
             }
-            pstatement.close();
         } catch (SQLException e) {
             Log.error("Could not fetch id from uid " + e.getMessage());
         }
@@ -192,12 +214,9 @@ public class JHVDatabase {
 
     private static void insertVoidEvent(Connection connection, String uid) {
         try {
-            String sql = "INSERT INTO events(uid) VALUES(?)";
-            PreparedStatement pstatement = connection.prepareStatement(sql);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT);
             pstatement.setString(1, uid);
             pstatement.executeUpdate();
-            pstatement.close();
         } catch (SQLException e) {
             Log.error("Could not insert event" + e.getMessage());
         }
@@ -242,16 +261,13 @@ public class JHVDatabase {
             return generatedKey;
 
         try {
-            String sql = "SELECT id from events WHERE uid=?";
-            PreparedStatement pstatement = connection.prepareStatement(sql);
-            pstatement.setQueryTimeout(30);
+            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_EVENT_ID_FROM_UID);
             pstatement.setString(1, uid);
             ResultSet generatedKeys = pstatement.executeQuery();
             if (generatedKeys.next()) {
                 generatedKey = generatedKeys.getInt(1);
             }
             generatedKeys.close();
-            pstatement.close();
         } catch (SQLException e) {
             Log.error("Could not select event with uid " + uid + e.getMessage());
         }
@@ -303,32 +319,24 @@ public class JHVDatabase {
 
                     if (generatedKey == -1) {
                         {
-                            String sql = "INSERT INTO events(type_id, uid,  start, end, data) VALUES(?,?,?,?,?)";
-                            PreparedStatement pstatement = connection.prepareStatement(sql);
-                            pstatement.setQueryTimeout(30);
+                            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_FULL_EVENT);
                             pstatement.setInt(1, typeId);
                             pstatement.setString(2, uid);
                             pstatement.setLong(3, start);
                             pstatement.setLong(4, end);
                             pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
                             pstatement.executeUpdate();
-                            pstatement.close();
                         }
                         {
-                            String sql = "SELECT last_insert_rowid()";
-                            PreparedStatement pstatement = connection.prepareStatement(sql);
-                            pstatement.setQueryTimeout(30);
+                            PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_INSERT);
                             ResultSet generatedKeys = pstatement.executeQuery();
                             if (generatedKeys.next()) {
                                 generatedKey = generatedKeys.getInt(1);
                             }
                             generatedKeys.close();
-                            pstatement.close();
                         }
                     } else {
-                        String sql = "UPDATE events SET type_id=?, uid=?,  start=?, end=?, data=? WHERE id=?";
-                        PreparedStatement pstatement = connection.prepareStatement(sql);
-                        pstatement.setQueryTimeout(30);
+                        PreparedStatement pstatement = getPreparedStatement(connection, UPDATE_EVENT);
                         pstatement.setInt(1, typeId);
                         pstatement.setString(2, uid);
                         pstatement.setLong(3, start);
@@ -336,7 +344,6 @@ public class JHVDatabase {
                         pstatement.setBinaryStream(5, new ByteArrayInputStream(compressedJson), compressedJson.length);
                         pstatement.setInt(6, generatedKey);
                         pstatement.executeUpdate();
-                        pstatement.close();
                     }
                     {
                         String fieldString = "";
@@ -346,8 +353,7 @@ public class JHVDatabase {
                             varString += ",?";
                         }
                         String sql = "INSERT INTO " + type.getSupplier().getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ")";
-                        PreparedStatement pstatement = connection.prepareStatement(sql);
-                        pstatement.setQueryTimeout(30);
+                        PreparedStatement pstatement = getPreparedStatement(connection, sql);
                         pstatement.setInt(1, generatedKey);
                         int index = 2;
                         for (JHVDatabaseParam p : this.paramList) {
@@ -359,7 +365,6 @@ public class JHVDatabase {
                             index++;
                         }
                         pstatement.executeUpdate();
-                        pstatement.close();
                     }
                 } else {
                     Log.error("Failed to insert event");
@@ -377,7 +382,6 @@ public class JHVDatabase {
     }
 
     private static class AddDateRange2db implements Runnable {
-
         private final JHVEventType type;
         private final Date start;
         private final Date end;
@@ -400,22 +404,16 @@ public class JHVDatabase {
             typedCache.adaptRequestCache(start, end);
             int typeId = getEventTypeId(connection, type);
             try {
-                String sqld = "DELETE FROM date_range where type_id=?";
-                PreparedStatement dstatement = connection.prepareStatement(sqld);
-                dstatement.setQueryTimeout(30);
+                PreparedStatement dstatement = getPreparedStatement(connection, DELETE_DATERANGE);
                 dstatement.setInt(1, typeId);
                 dstatement.executeUpdate();
                 for (Interval<Date> interval : typedCache.getAllRequestIntervals()) {
                     if (typeId != -1) {
-                        String sql = "INSERT INTO date_range(type_id,  start, end) VALUES(?,?,?)";
-                        PreparedStatement pstatement = connection.prepareStatement(sql);
-                        pstatement.setQueryTimeout(30);
-                        pstatement.setQueryTimeout(30);
+                        PreparedStatement pstatement = getPreparedStatement(connection, INSERT_DATERANGE);
                         pstatement.setInt(1, typeId);
                         pstatement.setLong(2, interval.getStart().getTime());
                         pstatement.setLong(3, interval.getEnd().getTime());
                         pstatement.executeUpdate();
-                        pstatement.close();
                     }
                 }
             } catch (SQLException e) {
@@ -470,9 +468,7 @@ public class JHVDatabase {
                 int typeId = getEventTypeId(connection, type);
                 if (typeId != -1) {
                     try {
-                        String sqlt = "SELECT start, end FROM date_range where type_id=? order by start, end ";
-                        PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                        pstatement.setQueryTimeout(30);
+                        PreparedStatement pstatement = getPreparedStatement(connection, SELECT_DATERANGE);
                         pstatement.setInt(1, typeId);
                         ResultSet rs = pstatement.executeQuery();
                         while (!rs.isClosed() && rs.next()) {
@@ -481,7 +477,6 @@ public class JHVDatabase {
                             typedCache.adaptRequestCache(beginDate, endDate);
                         }
                         rs.close();
-                        pstatement.close();
                     } catch (SQLException e) {
                         Log.error("Could db2daterange " + e.getMessage());
                     }
@@ -500,16 +495,13 @@ public class JHVDatabase {
         long last_timestamp = Long.MIN_VALUE;
         if (typeId != -1) {
             try {
-                String sqlt = "SELECT end FROM events WHERE type_id=? order by end DESC LIMIT 1";
-                PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                pstatement.setQueryTimeout(30);
+                PreparedStatement pstatement = getPreparedStatement(connection, SELECT_LAST_EVENT);
                 pstatement.setInt(1, typeId);
                 ResultSet rs = pstatement.executeQuery();
                 if (!rs.isClosed() && rs.next()) {
                     last_timestamp = rs.getLong(1);
                 }
                 rs.close();
-                pstatement.close();
             } catch (SQLException e) {
                 Log.error("Could not fetch id from uid " + e.getMessage());
             }
@@ -583,8 +575,7 @@ public class JHVDatabase {
                             + join
                             + " WHERE e.start BETWEEN ? AND ? and e.type_id=? "
                             + and + " order by e.start, e.end ";
-                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                    pstatement.setQueryTimeout(30);
+                    PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
                     pstatement.setLong(1, start);
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
@@ -599,7 +590,6 @@ public class JHVDatabase {
                         next = rs.next();
                     }
                     rs.close();
-                    pstatement.close();
                 } catch (SQLException e) {
                     Log.error("Could not fetch events " + e.getMessage());
                     return eventList;
@@ -625,10 +615,6 @@ public class JHVDatabase {
         private final JHVEventType type;
         private final long start;
         private final long end;
-        private static String sqlt = "SELECT left_events.id, right_events.id FROM event_link "
-                + "LEFT JOIN events AS left_events ON left_events.id=event_link.left_id "
-                + "LEFT JOIN events AS right_events ON right_events.id=event_link.right_id "
-                + "WHERE left_events.start BETWEEN ? AND ? and left_events.type_id=? order by left_events.start, left_events.end ";
 
         public Associations2Program(long _start, long _end, JHVEventType _type) {
             type = _type;
@@ -646,8 +632,7 @@ public class JHVDatabase {
             int typeId = getEventTypeId(connection, type);
             if (typeId != -1) {
                 try {
-                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                    pstatement.setQueryTimeout(30);
+                    PreparedStatement pstatement = getPreparedStatement(connection, SELECT_ASSOCIATIONS);
                     pstatement.setLong(1, start);
                     pstatement.setLong(2, end);
                     pstatement.setInt(3, typeId);
@@ -660,7 +645,6 @@ public class JHVDatabase {
                         next = rs.next();
                     }
                     rs.close();
-                    pstatement.close();
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
                     return assocList;
@@ -718,8 +702,7 @@ public class JHVDatabase {
                             + " WHERE tl." + param_left + "=tr." + param_right
                             + " AND tl.event_id!=tr.event_id"
                             + " tl.event_id=? OR tl.right_id=?";
-                    PreparedStatement pstatement = connection.prepareStatement(sqlt);
-                    pstatement.setQueryTimeout(30);
+                    PreparedStatement pstatement = getPreparedStatement(connection, sqlt);
                     pstatement.setLong(1, event_id);
                     pstatement.setLong(2, event_id);
                     ResultSet rs = pstatement.executeQuery();
@@ -731,7 +714,6 @@ public class JHVDatabase {
                         next = rs.next();
                     }
                     rs.close();
-                    pstatement.close();
                 } catch (SQLException e) {
                     Log.error("Could not fetch associations " + e.getMessage());
                     return assocList;
