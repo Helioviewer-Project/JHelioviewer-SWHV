@@ -7,7 +7,9 @@ void main(void)
     vec3 hitPoint = vec3(up1.x, up1.y, sqrt(1.-dot(up1.xy, up1.xy)));
     vec3 rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     float radius2 = dot(up1.xy, up1.xy);
+    float factor = 1.;
     if(radius2>=1. || dot(rotatedHitPoint.xyz, vec3(0.,0.,1.))<=0.) {
+        factor = radius2;
         hitPoint = vec3(up1.x, up1.y, intersectPlane(up1));
         rotatedHitPoint = rotate_vector_inverse(cameraDifferenceRotationQuat, hitPoint);
     }
@@ -46,5 +48,5 @@ void main(void)
             discard;
         }
     }
-    gl_FragColor = getColor(texcoord, difftexcoord);
+    gl_FragColor = getColor(texcoord, difftexcoord, factor);
 }
