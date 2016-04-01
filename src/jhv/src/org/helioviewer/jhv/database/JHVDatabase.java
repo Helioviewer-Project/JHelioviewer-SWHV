@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.cache.RequestCache;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.logging.Log;
@@ -182,28 +183,6 @@ public class JHVDatabase {
         }
     }
 
-    private static void insertLinkIfNotExist(Connection connection, int left_id, int right_id) {
-        try {
-            PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
-            pstatement.setInt(1, left_id);
-            pstatement.setInt(2, right_id);
-            pstatement.executeUpdate();
-        } catch (SQLException e) {
-            Log.error("Failed to insert event type " + e.getMessage());
-        }
-    }
-
-    private static Integer[] insertLinkIfNotExist(Connection connection, String left_uid, String right_uid) {
-        Integer[] ids = new Integer[] { getIdFromUID(connection, left_uid), getIdFromUID(connection, right_uid) };
-
-        if (ids[0] != -1 && ids[1] != -1) {
-            insertLinkIfNotExist(connection, ids[0], ids[1]);
-        } else {
-            Log.error("Could not add association to database " + ids[0] + " " + ids[1]);
-        }
-        return ids;
-    }
-
     private static int getIdFromUID(Connection connection, String uid) {
         int id = _getIdFromUID(connection, uid);
         if (id == -1) {
@@ -239,35 +218,69 @@ public class JHVDatabase {
         }
     }
 
-    public static Integer[] dump_association2db(String left, String right) {
-        FutureTask<Integer[]> ft = new FutureTask<Integer[]>(new DumpAssociation2Db(left, right));
+    public static Integer dump_association2db(Pair<String, String>[] assocs) {
+        FutureTask<Integer> ft = new FutureTask<Integer>(new DumpAssociation2Db(assocs));
         executor.execute(ft);
         try {
             return ft.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return new Integer[] { -1, -1 };
+            return -1;
         } catch (ExecutionException e) {
             e.printStackTrace();
-            return new Integer[] { -1, -1 };
+            return -1;
         }
     }
 
-    private static class DumpAssociation2Db implements Callable<Integer[]> {
-        private final String left;
-        private final String right;
+    private static class DumpAssociation2Db implements Callable<Integer> {
+        private final Pair<String, String>[] assocs;
 
-        public DumpAssociation2Db(String _left, String _right) {
-            left = _left;
-            right = _right;
+        public DumpAssociation2Db(Pair<String, String>[] _assocs) {
+            assocs = _assocs;
         }
 
         @Override
-        public Integer[] call() {
+        public Integer call() {
             Connection connection = ConnectionThread.getConnection();
             if (connection == null)
-                return new Integer[] { -1, -1 };
-            return insertLinkIfNotExist(connection, left, right);
+                return -1;
+            int len = assocs.length;
+            int i = 0;
+            int errorcode = 0;
+            try {
+                connection.setAutoCommit(false);
+            } catch (SQLException e1) {
+                errorcode = -1;
+                Log.error("Could not disable autocommit");
+            }
+            while (i < len && errorcode == 0) {
+                Pair<String, String> assoc = assocs[i];
+                Integer[] ids = new Integer[] { getIdFromUID(connection, assoc.a), getIdFromUID(connection, assoc.b) };
+
+                if (ids[0] != -1 && ids[1] != -1) {
+                    try {
+                        PreparedStatement pstatement = getPreparedStatement(connection, INSERT_LINK);
+                        pstatement.setInt(1, ids[0]);
+                        pstatement.setInt(2, ids[1]);
+                        pstatement.executeUpdate();
+                    } catch (SQLException e) {
+                        Log.error("Failed to insert event type " + e.getMessage());
+                        errorcode = -1;
+                    }
+                } else {
+                    errorcode = -1;
+                    Log.error("Could not add association to database ");
+                }
+                i++;
+            }
+            try {
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e1) {
+                Log.error("Could not reset autocommit");
+                errorcode = -1;
+            }
+            return errorcode;
         }
     }
 
