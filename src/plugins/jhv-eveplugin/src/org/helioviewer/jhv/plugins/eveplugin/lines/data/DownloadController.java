@@ -276,9 +276,8 @@ public class DownloadController {
 
                 for (int i = 0; i < length; i++) {
                     JSONArray entry = data.getJSONArray(i);
-                    long millis = ((long) entry.getDouble(0)) * 1000;
+                    dates[i] = entry.getLong(0) * 1000;
                     values[i] = (float) (entry.getDouble(1) * multiplier);
-                    dates[i] = millis;
                 }
 
                 addDataToCache(band, values, dates);
