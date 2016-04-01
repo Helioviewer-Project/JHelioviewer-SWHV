@@ -68,4 +68,7 @@ public class Regex {
     public static final Pattern FloatingPoint = Pattern.compile("[\\x00-\\x20]*[+-]?(NaN|Infinity|((((\\p{Digit}+)(\\.)?((\\p{Digit}+)?)([eE][+-]?(\\p{Digit}+))?)|(\\.((\\p{Digit}+))([eE][+-]?(\\p{Digit}+))?)|(((0[xX](\\p{XDigit}+)(\\.)?)|(0[xX](\\p{XDigit}+)?(\\.)(\\p{XDigit}+)))[pP][+-]?(\\p{Digit}+)))[fFdD]?))[\\x00-\\x20]*");
     public static final Pattern Integer = Pattern.compile("\\d+");
 
+    // Pattern to extract the filename from HTTP Content-Disposition header
+    public static final Pattern ContentDispositionFilename = Pattern.compile("filename=\\\"(.*?)\\\"");
+
 }
