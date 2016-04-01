@@ -260,7 +260,7 @@ public class RenderableContainer implements TableModel, Reorderable {
                 if (r instanceof RenderableImageLayer && r.isVisible()) {
                     RenderableImageLayer im = (RenderableImageLayer) r;
                     r.setVisible(ctImages);
-                    im.getGLImage().setOpacity(1);
+                    im.setOpacity(1);
                     ctImages++;
                 }
             }
@@ -276,7 +276,7 @@ public class RenderableContainer implements TableModel, Reorderable {
                         opacity = (float) (1. / (1. + ctImages));
                         ctImages++;
                     }
-                    im.getGLImage().setOpacity(opacity);
+                    im.setOpacity(opacity);
                 }
             }
         }

@@ -387,6 +387,10 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
         showCorona = !showCorona;
     }
 
+    public void setOpacity(float opacity) {
+        glImage.setOpacity(opacity);
+    }
+
     @Override
     public Component getOptionsPanel() {
         if (view == null)
@@ -455,10 +459,6 @@ public class RenderableImageLayer extends AbstractRenderable implements ImageDat
 
     public ImageData getImageData() {
         return imageData;
-    }
-
-    public GLImage getGLImage() {
-        return glImage;
     }
 
     @Override
