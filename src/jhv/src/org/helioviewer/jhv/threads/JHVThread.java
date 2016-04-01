@@ -111,6 +111,12 @@ public class JHVThread {
                     connection = null;
                 }
             }
+            if (connection != null)
+                try {
+                    connection.setAutoCommit(false);
+                } catch (SQLException e) {
+                    Log.error("Could not set autocommit off");
+                }
             return connection;
         }
     }
