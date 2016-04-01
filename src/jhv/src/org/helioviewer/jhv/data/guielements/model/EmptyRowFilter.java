@@ -11,7 +11,7 @@ import javax.swing.RowFilter;
 public class EmptyRowFilter extends RowFilter<ParameterTableModel, Integer> {
 
     @Override
-    public boolean include(javax.swing.RowFilter.Entry<? extends ParameterTableModel, ? extends Integer> entry) {
+    public boolean include(RowFilter.Entry<? extends ParameterTableModel, ? extends Integer> entry) {
         ParameterTableModel model = entry.getModel();
         String value = (String) model.getValueAt(entry.getIdentifier(), 1);
         return value != null && !value.equals("");
