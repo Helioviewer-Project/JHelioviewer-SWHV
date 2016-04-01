@@ -322,6 +322,7 @@ public class JHVDatabase {
                             if (generatedKeys.next()) {
                                 generatedKey = generatedKeys.getInt(1);
                             }
+                            generatedKeys.close();
                             pstatement.close();
                         }
                     } else {
