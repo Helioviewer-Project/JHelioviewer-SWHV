@@ -116,7 +116,6 @@ public class RenderableContainerPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 Displayer.multiview = multiview.isSelected();
                 ImageViewerGui.getRenderableContainer().arrangeMultiView(Displayer.multiview);
-                ImageViewerGui.getFiltersPanel().refresh();
             }
         });
 
@@ -262,9 +261,9 @@ public class RenderableContainerPanel extends JPanel {
         optionsPanelWrapper.removeAll();
         if (cmp != null) {
             optionsPanelWrapper.add(cmp, BorderLayout.CENTER);
+            cmp.repaint();
         }
-        super.revalidate();
-        // super.repaint();
+        revalidate();
     }
 
 }
