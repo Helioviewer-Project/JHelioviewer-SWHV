@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -20,7 +19,7 @@ import org.helioviewer.jhv.base.logging.Log;
 /**
  * General connection class which gives to a given URL a proper InputStream with
  * the response back, trying to use compressed transmission if the server
- * support it and hopefully as many protocols as needed.
+ * supports it and hopefully as many protocols as needed.
  *
  * To use it: - Create a new DownloadStream object - Add post data with
  * .setOutput() - Connect with the current parameters .connect(), automatically
@@ -32,11 +31,6 @@ import org.helioviewer.jhv.base.logging.Log;
  * @author Helge Dietert
  */
 public class DownloadStream {
-    /**
-     * Used pattern to extract from content-disposition the filename, group 1
-     * must be the filename
-     */
-    final private Pattern findFilename = Pattern.compile("filename=\\\"(.*?)\\\"");
     /**
      * Input stream to read the data from
      */
@@ -181,7 +175,7 @@ public class DownloadStream {
         outputName = url.getFile().replace("/", "-");
         String disposition = connection.getHeaderField("Content-Disposition");
         if (disposition != null) {
-            Matcher m = findFilename.matcher(disposition);
+            Matcher m = Regex.ContentDispositionFilename.matcher(disposition);
             if (m.find()) {
                 outputName = m.group(1);
             }
@@ -251,4 +245,5 @@ public class DownloadStream {
     public void setConnectTimeout(int timeout) {
         this.connectTimeout = timeout;
     }
+
 }
