@@ -161,7 +161,6 @@ public class JHVDatabase {
 
     private static void insertEventTypeIfNotExist(Connection connection, JHVEventType eventType) {
         try {
-
             PreparedStatement pstatement = getPreparedStatement(connection, INSERT_EVENT_TYPE);
             pstatement.setString(1, eventType.getEventType().getEventName());
             pstatement.setString(2, eventType.getSupplier().getSupplierName());
@@ -178,6 +177,7 @@ public class JHVDatabase {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
             statement.executeUpdate(createtbl);
+            connection.commit();
         } catch (SQLException e) {
             Log.error("Failed to insert event type " + e.getMessage());
         }
@@ -247,12 +247,6 @@ public class JHVDatabase {
             int len = assocs.length;
             int i = 0;
             int errorcode = 0;
-            try {
-                connection.setAutoCommit(false);
-            } catch (SQLException e1) {
-                errorcode = -1;
-                Log.error("Could not disable autocommit");
-            }
             while (i < len && errorcode == 0) {
                 Pair<String, String> assoc = assocs[i];
                 Integer[] ids = new Integer[] { getIdFromUID(connection, assoc.a), getIdFromUID(connection, assoc.b) };
@@ -275,7 +269,6 @@ public class JHVDatabase {
             }
             try {
                 connection.commit();
-                connection.setAutoCommit(true);
             } catch (SQLException e1) {
                 Log.error("Could not reset autocommit");
                 errorcode = -1;
@@ -335,7 +328,6 @@ public class JHVDatabase {
             int errorcode = 0;
             try
             {
-                connection.setAutoCommit(false);
                 int typeId = getEventTypeId(connection, type);
                 for (Event2Db event2db : event2db_list) {
                     if (typeId != -1) {
@@ -399,13 +391,6 @@ public class JHVDatabase {
             } catch (SQLException e) {
                 Log.error("Could not insert event " + e.getMessage());
                 errorcode = -1;
-            } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException ea) {
-                    Log.error("Could not reset autocommit " + ea.getMessage());
-                    errorcode = -1;
-                }
             }
             return errorcode;
         }
@@ -439,7 +424,6 @@ public class JHVDatabase {
             typedCache.adaptRequestCache(start, end);
             int typeId = getEventTypeId(connection, type);
             try {
-                connection.setAutoCommit(false);
                 PreparedStatement dstatement = getPreparedStatement(connection, DELETE_DATERANGE);
                 dstatement.setInt(1, typeId);
                 dstatement.executeUpdate();
@@ -455,12 +439,6 @@ public class JHVDatabase {
                 connection.commit();
             } catch (SQLException e) {
                 Log.error("Could not serialize date_range to database " + e.getMessage());
-            } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    Log.error("Could not reset autocommit " + e.getMessage());
-                }
             }
         }
 
