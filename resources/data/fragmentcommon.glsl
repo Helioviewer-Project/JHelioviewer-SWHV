@@ -33,9 +33,10 @@ uniform vec3 cutOffDirection;
 uniform float cutOffValue;
 uniform vec2 polarRadii;
 
-vec4 getColor(vec2 texcoord, vec2 difftexcoord) {
+vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
+    color.r = clamp(factor * color.r, 0., 1.);
     if(isdifference != NODIFFERENCE){
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;
