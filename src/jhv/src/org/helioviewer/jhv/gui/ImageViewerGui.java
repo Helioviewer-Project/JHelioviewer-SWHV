@@ -37,7 +37,6 @@ import org.helioviewer.jhv.gui.components.statusplugins.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugins.ZoomStatusPanel;
 import org.helioviewer.jhv.gui.controller.InputController;
-import org.helioviewer.jhv.gui.filters.FiltersPanel;
 import org.helioviewer.jhv.io.CommandLineProcessor;
 import org.helioviewer.jhv.io.LoadURIDownloadTask;
 import org.helioviewer.jhv.io.LoadURITask;
@@ -59,7 +58,6 @@ public class ImageViewerGui {
     private static JScrollPane leftScrollPane;
 
     private static SideContentPane leftPane;
-    private static FiltersPanel filtersPanel;
 
     private static InputController inputController;
     private static MainComponent mainComponent;
@@ -147,9 +145,6 @@ public class ImageViewerGui {
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
 
         contentPanel.add(statusPanel, BorderLayout.PAGE_END);
-
-        // extra widgets
-        filtersPanel = new FiltersPanel();
 
         mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
@@ -282,10 +277,6 @@ public class ImageViewerGui {
 
     public static InputController getInputController() {
         return inputController;
-    }
-
-    public static FiltersPanel getFiltersPanel() {
-        return filtersPanel;
     }
 
     public static ZoomStatusPanel getZoomStatusPanel() {
