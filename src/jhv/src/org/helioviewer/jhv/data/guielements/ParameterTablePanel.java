@@ -14,7 +14,6 @@ import java.awt.event.MouseMotionListener;
 import java.util.Collection;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -80,18 +79,11 @@ public class ParameterTablePanel extends JPanel {
         table.addMouseMotionListener(renderer);
         table.addMouseListener(renderer);
 
-        nullValue = new JCheckBox();
+        nullValue = new JCheckBox("Show Empty Parameters");
         JPanel nullValuePanel = new JPanel();
-        JLabel nullValueLabel = new JLabel("Show Empty Parameters");
         nullValuePanel.add(nullValue);
-        nullValuePanel.add(nullValueLabel);
-        RowFilter<ParameterTableModel, Integer> rf = null;
-        // If current expression doesn't parse, don't update.
-        try {
-            rf = new EmptyRowFilter();
-        } catch (java.util.regex.PatternSyntaxException ex) {
-            return;
-        }
+
+        final RowFilter<ParameterTableModel, Integer> rf = new EmptyRowFilter();
         sorter.setRowFilter(rf);
 
         nullValue.addActionListener(new ActionListener() {
@@ -100,13 +92,6 @@ public class ParameterTablePanel extends JPanel {
                 if (nullValue.isSelected()) {
                     sorter.setRowFilter(null);
                 } else {
-                    RowFilter<ParameterTableModel, Integer> rf = null;
-                    // If current expression doesn't parse, don't update.
-                    try {
-                        rf = new EmptyRowFilter();
-                    } catch (java.util.regex.PatternSyntaxException ex) {
-                        return;
-                    }
                     sorter.setRowFilter(rf);
                 }
             }
