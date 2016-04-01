@@ -33,6 +33,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  *
@@ -256,46 +257,35 @@ public class DownloadController {
             try {
                 DownloadStream ds = new DownloadStream(url, JHVGlobals.getStdConnectTimeout(), JHVGlobals.getStdReadTimeout());
                 BufferedReader in = new BufferedReader(new InputStreamReader(ds.getInput(), "UTF-8"));
-                final StringBuilder sb = new StringBuilder();
-                String str;
+                JSONObject json = new JSONObject(new JSONTokener(in));
 
-                while ((str = in.readLine()) != null) {
-                    sb.append(str);
-                }
-                in.close();
-                try {
-                    final JSONObject json = new JSONObject(sb.toString());
-
-                    double multiplier = 1.0;
-                    if (json.has("multiplier")) {
-                        multiplier = json.getDouble("multiplier");
-                    }
-                    final JSONArray data = json.getJSONArray("data");
-
-                    int length = data.length();
-                    if (length == 0) {
-                        return;
-                    }
-
-                    // Log.warn(data.toString());
-                    final float[] values = new float[length];
-                    final long[] dates = new long[length];
-
-                    for (int i = 0; i < length; i++) {
-                        final JSONArray entry = data.getJSONArray(i);
-                        final long millis = ((long) entry.getDouble(0)) * 1000;
-                        values[i] = (float) (entry.getDouble(1) * multiplier);
-                        dates[i] = millis;
-                    }
-
-                    addDataToCache(band, values, dates);
-
-                } catch (JSONException e) {
-                    Log.error("Error Parsing the EVE Response.", e);
+                double multiplier = 1.0;
+                if (json.has("multiplier")) {
+                    multiplier = json.getDouble("multiplier");
                 }
 
-            } catch (final IOException e1) {
-                Log.error("Error Parsing the EVE Response.", e1);
+                JSONArray data = json.getJSONArray("data");
+                int length = data.length();
+                if (length == 0) {
+                    return;
+                }
+
+                // Log.warn(data.toString());
+                float[] values = new float[length];
+                long[] dates = new long[length];
+
+                for (int i = 0; i < length; i++) {
+                    JSONArray entry = data.getJSONArray(i);
+                    long millis = ((long) entry.getDouble(0)) * 1000;
+                    values[i] = (float) (entry.getDouble(1) * multiplier);
+                    dates[i] = millis;
+                }
+
+                addDataToCache(band, values, dates);
+            } catch (JSONException e) {
+                Log.error("Error Parsing the EVE Response ", e);
+            } catch (IOException e) {
+                Log.error("Error Parsing the EVE Response ", e);
             }
         }
 

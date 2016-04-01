@@ -20,6 +20,7 @@ import org.helioviewer.jhv.data.datatype.event.SWEKParam;
 import org.helioviewer.jhv.database.JHVDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public abstract class SWEKDownloader {
     protected boolean overmax = true;
@@ -52,30 +53,25 @@ public abstract class SWEKDownloader {
     }
 
     public boolean parseStream(InputStream stream, JHVEventType type) {
-        try {
-            StringBuilder sb = new StringBuilder();
-            if (stream != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-                String reply = sb.toString().trim().replaceAll("[\n\r\t]", "");
-                JSONObject eventJSON = new JSONObject(reply);
-                if (eventJSON.has("overmax"))
-                    overmax = eventJSON.getBoolean("overmax");
-                else
-                    overmax = false;
-                boolean success = parseEvents(eventJSON, type);
-                if (!success)
-                    return false;
+        if (stream == null) {
+            Log.error("Download input stream was null. Probably HEK is down.");
+            return false;
+        }
 
-                success = parseAssociations(eventJSON);
-                return success;
-            } else {
-                Log.error("Download input stream was null. Probably the hek is down.");
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+            JSONObject eventJSON = new JSONObject(new JSONTokener(br));
+
+            if (eventJSON.has("overmax"))
+                overmax = eventJSON.getBoolean("overmax");
+            else
+                overmax = false;
+            boolean success = parseEvents(eventJSON, type);
+            if (!success)
                 return false;
-            }
+
+            success = parseAssociations(eventJSON);
+            return success;
         } catch (IOException e) {
             overmax = false;
             Log.error("Could not read the inputstream. " + e);
