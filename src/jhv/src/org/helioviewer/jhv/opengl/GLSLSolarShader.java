@@ -35,6 +35,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int cutOffDirectionRef;
     private int cutOffValueRef;
     private int polarRadiiRef;
+    private int enhancedParamRef;
 
     private int rectRef;
     private int differenceRectRef;
@@ -60,6 +61,7 @@ public class GLSLSolarShader extends GLSLShader {
     private final float[] cutOffDirectionFloat = new float[3];
     private final float[] cutOffValueFloat = new float[3];
     private final float[] polarRadii = new float[2];
+    private final int[] enhanced = new int[1];
 
     private final float[] rectVertex = new float[4];
     private final float[] differencerect = new float[4];
@@ -98,6 +100,7 @@ public class GLSLSolarShader extends GLSLShader {
         outerCutOffRadiusRef = gl.glGetUniformLocation(progID, "outerCutOffRadius");
         cutOffDirectionRef = gl.glGetUniformLocation(progID, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(progID, "cutOffValue");
+        enhancedParamRef = gl.glGetUniformLocation(progID, "enhanced");
 
         rectRef = gl.glGetUniformLocation(progID, "rect");
         differenceRectRef = gl.glGetUniformLocation(progID, "differencerect");
@@ -258,6 +261,18 @@ public class GLSLSolarShader extends GLSLShader {
         polarRadii[0] = (float) start;
         polarRadii[1] = (float) stop;
         gl.glUniform2fv(polarRadiiRef, 1, polarRadii, 0);
+    }
+
+    public void setEnhanced(GL2 gl, boolean _enhanced) {
+        if (_enhanced) {
+            enhanced[0] = 1;
+            gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
+        }
+        else {
+            enhanced[0] = 0;
+            gl.glUniform1iv(enhancedParamRef, 1, enhanced, 0);
+        }
+
     }
 
 }

@@ -38,6 +38,7 @@ public class GLImage {
     private boolean baseDifferenceNoRot = false;
     private boolean runningDifferenceNoRot = false;
     private float truncation = 1f - 0.8f;
+    private boolean enhanced = false;
 
     public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
@@ -73,7 +74,7 @@ public class GLImage {
         shader.setFactors(sharpen, 1f / w, 1f / h, 1f);
 
         applyLUT(gl);
-
+        shader.setEnhanced(gl, enhanced);
         tex.bind(gl, GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE0);
     }
 
@@ -245,6 +246,10 @@ public class GLImage {
 
     public void setTruncation(float truncation) {
         this.truncation = truncation;
+    }
+
+    public void setEnhanced(boolean enhanced) {
+        this.enhanced = enhanced;
     }
 
     public float getTruncation() {
