@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.logging.Log;
 import org.helioviewer.jhv.data.datatype.event.JHVEventType;
 import org.helioviewer.jhv.data.datatype.event.SWEKEventType;
@@ -71,12 +72,15 @@ public class ComesepDownloader extends SWEKDownloader {
     @Override
     protected boolean parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("associations");
-        for (int i = 0; i < associations.length(); i++) {
+        int len = associations.length();
+        Pair<String, String>[] assocs = new Pair[len];
+        for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            Integer[] ret = JHVDatabase.dump_association2db(asobj.getString("parent"), asobj.getString("child"));
-            if (ret[0] == -1 && ret[1] == -1) {
-                return false;
-            }
+            assocs[i] = (new Pair<String, String>(asobj.getString("parent"), asobj.getString("child")));
+        }
+        int ret = JHVDatabase.dump_association2db(assocs);
+        if (ret == -1) {
+            return false;
         }
         return true;
     }
