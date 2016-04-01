@@ -10,6 +10,7 @@
 uniform sampler2D image;
 uniform float truncationValue;
 uniform int isdifference;
+uniform int enhanced;
 uniform sampler2D differenceImage;
 uniform vec3 pixelSizeWeighting;
 //rect=(llx, lly, 1/w, 1/h)
@@ -36,7 +37,11 @@ uniform vec2 polarRadii;
 vec4 getColor(vec2 texcoord, vec2 difftexcoord, float factor) {
     float tmpConvolutionSum = 0.;
     vec4 color = texture2D(image, texcoord);
-    color.r = clamp(factor * color.r, 0., 1.);
+    float appliedfactor = 1.;
+    if(enhanced==1) {
+        appliedfactor = factor;
+    }
+    color.r = clamp(appliedfactor * color.r, 0., 1.);
     if(isdifference != NODIFFERENCE){
         color.r = color.r - texture2D(differenceImage, difftexcoord).r;
         color.r = clamp(color.r,-truncationValue,truncationValue)/truncationValue;

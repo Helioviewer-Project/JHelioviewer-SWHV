@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
@@ -21,6 +22,7 @@ import org.helioviewer.jhv.opengl.GLImage;
 public class LUTPanel extends AbstractFilterPanel implements ActionListener, FilterDetails {
 
     private static final Icon invertIcon = IconBank.getIcon(JHVIcon.INVERT);
+    private static final Icon enhanceIcon = IconBank.getIcon(JHVIcon.LAYER_IMAGE);
 
     private final Map<String, LUT> lutMap;
 
@@ -28,7 +30,10 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
      * Shown combobox to choose
      */
     private final JComboBox combobox;
+    private final JPanel buttonPanel;
     private final JToggleButton invertButton;
+    private final JToggleButton enhanceButton;
+
     private final JLabel title;
 
     public LUTPanel() {
@@ -45,6 +50,14 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
         invertButton.setToolTipText("Invert color table");
         invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         invertButton.addActionListener(this);
+
+        enhanceButton = new JToggleButton(enhanceIcon);
+        enhanceButton.setToolTipText("Enhance corona (multiply with squared radius).");
+        enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        enhanceButton.addActionListener(this);
+        buttonPanel = new JPanel();
+        buttonPanel.add(invertButton);
+        buttonPanel.add(enhanceButton);
     }
 
     /**
@@ -59,7 +72,15 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
                 invertButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
             }
         }
-
+        if (e.getSource() == enhanceButton) {
+            boolean isSelected = enhanceButton.isSelected();
+            image.setEnhanced(isSelected);
+            if (isSelected) {
+                enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            } else {
+                enhanceButton.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            }
+        }
         LUT newMap = lutMap.get(combobox.getSelectedItem());
         image.setLUT(newMap, invertButton.isSelected());
         Displayer.display();
@@ -120,7 +141,7 @@ public class LUTPanel extends AbstractFilterPanel implements ActionListener, Fil
 
     @Override
     public Component getValue() {
-        return invertButton;
+        return buttonPanel;
     }
 
 }
